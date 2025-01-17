@@ -16,14 +16,51 @@
     <link rel="stylesheet" href="assets/css/slick.min.css">
     <link rel="stylesheet" href="assets/css/odometer.css">
     <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+      @media (min-width: 768px) { /* Adjust the breakpoint as needed */
+        .desktop-margin {
+          margin-top: 40px;
+        }
+      }
+    </style>
+
+    <style>
+      /* Button styles */
+      .cs_circle_btn {
+        background-color: #ffba05; /* Green color */
+        border: none;
+        border-radius: 3%;
+        padding: 15px;
+        cursor: pointer;
+        animation: vibrate 0.5s infinite;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+  
+      /* Vibrate animation */
+      @keyframes vibrate {
+        0% { transform: translateX(-1px); }
+        25% { transform: translateX(2px); }
+        50% { transform: translateX(-2px); }
+        75% { transform: translateX(2px); }
+        100% { transform: translateX(-1px); }
+      }
+  
+      /* Icon styles */
+      .cs_circle_btn i {
+        font-size: 1.5rem;
+      }
+    </style>
   </head>
   <body>
     <!-- Start Preloader -->
     <div class="cs_center cs_heading_bg" id="preloader">
 			<div class="preloader-inner">
 				<div class="spinner">
-          <img src="assets/img/preloader_logo.svg" alt="img">
-          <img src="assets/img/icons/wheel.svg" alt="img" class="wheel">
+          <!-- <img src="assets/img/preloader_logo.svg" alt="img">
+          <img src="assets/img/icons/wheel.svg" alt="img" class="wheel"> -->
         </div>
 				<div class="loading-text">
 					<img src="assets/img/logo.svg" alt="img">
@@ -40,12 +77,9 @@
               <ul class="cs_header_contact_list cs_mp_0">
                 <li>
                   <i class="fa-solid fa-phone-volume"></i>
-                  <a href="tel:+111(564)56825">+91 9266961110</a>
+                  <a href="tel:+91 9266961110">+91 9266961110</a>
                 </li>
-                <li>
-                  <i class="fa-solid fa-envelope"></i>
-                  <a href="mailto:cripar@gmail.com">info.instantmechanic@gmail.com</a>
-                </li>
+
                 <li>
                   <i class="fa-solid fa-location-dot"></i>
                   <span>Southeren Peripheral Road, Sector 75, Gurgoan, Harayana</span>
@@ -79,47 +113,46 @@
             <div class="cs_main_header_left">
               <div class="cs_logo_wrap">
                 <a class="cs_site_branding" href="index.html">
-                  <img src="assets/img/logo.svg" alt="Logo" >
+                  <!-- <img src="assets/img/logo.svg" alt="Logo" > -->
+                  <img src="assets/img/logo.svg" alt="Logo" class="desktop-margin">
+
                 </a>
-                <div class="cs_logo_bg_shape cs_accent_color">
-                  <svg width="509" height="141" viewBox="0 0 509 141" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M74 0H487L508.5 70.5L473.5 141H74V0Z" fill="currentColor"/>
-                    <path d="M54 141H472.5L488.5 70.5L443.5 0H54V141Z" fill="white"/>
-                    <path d="M0 0H443L464.5 70.5L443 141H0V0Z" fill="currentColor"/>
-                  </svg>
-                  <img src="assets/img/logo_shape_pattern.svg" alt="">
-                </div>
+
               </div>
             </div>
             <div class="cs_main_header_center">
               <div class="cs_nav cs_fs_18 cs_semibold cs_heading_color cs_heading_font">
                 <div class="cs_nav_list_wrap">
                   <ul class="cs_nav_list">
-                    <li class="menu-item-has-children">
+                    <li>
                       <a href="index.html">Home</a>
-                      <ul>
+                      <!-- <ul>
                         <li><a href="index.html">Home V1</a></li>
                         <li><a href="home-v2.html">Home V2</a></li>
-                      </ul>
+                      </ul> -->
                     </li>
                     <li class="menu-item-has-children">
-                      <a href="services.html">Services</a>
+                      <a href="index.html">Services</a>
                       <ul>
-                        <li><a href="services.html">Services</a></li>
-                        <li><a href="service-details.html">Service Details</a></li>
+                        <li><a href="index.html">Battery Jump Start</a></li>
+                        <li><a href="index.html">Towing Crane</a></li>
+                        <li><a href="index.html">Fuel Delivery</a></li>
+                        <li><a href="index.html">Flat Tyre</a></li>
+                        <li><a href="index.html">Key Lockout</a></li>
+                        <li><a href="index.html">Minor Repair</a></li>
                       </ul>
                     </li>
-                    <li class="menu-item-has-children">
+                    <!-- <li class="menu-item-has-children">
                       <a href="portfolio.html">Portfolio</a>
                       <ul>
                         <li><a href="portfolio.html">Portfolio</a></li>
-                        <li><a href="portfolio-details.html">Portfolio Details</a></li>
+                        <li><a href="index.html">Portfolio Details</a></li>
                       </ul>
                     </li>
                     <li class="menu-item-has-children">
                       <a href="#">Pages</a>
                       <ul>
-                        <li><a href="about.html">About</a></li>
+                        <li><a href="index.html">About</a></li>
                         <li><a href="team.html">Team</a></li>
                         <li><a href="team-details.html">Team Details</a></li>
                       </ul>
@@ -128,29 +161,35 @@
                       <a href="blog.html">News</a>
                       <ul>
                         <li><a href="blog.html">Blogs</a></li>
-                        <li><a href="blog-details.html">Blog Details</a></li>
+                        <li><a href="index.html">Blog Details</a></li>
                       </ul>
-                    </li>
-                    <li><a href="contact.html">Contact</a></li>
+                    </li> -->
+                    <li><a href="membership.html">Membership Plans</a></li>
+                    <li><a href="index.html">Contact</a></li>
+
                   </ul>
                 </div>
               </div>
             </div>
             <div class="cs_main_header_right">
               <div class="position-relative d-flex">
-                <button class="cs_circle_btn cs_center cs_search_tobble_btn" type="button">
+                <!-- <button class="cs_circle_btn cs_center cs_search_tobble_btn" type="button">
                   <i class="fa-solid fa-magnifying-glass"></i>                                   
+                </button> -->
+
+                <button class="cs_circle_btn" type="button" onclick="makeCall()">
+                  <i class="fa-solid fa-phone"></i>. Call Now
                 </button>
-                <div class="cs_header_search_wrap">
+                <!-- <div class="cs_header_search_wrap">
                   <form action="#" class="cs_header_search">
                     <input type="text" class="cs_header_search_input" placeholder="Search For Anything">
                     <button class="cs_header_search_btn cs_center">
                       <i class="fa-solid fa-magnifying-glass"></i>
                     </button>
                   </form>
-                </div>
+                </div> -->
               </div>
-              <a href="contact.html" class="cs_btn cs_style_1">
+              <a href="index.html" class="cs_btn cs_style_1">
                 <span>Get a Quote</span>
                 <i class="fa-solid fa-arrow-right"></i>
               </a>
@@ -166,7 +205,7 @@
       <div class="cs_slider_container" data-autoplay="0" data-loop="1" data-speed="900" data-center="0" data-variable-width="0" data-slides-per-view="1">
         <div class="cs_slider_wrapper">
           <div class="cs_slide">
-            <div class="cs_hero cs_style_1 cs_type_1 cs_bg_filed cs_primary_bg cs_center" data-src="assets/img/title1.1.jpg">
+            <div class="cs_hero cs_style_1 cs_type_1 cs_bg_filed cs_primary_bg cs_center" >
               <div class="container">
                 <div class="cs_hero_text">
                   <h1 class="cs_hero_title cs_fs_70 cs_mb_18 wow fadeInUp">GET YOUR "NEAR BY MECHANIC" IN 10 MINUTES</h1>
@@ -174,7 +213,7 @@
                     We provide you the best nearby mechanic with all possible assistance in repairing problems, like jump Start, Dead battery, Battery replacement, 24/7 Car Towing service, Fuel Delivery, Key Lockout, Major Repairs.
                     </p></p>
                   <div class="cs_hero_btns">
-                    <a href="about.html" class="cs_btn cs_style_1 wow fadeInLeft">
+                    <a href="tel:+91 9266961110" class="cs_btn cs_style_1 wow fadeInLeft">
                       <span>CALL NOW</span>
                       <i class="fa-solid fa-arrow-right"></i>     
                     </a>
@@ -182,7 +221,7 @@
                       <span class="cs_hero_number_icon cs_center cs_heading_bg cs_white_color cs_fs_18">
                         <i class="fa-solid fa-phone-volume"></i>
                       </span>
-                      <a href="tel:(208)555-0112" class="cs_fs_24 cs_semibold cs_heading_color">+91 9266961110</a>
+                      <a href="tel:+91 9266961110" class="cs_fs_24 cs_semibold cs_heading_color">+91 9266961110</a>
                     </span>
                   </div>
                 </div>
@@ -190,7 +229,7 @@
             </div>
           </div>
           <div class="cs_slide">
-            <div class="cs_hero cs_style_1 cs_type_1 cs_bg_filed cs_primary_bg cs_center" data-src="assets/img/title2.4.jpg">
+            <div class="cs_hero cs_style_1 cs_type_1 cs_bg_filed cs_primary_bg cs_center" data-src="">
               <div class="container">
                 <div class="cs_hero_text">
                   <h1 class="cs_hero_title cs_fs_70 cs_mb_18">Fast, Reliable Towing 24/7 
@@ -198,7 +237,7 @@
                   <p class="cs_hero_subtitle cs_mb_34">Experiencing car trouble can be a major inconvenience, especially in a busy area. That's why Instant Mechanic offers fast and efficient towing services designed to get you back on the road quickly. Our team of skilled professionals prioritizes safety and ensures your vehicle is transported with care.
                     
                   <div class="cs_hero_btns">
-                    <a href="about.html" class="cs_btn cs_style_1">
+                    <a href="tel:+91 9266961110" class="cs_btn cs_style_1">
                       <span>CALL NOW</span>
                       <i class="fa-solid fa-arrow-right"></i>     
                     </a>
@@ -206,7 +245,7 @@
                       <span class="cs_hero_number_icon cs_center cs_heading_bg cs_white_color cs_fs_18">
                         <i class="fa-solid fa-phone-volume"></i>
                       </span>
-                      <a href="tel:(208)555-0112" class="cs_fs_24 cs_semibold cs_heading_color">+91 9266961110</a>
+                      <a href="tel:+91 9266961110" class="cs_fs_24 cs_semibold cs_heading_color">+91 9266961110</a>
                     </span>
                   </div>
                 </div>
@@ -214,7 +253,7 @@
             </div>
           </div>
           <div class="cs_slide">
-            <div class="cs_hero cs_style_1 cs_type_1 cs_bg_filed cs_primary_bg cs_center" data-src="assets/img/title3.2.jpg">
+            <div class="cs_hero cs_style_1 cs_type_1 cs_bg_filed cs_primary_bg cs_center" data-src="">
               <div class="container">
                 <div class="cs_hero_text">
                   <h1 class="cs_hero_title cs_fs_70 cs_mb_18">Get your car complete service check up at our garage </h1>
@@ -225,7 +264,7 @@
                     4 Steering and Suspension Problems
                     5 Battery and Wiring Problems </p>
                   <div class="cs_hero_btns">
-                    <a href="about.html" class="cs_btn cs_style_1">
+                    <a href="tel:+91 9266961110" class="cs_btn cs_style_1">
                       <span>CALL NOW</span>
                       <i class="fa-solid fa-arrow-right"></i>     
                     </a>
@@ -233,7 +272,7 @@
                       <span class="cs_hero_number_icon cs_center cs_heading_bg cs_white_color cs_fs_18">
                         <i class="fa-solid fa-phone-volume"></i>
                       </span>
-                      <a href="tel:(208)555-0112" class="cs_fs_24 cs_semibold cs_heading_color">+91 9266961110</a>
+                      <a href="tel:+91 9266961110" class="cs_fs_24 cs_semibold cs_heading_color">+91 9266961110</a>
                     </span>
                   </div>
                 </div>
@@ -268,7 +307,7 @@
                   <span class="cs_fs_50 cs_accent_color">10 Minutes</span>
                 </h2> -->
               </div>
-              <a href="tel:(208)555-0112" class="cs_phone_call cs_heading_color">
+              <a href="tel:+91 9266961110" class="cs_phone_call cs_heading_color">
                 <div class="cs_phone_icon cs_fs_24 cs_accent_color cs_center cs_radius_50">
                   <i class="fa-solid fa-phone-volume"></i></div>
                 <div class="cs_phone_number cs_fs_24 cs_semibold">+91 926696110</div>
@@ -323,7 +362,7 @@
                 </li>
               </ul>
               <div class="cs_about_btns">
-                <a href="about.html" class="cs_btn cs_style_1 wow fadeInLeft">
+                <a href="tel:+91 9266961110" class="cs_btn cs_style_1 wow fadeInLeft">
                   <span>CALL NOW</span>
                   <i class="fa-solid fa-arrow-right"></i>     
                 </a>
@@ -375,9 +414,9 @@
                   <img src="assets/img/im4.png" alt="Service Icon">
                 </div>
                 <h3 class="cs_card_title cs_fs_30 cs_mb_8">
-                  <a href="service-details.html">Battery Jumpstart & Replacement</a></h3>
+                  <a href="index.html">Battery Jumpstart & Replacement</a></h3>
                 <p class="cs_card_subtitle cs_mb_18">We cover all types of "Battery" isuues in your car,Just a call away from you</p>
-                <a href="service-details.html" class="cs_text_btn cs_style_1 cs_bold cs_heading_color">
+                <a href="index.html" class="cs_text_btn cs_style_1 cs_bold cs_heading_color">
                   <span class="cs_btn_text text-uppercase">Read More</span>
                   <span class="cs_btn_icon cs_center">
                     <i class="fa-solid fa-arrow-right"></i>
@@ -397,9 +436,9 @@
                   <img src="assets/img/im5.png" alt="Service Icon">
                 </div>
                 <h3 class="cs_card_title cs_fs_30 cs_mb_8">
-                  <a href="service-details.html">Flat Tyre and Stepni Change</a></h3>
+                  <a href="index.html">Flat Tyre and Stepni Change</a></h3>
                 <p class="cs_card_subtitle cs_mb_18">We make sure that your "car tyre" is in proper condition again, Juat a call away from you</p>
-                <a href="service-details.html" class="cs_text_btn cs_style_1 cs_bold cs_heading_color">
+                <a href="index.html" class="cs_text_btn cs_style_1 cs_bold cs_heading_color">
                   <span class="cs_btn_text text-uppercase">Read More</span>
                   <span class="cs_btn_icon cs_center">
                     <i class="fa-solid fa-arrow-right"></i>
@@ -419,9 +458,9 @@
                   <img src="assets/img/im6.png" alt="Service Icon">
                 </div>
                 <h3 class="cs_card_title cs_fs_30 cs_mb_8">
-                  <a href="service-details.html">Fuel Delivery and Key lock out</a></h3>
+                  <a href="index.html">Fuel Delivery and Key lock out</a></h3>
                 <p class="cs_card_subtitle cs_mb_18">We make sure that your car is back on road with sufficient fuel and Keylock out issue will be solved as soon as possible</p>
-                <a href="service-details.html" class="cs_text_btn cs_style_1 cs_bold cs_heading_color">
+                <a href="index.html" class="cs_text_btn cs_style_1 cs_bold cs_heading_color">
                   <span class="cs_btn_text text-uppercase">Read More</span>
                   <span class="cs_btn_icon cs_center">
                     <i class="fa-solid fa-arrow-right"></i>
@@ -441,9 +480,9 @@
                   <img src="assets/img/im7.png" alt="Service Icon">
                 </div>
                 <h3 class="cs_card_title cs_fs_30 cs_mb_8">
-                  <a href="service-details.html">From Major Repairs to 24/7 Car Towing Service</a></h3>
+                  <a href="index.html">From Major Repairs to 24/7 Car Towing Service</a></h3>
                 <p class="cs_card_subtitle cs_mb_18">From Minor issue to Major issue we make sure your safety First and provide the RSA in 10 minutes</p>
-                <a href="service-details.html" class="cs_text_btn cs_style_1 cs_bold cs_heading_color">
+                <a href="index.html" class="cs_text_btn cs_style_1 cs_bold cs_heading_color">
                   <span class="cs_btn_text text-uppercase">Read More</span>
                   <span class="cs_btn_icon cs_center">
                     <i class="fa-solid fa-arrow-right"></i>
@@ -523,7 +562,7 @@
                 </p>
               </div>
             </div>
-            <a href="about.html" class="cs_btn cs_style_1">
+            <a href="index.html" class="cs_btn cs_style_1">
               <span>Read more</span><i class="fa-solid fa-arrow-right"></i>     
             </a>
           </div>
@@ -557,11 +596,11 @@
         </div>
         <div class="cs_before_after-in">
           <div class="cs_before_after">
-            <div class="cs_after cs_single_slide cs_bg_filed" data-src="assets/img/after_img_1.jpg">
+            <div class="cs_after cs_single_slide cs_bg_filed" data-src="assets/img/compare_after.png">
               <div class="cs_after_badge cs_accent_bg cs_fs_20 cs_semibold cs_white_color position-absolute">
                 After</div>
             </div>
-            <div class="cs_before cs_single_slide cs_bg_filed" data-src="assets/img/before_img_1.jpg">
+            <div class="cs_before cs_single_slide cs_bg_filed" data-src="assets/img/compare_before.png">
               <div class="cs_before_badge cs_accent_bg cs_fs_20 cs_semibold cs_white_color position-absolute">
                 Before</div>
             </div>
@@ -599,13 +638,13 @@
               <div class="row cs_row_gap_60 cs_gap_y_30">
                 <div class="col-xl-3 col-md-6 wow fadeInLeft">
                   <div class="cs_card cs_style_2 position-relative">
-                    <a href="portfolio-details.html" class="cs_card_thumbnail position-relative">
+                    <a href="index.html" class="cs_card_thumbnail position-relative">
                       <img src="assets/img/rsa10min.jpg" alt="Portfolio Image">
                     </a>
                     <div class="cs_card_info cs_white_bg">
-                      <h3 class="cs_card_title cs_fs_24 cs_semibold cs_mb_15"><a href="portfolio-details.html">WE PROVIDE RSA SERVICE 10 MINUTES</a></h3>
+                      <h3 class="cs_card_title cs_fs_24 cs_semibold cs_mb_15"><a href="index.html">WE PROVIDE RSA SERVICE 10 MINUTES</a></h3>
                       <p class="cs_card_subtitle">Get car repair service with in your location(near me)</p>
-                      <a href="portfolio-details.html" class="cs_text_btn cs_style_1 cs_bold cs_heading_color">
+                      <a href="index.html" class="cs_text_btn cs_style_1 cs_bold cs_heading_color">
                         <span class="cs_btn_text text-uppercase">Read More</span>
                         <span class="cs_btn_icon cs_center">
                           <i class="fa-solid fa-arrow-right"></i>
@@ -617,13 +656,13 @@
                 </div>
                 <div class="col-xl-3 col-md-6 wow fadeInDown">
                   <div class="cs_card cs_style_2 position-relative">
-                    <a href="portfolio-details.html" class="cs_card_thumbnail position-relative">
+                    <a href="index.html" class="cs_card_thumbnail position-relative">
                       <img src="assets/img/tow10min.jpg" alt="Portfolio Image">
                     </a>
                     <div class="cs_card_info cs_white_bg">
-                      <h3 class="cs_card_title cs_fs_24 cs_semibold cs_mb_15"><a href="portfolio-details.html">Fast, Reliable Towing 24/7</a></h3>
+                      <h3 class="cs_card_title cs_fs_24 cs_semibold cs_mb_15"><a href="index.html">Fast, Reliable Towing 24/7</a></h3>
                       <p class="cs_card_subtitle">We provide towing service with in your near by location</p>
-                      <a href="portfolio-details.html" class="cs_text_btn cs_style_1 cs_bold cs_heading_color">
+                      <a href="index.html" class="cs_text_btn cs_style_1 cs_bold cs_heading_color">
                         <span class="cs_btn_text text-uppercase">Read More</span>
                         <span class="cs_btn_icon cs_center">
                           <i class="fa-solid fa-arrow-right"></i>
@@ -635,13 +674,13 @@
                 </div>
                 <div class="col-xl-3 col-md-6 wow fadeInUp">
                   <div class="cs_card cs_style_2 position-relative">
-                    <a href="portfolio-details.html" class="cs_card_thumbnail position-relative">
+                    <a href="index.html" class="cs_card_thumbnail position-relative">
                       <img src="assets/img/garage.jpg" alt="Portfolio Image">
                     </a>
                     <div class="cs_card_info cs_white_bg">
-                      <h3 class="cs_card_title cs_fs_24 cs_semibold cs_mb_15"><a href="portfolio-details.html">Garage Works</a></h3>
+                      <h3 class="cs_card_title cs_fs_24 cs_semibold cs_mb_15"><a href="index.html">Garage Works</a></h3>
                       <p class="cs_card_subtitle">We solve your all minor to major problems with certified mechanics in our garage.</p>
-                      <a href="portfolio-details.html" class="cs_text_btn cs_style_1 cs_bold cs_heading_color">
+                      <a href="index.html" class="cs_text_btn cs_style_1 cs_bold cs_heading_color">
                         <span class="cs_btn_text text-uppercase">Read More</span>
                         <span class="cs_btn_icon cs_center">
                           <i class="fa-solid fa-arrow-right"></i>
@@ -653,13 +692,13 @@
                 </div>
                 <div class="col-xl-3 col-md-6 wow fadeInRight">
                   <div class="cs_card cs_style_2 position-relative">
-                    <a href="portfolio-details.html" class="cs_card_thumbnail position-relative">
+                    <a href="index.html" class="cs_card_thumbnail position-relative">
                       <img src="assets/img/coustomer.jpg" alt="Portfolio Image">
                     </a>
                     <div class="cs_card_info cs_white_bg">
-                      <h3 class="cs_card_title cs_fs_24 cs_semibold cs_mb_15"><a href="portfolio-details.html">Peace of Mind on Every Mile</a></h3>
+                      <h3 class="cs_card_title cs_fs_24 cs_semibold cs_mb_15"><a href="index.html">Peace of Mind on Every Mile</a></h3>
                       <p class="cs_card_subtitle">We make sure tahat you are safe back on road with excellent condition of your vechile</p>
-                      <a href="portfolio-details.html" class="cs_text_btn cs_style_1 cs_bold cs_heading_color">
+                      <a href="index.html" class="cs_text_btn cs_style_1 cs_bold cs_heading_color">
                         <span class="cs_btn_text text-uppercase">Read More</span>
                         <span class="cs_btn_icon cs_center">
                           <i class="fa-solid fa-arrow-right"></i>
@@ -675,13 +714,13 @@
               <div class="row cs_row_gap_60 cs_gap_y_30">
                 <div class="col-xl-3 col-md-6">
                   <div class="cs_card cs_style_2 position-relative">
-                    <a href="portfolio-details.html" class="cs_card_thumbnail position-relative">
+                    <a href="index.html" class="cs_card_thumbnail position-relative">
                       <img src="assets/img/rsaservice1.jpg" alt="Portfolio Image">
                     </a>
                     <div class="cs_card_info cs_white_bg">
-                      <h3 class="cs_card_title cs_fs_24 cs_semibold cs_mb_15"><a href="portfolio-details.html">RSA services provided</a></h3>
+                      <h3 class="cs_card_title cs_fs_24 cs_semibold cs_mb_15"><a href="index.html">RSA services provided</a></h3>
                       <p class="cs_card_subtitle">We provide you the best RSA service in 10 minutes in your location</p>
-                      <a href="portfolio-details.html" class="cs_text_btn cs_style_1 cs_bold cs_heading_color">
+                      <a href="index.html" class="cs_text_btn cs_style_1 cs_bold cs_heading_color">
                         <span class="cs_btn_text text-uppercase">Read More</span>
                         <span class="cs_btn_icon cs_center">
                           <i class="fa-solid fa-arrow-right"></i>
@@ -693,13 +732,13 @@
                 </div>
                 <div class="col-xl-3 col-md-6">
                   <div class="cs_card cs_style_2 position-relative">
-                    <a href="portfolio-details.html" class="cs_card_thumbnail position-relative">
+                    <a href="index.html" class="cs_card_thumbnail position-relative">
                       <img src="assets/img/rsaservice2.jpg" alt="Portfolio Image">
                     </a>
                     <div class="cs_card_info cs_white_bg">
-                      <h3 class="cs_card_title cs_fs_24 cs_semibold cs_mb_15"><a href="portfolio-details.html">Jump start, Dead battery, Battery Replacement</a></h3>
+                      <h3 class="cs_card_title cs_fs_24 cs_semibold cs_mb_15"><a href="index.html">Jump start, Dead battery, Battery Replacement</a></h3>
                       <p class="cs_card_subtitle">We make sure that your Vehicle is back on the road safely. Our skilled mechanics will do the RSA in time and make sure that your vehicle is in good condition to ride…</p>
-                      <a href="portfolio-details.html" class="cs_text_btn cs_style_1 cs_bold cs_heading_color">
+                      <a href="index.html" class="cs_text_btn cs_style_1 cs_bold cs_heading_color">
                         <span class="cs_btn_text text-uppercase">Read More</span>
                         <span class="cs_btn_icon cs_center">
                           <i class="fa-solid fa-arrow-right"></i>
@@ -711,13 +750,13 @@
                 </div>
                 <div class="col-xl-3 col-md-6">
                   <div class="cs_card cs_style_2 position-relative">
-                    <a href="portfolio-details.html" class="cs_card_thumbnail position-relative">
+                    <a href="index.html" class="cs_card_thumbnail position-relative">
                       <img src="assets/img/rsaservice3.jpg" alt="Portfolio Image">
                     </a>
                     <div class="cs_card_info cs_white_bg">
-                      <h3 class="cs_card_title cs_fs_24 cs_semibold cs_mb_15"><a href="portfolio-details.html">Flat tyre, Stepne change</a></h3>
+                      <h3 class="cs_card_title cs_fs_24 cs_semibold cs_mb_15"><a href="index.html">Flat tyre, Stepne change</a></h3>
                       <p class="cs_card_subtitle">We make sure that your Vehicle is back on the road safely. Our skilled mechanics will do the RSA in time and make sure that your vehicle is in good condition to ride…</p>
-                      <a href="portfolio-details.html" class="cs_text_btn cs_style_1 cs_bold cs_heading_color">
+                      <a href="index.html" class="cs_text_btn cs_style_1 cs_bold cs_heading_color">
                         <span class="cs_btn_text text-uppercase">Read More</span>
                         <span class="cs_btn_icon cs_center">
                           <i class="fa-solid fa-arrow-right"></i>
@@ -729,13 +768,13 @@
                 </div>
                 <div class="col-xl-3 col-md-6">
                   <div class="cs_card cs_style_2 position-relative">
-                    <a href="portfolio-details.html" class="cs_card_thumbnail position-relative">
+                    <a href="index.html" class="cs_card_thumbnail position-relative">
                       <img src="assets/img/rsaservice4.jpg" alt="Portfolio Image">
                     </a>
                     <div class="cs_card_info cs_white_bg">
-                      <h3 class="cs_card_title cs_fs_24 cs_semibold cs_mb_15"><a href="portfolio-details.html">Fuel Delivery, Key Lockout, Minor Auto Repairs.</a></h3>
+                      <h3 class="cs_card_title cs_fs_24 cs_semibold cs_mb_15"><a href="index.html">Fuel Delivery, Key Lockout, Minor Auto Repairs.</a></h3>
                       <p class="cs_card_subtitle">We make sure that your Vehicle is back on the road safely. Our skilled mechanics will do the RSA in time and make sure that your vehicle is in good condition to ride..</p>
-                      <a href="portfolio-details.html" class="cs_text_btn cs_style_1 cs_bold cs_heading_color">
+                      <a href="index.html" class="cs_text_btn cs_style_1 cs_bold cs_heading_color">
                         <span class="cs_btn_text text-uppercase">Read More</span>
                         <span class="cs_btn_icon cs_center">
                           <i class="fa-solid fa-arrow-right"></i>
@@ -751,14 +790,14 @@
               <div class="row cs_row_gap_60 cs_gap_y_30">
                 <div class="col-xl-3 col-md-6">
                   <div class="cs_card cs_style_2 position-relative">
-                    <a href="portfolio-details.html" class="cs_card_thumbnail position-relative">
+                    <a href="index.html" class="cs_card_thumbnail position-relative">
                       <img src="assets/img/tow1.jpg" alt="Portfolio Image">
                     </a>
                     <div class="cs_card_info cs_white_bg">
-                      <h3 class="cs_card_title cs_fs_24 cs_semibold cs_mb_15"><a href="portfolio-details.html">Flatbed Towing</a></h3>
+                      <h3 class="cs_card_title cs_fs_24 cs_semibold cs_mb_15"><a href="index.html">Flatbed Towing</a></h3>
                       <p class="cs_card_subtitle">The vehicle is driven onto a flatbed platform and secured for transport.  
                         Best for low-clearance vehicles, sports cars, or vehicles with significant damage.</p>
-                      <a href="portfolio-details.html" class="cs_text_btn cs_style_1 cs_bold cs_heading_color">
+                      <a href="index.html" class="cs_text_btn cs_style_1 cs_bold cs_heading_color">
                         <span class="cs_btn_text text-uppercase">Read More</span>
                         <span class="cs_btn_icon cs_center">
                           <i class="fa-solid fa-arrow-right"></i>
@@ -770,15 +809,15 @@
                 </div>
                 <div class="col-xl-3 col-md-6">
                   <div class="cs_card cs_style_2 position-relative">
-                    <a href="portfolio-details.html" class="cs_card_thumbnail position-relative">
+                    <a href="index.html" class="cs_card_thumbnail position-relative">
                       <img src="assets/img/tow2.jpg" alt="Portfolio Image">
                     </a>
                     <div class="cs_card_info cs_white_bg">
-                      <h3 class="cs_card_title cs_fs_24 cs_semibold cs_mb_15"><a href="portfolio-details.html">Under Lift Towing</a></h3>
+                      <h3 class="cs_card_title cs_fs_24 cs_semibold cs_mb_15"><a href="index.html">Under Lift Towing</a></h3>
                       <p class="cs_card_subtitle">The front wheels of the vehicle are lifted off the ground using a yoke.
                         The rear wheels remain on the ground, allowing the vehicle to be towed.
                         More affordable than flatbed towing, but not suitable for all vehicles.</p>
-                      <a href="portfolio-details.html" class="cs_text_btn cs_style_1 cs_bold cs_heading_color">
+                      <a href="index.html" class="cs_text_btn cs_style_1 cs_bold cs_heading_color">
                         <span class="cs_btn_text text-uppercase">Read More</span>
                         <span class="cs_btn_icon cs_center">
                           <i class="fa-solid fa-arrow-right"></i>
@@ -790,14 +829,14 @@
                 </div>
                 <div class="col-xl-3 col-md-6">
                   <div class="cs_card cs_style_2 position-relative">
-                    <a href="portfolio-details.html" class="cs_card_thumbnail position-relative">
+                    <a href="index.html" class="cs_card_thumbnail position-relative">
                       <img src="assets/img/tow3.1.jpg" alt="Portfolio Image">
                     </a>
                     <div class="cs_card_info cs_white_bg">
-                      <h3 class="cs_card_title cs_fs_24 cs_semibold cs_mb_15"><a href="portfolio-details.html">Recovery Towing</a></h3>
+                      <h3 class="cs_card_title cs_fs_24 cs_semibold cs_mb_15"><a href="index.html">Recovery Towing</a></h3>
                       <p class="cs_card_subtitle">Used for vehicles that are stuck, overturned, or submerged.
                         Often requires specialized equipment and expertise.</p>
-                      <a href="portfolio-details.html" class="cs_text_btn cs_style_1 cs_bold cs_heading_color">
+                      <a href="index.html" class="cs_text_btn cs_style_1 cs_bold cs_heading_color">
                         <span class="cs_btn_text text-uppercase">Read More</span>
                         <span class="cs_btn_icon cs_center">
                           <i class="fa-solid fa-arrow-right"></i>
@@ -809,13 +848,13 @@
                 </div>
                 <div class="col-xl-3 col-md-6">
                   <div class="cs_card cs_style_2 position-relative">
-                    <a href="portfolio-details.html" class="cs_card_thumbnail position-relative">
+                    <a href="index.html" class="cs_card_thumbnail position-relative">
                       <img src="assets/img/tow5.jpg" alt="Portfolio Image">
                     </a>
                     <div class="cs_card_info cs_white_bg">
-                      <h3 class="cs_card_title cs_fs_24 cs_semibold cs_mb_15"><a href="portfolio-details.html">Motorcycle Towing</a></h3>
+                      <h3 class="cs_card_title cs_fs_24 cs_semibold cs_mb_15"><a href="index.html">Motorcycle Towing</a></h3>
                       <p class="cs_card_subtitle">Specialized equipment is used to safely transport motorcycles.</p>
-                      <a href="portfolio-details.html" class="cs_text_btn cs_style_1 cs_bold cs_heading_color">
+                      <a href="index.html" class="cs_text_btn cs_style_1 cs_bold cs_heading_color">
                         <span class="cs_btn_text text-uppercase">Read More</span>
                         <span class="cs_btn_icon cs_center">
                           <i class="fa-solid fa-arrow-right"></i>
@@ -831,13 +870,13 @@
               <div class="row cs_row_gap_60 cs_gap_y_30">
                 <div class="col-xl-3 col-md-6">
                   <div class="cs_card cs_style_2 position-relative">
-                    <a href="portfolio-details.html" class="cs_card_thumbnail position-relative">
+                    <a href="index.html" class="cs_card_thumbnail position-relative">
                       <img src="assets/img/garage1.jpg" alt="Portfolio Image">
                     </a>
                     <div class="cs_card_info cs_white_bg">
-                      <h3 class="cs_card_title cs_fs_24 cs_semibold cs_mb_15"><a href="portfolio-details.html">Engine Problems</a></h3>
+                      <h3 class="cs_card_title cs_fs_24 cs_semibold cs_mb_15"><a href="index.html">Engine Problems</a></h3>
                       <p class="cs_card_subtitle">Engine overheating-Engine misfiring-Engine knocking</p>
-                      <a href="portfolio-details.html" class="cs_text_btn cs_style_1 cs_bold cs_heading_color">
+                      <a href="index.html" class="cs_text_btn cs_style_1 cs_bold cs_heading_color">
                         <span class="cs_btn_text text-uppercase">Read More</span>
                         <span class="cs_btn_icon cs_center">
                           <i class="fa-solid fa-arrow-right"></i>
@@ -849,13 +888,13 @@
                 </div>
                 <div class="col-xl-3 col-md-6">
                   <div class="cs_card cs_style_2 position-relative">
-                    <a href="portfolio-details.html" class="cs_card_thumbnail position-relative">
+                    <a href="index.html" class="cs_card_thumbnail position-relative">
                       <img src="assets/img/garage3.jpg" alt="Portfolio Image">
                     </a>
                     <div class="cs_card_info cs_white_bg">
-                      <h3 class="cs_card_title cs_fs_24 cs_semibold cs_mb_15"><a href="portfolio-details.html">Gear problems</a></h3>
+                      <h3 class="cs_card_title cs_fs_24 cs_semibold cs_mb_15"><a href="index.html">Gear problems</a></h3>
                       <p class="cs_card_subtitle">Gear Slipping,Gear Shifting problems.</p>
-                      <a href="portfolio-details.html" class="cs_text_btn cs_style_1 cs_bold cs_heading_color">
+                      <a href="index.html" class="cs_text_btn cs_style_1 cs_bold cs_heading_color">
                         <span class="cs_btn_text text-uppercase">Read More</span>
                         <span class="cs_btn_icon cs_center">
                           <i class="fa-solid fa-arrow-right"></i>
@@ -867,13 +906,13 @@
                 </div>
                 <div class="col-xl-3 col-md-6">
                   <div class="cs_card cs_style_2 position-relative">
-                    <a href="portfolio-details.html" class="cs_card_thumbnail position-relative">
+                    <a href="index.html" class="cs_card_thumbnail position-relative">
                       <img src="assets/img/garage4.jpg" alt="Portfolio Image">
                     </a>
                     <div class="cs_card_info cs_white_bg">
-                      <h3 class="cs_card_title cs_fs_24 cs_semibold cs_mb_15"><a href="portfolio-details.html">Braking and Clutch Problems</a></h3>
+                      <h3 class="cs_card_title cs_fs_24 cs_semibold cs_mb_15"><a href="index.html">Braking and Clutch Problems</a></h3>
                       <p class="cs_card_subtitle">Brakes and Clutch Squealing,Brakes and Clutch Pulsation,Brakes and Clutch fade.</p>
-                      <a href="portfolio-details.html" class="cs_text_btn cs_style_1 cs_bold cs_heading_color">
+                      <a href="index.html" class="cs_text_btn cs_style_1 cs_bold cs_heading_color">
                         <span class="cs_btn_text text-uppercase">Read More</span>
                         <span class="cs_btn_icon cs_center">
                           <i class="fa-solid fa-arrow-right"></i>
@@ -885,13 +924,13 @@
                 </div>
                 <div class="col-xl-3 col-md-6">
                   <div class="cs_card cs_style_2 position-relative">
-                    <a href="portfolio-details.html" class="cs_card_thumbnail position-relative">
+                    <a href="index.html" class="cs_card_thumbnail position-relative">
                       <img src="assets/img/garage5.jpg" alt="Portfolio Image">
                     </a>
                     <div class="cs_card_info cs_white_bg">
-                      <h3 class="cs_card_title cs_fs_24 cs_semibold cs_mb_15"><a href="portfolio-details.html">Steering and Suspension Problems</a></h3>
+                      <h3 class="cs_card_title cs_fs_24 cs_semibold cs_mb_15"><a href="index.html">Steering and Suspension Problems</a></h3>
                       <p class="cs_card_subtitle">Steering wheel shake,Uneven tire wear,Suspension noise.</p>
-                      <a href="portfolio-details.html" class="cs_text_btn cs_style_1 cs_bold cs_heading_color">
+                      <a href="index.html" class="cs_text_btn cs_style_1 cs_bold cs_heading_color">
                         <span class="cs_btn_text text-uppercase">Read More</span>
                         <span class="cs_btn_icon cs_center">
                           <i class="fa-solid fa-arrow-right"></i>
@@ -940,8 +979,7 @@
                     <img src="assets/img/icons/phone-call.svg" alt="Phone Icon">
                   </div>
                   <div class="cs_iconbox_info">
-                   <a href="tel:(402)4521545844">+91 9266961110</a><br>
-                   <a href="tel:(123)2154546455">+91 9266961110</a>
+                   <a href="tel:+91 9266961110">+91 9266961110</a><br>
                   </div>
                 </div>
               </div>
@@ -997,7 +1035,8 @@
      </section>
     <!-- End Contact Section -->
     <!-- Start Testimonial Section -->
-    <section class="cs_slider cs_style_1 cs_slider_gap_30 cs_bg_filed position-relative" data-src="assets/img/testimonial_bg_1.jpg">
+    <section class="cs_slider cs_style_1 cs_slider_gap_30 cs_bg_filed position-relative"  style="background: #0F52BA;"
+    >
       <div class="cs_height_120 cs_height_lg_80"></div>
       <div class="container">
         <div class="cs_section_heading cs_style_1 cs_mb_47 text-center">
@@ -1102,12 +1141,12 @@
             <h2 class="cs_section_title cs_fs_50 mb-0 wow fadeInRight">Choose The Right Plan Which You Need!</h2>
           </div>
         </div>
-        <ul class="cs_tab_links cs_style_1 cs_type_1 cs_fs_18 cs_semibold cs_heading_color cs_heading_font cs_mp_0 wow fadeInUp">
+        <!-- <ul class="cs_tab_links cs_style_1 cs_type_1 cs_fs_18 cs_semibold cs_heading_color cs_heading_font cs_mp_0 wow fadeInUp">
           <li class="active"><a href="#monthly">Monthly</a></li>
           <li><a href="#yearly">Yearly</a></li>
-        </ul>
-        <div class="cs_tab_body">
-          <div class="cs_tab active" id="monthly">
+        </ul> -->
+        <div class="">
+          <!-- <div class="cs_tab active" id="monthly">
             <div class="row cs_row_gap_30 cs_gap_y_30 justify-content-center">
               <div class="col-lg-4">
                 <div class="cs_pricing_table cs_style_1">
@@ -1176,7 +1215,7 @@
                           <i class="fa-solid fa-check"></i></span>Water proofing
                       </li>
                     </ul>
-                    <a href="contact.html"
+                    <a href="index.html"
                       class="cs_pricing_btn cs_fs_14 cs_bold cs_heading_color text-uppercase cs_radius_10">Choose Plan</a>
                   </div>
                 </div>
@@ -1250,7 +1289,7 @@
                           <i class="fa-solid fa-check"></i></span>Water proofing
                       </li>
                     </ul>
-                    <a href="contact.html"
+                    <a href="index.html"
                       class="cs_pricing_btn cs_fs_14 cs_bold cs_heading_color text-uppercase cs_radius_10">Choose Plan</a>
                   </div>
                 </div>
@@ -1324,14 +1363,14 @@
                           <i class="fa-solid fa-check"></i></span>Water proofing
                       </li>
                     </ul>
-                    <a href="contact.html"
+                    <a href="index.html"
                       class="cs_pricing_btn cs_fs_14 cs_bold cs_heading_color text-uppercase cs_radius_10">Choose Plan</a>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-          <div class="cs_tab" id="yearly">
+          </div> -->
+          <div class="" id="monthly">
             <div class="row cs_row_gap_30 cs_gap_y_30 justify-content-center">
               <div class="col-lg-4">
                 <div class="cs_pricing_table cs_style_1">
@@ -1400,7 +1439,7 @@
                           <i class="fa-solid fa-check"></i></span>1 Time full car checkup
                       </li>
                     </ul>
-                    <a href="contact.html"
+                    <a href="index.html"
                       class="cs_pricing_btn cs_fs_14 cs_bold cs_heading_color text-uppercase cs_radius_10">Choose Plan</a>
                   </div>
                 </div>
@@ -1474,7 +1513,7 @@
                           <i class="fa-solid fa-check"></i></span>2 Time full car checkup
                       </li>
                     </ul>
-                    <a href="contact.html"
+                    <a href="index.html"
                       class="cs_pricing_btn cs_fs_14 cs_bold cs_heading_color text-uppercase cs_radius_10">Choose Plan</a>
                   </div>
                 </div>
@@ -1548,7 +1587,7 @@
                           <i class="fa-solid fa-check"></i></span>4 Time full car checkup
                       </li>
                     </ul>
-                    <a href="contact.html"
+                    <a href="index.html"
                       class="cs_pricing_btn cs_fs_14 cs_bold cs_heading_color text-uppercase cs_radius_10">Choose Plan</a>
                   </div>
                 </div>
@@ -1661,7 +1700,7 @@
             <h2 class="cs_section_title cs_fs_50 mb-0 wow fadeInRight">FAQ'S</h2>
           </div>
           <div class="cs_section_heading_right wow fadeInLeft">
-            <a href="blog.html" class="cs_btn cs_style_1">
+            <a href="index.html" class="cs_btn cs_style_1">
               <span>VIEW ALL FAQ'S</span><i class="fa-solid fa-arrow-right"></i>     
             </a>
           </div>
@@ -1669,8 +1708,8 @@
         <div class="row cs_row_gap_30 cs_gap_y_30">
           <div class="col-lg-4">
             <div class="cs_post cs_style_1">
-              <a href="blog-details.html" class="cs_post_thumbnail">
-                <img src="assets/img/post_img_1.jpg" alt="Post Image">
+              <a href="index.html" class="cs_post_thumbnail">
+                <img src="assets/img/faq-flat-tyre.jpg" alt="Post Image">
               </a>
               <div class="cs_post_content_wrapper position-relative">
                 <div class="cs_post_content cs_white_bg">
@@ -1684,9 +1723,9 @@
                       <span class="cs_heading_color">Coustomer</span>
                     </div>
                   </div>
-                  <h3 class="cs_fs_20 cs_semibold cs_mb_5"><a href="blog-details.html">What should I do if I have a flat tire?</a></h3>
+                  <h3 class="cs_fs_20 cs_semibold cs_mb_5"><a href="index.html">What should I do if I have a flat tire?</a></h3>
                   <p class="cs_mb_19">If you experience a flat tire, prioritize your safety by pulling over to a safe location away from traffic and activating your hazard lights. Assess the damage to your tire. Our team will then assess the situation and determine the best course of action, which may include on-site tire repair, towing to a service center, or providing alternative transportation options.</p>
-                  <a href="blog-details.html" class="cs_text_btn cs_style_1 cs_bold cs_heading_color">
+                  <a href="index.html" class="cs_text_btn cs_style_1 cs_bold cs_heading_color">
                     <span class="cs_btn_text text-uppercase">Read More</span>
                     <span class="cs_btn_icon cs_center">
                       <i class="fa-solid fa-arrow-right"></i>
@@ -1700,8 +1739,8 @@
           </div>
           <div class="col-lg-4 wow fadeInUp">
             <div class="cs_post cs_style_1">
-              <a href="blog-details.html" class="cs_post_thumbnail">
-                <img src="assets/img/post_img_2.jpg" alt="Post Image">
+              <a href="index.html" class="cs_post_thumbnail">
+                <img src="assets/img/faq-towing.jpg" alt="Post Image">
               </a>
               <div class="cs_post_content_wrapper position-relative">
                 <div class="cs_post_content cs_white_bg">
@@ -1715,10 +1754,10 @@
                       <span class="cs_heading_color">Coustomer</span>
                     </div>
                   </div>
-                  <h3 class="cs_fs_20 cs_semibold cs_mb_5"><a href="blog-details.html">How does towing work?</a></h3>
+                  <h3 class="cs_fs_20 cs_semibold cs_mb_5"><a href="index.html">How does towing work?</a></h3>
                   <p class="cs_mb_19">When you need a tow, our company first gathers information about your vehicle and the situation. Then, they send a tow truck to your location. The tow truck driver will assess the situation and choose the safest way to tow your vehicle, such as using a flatbed or lifting the front wheels. Once loaded, the tow truck will transport your vehicle to the desired location. Finally, you pay for the service.
                   </p>
-                  <a href="blog-details.html" class="cs_text_btn cs_style_1 cs_bold cs_heading_color">
+                  <a href="index.html" class="cs_text_btn cs_style_1 cs_bold cs_heading_color">
                     <span class="cs_btn_text text-uppercase">Read More</span>
                     <span class="cs_btn_icon cs_center">
                       <i class="fa-solid fa-arrow-right"></i>
@@ -1732,8 +1771,8 @@
           </div>
           <div class="col-lg-4">
             <div class="cs_post cs_style_1">
-              <a href="blog-details.html" class="cs_post_thumbnail">
-                <img src="assets/img/post_img_3.jpg" alt="Post Image">
+              <a href="index.html" class="cs_post_thumbnail">
+                <img src="assets/img/faq-jumpstart.jpg" alt="Post Image">
               </a>
               <div class="cs_post_content_wrapper position-relative">
                 <div class="cs_post_content cs_white_bg">
@@ -1747,10 +1786,10 @@
                       <span class="cs_heading_color">Coustomer</span>
                     </div>
                   </div>
-                  <h3 class="cs_fs_20 cs_semibold cs_mb_5"><a href="blog-details.html">What happens when I request a jump start service?</a></h3>
+                  <h3 class="cs_fs_20 cs_semibold cs_mb_5"><a href="index.html">What happens when I request a jump start service?</a></h3>
                   <p class="cs_mb_19">When you request a jump start service, a qualified technician will be dispatched to your location. They will safely connect jumper cables to your vehicle's battery and a booster battery. Once connected, they will attempt to start your engine. After a successful start, the technician will briefly test your vehicle's charging system to ensure proper battery function. They will then provide guidance on the next steps, such as driving to a repair shop for further diagnostics or replacing your vehicle's battery.
                   </p>
-                  <a href="blog-details.html" class="cs_text_btn cs_style_1 cs_bold cs_heading_color">
+                  <a href="index.html" class="cs_text_btn cs_style_1 cs_bold cs_heading_color">
                     <span class="cs_btn_text text-uppercase">Read More</span>
                     <span class="cs_btn_icon cs_center">
                       <i class="fa-solid fa-arrow-right"></i>
@@ -1775,7 +1814,7 @@
       <div class="container">
         <div class="cs_footer_newsletter cs_style_1">
           <div class="cs_footer_newsletter_left cs_accent_bg cs_center">
-            <img src="assets/img/footer_logo.svg" alt="Logo" class="wow fadeInLeft">
+            <img src="assets/img/logo.svg" alt="Logo" class="wow fadeInLeft">
           </div>
           <div class="cs_footer_newsletter_right">
             <h3 class="cs_fs_24 cs_semibold cs_white_color mb-0">Subscribe now to get latest updates</h3>
@@ -1800,7 +1839,7 @@
                   <span class="cs_white_bg"></span>
                 </div>
                 <div class="cs_text_widget">
-                  <p>Phosfluorescently transform out-of-the-box paradigms whereas accurate supply chains. Continually</p>
+                  <p>Instant Mechanic is a fast-growing roadside assistance service designed to provide immediate help for car owners when they need it the most.</p>
                 </div>
                 <div class="cs_social_btns cs_style_1">
                   <a href="#" class="cs_social_btn cs_center">
@@ -1828,19 +1867,19 @@
                 </div>
                 <ul class="cs_footer_menu">
                   <li>
-                    <a href="service-details.html">Adult In Car Lessons</a>
+                    <a href="index.html">Battery Jumpstart</a>
                   </li>
                   <li>
-                    <a href="service-details.html">Defensive Driving</a>
+                    <a href="index.html">24 Hour Car Towing</a>
                   </li>
                   <li>
-                    <a href="service-details.html">Defensive Driving</a>
+                    <a href="index.html">Flat Tyre</a>
                   </li>
                   <li>
-                    <a href="service-details.html">Initial driving lesson</a>
+                    <a href="index.html">Key Lockout</a>
                   </li>
                   <li>
-                    <a href="service-details.html">Woman Education</a>
+                    <a href="index.html">Fuel Delivery</a>
                   </li>
                 </ul>
               </div>
@@ -1856,16 +1895,16 @@
                 <ul class="cs_footer_contact_list cs_mp_0">
                   <li>
                     <i class="fa-solid fa-location-dot cs_center"></i>
-                    Musaffah - M-6 - Abu Dhabi United Arab Emirates
+                    Sector 75, Gurgoan
                   </li>
                   <li>
                     <i class="fa-solid fa-phone cs_center"></i>
-                    <a href="tel:+(163)-5565-06979">+(163)-5565-06979</a> <br>
-                    <a href="tel:+(163)-5565-07989">+(163)-5565-07989</a>
+                    <a href="tel:+91 9266961110">+91 9266961110</a> <br>
+                    <!-- <a href="tel:+(163)-5565-07989">+(163)-5565-07989</a> -->
                   </li>
                   <li>
                     <i class="fa-solid fa-envelope cs_center"></i>
-                    <a href="mailto:cripar@gmail.com">cripar@gmail.com</a>
+                    <a href="mailto:cripar@gmail.com">info.instantmechanic@gmail.com</a>
                   </li>
                 </ul>
               </div>
@@ -1878,23 +1917,40 @@
                   <span class="cs_white_bg"></span>
                   <span class="cs_white_bg"></span>
                 </div>
-                <ul class="cs_working_hours">
+                <!-- <ul class="cs_working_hours">
                   <li>
                     <span>Thu - Fri</span>
-                    <span>9:00 AM - 7:00 PM</span>
+                    <span>24 Hours</span>
                   </li>
                   <li>
                     <span>Mon - Wed</span>
-                    <span>8:00 AM - 10:00 PM</span>
+                    <span>24 Hours</span>
                   </li>
                   <li>
                     <span>Saturday</span>
-                    <span>7:00 AM - 9:00 PM</span>
+                    <span>24 Hours</span>
                   </li>
                   <li>
                     <span>Sunday</span>
-                    <span>Close</span>
+                    <span>24 Hours</span>
                   </li>
+                </ul> -->
+                <ul class="cs_working_hours">
+                  <li>
+                    <a href="terms-and-conditions.html">Terms & Conditions</a>
+                  </li>
+                  <li>
+                    <a href="privacy-policy.html">Privacy Policy</a>
+                  </li>
+                  <li>
+                    <a href="cancellation-policy.html">Cancellation Policy</a>
+                  </li>
+                  <li>
+                    <a href="refund-policy.html">Refund Policy</a>
+                  </li>
+                  <!-- <li>
+                    <a href="service-details.html">Woman Education</a>
+                  </li> -->
                 </ul>
               </div>
             </div>
@@ -1905,7 +1961,7 @@
         <div class="container">
           <div class="cs_footer_bottom_in">
             <div class="cs_footer_copyright">
-              Copyright © 2024 <a href="#">Cripar</a>. All Rights Reserved.
+              Copyright © 2024 <a href="#">Instant Mechanic</a>. All Rights Reserved.
             </div>
             <div>
               <img src="assets/img/payment_card.svg" alt="">
@@ -1927,5 +1983,14 @@
     <script src="assets/js/ripples.min.js"></script>
     <script src="assets/js/odometer.js"></script>
     <script src="assets/js/main.js"></script>
+    <script>
+      function makeCall() {
+        window.location.href = 'tel:+919266961110';
+      }
+    </script>
+    
+    <!-- Font Awesome CDN -->
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    
   </body>
 </html>
