@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+  <head>
+    <!-- Meta Tags -->
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="ThemeServices">
+    <!-- Favicon Icon -->
+    <link rel="icon" href="assets/img/favicon.png">
+    <!-- Site Title -->
+    <title>Instant Mechanic - Get Mechanic in 10 Minutes</title>
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="assets/css/fontawesome.min.css">
+    <link rel="stylesheet" href="assets/css/animate.css">
+    <link rel="stylesheet" href="assets/css/slick.min.css">
+    <link rel="stylesheet" href="assets/css/odometer.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+      @media (min-width: 768px) { /* Adjust the breakpoint as needed */
+        .desktop-margin {
+          margin-top: 40px;
+        }
+      }
+    </style>
+
+    <style>
+      /* Button styles */
+      .cs_circle_btn {
+        background-color: #ffba05; /* Green color */
+        border: none;
+        border-radius: 3%;
+        padding: 15px;
+        cursor: pointer;
+        animation: vibrate 0.5s infinite;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+  
+      /* Vibrate animation */
+      @keyframes vibrate {
+        0% { transform: translateX(-1px); }
+        25% { transform: translateX(2px); }
+        50% { transform: translateX(-2px); }
+        75% { transform: translateX(2px); }
+        100% { transform: translateX(-1px); }
+      }
+  
+      /* Icon styles */
+      .cs_circle_btn i {
+        font-size: 1.5rem;
+      }
+    </style>
+  </head>
+  <!-- <body>
+     -->
+     <body style="text-align: center; font-family: Arial, sans-serif;">
+    <!-- Start Preloader -->
+    <div class="cs_center cs_heading_bg" id="preloader">
+			<div class="preloader-inner">
+				<div class="spinner">
+          <!-- <img src="assets/img/preloader_logo.svg" alt="img">
+          <img src="assets/img/icons/wheel.svg" alt="img" class="wheel"> -->
+        </div>
+				<div class="loading-text">
+					<img src="assets/img/logo.svg" alt="img">
+				</div>
+			</div>
+		</div>
+    <!-- End Preloader -->
+    <!-- Start Header Section -->
+    <header class="cs_site_header cs_style_1 cs_heading_color cs_sticky_header">
+      <div class="cs_top_header">
+        <div class="container-fluid">
+          <div class="cs_top_header_in">
+            <div class="cs_top_header_left">
+              <ul class="cs_header_contact_list cs_mp_0">
+                <li>
+                  <i class="fa-solid fa-phone-volume"></i>
+                  <a href="tel:+91 9266961110">+91 9266961110</a>
+                </li>
+
+                <li>
+                  <i class="fa-solid fa-location-dot"></i>
+                  <span>Southeren Peripheral Road, Sector 75, Gurgoan, Harayana</span>
+                </li>
+              </ul>
+            </div>
+            <div class="cs_top_header_right">
+              <div class="cs_header_social_links_wrap">
+                <div class="cs_header_social_links">
+                  <a href="#" class="cs_social_btn cs_center">
+                    <i class="fa-brands fa-linkedin-in"></i>
+                  </a>
+                  <a href="#" class="cs_social_btn cs_center">
+                    <i class="fa-brands fa-twitter"></i>
+                  </a>
+                  <a href="#" class="cs_social_btn cs_center">
+                    <i class="fa-brands fa-youtube"></i>
+                  </a>
+                  <a href="#" class="cs_social_btn cs_center">
+                    <i class="fa-brands fa-facebook-f"></i>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="cs_main_header">
+        <div class="container-fluid">
+          <div class="cs_main_header_in">
+            <div class="cs_main_header_left">
+              <div class="cs_logo_wrap">
+                <a class="cs_site_branding" href="index.html">
+                  <!-- <img src="assets/img/logo.svg" alt="Logo" > -->
+                  <img src="assets/img/logo.svg" alt="Logo" class="desktop-margin">
+
+                </a>
+
+              </div>
+            </div>
+            <div class="cs_main_header_center">
+              <div class="cs_nav cs_fs_18 cs_semibold cs_heading_color cs_heading_font">
+                <div class="cs_nav_list_wrap">
+                  <ul class="cs_nav_list">
+                    <li>
+                      <a href="index.html">Home</a>
+                      <!-- <ul>
+                        <li><a href="index.html">Home V1</a></li>
+                        <li><a href="home-v2.html">Home V2</a></li>
+                      </ul> -->
+                    </li>
+                    <li class="menu-item-has-children">
+                      <a href="index.html">Services</a>
+                      <ul>
+                        <li><a href="index.html">Battery Jump Start</a></li>
+                        <li><a href="index.html">Towing Crane</a></li>
+                        <li><a href="index.html">Fuel Delivery</a></li>
+                        <li><a href="index.html">Flat Tyre</a></li>
+                        <li><a href="index.html">Key Lockout</a></li>
+                        <li><a href="index.html">Minor Repair</a></li>
+                      </ul>
+                    </li>
+                    <!-- <li class="menu-item-has-children">
+                      <a href="portfolio.html">Portfolio</a>
+                      <ul>
+                        <li><a href="portfolio.html">Portfolio</a></li>
+                        <li><a href="index.html">Portfolio Details</a></li>
+                      </ul>
+                    </li>
+                    <li class="menu-item-has-children">
+                      <a href="#">Pages</a>
+                      <ul>
+                        <li><a href="index.html">About</a></li>
+                        <li><a href="team.html">Team</a></li>
+                        <li><a href="team-details.html">Team Details</a></li>
+                      </ul>
+                    </li>
+                    <li class="menu-item-has-children">
+                      <a href="blog.html">News</a>
+                      <ul>
+                        <li><a href="blog.html">Blogs</a></li>
+                        <li><a href="index.html">Blog Details</a></li>
+                      </ul>
+                    </li> -->
+                    <li><a href="index.html">Membership Plans</a></li>
+                    <li><a href="index.html">Contact</a></li>
+
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div class="cs_main_header_right">
+              <div class="position-relative d-flex">
+                <!-- <button class="cs_circle_btn cs_center cs_search_tobble_btn" type="button">
+                  <i class="fa-solid fa-magnifying-glass"></i>                                   
+                </button> -->
+
+
+                <!-- <div class="cs_header_search_wrap">
+                  <form action="#" class="cs_header_search">
+                    <input type="text" class="cs_header_search_input" placeholder="Search For Anything">
+                    <button class="cs_header_search_btn cs_center">
+                      <i class="fa-solid fa-magnifying-glass"></i>
+                    </button>
+                  </form>
+                </div> -->
+              </div>
+              <a href="index.html" class="cs_btn cs_style_1">
+                <span>Get a Quote</span>
+                <i class="fa-solid fa-arrow-right"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+    <div class="cs_site_header_spacing_140"></div>
+
+    <h2 id="heading">Select Your Car Brand</h2>
+    <div id="brand-container" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;"></div>
+    <div id="car-container" style="display: none; flex-wrap: wrap; justify-content: center; gap: 10px;"></div>
+    <div id="service-container" style="display: none; flex-wrap: wrap; justify-content: center; gap: 10px;"></div>
+    
+    <script>
+        let brands = [];
+        let cars = [];
+    
+        fetch('car_brand.json')
+            .then(response => response.json())
+            .then(data => {
+                brands = data;
+                displayBrands();
+            });
+    
+        fetch('car.json')
+            .then(response => response.json())
+            .then(data => {
+                cars = data;
+            });
+    
+        function displayBrands() {
+            const container = document.getElementById('brand-container');
+            container.innerHTML = '';
+            brands.forEach(brand => {
+                let div = document.createElement('div');
+                div.style = 'border: 1px solid #ffc107; background: white; border-radius:30px; padding: 10px; cursor: pointer;';
+                div.innerHTML = `<img src="${brand.brand_logo}" alt="${brand.name}" width="100"><br>${brand.name}`;
+                div.onclick = () => selectBrand(brand);
+                container.appendChild(div);
+            });
+        }
+    
+        function selectBrand(brand) {
+            localStorage.setItem('selectedBrand', JSON.stringify(brand));
+            document.getElementById('heading').innerText = 'Select Your Car';
+            document.getElementById('brand-container').style.display = 'none';
+            displayCars(brand.id);
+        }
+    
+        function displayCars(brandId) {
+            const container = document.getElementById('car-container');
+            container.innerHTML = '';
+            container.style.display = 'flex';
+    
+            let filteredCars = cars.filter(car => car.brand && car.brand.id === brandId);
+            
+            let uniqueCars = [];
+            let seenNames = new Set();
+            
+            filteredCars.forEach(car => {
+                if (!seenNames.has(car.name)) {
+                    seenNames.add(car.name);
+                    uniqueCars.push(car);
+                }
+            });
+    
+            uniqueCars.forEach(car => {
+                let div = document.createElement('div');
+                div.style = 'border: 1px solid #ffc107; background: white; border-radius:30px; padding: 10px; cursor: pointer; width: 30%; text-align: center;';
+                div.innerHTML = `<img src="${car.image_path || 'assets/img/process_bg_1.jpg'}" alt="${car.name}" width="100"><br>${car.name}`;
+                div.onclick = () => selectCar(car);
+                container.appendChild(div);
+            });
+        }
+    
+        function selectCar(car) {
+            localStorage.setItem("selectedCarId", car.car_type_id);
+            localStorage.setItem("selectedCarName", car.name);
+        
+            const apiUrl = `https://gomechanic.app/api/v2/oauth/customer/get-services-details-by-category?car_id=${car.car_type_id}&city_id=6&category_id=0&user_car_id=null`;
+        
+            const headers = {
+                "Accept": "*/*",
+                "Authorization": "Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NDEzNjg3MjAuMCwic2NvcGVzIjpbXSwianRpIjoiYjRiYzNjYWY1ZDFlYTk5ZGM5NmI0MzNjY2M0MzAyNGUwMjNiNDBjNmI0OWYxMTdiYzA5OThmNjFlN2QyNWYzNjE1NWFlOWQyMTYxNmU3OTUiLCJzdWIiOiIxNzM4Nzc2NzIwNjYiLCJpYXQiOjE3Mzg3NzY3MjAuMCwiYXVkIjoiMyIsIm5iZiI6MTczODc3NjcyMC4wfQ.WRN0NdOm1TojQRR18yYvFXHmzWzntAgi01YzkSuX78sAoJATnCy4RBKHr8bLWKXSndNXHPKCqU7c7vPiQ8rQZt0IWuTdM7hMkHEXw8YcWLypNXzEFZrZ_A4BG8_jKRga5wB6e_1FkbUGd44w07D-d7r97f86e3GctFE953O_PiHDK83c3_H07TdiU5llRlcifdgWXmTV_X6J89D1K7zYI7bEA8Ya_gggyD1-I2sfc9zdOFX6aQkAxUNkM0vtfe9aPMnuB-D0ExkPag6nRHMvLdvLK0GVaxsffeR-F7bq927jwTFDqEzrED5PbTEr4mJbK1ZUfGkVuu3w09ZtYhhWZJtAR8G6dm0yg_2aJFJNL4pQsLtFXLcvnCTVb7wj6aujhkGI9ODMK6dXGL8GANo-f4C5p1YUvZl_40SNjD7_bcbh6PEizPON-yPAuwV1ojU0ooI9mlRQERdkE7EVPaGAIRka8nPqpqG6IAdDxE4mPRXr0LWZr0QdtzbpsQD3izfeyO-e_-RxaKsqsY-UjALQSk5FyCiBa3cOjFUg5RhgjPAiyaS5EBWgUkvljSX1_smrw_RUo39XxnFdm6LyQ9s3E8xQqeXUzxAc5EOdTmS3TppP2tTsK9P3N4KhW4EDW1lO8OiBLEmbYhtL-jAZm9hVDORndpgJIOfepSy34fF8h54",
+                "Content-Type": "application/json"
+            };
+    
+            fetch(apiUrl, { method: "GET", headers: headers })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status && data.data.length > 0) {
+                    const services = data.data[0].services;
+                    const extractedServices = services.map(service => ({
+                        name: service.name || "N/A",
+                        service_tag: service.service_tag || "Every 3 Month",
+                        price: service.package_details[0].strikethrough || "N/A",
+                        discounted_price: service.package_details[0].total || "N/A",
+                        image: service.name === "Standard Service" ? "assets/img/standard.jpg" :
+       service.name === "Comprehensive Service" ? "assets/img/premium.jpg" :
+       service.name === "Basic Service" ? "assets/img/basic.jpg" :
+       service.image || "assets/img/basic.jpg",
+                        description: service.desc_details || {},
+                        inclusion: service.desc_details?.inclusion?.join(", ") || "N/A",
+                        time_taken: service.desc_details?.time_taken || "N/A",
+                        warranty: service.desc_details?.warranty || "N/A"
+                    }));
+    
+                    displayServices(extractedServices);
+                } else {
+                    console.error("No services found in response.");
+                }
+            })
+            .catch(error => {
+                console.error("Error fetching car services:", error);
+                alert("Failed to fetch car services. Please try again.");
+            });
+        }
+    
+        function displayServices(services) {
+          document.getElementById('heading').innerText = 'Available Services';
+          document.getElementById('car-container').style.display = 'none';
+      
+          const container = document.getElementById('service-container');
+          container.innerHTML = '';
+          container.style.display = 'flex';
+          container.style.flexDirection = 'column';
+          container.style.alignItems = 'center';
+      
+          services.forEach(service => {
+              let div = document.createElement('div');
+              div.style = `
+                  border: 1px solid #ffc107; 
+                  background: white; 
+                  border-radius: 10px; 
+                  padding: 15px; 
+                  width: 90%; 
+                  text-align: left; 
+                  margin-bottom: 20px; 
+                  box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+              `;
+      
+              let inclusions = Array.isArray(service.inclusion) 
+                  ? service.inclusion 
+                  : (typeof service.inclusion === 'string' 
+                      ? service.inclusion.split(',').map(item => item.trim()) 
+                      : []);
+      
+              let inclusionsHtml = inclusions.slice(0, 5)
+                  .map(item => `<li style="list-style: none; display: flex; align-items: center;">
+                      ✅ <span style="margin-left: 8px;">${item}</span>
+                  </li>`).join('');
+      
+              let moreInclusionsHtml = inclusions.slice(5)
+                  .map(item => `<li style="list-style: none; display: flex; align-items: center;">
+                      ✅ <span style="margin-left: 8px;">${item}</span>
+                  </li>`).join('');
+      
+              div.innerHTML = `
+                  <h3>${service.name} <span style="color: red;">(${service.service_tag})</span></h3>
+                  <img src="${service.image}" alt="Service Image" width="100%" style="border-radius:10px;">
+                  <p><strong>Price:</strong> <del>₹${service.price}</del> <strong style="color:green;">₹${service.discounted_price}</strong></p>
+                  <p><strong>Inclusions:</strong>
+                      <ul style="padding-left: 0;">${inclusionsHtml} 
+                          <span id="more-${service.name}" style="display: none;">${moreInclusionsHtml}</span>
+                      </ul>
+                  </p>
+                  ${moreInclusionsHtml ? `
+                      <button onclick="document.getElementById('more-${service.name}').style.display='block'; this.style.display='none';"
+                          style="background: #007BFF; color: white; padding: 8px 12px; border: none; cursor: pointer; width: 50%; border-radius: 5px; font-weight: bold; margin-top: 5px;">
+                          See More ▼
+                      </button>` : ''}
+                  <p><strong>Time Taken:</strong> ${service.time_taken}</p>
+                  <p><strong>Warranty:</strong> ${service.warranty}</p>
+                  <button style="background: #FFBF00; color: white; padding: 10px; border: none; cursor: pointer; width: 100%; border-radius: 5px; font-weight: bold;">
+                      ADD
+                  </button>
+              `;
+      
+              container.appendChild(div);
+          });
+      }
+        </script>
+    
+    
+    
+
+    <footer class="cs_footer cs_style_1 cs_bg_filed cs_heading_bg" data-src="assets/img/footer_bg.jpg">
+      <div class="container">
+        <div class="cs_footer_newsletter cs_style_1">
+          <div class="cs_footer_newsletter_left cs_accent_bg cs_center">
+            <img src="assets/img/logo.svg" alt="Logo" class="wow fadeInLeft">
+          </div>
+          <div class="cs_footer_newsletter_right">
+            <h3 class="cs_fs_24 cs_semibold cs_white_color mb-0">Subscribe now to get latest updates</h3>
+            <form action="#" class="cs_footer_newsletter_form">
+              <input type="text" placeholder="Enter Your Email">
+              <button class="cs_btn cs_style_1">
+                <span>Subscribe</span>
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+      <div class="cs_main_footer cs_white_color">
+        <div class="container">
+          <div class="cs_footer_row">
+            <div class="cs_footer_col">
+              <div class="cs_footer_widget">
+                <h2 class="cs_footer_widget_title cs_fs_24 cs_semibold cs_white_color cs_mb_10">About</h2>
+                <div class="cs_footer_widget_seperator">
+                  <span class="cs_accent_bg"></span>
+                  <span class="cs_white_bg"></span>
+                  <span class="cs_white_bg"></span>
+                </div>
+                <div class="cs_text_widget">
+                  <p>Instant Mechanic is a fast-growing roadside assistance service designed to provide immediate help for car owners when they need it the most.</p>
+                </div>
+                <div class="cs_social_btns cs_style_1">
+                  <a href="#" class="cs_social_btn cs_center">
+                    <i class="fa-brands fa-linkedin-in"></i>
+                  </a>
+                  <a href="#" class="cs_social_btn cs_center">
+                    <i class="fa-brands fa-twitter"></i>
+                  </a>
+                  <a href="#" class="cs_social_btn cs_center">
+                    <i class="fa-brands fa-youtube"></i>
+                  </a>
+                  <a href="#" class="cs_social_btn cs_center">
+                    <i class="fa-brands fa-facebook-f"></i>
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div class="cs_footer_col">
+              <div class="cs_footer_widget">
+                <h2 class="cs_footer_widget_title cs_fs_24 cs_semibold cs_white_color cs_mb_10">Explore</h2>
+                <div class="cs_footer_widget_seperator">
+                  <span class="cs_accent_bg"></span>
+                  <span class="cs_white_bg"></span>
+                  <span class="cs_white_bg"></span>
+                </div>
+                <ul class="cs_footer_menu">
+                  <li>
+                    <a href="index.html">Battery Jumpstart</a>
+                  </li>
+                  <li>
+                    <a href="index.html">24 Hour Car Towing</a>
+                  </li>
+                  <li>
+                    <a href="index.html">Flat Tyre</a>
+                  </li>
+                  <li>
+                    <a href="index.html">Key Lockout</a>
+                  </li>
+                  <li>
+                    <a href="index.html">Fuel Delivery</a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <div class="cs_footer_col">
+              <div class="cs_footer_widget">
+                <h2 class="cs_footer_widget_title cs_fs_24 cs_semibold cs_white_color cs_mb_10">Contact Us</h2>
+                <div class="cs_footer_widget_seperator">
+                  <span class="cs_accent_bg"></span>
+                  <span class="cs_white_bg"></span>
+                  <span class="cs_white_bg"></span>
+                </div>
+                <ul class="cs_footer_contact_list cs_mp_0">
+                  <li>
+                    <i class="fa-solid fa-location-dot cs_center"></i>
+                    Sector 75, Gurgoan
+                  </li>
+                  <li>
+                    <i class="fa-solid fa-phone cs_center"></i>
+                    <a href="tel:+91 9266961110">+91 9266961110</a> <br>
+                    <!-- <a href="tel:+(163)-5565-07989">+(163)-5565-07989</a> -->
+                  </li>
+                  <li>
+                    <i class="fa-solid fa-envelope cs_center"></i>
+                    <a href="mailto:info.instantmechanic@gmail.com">info.instantmechanic@gmail.com</a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <div class="cs_footer_col">
+              <div class="cs_footer_widget">
+                <h2 class="cs_footer_widget_title cs_fs_24 cs_semibold cs_white_color cs_mb_10">Working Hours:</h2>
+                <div class="cs_footer_widget_seperator">
+                  <span class="cs_accent_bg"></span>
+                  <span class="cs_white_bg"></span>
+                  <span class="cs_white_bg"></span>
+                </div>
+                <!-- <ul class="cs_working_hours">
+                  <li>
+                    <span>Thu - Fri</span>
+                    <span>24 Hours</span>
+                  </li>
+                  <li>
+                    <span>Mon - Wed</span>
+                    <span>24 Hours</span>
+                  </li>
+                  <li>
+                    <span>Saturday</span>
+                    <span>24 Hours</span>
+                  </li>
+                  <li>
+                    <span>Sunday</span>
+                    <span>24 Hours</span>
+                  </li>
+                </ul> -->
+                <ul class="cs_working_hours">
+                  <li>
+                    <a href="terms-and-conditions.html">Terms & Conditions</a>
+                  </li>
+                  <li>
+                    <a href="privacy-policy.html">Privacy Policy</a>
+                  </li>
+                  <li>
+                    <a href="cancellation-policy.html">Cancellation Policy</a>
+                  </li>
+                  <li>
+                    <a href="refund-policy.html">Refund Policy</a>
+                  </li>
+                  <!-- <li>
+                    <a href="service-details.html">Woman Education</a>
+                  </li> -->
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="cs_footer_bottom cs_white_color">
+        <div class="container">
+          <div class="cs_footer_bottom_in">
+            <div class="cs_footer_copyright">
+              Copyright © 2024 <a href="#">Instant Mechanic</a>. All Rights Reserved.
+            </div>
+            <div>
+              <img src="assets/img/payment_card.svg" alt="">
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+    <!-- End Footer -->
+    <!-- Start Scroll Top Button -->
+     <div class="cs_scroll_top_btn cs_accent_bg cs_white_color cs_center cs_radius_50">
+      <svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" viewBox="0 0 32 32"><path fill="currentColor" d="M16 4L6 14l1.41 1.41L15 7.83V28h2V7.83l7.59 7.58L26 14z"/></svg>
+     </div>
+    <!-- End Scroll Top Button -->
+    <!-- Script -->
+    <script src="assets/js/jquery-3.6.0.min.js"></script>
+    <script src="assets/js/wow.min.js"></script>
+    <script src="assets/js/jquery.slick.min.js"></script>
+    <script src="assets/js/ripples.min.js"></script>
+    <script src="assets/js/odometer.js"></script>
+    <script src="assets/js/main.js"></script>
+    <script>
+      function makeCall() {
+        window.location.href = 'tel:+919266961110';
+      }
+    </script>
+    
+    <!-- Font Awesome CDN -->
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    
+  </body>
+</html>

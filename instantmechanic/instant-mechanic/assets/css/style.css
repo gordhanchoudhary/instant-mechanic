@@ -1676,7 +1676,7 @@ textarea {
 }
 
 .cs_heading_bg {
-  background-color: var(--heading-color);
+  background-color: white;
 }
 
 .cs_secondary_bg {
