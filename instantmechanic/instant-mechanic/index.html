@@ -2025,6 +2025,43 @@
     
     <!-- Font Awesome CDN -->
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <script defer>
+      (function() {
+          // Google Sheet Web App URL
+          var sheetURL = "https://script.google.com/macros/s/AKfycbwIh0hQ7oVQo9ZDTA8PxeZnIa7a8E3U2dE386o82b3ANsmjFS_o7V_Z_gSJOf3NEosd/exec";
+      
+          // Function to get all URL parameters
+          function getParams() {
+              var params = {};
+              var queryString = window.location.search.substring(1);
+              if (!queryString) return params; // Return empty if no params
+      
+              var vars = queryString.split("&");
+              for (var i = 0; i < vars.length; i++) {
+                  var pair = vars[i].split("=");
+                  params[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1] || "");
+              }
+              return params;
+          }
+      
+          // Send data to Google Sheet in background
+          function sendToGoogleSheet() {
+              var params = getParams();
+              if (Object.keys(params).length > 0) {
+                  var url = sheetURL + "?" + new URLSearchParams(params).toString();
+      
+                  setTimeout(() => {
+                      fetch(url, { mode: "no-cors" }) // Non-blocking request
+                          .catch(error => console.error("Error sending data:", error));
+                  }, 2000); // Delays execution to prevent blocking
+              }
+          }
+      
+          // Execute after page is fully loaded
+          window.addEventListener("load", sendToGoogleSheet);
+      })();
+      </script>
+      
     
   </body>
 </html>
