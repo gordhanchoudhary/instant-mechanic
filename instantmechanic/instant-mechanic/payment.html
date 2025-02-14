@@ -1,0 +1,96 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Razorpay Payment Link Generator</title>
+    <script>
+        async function createPaymentLink() {
+            const title = document.getElementById('title').value;
+            const description = document.getElementById('description').value;
+            const customerNumber = document.getElementById('customerNumber').value;
+            const amount = document.getElementById('amount').value;
+            const customerName = document.getElementById('customerName').value;
+            const customerEmail = document.getElementById('customerEmail').value;
+            
+            if (!title || !description || !customerNumber || !amount || !customerName || !customerEmail) {
+                alert("Please fill all fields");
+                return;
+            }
+            
+            const response = await fetch('https://api.razorpay.com/v1/payment_links/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Basic ' + btoa('rzp_live_MBBwtLWUwVIMJC:X3JjRRYZpaLQokPjGQPOrLq3')
+                },
+                body: JSON.stringify({
+                    amount: amount * 100, // Convert to paise
+                    currency: "INR",
+                    accept_partial: true,
+                    first_min_partial_amount: amount * 10 / 100, // 10% of the amount
+                    expire_by: Math.floor(Date.now() / 1000) + 86400,
+                    reference_id: "ORDER_" + Date.now(),
+                    description: description,
+                    customer: {
+                        name: customerName,
+                        contact: customerNumber,
+                        email: customerEmail
+                    },
+                    notify: {
+                        sms: true,
+                        email: true
+                    },
+                    reminder_enable: true,
+                    notes: {
+                        policy_name: title
+                    },
+                    callback_url: "https://yourwebsite.com/payment-success",
+                    callback_method: "get"
+                })
+            });
+            
+            const data = await response.json();
+            if (data.short_url) {
+                document.getElementById('paymentLink').value = data.short_url;
+                document.getElementById('actions').style.display = 'block';
+            } else {
+                alert("Error creating payment link: " + data.error.description);
+            }
+        }
+        
+        function copyLink() {
+            const linkField = document.getElementById('paymentLink');
+            linkField.select();
+            document.execCommand('copy');
+            alert("Link copied to clipboard");
+        }
+        
+        function sendWhatsApp() {
+            const link = document.getElementById('paymentLink').value;
+            const customerNumber = document.getElementById('customerNumber').value;
+            if (link) {
+                window.open(`https://wa.me/${customerNumber}?text=Pay%20here:%20${encodeURIComponent(link)}`, '_blank');
+            }
+        }
+    </script>
+</head>
+<body>
+    <h2>Create Razorpay Payment Link</h2>
+    <label>Title:</label> <input type="text" id="title"><br><br>
+    <label>Description:</label> <input type="text" id="description"><br><br>
+    <label>Customer Name:</label> <input type="text" id="customerName"><br><br>
+    <label>Customer Email:</label> <input type="email" id="customerEmail"><br><br>
+    <label>Customer Number:</label> <input type="text" id="customerNumber"><br><br>
+    <label>Amount (INR):</label> <input type="number" id="amount"><br><br>
+    <button onclick="createPaymentLink()">Generate Payment Link</button>
+    
+    <div id="actions" style="display:none; margin-top:20px;">
+        <input type="text" id="paymentLink" readonly>
+        <button onclick="copyLink()">Copy Link</button>
+        <button onclick="sendWhatsApp()">Send to WhatsApp</button>
+    </div>
+</body>
+</html>
