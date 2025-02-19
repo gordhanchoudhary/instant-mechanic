@@ -246,7 +246,7 @@
 
         function sendToWhatsApp(service) {
             console.log("service------------------",service)
-            let message = `Hi team, I want my *${localStorage.getItem("brand") + " - " + localStorage.getItem("carName")}* Car ${service}. %0A📞 Please arrange a call back.`;
+            let message = `Hi team, I want my *${localStorage.getItem("brand")} - ${localStorage.getItem("carName")}* Car ${service}. \n📞 Please arrange a call back.`;
             let phone = "9266961110";
             let whatsappURL = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
             window.location.href = whatsappURL;
