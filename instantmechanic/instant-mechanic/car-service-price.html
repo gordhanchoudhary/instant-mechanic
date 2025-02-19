@@ -216,10 +216,14 @@
       </div>
     </header>
     <div class="cs_site_header_spacing_140"></div>
+    <div id="car-detail-container" style="display: none; flex-wrap: wrap; justify-content: center; gap: 10px;"></div>
 
-    <h2 id="heading">Select Your Car Brand</h2>
+
+    <h3 id="heading">Select Your Car Brand</h3>
+
     <div id="brand-container" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;"></div>
     <div id="car-container" style="display: none; flex-wrap: wrap; justify-content: center; gap: 10px;"></div>
+
     <div id="service-container" style="display: none; flex-wrap: wrap; justify-content: center; gap: 10px;"></div>
     
     <script>
@@ -230,13 +234,39 @@
             .then(response => response.json())
             .then(data => {
                 brands = data;
-                displayBrands();
+                
             });
     
         fetch('car.json')
             .then(response => response.json())
             .then(data => {
                 cars = data;
+
+                console.log("car data -----------##############")
+                console.log(cars)
+
+
+
+
+                // Get the query parameters from the URL
+                const urlParams = new URLSearchParams(window.location.search);
+            
+                // Extract specific parameters
+                const carId = urlParams.get('car-id');
+                const brand = urlParams.get('brand');
+                const carName = urlParams.get('car');
+
+
+                const car = cars.find(car => car.car_type_id === carId);
+                const carImage =  car ? car.image_path : null;
+                localStorage.setItem("carImage", carImage)
+                localStorage.setItem("brand", brand);
+                localStorage.setItem("carName", carName);
+
+                selectCar(carId);
+
+            
+
             });
     
         function displayBrands() {
@@ -279,23 +309,15 @@
                 let div = document.createElement('div');
                 div.style = 'border: 1px solid #ffc107; background: white; border-radius:30px; padding: 10px; cursor: pointer; width: 30%; text-align: center;';
                 div.innerHTML = `<img src="${car.image_path || 'assets/img/process_bg_1.jpg'}" alt="${car.name}" width="100"><br>${car.name}`;
-
-                console.log("car details-----------------------")
-                console.log(car)
-
-
-                div.onclick = () => {
-                  window.location.href = `/instantmechanic/instant-mechanic/car-service-price.html?car-id=${car.car_type_id}&brand=${car.brand.name}&car=${car.name}`;
-              };
+                div.onclick = () => selectCar(car);
                 container.appendChild(div);
             });
         }
     
-        function selectCar(car) {
-            localStorage.setItem("selectedCarId", car.car_type_id);
-            localStorage.setItem("selectedCarName", car.name);
+        function selectCar(carId) {
+
         
-            const apiUrl = `https://gomechanic.app/api/v2/oauth/customer/get-services-details-by-category?car_id=${car.car_type_id}&city_id=6&category_id=0&user_car_id=null`;
+            const apiUrl = `https://gomechanic.app/api/v2/oauth/customer/get-services-details-by-category?car_id=${carId}&city_id=6&category_id=0&user_car_id=null`;
         
             const headers = {
                 "Accept": "*/*",
@@ -337,6 +359,24 @@
         function displayServices(services) {
           document.getElementById('heading').innerText = 'Available Services';
           document.getElementById('car-container').style.display = 'none';
+
+            // Show the container
+            document.getElementById('car-detail-container').style.display = 'block'; 
+
+            // Get the container element
+            const carContainer = document.getElementById('car-detail-container');
+
+            // Retrieve data from localStorage
+            const carImage = localStorage.getItem('carImage');
+            const carName = localStorage.getItem('brand') + " - " + localStorage.getItem('carName');
+
+            // Update the container's innerHTML
+            carContainer.innerHTML = `
+                <img src="${carImage}" alt="Car Image" style="width: 100%; max-width: 300px; display: block; margin: auto; border-radius: 10px;">
+                <h4 style="text-align: center; margin-top: 10px;  color:#f06f0d;">${carName}</h4>
+            `;
+
+
       
           const container = document.getElementById('service-container');
           container.innerHTML = '';
@@ -376,7 +416,7 @@
               div.innerHTML = `
                   <h3>${service.name} <span style="color: red;">(${service.service_tag})</span></h3>
                   <img src="${service.image}" alt="Service Image" width="100%" style="border-radius:10px;">
-                  <p><strong>Price:</strong> <del>₹${service.price}</del> <strong style="color:green;">₹${service.discounted_price}</strong></p>
+                  <p><strong>Price:</strong> <del>₹${service.price }</del> <strong style="color:green;">₹${service.discounted_price + 500}</strong></p>
                   <p><strong>Inclusions:</strong>
                       <ul style="padding-left: 0;">${inclusionsHtml} 
                           <span id="more-${service.name}" style="display: none;">${moreInclusionsHtml}</span>
