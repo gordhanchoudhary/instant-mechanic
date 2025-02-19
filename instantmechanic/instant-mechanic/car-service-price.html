@@ -9,7 +9,7 @@
     <!-- Favicon Icon -->
     <link rel="icon" href="assets/img/favicon.png">
     <!-- Site Title -->
-    <title>Instant Mechanic - Best Car Service In Gurgoan</title>
+    <title>Instant Mechanic - Best in Car Service</title>
     <link rel="stylesheet" href="assets/css/bootstrap.min.css">
     <link rel="stylesheet" href="assets/css/fontawesome.min.css">
     <link rel="stylesheet" href="assets/css/animate.css">
@@ -246,7 +246,7 @@
 
         function sendToWhatsApp(service) {
             console.log("service------------------",service)
-            let message = `Hi team, I want my *${localStorage.getItem("brand")} - ${localStorage.getItem("carName")}* Car ${service}. \n📞 Please arrange a call back.`;
+            let message = `Hi team, I want my *${localStorage.getItem("brand")} - ${localStorage.getItem("carName")}* Car ${service}. \n Please arrange a call back📞.`;
             let phone = "9266961110";
             let whatsappURL = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
             window.location.href = whatsappURL;
