@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Invoice Generator</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f2f2f2;
+      padding: 20px;
+    }
+    .container {
+      background: white;
+      padding: 20px;
+      max-width: 600px;
+      margin: auto;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      font-size: 16px;
+    }
+    button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h2>Instant Mechanic - Invoice Generator</h2>
+  <input type="text" id="customerName" placeholder="Customer Name" required />
+  <input type="text" id="carNumber" placeholder="Car Number" required />
+  <input type="number" id="price" placeholder="Total Price (in ₹)" required />
+  <button onclick="generateInvoice()">Download Invoice PDF</button>
+</div>
+
+<script>
+  async function generateInvoice() {
+    const { jsPDF } = window.jspdf;
+
+    const name = document.getElementById("customerName").value;
+    const carNumber = document.getElementById("carNumber").value;
+    const price = parseFloat(document.getElementById("price").value);
+
+    if (!name || !carNumber || isNaN(price)) {
+      alert("Please fill all fields correctly.");
+      return;
+    }
+
+    const doc = new jsPDF({ unit: "pt" });
+    const date = new Date();
+    const invoiceNo = "IM" + Math.floor(10000 + Math.random() * 90000);
+
+    // Logo
+    const logoUrl = "/instantmechanic/instant-mechanic/logo.png";
+
+    // Load logo
+    const logoImage = await fetch(logoUrl)
+      .then(res => res.blob())
+      .then(blob => {
+        return new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result);
+          reader.readAsDataURL(blob);
+        });
+      });
+
+    doc.addImage(logoImage, "PNG", 40, 40, 80, 40);
+
+    // Company Info
+    doc.setFontSize(16);
+    doc.text("Instant Mechanic", 130, 55);
+    doc.setFontSize(10);
+    doc.text("Darbaripur, Sector 75, Gurugram, Haryana 122018", 130, 70);
+    doc.text("Contact: 92669661110", 130, 85);
+    doc.text("Email: info.instantmechanic@gmail.com", 130, 100);
+    doc.text("Website: https://instantmechanic.online/", 130, 115);
+
+    // Invoice Info
+    doc.setFontSize(12);
+    doc.text("INVOICE", 460, 40);
+    doc.setFontSize(10);
+    doc.text(`Date: ${date.toLocaleDateString()}`, 460, 60);
+    doc.text(`Invoice #: ${invoiceNo}`, 460, 75);
+    doc.text(`Customer ID: ${carNumber}`, 460, 90);
+    doc.text(`Due Date: ${date.toLocaleDateString()}`, 460, 105);
+
+    // Bill To
+    doc.setFontSize(12);
+    doc.setFillColor("#2a3f5f");
+    doc.setTextColor("#fff");
+    doc.rect(40, 140, 120, 20, "F");
+    doc.text("BILL TO", 45, 155);
+    doc.setTextColor("#000");
+    doc.setFontSize(10);
+    doc.text(`${name}`, 40, 180);
+    doc.text(`Car Number: ${carNumber}`, 40, 195);
+
+    // Table Header
+    doc.setFillColor("#2a3f5f");
+    doc.setTextColor("#fff");
+    doc.rect(40, 220, 500, 20, "F");
+    doc.text("DESCRIPTION", 45, 234);
+    doc.text("PRICE (INR)", 400, 234);
+    doc.text("AMOUNT", 500, 234);
+
+    // Table Content
+    doc.setTextColor("#000");
+    doc.setFontSize(10);
+    doc.text("Roadside Assistance Service", 45, 255);
+    doc.text(price.toFixed(2), 400, 255);
+    doc.text(price.toFixed(2), 500, 255);
+
+    // Summary
+    doc.line(400, 270, 560, 270);
+    doc.text("TOTAL", 400, 290);
+    doc.text(`₹ ${price.toFixed(2)}`, 500, 290);
+
+    // Footer
+    doc.setFontSize(9);
+    doc.setTextColor("#000");
+    doc.text("This is a non-GST case memo.", 40, 340);
+    doc.setFontSize(10);
+    doc.text("Thank you for choosing Instant Mechanic!", 200, 380);
+
+    doc.save(`Invoice_${invoiceNo}.pdf`);
+  }
+</script>
+</body>
+</html>
