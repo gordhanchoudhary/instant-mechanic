@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Instant Mechanic Agent</title>
+  <style>
+    :root {
+      --primary: #0077ff;
+      --primary-dark: #005fcc;
+      --bg: #f2f5f9;
+      --white: #fff;
+      --text: #333;
+      --danger: #d9534f;
+      --radius: 12px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      background-color: var(--bg);
+      color: var(--text);
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 500px;
+      margin: auto;
+      background-color: var(--white);
+      padding: 30px;
+      border-radius: var(--radius);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      animation: fadeIn 0.5s ease-in;
+    }
+
+    h2 {
+      color: var(--primary-dark);
+      text-align: center;
+    }
+
+    p.warning {
+      color: var(--danger);
+      font-weight: bold;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: 600;
+    }
+
+    input, select, button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 6px;
+      border-radius: var(--radius);
+      border: 1px solid #ccc;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--primary);
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(0, 119, 255, 0.2);
+    }
+
+    button {
+      background-color: var(--primary);
+      color: var(--white);
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+
+    button:hover {
+      background-color: var(--primary-dark);
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    #generatedUrl {
+      margin-top: 15px;
+      background: #eaf1ff;
+      padding: 12px;
+      border-radius: var(--radius);
+      word-break: break-all;
+      border: 1px dashed var(--primary-dark);
+    }
+
+    @keyframes fadeIn {
+      from {opacity: 0; transform: translateY(10px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 20px;
+      }
+
+      input, button {
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="loginPage" class="container">
+    <h2>Welcome to Instant Mechanic</h2>
+    <p class="warning">⚠️ Please enter your name and mobile number correctly.<br>You can't change them later.</p>
+    <label for="fullNameInput">Full Name</label>
+    <input type="text" id="fullNameInput" placeholder="e.g. Rajeev Kumar" />
+    <label for="mobileInput">Mobile Number</label>
+    <input type="tel" id="mobileInput" placeholder="e.g. 9876543210" />
+    <button onclick="submitLogin()">🚀 Submit</button>
+  </div>
+
+  <div id="mainPage" class="container hidden">
+    <h2>Generate Live Location URL</h2>
+    <label for="locationInput">Location (lat,long)</label>
+    <input type="text" id="locationInput" placeholder="28.45,77.12" />
+    
+    <label for="priceInput">Price</label>
+    <input type="number" id="priceInput" placeholder="Enter price" />
+
+    <label for="mechanicInput">Select Mechanic</label>
+    <input list="mechanicsList" id="mechanicInput" placeholder="Search mechanic..." />
+    <datalist id="mechanicsList"></datalist>
+
+    <button onclick="generateUrl()">🔗 Get Live Location</button>
+
+    <div id="generatedUrlSection" class="hidden">
+      <label>Generated URL:</label>
+      <div id="generatedUrl"></div>
+      <button onclick="copyUrl()">📋 Copy URL</button>
+    </div>
+  </div>
+
+  <script>
+    const loginPage = document.getElementById("loginPage");
+    const mainPage = document.getElementById("mainPage");
+    const generatedUrlSection = document.getElementById("generatedUrlSection");
+    const generatedUrlDiv = document.getElementById("generatedUrl");
+
+    if (localStorage.getItem("fullName") && localStorage.getItem("mobile")) {
+      loginPage.classList.add("hidden");
+      mainPage.classList.remove("hidden");
+      loadMechanics();
+    }
+
+    function submitLogin() {
+      const fullName = document.getElementById("fullNameInput").value.trim();
+      const mobile = document.getElementById("mobileInput").value.trim();
+
+      if (!fullName || !mobile) {
+        alert("Please enter both full name and mobile number.");
+        return;
+      }
+
+      localStorage.setItem("fullName", fullName);
+      localStorage.setItem("mobile", mobile);
+      loginPage.classList.add("hidden");
+      mainPage.classList.remove("hidden");
+      loadMechanics();
+    }
+
+    async function loadMechanics() {
+      try {
+        const res = await fetch("https://live.instantmechanic.online//live-mech/");
+        const data = await res.json();
+        const list = document.getElementById("mechanicsList");
+        list.innerHTML = "";
+        data.forEach(m => {
+          const option = document.createElement("option");
+          option.value = m.full_name;
+          list.appendChild(option);
+        });
+      } catch (err) {
+        alert("Error loading mechanics list.");
+      }
+    }
+
+    function generateUrl() {
+      const location = document.getElementById("locationInput").value.trim();
+      const price = document.getElementById("priceInput").value.trim();
+      const mechanic = document.getElementById("mechanicInput").value.trim().toLowerCase();
+
+      if (!location || !price || !mechanic) {
+        alert("All fields are required.");
+        return;
+      }
+
+      const [lat, long] = location.split(",");
+      if (!lat || !long) {
+        alert("Location must be in 'lat,long' format.");
+        return;
+      }
+
+      const url = `https://instantmechanic.online/live.html?lat=${encodeURIComponent(lat)}&long=${encodeURIComponent(long)}&mechanic=${encodeURIComponent(mechanic)}&price=${encodeURIComponent(price)}`;
+      generatedUrlDiv.textContent = url;
+      generatedUrlSection.classList.remove("hidden");
+    }
+
+    function copyUrl() {
+      const url = generatedUrlDiv.textContent;
+      navigator.clipboard.writeText(url).then(() => {
+        alert("✅ URL copied to clipboard!");
+      });
+    }
+  </script>
+
+</body>
+</html>
