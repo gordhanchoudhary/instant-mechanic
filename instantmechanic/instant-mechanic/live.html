@@ -118,7 +118,7 @@
 
         async function fetchMechanicData(mechanicId) {
             try {
-                const response = await fetch(`http://live.instantmechanic.online/live/?mechanic=${mechanicId}`);
+                const response = await fetch(`https://live.instantmechanic.online/live/?mechanic=${mechanicId}`);
                 if (!response.ok) throw new Error('API Error');
                 const data = await response.json();
                 localStorage.setItem(`mechanic_${mechanicId}`, JSON.stringify(data));
