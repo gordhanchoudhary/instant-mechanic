@@ -14,6 +14,13 @@
       padding: 2rem;
     }
 
+    @keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.4; }
+  100% { opacity: 1; }
+}
+
+
     .container {
       background: #fff;
       padding: 2rem;
@@ -116,7 +123,7 @@ You are CarGPT, a smart car assistant for Instant Mechanic.
 - Step-by-step solutions, quick tips, and simple cost estimates.
 - Instant Mechanic Operate in delhi ncr- gurugram, noida, faridabbad, gaziyabaad only and use INR currency if needed.
 - Always reply as Instant Mechanic: "We at Instant Mechanic recommend..."
-- If there is any estimate customer ask, keep it lower side everything, we want show minimum price which is geniune. 
+- If there is any estimate customer ask, keep it lower side everything, we want show minimum price. 
 
 ✅ **What to Provide:**
 - Repair steps
@@ -145,6 +152,23 @@ ${problem}
         const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || "Something went wrong.";
         responseDiv.innerHTML = reply.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
 
+
+        // Add Call and WhatsApp buttons
+        const buttonsHTML = `
+          <div style="margin-top: 20px; display: flex; gap: 10px;">
+            <a href="tel:+919266961110" style="background: green; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none;">Get Free Consultation</a>
+          </div>
+
+
+          <div><h3>Connect with Your Near by Mechanic(just tap on nearby icon)</h3></div>
+          <div id="map" style="margin-top: 20px; width: 100%; height: 400px;"></div>
+        `;
+
+        responseDiv.innerHTML += buttonsHTML;
+
+        initMap();
+
+
       } catch (error) {
         responseDiv.innerText = "Error fetching estimate.";
         console.error(error);
@@ -160,7 +184,96 @@ ${problem}
       const responseDiv = document.getElementById("policyResponse");
       responseDiv.innerText = "Insurance policy checker coming soon (requires PDF reader backend).";
     }
+
+    function initMap() {
+  const locations = [
+  { name: 'Lal Babu', lat: 28.5780441, lng: 77.1446968 },
+  { name: 'Shrichand Chand', lat: 30.418195271991344, lng: 78.07469990104437 },
+  { name: 'Ajay Kumar', lat: 28.7097429, lng: 77.0631022 },
+  { name: 'Alauddin Khilzi', lat: 28.4262133, lng: 77.0383333 },
+  { name: 'Subhash Chand', lat: 28.6303986, lng: 77.3407967 },
+  { name: 'Irshad Khan', lat: 28.7174782, lng: 77.3078602 },
+  { name: 'Satpal Kumar', lat: 29.9706988, lng: 78.1723038 },
+  { name: 'Pinku Kumar', lat: 28.578436, lng: 77.2003424 },
+  { name: 'Ajay Singh', lat: 28.3494806, lng: 77.3330996 },
+  { name: 'Harsh Singh', lat: 28.5043569, lng: 77.2554345 },
+  { name: 'SURJEET Yadav', lat: 28.5761761, lng: 77.0821683 },
+  { name: 'Satpal Singh', lat: 28.392441, lng: 77.0639662 },
+  { name: 'Parvej Khan', lat: 28.494076, lng: 77.415902 },
+  { name: 'Nisar Khan', lat: 28.627834, lng: 77.3400044 },
+  { name: 'Ashokkumar', lat: 28.641722, lng: 77.2842443 },
+  { name: 'Anjeb Khan', lat: 28.6685686, lng: 77.2139338 },
+  { name: 'Surjeet Singh', lat: 28.5761761, lng: 77.0821683 },
+  { name: 'BABA Mechanic', lat: 28.6110226, lng: 77.3052422 },
+  { name: 'Nitu Devi', lat: 28.5522639, lng: 77.1847439 },
+  { name: 'Devender Singh', lat: 28.64694, lng: 77.1863054 },
+  { name: 'Karan Road Help', lat: 28.5596, lng: 77.2490174 },
+  { name: 'Shoaib Pasha', lat: 28.4446857, lng: 76.9940664 },
+  { name: 'Saurabh Gautam', lat: 28.6050033, lng: 77.3090892 },
+  { name: 'Arjun Singh', lat: 28.7310144, lng: 77.0730894 },
+  { name: 'Param Veer', lat: 28.7189756, lng: 77.1015433 },
+  { name: 'Sanjay Chauhan', lat: 28.6040116, lng: 77.4262806 },
+  { name: 'Tarun Sharma', lat: 28.68942914199478, lng: 77.26036387623361 },
+  { name: 'Sudhir Tyagi', lat: 28.6916478, lng: 77.4483584 },
+  { name: 'Pream Kumar', lat: 28.5727948, lng: 77.222732 },
+  { name: 'Tasleem Khan', lat: 28.2726049, lng: 77.2976758 },
+  { name: 'Rahisuddin Khan', lat: 28.6107068, lng: 77.0295255 },
+  { name: 'Jonityagi', lat: 28.5211925, lng: 77.3672164 },
+  { name: 'Arman Khan', lat: 28.4707478, lng: 77.0656899 },
+  { name: 'Rashid Khan', lat: 28.7563304, lng: 77.2489065 },
+  { name: 'Madhur CarHelp Line', lat: 28.6389174, lng: 77.3216976 },
+  { name: 'Nitin Arora', lat: 28.6439392, lng: 77.2417891 },
+  { name: 'Pandey Kamleshwar', lat: 28.7559169, lng: 77.1819704 },
+  { name: 'Shadab Malik', lat: 28.4718577, lng: 77.1315175 },
+  { name: 'Saif Khan', lat: 28.753175, lng: 77.2742517 },
+  { name: 'Satish Kumar', lat: 28.63484113318034, lng: 77.40040764212608 },
+  { name: 'Dharamveer Sharma', lat: 28.6522171, lng: 77.2818265 },
+  { name: 'Rizwan Khan', lat: 28.6924033, lng: 77.317285 },
+  { name: 'Virender Kumar', lat: 28.758823, lng: 77.1639187 },
+  { name: 'Asif Khan', lat: 28.3922713, lng: 77.0639737 },
+  { name: 'Saheed Khan', lat: 28.435365, lng: 77.0349171 },
+  { name: 'Ajay Kumar', lat: 28.700392, lng: 77.077492 },
+  { name: 'Amit Kumar', lat: 28.6219077, lng: 77.0073907 },
+  { name: 'Manoj Kumar Singh', lat: 28.5707728, lng: 77.1634898 },
+  { name: 'Harinder Yadav', lat: 28.5760658, lng: 77.0817539 },
+  { name: 'Narender Kashyap', lat: 28.71679, lng: 77.1390417 }
+];
+
+
+  const map = new google.maps.Map(document.getElementById("map"), {
+    zoom: 10,
+    center: { lat: 28.6139, lng: 77.2090 } // Center at Delhi
+  });
+
+  locations.forEach((loc) => {
+    const marker = new google.maps.Marker({
+      position: { lat: loc.lat, lng: loc.lng },
+      map,
+      title: loc.name,
+      icon: {
+        url: "https://cdn-icons-png.flaticon.com/512/684/684908.png", // Bike icon
+        scaledSize: new google.maps.Size(40, 40),
+      },
+      animation: google.maps.Animation.BOUNCE
+    });
+
+    const infoWindow = new google.maps.InfoWindow({
+      content: `<div style="color: green; font-weight: bold;">${loc.name}<br><span style="animation: pulse 1s infinite;">🟢 Live</span><br>📞 +91 9266961110</div>`
+    });
+
+    marker.addListener("click", () => {
+      infoWindow.open(map, marker);
+    });
+  });
+}
+
   </script>
+
+  <script async defer
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDAq3BjKpY_ZxvaFjoE4pkTjO6Gn6HUz2E&callback=initMap">
+</script>
+
+  
 </body>
 
 </html>
