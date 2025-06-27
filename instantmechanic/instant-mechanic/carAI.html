@@ -13,8 +13,7 @@
       margin: 0;
       padding: 2rem;
     }
-
-            .logo-container {
+        .logo-container {
       text-align: center;
       margin-bottom: 1rem;
     }
@@ -82,12 +81,16 @@
 </head>
 
 <body>
+
+
   <div class="container">
 
-            <!-- Company Logo -->
+        <!-- Company Logo -->
   <div class="logo-container">
     <img src="https://instantmechanic.online/assets/img/logo.svg" alt="Instant Mechanic Logo">
   </div>
+
+
     <h1>Instant Mechanic - CarAI</h1>
     <div class="section">
       <h3>Describe Your Problem with Car Model and Name</h3>
@@ -107,88 +110,77 @@
   <script>
     const GEMINI_API_KEY = "AIzaSyDIlRy9CDNhOTLfgQjFrzlm8a-Fvvqs5mw";
 
-    async function getEstimate() {
-      const problem = document.getElementById('problemDescription').value.trim();
-      if (!problem) return alert('Please describe the problem.');
 
-      const responseDiv = document.getElementById("estimateResponse");
-      responseDiv.innerText = "Thinking...";
+async function getEstimate() {
+  const problem = document.getElementById('problemDescription').value.trim();
+  if (!problem) return alert('Please describe the problem.');
 
-      try {
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            contents: [
-              {
-  role: "user",
+  const responseDiv = document.getElementById("estimateResponse");
+  responseDiv.innerText = "Thinking...";
 
-  parts: [{
-    text: `
+  const mobile = localStorage.getItem('mobile') || 'Unknown';
+
+  // Record the question in the background (always call this)
+  recordQuestion(mobile, problem);
+
+  try {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [{
+          role: "user",
+          parts: [{
+            text: `
 You are CarGPT, a smart car assistant for Instant Mechanic.
-
 ✅ **Your Role:**
 - ONLY answer car-related questions: repairs, servicing, parts, insurance, towing, roadside help.
 - NEVER answer non-car questions. Say: "Sorry, I can only help with car-related queries."
-
 ✅ **How to Reply:**
 - Short, clear, direct answers. No long paragraphs.
 - Step-by-step solutions, quick tips, and simple cost estimates.
 - Instant Mechanic Operate in delhi ncr- gurugram, noida, faridabbad, gaziyabaad only and use INR currency if needed.
 - Always reply as Instant Mechanic: "We at Instant Mechanic recommend..."
 - If there is any estimate customer ask, keep it lower side everything, we want show minimum price. 
-
-✅ **What to Provide:**
-- Repair steps
-- Insurance help
-- Estimated costs
-- Part recommendations
-- Support for roadside help
-
 ✅ **Important:**
 - You are CarGPT from Instant Mechanic. Never say you are Gemini or AI.
-
 ---
-
 Provide car repair steps, insurance help, and estimates based on this problem:
 ${problem}
-    `
-  }]
+            `
+          }]
+        }]
+      })
+    });
+
+    const data = await response.json();
+    const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || "Something went wrong.";
+    responseDiv.innerHTML = reply.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+
+    // Add Call and WhatsApp buttons
+    const buttonsHTML = `
+      <div style="margin-top: 20px; display: flex; gap: 10px;">
+        <a href="tel:+919266961110" style="background: green; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none;">Get Free Consultation</a>
+      </div>
+      <div><h3>Connect with Your Near by Mechanic (just tap on nearby icon)</h3></div>
+      <div id="map" style="margin-top: 20px; width: 100%; height: 400px;"></div>
+    `;
+
+    responseDiv.innerHTML += buttonsHTML;
+
+    initMap();
+
+    // Record the answer in the background
+    recordAnswer(mobile, reply);
+
+  } catch (error) {
+    responseDiv.innerText = "Error fetching estimate.";
+    console.error(error);
+
+    // Record the answer as failed in the background
+    recordAnswer(mobile, 'api failed');
+  }
 }
-
-
-            ]
-          })
-        });
-
-        const data = await response.json();
-        const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || "Something went wrong.";
-        responseDiv.innerHTML = reply.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-
-
-        // Add Call and WhatsApp buttons
-        const buttonsHTML = `
-          <div style="margin-top: 20px; display: flex; gap: 10px;">
-            <a href="tel:+919266961110" style="background: green; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none;">Get Free Consultation</a>
-          </div>
-
-
-          <div><h3>Connect with Your Near by Mechanic(just tap on nearby icon)</h3></div>
-          <div id="map" style="margin-top: 20px; width: 100%; height: 400px;"></div>
-        `;
-
-        responseDiv.innerHTML += buttonsHTML;
-
-        initMap();
-
-
-      } catch (error) {
-        responseDiv.innerText = "Error fetching estimate.";
-        console.error(error);
-      }
-    }
 
     async function analyzeImage() {
       const responseDiv = document.getElementById("imageAnalysis");
@@ -281,6 +273,21 @@ ${problem}
     });
   });
 }
+
+function recordQuestion(mobile, question) {
+  fetch(`https://script.google.com/macros/s/AKfycbyrzWYIbwFC-cwIwbwNC9zcLe21-ZGeITLF_cO9FlxbJLDu_UEmeBKEU7g8LhYRApo1hg/exec?action=api1&mobile=${encodeURIComponent(mobile)}&question=${encodeURIComponent(question)}`)
+    .catch((error) => {
+      console.error('Question API failed:', error);
+    });
+}
+
+function recordAnswer(mobile, answer) {
+  fetch(`https://script.google.com/macros/s/AKfycbyrzWYIbwFC-cwIwbwNC9zcLe21-ZGeITLF_cO9FlxbJLDu_UEmeBKEU7g8LhYRApo1hg/exec?action=api2&mobile=${encodeURIComponent(mobile)}&answer=${encodeURIComponent(answer)}`)
+    .catch((error) => {
+      console.error('Answer API failed:', error);
+    });
+}
+
 
   </script>
 
