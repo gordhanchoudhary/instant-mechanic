@@ -108,6 +108,24 @@
   </div>
 
   <script>
+
+    // URL Mobile Check and LocalStorage Save
+(function() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const mobileParam = urlParams.get('mobile');
+
+  // Save mobile param to localStorage if present
+  if (mobileParam) {
+    localStorage.setItem('mobile', mobileParam);
+  }
+
+  // Check if mobile exists in localStorage
+  const mobile = localStorage.getItem('mobile');
+  if (!mobile) {
+    window.location.href = 'https://instantmechanic.online/ai-login.html';
+  }
+})();
+
     //const GEMINI_API_KEY = "AIzaSyDIlRy9CDNhOTLfgQjFrzlm8a-Fvvqs5mw";
     const GEMINI_API_KEY = "AIzaSyDgussp_jrzt6rV-OZtxa9EjTuYC7ytlGY";
     
