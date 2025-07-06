@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instant Mechanic Chat</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 400px;
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+        input, button, textarea {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .chat-window {
+            height: 400px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 8px;
+            background: #f9f9f9;
+        }
+        .message {
+            margin-bottom: 10px;
+        }
+        .user {
+            text-align: right;
+            color: blue;
+        }
+        .bot {
+            text-align: left;
+            color: green;
+        }
+        .change-number {
+            background: #dc3545;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container" id="loginScreen">
+    <h2>Enter Mobile Number</h2>
+    <input type="text" id="mobileNumber" placeholder="Enter your mobile number" />
+    <button onclick="saveMobile()">Start Chat</button>
+</div>
+
+<div class="container" id="chatScreen" style="display:none;">
+    <h2>Instant Mechanic AI Chat</h2>
+    <div class="chat-window" id="chatWindow"></div>
+    <textarea id="userMessage" placeholder="Type your message..."></textarea>
+    <button onclick="sendMessage()">Send</button>
+    <button class="change-number" onclick="changeNumber()">Change Mobile Number</button>
+</div>
+
+<script>
+    let mobileNumber = localStorage.getItem('mobileNumber');
+
+    if (mobileNumber) {
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('chatScreen').style.display = 'block';
+    }
+
+    function saveMobile() {
+        let inputNumber = document.getElementById('mobileNumber').value.trim();
+        if (inputNumber === '') {
+            alert('Please enter your mobile number');
+            return;
+        }
+        localStorage.setItem('mobileNumber', inputNumber);
+        mobileNumber = inputNumber;
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('chatScreen').style.display = 'block';
+    }
+
+    function sendMessage() {
+        let message = document.getElementById('userMessage').value.trim();
+        if (message === '') {
+            alert('Please type a message');
+            return;
+        }
+
+        appendMessage('You: ' + message, 'user');
+
+        fetch('https://ai.instantmechanic.online/bot/webhook/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                from: mobileNumber,
+                message: message
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.reply) {
+                appendMessage('AI: ' + data.reply, 'bot');
+            } else {
+                appendMessage('AI: No reply received.', 'bot');
+            }
+        })
+        .catch(error => {
+            appendMessage('AI: Error connecting to server.', 'bot');
+        });
+
+        document.getElementById('userMessage').value = '';
+    }
+
+    function appendMessage(message, sender) {
+        const chatWindow = document.getElementById('chatWindow');
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'message ' + sender;
+        messageDiv.textContent = message;
+        chatWindow.appendChild(messageDiv);
+        chatWindow.scrollTop = chatWindow.scrollHeight;
+    }
+
+    function changeNumber() {
+        localStorage.removeItem('mobileNumber');
+        window.location.reload();
+    }
+</script>
+
+</body>
+</html>
+
