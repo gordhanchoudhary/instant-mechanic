@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Instant Mechanic AI Flow</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background: #f2f6fb;
+    }
+
+    .card {
+      background: #fff;
+      padding: 2rem 3rem;
+      border-radius: 16px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+      text-align: center;
+      max-width: 400px;
+      width: 100%;
+    }
+
+    .card h1 {
+      margin-bottom: 30px;
+      font-size: 1.5rem;
+      color: #2c3e50;
+    }
+
+    .switch-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 60px;
+      height: 34px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: 0.4s;
+      border-radius: 34px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 26px;
+      width: 26px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: 0.4s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: #28a745;
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(26px);
+    }
+
+    .status-text {
+      margin-top: 15px;
+      font-size: 1rem;
+      font-weight: 500;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <h1>Instant Mechanic AI Flow</h1>
+
+    <div class="switch-container">
+      <label class="switch">
+        <input type="checkbox" id="aiToggle">
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="status-text" id="statusText">Loading...</div>
+  </div>
+
+  <script>
+    const toggle = document.getElementById("aiToggle");
+    const statusText = document.getElementById("statusText");
+
+    // Fetch initial AI flow status
+    async function fetchStatus() {
+      try {
+        const res = await fetch("https://new.instantmechanic.online/get-ai-flow/1");
+        const data = await res.json();
+        toggle.checked = data.is_on;
+        updateText(data.is_on);
+      } catch (err) {
+        statusText.textContent = "Unable to load status.";
+        console.error(err);
+      }
+    }
+
+    function updateText(isOn) {
+      statusText.textContent = isOn ? "AI Flow is ON" : "AI Flow is OFF";
+    }
+
+    // Toggle handler
+    toggle.addEventListener("change", async () => {
+      const newStatus = toggle.checked;
+      try {
+        const res = await fetch("https://new.instantmechanic.online/get-ai-flow/1/", {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ is_on: newStatus })
+        });
+        if (!res.ok) throw new Error("Update failed");
+        updateText(newStatus);
+      } catch (err) {
+        alert("Failed to update. Reverting.");
+        toggle.checked = !newStatus;
+        updateText(!newStatus);
+        console.error(err);
+      }
+    });
+
+    // Init
+    fetchStatus();
+  </script>
+
+</body>
+</html>
