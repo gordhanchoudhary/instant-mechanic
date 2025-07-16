@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Instant Mechanic Chat</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    .container {
+      display: flex;
+      height: 100vh;
+    }
+
+    .sidebar {
+      width: 30%;
+      background: #fff;
+      border-right: 1px solid #ddd;
+      overflow-y: auto;
+    }
+
+    .chat-window {
+      flex: 1;
+      background: #ece5dd;
+      display: flex;
+      flex-direction: column;
+      padding: 16px;
+      overflow-y: auto;
+    }
+
+    .search-box {
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .search-box input {
+      width: 95%;
+      padding: 8px;
+      font-size: 14px;
+    }
+
+    .customer {
+      padding: 12px;
+      border-bottom: 1px solid #eee;
+      cursor: pointer;
+    }
+
+    .customer:hover {
+      background: #f2f2f2;
+    }
+
+    .customer.active {
+      background: #d1f7c4;
+    }
+
+    .chat-bubble {
+      max-width: 70%;
+      padding: 10px 14px;
+      border-radius: 8px;
+      margin: 8px 0;
+      font-size: 14px;
+      position: relative;
+    }
+
+    .from-user {
+      background: #fff;
+      align-self: flex-start;
+    }
+
+    .from-agent {
+      background: #dcf8c6;
+      align-self: flex-end;
+    }
+
+    .call-message {
+      align-self: center;
+      background: #ffeeba;
+      color: #444;
+      padding: 6px 10px;
+      font-size: 13px;
+      border-radius: 6px;
+      margin: 10px 0;
+    }
+
+    .timestamp {
+      font-size: 11px;
+      color: #888;
+      margin-top: 4px;
+    }
+
+    .header {
+      padding: 10px;
+      background: #128c7e;
+      color: white;
+      font-weight: bold;
+    }
+
+  .booking-icon {
+    font-size: 30px;
+    color: green;
+    margin-left: 6px;
+  }
+
+  .booking-button {
+    background-color: #25d366;
+    color: white;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    margin-bottom: 10px;
+    align-self: flex-start;
+  }
+
+  .booking-details {
+    background-color: #d9fdd3;
+    border-left: 4px solid #128c7e;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 6px;
+    font-size: 14px;
+    line-height: 1.4;
+  }
+</style>
+
+</head>
+<body>
+<div style="padding: 8px; background: #128c7e; color: white; font-weight: bold;">
+  <span>Instant Mechanic</span>
+  <input type="date" id="datePicker" style="margin-left: 10px; padding: 4px;" onchange="loadChatsForDate()" />
+</div>
+
+<div class="container">
+  <div class="sidebar">
+    <div class="search-box">
+      <input type="text" placeholder="Search..." id="searchInput" oninput="filterCustomers()"/>
+    </div>
+    <div id="customerList"></div>
+  </div>
+
+  <div class="chat-window">
+    <div id="chatHeader" style="font-weight: bold; margin-bottom: 10px;"></div>
+    <div id="chatBox" style="display: flex; flex-direction: column;"></div>
+  </div>
+</div>
+
+<script>
+let allCustomers = [];
+
+document.getElementById('datePicker').valueAsDate = new Date();
+
+function loadChatsForDate() {
+  const selectedDate = document.getElementById('datePicker').value;
+  fetch(`https://ai.instantmechanic.online/bot/customer_chats/?date=${selectedDate}`)
+    .then(res => res.json())
+    .then(data => {
+      if (data.status === 'success') {
+        allCustomers = data.data;
+        displayCustomerList(allCustomers);
+        if (allCustomers.length > 0) showChat(allCustomers[0]);
+      }
+    });
+}
+
+// Initial load
+loadChatsForDate();
+
+function formatTime(dateStr) {
+  const d = new Date(dateStr);
+  return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+
+function displayCustomerList(customers) {
+  // Sort customers: latest message time DESC
+  customers.sort((a, b) => {
+    const lastA = a.chats.length ? new Date(a.chats[a.chats.length - 1].timestamp) : new Date(0);
+    const lastB = b.chats.length ? new Date(b.chats[b.chats.length - 1].timestamp) : new Date(0);
+    return lastB - lastA;
+  });
+
+  const list = document.getElementById('customerList');
+  list.innerHTML = '';
+  const now = Date.now();
+
+  customers.forEach((c, index) => {
+    const div = document.createElement('div');
+    div.className = 'customer';
+    div.id = `cust-${index}`;
+
+    const hasBooking = c.bookings && c.bookings.length > 0;
+
+    let bgColor = '';
+    if (hasBooking) {
+      bgColor = 'background: #d1f7c4;'; // light green
+    } else {
+      const lastMsgTime = c.chats.length ? new Date(c.chats[c.chats.length - 1].timestamp).getTime() : 0;
+      if (lastMsgTime && now - lastMsgTime > 5 * 60 * 1000) {
+        bgColor = 'background: #f8d7da;'; // light red
+      }
+    }
+
+    // Extract agent name
+    const lastAgentMsg = c.chats.filter(m => !m.is_from_customer).pop();
+    const agentName = c.agent ?  c.agent : 'Auto Agent';
+
+    div.style = bgColor;
+    const bookingTick = hasBooking ? '<span class="booking-icon">✅</span>' : '';
+
+    div.innerHTML = `
+      <div><strong>${c.name || 'Unnamed'}</strong> (${c.mobile}) ${bookingTick}</div>
+      <div style="font-size: 12px; color: gray;">Agent: ${agentName}</div>
+      <div style="font-size: 12px; color: gray;">${c.chats.length > 0 ? c.chats[c.chats.length - 1].message.slice(0, 30) : 'No message yet..'}</div>
+    `;
+
+    div.onclick = () => {
+      document.querySelectorAll('.customer').forEach(el => el.classList.remove('active'));
+      div.classList.add('active');
+      showChat(c);
+    };
+
+    list.appendChild(div);
+  });
+}
+
+function extractAgentName(message) {
+  const nameRegex = /Hi\s+([^\s!,]+)/i;
+  const match = message.match(nameRegex);
+  return match ? match[1] : 'Auto Agent';
+}
+
+function showChat(customer) {
+  const chatBox = document.getElementById('chatBox');
+  document.getElementById('chatHeader').innerText = `${customer.name || 'Unnamed'} (${customer.mobile})`;
+  chatBox.innerHTML = '';
+
+  if (customer.bookings && customer.bookings.length > 0) {
+    const viewBtn = document.createElement('button');
+    viewBtn.innerText = '📄 View Booking Details';
+    viewBtn.className = 'booking-button';
+    viewBtn.onclick = () => toggleBookingDetails(customer);
+    chatBox.appendChild(viewBtn);
+  }
+
+  let allMessages = [];
+
+  customer.chats.forEach(m => {
+    allMessages.push({
+      type: 'chat',
+      message: m.message,
+      is_from_customer: m.is_from_customer,
+      timestamp: m.timestamp
+    });
+  });
+
+  customer.calls.forEach(c => {
+    allMessages.push({
+      type: 'call',
+      timestamp: c.created_at
+    });
+  });
+
+  // Sort descending: recent first
+
+  allMessages.forEach(msg => {
+    if (msg.type === 'call') {
+      const callDiv = document.createElement('div');
+      callDiv.className = 'call-message';
+      callDiv.innerText = `📞 Call made at ${formatTime(msg.timestamp)}`;
+      chatBox.appendChild(callDiv);
+    } else {
+      const bubble = document.createElement('div');
+      bubble.className = `chat-bubble ${msg.is_from_customer ? 'from-user' : 'from-agent'}`;
+      bubble.innerText = msg.message;
+
+      const time = document.createElement('div');
+      time.className = 'timestamp';
+      time.innerText = formatTime(msg.timestamp);
+
+      bubble.appendChild(time);
+      chatBox.appendChild(bubble);
+    }
+  });
+}
+
+function toggleBookingDetails(customer) {
+  const chatBox = document.getElementById('chatBox');
+
+  const existing = document.getElementById('booking-details-block');
+  if (existing) {
+    existing.remove();
+    return;
+  }
+
+  const div = document.createElement('div');
+  div.className = 'booking-details';
+  div.id = 'booking-details-block';
+
+  div.innerHTML = customer.bookings.map(b => `
+    <div><strong>Car:</strong> ${b.car || '-'} | <strong>Price:</strong> ₹${b.price || '-'}</div>
+    <div><strong>Problem:</strong> ${b.problem || '-'}</div>
+    <div><strong>Location:</strong> ${b.location || '-'}</div>
+    <div><strong>Remarks:</strong> ${b.remarks || '-'}</div>
+    <div><strong>Date:</strong> ${new Date(b.created_at).toLocaleString()}</div>
+  `).join('<hr style="margin: 6px 0;">');
+
+  chatBox.insertBefore(div, chatBox.children[1]);
+}
+
+function filterCustomers() {
+  const query = document.getElementById('searchInput').value.toLowerCase();
+  const filtered = allCustomers.filter(c =>
+    (c.name || '').toLowerCase().includes(query) ||
+    c.mobile.includes(query)
+  );
+  displayCustomerList(filtered);
+}
+</script>
+</body>
+
+</html>
