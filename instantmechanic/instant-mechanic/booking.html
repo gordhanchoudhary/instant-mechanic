@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Instant Mechanic Agent</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; background-color: #f3f3f3; }
+    .container { max-width: 500px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    input, select, button, textarea { width: 100%; padding: 10px; margin: 8px 0; border-radius: 6px; border: 1px solid #ccc; }
+    button { background-color: #4CAF50; color: white; cursor: pointer; }
+    h2 { text-align: center; }
+    .hidden { display: none; }
+    .select-container { position: relative; }
+    #mechanicInput {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    #mechanicSelect {
+      max-height: 200px;
+      overflow-y: auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="container" id="loginBox">
+    <h2>Agent Login</h2>
+    <input type="text" id="agentName" placeholder="Agent Name" required />
+    <input type="text" id="mobile" placeholder="Mobile (10 digits)" required />
+    <input type="password" id="password" placeholder="Password" required />
+    <button onclick="handleLogin()">Login</button>
+  </div>
+
+  <div class="container hidden" id="bookingBox">
+    <h2>Booking Details</h2>
+    <div id="bookingDetails"></div>
+
+    <h3>Update Booking</h3>
+
+    <label for="mechanicInput">Select Mechanic:</label>
+    <div class="select-container">
+      <input type="text" id="mechanicInput" placeholder="Search by name or number">
+      <select id="mechanicSelect" size="5"></select>
+    </div>
+
+    <label><input type="checkbox" id="markCancelled" onclick="toggleCancelReason()"> Mark as Cancelled</label>
+
+    <div id="cancelBox" class="hidden">
+      <label>Cancellation Reason:</label>
+      <textarea id="cancelReason"></textarea>
+    </div>
+
+    <button onclick="updateBooking()">Update Booking</button>
+  </div>
+
+  <script>
+    const bookingId = new URLSearchParams(window.location.search).get("booking_id");
+    let mechanicList = [];
+    let assignedMechanicId = null;
+
+    if (localStorage.getItem("agent_login") === "Yes") {
+      document.getElementById("loginBox").classList.add("hidden");
+      document.getElementById("bookingBox").classList.remove("hidden");
+      fetchBooking();
+    }
+
+    function handleLogin() {
+      const mobile = document.getElementById("mobile").value;
+      const password = document.getElementById("password").value;
+      const agentName = document.getElementById("agentName").value;
+
+      if (/^\d{10}$/.test(mobile) && password === "InstantMech") {
+        localStorage.setItem("agent_login", "Yes");
+        localStorage.setItem("agent_name", agentName);
+        document.getElementById("loginBox").classList.add("hidden");
+        document.getElementById("bookingBox").classList.remove("hidden");
+        fetchBooking();
+      } else {
+        alert("Invalid login");
+      }
+    }
+
+    function fetchBooking() {
+      if (!bookingId) return alert("Booking ID not provided in URL");
+      fetch(`https://ai.instantmechanic.online/bot/api/bookings/${bookingId}/`)
+        .then(res => res.json())
+        .then(data => {
+          const details = `
+            <p><strong>Car:</strong> ${data.car}</p>
+            <p><strong>Problem:</strong> ${data.problem}</p>
+            <p><strong>Price:</strong> ${data.price}</p>
+            <p><strong>Location:</strong> ${data.location}</p>
+            <p><strong>Is Cancelled:</strong> ${data.is_cancelled ? 'Yes' : 'No'}</p>
+            <p><strong>Cancellation Reason:</strong> ${data.cancellation_reason || '-'}</p>
+            <p><strong>Agent:</strong> ${data.agent || '-'}</p>
+          `;
+          document.getElementById("bookingDetails").innerHTML = details;
+          assignedMechanicId = data.mechanic;
+          fetchMechanics();
+        });
+    }
+
+    function fetchMechanics() {
+      fetch("https://ai.instantmechanic.online/bot/api/mechanic/")
+        .then(res => res.json())
+        .then(data => {
+          mechanicList = data;
+          populateMechanicDropdown(data);
+        });
+    }
+
+    function populateMechanicDropdown(list) {
+      const select = document.getElementById("mechanicSelect");
+      select.innerHTML = "";
+
+      list.forEach(m => {
+        const opt = document.createElement("option");
+        opt.value = m.id;
+        opt.text = `${m.name} - ${m.mobile} - ${m.city}`;
+        if (assignedMechanicId && m.id === assignedMechanicId) {
+          opt.selected = true;
+          document.getElementById("mechanicInput").value = opt.text;
+        }
+        select.appendChild(opt);
+      });
+    }
+
+    document.getElementById("mechanicInput").addEventListener("input", function () {
+      const query = this.value.toLowerCase();
+      const filtered = mechanicList.filter(m =>
+        m.name.toLowerCase().includes(query) || m.mobile.includes(query)
+      );
+      populateMechanicDropdown(filtered);
+    });
+
+    document.getElementById("mechanicSelect").addEventListener("change", function () {
+      document.getElementById("mechanicInput").value = this.options[this.selectedIndex].text;
+    });
+
+    function toggleCancelReason() {
+      const checkbox = document.getElementById("markCancelled");
+      const cancelBox = document.getElementById("cancelBox");
+      cancelBox.classList.toggle("hidden", !checkbox.checked);
+    }
+
+    function updateBooking() {
+      const isCancelled = document.getElementById("markCancelled").checked;
+      const mechanicId = document.getElementById("mechanicSelect").value;
+      const cancelReason = document.getElementById("cancelReason").value;
+      const agentName = localStorage.getItem("agent_name");
+
+      const updateData = {
+        cancellation_reason: isCancelled ? cancelReason : "",
+        is_cancelled: isCancelled,
+        agent: agentName  // ✅ include agent here
+      };
+
+      if (mechanicId) updateData.mechanic = mechanicId;
+
+      fetch(`https://ai.instantmechanic.online/bot/api/booking/update/${bookingId}/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updateData)
+      })
+        .then(res => res.json())
+        .then(data => {
+          alert("Booking updated successfully.");
+          fetchBooking();
+        });
+    }
+</script>
+</body>
+</html>
