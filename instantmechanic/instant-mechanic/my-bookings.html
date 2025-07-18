@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Booking Details | Instant Mechanic</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>body { font-family: 'Inter', sans-serif; }</style>
+
+  <!-- Google Maps JavaScript API -->
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDAq3BjKpY_ZxvaFjoE4pkTjO6Gn6HUz2E"></script>
+</head>
+<body class="bg-[#F4F5F9] flex flex-col items-center min-h-screen">
+
+<!-- Map Container -->
+<div class="relative w-full h-[50vh] max-w-sm overflow-hidden">
+  <div id="map" class="absolute top-0 left-0 w-full h-full rounded-xl"></div>
+  <div class="absolute top-4 left-4 bg-white rounded-full px-3 py-1 text-xs font-medium text-gray-700 shadow">Moving</div>
+</div>
+
+<!-- Message -->
+<div class="mt-4 w-full max-w-sm px-4">
+  <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 text-sm font-semibold rounded-xl px-4 py-3 shadow flex items-start space-x-2">
+    <span class="text-xl">🛠️</span>
+    <span>Service is ready to move. Please <span class="underline decoration-dotted">make payment</span> to proceed.</span>
+  </div>
+</div>
+
+<!-- Booking Card -->
+<div class="w-full max-w-sm bg-white rounded-t-3xl mt-4 p-4 space-y-4 shadow-xl">
+  <div class="flex items-center space-x-4">
+    <img id="carImage" src="" alt="Car" class="w-28 h-20 object-cover rounded-xl shadow" />
+    <div class="flex-1">
+      <p id="car" class="text-sm font-bold text-gray-800">Car Name</p>
+      <p id="problem" class="text-xs text-gray-500 mt-1">Service Detail</p>
+      <p id="price" class="text-sm font-semibold text-purple-600 mt-1">Amount</p>
+    </div>
+  </div>
+
+  <div class="flex space-x-2">
+    <button id="payNow" class="flex-1 bg-purple-600 text-white py-3 rounded-xl text-sm font-semibold">Pay Now</button>
+    <button id="ring" class="flex-1 bg-purple-500 text-white py-3 rounded-xl text-sm font-semibold">Call Instant Mechanic</button>
+  </div>
+  <button id="cancelBooking" class="w-full bg-gray-200 text-gray-800 py-3 rounded-xl text-sm font-semibold">Cancel Booking</button>
+  <p class="text-center text-[11px] text-gray-400">Complete payment in <span id="timer">10:00</span> to avoid auto-cancellation.</p>
+</div>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+  const query = new URLSearchParams(window.location.search);
+  const mobile = query.get('mobile');
+  const apiUrl = `https://ai.instantmechanic.online/bot/api/booking-details?mobile=${mobile}`;
+  let interval;
+
+  function startCountdown() {
+    const storageKey = `booking_timer_${mobile}`;
+    if (!localStorage.getItem(storageKey)) {
+      localStorage.setItem(storageKey, Date.now());
+    }
+
+    const startTime = parseInt(localStorage.getItem(storageKey));
+    const countdownDuration = 10 * 60 * 1000;
+
+    interval = setInterval(() => {
+      const elapsed = Date.now() - startTime;
+      const remaining = countdownDuration - elapsed;
+
+      if (remaining <= 0) {
+        clearInterval(interval);
+        localStorage.removeItem(storageKey);
+        cancelBooking();
+        document.getElementById('timer').textContent = `00:00`;
+        return;
+      }
+
+      const mins = String(Math.floor(remaining / 60000)).padStart(2, '0');
+      const secs = String(Math.floor((remaining % 60000) / 1000)).padStart(2, '0');
+      document.getElementById('timer').textContent = `${mins}:${secs}`;
+    }, 1000);
+  }
+
+function initMap(lat, lng, bookingId) {
+  const map = new google.maps.Map(document.getElementById("map"), {
+    center: { lat, lng },
+    zoom: 13,
+    gestureHandling: "greedy",
+    zoomControl: true,
+    fullscreenControl: false,
+    streetViewControl: false,
+    mapTypeControl: false,
+    styles: [
+      { featureType: "poi", stylers: [{ visibility: "off" }] },
+      { featureType: "transit", stylers: [{ visibility: "off" }] }
+    ]
+  });
+
+  // Customer marker
+  new google.maps.Marker({
+    position: { lat, lng },
+    map: map,
+    title: "Customer",
+    icon: {
+      url: "https://maps.google.com/mapfiles/ms/icons/red-dot.png"
+    }
+  });
+
+  const mechanics = [
+    { name: "Narendra", eta: "11 min" },
+    { name: "Saheed", eta: "11 min" },
+    { name: "Harbeer", eta: "13 min" },
+    { name: "Lal Babu", eta: "14 min" },
+    { name: "Nitin", eta: "15 min" },
+    { name: "Arjun", eta: "18 min" }
+  ];
+
+  const key = `mechanic_locations_${bookingId}`;
+  let savedLocations = localStorage.getItem(key);
+
+  if (savedLocations) {
+    savedLocations = JSON.parse(savedLocations);
+  } else {
+    savedLocations = mechanics.map((_, index) => {
+      const angle = Math.random() * 2 * Math.PI;
+      const distance = 2 + Math.random(); // 2–3 km
+      const deltaLat = (distance / 111) * Math.cos(angle);
+      const deltaLng = (distance / (111 * Math.cos(lat * Math.PI / 180))) * Math.sin(angle);
+      return {
+        lat: lat + deltaLat,
+        lng: lng + deltaLng
+      };
+    });
+    localStorage.setItem(key, JSON.stringify(savedLocations));
+  }
+
+  savedLocations.forEach((pos, i) => {
+    const mechanic = mechanics[i];
+    new google.maps.Marker({
+      position: pos,
+      map: map,
+      title: `${mechanic.name} (${mechanic.eta})`,
+      icon: {
+        url: "https://cdn-icons-png.flaticon.com/512/1995/1995470.png",
+        scaledSize: new google.maps.Size(30, 30)
+      },
+      label: {
+        text: `${mechanic.name} ------- (${mechanic.eta})`,
+        color: "#111",
+        fontSize: "10px",
+        fontWeight: "bold"
+      }
+    });
+  });
+}
+
+  async function fetchBookingDetails() {
+    try {
+      const res = await fetch(apiUrl);
+      const data = await res.json();
+
+      document.getElementById('car').textContent = data.car;
+      document.getElementById('problem').textContent = data.problem;
+      document.getElementById('price').textContent = data.price;
+      document.getElementById('carImage').src = data.car_image;
+
+      const latlng = data.location.split('=')[1];
+      const [lat, lng] = latlng.split(',').map(Number);
+      initMap(lat, lng, data.id);
+
+      window.razorpayOrderId = data.payment_id;
+      window.amountToPay = parseInt(data.advance_payment_amount) * 100;
+      document.getElementById('payNow').textContent = `Pay Now (₹${data.advance_payment_amount})`;
+
+      localStorage.setItem('booking_id', data.id);
+    } catch (error) {
+      alert("Failed to load booking details.");
+    }
+  }
+
+  document.getElementById('payNow').addEventListener('click', () => {
+    const options = {
+      key: 'rzp_live_NYD17iu2Juy3A5',
+      amount: window.amountToPay,
+      currency: 'INR',
+      name: 'Instant Mechanic',
+      description: 'Advance Payment',
+      order_id: window.razorpayOrderId,
+      handler: function (response) {
+        alert('✅ Payment Successful!');
+        localStorage.removeItem(`booking_timer_${mobile}`);
+      },
+      prefill: { contact: mobile },
+      theme: { color: '#7c3aed' }
+    };
+    const rzp = new Razorpay(options);
+    rzp.open();
+  });
+
+  document.getElementById('cancelBooking').addEventListener('click', () => {
+    alert('❌ Booking cancelled.');
+    localStorage.removeItem(`booking_timer_${mobile}`);
+  });
+
+  startCountdown();
+  fetchBookingDetails();
+</script>
+</body>
+</html>
