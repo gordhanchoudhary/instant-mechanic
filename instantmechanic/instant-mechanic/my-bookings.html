@@ -289,6 +289,15 @@ function showAfterPaymentUI() {
       document.getElementById('price').textContent = data.price;
       document.getElementById('carImage').src = data.car_image;
 
+
+
+      if (data.payment_status === "partially-paid" && !isPaid) {
+        localStorage.setItem('paid', 'true');
+        localStorage.removeItem(`booking_timer_${mobile}`);
+        window.location.reload();
+      }
+
+
       const latlng = data.location.split('=')[1];
       const [lat, lng] = latlng.split(',').map(Number);
       if (!isPaid) initMap(lat, lng, data.id);
