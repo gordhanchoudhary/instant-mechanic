@@ -6,23 +6,77 @@
   <title>Booking Details | Instant Mechanic</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>body { font-family: 'Inter', sans-serif; }</style>
-
-  <!-- Google Maps JavaScript API -->
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDAq3BjKpY_ZxvaFjoE4pkTjO6Gn6HUz2E"></script>
 </head>
 <body class="bg-[#F4F5F9] flex flex-col items-center min-h-screen">
 
-<!-- Map Container -->
-<div class="relative w-full h-[50vh] max-w-sm overflow-hidden">
+<!-- Paid UI Image Replacement -->
+<div id="paidSection" class="relative w-full h-[50vh] max-w-sm overflow-hidden hidden">
+  <div class="absolute top-4 left-4 bg-white rounded-full px-3 py-1 text-xs font-medium text-gray-700 shadow">Moving</div>
+</div>
+
+<!-- Map Container (default view) -->
+<div id="mapContainer" class="relative w-full h-[50vh] max-w-sm overflow-hidden">
   <div id="map" class="absolute top-0 left-0 w-full h-full rounded-xl"></div>
   <div class="absolute top-4 left-4 bg-white rounded-full px-3 py-1 text-xs font-medium text-gray-700 shadow">Moving</div>
 </div>
 
+<!-- After Payment Overlay -->
+<div id="afterPaymentOverlay" class="hidden w-full max-w-sm h-[50vh] bg-[#6B21A8] text-white relative flex flex-col items-center justify-start rounded-b-[2rem] overflow-hidden">
+  <!-- Back Arrow -->
+
+  <!-- Countdown Circle -->
+  <div class="mt-12 w-32 h-32 rounded-full border-[6px] border-white flex items-center justify-center text-center">
+    <div>
+      <div class="text-xs font-light">ARRIVING IN</div>
+      <div id="countdownTimer" class="text-2xl font-bold mt-1">00:00</div>
+    </div>
+  </div>
+<!-- Itinerary Timeline -->
+<div class="mt-4 pl-6 relative">
+  <!-- Vertical line through icons -->
+  <div class="absolute top-0 left-3 w-px h-full bg-gray-300" 
+    style="
+    margin-left: 19px;
+"
+></div>
+
+ <!-- Step 1 -->
+<div class="flex items-center mb-4 relative">
+  <div class="w-4 h-4 rounded-full bg-green-400 z-10"></div>
+  <span class="ml-3 text-white text-sm font-medium">BOOKING CONFIRMED</span>
+</div>
+
+<!-- Step 2 -->
+<div class="flex items-center mb-4 relative">
+  <div class="w-4 h-4 rounded-full bg-green-400 z-10"></div>
+  <span class="ml-3 text-white text-sm font-medium">SECURITY PAYMENT RECEIVED</span>
+</div>
+
+<!-- Step 3 with blinking green icon -->
+<div class="flex items-center mb-4 relative">
+  <!-- Blinking pulse ring -->
+  <span class="absolute w-4 h-4 rounded-full bg-green-400 opacity-75 animate-ping"></span>
+  <!-- Actual dot -->
+  <div class="w-4 h-4 rounded-full bg-green-400 z-10"></div>
+  <span class="ml-3 text-white text-sm font-medium">HELP IS ON THE WAY</span>
+</div>
+
+<!-- Step 4 -->
+<div class="flex items-center relative">
+  <div class="w-4 h-4 rounded-full bg-white border border-gray-300 z-10"></div>
+  <span class="ml-3 text-gray-300 text-sm font-medium">ARRIVED</span>
+</div>
+
+</div>
+
+</div>
+
 <!-- Message -->
-<div class="mt-4 w-full max-w-sm px-4">
+<div id="statusMessage" class="mt-4 w-full max-w-sm px-4">
   <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 text-sm font-semibold rounded-xl px-4 py-3 shadow flex items-start space-x-2">
     <span class="text-xl">🛠️</span>
-    <span>Service is ready to move. Please <span class="underline decoration-dotted">make payment</span> to proceed.</span>
+    <span id="statusText">Service is ready to move. Please <span class="underline decoration-dotted">make payment</span> to proceed.</span>
   </div>
 </div>
 
@@ -39,10 +93,13 @@
 
   <div class="flex space-x-2">
     <button id="payNow" class="flex-1 bg-purple-600 text-white py-3 rounded-xl text-sm font-semibold">Pay Now</button>
-    <button id="ring" class="flex-1 bg-purple-500 text-white py-3 rounded-xl text-sm font-semibold">Call Instant Mechanic</button>
+    <button id="ring" class="flex-1 bg-purple-500 hover:bg-purple-600 text-white py-3 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition">
+      <img src="https://cdn-icons-png.flaticon.com/512/3670/3670051.png" alt="WhatsApp" class="h-5 w-5">
+      Get Help
+    </button>
   </div>
-  <button id="cancelBooking" class="w-full bg-gray-200 text-gray-800 py-3 rounded-xl text-sm font-semibold">Cancel Booking</button>
-  <p class="text-center text-[11px] text-gray-400">Complete payment in <span id="timer">10:00</span> to avoid auto-cancellation.</p>
+  <button id="cancelBooking" class="w-full bg-gray-200 text-gray-800 py-3 rounded-xl text-sm font-semibold">Call Instant Mechanic Team</button>
+  <p class="text-center text-[11px] text-gray-400" id="footer-text">Complete payment in <span id="timer">10:00</span> to avoid auto-cancellation.</p>
 </div>
 
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
@@ -50,21 +107,20 @@
   const query = new URLSearchParams(window.location.search);
   const mobile = query.get('mobile');
   const apiUrl = `https://ai.instantmechanic.online/bot/api/booking-details?mobile=${mobile}`;
-  let interval;
+  const isPaid = localStorage.getItem('paid') === 'true';
+
+  if (isPaid) showAfterPaymentUI();
 
   function startCountdown() {
     const storageKey = `booking_timer_${mobile}`;
     if (!localStorage.getItem(storageKey)) {
       localStorage.setItem(storageKey, Date.now());
     }
-
     const startTime = parseInt(localStorage.getItem(storageKey));
     const countdownDuration = 10 * 60 * 1000;
-
-    interval = setInterval(() => {
+    const interval = setInterval(() => {
       const elapsed = Date.now() - startTime;
       const remaining = countdownDuration - elapsed;
-
       if (remaining <= 0) {
         clearInterval(interval);
         localStorage.removeItem(storageKey);
@@ -72,14 +128,87 @@
         document.getElementById('timer').textContent = `00:00`;
         return;
       }
-
       const mins = String(Math.floor(remaining / 60000)).padStart(2, '0');
       const secs = String(Math.floor((remaining % 60000) / 1000)).padStart(2, '0');
       document.getElementById('timer').textContent = `${mins}:${secs}`;
     }, 1000);
   }
 
-function initMap(lat, lng, bookingId) {
+function showAfterPaymentUI() {
+  document.getElementById('mapContainer').classList.add('hidden');
+  document.getElementById('afterPaymentOverlay').classList.remove('hidden');
+  document.getElementById('statusText').textContent = 'Our service is on the way to help, you can reach out to team for further update.';
+
+  const payBtn = document.getElementById('payNow');
+  if (payBtn) payBtn.textContent = `Paid (₹${window.amountToPay / 100})`;
+
+  const DISPLAY_DURATION_SECONDS = 18 * 60;
+  const storageKey = 'arrival_display_start_time';
+
+  let displaySecondsLeft = DISPLAY_DURATION_SECONDS;
+  const timerEl = document.getElementById('countdownTimer');
+
+  // Save start time if not already
+  let displayStartTime = localStorage.getItem(storageKey);
+  if (!displayStartTime) {
+    displayStartTime = Date.now();
+    localStorage.setItem(storageKey, displayStartTime);
+  } else {
+    displayStartTime = parseInt(displayStartTime);
+  }
+
+  function updateTimerDisplay(sec) {
+    const mins = String(Math.floor(sec / 60)).padStart(2, '0');
+    const secs = String(sec % 60).padStart(2, '0');
+    timerEl.textContent = `${mins}:${secs}`;
+  }
+
+  async function countdownLoop() {
+    if (displaySecondsLeft <= 60) {
+      updateTimerDisplay(60);
+      //localStorage.removeItem(storageKey);
+      return;
+    }
+
+    updateTimerDisplay(displaySecondsLeft);
+
+    // Choose delay based on how much time is left
+    let delay = 1000;
+    if (displaySecondsLeft <= 4 * 60) {
+      delay = 2000; // slowest
+    } else if (displaySecondsLeft <= 15 * 60) {
+      delay = 1500; // medium
+    }
+
+    await new Promise(r => setTimeout(r, delay));
+    displaySecondsLeft--;
+    countdownLoop();
+  }
+
+  // Adjust displaySecondsLeft based on real time passed + fake speed logic
+  function computeFakeSecondsLeft() {
+    const realElapsedMs = Date.now() - displayStartTime;
+
+    let fakeElapsed = 0;
+
+    if (realElapsedMs <= 3 * 60 * 1000) {
+      fakeElapsed = realElapsedMs / 1000; // real speed
+    } else if (realElapsedMs <= (3 + 11) * 60 * 1000) {
+      const over3Min = realElapsedMs - 3 * 60 * 1000;
+      fakeElapsed = 3 * 60 + (over3Min / 1500); // slower
+    } else {
+      const over14Min = realElapsedMs - 14 * 60 * 1000;
+      fakeElapsed = 3 * 60 + (11 * 60 / 1.5) + (over14Min / 2000); // slowest
+    }
+
+    return Math.max(0, Math.floor(DISPLAY_DURATION_SECONDS - fakeElapsed));
+  }
+
+  displaySecondsLeft = computeFakeSecondsLeft();
+  countdownLoop();
+}
+
+  function initMap(lat, lng, bookingId) {
   const map = new google.maps.Map(document.getElementById("map"), {
     center: { lat, lng },
     zoom: 13,
@@ -151,12 +280,10 @@ function initMap(lat, lng, bookingId) {
     });
   });
 }
-
   async function fetchBookingDetails() {
     try {
       const res = await fetch(apiUrl);
       const data = await res.json();
-
       document.getElementById('car').textContent = data.car;
       document.getElementById('problem').textContent = data.problem;
       document.getElementById('price').textContent = data.price;
@@ -164,15 +291,44 @@ function initMap(lat, lng, bookingId) {
 
       const latlng = data.location.split('=')[1];
       const [lat, lng] = latlng.split(',').map(Number);
-      initMap(lat, lng, data.id);
+      if (!isPaid) initMap(lat, lng, data.id);
 
       window.razorpayOrderId = data.payment_id;
       window.amountToPay = parseInt(data.advance_payment_amount) * 100;
       document.getElementById('payNow').textContent = `Pay Now (₹${data.advance_payment_amount})`;
+if (isPaid) {
+  // Update Pay Now button with icon
+  document.getElementById('payNow').innerHTML = `
+    <img src="https://cdn-icons-png.flaticon.com/512/4272/4272841.png" class="w-4 h-4 mr-2 inline-block" />
+    Paid (₹${data.advance_payment_amount})
+  `;
+
+  // If mechanic is assigned
+  if (data.mechanic) {
+    fetch(`https://ai.instantmechanic.online/bot/api/mechanic/${data.mechanic}/`)
+      .then(res => res.json())
+      .then(mechanicData => {
+          const mechanic_name = mechanicData.name;
+          const mechanic_number = mechanicData.mobile;
+
+          console.log("Mechanic:", mechanic_name, mechanic_number);
+
+          document.getElementById('statusText').textContent = `${mechanic_name} is on the way to help, you can reach out to him for further update.`;
+          document.getElementById('cancelBooking').textContent = `Call ${mechanic_name}`;
+          localStorage.setItem("mechanicMobile",mechanic_number )
+
+        // Optional: show on UI or send WhatsApp message
+        // document.getElementById('mechanicInfo').textContent = `Assigned: ${mechanic_name} (${mechanic_number})`;
+      })
+      .catch(err => console.error("Failed to fetch mechanic:", err));
+  }
+}
+
+
 
       localStorage.setItem('booking_id', data.id);
     } catch (error) {
-      alert("Failed to load booking details.");
+      alert(error);
     }
   }
 
@@ -186,7 +342,9 @@ function initMap(lat, lng, bookingId) {
       order_id: window.razorpayOrderId,
       handler: function (response) {
         alert('✅ Payment Successful!');
+        localStorage.setItem('paid', 'true');
         localStorage.removeItem(`booking_timer_${mobile}`);
+        window.location.reload();
       },
       prefill: { contact: mobile },
       theme: { color: '#7c3aed' }
@@ -195,8 +353,20 @@ function initMap(lat, lng, bookingId) {
     rzp.open();
   });
 
-  document.getElementById('cancelBooking').addEventListener('click', () => {
-    alert('❌ Booking cancelled.');
+document.getElementById('cancelBooking').addEventListener('click', () => {
+  const mechanicNumber = localStorage.getItem("mechanicMobile");
+
+  if (mechanicNumber) {
+    window.location.href = `tel:+91${mechanicNumber}`;
+    console.log("******", mechanicNumber)
+  } else {
+    window.location.href = 'tel:+919266961110';
+  }
+});
+
+
+  document.getElementById('ring').addEventListener('click', () => {
+    window.location.href='https://wa.me/918700199791';
     localStorage.removeItem(`booking_timer_${mobile}`);
   });
 
