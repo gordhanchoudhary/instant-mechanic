@@ -281,7 +281,7 @@ function showAfterPaymentUI() {
   });
 }
   async function fetchBookingDetails() {
-    try {
+    //try {
       const res = await fetch(apiUrl);
       const data = await res.json();
       document.getElementById('car').textContent = data.car;
@@ -298,8 +298,20 @@ function showAfterPaymentUI() {
       }
 
 
-      const latlng = data.location.split('=')[1];
-      const [lat, lng] = latlng.split(',').map(Number);
+      
+try {
+    const latlng = data.location.split('=')[1];
+    [lat, lng] = latlng.split(',').map(Number);
+
+    console.log("✅ Parsed lat/lng from URL:", lat, lng);
+} catch (error) {
+    console.warn("⚠️ Failed to parse lat/lng from URL, using geocoding fallback:", error.message);
+
+    [lat, lng] = await getLatLngFromAddress(data.location);
+
+    console.log("✅ Got lat/lng from geocoding:", lat, lng);
+}
+      
       if (!isPaid) initMap(lat, lng, data.id);
 
       window.razorpayOrderId = data.payment_id;
@@ -336,9 +348,7 @@ if (isPaid) {
 
 
       localStorage.setItem('booking_id', data.id);
-    } catch (error) {
-      alert(error);
-    }
+
   }
 
   document.getElementById('payNow').addEventListener('click', () => {
@@ -378,6 +388,34 @@ document.getElementById('cancelBooking').addEventListener('click', () => {
     window.location.href='https://wa.me/918700199791';
     localStorage.removeItem(`booking_timer_${mobile}`);
   });
+
+  async function getLatLngFromAddress(address) {
+    const apiKey = 'AIzaSyDAq3BjKpY_ZxvaFjoE4pkTjO6Gn6HUz2E';  // replace with your actual key
+    const encodedAddress = encodeURIComponent(address);
+    const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodedAddress}&key=${apiKey}`;
+
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (data.status === "OK") {
+            const location = data.results[0].geometry.location;
+            const lat = location.lat;
+            const lng = location.lng;
+            console.log("Latitude:", lat, "Longitude:", lng);
+            return [lat, lng];
+        } else {
+            console.error("Geocoding failed:", data.status, data.error_message);
+            return [null, null];
+        }
+    } catch (error) {
+        console.error("Error fetching lat/lng:", error);
+        return [null, null];
+    }
+}
+
+
+
 
   startCountdown();
   fetchBookingDetails();
