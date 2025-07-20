@@ -9,9 +9,10 @@
     .container { max-width: 500px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
     input, select, button, textarea { width: 100%; padding: 10px; margin: 8px 0; border-radius: 6px; border: 1px solid #ccc; }
     button { background-color: #4CAF50; color: white; cursor: pointer; }
-    h2 { text-align: center; }
+    h2, h3 { text-align: center; }
     .hidden { display: none; }
     .select-container { position: relative; }
+
     #mechanicInput {
       width: 100%;
       padding: 10px;
@@ -19,9 +20,52 @@
       border-radius: 6px;
       border: 1px solid #ccc;
     }
+
     #mechanicSelect {
       max-height: 200px;
       overflow-y: auto;
+    }
+
+    /* Chat styles */
+    #chatContainer {
+      max-height: 400px;
+      overflow-y: auto;
+      border: 1px solid #ddd;
+      padding: 10px;
+      border-radius: 8px;
+      background-color: #fafafa;
+    }
+
+    .chat-bubble {
+      max-width: 80%;
+      padding: 10px;
+      margin: 6px 0;
+      border-radius: 10px;
+      line-height: 1.4;
+      word-wrap: break-word;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .chat-customer {
+      background-color: #e0f7fa;
+      align-self: flex-start;
+    }
+
+    .chat-agent {
+      background-color: #dcedc8;
+      align-self: flex-end;
+    }
+
+    .chat-time {
+      font-size: 0.75rem;
+      color: #666;
+      margin-top: 4px;
+      text-align: right;
+    }
+
+    .chat-wrapper {
+      display: flex;
+      flex-direction: column;
     }
   </style>
 </head>
@@ -39,7 +83,6 @@
     <div id="bookingDetails"></div>
 
     <h3>Update Booking</h3>
-
     <label for="mechanicInput">Select Mechanic:</label>
     <div class="select-container">
       <input type="text" id="mechanicInput" placeholder="Search by name or number">
@@ -47,13 +90,18 @@
     </div>
 
     <label><input type="checkbox" id="markCancelled" onclick="toggleCancelReason()"> Mark as Cancelled</label>
-
     <div id="cancelBox" class="hidden">
       <label>Cancellation Reason:</label>
       <textarea id="cancelReason"></textarea>
     </div>
 
     <button onclick="updateBooking()">Update Booking</button>
+
+    <!-- Chat Section -->
+    <h3>Customer Chat History</h3>
+    <div id="chatContainer">
+      <div id="chatMessages"></div>
+    </div>
   </div>
 
   <script>
@@ -100,6 +148,7 @@
           document.getElementById("bookingDetails").innerHTML = details;
           assignedMechanicId = data.mechanic;
           fetchMechanics();
+          fetchChat();  // ✅ Load chat after booking data
         });
     }
 
@@ -155,7 +204,7 @@
       const updateData = {
         cancellation_reason: isCancelled ? cancelReason : "",
         is_cancelled: isCancelled,
-        agent: agentName  // ✅ include agent here
+        agent: agentName
       };
 
       if (mechanicId) updateData.mechanic = mechanicId;
@@ -171,6 +220,36 @@
           fetchBooking();
         });
     }
-</script>
+
+    // ✅ Load chat from chat API and display
+    function fetchChat() {
+      fetch(`https://ai.instantmechanic.online/bot/customer_chats/?booking=${bookingId}`)
+        .then(res => res.json())
+        .then(res => {
+          if (res.status === "success") {
+            const messages = res.data[0]?.chats || [];
+            const chatContainer = document.getElementById("chatMessages");
+            chatContainer.innerHTML = "";
+
+            messages.forEach(msg => {
+              const div = document.createElement("div");
+              div.classList.add("chat-wrapper");
+
+              const bubble = document.createElement("div");
+              bubble.classList.add("chat-bubble", msg.is_from_customer ? "chat-customer" : "chat-agent");
+              bubble.textContent = msg.message;
+
+              const time = document.createElement("div");
+              time.classList.add("chat-time");
+              time.textContent = new Date(msg.timestamp).toLocaleString();
+
+              div.appendChild(bubble);
+              div.appendChild(time);
+              chatContainer.appendChild(div);
+            });
+          }
+        });
+    }
+  </script>
 </body>
 </html>
