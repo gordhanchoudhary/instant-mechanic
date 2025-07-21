@@ -155,15 +155,15 @@
       agentData.forEach(d => {
         let score = 0;
         if (d.time_taken_to_respond === null) score -= 100;
-        else if (d.time_taken_to_respond < 30) score += 100;
-        else if (d.time_taken_to_respond < 60) score += 70;
-        else if (d.time_taken_to_respond < 120) score += 50;
-        else if (d.time_taken_to_respond < 300) score += 30;
+        else if (d.time_taken_to_respond < 30) score += 70;
+        else if (d.time_taken_to_respond < 60) score += 60;
+        else if (d.time_taken_to_respond < 120) score += 40;
+        else if (d.time_taken_to_respond < 300) score += 25;
         else if (d.time_taken_to_respond < 600) score += 15;
         else score -= 100;
 
-        if (d.remarks && d.remarks.trim() !== '') score += 50;
-        else score -= 50;
+        if (d.remarks && d.remarks.trim() !== '') score += 30;
+        else score -= 30;
 
         totalScore += score;
       });
