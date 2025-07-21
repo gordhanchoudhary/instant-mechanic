@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Customer Recall</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f2f2f2;
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+    }
+
+    h2, h3 {
+      color: #333;
+    }
+
+    .customer-info {
+      font-size: 1rem;
+      margin-bottom: 20px;
+    }
+
+    .button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      max-width: 320px;
+      margin: 10px auto;
+      padding: 14px 20px;
+      font-size: 1.1rem;
+      border: none;
+      border-radius: 10px;
+      color: white;
+      text-decoration: none;
+    }
+
+    .call-btn {
+      background-color: #28a745;
+    }
+
+    .whatsapp-btn {
+      background-color: #25d366;
+    }
+
+    .button img {
+      height: 24px;
+      width: 24px;
+      margin-right: 10px;
+    }
+
+    table {
+      width: 100%;
+      max-width: 100%;
+      border-collapse: collapse;
+      margin-top: 30px;
+      background: white;
+      box-shadow: 0 0 5px rgba(0,0,0,0.05);
+    }
+
+    th, td {
+      padding: 12px 10px;
+      border: 1px solid #ddd;
+      font-size: 0.9rem;
+    }
+
+    th {
+      background: #eaeaea;
+    }
+
+    @media (max-width: 500px) {
+      .button {
+        font-size: 1rem;
+        padding: 12px 10px;
+      }
+
+      th, td {
+        font-size: 0.8rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Customer Recall Panel</h2>
+  <div class="customer-info" id="customer">Loading...</div>
+
+  <a class="button call-btn" onclick="createAction('call')" id="callBtn">
+    <img src="https://cdn-icons-png.flaticon.com/512/126/126509.png" alt="Call Icon" />
+    Call Now
+  </a>
+
+  <a class="button whatsapp-btn" onclick="createAction('whatsapp')" id="whatsappBtn">
+    <img src="https://cdn-icons-png.flaticon.com/512/3670/3670051.png" alt="WhatsApp Icon" />
+    WhatsApp Now
+  </a>
+
+  <h3>Previous Actions</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Agent</th>
+        <th>Time</th>
+      </tr>
+    </thead>
+    <tbody id="history">
+      <tr><td colspan="3">Loading...</td></tr>
+    </tbody>
+  </table>
+
+  <script>
+    const apiUrl = "https://ai.instantmechanic.online/bot/api/customer-recall/";
+    const mobile = new URLSearchParams(window.location.search).get("mobile");
+    const agent = new URLSearchParams(window.location.search).get("agent");
+
+    document.getElementById("customer").innerText = `📱 ${mobile} | 👤 ${agent}`;
+    document.getElementById("callBtn").href = `tel:${mobile}`;
+    const encodedMessage = encodeURIComponent(`Hello sir, ${agent} here from Instant Mechanic. Are you facing any issue with the booking?`);
+    document.getElementById("whatsappBtn").href = `https://wa.me/${mobile}?text=${encodedMessage}`;
+
+    async function createAction(type) {
+      const data = {
+        mobile: mobile,
+        action_type: type,
+        agent_name: agent,
+        is_deleted: false
+      };
+      try {
+        await fetch(apiUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(data)
+        });
+        fetchHistory();
+      } catch (error) {
+        alert("Failed to track action.");
+      }
+    }
+
+    async function fetchHistory() {
+      const response = await fetch(apiUrl);
+      const result = await response.json();
+      const list = result.filter(item => item.mobile === mobile);
+      const historyTable = document.getElementById("history");
+      if (list.length === 0) {
+        historyTable.innerHTML = '<tr><td colspan="3">No history found.</td></tr>';
+        return;
+      }
+      historyTable.innerHTML = list.reverse().map(item => `
+        <tr>
+          <td>${item.action_type.toUpperCase()}</td>
+          <td>${item.agent_name}</td>
+          <td>${new Date(item.created_at).toLocaleString()}</td>
+        </tr>
+      `).join("");
+    }
+
+    fetchHistory();
+  </script>
+
+</body>
+</html>
