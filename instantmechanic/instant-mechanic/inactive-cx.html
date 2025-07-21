@@ -114,7 +114,8 @@
 <script>
 
 
-  const mobile = new URLSearchParams(window.location.search).get("mobile");
+  let mobileRaw = new URLSearchParams(window.location.search).get("mobile");
+  const mobile = mobileRaw?.replace(/[^0-9]/g, "") || "";
   const agentName = new URLSearchParams(window.location.search).get("agent");
 
   document.getElementById("chatandcall").innerText = "Chat & Call History of +" + mobile ;
