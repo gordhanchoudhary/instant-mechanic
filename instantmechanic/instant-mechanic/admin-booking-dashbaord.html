@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Booking Dashboard | Instant Mechanic</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen p-6">
+  <div class="max-w-7xl mx-auto">
+    <div class="flex justify-between items-center mb-6">
+  <h1 class="text-3xl font-bold">Instant Mechanic Dashboard</h1>
+  <div class="space-x-2">
+    <a href="https://instantmechanic.online/chat.html" target="_blank"
+       class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded text-sm shadow">
+      View Chat Dashboard
+    </a>
+    <a href="https://instantmechanic.online/agent.html" target="_blank"
+       class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded text-sm shadow">
+      View Agent Dashboard
+    </a>
+  </div>
+</div>
+
+    <!-- Date Filter -->
+    <div class="flex justify-end mb-4">
+      <input id="datePicker" type="date" class="border rounded px-4 py-2 text-sm shadow" />
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+      <div class="bg-white shadow p-4 rounded-lg text-center">
+        <p class="text-gray-500 text-sm">Total Bookings</p>
+        <p id="totalBookings" class="text-xl font-bold text-blue-600">0</p>
+      </div>
+      <div class="bg-white shadow p-4 rounded-lg text-center">
+        <p class="text-gray-500 text-sm">Total Collected</p>
+        <p id="totalCollected" class="text-xl font-bold text-green-600">₹0</p>
+      </div>
+      <div class="bg-white shadow p-4 rounded-lg text-center">
+        <p class="text-gray-500 text-sm">Total Pending</p>
+        <p id="totalPending" class="text-xl font-bold text-yellow-600">₹0</p>
+      </div>
+      <div class="bg-white shadow p-4 rounded-lg text-center">
+        <p class="text-gray-500 text-sm">Total Cancelled</p>
+        <p id="totalCancelled" class="text-xl font-bold text-red-600">0</p>
+      </div>
+      <div class="bg-white shadow p-4 rounded-lg text-center">
+        <p class="text-gray-500 text-sm">Mech. Not Assigned</p>
+        <p id="totalNotAssigned" class="text-xl font-bold text-purple-600">0</p>
+      </div>
+    </div>
+
+    <!-- Booking Table -->
+    <div class="bg-white shadow rounded-lg overflow-auto">
+      <table class="min-w-full text-sm text-left">
+        <thead class="bg-gray-200 text-gray-600">
+          <tr>
+            <th class="p-3">Image</th>
+            <th class="p-3">Time</th>
+            <th class="p-3">Car</th>
+            <th class="p-3">Problem</th>
+            <th class="p-3">Price</th>
+            <th class="p-3">Mech. ID</th>
+            <th class="p-3">Paid</th>
+            <th class="p-3">Pending</th>
+            <th class="p-3">Agent</th>
+            <th class="p-3">Cancelled</th>
+            <th class="p-3">Reason</th>
+            <th class="p-3">Action</th>
+          </tr>
+        </thead>
+        <tbody id="bookingTableBody" class="bg-white divide-y divide-gray-200"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    const dateInput = document.getElementById("datePicker");
+    const bookingTableBody = document.getElementById("bookingTableBody");
+
+    const totalBookings = document.getElementById("totalBookings");
+    const totalCollected = document.getElementById("totalCollected");
+    const totalPending = document.getElementById("totalPending");
+    const totalCancelled = document.getElementById("totalCancelled");
+    const totalNotAssigned = document.getElementById("totalNotAssigned");
+
+    const formatCurrency = (amount) => '₹' + (parseInt(amount) || 0).toLocaleString();
+
+    async function fetchBookings(date) {
+      bookingTableBody.innerHTML = '';
+      totalBookings.textContent = '0';
+      totalCollected.textContent = '₹0';
+      totalPending.textContent = '₹0';
+      totalCancelled.textContent = '0';
+      totalNotAssigned.textContent = '0';
+
+      const url = `https://ai.instantmechanic.online/bot/api/booking/by-date/?date=${date}`;
+      const res = await fetch(url);
+      const data = await res.json();
+
+      let count = 0;
+      let collected = 0;
+      let pending = 0;
+      let cancelled = 0;
+      let notAssigned = 0;
+      data.reverse();
+
+
+      data.forEach(item => {
+        count++;
+
+        const advance = parseInt(item.advance_payment_amount) || 0;
+        const pendingAmt = parseInt(item.pending_payment_amount) || 0;
+
+        let paid = 0;
+        let pendingAmount = 0;
+
+        if (item.payment_status === "pending") {
+          paid = 0;
+          pendingAmount = advance + pendingAmt;
+        } else {
+          paid = advance;
+          pendingAmount = pendingAmt;
+        }
+
+        collected += paid;
+        pending += pendingAmount;
+        if (item.is_cancelled) cancelled++;
+
+        if (!item.is_cancelled && !item.mechanic) notAssigned++;
+
+        const row = `
+          <tr class="hover:bg-gray-50">
+            <td class="p-3">
+              <img src="${item.car_image}" alt="Car" class="w-12 h-8 object-contain rounded-sm" />
+            </td>
+            <td class="p-3 text-gray-600">${new Date(item.created_at).toLocaleTimeString()}</td>
+            <td class="p-3">${item.car}</td>
+            <td class="p-3">${item.problem}</td>
+            <td class="p-3">${item.price}</td>
+            <td class="p-3">${item.mechanic ?? '-'}</td>
+            <td class="p-3 text-green-600">${formatCurrency(paid)}</td>
+            <td class="p-3 text-yellow-600">${formatCurrency(pendingAmount)}</td>
+            <td class="p-3">${item.agent ?? '-'}</td>
+            <td class="p-3 ${item.is_cancelled ? 'text-red-500' : 'text-green-500'} font-bold">
+              ${item.is_cancelled ? 'Yes' : 'No'}
+            </td>
+            <td class="p-3 text-xs">${item.cancellation_reason || '-'}</td>
+            <td class="p-3">
+              <a href="https://instantmechanic.online/booking.html?id=${item.id}" target="_blank" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs">
+                View
+              </a>
+            </td>
+          </tr>
+        `;
+        bookingTableBody.innerHTML += row;
+      });
+
+      totalBookings.textContent = count;
+      totalCollected.textContent = formatCurrency(collected);
+      totalPending.textContent = formatCurrency(pending);
+      totalCancelled.textContent = cancelled;
+      totalNotAssigned.textContent = notAssigned;
+    }
+
+    // Load today's bookings by default
+    const today = new Date().toISOString().split('T')[0];
+    dateInput.value = today;
+    fetchBookings(today);
+
+    dateInput.addEventListener("change", () => {
+      fetchBookings(dateInput.value);
+    });
+  </script>
+</body>
+</html>
