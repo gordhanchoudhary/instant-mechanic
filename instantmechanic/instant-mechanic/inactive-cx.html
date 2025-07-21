@@ -5,101 +5,27 @@
   <title>Customer Contact History</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 10px;
-      background: #fff;
-    }
+    body { font-family: Arial, sans-serif; padding: 10px; background: #fff; }
+    .buttons { display: flex; justify-content: center; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
+    .buttons a { display: flex; align-items: center; gap: 8px; text-decoration: none; background: #e8f5e9; padding: 10px 15px; border-radius: 12px; color: #333; font-size: 14px; border: 1px solid #ccc; transition: background 0.2s ease; }
+    .buttons a:hover { background: #d0f0d4; }
+    .buttons img { width: 20px; height: 20px; }
+    .chat-container { max-height: 500px; overflow-y: auto; background: #f9f9f9; padding: 10px; border-radius: 10px; }
+    .chat-bubble { max-width: 80%; padding: 10px 14px; border-radius: 16px; margin-bottom: 10px; font-size: 14px; position: relative; line-height: 1.4; }
+    .from-customer { background-color: #ffffff; align-self: flex-start; margin-right: auto; border: 1px solid #ccc; }
+    .from-agent { background-color: #dcf8c6; align-self: flex-end; margin-left: auto; }
+    .event-entry { background: #eee; border-radius: 10px; padding: 10px 14px; font-size: 13px; margin: 8px auto; max-width: 85%; color: #333; display: inline-block; }
+    .chat-time { font-size: 11px; color: #666; margin-top: 4px; text-align: right; }
+    .chat-wrapper { display: flex; flex-direction: column; }
+    h2 { font-size: 16px; margin: 10px 0; }
 
-    .buttons {
-      display: flex;
-      justify-content: center;
-      gap: 15px;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-    }
-
-    .buttons a {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      text-decoration: none;
-      background: #e8f5e9;
-      padding: 10px 15px;
-      border-radius: 12px;
-      color: #333;
-      font-size: 14px;
-      border: 1px solid #ccc;
-      transition: background 0.2s ease;
-    }
-
-    .buttons a:hover {
-      background: #d0f0d4;
-    }
-
-    .buttons img {
-      width: 20px;
-      height: 20px;
-    }
-
-    .chat-container {
-      max-height: 500px;
-      overflow-y: auto;
-      background: #f9f9f9;
-      padding: 10px;
-      border-radius: 10px;
-    }
-
-    .chat-bubble {
-      max-width: 80%;
-      padding: 10px 14px;
-      border-radius: 16px;
-      margin-bottom: 10px;
-      font-size: 14px;
-      position: relative;
-      line-height: 1.4;
-    }
-
-    .from-customer {
-      background-color: #ffffff;
-      align-self: flex-start;
-      margin-right: auto;
-      border: 1px solid #ccc;
-    }
-
-    .from-agent {
-      background-color: #dcf8c6;
-      align-self: flex-end;
-      margin-left: auto;
-    }
-
-    .event-entry {
-      background: #eee;
-      border-radius: 10px;
-      padding: 10px 14px;
-      font-size: 13px;
-      margin: 8px auto;
-      max-width: 85%;
-      color: #333;
-      display: inline-block;
-    }
-
-    .chat-time {
-      font-size: 11px;
-      color: #666;
-      margin-top: 4px;
-      text-align: right;
-    }
-
-    .chat-wrapper {
-      display: flex;
-      flex-direction: column;
-    }
-
-    h2 {
-      font-size: 16px;
-      margin: 10px 0;
-    }
+    /* Modal styles */
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; z-index: 9999; }
+    .modal-content { background: white; padding: 20px; border-radius: 10px; width: 90%; max-width: 400px; }
+    .modal-content textarea { width: 100%; height: 100px; padding: 8px; margin-bottom: 10px; border-radius: 8px; border: 1px solid #ccc; }
+    .modal-content button { padding: 8px 16px; background: #4CAF50; color: white; border: none; border-radius: 8px; cursor: pointer; }
+    .modal-content button:hover { background: #45a049; }
+    .modal-close { background: #ccc; margin-left: 10px; }
   </style>
 </head>
 <body>
@@ -111,38 +37,47 @@
 <h2 id="chatandcall">Chat & Call History</h2>
 <div class="chat-container chat-wrapper" id="chatBox">Loading...</div>
 
+<!-- Modal -->
+<div id="remarksModal" class="modal-overlay" style="display:none;">
+  <div class="modal-content">
+    <h3>Add Remarks</h3>
+    <textarea id="remarksText" placeholder="Enter remarks..."></textarea>
+    <div style="text-align:right;">
+      <button id="submitRemarksBtn">Submit</button>
+      <button id="closeModalBtn" class="modal-close">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <script>
-
-
   let mobileRaw = new URLSearchParams(window.location.search).get("mobile");
   const mobile = mobileRaw?.replace(/[^0-9]/g, "") || "";
   const agentName = new URLSearchParams(window.location.search).get("agent");
 
   document.getElementById("chatandcall").innerText = "Chat & Call History of +" + mobile ;
 
-
   const whatsappText = `Hello sir\n${agentName} this side from Instant Mechanic.\nAre you facing any issue with your booking?`;
   const encodedText = encodeURIComponent(whatsappText);
 
-  async function postCustomerRecall(type) {
+  async function postCustomerRecall(type, remarks = null) {
     try {
       await fetch("https://ai.instantmechanic.online/bot/api/customer-recall/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          mobile: mobile.replace(/^91/, ''), // mobile like "997787883"
+          mobile: mobile,
           is_deleted: false,
           action_type: type,
-          agent_name: agentName
+          agent_name: agentName,
+          remarks: remarks
         })
       });
-      loadData(); // Refresh chat after POST
+      loadData();
     } catch (err) {
       console.error("Recall POST failed:", err);
     }
   }
 
-  // Button click handlers
   function handleWhatsappClick() {
     postCustomerRecall("whatsapp");
     window.open(`https://wa.me/${mobile}?text=${encodedText}`, "_blank");
@@ -153,7 +88,25 @@
     window.location.href = `tel:${mobile}`;
   }
 
-  // Buttons
+  function handleAddRemarksClick() {
+    document.getElementById("remarksModal").style.display = "flex";
+    document.getElementById("remarksText").value = "";
+  }
+
+  document.getElementById("submitRemarksBtn").addEventListener("click", async () => {
+    const remarks = document.getElementById("remarksText").value.trim();
+    if (!remarks) {
+      alert("Please enter remarks before submitting.");
+      return;
+    }
+    await postCustomerRecall("agent remarks", remarks);
+    document.getElementById("remarksModal").style.display = "none";
+  });
+
+  document.getElementById("closeModalBtn").addEventListener("click", () => {
+    document.getElementById("remarksModal").style.display = "none";
+  });
+
   const buttonsHTML = `
     <a href="javascript:void(0)" onclick="handleWhatsappClick()">
       <img src="https://cdn-icons-png.flaticon.com/512/3670/3670051.png" alt="WhatsApp Icon"> WhatsApp
@@ -161,14 +114,16 @@
     <a href="javascript:void(0)" onclick="handleCallClick()">
       <img src="https://cdn-icons-png.flaticon.com/512/126/126509.png" alt="Call Icon"> Call Now
     </a>
+    <a href="javascript:void(0)" onclick="handleAddRemarksClick()">
+      <img src="https://cdn-icons-png.flaticon.com/512/1827/1827276.png" alt="Remarks Icon"> Add Remarks
+    </a>
   `;
   document.getElementById("actionButtons").innerHTML = buttonsHTML;
 
-  // Load chat + customer recall
   async function loadData() {
     try {
       const chatRes = await fetch(`https://ai.instantmechanic.online/bot/customer_chats/?mobile=${mobile}`);
-      const recallRes = await fetch(`https://ai.instantmechanic.online/bot/api/customer-recall/?mobile=${mobile.replace(/^91/, '')}`);
+      const recallRes = await fetch(`https://ai.instantmechanic.online/bot/api/customer-recall/?mobile=${mobile}`);
 
       const chatData = await chatRes.json();
       const recallData = await recallRes.json();
@@ -179,7 +134,8 @@
       recallData.forEach(r => {
         events.push({
           action_type: r.action_type,
-          timestamp: r.created_at
+          timestamp: r.created_at,
+          remarks: r.remarks || null
         });
       });
 
@@ -198,7 +154,8 @@
         combined.push({
           type: "event",
           action_type: e.action_type,
-          timestamp: new Date(e.timestamp)
+          timestamp: new Date(e.timestamp),
+          remarks: e.remarks
         });
       });
 
@@ -219,8 +176,11 @@
         } else if (item.type === "event") {
           const div = document.createElement('div');
           const time = item.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-          let icon = item.action_type === 'call' ? '📞' : '💬';
-          let text = `${agentName} ${item.action_type === 'call' ? 'called' : 'sent WhatsApp'} at ${time}`;
+          let icon = item.action_type === 'call' ? '📞' : item.action_type === 'whatsapp' ? '💬' : '📝';
+          let text = `${agentName} ${item.action_type === 'call' ? 'called' : item.action_type === 'whatsapp' ? 'sent WhatsApp' : 'added remarks'} at ${time}`;
+          if (item.action_type === 'agent remarks' && item.remarks) {
+            text += `: "${item.remarks}"`;
+          }
           div.className = 'event-entry';
           div.textContent = `${icon} ${text}`;
           chatBox.appendChild(div);
@@ -235,7 +195,5 @@
 
   loadData();
 </script>
-
-
 </body>
 </html>
