@@ -1,167 +1,240 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Customer Recall</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <title>Customer Contact History</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f2f2f2;
-      margin: 0;
-      padding: 20px;
-      text-align: center;
+      padding: 10px;
+      background: #fff;
     }
 
-    h2, h3 {
-      color: #333;
-    }
-
-    .customer-info {
-      font-size: 1rem;
+    .buttons {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
       margin-bottom: 20px;
+      flex-wrap: wrap;
     }
 
-    .button {
+    .buttons a {
       display: flex;
       align-items: center;
-      justify-content: center;
-      width: 100%;
-      max-width: 320px;
-      margin: 10px auto;
-      padding: 14px 20px;
-      font-size: 1.1rem;
-      border: none;
-      border-radius: 10px;
-      color: white;
+      gap: 8px;
       text-decoration: none;
+      background: #e8f5e9;
+      padding: 10px 15px;
+      border-radius: 12px;
+      color: #333;
+      font-size: 14px;
+      border: 1px solid #ccc;
+      transition: background 0.2s ease;
     }
 
-    .call-btn {
-      background-color: #28a745;
+    .buttons a:hover {
+      background: #d0f0d4;
     }
 
-    .whatsapp-btn {
-      background-color: #25d366;
+    .buttons img {
+      width: 20px;
+      height: 20px;
     }
 
-    .button img {
-      height: 24px;
-      width: 24px;
-      margin-right: 10px;
+    .chat-container {
+      max-height: 500px;
+      overflow-y: auto;
+      background: #f9f9f9;
+      padding: 10px;
+      border-radius: 10px;
     }
 
-    table {
-      width: 100%;
-      max-width: 100%;
-      border-collapse: collapse;
-      margin-top: 30px;
-      background: white;
-      box-shadow: 0 0 5px rgba(0,0,0,0.05);
+    .chat-bubble {
+      max-width: 80%;
+      padding: 10px 14px;
+      border-radius: 16px;
+      margin-bottom: 10px;
+      font-size: 14px;
+      position: relative;
+      line-height: 1.4;
     }
 
-    th, td {
-      padding: 12px 10px;
-      border: 1px solid #ddd;
-      font-size: 0.9rem;
+    .from-customer {
+      background-color: #ffffff;
+      align-self: flex-start;
+      margin-right: auto;
+      border: 1px solid #ccc;
     }
 
-    th {
-      background: #eaeaea;
+    .from-agent {
+      background-color: #dcf8c6;
+      align-self: flex-end;
+      margin-left: auto;
     }
 
-    @media (max-width: 500px) {
-      .button {
-        font-size: 1rem;
-        padding: 12px 10px;
-      }
+    .event-entry {
+      background: #eee;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 13px;
+      margin: 8px auto;
+      max-width: 85%;
+      color: #333;
+      display: inline-block;
+    }
 
-      th, td {
-        font-size: 0.8rem;
-      }
+    .chat-time {
+      font-size: 11px;
+      color: #666;
+      margin-top: 4px;
+      text-align: right;
+    }
+
+    .chat-wrapper {
+      display: flex;
+      flex-direction: column;
+    }
+
+    h2 {
+      font-size: 16px;
+      margin: 10px 0;
     }
   </style>
 </head>
 <body>
 
-  <h2>Customer Recall Panel</h2>
-  <div class="customer-info" id="customer">Loading...</div>
+<!-- Buttons -->
+<div class="buttons" id="actionButtons"></div>
 
-  <a class="button call-btn" onclick="createAction('call')" id="callBtn">
-    <img src="https://cdn-icons-png.flaticon.com/512/126/126509.png" alt="Call Icon" />
-    Call Now
-  </a>
+<!-- Chat -->
+<h2 id="chatandcall">Chat & Call History</h2>
+<div class="chat-container chat-wrapper" id="chatBox">Loading...</div>
 
-  <a class="button whatsapp-btn" onclick="createAction('whatsapp')" id="whatsappBtn">
-    <img src="https://cdn-icons-png.flaticon.com/512/3670/3670051.png" alt="WhatsApp Icon" />
-    WhatsApp Now
-  </a>
+<script>
 
-  <h3>Previous Actions</h3>
-  <table>
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Agent</th>
-        <th>Time</th>
-      </tr>
-    </thead>
-    <tbody id="history">
-      <tr><td colspan="3">Loading...</td></tr>
-    </tbody>
-  </table>
 
-  <script>
-    const apiUrl = "https://ai.instantmechanic.online/bot/api/customer-recall/";
-    const mobile = new URLSearchParams(window.location.search).get("mobile");
-    const agent = new URLSearchParams(window.location.search).get("agent");
+  const mobile = new URLSearchParams(window.location.search).get("mobile");
+  const agentName = new URLSearchParams(window.location.search).get("agent");
 
-    document.getElementById("customer").innerText = `📱 ${mobile} | 👤 ${agent}`;
-    document.getElementById("callBtn").href = `tel:${mobile}`;
-    const encodedMessage = encodeURIComponent(`Hello sir, ${agent} here from Instant Mechanic. Are you facing any issue with the booking?`);
-    document.getElementById("whatsappBtn").href = `https://wa.me/${mobile}?text=${encodedMessage}`;
+  document.getElementById("chatandcall").innerText = "Chat & Call History of +" + mobile ;
 
-    async function createAction(type) {
-      const data = {
-        mobile: mobile,
-        action_type: type,
-        agent_name: agent,
-        is_deleted: false
-      };
-      try {
-        await fetch(apiUrl, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(data)
+
+  const whatsappText = `Hello sir\n${agentName} this side from Instant Mechanic.\nAre you facing any issue with your booking?`;
+  const encodedText = encodeURIComponent(whatsappText);
+
+  async function postCustomerRecall(type) {
+    try {
+      await fetch("https://ai.instantmechanic.online/bot/api/customer-recall/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          mobile: mobile.replace(/^91/, ''), // mobile like "997787883"
+          is_deleted: false,
+          action_type: type,
+          agent_name: agentName
+        })
+      });
+      loadData(); // Refresh chat after POST
+    } catch (err) {
+      console.error("Recall POST failed:", err);
+    }
+  }
+
+  // Button click handlers
+  function handleWhatsappClick() {
+    postCustomerRecall("whatsapp");
+    window.open(`https://wa.me/${mobile}?text=${encodedText}`, "_blank");
+  }
+
+  function handleCallClick() {
+    postCustomerRecall("call");
+    window.location.href = `tel:${mobile}`;
+  }
+
+  // Buttons
+  const buttonsHTML = `
+    <a href="javascript:void(0)" onclick="handleWhatsappClick()">
+      <img src="https://cdn-icons-png.flaticon.com/512/3670/3670051.png" alt="WhatsApp Icon"> WhatsApp
+    </a>
+    <a href="javascript:void(0)" onclick="handleCallClick()">
+      <img src="https://cdn-icons-png.flaticon.com/512/126/126509.png" alt="Call Icon"> Call Now
+    </a>
+  `;
+  document.getElementById("actionButtons").innerHTML = buttonsHTML;
+
+  // Load chat + customer recall
+  async function loadData() {
+    try {
+      const chatRes = await fetch(`https://ai.instantmechanic.online/bot/customer_chats/?mobile=${mobile}`);
+      const recallRes = await fetch(`https://ai.instantmechanic.online/bot/api/customer-recall/?mobile=${mobile.replace(/^91/, '')}`);
+
+      const chatData = await chatRes.json();
+      const recallData = await recallRes.json();
+
+      const messages = chatData?.data?.[0]?.chats || [];
+      const events = chatData?.data?.[0]?.events || [];
+
+      recallData.forEach(r => {
+        events.push({
+          action_type: r.action_type,
+          timestamp: r.created_at
         });
-        fetchHistory();
-      } catch (error) {
-        alert("Failed to track action.");
-      }
-    }
+      });
 
-    async function fetchHistory() {
-      const response = await fetch(apiUrl);
-      const result = await response.json();
-      const list = result.filter(item => item.mobile === mobile);
-      const historyTable = document.getElementById("history");
-      if (list.length === 0) {
-        historyTable.innerHTML = '<tr><td colspan="3">No history found.</td></tr>';
-        return;
-      }
-      historyTable.innerHTML = list.reverse().map(item => `
-        <tr>
-          <td>${item.action_type.toUpperCase()}</td>
-          <td>${item.agent_name}</td>
-          <td>${new Date(item.created_at).toLocaleString()}</td>
-        </tr>
-      `).join("");
-    }
+      const combined = [];
 
-    fetchHistory();
-  </script>
+      messages.forEach(m => {
+        combined.push({
+          type: "chat",
+          isCustomer: m.is_from_customer,
+          message: m.message,
+          timestamp: new Date(m.timestamp)
+        });
+      });
+
+      events.forEach(e => {
+        combined.push({
+          type: "event",
+          action_type: e.action_type,
+          timestamp: new Date(e.timestamp)
+        });
+      });
+
+      combined.sort((a, b) => a.timestamp - b.timestamp);
+
+      const chatBox = document.getElementById("chatBox");
+      chatBox.innerHTML = '';
+
+      combined.forEach(item => {
+        if (item.type === "chat") {
+          const bubble = document.createElement('div');
+          bubble.classList.add('chat-bubble', item.isCustomer ? 'from-customer' : 'from-agent');
+          bubble.innerHTML = `
+            ${item.message.replace(/\n/g, "<br>")}
+            <div class="chat-time">${item.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+          `;
+          chatBox.appendChild(bubble);
+        } else if (item.type === "event") {
+          const div = document.createElement('div');
+          const time = item.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          let icon = item.action_type === 'call' ? '📞' : '💬';
+          let text = `${agentName} ${item.action_type === 'call' ? 'called' : 'sent WhatsApp'} at ${time}`;
+          div.className = 'event-entry';
+          div.textContent = `${icon} ${text}`;
+          chatBox.appendChild(div);
+        }
+      });
+
+    } catch (error) {
+      document.getElementById("chatBox").innerHTML = "Failed to load history.";
+      console.error(error);
+    }
+  }
+
+  loadData();
+</script>
+
 
 </body>
 </html>
