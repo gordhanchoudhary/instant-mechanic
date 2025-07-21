@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Agent Performance Funnel</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f9fafc;
+      color: #333;
+    }
+
+    header {
+      background: #2b7a78;
+      padding: 16px 24px;
+      color: white;
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      padding: 16px 24px;
+      background: #fff;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .filters select,
+    .filters input {
+      margin-right: 12px;
+      margin-bottom: 8px;
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+
+    .dashboard {
+      padding: 24px;
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 24px;
+    }
+
+    .score-card {
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    }
+
+    .score-card h3 {
+      margin: 0 0 8px;
+    }
+
+    .insights {
+      background: #fff;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    }
+
+    .funnel-row {
+      border-left: 5px solid #2196f3;
+      background: #f1f9ff;
+      padding: 12px 16px;
+      margin-bottom: 14px;
+      border-radius: 10px;
+      transition: all 0.3s;
+    }
+
+    .funnel-row.no-response { border-left-color: #f44336; background: #ffeaea; }
+    .funnel-row.slow-response { border-left-color: #ff9800; background: #fff5e6; }
+    .funnel-row.converted { border-left-color: #4caf50; background: #ecf9f1; }
+
+    .funnel-row h4 {
+      margin: 0;
+      font-size: 16px;
+    }
+
+    .funnel-row .tags {
+      margin: 6px 0;
+      font-size: 13px;
+    }
+
+    .tag {
+      display: inline-block;
+      margin: 2px 5px 2px 0;
+      padding: 2px 6px;
+      background: #eee;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+
+    .remarks {
+      margin-top: 6px;
+      font-style: italic;
+      color: #666;
+    }
+
+    .timestamp {
+      font-size: 12px;
+      color: #888;
+      margin-top: 4px;
+    }
+  </style>
+</head>
+<body>
+  <header>🚦 Agent Funnel & Performance Dashboard</header>
+  <div class="filters">
+    <input type="date" id="dateFilter">
+    <select id="agentFilter">
+      <option value="all">All Agents</option>
+    </select>
+  </div>
+  <div class="dashboard">
+    <div class="score-card">
+      <h3>Performance Score</h3>
+      <p id="agentScoreBox"></p>
+    </div>
+    <div class="insights">
+      <h3>Call Funnel & Issues</h3>
+      <div id="funnelBox"></div>
+    </div>
+  </div>
+
+  <script>
+    let allData = [];
+
+    async function loadFunnelData(date) {
+      const res = await fetch(`https://ai.instantmechanic.online/bot/api/agent-track?date=${date}`);
+      const json = await res.json();
+      allData = json.data || [];
+
+      const agentSet = new Set(allData.map(item => item.agent_name).filter(Boolean));
+      const agentFilter = document.getElementById("agentFilter");
+      agentFilter.innerHTML = '<option value="all">All Agents</option>';
+      agentSet.forEach(agent => {
+        const opt = document.createElement("option");
+        opt.value = agent;
+        opt.textContent = agent;
+        agentFilter.appendChild(opt);
+      });
+
+      agentFilter.addEventListener('change', () => renderFunnel(agentFilter.value));
+      renderFunnel("all");
+    }
+
+    function calculateScore(agentData) {
+      let totalScore = 0;
+      agentData.forEach(d => {
+        let score = 0;
+        if (d.time_taken_to_respond === null) score -= 100;
+        else if (d.time_taken_to_respond < 30) score += 100;
+        else if (d.time_taken_to_respond < 60) score += 70;
+        else if (d.time_taken_to_respond < 120) score += 50;
+        else if (d.time_taken_to_respond < 300) score += 30;
+        else if (d.time_taken_to_respond < 600) score += 15;
+        else score -= 100;
+
+        if (d.remarks && d.remarks.trim() !== '') score += 50;
+        else score -= 50;
+
+        totalScore += score;
+      });
+      return Math.max(totalScore, 0);
+    }
+
+    function formatTimestamp(ts) {
+      if (!ts) return '';
+      const d = new Date(ts);
+      return d.toLocaleString();
+    }
+
+    function renderFunnel(agent) {
+      const container = document.getElementById("funnelBox");
+      const scoreBox = document.getElementById("agentScoreBox");
+      const filtered = agent === "all" ? allData : allData.filter(d => d.agent_name === agent);
+
+      const score = calculateScore(filtered);
+      scoreBox.innerHTML = `<strong>${agent === "all" ? "All Agents" : agent}</strong>: ${score} points`;
+
+      container.innerHTML = "";
+      filtered.reverse().forEach(item => {
+        const row = document.createElement("div");
+        row.className = "funnel-row";
+
+        if (!item.first_action_type) row.classList.add('no-response');
+        else if (item.time_taken_to_respond > 600) row.classList.add('slow-response');
+        if (item.is_converted) row.classList.add('converted');
+
+        const tags = [];
+        if (item.first_action_type) tags.push(`<span class="tag">${item.first_action_type}</span>`);
+        if (item.time_taken_to_respond > 600) tags.push(`<span class="tag">Delayed</span>`);
+        tags.push(`<span class="tag">${item.is_converted ? 'Converted' : 'Not Converted'}</span>`);
+
+        row.innerHTML = `
+          <h4>+${item.mobile}</h4>
+          <div><strong>Agent:</strong> ${item.agent_name || '—'} | <strong>Responded:</strong> ${item.time_taken_to_respond !== null ? Math.floor(item.time_taken_to_respond ) + ' Sec' : 'No'}</div>
+          <div class="tags">${tags.join(" ")}</div>
+          ${item.remarks ? `<div class="remarks">📝 ${item.remarks}</div>` : ''}
+          <div class="timestamp">📅 ${formatTimestamp(item.system_notify_time)}</div>
+        `;
+
+        container.appendChild(row);
+      });
+    }
+
+    document.getElementById("dateFilter").addEventListener("change", (e) => {
+      loadFunnelData(e.target.value);
+    });
+
+    document.getElementById("dateFilter").value = new Date().toISOString().split("T")[0];
+    loadFunnelData(document.getElementById("dateFilter").value);
+  </script>
+</body>
+</html>
