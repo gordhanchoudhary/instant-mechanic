@@ -32,11 +32,27 @@
     </div>
 
     <!-- Summary Cards -->
-    <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+    <div class="grid grid-cols-2 md:grid-cols-8 gap-4 mb-6">
+      <div class="bg-white shadow p-4 rounded-lg text-center">
+        <p class="text-gray-500 text-sm">Total Customers</p>
+        <p id="totalCustomers" class="text-2xl font-bold text-indigo-700">0</p>
+      </div>
+
       <div class="bg-white shadow p-4 rounded-lg text-center">
         <p class="text-gray-500 text-sm">Total Bookings</p>
         <p id="totalBookings" class="text-xl font-bold text-blue-600">0</p>
       </div>
+
+      <div class="bg-white shadow p-4 rounded-lg text-center">
+        <p class="text-gray-500 text-sm">Total Revenue</p>
+        <p id="totalRevenue" class="text-xl font-bold text-yellow-600">0</p>
+      </div>
+
+      <div class="bg-white shadow p-4 rounded-lg text-center">
+        <p class="text-gray-500 text-sm">Total Advance Payments</p>
+        <p id="totalAdvancePayment" class="text-xl font-bold text-blue-700">0</p>
+      </div>
+
       <div class="bg-white shadow p-4 rounded-lg text-center">
         <p class="text-gray-500 text-sm">Total Collected</p>
         <p id="totalCollected" class="text-xl font-bold text-green-600">₹0</p>
@@ -65,7 +81,7 @@
             <th class="p-3">Car</th>
             <th class="p-3">Problem</th>
             <th class="p-3">Price</th>
-            <th class="p-3">Mech. ID</th>
+            <th class="p-3">Mechanic</th>
             <th class="p-3">Paid</th>
             <th class="p-3">Pending</th>
             <th class="p-3">Agent</th>
@@ -98,6 +114,30 @@
       totalPending.textContent = '₹0';
       totalCancelled.textContent = '0';
       totalNotAssigned.textContent = '0';
+
+      const totalCustomers = document.getElementById("totalCustomers");
+      const totalRevenue = document.getElementById("totalRevenue");
+      const totalAdvancePayment = document.getElementById("totalAdvancePayment");
+      
+      totalCustomers.textContent = '0';
+      totalRevenue.textContent = '0';
+      totalAdvancePayment.textContent = '0';
+
+
+      try {
+        const customerRes = await fetch(`https://ai.instantmechanic.online/bot/api/customer-flow/by-date/?date=${date}`);
+        const customerData = await customerRes.json();
+        totalCustomers.textContent = customerData.total_customers || 0;
+        totalRevenue.textContent = formatCurrency(customerData.total_revenue) || '₹0';
+        totalAdvancePayment.textContent = customerData.payment_done_bookings || 0;
+        totalCollected.textContent = formatCurrency(customerData.payment_collected) || '₹0';
+        totalPending.textContent = formatCurrency(customerData.payment_pending) || '₹0';
+
+
+      } catch (err) {
+        totalCustomers.textContent = '0';
+      }
+
 
       const url = `https://ai.instantmechanic.online/bot/api/booking/by-date/?date=${date}`;
       const res = await fetch(url);
@@ -143,10 +183,10 @@
             <td class="p-3">${item.car}</td>
             <td class="p-3">${item.problem}</td>
             <td class="p-3">${item.price}</td>
-            <td class="p-3">${item.mechanic ?? '-'}</td>
+            <td class="p-3">${item.mechanic_name ?? '-'}</td>
             <td class="p-3 text-green-600">${formatCurrency(paid)}</td>
             <td class="p-3 text-yellow-600">${formatCurrency(pendingAmount)}</td>
-            <td class="p-3">${item.agent ?? '-'}</td>
+            <td class="p-3">${item.agent_name ?? '-'}</td>
             <td class="p-3 ${item.is_cancelled ? 'text-red-500' : 'text-green-500'} font-bold">
               ${item.is_cancelled ? 'Yes' : 'No'}
             </td>
@@ -162,8 +202,7 @@
       });
 
       totalBookings.textContent = count;
-      totalCollected.textContent = formatCurrency(collected);
-      totalPending.textContent = formatCurrency(pending);
+
       totalCancelled.textContent = cancelled;
       totalNotAssigned.textContent = notAssigned;
     }
