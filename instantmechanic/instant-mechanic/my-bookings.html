@@ -6,7 +6,7 @@
   <title>Booking Details | Instant Mechanic</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>body { font-family: 'Inter', sans-serif; }</style>
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDAq3BjKpY_ZxvaFjoE4pkTjO6Gn6HUz2E"></script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAEFSrFGkBtDgc962tBB4WVlSssDhiZkUI"></script>
 </head>
 <body class="bg-[#F4F5F9] flex flex-col items-center min-h-screen">
 
@@ -296,7 +296,7 @@ function showAfterPaymentUI() {
         localStorage.removeItem(`booking_timer_${mobile}`);
         window.location.reload();
       }
-      agent_mobile = data.agent_mobile
+      agent_mobile =  data.agent_mobile
       localStorage.setItem("mechanicMobile",agent_mobile )
 
 
@@ -393,7 +393,7 @@ document.getElementById('cancelBooking').addEventListener('click', () => {
   });
 
   async function getLatLngFromAddress(address) {
-    const apiKey = 'AIzaSyDAq3BjKpY_ZxvaFjoE4pkTjO6Gn6HUz2E';  // replace with your actual key
+    const apiKey = 'AIzaSyAEFSrFGkBtDgc962tBB4WVlSssDhiZkUI';  // replace with your actual key
     const encodedAddress = encodeURIComponent(address);
     const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodedAddress}&key=${apiKey}`;
 
