@@ -296,6 +296,8 @@ function showAfterPaymentUI() {
         localStorage.removeItem(`booking_timer_${mobile}`);
         window.location.reload();
       }
+      agent_mobile = "+91 " + data.agent_mobile
+      localStorage.setItem("mechanicMobile",agent_mobile )
 
 
       
@@ -323,8 +325,7 @@ if (isPaid) {
     <img src="https://cdn-icons-png.flaticon.com/512/4272/4272841.png" class="w-4 h-4 mr-2 inline-block" />
     Paid (₹${data.advance_payment_amount})
   `;
-  agent_mobile = "+91 " + data.agent_mobile
-  localStorage.setItem("mechanicMobile",agent_mobile )
+
 
   // If mechanic is assigned
   if (data.mechanic) {
