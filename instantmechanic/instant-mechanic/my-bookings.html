@@ -139,9 +139,14 @@
 <script>
   const query = new URLSearchParams(window.location.search);
   const mobile = query.get('mobile');
+  const carNumber = query.get('cn');
   const apiUrl = `https://ai.instantmechanic.online/bot/api/booking-details?mobile=${mobile}`;
   const isPaid = localStorage.getItem('paid') === 'true';
   const hasVehicleNumber = localStorage.getItem('vehicleNumber');
+
+  if(carNumber == "y" && !hasVehicleNumber){
+    showCarNumberPopup();
+  }
 
 
 
@@ -175,8 +180,7 @@
     // Optional: Send to your API
     sendVehicleNumberToAPI(vehicleNumber);
     
-    hideCarNumberPopup();
-    showAfterPaymentUI();
+
   });
 
   // Allow Enter key to submit
@@ -221,9 +225,13 @@
       
       if (response.ok) {
         console.log('Vehicle number updated successfully');
+        hideCarNumberPopup();
+        window.location.reload();
       }
     } catch (error) {
       console.error('Failed to update vehicle number:', error);
+        hideCarNumberPopup();
+        window.location.reload();
     }
   }
 
