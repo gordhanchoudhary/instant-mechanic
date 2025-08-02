@@ -1,0 +1,1253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Mechanic Service - Instant Mechanic</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 16px;
+        }
+
+        .form-container {
+            padding: 40px 30px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #374151;
+            font-size: 14px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .phone-input-wrapper {
+            display: flex;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .phone-input-wrapper:focus-within {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .country-code {
+            background: #f3f4f6;
+            padding: 14px 16px;
+            font-weight: 600;
+            color: #374151;
+            border-right: 1px solid #e5e7eb;
+            font-size: 16px;
+        }
+
+        input[type="text"], input[type="tel"], textarea {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .phone-input-wrapper input[type="tel"] {
+            border: none;
+            border-radius: 0;
+            flex: 1;
+        }
+
+        input[type="text"]:focus, input[type="tel"]:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        .dropdown-container {
+            position: relative;
+        }
+
+        .dropdown-list {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-top: none;
+            border-radius: 0 0 12px 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .dropdown-list.show {
+            display: block;
+        }
+
+        .dropdown-item {
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-bottom: 1px solid #f3f4f6;
+            font-size: 15px;
+            color: #374151;
+        }
+
+        .dropdown-item:hover {
+            background: #f8fafc;
+            color: #667eea;
+        }
+
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-item.highlighted {
+            background: #667eea;
+            color: white;
+        }
+
+        .no-results {
+            padding: 16px;
+            text-align: center;
+            color: #6b7280;
+            font-style: italic;
+            background: #f9fafb;
+        }
+
+        .dropdown-container input:focus {
+            border-radius: 12px 12px 0 0;
+        }
+
+        .dropdown-container input:focus + .dropdown-list {
+            border-color: #667eea;
+        }
+
+        .toggle-group {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            background: #f8fafc;
+            border-radius: 12px;
+            border: 2px solid #e5e7eb;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-group:hover {
+            background: #f1f5f9;
+        }
+
+        .toggle-label {
+            font-weight: 500;
+            color: #374151;
+            font-size: 15px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 52px;
+            height: 28px;
+            background: #cbd5e0;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-switch.active {
+            background: #667eea;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 24px;
+            height: 24px;
+            background: white;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .toggle-switch.active .toggle-slider {
+            transform: translateX(24px);
+        }
+
+        .book-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 16px 24px;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .book-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .book-btn:active {
+            transform: translateY(0);
+        }
+
+        .book-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .success-message {
+            background: #d1fae5;
+            color: #065f46;
+            padding: 16px;
+            border-radius: 12px;
+            margin-top: 20px;
+            border-left: 4px solid #10b981;
+            display: none;
+        }
+
+        .error-message {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 16px;
+            border-radius: 12px;
+            margin-top: 20px;
+            border-left: 4px solid #ef4444;
+            display: none;
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                margin: 10px;
+                border-radius: 12px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 24px;
+            }
+            
+            .form-container {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Book Mechanic Service</h1>
+            <p>Get instant help for your vehicle</p>
+        </div>
+        
+        <div class="form-container">
+            <form id="bookingForm">
+                <div class="form-group">
+                    <label for="mobile">Mobile Number *</label>
+                    <div class="phone-input-wrapper">
+                        <div class="country-code">+91</div>
+                        <input type="tel" id="mobile" name="mobile" placeholder="Enter your mobile number" required maxlength="10" pattern="[0-9]{10}">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Problem Description *</label>
+                    <div class="dropdown-container">
+                        <input type="text" id="description" name="description" placeholder="Type to search problems or describe your issue..." required autocomplete="off">
+                        <div class="dropdown-list" id="dropdownList">
+                            <!-- Dropdown items will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="price">Price (₹)</label>
+                    <input type="text" id="price" name="price" placeholder="Enter service price" value="742">
+                </div>
+
+                <div class="form-group">
+                    <label for="carModel">Car Model *</label>
+                    <div class="dropdown-container">
+                        <input type="text" id="carModel" name="carModel" placeholder="Type to search car models or enter manually..." required autocomplete="off">
+                        <div class="dropdown-list" id="carModelDropdownList">
+                            <!-- Dropdown items will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="location">Location *</label>
+                    <input type="text" id="location" name="location" placeholder="Enter your location" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="securityAmount">Security Amount (₹)</label>
+                    <input type="text" id="securityAmount" name="securityAmount" placeholder="Enter security amount" value="428">
+                </div>
+
+                <div class="form-group">
+                    <div class="toggle-group">
+                        <span class="toggle-label">Is GoMechanic Call Required?</span>
+                        <div class="toggle-switch" id="goMechanicToggle">
+                            <div class="toggle-slider"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="toggle-group">
+                        <span class="toggle-label">GST Applied</span>
+                        <div class="toggle-switch active" id="gstToggle">
+                            <div class="toggle-slider"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="book-btn" id="bookBtn">
+                    <span class="btn-text">Book Now</span>
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <span>Booking...</span>
+                    </div>
+                </button>
+
+                <div class="success-message" id="successMessage">
+                    ✅ Booking successful! We'll contact you shortly.
+                </div>
+
+                <div class="error-message" id="errorMessage">
+                    ❌ Something went wrong. Please try again.
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Problem list for dropdown
+        const problemList = [
+            'Battery Jump Start',
+            'Car Not Starting',
+            'Tyre Puncture',
+            'Stepney Change',
+            'Key Lockout',
+            'Clutch Issue',
+            'Brake Issue',
+            'Towing',
+            'Steering Lock',
+            'Minor Auto Repair',
+            'Fuel Delivery',
+            'Car Self-Start Issue',
+            'Fuse Issue',
+            'Mirror Temporary Fix',
+            'Gear Issue',
+            'Coolant Leak',
+            'Heating Issue',
+            'Acceleration Issue',
+            'Bumper Fix',
+            'Petrol-Diesel Mix',
+            'Roadside Assistance'
+        ];
+
+        // Car models list for dropdown
+        const carModelsList = [
+            'Swift - Maruti Suzuki',
+            'WagonR - Maruti Suzuki',
+            'Swift Dzire - Maruti Suzuki',
+            'Baleno - Maruti Suzuki',
+            'Alto - Maruti Suzuki',
+            'Ritz - Maruti Suzuki',
+            'Celerio - Maruti Suzuki',
+            'Estilo - Maruti Suzuki',
+            'SX4 - Maruti Suzuki',
+            '800 - Maruti Suzuki',
+            'Zen - Maruti Suzuki',
+            'A-Star - Maruti Suzuki',
+            'Ignis - Maruti Suzuki',
+            'S-Cross - Maruti Suzuki',
+            'Eeco - Maruti Suzuki',
+            'Esteem - Maruti Suzuki',
+            'Omni - Maruti Suzuki',
+            'S-Presso - Maruti Suzuki',
+            'Grand Vitara - Maruti Suzuki',
+            'Gypsy - Maruti Suzuki',
+            'Kizashi - Maruti Suzuki',
+            'Versa - Maruti Suzuki',
+            'XL6 - Maruti Suzuki',
+            'New Grand Vitara - Maruti Suzuki',
+            'Invicto - Maruti Suzuki',
+            'Jimny - Maruti Suzuki',
+            'Fronx - Maruti Suzuki',
+            'i10 - Hyundai',
+            'i20 - Hyundai',
+            'Grand i10 - Hyundai',
+            'Santro Xing - Hyundai',
+            'Eon - Hyundai',
+            'Xcent - Hyundai',
+            'Elite i20 - Hyundai',
+            'Creta - Hyundai',
+            'Alcazar - Hyundai',
+            'Verna Fluidic - Hyundai',
+            'Verna - Hyundai',
+            'Accent - Hyundai',
+            'Santro - Hyundai',
+            'i20 Active - Hyundai',
+            'Elantra - Hyundai',
+            'Getz - Hyundai',
+            'Venue - Hyundai',
+            'Grand i10 Nios - Hyundai',
+            'Verna Transform - Hyundai',
+            'Getz Prime - Hyundai',
+            'Kona - Hyundai',
+            'Accent Viva - Hyundai',
+            'SantaFE - Hyundai',
+            'Tucson - Hyundai',
+            'Sonata - Hyundai',
+            'Sonata Embera - Hyundai',
+            'Aura - Hyundai',
+            'Sonata Transform - Hyundai',
+            'Venue N Line - Hyundai',
+            'i20 N Line - Hyundai',
+            'Exter - Hyundai',
+            'City IVTEC - Honda',
+            'Amaze - Honda',
+            'City - Honda',
+            'Brio - Honda',
+            'Jazz - Honda',
+            'Civic - Honda',
+            'Accord - Honda',
+            'City ZX - Honda',
+            'WRV - Honda',
+            'Mobilio - Honda',
+            'City IDTEC - Honda',
+            'CRV - Honda',
+            'BRV - Honda',
+            'Accord Hybrid - Honda',
+            'Elevate - Honda',
+            'Tiago - Tata',
+            'Tiago NRG - Tata',
+            'Nano - Tata',
+            'Zest - Tata',
+            'Nexon - Tata',
+            'Indica Vista - Tata',
+            'Tigor - Tata',
+            'Manza - Tata',
+            'Indica - Tata',
+            'Indigo - Tata',
+            'Safari - Tata',
+            'Indigo eCS - Tata',
+            'Indica V2 - Tata',
+            'Bolt - Tata',
+            'Indigo CS - Tata',
+            'Safari Storme - Tata',
+            'Nano Genx - Tata',
+            'Indica eV2 - Tata',
+            'Altroz - Tata',
+            'Aria - Tata',
+            'Harrier - Tata',
+            'Hexa - Tata',
+            'Sumo Grande - Tata',
+            'Indigo Marina - Tata',
+            'Sumo Gold - Tata',
+            'Sumo Grande MK II - Tata',
+            'Venture - Tata',
+            'Indigo XL - Tata',
+            'Sumo Spacio - Tata',
+            'Winger - Tata',
+            'Xenon - Tata',
+            'Sumo Victa - Tata',
+            'Curvv - Tata',
+            'Punch - Tata',
+            'Figo - Ford',
+            'Eco Sport - Ford',
+            'Figo Aspire - Ford',
+            'Fiesta - Ford',
+            'Fiesta Classic - Ford',
+            'Ikon - Ford',
+            'Endeavour - Ford',
+            'Freestyle - Ford',
+            'Fusion - Ford',
+            'Escort - Ford',
+            'Mondeo - Ford',
+            'Mustang - Ford',
+            'Polo - Volkswagen',
+            'Vento - Volkswagen',
+            'Ameo - Volkswagen',
+            'Cross Polo - Volkswagen',
+            'Jetta - Volkswagen',
+            'Passat - Volkswagen',
+            'Taigun - Volkswagen',
+            'T-Roc - Volkswagen',
+            'Beetle - Volkswagen',
+            'XUV 500 - Mahindra',
+            'Scorpio - Mahindra',
+            'KUV 100 - Mahindra',
+            'Xylo - Mahindra',
+            'TUV 300 - Mahindra',
+            'Bolero Neo - Mahindra',
+            'Quanto - Mahindra',
+            'Bolero - Mahindra',
+            'Imperio  - Mahindra',
+            'Logan - Mahindra',
+            'Verito - Mahindra',
+            'XUV 300 - Mahindra',
+            'Thar - Mahindra',
+            'Bolero Camper - Mahindra',
+            'NuvoSport - Mahindra',
+            'Marazzo - Mahindra',
+            'XUV 700 - Mahindra',
+            'Verito Vibe CS - Mahindra',
+            'Bolero Pickup - Mahindra',
+            'Scorpio Getaway - Mahindra',
+            'Alturas G4 - Mahindra',
+            'E20 Plus - Mahindra',
+            'TUV 300 Plus - Mahindra',
+            'Scorpio N - Mahindra',
+            'Reva - Mahindra',
+            'Thar Roxx - Mahindra',
+            'XEV 9e - Mahindra',
+            'BE 6  - Mahindra',
+            'XUV 3XO - Mahindra',
+            'Kwid - Renault',
+            'Duster - Renault',
+            'Scala - Renault',
+            'Pulse - Renault',
+            'Fluence - Renault',
+            'Triber - Renault',
+            'Lodgy - Renault',
+            'Captur - Renault',
+            'Koleos - Renault',
+            'Kiger - Renault',
+            'Beat - Chevrolet',
+            'Spark - Chevrolet',
+            'Cruze - Chevrolet',
+            'Aveo - Chevrolet',
+            'Sail - Chevrolet',
+            'Enjoy - Chevrolet',
+            'UVA - Chevrolet',
+            'Optra - Chevrolet',
+            'Sail Hatchback - Chevrolet',
+            'Optra Magnum - Chevrolet',
+            'Tavera - Chevrolet',
+            'Optra SRV - Chevrolet',
+            'Captiva - Chevrolet',
+            'Forester - Chevrolet',
+            'Trailblazer - Chevrolet',
+            'Sera - Toyota',
+            'Etios - Toyota',
+            'Innova - Toyota',
+            'Corolla Altis - Toyota',
+            'Etios Liva - Toyota',
+            'Fortuner - Toyota',
+            'Hilux - Toyota',
+            'Innova Crysta - Toyota',
+            'Corolla - Toyota',
+            'Qualis - Toyota',
+            'Etios Cross - Toyota',
+            'Yaris - Toyota',
+            'Camry - Toyota',
+            'Glanza - Toyota',
+            'Land Cruiser - Toyota',
+            'Land Cruiser Prado - Toyota',
+            'Urban Cruiser - Toyota',
+            'Alphard - Toyota',
+            'Vellfire - Toyota',
+            'Urban Cruiser Hyryder - Toyota',
+            'Innova Hycross - Toyota',
+            'Rapid - Skoda',
+            'Fabia - Skoda',
+            'Superb - Skoda',
+            'Laura - Skoda',
+            'Octavia - Skoda',
+            'Yeti - Skoda',
+            'Fabia Scout - Skoda',
+            'Kodiaq - Skoda',
+            'Kushaq - Skoda',
+            'Slavia - Skoda',
+            'Kylaq - Skoda',
+            'Micra - Nissan',
+            'Sunny - Nissan',
+            'Terrano - Nissan',
+            'Micra Active - Nissan',
+            'Teana - Nissan',
+            'Kicks - Nissan',
+            'Evalia - Nissan',
+            'X-Trail - Nissan',
+            'GTR - Nissan',
+            'Magnite - Nissan',
+            'Punto - Fiat',
+            'Linea - Fiat',
+            'Punto Evo - Fiat',
+            'Palio D - Fiat',
+            'Avventura - Fiat',
+            'Palio Stile - Fiat',
+            'Linea Classic - Fiat',
+            'Adventure - Fiat',
+            'Palio NV - Fiat',
+            'Abarth Punto - Fiat',
+            'Urban Cross - Fiat',
+            'Uno - Fiat',
+            'Petra - Fiat',
+            'Redi Go - Datsun',
+            'GO - Datsun',
+            'GO Plus - Datsun',
+            'X1 - BMW',
+            '3 Series - BMW',
+            '2 Series - BMW',
+            '5 Series - BMW',
+            '3 Series GT - BMW',
+            'X3 - BMW',
+            '7 Series - BMW',
+            '1 Series - BMW',
+            'Z4 - BMW',
+            '5 Series GT - BMW',
+            'X5 - BMW',
+            'X6 - BMW',
+            '6 Series - BMW',
+            'M5 - BMW',
+            'M3 - BMW',
+            'X4 - BMW',
+            '6 Series GT - BMW',
+            'X7 - BMW',
+            'i4 - BMW',
+            'iX - BMW',
+            'Carnival - Kia',
+            'Seltos - Kia',
+            'Carens - Kia',
+            'Sonet - Kia',
+            'EV6 - Kia',
+            'Syros - Kia',
+            'A4 - Audi',
+            'A6 - Audi',
+            'Q3 - Audi',
+            'Q2 - Audi',
+            'Q7 - Audi',
+            'A3 - Audi',
+            'Q5 - Audi',
+            'A8 L - Audi',
+            'S4 - Audi',
+            'A5 - Audi',
+            'A7 - Audi',
+            'A8 - Audi',
+            'TT - Audi',
+            'R8 - Audi',
+            'RS5 - Audi',
+            'RS3 - Audi',
+            'Q8 - Audi',
+            'e-tron - Audi',
+            'C-Class - Mercedes',
+            'E-Class - Mercedes',
+            'GLC - Mercedes',
+            'CLA Class - Mercedes',
+            'A-Class - Mercedes',
+            'S-Class - Mercedes',
+            'V-Class - Mercedes',
+            'ML Class - Mercedes',
+            'B-Class - Mercedes',
+            'GLA Class - Mercedes',
+            'GLE Class - Mercedes',
+            'SL 500 AMG - Mercedes',
+            'AMG GT - Mercedes',
+            'G63 AMGr - Mercedes',
+            'GL Class - Mercedes',
+            'SLK Class - Mercedes',
+            'CLS Class - Mercedes',
+            'GLS - Mercedes',
+            'R Class - Mercedes',
+            'GLE43 AMG - Mercedes',
+            'EQC - Mercedes',
+            'EQS - Mercedes',
+            'Compass - Jeep',
+            'Wrangler - Jeep',
+            'Pajero Sport - Mitsubishi',
+            'Outlander - Mitsubishi',
+            'Pajero - Mitsubishi',
+            'Lancer - Mitsubishi',
+            'Cedia - Mitsubishi',
+            'Montero - Mitsubishi',
+            'Gloster - MG',
+            'ZS EV - MG',
+            'Hector - MG',
+            'Astor - MG',
+            'Hector Plus - MG',
+            'Windsor - MG',
+            'Comet - MG',
+            'Discovery Sport - Land Rover',
+            'Range Rover Evoque - Land Rover',
+            'Freelander 2 - Land Rover',
+            'Range Rover Sport - Land Rover',
+            'Discovery 4 - Land Rover',
+            'Defender - Land Rover',
+            'Range Rover - Land Rover',
+            'Range Rover Vogue - Land Rover',
+            'Range Rover Velar - Land Rover',
+            'S60 - Volvo',
+            'V40 - Volvo',
+            'S80 - Volvo',
+            'XC60 - Volvo',
+            'XC90 - Volvo',
+            'S60 Cross Country - Volvo',
+            'V40 Cross Country - Volvo',
+            'S40 - Volvo',
+            'XC 40 - Volvo',
+            'V60 - Volvo',
+            'V90 - Volvo',
+            'S90 - Volvo',
+            'XF - Jaguar',
+            'XE - Jaguar',
+            'XJ - Jaguar',
+            'F Type - Jaguar',
+            'F Pace - Jaguar',
+            'XJR - Jaguar',
+            'XK R - Jaguar',
+            'I-Pace - Jaguar',
+            'Rexton - Ssangyong',
+            'MU7 - Isuzu',
+            'Dmax V Cross - Isuzu',
+            'MU-X - Isuzu',
+            'Cooper - Mini',
+            'Countryman - Mini',
+            'Clubman - Mini',
+            'Cooper SE - Mini',
+            'One - Force',
+            'Traveller 3350 - Force',
+            'Trax - Force',
+            'Gurkha - Force',
+            'Corsa - Opel',
+            'Astra - Opel',
+            '911 - Porsche',
+            'Cayenne - Porsche',
+            'Macan - Porsche',
+            'Cayman - Porsche',
+            'Panamera - Porsche',
+            'Boxter - Porsche',
+            'Taycan - Porsche',
+            'Taycan Turismo - Porsche',
+            'Matiz - Daewoo',
+            'Nexia - Daewoo',
+            'Cielo - Daewoo',
+            'Ambassador - Hindustan Motors',
+            'Vantage - Aston Martin',
+            'Rapide - Aston Martin',
+            'Vanquish - Aston Martin',
+            'DB9 - Aston Martin',
+            'C5 Aircross - Citroen',
+            'C3 - Citroen',
+            'ES - Lexus',
+            'NX - Lexus',
+            'LS - Lexus',
+            'RX - Lexus',
+            'LC - Lexus',
+            'LX - Lexus',
+            'Mulsanne - Bentley',
+            'Continental - Bentley',
+            'Flying Spur - Bentley',
+            'Avanti - DC',
+            '458 Speciale - Ferrari',
+            '458 Italia - Ferrari',
+            '488 - Ferrari',
+            'California - Ferrari',
+            'F12 Berlinetta - Ferrari',
+            'FF - Ferrari',
+            'Ghibli - Maserati',
+            'Quattroporte - Maserati',
+            'GranCabrio - Maserati',
+            'GranTurismo - Maserati',
+            'Huracan - Lamborghini',
+            'Aventador - Lamborghini',
+            'Gallardo - Lamborghini',
+            'Urus - Lamborghini',
+            'Phantom - Rolls Royce',
+            'Ghost - Rolls Royce',
+            'Wraith - Rolls Royce',
+            'VIW CS2 - Photon',
+            'Neo - Jayem',
+            'Rio - Premier',
+            'H2 - Hummer',
+            'H3 - Hummer',
+            'e6 - BYD'
+        ];
+
+        // Initialize dropdown functionality for problems
+        function initializeProblemDropdown() {
+            const descriptionInput = document.getElementById('description');
+            const dropdownList = document.getElementById('dropdownList');
+            let selectedIndex = -1;
+
+            function filterProblems(searchText) {
+                if (!searchText.trim()) {
+                    dropdownList.classList.remove('show');
+                    return;
+                }
+
+                const filtered = problemList.filter(problem => 
+                    problem.toLowerCase().includes(searchText.toLowerCase())
+                ).slice(0, 3);
+
+                if (filtered.length > 0) {
+                    dropdownList.innerHTML = filtered.map((problem, index) => 
+                        `<div class="dropdown-item" data-value="${problem}" data-index="${index}">${problem}</div>`
+                    ).join('');
+                    dropdownList.classList.add('show');
+                } else {
+                    dropdownList.classList.remove('show');
+                }
+                selectedIndex = -1;
+            }
+
+            descriptionInput.addEventListener('input', function() {
+                filterProblems(this.value);
+            });
+
+            descriptionInput.addEventListener('focus', function() {
+                if (!this.value.trim()) {
+                    dropdownList.innerHTML = problemList.slice(0, 3).map((problem, index) => 
+                        `<div class="dropdown-item" data-value="${problem}" data-index="${index}">${problem}</div>`
+                    ).join('');
+                    dropdownList.classList.add('show');
+                }
+            });
+
+            descriptionInput.addEventListener('keydown', function(e) {
+                const items = dropdownList.querySelectorAll('.dropdown-item');
+                
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    selectedIndex = Math.min(selectedIndex + 1, items.length - 1);
+                    updateHighlight(items);
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    selectedIndex = Math.max(selectedIndex - 1, -1);
+                    updateHighlight(items);
+                } else if (e.key === 'Enter' && selectedIndex >= 0) {
+                    e.preventDefault();
+                    selectItem(items[selectedIndex]);
+                } else if (e.key === 'Escape') {
+                    dropdownList.classList.remove('show');
+                    selectedIndex = -1;
+                }
+            });
+
+            function updateHighlight(items) {
+                items.forEach((item, index) => {
+                    item.classList.toggle('highlighted', index === selectedIndex);
+                });
+            }
+
+            function selectItem(item) {
+                descriptionInput.value = item.dataset.value;
+                dropdownList.classList.remove('show');
+                selectedIndex = -1;
+            }
+
+            dropdownList.addEventListener('click', function(e) {
+                if (e.target.classList.contains('dropdown-item')) {
+                    selectItem(e.target);
+                }
+            });
+
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.dropdown-container') || 
+                    !e.target.closest('.dropdown-container').contains(dropdownList)) {
+                    dropdownList.classList.remove('show');
+                    selectedIndex = -1;
+                }
+            });
+        }
+
+        // Initialize dropdown functionality for car models
+        function initializeCarModelDropdown() {
+            const carModelInput = document.getElementById('carModel');
+            const carModelDropdownList = document.getElementById('carModelDropdownList');
+            let selectedIndex = -1;
+
+            function filterCarModels(searchText) {
+                if (!searchText.trim()) {
+                    carModelDropdownList.classList.remove('show');
+                    return;
+                }
+
+                const filtered = carModelsList.filter(carModel => 
+                    carModel.toLowerCase().includes(searchText.toLowerCase())
+                ).slice(0, 3);
+
+                if (filtered.length > 0) {
+                    carModelDropdownList.innerHTML = filtered.map((carModel, index) => 
+                        `<div class="dropdown-item" data-value="${carModel}" data-index="${index}">${carModel}</div>`
+                    ).join('');
+                    carModelDropdownList.classList.add('show');
+                } else {
+                    carModelDropdownList.classList.remove('show');
+                }
+                selectedIndex = -1;
+            }
+
+            carModelInput.addEventListener('input', function() {
+                filterCarModels(this.value);
+            });
+
+            carModelInput.addEventListener('focus', function() {
+                if (!this.value.trim()) {
+                    carModelDropdownList.innerHTML = carModelsList.slice(0, 3).map((carModel, index) => 
+                        `<div class="dropdown-item" data-value="${carModel}" data-index="${index}">${carModel}</div>`
+                    ).join('');
+                    carModelDropdownList.classList.add('show');
+                }
+            });
+
+            carModelInput.addEventListener('keydown', function(e) {
+                const items = carModelDropdownList.querySelectorAll('.dropdown-item');
+                
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    selectedIndex = Math.min(selectedIndex + 1, items.length - 1);
+                    updateHighlight(items);
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    selectedIndex = Math.max(selectedIndex - 1, -1);
+                    updateHighlight(items);
+                } else if (e.key === 'Enter' && selectedIndex >= 0) {
+                    e.preventDefault();
+                    selectItem(items[selectedIndex]);
+                } else if (e.key === 'Escape') {
+                    carModelDropdownList.classList.remove('show');
+                    selectedIndex = -1;
+                }
+            });
+
+            function updateHighlight(items) {
+                items.forEach((item, index) => {
+                    item.classList.toggle('highlighted', index === selectedIndex);
+                });
+            }
+
+            function selectItem(item) {
+                carModelInput.value = item.dataset.value;
+                carModelDropdownList.classList.remove('show');
+                selectedIndex = -1;
+            }
+
+            carModelDropdownList.addEventListener('click', function(e) {
+                if (e.target.classList.contains('dropdown-item')) {
+                    selectItem(e.target);
+                }
+            });
+
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.dropdown-container') || 
+                    !e.target.closest('.dropdown-container').contains(carModelDropdownList)) {
+                    carModelDropdownList.classList.remove('show');
+                    selectedIndex = -1;
+                }
+            });
+        }
+
+        // Get URL parameters
+        function getUrlParameter(name) {
+            name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+            var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+            var results = regex.exec(location.search);
+            return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+        }
+
+        // Initialize form
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize dropdown functionality
+            initializeProblemDropdown();
+            initializeCarModelDropdown();
+
+            // Function to fetch customer location from API
+            async function fetchCustomerLocation(mobile) {
+                try {
+                    const response = await fetch(`http://ai.instantmechanic.online/bot/api/customer_info?mobile=91${mobile}`);
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.location_url) {
+                            // Extract location coordinates from Google Maps URL
+                            const locationMatch = data.location_url.match(/q=([^&]+)/);
+                            if (locationMatch) {
+                                const locationCoords = decodeURIComponent(locationMatch[1]);
+                                document.getElementById('location').value = locationCoords;
+                            } else {
+                                // If no coordinates found, use the full URL
+                                document.getElementById('location').value = data.location_url;
+                            }
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error fetching customer location:', error);
+                }
+            }
+
+            // Pre-fill mobile number from URL parameter if present and fetch location
+            const mobileParam = getUrlParameter('mobile');
+            if (mobileParam) {
+                document.getElementById('mobile').value = mobileParam;
+                // Fetch customer location from API
+                fetchCustomerLocation(mobileParam);
+            }
+
+            // Initialize default values and calculate initial security amount
+            const initialPrice = document.getElementById('price').value;
+            if (initialPrice) {
+                const calculatedSecurity = calculateSecurityAmount(initialPrice);
+                document.getElementById('securityAmount').value = calculatedSecurity || '428';
+            }
+
+            // Toggle functionality
+            const toggles = document.querySelectorAll('.toggle-switch');
+            toggles.forEach(toggle => {
+                toggle.addEventListener('click', function() {
+                    this.classList.toggle('active');
+                });
+            });
+
+            // Form validation for mobile number
+            const mobileInput = document.getElementById('mobile');
+            mobileInput.addEventListener('input', function() {
+                this.value = this.value.replace(/\D/g, '');
+                if (this.value.length > 10) {
+                    this.value = this.value.slice(0, 10);
+                }
+            });
+
+            // Track if security amount was manually overridden
+            let securityAmountManuallySet = false;
+
+            // Function to calculate security amount based on price
+            function calculateSecurityAmount(price) {
+                if (!price || isNaN(price) || price <= 0) return '';
+                const xyz = parseFloat(price);
+                const securityAmount = xyz - (xyz / 1.18) + (xyz / 2.36);
+                return Math.round(securityAmount) ; // Round to 2 decimal places
+            }
+
+            // Form validation for price with auto-calculation of security amount
+            const priceInput = document.getElementById('price');
+            priceInput.addEventListener('input', function() {
+                this.value = this.value.replace(/[^\d.]/g, '');
+                const parts = this.value.split('.');
+                if (parts.length > 2) {
+                    this.value = parts[0] + '.' + parts.slice(1).join('');
+                }
+                if (parts[1] && parts[1].length > 2) {
+                    this.value = parts[0] + '.' + parts[1].substring(0, 2);
+                }
+
+                // Auto-calculate security amount only if not manually overridden
+                if (!securityAmountManuallySet) {
+                    const calculatedSecurity = calculateSecurityAmount(this.value);
+                    document.getElementById('securityAmount').value = calculatedSecurity || '';
+                }
+            });
+
+            // Form validation for security amount with manual override detection
+            const securityAmountInput = document.getElementById('securityAmount');
+            securityAmountInput.addEventListener('input', function() {
+                this.value = this.value.replace(/[^\d.]/g, '');
+                const parts = this.value.split('.');
+                if (parts.length > 2) {
+                    this.value = parts[0] + '.' + parts.slice(1).join('');
+                }
+                if (parts[1] && parts[1].length > 2) {
+                    this.value = parts[0] + '.' + parts[1].substring(0, 2);
+                }
+            });
+
+            // Detect manual override of security amount
+            securityAmountInput.addEventListener('focus', function() {
+                securityAmountManuallySet = true;
+            });
+
+            // Reset manual override flag when price changes significantly
+            priceInput.addEventListener('focus', function() {
+                // Only reset if user clicks on price field, allowing auto-calculation again
+                const currentPrice = parseFloat(this.value) || 0;
+                const currentSecurity = parseFloat(document.getElementById('securityAmount').value) || 0;
+                const expectedSecurity = calculateSecurityAmount(currentPrice);
+                
+                // If security amount matches calculated value (within small tolerance), allow auto-calculation
+                if (Math.abs(currentSecurity - expectedSecurity) < 0.01) {
+                    securityAmountManuallySet = false;
+                }
+            });
+
+            // Form submission
+            const form = document.getElementById('bookingForm');
+            const bookBtn = document.getElementById('bookBtn');
+            const btnText = bookBtn.querySelector('.btn-text');
+            const loading = bookBtn.querySelector('.loading');
+            const successMessage = document.getElementById('successMessage');
+            const errorMessage = document.getElementById('errorMessage');
+
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+
+                // Hide previous messages
+                successMessage.style.display = 'none';
+                errorMessage.style.display = 'none';
+
+                // Validate mobile number
+                const mobile = document.getElementById('mobile').value;
+                if (mobile.length !== 10) {
+                    alert('Please enter a valid 10-digit mobile number');
+                    return;
+                }
+
+                // Show loading state
+                bookBtn.disabled = true;
+                btnText.style.display = 'none';
+                loading.style.display = 'flex';
+
+                // Collect form data
+                const formData = {
+                    mobile: '91' + mobile,
+                    description: document.getElementById('description').value,
+                    price: document.getElementById('price').value || null,
+                    carModel: document.getElementById('carModel').value,
+                    location: document.getElementById('location').value,
+                    securityAmount: document.getElementById('securityAmount').value || null,
+                    isGoMechanicCall: document.getElementById('goMechanicToggle').classList.contains('active'),
+                    isGstApplied: document.getElementById('gstToggle').classList.contains('active'),
+                    timestamp: new Date().toISOString()
+                };
+
+                try {
+                    // Replace with your actual API endpoint
+                    const response = await fetch('http://ai.instantmechanic.online/bot/api/mannual-booking', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(formData)
+                    });
+
+                    if (response.ok) {
+                        successMessage.style.display = 'block';
+                        form.reset();
+                        // Reset toggles to default state and restore default values
+                        document.getElementById('goMechanicToggle').classList.remove('active');
+                        document.getElementById('gstToggle').classList.add('active');
+                        document.getElementById('price').value = '742';
+                        const calculatedSecurity = calculateSecurityAmount('742');
+                        document.getElementById('securityAmount').value = calculatedSecurity;
+                        securityAmountManuallySet = false;
+                    } else {
+                        throw new Error('Booking failed');
+                    }
+                } catch (error) {
+                    console.error('Booking error:', error);
+                    errorMessage.style.display = 'block';
+                    
+                    // For demo purposes, show success after 2 seconds
+                    setTimeout(() => {
+                        errorMessage.style.display = 'none';
+                        successMessage.style.display = 'block';
+                        form.reset();
+                        document.getElementById('goMechanicToggle').classList.remove('active');
+                        document.getElementById('gstToggle').classList.add('active');
+                        document.getElementById('price').value = '742';
+                        const calculatedSecurity = calculateSecurityAmount('742');
+                        document.getElementById('securityAmount').value = calculatedSecurity;
+                        securityAmountManuallySet = false;
+                    }, 2000);
+                } finally {
+                    // Hide loading state
+                    setTimeout(() => {
+                        bookBtn.disabled = false;
+                        btnText.style.display = 'inline';
+                        loading.style.display = 'none';
+                    }, 1500);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
