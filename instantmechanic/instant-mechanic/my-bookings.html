@@ -9,7 +9,38 @@
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAEFSrFGkBtDgc962tBB4WVlSssDhiZkUI"></script>
 </head>
 <body class="bg-[#F4F5F9] flex flex-col items-center min-h-screen">
-
+<!-- Car Number Popup (Mandatory) -->
+<div id="carNumberPopup" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
+  <div class="bg-white rounded-3xl p-8 mx-4 w-full max-w-sm shadow-2xl">
+    <div class="text-center mb-6">
+      <h2 class="text-2xl font-bold text-gray-800 mb-2">Enter Car Number</h2>
+      <p class="text-gray-600 text-sm">Please provide your car number to locate esaily</p>
+    </div>
+    
+    <div class="mb-6">
+      <div class="flex items-center bg-gray-100 rounded-2xl overflow-hidden">
+        <div class="bg-orange-500 text-white px-2 py-5 flex items-center">
+          <img src="https://flagcdn.com/w20/in.png" alt="India" class="w-5 h-3 mr-2">
+          <span class="text-sm font-semibold">IND</span>
+        </div>
+        <input 
+          type="text" 
+          id="vehicleNumberInput" 
+          placeholder="DL 12 AA 1234" 
+          class="flex-1 px-4 py-3 text-gray-700 text-lg font-medium placeholder-gray-400 bg-transparent focus:outline-none uppercase"
+          maxlength="15"
+        >
+      </div>
+    </div>
+    
+    <button 
+      id="submitVehicleNumber" 
+      class="w-full bg-orange-500 hover:bg-orange-600 text-white py-4 rounded-2xl text-lg font-semibold transition-colors"
+    >
+      Submit
+    </button>
+  </div>
+</div>
 <!-- Paid UI Image Replacement -->
 <div id="paidSection" class="relative w-full h-[50vh] max-w-sm overflow-hidden hidden">
   <div class="absolute top-4 left-4 bg-white rounded-full px-3 py-1 text-xs font-medium text-gray-700 shadow">Moving</div>
@@ -24,6 +55,8 @@
 <!-- After Payment Overlay -->
 <div id="afterPaymentOverlay" class="hidden w-full max-w-sm h-[50vh] bg-[#6B21A8] text-white relative flex flex-col items-center justify-start rounded-b-[2rem] overflow-hidden">
   <!-- Back Arrow -->
+
+  
 
   <!-- Countdown Circle -->
   <div class="mt-12 w-32 h-32 rounded-full border-[6px] border-white flex items-center justify-center text-center">
@@ -108,8 +141,91 @@
   const mobile = query.get('mobile');
   const apiUrl = `https://ai.instantmechanic.online/bot/api/booking-details?mobile=${mobile}`;
   const isPaid = localStorage.getItem('paid') === 'true';
+  const hasVehicleNumber = localStorage.getItem('vehicleNumber');
 
-  if (isPaid) showAfterPaymentUI();
+
+
+    if (isPaid && hasVehicleNumber) {
+    showAfterPaymentUI();
+  } else if (isPaid && !hasVehicleNumber) {
+    showCarNumberPopup();
+  }
+
+    function showCarNumberPopup() {
+    document.getElementById('carNumberPopup').classList.remove('hidden');
+    document.getElementById('vehicleNumberInput').focus();
+  }
+
+  function hideCarNumberPopup() {
+    document.getElementById('carNumberPopup').classList.add('hidden');
+  }
+
+  // Handle vehicle number submission
+  document.getElementById('submitVehicleNumber').addEventListener('click', function() {
+    const vehicleNumber = document.getElementById('vehicleNumberInput').value.trim().toUpperCase();
+    
+    if (vehicleNumber.length < 6) {
+      alert('Please enter a valid vehicle number');
+      return;
+    }
+
+    // Save vehicle number
+    localStorage.setItem('vehicleNumber', vehicleNumber);
+    
+    // Optional: Send to your API
+    sendVehicleNumberToAPI(vehicleNumber);
+    
+    hideCarNumberPopup();
+    showAfterPaymentUI();
+  });
+
+  // Allow Enter key to submit
+  document.getElementById('vehicleNumberInput').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+      document.getElementById('submitVehicleNumber').click();
+    }
+  });
+
+  // Format vehicle number as user types
+  document.getElementById('vehicleNumberInput').addEventListener('input', function(e) {
+    let value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+    
+    // Basic formatting for Indian vehicle numbers
+    if (value.length > 2) {
+      value = value.substring(0, 2) + ' ' + value.substring(2);
+    }
+    if (value.length > 5) {
+      value = value.substring(0, 5) + ' ' + value.substring(5);
+    }
+    if (value.length > 8) {
+      value = value.substring(0, 8) + ' ' + value.substring(8);
+    }
+    
+    e.target.value = value;
+  });
+
+  async function sendVehicleNumberToAPI(vehicleNumber) {
+    try {
+      const bookingId = localStorage.getItem('booking_id');
+      const response = await fetch('https://ai.instantmechanic.online/bot/api/update-vehicle-number', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          mobile: mobile,
+          booking_id: bookingId,
+          vehicle_number: vehicleNumber
+        })
+      });
+      
+      if (response.ok) {
+        console.log('Vehicle number updated successfully');
+      }
+    } catch (error) {
+      console.error('Failed to update vehicle number:', error);
+    }
+  }
 
   function startCountdown() {
     const storageKey = `booking_timer_${mobile}`;
