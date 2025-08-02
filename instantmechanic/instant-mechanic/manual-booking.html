@@ -1046,19 +1046,12 @@
             // Function to fetch customer location from API
             async function fetchCustomerLocation(mobile) {
                 try {
-                    const response = await fetch(`http://ai.instantmechanic.online/bot/api/customer_info?mobile=91${mobile}`);
+                    const response = await fetch(`https://ai.instantmechanic.online/bot/api/customer_info?mobile=91${mobile}`);
                     if (response.ok) {
                         const data = await response.json();
                         if (data.location_url) {
                             // Extract location coordinates from Google Maps URL
-                            const locationMatch = data.location_url.match(/q=([^&]+)/);
-                            if (locationMatch) {
-                                const locationCoords = decodeURIComponent(locationMatch[1]);
-                                document.getElementById('location').value = locationCoords;
-                            } else {
-                                // If no coordinates found, use the full URL
-                                document.getElementById('location').value = data.location_url;
-                            }
+                            document.getElementById('location').value = data.location_url;
                         }
                     }
                 } catch (error) {
@@ -1201,7 +1194,7 @@
 
                 try {
                     // Replace with your actual API endpoint
-                    const response = await fetch('http://ai.instantmechanic.online/bot/api/mannual-booking', {
+                    const response = await fetch('https://ai.instantmechanic.online/bot/api/mannual-booking', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
