@@ -93,6 +93,12 @@
     document.getElementById("remarksText").value = "";
   }
 
+  function handleManualBookingClick() {
+const cleanedMobile = mobile.replace(/^(\+91|91)/, "");
+
+window.open(`https://instantmechanic.online/manual-booking.html?mobile=${cleanedMobile}`, "_blank");
+}
+
   document.getElementById("submitRemarksBtn").addEventListener("click", async () => {
     const remarks = document.getElementById("remarksText").value.trim();
     if (!remarks) {
@@ -116,6 +122,9 @@
     </a>
     <a href="javascript:void(0)" onclick="handleAddRemarksClick()">
       <img src="https://cdn-icons-png.flaticon.com/512/1827/1827276.png" alt="Remarks Icon"> Add Remarks
+    </a>
+    <a href="javascript:void(0)" onclick="handleManualBookingClick()">
+      <img src="https://cdn-icons-png.flaticon.com/512/2921/2921222.png" alt="Manual Booking Icon"> Manual Booking
     </a>
   `;
   document.getElementById("actionButtons").innerHTML = buttonsHTML;
