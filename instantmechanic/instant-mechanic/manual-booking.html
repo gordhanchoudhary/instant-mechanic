@@ -368,7 +368,7 @@
                     <input type="text" id="location" name="location" placeholder="Enter your location" required>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group" hidden>
                     <label for="securityAmount">Security Amount (₹)</label>
                     <input type="text" id="securityAmount" name="securityAmount" placeholder="Enter security amount" value="428">
                 </div>
@@ -382,14 +382,7 @@
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <div class="toggle-group">
-                        <span class="toggle-label">GST Applied</span>
-                        <div class="toggle-switch active" id="gstToggle">
-                            <div class="toggle-slider"></div>
-                        </div>
-                    </div>
-                </div>
+
 
                 <button type="submit" class="book-btn" id="bookBtn">
                     <span class="btn-text">Book Now</span>
@@ -1188,8 +1181,8 @@
                     location: document.getElementById('location').value,
                     securityAmount: document.getElementById('securityAmount').value || null,
                     isGoMechanicCall: document.getElementById('goMechanicToggle').classList.contains('active'),
-                    isGstApplied: document.getElementById('gstToggle').classList.contains('active'),
-                    timestamp: new Date().toISOString()
+                    timestamp: new Date().toISOString(),
+                    agent: localStorage.getItem("agent_name") || "Harshit"
                 };
 
                 try {
@@ -1207,7 +1200,6 @@
                         form.reset();
                         // Reset toggles to default state and restore default values
                         document.getElementById('goMechanicToggle').classList.remove('active');
-                        document.getElementById('gstToggle').classList.add('active');
                         document.getElementById('price').value = '742';
                         const calculatedSecurity = calculateSecurityAmount('742');
                         document.getElementById('securityAmount').value = calculatedSecurity;
@@ -1225,7 +1217,6 @@
                         successMessage.style.display = 'block';
                         form.reset();
                         document.getElementById('goMechanicToggle').classList.remove('active');
-                        document.getElementById('gstToggle').classList.add('active');
                         document.getElementById('price').value = '742';
                         const calculatedSecurity = calculateSecurityAmount('742');
                         document.getElementById('securityAmount').value = calculatedSecurity;
