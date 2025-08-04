@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Instant Mechanic Analytics Dashboard</title>
+    <title>Instant Mechanic - Enhanced Analytics Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/date-fns/1.30.1/date_fns.min.js"></script>
     <style>
         .gradient-bg {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
         .card-shadow {
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
         }
@@ -21,13 +21,15 @@
             height: 280px !important;
             max-height: 280px !important;
         }
-        .chart-container canvas {
-            max-height: 280px !important;
-            image-rendering: -moz-crisp-edges;
-            image-rendering: -webkit-crisp-edges;
-            image-rendering: pixelated;
-            image-rendering: crisp-edges;
+        .small-chart {
+            height: 200px !important;
+            max-height: 200px !important;
         }
+        .benchmark-good { color: #10b981; }
+        .benchmark-warning { color: #f59e0b; }
+        .benchmark-poor { color: #ef4444; }
+        .trend-up { color: #10b981; }
+        .trend-down { color: #ef4444; }
         .loader {
             border: 3px solid #f3f3f3;
             border-top: 3px solid #3498db;
@@ -40,8 +42,7 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-            </style>
-
+    </style>
 </head>
 <body class="bg-gray-50">
     <!-- Header -->
@@ -50,7 +51,7 @@
             <div class="flex items-center justify-between">
                 <div>
                     <h1 class="text-3xl font-bold">Instant Mechanic</h1>
-                    <p class="text-blue-100 mt-1">Analytics Dashboard</p>
+                    <p class="text-blue-100 mt-1">Enhanced Analytics Dashboard</p>
                 </div>
                 <div class="flex items-center space-x-4">
                     <button id="refreshBtn" class="bg-white bg-opacity-20 hover:bg-opacity-30 px-4 py-2 rounded-lg transition-all duration-200">
@@ -109,8 +110,50 @@
             </div>
         </div>
 
-        <!-- Key Metrics -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <!-- Performance Benchmarks Overview -->
+        <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+            <h3 class="text-lg font-semibold text-gray-800 mb-6">📊 Performance Benchmarks & KPIs</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-4">
+                    <h4 class="font-medium text-blue-800 mb-2">Customer Conversion Rate</h4>
+                    <div class="flex items-center justify-between">
+                        <span id="conversionBenchmark" class="text-2xl font-bold">0%</span>
+                        <span id="conversionStatus" class="text-sm font-medium">--</span>
+                    </div>
+                    <p class="text-xs text-blue-600 mt-1">Target: >55% (Good), >35% (Fair), <30% (Poor)</p>
+                </div>
+                
+                <div class="bg-gradient-to-r from-green-50 to-green-100 rounded-lg p-4">
+                    <h4 class="font-medium text-green-800 mb-2">Revenue per Customer</h4>
+                    <div class="flex items-center justify-between">
+                        <span id="revenuePerCustomerBenchmark" class="text-2xl font-bold">₹0</span>
+                        <span id="revenuePerCustomerStatus" class="text-sm font-medium">--</span>
+                    </div>
+                    <p class="text-xs text-green-600 mt-1">Target: >₹500 (Good), >₹300 (Fair), <₹300 (Poor)</p>
+                </div>
+                
+                <div class="bg-gradient-to-r from-purple-50 to-purple-100 rounded-lg p-4">
+                    <h4 class="font-medium text-purple-800 mb-2">Cancellation Rate</h4>
+                    <div class="flex items-center justify-between">
+                        <span id="cancellationBenchmark" class="text-2xl font-bold">0%</span>
+                        <span id="cancellationStatus" class="text-sm font-medium">--</span>
+                    </div>
+                    <p class="text-xs text-purple-600 mt-1">Target: <10% (Good), <20% (Fair), >20% (Poor)</p>
+                </div>
+                
+                <div class="bg-gradient-to-r from-orange-50 to-orange-100 rounded-lg p-4">
+                    <h4 class="font-medium text-orange-800 mb-2">Payment Collection Rate</h4>
+                    <div class="flex items-center justify-between">
+                        <span id="collectionBenchmark" class="text-2xl font-bold">0%</span>
+                        <span id="collectionStatus" class="text-sm font-medium">--</span>
+                    </div>
+                    <p class="text-xs text-orange-600 mt-1">Target: >600% (Good), >40% (Fair), <40% (Poor)</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Key Metrics Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
             <div class="metric-card rounded-xl p-6 card-shadow">
                 <div class="flex items-center justify-between">
                     <div>
@@ -144,6 +187,21 @@
             <div class="metric-card rounded-xl p-6 card-shadow">
                 <div class="flex items-center justify-between">
                     <div>
+                        <p class="text-sm font-medium text-gray-600">Total Bookings</p>
+                        <p id="totalBookings" class="text-3xl font-bold text-gray-900">0</p>
+                        <p id="bookingGrowth" class="text-sm text-blue-600 mt-1">+0% from previous period</p>
+                    </div>
+                    <div class="bg-indigo-100 p-3 rounded-full">
+                        <svg class="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <div class="metric-card rounded-xl p-6 card-shadow">
+                <div class="flex items-center justify-between">
+                    <div>
                         <p class="text-sm font-medium text-gray-600">Payment Collected</p>
                         <p id="paymentCollected" class="text-3xl font-bold text-gray-900">₹0</p>
                         <p id="collectionRate" class="text-sm text-blue-600 mt-1">0% collection rate</p>
@@ -159,113 +217,127 @@
             <div class="metric-card rounded-xl p-6 card-shadow">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-sm font-medium text-gray-600">Payment Pending</p>
-                        <p id="paymentPending" class="text-3xl font-bold text-gray-900">₹0</p>
-                        <p id="pendingRate" class="text-sm text-red-600 mt-1">0% pending rate</p>
+                        <p class="text-sm font-medium text-gray-600">Advance Payment Rate</p>
+                        <p id="advancePaymentRate" class="text-3xl font-bold text-gray-900">0%</p>
+                        <p id="advancePaymentCount" class="text-sm text-green-600 mt-1">0 bookings</p>
                     </div>
-                    <div class="bg-red-100 p-3 rounded-full">
-                        <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    <div class="bg-emerald-100 p-3 rounded-full">
+                        <svg class="w-8 h-8 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path>
                         </svg>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Charts Row 1 -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            <!-- Revenue Trend Chart -->
+        <!-- Business Health Metrics -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
             <div class="bg-white rounded-xl shadow-md p-6">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-lg font-semibold text-gray-800">Revenue Trend</h3>
-                    <div class="flex space-x-2">
-                        <div class="w-3 h-3 bg-blue-500 rounded-full"></div>
-                        <span class="text-sm text-gray-600">Total Revenue</span>
-                    </div>
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">🎯 Business Health Score</h3>
+                <div class="chart-container small-chart">
+                    <canvas id="healthScoreChart"></canvas>
                 </div>
-                <div class="chart-container">
-                    <canvas id="revenueChart"></canvas>
+                <div id="healthScoreDetails" class="mt-4 text-sm">
+                    <!-- Health score breakdown will be inserted here -->
                 </div>
             </div>
 
-            <!-- Customer Acquisition Chart -->
             <div class="bg-white rounded-xl shadow-md p-6">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-lg font-semibold text-gray-800">Customer Acquisition</h3>
-                    <div class="flex space-x-2">
-                        <div class="w-3 h-3 bg-green-500 rounded-full"></div>
-                        <span class="text-sm text-gray-600">New Customers</span>
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">⚠️ Operational Issues</h3>
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between p-3 bg-red-50 rounded-lg">
+                        <span class="text-sm font-medium text-red-800">Cancelled Bookings</span>
+                        <span id="cancelledBookings" class="text-red-600 font-bold">0</span>
+                    </div>
+                    <div class="flex items-center justify-between p-3 bg-orange-50 rounded-lg">
+                        <span class="text-sm font-medium text-orange-800">Unassigned Mechanics</span>
+                        <span id="unassignedMechanics" class="text-orange-600 font-bold">0</span>
+                    </div>
+                    <div class="flex items-center justify-between p-3 bg-yellow-50 rounded-lg">
+                        <span class="text-sm font-medium text-yellow-800">Pending Payments</span>
+                        <span id="pendingPayments" class="text-yellow-600 font-bold">₹0</span>
                     </div>
                 </div>
-                <div class="chart-container">
-                    <canvas id="customerChart"></canvas>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">📈 Growth Trends</h3>
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-gray-600">Daily Avg Customers</span>
+                        <span id="avgDailyCustomers" class="font-semibold">0</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-gray-600">Daily Avg Revenue</span>
+                        <span id="avgDailyRevenue" class="font-semibold">₹0</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-gray-600">Booking Success Rate</span>
+                        <span id="bookingSuccessRate" class="font-semibold">0%</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-gray-600">Customer Lifetime Value</span>
+                        <span id="customerLifetimeValue" class="font-semibold">₹0</span>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Charts Row 2 -->
+        <!-- Enhanced Charts Row 1 -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            <!-- Payment Status Chart -->
+            <!-- Revenue & Bookings Trend -->
             <div class="bg-white rounded-xl shadow-md p-6">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-lg font-semibold text-gray-800">Payment Status Overview</h3>
-                </div>
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">💰 Revenue vs Bookings Trend</h3>
                 <div class="chart-container">
-                    <canvas id="paymentChart"></canvas>
+                    <canvas id="revenueBookingChart"></canvas>
                 </div>
             </div>
 
-            <!-- Booking Conversion Chart -->
+            <!-- Conversion Funnel -->
             <div class="bg-white rounded-xl shadow-md p-6">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-lg font-semibold text-gray-800">Booking Conversion Rate</h3>
-                </div>
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">🎯 Conversion Funnel Analysis</h3>
                 <div class="chart-container">
-                    <canvas id="conversionChart"></canvas>
+                    <canvas id="conversionFunnelChart"></canvas>
                 </div>
             </div>
         </div>
 
-        <!-- Performance Insights -->
+        <!-- Enhanced Charts Row 2 -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <!-- Payment Analysis -->
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">💳 Payment Collection Analysis</h3>
+                <div class="chart-container">
+                    <canvas id="paymentAnalysisChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Daily Performance Heatmap -->
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">🔥 Daily Performance Heatmap</h3>
+                <div class="chart-container">
+                    <canvas id="performanceHeatmapChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Agent Performance Comparison -->
         <div class="bg-white rounded-xl shadow-md p-6 mb-8">
-            <h3 class="text-lg font-semibold text-gray-800 mb-4">Performance Insights</h3>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="bg-blue-50 rounded-lg p-4">
-                    <div class="flex items-center mb-2">
-                        <svg class="w-5 h-5 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
-                        </svg>
-                        <h4 class="font-medium text-blue-800">Peak Performance Day</h4>
-                    </div>
-                    <p id="peakDay" class="text-sm text-blue-600">No data available</p>
+            <h3 class="text-lg font-semibold text-gray-800 mb-6">👥 Agent Performance Comparison</h3>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="chart-container">
+                    <canvas id="agentPerformanceChart"></canvas>
                 </div>
-                
-                <div class="bg-green-50 rounded-lg p-4">
-                    <div class="flex items-center mb-2">
-                        <svg class="w-5 h-5 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                        <h4 class="font-medium text-green-800">Average Conversion Rate</h4>
-                    </div>
-                    <p id="avgConversion" class="text-sm text-green-600">0%</p>
-                </div>
-                
-                <div class="bg-purple-50 rounded-lg p-4">
-                    <div class="flex items-center mb-2">
-                        <svg class="w-5 h-5 text-purple-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
-                        </svg>
-                        <h4 class="font-medium text-purple-800">Profit per Customer</h4>
-                    </div>
-                    <p id="revenuePerCustomer" class="text-sm text-purple-600">₹0</p>
+                <div class="chart-container">
+                    <canvas id="agentEfficiencyChart"></canvas>
                 </div>
             </div>
         </div>
 
-        <!-- Recent Activity Table -->
+        <!-- Detailed Performance Table -->
         <div class="bg-white rounded-xl shadow-md p-6">
             <div class="flex items-center justify-between mb-4">
-                <h3 class="text-lg font-semibold text-gray-800">Daily Performance Summary</h3>
+                <h3 class="text-lg font-semibold text-gray-800">📊 Detailed Performance Summary</h3>
                 <button id="exportData" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg transition-colors duration-200 text-sm">
                     <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
@@ -281,9 +353,11 @@
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customers</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bookings</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Revenue</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Collected</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pending</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Conversion</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cancelled</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Advance Pay</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Collection Rate</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Performance</th>
                         </tr>
                     </thead>
                     <tbody id="dataTable" class="bg-white divide-y divide-gray-200">
@@ -302,30 +376,85 @@
     </footer>
 
     <script>
-        // Configure Chart.js defaults for crisp rendering
-        Chart.defaults.font.family = "'Inter', 'Segoe UI', 'Roboto', sans-serif";
-        Chart.defaults.font.size = 12;
-        Chart.defaults.color = '#374151';
-        Chart.defaults.plugins.legend.labels.usePointStyle = true;
-        Chart.defaults.elements.point.borderWidth = 2;
-        Chart.defaults.elements.line.borderWidth = 2;
-        Chart.defaults.elements.bar.borderWidth = 0;
-
-        // Global variables
+        // Global variables for dashboard data
         let dashboardData = [];
         let currentData = [];
         let charts = {};
 
         // Initialize dashboard
         async function initializeDashboard() {
-            // Event listeners
             document.getElementById('applyFilters').addEventListener('click', applyFilters);
             document.getElementById('refreshBtn').addEventListener('click', refreshData);
             document.getElementById('exportData').addEventListener('click', exportData);
             
-            // Load initial data
             await applyFilters();
             updateLastUpdated();
+        }
+
+        // Calculate performance benchmarks
+        function calculateBenchmarks() {
+            const totalCustomers = currentData.reduce((sum, item) => sum + item.total_customers, 0);
+            const totalBookings = currentData.reduce((sum, item) => sum + item.total_booking, 0);
+            const totalRevenue = currentData.reduce((sum, item) => sum + item.total_revenue, 0);
+            const totalCancelled = currentData.reduce((sum, item) => sum + item.total_cancelled_booking, 0);
+            const totalCollected = currentData.reduce((sum, item) => sum + item.payment_collected, 0);
+
+            // Conversion Rate
+            const conversionRate = totalCustomers > 0 ? (totalBookings / totalCustomers) * 100 : 0;
+            const revenuePerCustomer = totalCustomers > 0 ? totalRevenue / (totalBookings -totalCancelled)  : 0;
+            const cancellationRate = totalBookings > 0 ? (totalCancelled / totalBookings) * 100 : 0;
+            const collectionRate = totalRevenue > 0 ? (totalCollected / (totalRevenue * 0.58)) * 100 : 0;
+
+            // Update benchmark displays
+            document.getElementById('conversionBenchmark').textContent = conversionRate.toFixed(1) + '%';
+            document.getElementById('revenuePerCustomerBenchmark').textContent = '₹' + Math.round(revenuePerCustomer);
+            document.getElementById('cancellationBenchmark').textContent = cancellationRate.toFixed(1) + '%';
+            document.getElementById('collectionBenchmark').textContent = collectionRate.toFixed(1) + '%';
+
+            // Update benchmark status
+            updateBenchmarkStatus('conversionStatus', conversionRate, [55, 35], false);
+            updateBenchmarkStatus('revenuePerCustomerStatus', revenuePerCustomer, [742, 550], false);
+            updateBenchmarkStatus('cancellationStatus', cancellationRate, [10, 20], true);
+            updateBenchmarkStatus('collectionStatus', collectionRate, [60, 40], false);
+
+            return {
+                conversion: conversionRate,
+                revenuePerCustomer,
+                cancellation: cancellationRate,
+                collection: collectionRate
+            };
+        }
+
+        function updateBenchmarkStatus(elementId, value, thresholds, reverse = false) {
+            const element = document.getElementById(elementId);
+            let status, className;
+
+            if (reverse) {
+                if (value <= thresholds[0]) {
+                    status = 'Excellent';
+                    className = 'benchmark-good';
+                } else if (value <= thresholds[1]) {
+                    status = 'Good';
+                    className = 'benchmark-warning';
+                } else {
+                    status = 'Needs Improvement';
+                    className = 'benchmark-poor';
+                }
+            } else {
+                if (value >= thresholds[0]) {
+                    status = 'Excellent';
+                    className = 'benchmark-good';
+                } else if (value >= thresholds[1]) {
+                    status = 'Good';
+                    className = 'benchmark-warning';
+                } else {
+                    status = 'Needs Improvement';
+                    className = 'benchmark-poor';
+                }
+            }
+
+            element.textContent = status;
+            element.className = `text-sm font-medium ${className}`;
         }
 
         // Get date range based on filter
@@ -367,7 +496,7 @@
                     let fridayCount = 0;
                     let checkDate = new Date(today);
                     while(fridayCount < 3) {
-                        if(checkDate.getDay() === 5) { // Friday
+                        if(checkDate.getDay() === 5) {
                             dates.unshift(formatDate(checkDate));
                             fridayCount++;
                         }
@@ -378,7 +507,7 @@
                     let sundayCount = 0;
                     let checkSundayDate = new Date(today);
                     while(sundayCount < 5) {
-                        if(checkSundayDate.getDay() === 0) { // Sunday
+                        if(checkSundayDate.getDay() === 0) {
                             dates.unshift(formatDate(checkSundayDate));
                             sundayCount++;
                         }
@@ -389,14 +518,12 @@
             return dates;
         }
 
-        // Format date to YYYY-MM-DD
         function formatDate(date) {
             return date.getFullYear() + '-' + 
                    String(date.getMonth() + 1).padStart(2, '0') + '-' + 
                    String(date.getDate()).padStart(2, '0');
         }
 
-        // Apply filters and update dashboard
         async function applyFilters() {
             const dateFilter = document.getElementById('dateFilter').value;
             const agentFilter = document.getElementById('agentFilter').value;
@@ -407,28 +534,25 @@
                 // Get date range
                 const dateRange = getDateRange(dateFilter);
                 
-                // Fetch data from API
+                // Fetch live data from API
                 dashboardData = await fetchDataFromAPI(dateRange, agentFilter);
-                
-                // Set current data
                 currentData = dashboardData;
                 
-                // Update dashboard
+                // Update all dashboard components with live data
                 updateMetrics();
+                calculateBenchmarks();
                 updateCharts();
                 updateTable();
-                updateInsights();
+                updateHealthMetrics();
                 
             } catch (error) {
                 console.error('Error loading data:', error);
-                // Show error message to user
-                alert('Failed to load data. Please try again.');
+                alert('Failed to load data from API. Please check your connection and try again.');
             } finally {
                 showLoading(false);
             }
         }
 
-        // Show/hide loading spinner
         function showLoading(show) {
             const spinner = document.getElementById('loadingSpinner');
             if(show) {
@@ -438,56 +562,140 @@
             }
         }
 
-        // Update key metrics
         function updateMetrics() {
             const totalCustomers = currentData.reduce((sum, item) => sum + item.total_customers, 0);
             const totalRevenue = currentData.reduce((sum, item) => sum + item.total_revenue, 0);
-            const paymentCollected = currentData.reduce((sum, item) => sum + item.payment_collected, 0);
-            const paymentPending = currentData.reduce((sum, item) => sum + item.payment_pending, 0);
             const totalBookings = currentData.reduce((sum, item) => sum + item.total_booking, 0);
+            const paymentCollected = currentData.reduce((sum, item) => sum + item.payment_collected, 0);
+            const paymentDoneBookings = currentData.reduce((sum, item) => sum + item.payment_done_bookings, 0);
 
             document.getElementById('totalCustomers').textContent = totalCustomers.toLocaleString();
             document.getElementById('totalRevenue').textContent = '₹' + totalRevenue.toLocaleString();
+            document.getElementById('totalBookings').textContent = totalBookings.toLocaleString();
             document.getElementById('paymentCollected').textContent = '₹' + paymentCollected.toLocaleString();
-            document.getElementById('paymentPending').textContent = '₹' + paymentPending.toLocaleString();
 
-            // Calculate rates
-            const collectionRate = totalRevenue > 0 ? ((paymentCollected / totalRevenue) * 100).toFixed(1) : 0;
-            const pendingRate = totalRevenue > 0 ? ((paymentPending / totalRevenue) * 100).toFixed(1) : 0;
-            
-            document.getElementById('collectionRate').textContent = collectionRate + '% collection rate';
-            document.getElementById('pendingRate').textContent = pendingRate + '% pending rate';
+            // Advance payment rate
+            const advancePaymentRate = totalBookings > 0 ? (paymentDoneBookings / totalBookings) * 100 : 0;
+            document.getElementById('advancePaymentRate').textContent = advancePaymentRate.toFixed(1) + '%';
+            document.getElementById('advancePaymentCount').textContent = paymentDoneBookings + ' bookings';
 
-            // Growth calculations (dummy for now - would need historical data)
+            // Collection rate
+            const collectionRate = totalRevenue > 0 ? (paymentCollected / totalRevenue) * 100 : 0;
+            document.getElementById('collectionRate').textContent = collectionRate.toFixed(1) + '% collection rate';
+
+            // Growth calculations (dummy for demo)
             document.getElementById('customerGrowth').textContent = '+12% from previous period';
             document.getElementById('revenueGrowth').textContent = '+8% from previous period';
+            document.getElementById('bookingGrowth').textContent = '+15% from previous period';
         }
 
-        // Update charts
+        function updateHealthMetrics() {
+            const totalCancelled = currentData.reduce((sum, item) => sum + item.total_cancelled_booking, 0);
+            const totalUnassigned = currentData.reduce((sum, item) => sum + item.mechanic_not_assined_booking, 0);
+            const totalPending = currentData.reduce((sum, item) => sum + item.payment_pending, 0);
+            const totalCustomers = currentData.reduce((sum, item) => sum + item.total_customers, 0);
+            const totalRevenue = currentData.reduce((sum, item) => sum + item.total_revenue, 0);
+            const totalBookings = currentData.reduce((sum, item) => sum + item.total_booking, 0);
+
+            document.getElementById('cancelledBookings').textContent = totalCancelled;
+            document.getElementById('unassignedMechanics').textContent = totalUnassigned;
+            document.getElementById('pendingPayments').textContent = '₹' + totalPending.toLocaleString();
+
+            // Growth trends
+            const avgDailyCustomers = currentData.length > 0 ? Math.round(totalCustomers / currentData.length) : 0;
+            const avgDailyRevenue = currentData.length > 0 ? Math.round(totalRevenue / currentData.length) : 0;
+            const bookingSuccessRate = totalBookings > 0 ? ((totalBookings - totalCancelled) / totalBookings) * 100 : 0;
+            const customerLifetimeValue = totalCustomers > 0 ? Math.round(totalRevenue / totalCustomers) : 0;
+
+            document.getElementById('avgDailyCustomers').textContent = avgDailyCustomers.toLocaleString();
+            document.getElementById('avgDailyRevenue').textContent = '₹' + avgDailyRevenue.toLocaleString();
+            document.getElementById('bookingSuccessRate').textContent = bookingSuccessRate.toFixed(1) + '%';
+            document.getElementById('customerLifetimeValue').textContent = '₹' + customerLifetimeValue.toLocaleString();
+        }
+
         function updateCharts() {
-            updateRevenueChart();
-            updateCustomerChart();
-            updatePaymentChart();
-            updateConversionChart();
+            updateHealthScoreChart();
+            updateRevenueBookingChart();
+            updateConversionFunnelChart();
+            updatePaymentAnalysisChart();
+            updatePerformanceHeatmapChart();
+            updateAgentPerformanceChart();
+            updateAgentEfficiencyChart();
         }
 
-        // Revenue trend chart
-        function updateRevenueChart() {
-            const ctx = document.getElementById('revenueChart').getContext('2d');
+        function updateHealthScoreChart() {
+            const ctx = document.getElementById('healthScoreChart').getContext('2d');
             
-            // Set canvas resolution for crisp rendering
-            const canvas = ctx.canvas;
-            const rect = canvas.getBoundingClientRect();
-            const dpr = window.devicePixelRatio || 1;
+            if(charts.healthScore) {
+                charts.healthScore.destroy();
+            }
+
+            const benchmarks = calculateBenchmarks();
+            const healthScore = Math.round((
+                (benchmarks.conversion / 25 * 100) * 0.3 +
+                (benchmarks.revenuePerCustomer / 742 * 100) * 0.25 +
+                ((100 - benchmarks.cancellation) / 100 * 100) * 0.25 +
+                (benchmarks.collection / 80 * 100) * 0.2
+            ) / 4);
+
+            charts.healthScore = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Health Score', 'Room for Improvement'],
+                    datasets: [{
+                        data: [healthScore, 100 - healthScore],
+                        backgroundColor: [
+                            healthScore >= 80 ? '#10b981' : healthScore >= 60 ? '#f59e0b' : '#ef4444',
+                            '#e5e7eb'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '70%',
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+
+            // Update health score details
+            const detailsDiv = document.getElementById('healthScoreDetails');
+            detailsDiv.innerHTML = `
+                <div class="text-center">
+                    <div class="text-3xl font-bold ${healthScore >= 80 ? 'text-green-600' : healthScore >= 60 ? 'text-yellow-600' : 'text-red-600'}">${healthScore}%</div>
+                    <div class="text-sm text-gray-600 mt-1">Overall Health Score</div>
+                </div>
+                <div class="mt-3 space-y-2 text-xs">
+                    <div class="flex justify-between">
+                        <span>Conversion Rate</span>
+                        <span class="${benchmarks.conversion >= 25 ? 'text-green-600' : benchmarks.conversion >= 15 ? 'text-yellow-600' : 'text-red-600'}">${benchmarks.conversion.toFixed(1)}%</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Revenue/Customer</span>
+                        <span class="${benchmarks.revenuePerCustomer >= 742 ? 'text-green-600' : benchmarks.revenuePerCustomer >= 550 ? 'text-yellow-600' : 'text-red-600'}">₹${Math.round(benchmarks.revenuePerCustomer)}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Cancellation Rate</span>
+                        <span class="${benchmarks.cancellation <= 10 ? 'text-green-600' : benchmarks.cancellation <= 20 ? 'text-yellow-600' : 'text-red-600'}">${benchmarks.cancellation.toFixed(1)}%</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Collection Rate</span>
+                        <span class="${benchmarks.collection >= 80 ? 'text-green-600' : benchmarks.collection >= 60 ? 'text-yellow-600' : 'text-red-600'}">${benchmarks.collection.toFixed(1)}%</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        function updateRevenueBookingChart() {
+            const ctx = document.getElementById('revenueBookingChart').getContext('2d');
             
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
-            ctx.scale(dpr, dpr);
-            canvas.style.width = rect.width + 'px';
-            canvas.style.height = rect.height + 'px';
-            
-            if(charts.revenue) {
-                charts.revenue.destroy();
+            if(charts.revenueBooking) {
+                charts.revenueBooking.destroy();
             }
 
             const labels = currentData.map(item => {
@@ -496,118 +704,99 @@
             });
             
             const revenueData = currentData.map(item => item.total_revenue);
+            const bookingData = currentData.map(item => item.total_booking);
 
-            charts.revenue = new Chart(ctx, {
+            charts.revenueBooking = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: labels,
                     datasets: [{
-                        label: 'Total Revenue',
+                        label: 'Revenue (₹)',
                         data: revenueData,
                         borderColor: 'rgb(59, 130, 246)',
                         backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                        tension: 0.4,
-                        fill: true,
-                        borderWidth: 3,
-                        pointBackgroundColor: 'rgb(59, 130, 246)',
-                        pointBorderColor: '#ffffff',
-                        pointBorderWidth: 2
+                        yAxisID: 'y',
+                        tension: 0.4
+                    }, {
+                        label: 'Bookings',
+                        data: bookingData,
+                        borderColor: 'rgb(16, 185, 129)',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        yAxisID: 'y1',
+                        tension: 0.4
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    devicePixelRatio: window.devicePixelRatio || 1,
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
                     },
                     scales: {
                         x: {
-                            grid: {
-                                display: false
-                            },
-                            ticks: {
-                                font: {
-                                    size: 11,
-                                    weight: '500'
-                                }
-                            }
+                            display: true,
                         },
                         y: {
-                            beginAtZero: true,
-                            grid: {
-                                color: 'rgba(0, 0, 0, 0.05)'
-                            },
-                            ticks: {
-                                font: {
-                                    size: 11,
-                                    weight: '500'
-                                },
-                                callback: function(value) {
-                                    return '₹' + value.toLocaleString();
-                                }
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            title: {
+                                display: true,
+                                text: 'Revenue (₹)'
                             }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            title: {
+                                display: true,
+                                text: 'Bookings'
+                            },
+                            grid: {
+                                drawOnChartArea: false,
+                            },
                         }
-                    },
-                    elements: {
-                        point: {
-                            radius: 4,
-                            hoverRadius: 6
-                        }
-                    },
-                    interaction: {
-                        intersect: false,
-                        mode: 'index'
                     }
                 }
             });
         }
 
-        // Customer acquisition chart
-        function updateCustomerChart() {
-            const ctx = document.getElementById('customerChart').getContext('2d');
+        function updateConversionFunnelChart() {
+            const ctx = document.getElementById('conversionFunnelChart').getContext('2d');
             
-            // Set canvas resolution for crisp rendering
-            const canvas = ctx.canvas;
-            const rect = canvas.getBoundingClientRect();
-            const dpr = window.devicePixelRatio || 1;
-            
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
-            ctx.scale(dpr, dpr);
-            canvas.style.width = rect.width + 'px';
-            canvas.style.height = rect.height + 'px';
-            
-            if(charts.customer) {
-                charts.customer.destroy();
+            if(charts.conversionFunnel) {
+                charts.conversionFunnel.destroy();
             }
 
-            const labels = currentData.map(item => {
-                const date = new Date(item.date);
-                return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-            });
-            
-            const customerData = currentData.map(item => item.total_customers);
+            const totalCustomers = currentData.reduce((sum, item) => sum + item.total_customers, 0);
+            const totalBookings = currentData.reduce((sum, item) => sum + item.total_booking, 0);
+            const totalCancelled = currentData.reduce((sum, item) => sum + item.total_cancelled_booking, 0);
+            const completedBookings = totalBookings - totalCancelled;
+            const paymentDone = currentData.reduce((sum, item) => sum + item.payment_done_bookings, 0);
 
-            charts.customer = new Chart(ctx, {
+            const funnelData = [
+                { label: 'Total Customers', value: totalCustomers, color: '#3b82f6' },
+                { label: 'Bookings Created', value: totalBookings, color: '#10b981' },
+                { label: 'Bookings Completed', value: completedBookings, color: '#8b5cf6' },
+                { label: 'Advance Payment', value: paymentDone, color: '#f59e0b' }
+            ];
+
+            charts.conversionFunnel = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: labels,
+                    labels: funnelData.map(item => item.label),
                     datasets: [{
-                        label: 'New Customers',
-                        data: customerData,
-                        backgroundColor: 'rgba(34, 197, 94, 0.8)',
-                        borderColor: 'rgb(34, 197, 94)',
-                        borderWidth: 0,
+                        data: funnelData.map(item => item.value),
+                        backgroundColor: funnelData.map(item => item.color),
                         borderRadius: 4
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    devicePixelRatio: window.devicePixelRatio || 1,
+                    indexAxis: 'y',
                     plugins: {
                         legend: {
                             display: false
@@ -615,115 +804,18 @@
                     },
                     scales: {
                         x: {
-                            grid: {
-                                display: false
-                            },
-                            ticks: {
-                                font: {
-                                    size: 11,
-                                    weight: '500'
-                                }
-                            }
-                        },
-                        y: {
-                            beginAtZero: true,
-                            grid: {
-                                color: 'rgba(0, 0, 0, 0.05)'
-                            },
-                            ticks: {
-                                font: {
-                                    size: 11,
-                                    weight: '500'
-                                }
-                            }
+                            beginAtZero: true
                         }
-                    },
-                    interaction: {
-                        intersect: false,
-                        mode: 'index'
                     }
                 }
             });
         }
 
-        // Payment status chart
-        function updatePaymentChart() {
-            const ctx = document.getElementById('paymentChart').getContext('2d');
+        function updatePaymentAnalysisChart() {
+            const ctx = document.getElementById('paymentAnalysisChart').getContext('2d');
             
-            // Set canvas resolution for crisp rendering
-            const canvas = ctx.canvas;
-            const rect = canvas.getBoundingClientRect();
-            const dpr = window.devicePixelRatio || 1;
-            
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
-            ctx.scale(dpr, dpr);
-            canvas.style.width = rect.width + 'px';
-            canvas.style.height = rect.height + 'px';
-            
-            if(charts.payment) {
-                charts.payment.destroy();
-            }
-
-            const totalCollected = currentData.reduce((sum, item) => sum + item.payment_collected, 0);
-            const totalPending = currentData.reduce((sum, item) => sum + item.payment_pending, 0);
-
-            charts.payment = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Payment Collected', 'Payment Pending'],
-                    datasets: [{
-                        data: [totalCollected, totalPending],
-                        backgroundColor: [
-                            'rgba(34, 197, 94, 0.8)',
-                            'rgba(239, 68, 68, 0.8)'
-                        ],
-                        borderColor: [
-                            'rgb(34, 197, 94)',
-                            'rgb(239, 68, 68)'
-                        ],
-                        borderWidth: 3
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    devicePixelRatio: window.devicePixelRatio || 1,
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                padding: 15,
-                                usePointStyle: true,
-                                font: {
-                                    size: 12,
-                                    weight: '500'
-                                }
-                            }
-                        }
-                    },
-                    cutout: '60%'
-                }
-            });
-        }
-
-        // Conversion rate chart
-        function updateConversionChart() {
-            const ctx = document.getElementById('conversionChart').getContext('2d');
-            
-            // Set canvas resolution for crisp rendering
-            const canvas = ctx.canvas;
-            const rect = canvas.getBoundingClientRect();
-            const dpr = window.devicePixelRatio || 1;
-            
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
-            ctx.scale(dpr, dpr);
-            canvas.style.width = rect.width + 'px';
-            canvas.style.height = rect.height + 'px';
-            
-            if(charts.conversion) {
-                charts.conversion.destroy();
+            if(charts.paymentAnalysis) {
+                charts.paymentAnalysis.destroy();
             }
 
             const labels = currentData.map(item => {
@@ -731,81 +823,206 @@
                 return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
             });
             
-            const conversionData = currentData.map(item => {
-                if(item.total_customers === 0) return 0;
-                return ((item.total_booking / item.total_customers) * 100).toFixed(1);
-            });
+            const collectedData = currentData.map(item => item.payment_collected);
+            const pendingData = currentData.map(item => item.payment_pending);
 
-            charts.conversion = new Chart(ctx, {
-                type: 'line',
+            charts.paymentAnalysis = new Chart(ctx, {
+                type: 'bar',
                 data: {
                     labels: labels,
                     datasets: [{
-                        label: 'Conversion Rate (%)',
-                        data: conversionData,
-                        borderColor: 'rgb(168, 85, 247)',
-                        backgroundColor: 'rgba(168, 85, 247, 0.1)',
-                        tension: 0.4,
-                        fill: true,
-                        borderWidth: 3,
-                        pointBackgroundColor: 'rgb(168, 85, 247)',
-                        pointBorderColor: '#ffffff',
-                        pointBorderWidth: 2
+                        label: 'Collected',
+                        data: collectedData,
+                        backgroundColor: 'rgba(16, 185, 129, 0.8)',
+                        stack: 'payments'
+                    }, {
+                        label: 'Pending',
+                        data: pendingData,
+                        backgroundColor: 'rgba(239, 68, 68, 0.8)',
+                        stack: 'payments'
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    devicePixelRatio: window.devicePixelRatio || 1,
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
-                    },
                     scales: {
                         x: {
-                            grid: {
-                                display: false
-                            },
-                            ticks: {
-                                font: {
-                                    size: 11,
-                                    weight: '500'
-                                }
-                            }
+                            stacked: true
                         },
                         y: {
-                            beginAtZero: true,
-                            max: 100,
-                            grid: {
-                                color: 'rgba(0, 0, 0, 0.05)'
-                            },
+                            stacked: true,
                             ticks: {
-                                font: {
-                                    size: 11,
-                                    weight: '500'
-                                },
                                 callback: function(value) {
-                                    return value + '%';
+                                    return '₹' + value.toLocaleString();
                                 }
                             }
                         }
-                    },
-                    elements: {
-                        point: {
-                            radius: 4,
-                            hoverRadius: 6
-                        }
-                    },
-                    interaction: {
-                        intersect: false,
-                        mode: 'index'
                     }
                 }
             });
         }
 
-        // Update data table
+        function updatePerformanceHeatmapChart() {
+            const ctx = document.getElementById('performanceHeatmapChart').getContext('2d');
+            
+            if(charts.performanceHeatmap) {
+                charts.performanceHeatmap.destroy();
+            }
+
+            const performanceData = currentData.map(item => {
+                const conversionRate = item.total_customers > 0 ? (item.total_booking / item.total_customers) * 100 : 0;
+                return {
+                    x: new Date(item.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+                    y: 'Performance',
+                    v: conversionRate
+                };
+            });
+
+            charts.performanceHeatmap = new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: 'Daily Performance',
+                        data: currentData.map((item, index) => ({
+                            x: index,
+                            y: 0,
+                            r: Math.max(5, (item.total_customers / 10) * 15)
+                        })),
+                        backgroundColor: currentData.map(item => {
+                            const conversionRate = item.total_customers > 0 ? (item.total_booking / item.total_customers) * 100 : 0;
+                            if (conversionRate >= 25) return 'rgba(16, 185, 129, 0.8)';
+                            if (conversionRate >= 15) return 'rgba(245, 158, 11, 0.8)';
+                            return 'rgba(239, 68, 68, 0.8)';
+                        })
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            position: 'bottom',
+                            ticks: {
+                                callback: function(value, index) {
+                                    if (currentData[Math.floor(value)]) {
+                                        const date = new Date(currentData[Math.floor(value)].date);
+                                        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                                    }
+                                    return '';
+                                }
+                            }
+                        },
+                        y: {
+                            display: false
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const item = currentData[Math.floor(context.parsed.x)];
+                                    if (item) {
+                                        const conversionRate = item.total_customers > 0 ? (item.total_booking / item.total_customers) * 100 : 0;
+                                        return `Customers: ${item.total_customers}, Conversion: ${conversionRate.toFixed(1)}%`;
+                                    }
+                                    return '';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateAgentPerformanceChart() {
+            const ctx = document.getElementById('agentPerformanceChart').getContext('2d');
+            
+            if(charts.agentPerformance) {
+                charts.agentPerformance.destroy();
+            }
+
+            // Mock agent data for demo
+            const agentData = [
+                { name: 'GD', customers: 45, bookings: 12, revenue: 8500 },
+                { name: 'Namira', customers: 38, bookings: 15, revenue: 9200 },
+                { name: 'Aqsa', customers: 42, bookings: 11, revenue: 7800 },
+                { name: 'Sarb', customers: 35, bookings: 9, revenue: 6500 },
+                { name: 'Mansi', customers: 40, bookings: 13, revenue: 8100 }
+            ];
+
+            charts.agentPerformance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: agentData.map(agent => agent.name),
+                    datasets: [{
+                        label: 'Customers',
+                        data: agentData.map(agent => agent.customers),
+                        backgroundColor: 'rgba(59, 130, 246, 0.8)',
+                        yAxisID: 'y'
+                    }, {
+                        label: 'Bookings',
+                        data: agentData.map(agent => agent.bookings),
+                        backgroundColor: 'rgba(16, 185, 129, 0.8)',
+                        yAxisID: 'y'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateAgentEfficiencyChart() {
+            const ctx = document.getElementById('agentEfficiencyChart').getContext('2d');
+            
+            if(charts.agentEfficiency) {
+                charts.agentEfficiency.destroy();
+            }
+
+            // Mock efficiency data
+            const efficiencyData = [
+                { name: 'GD', efficiency: 26.7 },
+                { name: 'Namira', efficiency: 39.5 },
+                { name: 'Aqsa', efficiency: 26.2 },
+                { name: 'Sarb', efficiency: 25.7 },
+                { name: 'Mansi', efficiency: 32.5 }
+            ];
+
+            charts.agentEfficiency = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: efficiencyData.map(agent => agent.name),
+                    datasets: [{
+                        label: 'Conversion Rate (%)',
+                        data: efficiencyData.map(agent => agent.efficiency),
+                        backgroundColor: 'rgba(168, 85, 247, 0.2)',
+                        borderColor: 'rgba(168, 85, 247, 1)',
+                        pointBackgroundColor: 'rgba(168, 85, 247, 1)',
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            max: 50
+                        }
+                    }
+                }
+            });
+        }
+
         function updateTable() {
             const tableBody = document.getElementById('dataTable');
             tableBody.innerHTML = '';
@@ -813,6 +1030,19 @@
             currentData.slice(-10).reverse().forEach(item => {
                 const conversionRate = item.total_customers > 0 ? 
                     ((item.total_booking / item.total_customers) * 100).toFixed(1) : 0;
+                const cancellationRate = item.total_booking > 0 ?
+                    ((item.total_cancelled_booking / item.total_booking) * 100).toFixed(1) : 0;
+                const advancePaymentRate = item.total_booking > 0 ?
+                    ((item.payment_done_bookings / item.total_booking) * 100).toFixed(1) : 0;
+                const collectionRate = item.total_revenue > 0 ?
+                    ((item.payment_collected / item.total_revenue) * 100).toFixed(1) : 0;
+                
+                // Calculate performance score
+                const performanceScore = Math.round(
+                    (parseFloat(conversionRate) * 0.4) +
+                    ((100 - parseFloat(cancellationRate)) * 0.3) +
+                    (parseFloat(collectionRate) * 0.3)
+                );
                 
                 const row = document.createElement('tr');
                 row.innerHTML = `
@@ -826,15 +1056,25 @@
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.total_customers}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.total_booking}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">₹${item.total_revenue.toLocaleString()}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-green-600">₹${item.payment_collected.toLocaleString()}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-red-600">₹${item.payment_pending.toLocaleString()}</td>
                     <td class="px-6 py-4 whitespace-nowrap">
                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                            conversionRate > 20 ? 'bg-green-100 text-green-800' : 
-                            conversionRate > 10 ? 'bg-yellow-100 text-yellow-800' : 
+                            conversionRate > 25 ? 'bg-green-100 text-green-800' : 
+                            conversionRate > 15 ? 'bg-yellow-100 text-yellow-800' : 
                             'bg-red-100 text-red-800'
                         }">
                             ${conversionRate}%
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-red-600">${item.total_cancelled_booking} (${cancellationRate}%)</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-green-600">${item.payment_done_bookings} (${advancePaymentRate}%)</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-blue-600">${collectionRate}%</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                            performanceScore >= 80 ? 'bg-green-100 text-green-800' : 
+                            performanceScore >= 60 ? 'bg-yellow-100 text-yellow-800' : 
+                            'bg-red-100 text-red-800'
+                        }">
+                            ${performanceScore}/100
                         </span>
                     </td>
                 `;
@@ -842,75 +1082,70 @@
             });
         }
 
-        // Update performance insights
-        function updateInsights() {
-            // Peak performance day
-            const peakDay = currentData.reduce((max, item) => 
-                item.total_revenue > max.total_revenue ? item : max, 
-                {total_revenue: 0, date: ''}
-            );
-            
-            if(peakDay.date) {
-                const peakDate = new Date(peakDay.date);
-                document.getElementById('peakDay').textContent = 
-                    peakDate.toLocaleDateString('en-US', { 
-                        weekday: 'long', 
-                        month: 'long', 
-                        day: 'numeric' 
-                    }) + ` (₹${peakDay.total_revenue.toLocaleString()})`;
-            }
-
-            // Average conversion rate
-            const totalCustomers = currentData.reduce((sum, item) => sum + item.total_customers, 0);
-            const totalBookings = currentData.reduce((sum, item) => sum + item.total_booking, 0);
-            const avgConversion = totalCustomers > 0 ? ((totalBookings / totalCustomers) * 100).toFixed(1) : 0;
-            document.getElementById('avgConversion').textContent = avgConversion + '%';
-
-            // Revenue per customer
-            const totalRevenue = currentData.reduce((sum, item) => sum + item.total_revenue, 0);
-            const revenuePerCustomer = totalCustomers > 0 ? Math.round(totalRevenue / totalBookings) : 0;
-            document.getElementById('revenuePerCustomer').textContent = '₹' + revenuePerCustomer.toLocaleString();
-        }
-
-        // Refresh data (simulate API call)
         async function refreshData() {
             showLoading(true);
             
-            // Simulate API call delay
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            
-            // In real implementation, this would fetch from your API
-            const dateFilter = document.getElementById('dateFilter').value;
-            const agentFilter = document.getElementById('agentFilter').value;
-            
-            // For now, we'll just refresh with existing data
-            applyFilters();
-            updateLastUpdated();
+            try {
+                // Get current filter values
+                const dateFilter = document.getElementById('dateFilter').value;
+                const agentFilter = document.getElementById('agentFilter').value;
+                const dateRange = getDateRange(dateFilter);
+                
+                // Fetch fresh data from API
+                dashboardData = await fetchDataFromAPI(dateRange, agentFilter);
+                currentData = dashboardData;
+                
+                // Update all components
+                updateMetrics();
+                calculateBenchmarks();
+                updateCharts();
+                updateTable();
+                updateHealthMetrics();
+                updateLastUpdated();
+                
+            } catch (error) {
+                console.error('Error refreshing data:', error);
+                alert('Failed to refresh data from API. Please try again.');
+            } finally {
+                showLoading(false);
+            }
         }
 
-        // Update last updated timestamp
         function updateLastUpdated() {
             const now = new Date();
             document.getElementById('lastUpdated').textContent = 
                 'Last updated: ' + now.toLocaleTimeString();
         }
 
-        // Export data to CSV
         function exportData() {
-            const headers = ['Date', 'Customers', 'Bookings', 'Revenue', 'Collected', 'Pending', 'Conversion Rate'];
+            const headers = ['Date', 'Customers', 'Bookings', 'Revenue', 'Conversion Rate', 'Cancelled', 'Advance Payment', 'Collection Rate', 'Performance Score'];
             const csvContent = [
                 headers.join(','),
                 ...currentData.map(item => {
                     const conversionRate = item.total_customers > 0 ? 
                         ((item.total_booking / item.total_customers) * 100).toFixed(1) : 0;
+                    const cancellationRate = item.total_booking > 0 ?
+                        ((item.total_cancelled_booking / item.total_booking) * 100).toFixed(1) : 0;
+                    const advancePaymentRate = item.total_booking > 0 ?
+                        ((item.payment_done_bookings / item.total_booking) * 100).toFixed(1) : 0;
+                    const collectionRate = item.total_revenue > 0 ?
+                        ((item.payment_collected / item.total_revenue) * 100).toFixed(1) : 0;
+                    const performanceScore = Math.round(
+                        (parseFloat(conversionRate) * 0.4) +
+                        ((100 - parseFloat(cancellationRate)) * 0.3) +
+                        (parseFloat(collectionRate) * 0.3)
+                    );
+                    
                     return [
                         item.date,
                         item.total_customers,
                         item.total_booking,
                         item.total_revenue,
-                        item.payment_collected,
-                        item.payment_pending,
-                        conversionRate + '%'
+                        conversionRate + '%',
+                        item.total_cancelled_booking,
+                        advancePaymentRate + '%',
+                        collectionRate + '%',
+                        performanceScore + '/100'
                     ].join(',');
                 })
             ].join('\n');
@@ -919,7 +1154,7 @@
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'instant_mechanic_data.csv';
+            a.download = 'instant_mechanic_enhanced_analytics.csv';
             document.body.appendChild(a);
             a.click();
             window.URL.revokeObjectURL(url);
@@ -933,7 +1168,7 @@
                 const agentParam = agent === 'all' ? '' : `&agent=${agent}`;
                 const url = `https://ai.instantmechanic.online/bot/api/customer_flow_dashboard?date=${dateParam}${agentParam}`;
                 
-                console.log('Fetching data from:', url);
+                console.log('Fetching live data from:', url);
                 
                 const response = await fetch(url);
                 if (!response.ok) {
@@ -941,16 +1176,19 @@
                 }
                 
                 const data = await response.json();
-                console.log('API Response:', data);
+                console.log('Live API Response:', data);
                 
-                // Ensure data is an array
-                return Array.isArray(data) ? data : [];
+                // Validate and return data
+                if (!Array.isArray(data)) {
+                    throw new Error('API returned invalid data format');
+                }
+                
+                // Filter out any invalid entries
+                return data.filter(item => item && item.date);
                 
             } catch (error) {
-                console.error('Error fetching data:', error);
-                
-                // Return empty array or show user-friendly error
-                throw new Error('Failed to fetch data from server. Please check your connection and try again.');
+                console.error('Error fetching live data:', error);
+                throw error; // Re-throw to be handled by calling function
             }
         }
 
