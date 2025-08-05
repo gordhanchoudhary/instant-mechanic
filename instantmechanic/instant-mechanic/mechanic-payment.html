@@ -1,0 +1,1273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mechanic Payout Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .header h1 {
+            color: #2d3748;
+            font-size: 2rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header h1 i {
+            color: #667eea;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .overview-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .card-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: white;
+        }
+
+        .card-icon.primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .card-icon.success { background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); }
+        .card-icon.warning { background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%); }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .card-amount {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1a365d;
+            margin-bottom: 10px;
+        }
+
+        .card-subtitle {
+            color: #718096;
+            font-size: 0.9rem;
+        }
+
+        .filters {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .filters h3 {
+            color: #2d3748;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .filter-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            align-items: end;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: #4a5568;
+            font-size: 0.9rem;
+        }
+
+        .form-control {
+            padding: 12px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background: #f8fafc;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        /* Custom select styling */
+        select.form-control {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 12px center;
+            background-repeat: no-repeat;
+            background-size: 16px;
+            padding-right: 40px;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            cursor: pointer;
+        }
+
+        select.form-control:focus {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23667eea' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+        }
+
+        /* Remove default select arrows for all browsers */
+        select.form-control::-ms-expand {
+            display: none;
+        }
+
+        select.form-control::-webkit-outer-spin-button,
+        select.form-control::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .btn-secondary {
+            background: #f1f5f9;
+            color: #475569;
+            padding: 12px 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+            border-color: #cbd5e0;
+        }
+
+        .data-section {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .section-header {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            padding: 20px 25px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .section-header h3 {
+            color: #2d3748;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th,
+        .table td {
+            padding: 15px 20px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .table th {
+            background: #f8fafc;
+            font-weight: 600;
+            color: #4a5568;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .table tr:hover {
+            background: #f8fafc;
+        }
+
+        .amount-positive {
+            color: #e53e3e;
+            font-weight: 600;
+        }
+
+        .amount-negative {
+            color: #38a169;
+            font-weight: 600;
+        }
+
+        .confirmation-modal {
+            display: none;
+            position: fixed;
+            z-index: 1001;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.6);
+            backdrop-filter: blur(8px);
+        }
+
+        .confirmation-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 0;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 450px;
+            box-shadow: 0 25px 70px rgba(0,0,0,0.3);
+            animation: confirmationSlideIn 0.3s ease;
+        }
+
+        @keyframes confirmationSlideIn {
+            from { transform: translateY(-30px) scale(0.95); opacity: 0; }
+            to { transform: translateY(0) scale(1); opacity: 1; }
+        }
+
+        .confirmation-header {
+            background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+            color: white;
+            padding: 20px 25px;
+            border-radius: 15px 15px 0 0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .confirmation-header i {
+            font-size: 1.5rem;
+        }
+
+        .confirmation-body {
+            padding: 25px;
+            text-align: center;
+        }
+
+        .confirmation-body h4 {
+            color: #2d3748;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .confirmation-details {
+            background: #f7fafc;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border-left: 4px solid #ed8936;
+        }
+
+        .confirmation-details p {
+            margin: 5px 0;
+            color: #4a5568;
+        }
+
+        .confirmation-amount {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #e53e3e;
+        }
+
+        .confirmation-footer {
+            padding: 20px 25px;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(229, 62, 62, 0.4);
+        }
+
+        .btn-danger:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 0;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 25px;
+            border-radius: 15px 15px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h4 {
+            margin: 0;
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .close {
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background 0.3s ease;
+        }
+
+        .close:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .modal-body {
+            padding: 25px;
+        }
+
+        .modal-body .form-group {
+            margin-bottom: 20px;
+        }
+
+        .modal-footer {
+            padding: 20px 25px;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(72, 187, 120, 0.4);
+        }
+
+        .btn-success:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 500;
+        }
+
+        .alert-success {
+            background: #f0fff4;
+            color: #22543d;
+            border: 1px solid #9ae6b4;
+        }
+
+        .alert-error {
+            background: #fed7d7;
+            color: #742a2a;
+            border: 1px solid #feb2b2;
+        }
+
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            color: #718096;
+        }
+
+        .loading i {
+            margin-right: 10px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #718096;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: #cbd5e0;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            .header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .overview-cards {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-row {
+                grid-template-columns: 1fr;
+            }
+
+            .card-amount {
+                font-size: 1.5rem;
+            }
+
+            .table th,
+            .table td {
+                padding: 10px 15px;
+                font-size: 0.9rem;
+            }
+
+            .modal-content {
+                margin: 10% auto;
+                width: 95%;
+            }
+        }
+
+        .mechanic-name-link {
+            cursor: pointer;
+            color: #667eea;
+            text-decoration: underline;
+            transition: color 0.3s ease;
+        }
+
+        .mechanic-name-link:hover {
+            color: #764ba2;
+            text-decoration: none;
+        }
+
+        .settled-badge {
+            color: #38a169;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.9rem;
+        }
+
+        .btn-settle {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s ease;
+            font-size: 0.85rem;
+        }
+
+        .btn-settle:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(72, 187, 120, 0.4);
+        }
+
+        .pending-balance {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .pending-icon {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #ed8936;
+        }
+
+        .no-pending {
+            color: #38a169;
+        }
+
+        .has-pending {
+            color: #e53e3e;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>
+                <i class="fas fa-wallet"></i>
+                Mechanic Payout Dashboard
+            </h1>
+            <button class="btn-primary" onclick="openCreateModal()">
+                <i class="fas fa-plus"></i>
+                Create Manual Payment
+            </button>
+        </div>
+
+        <div id="alertContainer"></div>
+
+        <!-- Overview Cards -->
+        <div class="overview-cards">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon primary">
+                        <i class="fas fa-credit-card"></i>
+                    </div>
+                    <div>
+                        <div class="card-title">Total Pending Payments</div>
+                        <div class="card-subtitle">Overall system pending</div>
+                    </div>
+                </div>
+                <div class="card-amount" id="totalPending">₹0</div>
+                <div class="card-subtitle" id="lastUpdated">Last updated: --</div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon warning">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div>
+                        <div class="card-title">Mechanics with Pending</div>
+                        <div class="card-subtitle">Active pending balances</div>
+                    </div>
+                </div>
+                <div class="card-amount" id="mechanicsWithPending">0</div>
+                <div class="card-subtitle">mechanics have pending amounts</div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon success">
+                        <i class="fas fa-history"></i>
+                    </div>
+                    <div>
+                        <div class="card-title">Recent Payouts</div>
+                        <div class="card-subtitle">Today's transactions</div>
+                    </div>
+                </div>
+                <div class="card-amount" id="recentPayouts">0</div>
+                <div class="card-subtitle">transactions today</div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters">
+            <h3>
+                <i class="fas fa-filter"></i>
+                Filters
+            </h3>
+            <div class="filter-row">
+                <div class="form-group">
+                    <label>Mechanic Name</label>
+                    <select class="form-control" id="mechanicNameFilter">
+                        <option value="">All Mechanics</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Start Date</label>
+                    <input type="date" class="form-control" id="startDateFilter">
+                </div>
+                <div class="form-group">
+                    <label>End Date</label>
+                    <input type="date" class="form-control" id="endDateFilter">
+                </div>
+                <div class="form-group">
+                    <button class="btn-secondary" onclick="applyFilters()">
+                        <i class="fas fa-search"></i>
+                        Apply Filters
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mechanic Pending Balances -->
+        <div class="data-section" style="margin-bottom: 30px;">
+            <div class="section-header">
+                <h3>Mechanic Pending Balances</h3>
+            </div>
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Mechanic Name</th>
+                            <th>Pending Balance</th>
+                            <th>Last Updated</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="mechanicPendingTableBody">
+                        <tr>
+                            <td colspan="4" class="loading">
+                                <i class="fas fa-spinner"></i>
+                                Loading data...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Daily Payouts -->
+        <div class="data-section" id="dailyPayoutsSection" style="display: none;">
+            <div class="section-header">
+                <h3>Daily Payouts History</h3>
+            </div>
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Mechanic Name</th>
+                            <th>Amount</th>
+                            <th>Total Calls</th>
+                            <th>Remarks</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dailyPayoutsTableBody">
+                        <tr>
+                            <td colspan="5" class="loading">
+                                <i class="fas fa-spinner"></i>
+                                Loading data...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmationModal" class="confirmation-modal">
+        <div class="confirmation-content">
+            <div class="confirmation-header">
+                <i class="fas fa-exclamation-triangle"></i>
+                <h4>Confirm Payment Settlement</h4>
+            </div>
+            <div class="confirmation-body">
+                <h4>Are you sure you want to settle this pending amount?</h4>
+                <div class="confirmation-details">
+                    <p><strong>Mechanic:</strong> <span id="confirmMechanicName"></span></p>
+                    <p><strong>Amount to Settle:</strong> <span id="confirmAmount" class="confirmation-amount"></span></p>
+                </div>
+                <p style="color: #718096; font-size: 0.9rem;">This action will create a manual payment record and update the pending balance.</p>
+            </div>
+            <div class="confirmation-footer">
+                <button class="btn-secondary" onclick="closeConfirmationModal()">Cancel</button>
+                <button class="btn-danger" id="confirmSettleBtn" onclick="confirmSettle()">
+                    <i class="fas fa-check"></i>
+                    Yes, Settle Payment
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Payment Modal -->
+    <div id="createPaymentModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4>Create Manual Payment</h4>
+                <button class="close" onclick="closeCreateModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Select Mechanic *</label>
+                    <select class="form-control" id="mechanicSelect" required>
+                        <option value="">Choose a mechanic...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Payment Amount *</label>
+                    <input type="number" class="form-control" id="paymentAmount" placeholder="Enter amount" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label>Remarks (Optional)</label>
+                    <textarea class="form-control" id="paymentRemarks" placeholder="Enter any additional notes..." rows="3"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeCreateModal()">Cancel</button>
+                <button class="btn-success" id="createPaymentBtn" onclick="createPayment()">
+                    <i class="fas fa-plus"></i>
+                    Create Payment
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let mechanics = [];
+        let paymentData = {
+            overall_payment: {},
+            mechanic_pending: [],
+            daily_payouts: []
+        };
+
+        // Initialize the dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchMechanics();
+            fetchPaymentData();
+        });
+
+        // Fetch mechanics list
+        async function fetchMechanics() {
+            try {
+                const response = await fetch('https://ai.instantmechanic.online/bot/api/mechanic/', {
+                    headers: {
+                        'Accept': '*/*',
+                        'Origin': 'https://instantmechanic.online',
+                        'Referer': 'https://instantmechanic.online/',
+                    }
+                });
+                mechanics = await response.json();
+                populateMechanicSelect();
+            } catch (error) {
+                console.error('Error fetching mechanics:', error);
+                showAlert('error', 'Failed to fetch mechanics list');
+            }
+        }
+
+        // Populate mechanic select dropdown
+        function populateMechanicSelect() {
+            const select = document.getElementById('mechanicSelect');
+            const filterSelect = document.getElementById('mechanicNameFilter');
+            
+            // Clear existing options
+            select.innerHTML = '<option value="">Choose a mechanic...</option>';
+            filterSelect.innerHTML = '<option value="">All Mechanics</option>';
+            
+            mechanics.forEach(mechanic => {
+                // For create payment modal
+                const option = document.createElement('option');
+                option.value = mechanic.id;
+                option.textContent = `${mechanic.name} (${mechanic.mobile})`;
+                select.appendChild(option);
+
+                // For filter dropdown
+                const filterOption = document.createElement('option');
+                filterOption.value = mechanic.name;
+                filterOption.textContent = `${mechanic.name} (${mechanic.mobile})`;
+                filterSelect.appendChild(filterOption);
+            });
+        }
+
+        // Fetch payment data
+        async function fetchPaymentData() {
+            try {
+                const params = new URLSearchParams();
+                const mechanicName = document.getElementById('mechanicNameFilter').value;
+                const startDate = document.getElementById('startDateFilter').value;
+                const endDate = document.getElementById('endDateFilter').value;
+
+                if (mechanicName) params.append('mechanic_name', mechanicName);
+                if (startDate) params.append('start_date', startDate);
+                if (endDate) params.append('end_date', endDate);
+
+                const response = await fetch(`https://ai.instantmechanic.online/bot/api/mechanic_payment_overview?${params}`);
+                paymentData = await response.json();
+                
+                updateOverviewCards();
+                updateMechanicPendingTable();
+                updateDailyPayoutsTable();
+            } catch (error) {
+                console.error('Error fetching payment data:', error);
+                showAlert('error', 'Failed to fetch payment data');
+            }
+        }
+
+        // Update overview cards
+        function updateOverviewCards() {
+            const totalPendingEl = document.getElementById('totalPending');
+            const lastUpdatedEl = document.getElementById('lastUpdated');
+            const mechanicsWithPendingEl = document.getElementById('mechanicsWithPending');
+            const recentPayoutsEl = document.getElementById('recentPayouts');
+
+            // Total pending
+            const totalPending = paymentData.overall_payment.pending_payments || 0;
+            totalPendingEl.textContent = formatCurrency(totalPending);
+            
+            // Last updated
+            if (paymentData.overall_payment.updated_at) {
+                lastUpdatedEl.textContent = `Last updated: ${formatDateTime(paymentData.overall_payment.updated_at)}`;
+            }
+
+            // Mechanics with pending
+            const mechanicsWithPending = paymentData.mechanic_pending.filter(m => Math.abs(m.pending_balance) > 0).length;
+            mechanicsWithPendingEl.textContent = mechanicsWithPending;
+
+            // Recent payouts (today)
+            const today = new Date().toISOString().split('T')[0];
+            const todayPayouts = paymentData.daily_payouts.filter(p => p.payout_date === today).length;
+            recentPayoutsEl.textContent = todayPayouts;
+        }
+
+        // Update mechanic pending table
+        function updateMechanicPendingTable() {
+            const tbody = document.getElementById('mechanicPendingTableBody');
+            
+            if (paymentData.mechanic_pending.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="empty-state">
+                            <i class="fas fa-inbox"></i>
+                            <div>No pending balances found</div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            // Sort by pending balance from high to low
+            const sortedMechanics = [...paymentData.mechanic_pending].sort((a, b) => b.pending_balance - a.pending_balance);
+
+            tbody.innerHTML = sortedMechanics.map(item => `
+                <tr>
+                    <td>
+                        <span class="mechanic-name-link" onclick="selectMechanicForPayouts('${item.mechanic_name}')" style="cursor: pointer; color: #667eea; text-decoration: underline;">
+                            ${item.mechanic_name}
+                        </span>
+                    </td>
+                    <td class="${item.pending_balance >= 0 ? 'amount-positive' : 'amount-negative'}">
+                        ${formatCurrency(item.pending_balance)}
+                    </td>
+                    <td>${formatDateTime(item.updated_at)}</td>
+                    <td>
+                        <div class="pending-balance">
+                            ${Math.abs(item.pending_balance) > 0 ? 
+                                '<div class="pending-icon"></div><span class="has-pending">Pending</span>' : 
+                                '<i class="fas fa-check-circle" style="color: #38a169;"></i><span class="no-pending">Clear</span>'
+                            }
+                        </div>
+                    </td>
+                    <td>
+                        ${Math.abs(item.pending_balance) > 0 ? 
+                            `<button class="btn-settle" onclick="settlePending('${item.mechanic_name}', ${Math.abs(item.pending_balance)})">
+                                <i class="fas fa-credit-card"></i>
+                                Settle Pending
+                            </button>` : 
+                            '<span class="settled-badge"><i class="fas fa-check"></i> Settled</span>'
+                        }
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Update daily payouts table
+        function updateDailyPayoutsTable() {
+            const tbody = document.getElementById('dailyPayoutsTableBody');
+            const dailyPayoutsSection = document.getElementById('dailyPayoutsSection');
+            const mechanicFilter = document.getElementById('mechanicNameFilter').value;
+            
+            // Show/hide daily payouts section based on mechanic filter
+            if (!mechanicFilter) {
+                dailyPayoutsSection.style.display = 'none';
+                return;
+            } else {
+                dailyPayoutsSection.style.display = 'block';
+            }
+            
+            if (paymentData.daily_payouts.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="empty-state">
+                            <i class="fas fa-calendar-times"></i>
+                            <div>No payout records found for selected mechanic</div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = paymentData.daily_payouts.map(item => `
+                <tr>
+                    <td>${formatDate(item.payout_date)}</td>
+                    <td>${item.mechanic_name}</td>
+                    <td class="${item.pending_amount >= 0 ? 'amount-positive' : 'amount-negative'}">
+                        ${formatCurrency(item.pending_amount)}
+                    </td>
+                    <td>${item.total_calls || 0}</td>
+                    <td>${item.remarks || '-'}</td>
+                </tr>
+            `).join('');
+        }
+
+        // Apply filters
+        function applyFilters() {
+            fetchPaymentData();
+        }
+
+        // Select mechanic for payouts view
+        function selectMechanicForPayouts(mechanicName) {
+            const mechanicFilter = document.getElementById('mechanicNameFilter');
+            mechanicFilter.value = mechanicName;
+            fetchPaymentData();
+        }
+
+        // Settle pending payment
+        function settlePending(mechanicName, pendingAmount) {
+            // Find the mechanic ID
+            const mechanic = mechanics.find(m => m.name === mechanicName);
+            if (!mechanic) {
+                showAlert('error', 'Mechanic not found');
+                return;
+            }
+
+            // Store settlement data for confirmation
+            window.settlementData = {
+                mechanicId: mechanic.id,
+                mechanicName: mechanicName,
+                amount: pendingAmount
+            };
+
+            // Show confirmation modal
+            document.getElementById('confirmMechanicName').textContent = mechanicName;
+            document.getElementById('confirmAmount').textContent = formatCurrency(pendingAmount);
+            document.getElementById('confirmationModal').style.display = 'block';
+        }
+
+        // Close confirmation modal
+        function closeConfirmationModal() {
+            document.getElementById('confirmationModal').style.display = 'none';
+            window.settlementData = null;
+        }
+
+        // Confirm and execute settlement
+        async function confirmSettle() {
+            if (!window.settlementData) {
+                showAlert('error', 'Settlement data not found');
+                return;
+            }
+
+            const confirmBtn = document.getElementById('confirmSettleBtn');
+            confirmBtn.disabled = true;
+            confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+
+            try {
+                const response = await fetch('https://ai.instantmechanic.online/bot/api/create_mechanic_payment', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': '*/*',
+                        'Origin': 'https://instantmechanic.online',
+                        'Referer': 'https://instantmechanic.online/',
+                    },
+                    body: JSON.stringify({
+                        mechanic_id: window.settlementData.mechanicId,
+                        pending_amount: window.settlementData.amount,
+                        remarks: `Pending balance settlement of ${formatCurrency(window.settlementData.amount)} for ${window.settlementData.mechanicName}`
+                    })
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    showAlert('success', `Payment of ${formatCurrency(window.settlementData.amount)} settled successfully for ${window.settlementData.mechanicName}!`);
+                    closeConfirmationModal();
+                    fetchPaymentData(); // Refresh data
+                } else {
+                    showAlert('error', result.error || 'Failed to settle payment');
+                }
+            } catch (error) {
+                console.error('Error settling payment:', error);
+                showAlert('error', 'Failed to settle payment');
+            } finally {
+                confirmBtn.disabled = false;
+                confirmBtn.innerHTML = '<i class="fas fa-check"></i> Yes, Settle Payment';
+            }
+        }
+
+        // Open create modal
+        function openCreateModal() {
+            document.getElementById('createPaymentModal').style.display = 'block';
+            // Reset form
+            document.getElementById('mechanicSelect').value = '';
+            document.getElementById('paymentAmount').value = '';
+            document.getElementById('paymentRemarks').value = '';
+        }
+
+        // Close create modal
+        function closeCreateModal() {
+            document.getElementById('createPaymentModal').style.display = 'none';
+        }
+
+        // Create payment
+        async function createPayment() {
+            const mechanicId = document.getElementById('mechanicSelect').value;
+            const amount = document.getElementById('paymentAmount').value;
+            const remarks = document.getElementById('paymentRemarks').value;
+
+            if (!mechanicId || !amount) {
+                showAlert('error', 'Please fill in all required fields');
+                return;
+            }
+
+            const createBtn = document.getElementById('createPaymentBtn');
+            createBtn.disabled = true;
+            createBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
+
+            try {
+                const requestBody = {
+                    mechanic_id: parseInt(mechanicId),
+                    pending_amount: parseFloat(amount)
+                };
+
+                // Only add remarks if it's not empty
+                if (remarks.trim()) {
+                    requestBody.remarks = remarks;
+                }
+
+                const response = await fetch('https://ai.instantmechanic.online/bot/api/create_mechanic_payment', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': '*/*',
+                        'Origin': 'https://instantmechanic.online',
+                        'Referer': 'https://instantmechanic.online/',
+                    },
+                    body: JSON.stringify(requestBody)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    showAlert('success', 'Payment recorded successfully!');
+                    closeCreateModal();
+                    fetchPaymentData(); // Refresh data
+                } else {
+                    showAlert('error', result.error || 'Failed to create payment');
+                }
+            } catch (error) {
+                console.error('Error creating payment:', error);
+                showAlert('error', 'Failed to create payment');
+            } finally {
+                createBtn.disabled = false;
+                createBtn.innerHTML = '<i class="fas fa-plus"></i> Create Payment';
+            }
+        }
+
+        // Show alert
+        function showAlert(type, message) {
+            const container = document.getElementById('alertContainer');
+            const alertId = 'alert-' + Date.now();
+            
+            const alert = document.createElement('div');
+            alert.id = alertId;
+            alert.className = `alert alert-${type}`;
+            alert.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+                ${message}
+            `;
+            
+            container.appendChild(alert);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                const alertEl = document.getElementById(alertId);
+                if (alertEl) {
+                    alertEl.remove();
+                }
+            }, 5000);
+        }
+
+        // Format currency
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('en-IN', {
+                style: 'currency',
+                currency: 'INR',
+                minimumFractionDigits: 0
+            }).format(amount || 0);
+        }
+
+        // Format date
+        function formatDate(dateString) {
+            return new Date(dateString).toLocaleDateString('en-IN', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+        }
+
+        // Format date and time
+        function formatDateTime(dateString) {
+            return new Date(dateString).toLocaleString('en-IN', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('createPaymentModal');
+            if (event.target === modal) {
+                closeCreateModal();
+            }
+        }
+
+        // Auto-refresh data every 5 minutes
+        setInterval(fetchPaymentData, 5 * 60 * 1000);
+    </script>
+</body>
+</html>
