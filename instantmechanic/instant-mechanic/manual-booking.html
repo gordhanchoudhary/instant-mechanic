@@ -1109,7 +1109,8 @@
                 if (!price || isNaN(price) || price <= 0) return '';
                 const xyz = parseFloat(price);
                 const securityAmount = xyz / 2.36;
-                return Math.round(securityAmount); // Round to nearest integer
+                const roundedAmount = Math.round(securityAmount);
+                return Math.max(roundedAmount, 250);
             }
 
             // Form validation for price with auto-calculation of security amount
