@@ -51,6 +51,11 @@
 
         .form-group {
             margin-bottom: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .form-group.hidden {
+            display: none;
         }
 
         .form-group label {
@@ -331,6 +336,15 @@
         <div class="form-container">
             <form id="bookingForm">
                 <div class="form-group">
+                    <div class="toggle-group">
+                        <span class="toggle-label">Is GoMechanic Call?</span>
+                        <div class="toggle-switch" id="goMechanicToggle">
+                            <div class="toggle-slider"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
                     <label for="mobile">Mobile Number *</label>
                     <div class="phone-input-wrapper">
                         <div class="country-code">+91</div>
@@ -348,7 +362,7 @@
                     </div>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group" id="priceGroup">
                     <label for="price">Price (₹)</label>
                     <input type="text" id="price" name="price" placeholder="Enter service price" value="742">
                 </div>
@@ -368,21 +382,10 @@
                     <input type="text" id="location" name="location" placeholder="Enter your location" required>
                 </div>
 
-                <div class="form-group" hidden>
-                    <label for="securityAmount">Security Amount (₹)</label>
+                <div class="form-group" id="securityAmountGroup">
+                    <label for="securityAmount">Mechanic Amount (₹)</label>
                     <input type="text" id="securityAmount" name="securityAmount" placeholder="Enter security amount" value="428">
                 </div>
-
-                <div class="form-group">
-                    <div class="toggle-group">
-                        <span class="toggle-label">Is GoMechanic Call Required?</span>
-                        <div class="toggle-switch" id="goMechanicToggle">
-                            <div class="toggle-slider"></div>
-                        </div>
-                    </div>
-                </div>
-
-
 
                 <button type="submit" class="book-btn" id="bookBtn">
                     <span class="btn-text">Book Now</span>
@@ -429,7 +432,6 @@
             'Roadside Assistance'
         ];
 
-        // Car models list for dropdown
         const carModelsList = [
             'Swift - Maruti Suzuki',
             'WagonR - Maruti Suzuki',
@@ -848,6 +850,7 @@
             'e6 - BYD'
         ];
 
+
         // Initialize dropdown functionality for problems
         function initializeProblemDropdown() {
             const descriptionInput = document.getElementById('description');
@@ -1022,6 +1025,20 @@
             });
         }
 
+        // Function to toggle price and security amount visibility
+        function togglePriceAndSecurityVisibility(isGoMechanic) {
+            const priceGroup = document.getElementById('priceGroup');
+            const securityAmountGroup = document.getElementById('securityAmountGroup');
+            
+            if (isGoMechanic) {
+                priceGroup.classList.add('hidden');
+                securityAmountGroup.classList.add('hidden');
+            } else {
+                priceGroup.classList.remove('hidden');
+                securityAmountGroup.classList.remove('hidden');
+            }
+        }
+
         // Get URL parameters
         function getUrlParameter(name) {
             name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
@@ -1067,12 +1084,12 @@
                 document.getElementById('securityAmount').value = calculatedSecurity || '428';
             }
 
-            // Toggle functionality
-            const toggles = document.querySelectorAll('.toggle-switch');
-            toggles.forEach(toggle => {
-                toggle.addEventListener('click', function() {
-                    this.classList.toggle('active');
-                });
+            // Toggle functionality with visibility control
+            const goMechanicToggle = document.getElementById('goMechanicToggle');
+            goMechanicToggle.addEventListener('click', function() {
+                this.classList.toggle('active');
+                const isGoMechanic = this.classList.contains('active');
+                togglePriceAndSecurityVisibility(isGoMechanic);
             });
 
             // Form validation for mobile number
@@ -1091,8 +1108,8 @@
             function calculateSecurityAmount(price) {
                 if (!price || isNaN(price) || price <= 0) return '';
                 const xyz = parseFloat(price);
-                const securityAmount = xyz - (xyz / 1.18) + (xyz / 2.36);
-                return Math.round(securityAmount) ; // Round to 2 decimal places
+                const securityAmount = xyz / 2.36;
+                return Math.round(securityAmount); // Round to nearest integer
             }
 
             // Form validation for price with auto-calculation of security amount
@@ -1172,15 +1189,18 @@
                 btnText.style.display = 'none';
                 loading.style.display = 'flex';
 
+                // Check if GoMechanic toggle is active
+                const isGoMechanic = document.getElementById('goMechanicToggle').classList.contains('active');
+
                 // Collect form data
                 const formData = {
                     mobile: '91' + mobile,
                     description: document.getElementById('description').value,
-                    price: document.getElementById('price').value || null,
+                    price:  document.getElementById('price').value || null,
                     carModel: document.getElementById('carModel').value,
                     location: document.getElementById('location').value,
                     securityAmount: document.getElementById('securityAmount').value || null,
-                    isGoMechanicCall: document.getElementById('goMechanicToggle').classList.contains('active'),
+                    isGoMechanicCall: isGoMechanic,
                     timestamp: new Date().toISOString(),
                     agent: localStorage.getItem("agent_name") || "Harshit"
                 };
@@ -1200,6 +1220,7 @@
                         form.reset();
                         // Reset toggles to default state and restore default values
                         document.getElementById('goMechanicToggle').classList.remove('active');
+                        togglePriceAndSecurityVisibility(false); // Show price and security fields
                         document.getElementById('price').value = '742';
                         const calculatedSecurity = calculateSecurityAmount('742');
                         document.getElementById('securityAmount').value = calculatedSecurity;
@@ -1217,6 +1238,7 @@
                         successMessage.style.display = 'block';
                         form.reset();
                         document.getElementById('goMechanicToggle').classList.remove('active');
+                        togglePriceAndSecurityVisibility(false); // Show price and security fields
                         document.getElementById('price').value = '742';
                         const calculatedSecurity = calculateSecurityAmount('742');
                         document.getElementById('securityAmount').value = calculatedSecurity;
