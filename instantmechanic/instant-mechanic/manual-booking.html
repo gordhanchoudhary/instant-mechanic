@@ -306,6 +306,120 @@
             display: none;
         }
 
+        /* Agent Selection Popup Styles */
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .popup-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .popup-content {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.2);
+            max-width: 400px;
+            width: 90%;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .popup-overlay.show .popup-content {
+            transform: scale(1);
+        }
+
+        .popup-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .popup-header h2 {
+            color: #374151;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .popup-header p {
+            color: #6b7280;
+            font-size: 16px;
+        }
+
+        .agent-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .agent-option {
+            padding: 14px 20px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            color: #374151;
+            background: white;
+        }
+
+        .agent-option:hover {
+            border-color: #667eea;
+            background: #f8fafc;
+            color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .agent-option.selected {
+            border-color: #667eea;
+            background: #667eea;
+            color: white;
+        }
+
+        .popup-footer {
+            text-align: center;
+        }
+
+        .confirm-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 120px;
+        }
+
+        .confirm-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .confirm-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
         @media (max-width: 640px) {
             .container {
                 margin: 10px;
@@ -323,10 +437,40 @@
             .form-container {
                 padding: 30px 20px;
             }
+
+            .agent-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .popup-content {
+                padding: 25px 20px;
+            }
         }
     </style>
 </head>
 <body>
+    <!-- Agent Selection Popup -->
+    <div class="popup-overlay" id="agentPopup">
+        <div class="popup-content">
+            <div class="popup-header">
+                <h2>Select Your Name</h2>
+                <p>Please choose your agent name to continue</p>
+            </div>
+            <div class="agent-grid">
+                <div class="agent-option" data-agent="GD">GD</div>
+                <div class="agent-option" data-agent="Harshit">Harshit</div>
+                <div class="agent-option" data-agent="Namira">Namira</div>
+                <div class="agent-option" data-agent="Aqsa">Aqsa</div>
+                <div class="agent-option" data-agent="Mansi">Mansi</div>
+                <div class="agent-option" data-agent="Mehak">Mehak</div>
+                <div class="agent-option" data-agent="Sarb">Sarb</div>
+            </div>
+            <div class="popup-footer">
+                <button class="confirm-btn" id="confirmAgent" disabled>Confirm</button>
+            </div>
+        </div>
+    </div>
+
     <div class="container">
         <div class="header">
             <h1>Book Mechanic Service</h1>
@@ -850,6 +994,62 @@
             'e6 - BYD'
         ];
 
+        // Agent Selection Popup Functions
+        function showAgentPopup() {
+            const popup = document.getElementById('agentPopup');
+            popup.classList.add('show');
+        }
+
+        function hideAgentPopup() {
+            const popup = document.getElementById('agentPopup');
+            popup.classList.remove('show');
+        }
+
+        function initializeAgentSelection() {
+            const agentOptions = document.querySelectorAll('.agent-option');
+            const confirmBtn = document.getElementById('confirmAgent');
+            let selectedAgent = null;
+
+            agentOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    // Remove selected class from all options
+                    agentOptions.forEach(opt => opt.classList.remove('selected'));
+                    
+                    // Add selected class to clicked option
+                    this.classList.add('selected');
+                    selectedAgent = this.dataset.agent;
+                    
+                    // Enable confirm button
+                    confirmBtn.disabled = false;
+                });
+            });
+
+            confirmBtn.addEventListener('click', function() {
+                if (selectedAgent) {
+                    // Save agent name to localStorage
+                    localStorage.setItem('agent_name', selectedAgent);
+                    
+                    // Hide popup
+                    hideAgentPopup();
+                }
+            });
+
+            // Prevent closing popup by clicking outside
+            document.getElementById('agentPopup').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    // Don't allow closing by clicking outside - agent selection is required
+                    return;
+                }
+            });
+        }
+
+        // Check if agent name exists in localStorage on page load
+        function checkAgentName() {
+            const agentName = localStorage.getItem('agent_name');
+            if (!agentName) {
+                showAgentPopup();
+            }
+        }
 
         // Initialize dropdown functionality for problems
         function initializeProblemDropdown() {
@@ -1049,6 +1249,12 @@
 
         // Initialize form
         document.addEventListener('DOMContentLoaded', function() {
+            // Check agent name and show popup if needed
+            checkAgentName();
+            
+            // Initialize agent selection
+            initializeAgentSelection();
+            
             // Initialize dropdown functionality
             initializeProblemDropdown();
             initializeCarModelDropdown();
