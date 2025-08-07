@@ -188,6 +188,11 @@
           // Set the extra payment input field
           document.getElementById("mechanicExtraPayment").value = data.mechanic_extra_payment || 0;
           
+          // Set cancellation checkbox and reason based on current booking status
+          document.getElementById("markCancelled").checked = data.is_cancelled;
+          document.getElementById("cancelReason").value = data.cancellation_reason || "";
+          toggleCancelReason(); // Show/hide cancel reason box based on checkbox state
+          
           fetchMechanics();
           fetchChat();
         });
@@ -260,11 +265,13 @@
       const extraPayment = document.getElementById("mechanicExtraPayment").value;
 
       const updateData = {
-        cancellation_reason: isCancelled ? cancelReason : "",
-        is_cancelled: isCancelled,
         agent: agentName,
         mechanic_extra_payment: extraPayment || 0
       };
+
+      // Only include cancellation fields if the checkbox state has been explicitly set
+      updateData.is_cancelled = isCancelled;
+      updateData.cancellation_reason = isCancelled ? cancelReason : "";
 
       if (assignedMechanicId) updateData.mechanic = assignedMechanicId;
 
