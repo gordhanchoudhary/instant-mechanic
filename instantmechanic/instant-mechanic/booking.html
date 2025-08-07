@@ -75,6 +75,12 @@
     #mechanicDropdown .selected {
       background-color: #dcedc8;
     }
+
+    .payment-input {
+      width: 100px;
+      display: inline-block;
+      margin-left: 10px;
+    }
   </style>
 </head>
 <body>
@@ -97,6 +103,9 @@
       <div id="mechanicDropdown" style="position:absolute; top:100%; left:0; right:0; background:white; border:1px solid #ccc; border-top:none; max-height:200px; overflow-y:auto; z-index:1000; display:none;"></div>
     </div>
 
+    <label for="mechanicExtraPayment">Extra Mechanic Payment (₹):</label>
+    <input type="number" id="mechanicExtraPayment" placeholder="Enter extra payment amount" min="0" step="1">
+
     <label><input type="checkbox" id="markCancelled" onclick="toggleCancelReason()"> Mark as Cancelled</label>
     <div id="cancelBox" class="hidden">
       <label>Cancellation Reason:</label>
@@ -117,6 +126,7 @@
     let mechanicList = [];
     let assignedMechanicId = null;
     let userChangedMechanic = false;
+    let currentExtraPayment = 0;
 
     if (localStorage.getItem("agent_login") === "Yes") {
       document.getElementById("loginBox").classList.add("hidden");
@@ -146,6 +156,7 @@
         .then(res => res.json())
         .then(data => {
           assignedMechanicId = data.mechanic;
+          currentExtraPayment = data.mechanic_extra_payment || 0;
             // Only auto-fill if user has not changed the input manually
 
           let details = `
@@ -169,9 +180,14 @@
                 ${data.mechanic_payment_status.replace('_', ' ')}
               </span>
             </p>
+            <p><strong>Extra Mechanic Payment:</strong> ₹${data.mechanic_extra_payment || 0}</p>
           `;
 
           document.getElementById("bookingDetails").innerHTML = details;
+          
+          // Set the extra payment input field
+          document.getElementById("mechanicExtraPayment").value = data.mechanic_extra_payment || 0;
+          
           fetchMechanics();
           fetchChat();
         });
@@ -241,11 +257,13 @@
       const isCancelled = document.getElementById("markCancelled").checked;
       const cancelReason = document.getElementById("cancelReason").value;
       const agentName = localStorage.getItem("agent_name");
+      const extraPayment = document.getElementById("mechanicExtraPayment").value;
 
       const updateData = {
         cancellation_reason: isCancelled ? cancelReason : "",
         is_cancelled: isCancelled,
-        agent: agentName
+        agent: agentName,
+        mechanic_extra_payment: extraPayment || 0
       };
 
       if (assignedMechanicId) updateData.mechanic = assignedMechanicId;
@@ -260,6 +278,9 @@
           alert("Booking updated successfully.");
           userChangedMechanic = false;
           fetchBooking();
+        })
+        .catch(error => {
+          alert("Error updating booking: " + error.message);
         });
     }
 
