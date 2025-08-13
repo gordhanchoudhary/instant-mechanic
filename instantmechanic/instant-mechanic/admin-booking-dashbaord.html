@@ -30,9 +30,20 @@
   </div>
 </div>
 
-    <!-- Date Filter -->
-    <div class="flex justify-end mb-4">
+    <!-- Date and Filters -->
+    <div class="flex justify-end items-center gap-2 mb-4">
       <input id="datePicker" type="date" class="border rounded px-4 py-2 text-sm shadow" />
+      
+      <!-- Agent Filter -->
+      <select id="agentFilter" class="border rounded px-4 py-2 text-sm shadow">
+        <option value="">All Agents</option>
+      </select>
+      
+      <!-- Mechanic Filter -->
+      <select id="mechanicFilter" class="border rounded px-4 py-2 text-sm shadow">
+        <option value="">All Mechanics</option>
+        <option value="unassigned">Unassigned</option>
+      </select>
     </div>
 
     <!-- Summary Cards -->
@@ -98,19 +109,11 @@
       </table>
     </div>
   </div>
-<!-- Inside your body before <script> tag, just below date picker -->
-<div class="flex justify-end items-center gap-2 mb-4">
-  <input id="datePicker" type="date" class="border rounded px-4 py-2 text-sm shadow" />
-  
-  <!-- [ADDED] Agent Filter -->
-  <select id="agentFilter" class="border rounded px-4 py-2 text-sm shadow">
-    <option value="">All Agents</option>
-  </select>
-</div>
 
 <script>
   const dateInput = document.getElementById("datePicker");
-  const agentFilter = document.getElementById("agentFilter"); // [ADDED]
+  const agentFilter = document.getElementById("agentFilter");
+  const mechanicFilter = document.getElementById("mechanicFilter"); // New mechanic filter
   const bookingTableBody = document.getElementById("bookingTableBody");
 
   const totalBookings = document.getElementById("totalBookings");
@@ -137,11 +140,14 @@
     totalRevenue.textContent = '0';
     totalAdvancePayment.textContent = '0';
 
-    const selectedAgent = agentFilter.value; // [ADDED]
-    const agentParam = selectedAgent ? `&agent=${encodeURIComponent(selectedAgent)}` : ''; // [ADDED]
+    const selectedAgent = agentFilter.value;
+    const selectedMechanic = mechanicFilter.value; // Get selected mechanic
+    
+    const agentParam = selectedAgent ? `&agent=${encodeURIComponent(selectedAgent)}` : '';
+    const mechanicParam = selectedMechanic ? `&mechanic=${encodeURIComponent(selectedMechanic)}` : '';
 
     try {
-      const customerRes = await fetch(`https://ai.instantmechanic.online/bot/api/customer-flow/by-date/?date=${date}${agentParam}`);
+      const customerRes = await fetch(`https://ai.instantmechanic.online/bot/api/customer-flow/by-date/?date=${date}${agentParam}${mechanicParam}`);
       const customerData = await customerRes.json();
       totalCustomers.textContent = customerData.total_customers || 0;
       totalRevenue.textContent = formatCurrency(customerData.total_revenue) || '₹0';
@@ -152,11 +158,11 @@
       totalCustomers.textContent = '0';
     }
 
-    const url = `https://ai.instantmechanic.online/bot/api/booking/by-date/?date=${date}${agentParam}`;
+    const url = `https://ai.instantmechanic.online/bot/api/booking/by-date/?date=${date}${agentParam}${mechanicParam}`;
     const res = await fetch(url);
-    const data = await res.json();
+    let data = await res.json();
 
-    // [ADDED] Populate agent filter dropdown
+    // Populate agent filter dropdown
     if (agentFilter.options.length <= 1) {
       const uniqueAgents = [...new Set(data.map(b => b.agent_name).filter(Boolean))];
       uniqueAgents.forEach(agent => {
@@ -165,6 +171,24 @@
         option.textContent = agent;
         agentFilter.appendChild(option);
       });
+    }
+
+    // Populate mechanic filter dropdown
+    if (mechanicFilter.options.length <= 2) { // 2 because we already have "All Mechanics" and "Unassigned"
+      const uniqueMechanics = [...new Set(data.map(b => b.mechanic_name).filter(Boolean))];
+      uniqueMechanics.forEach(mechanic => {
+        const option = document.createElement("option");
+        option.value = mechanic;
+        option.textContent = mechanic;
+        mechanicFilter.appendChild(option);
+      });
+    }
+
+    // Client-side filtering for mechanic (in case API doesn't support mechanic filter)
+    if (selectedMechanic === 'unassigned') {
+      data = data.filter(item => !item.mechanic_name);
+    } else if (selectedMechanic && selectedMechanic !== 'unassigned') {
+      data = data.filter(item => item.mechanic_name === selectedMechanic);
     }
 
     let count = 0;
@@ -237,12 +261,16 @@
     fetchBookings(dateInput.value);
   });
 
-  // [ADDED] Agent filter change handler
+  // Agent filter change handler
   agentFilter.addEventListener("change", () => {
+    fetchBookings(dateInput.value);
+  });
+
+  // Mechanic filter change handler
+  mechanicFilter.addEventListener("change", () => {
     fetchBookings(dateInput.value);
   });
 </script>
 
-  
 </body>
 </html>
