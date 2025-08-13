@@ -96,6 +96,7 @@
             <th class="p-3">Car</th>
             <th class="p-3">Problem</th>
             <th class="p-3">Price</th>
+            <th class="p-3">Mobile</th>
             <th class="p-3">Mechanic</th>
             <th class="p-3">Paid</th>
             <th class="p-3">Pending</th>
@@ -229,6 +230,14 @@
           <td class="p-3">${item.car}</td>
           <td class="p-3">${item.problem}</td>
           <td class="p-3">${item.price}</td>
+          <td class="p-3">
+            ${item.customer_mobile ? 
+              `<a href="https://wa.me/91${item.customer_mobile.replace(/^91/, '')}" target="_blank" class="text-blue-600 hover:text-blue-800 hover:underline">
+                ${item.customer_mobile.replace(/^91/, '')}
+              </a>` 
+              : '-'
+            }
+          </td>
           <td class="p-3">${item.mechanic_name ?? '-'}</td>
           <td class="p-3 text-green-600">${formatCurrency(paid)}</td>
           <td class="p-3 text-yellow-600">${formatCurrency(pendingAmount)}</td>
