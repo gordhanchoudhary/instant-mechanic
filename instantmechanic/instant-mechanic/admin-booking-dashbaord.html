@@ -246,13 +246,23 @@
       let paid = 0;
       let pendingAmount = 0;
 
+      if (item.is_cancelled == true) {
       if (item.payment_status === "pending") {
         paid = 0;
-        pendingAmount = advance + pendingAmt;
+        pendingAmount =  0;
       } else {
         paid = advance;
-        pendingAmount = pendingAmt;
+        pendingAmount = 0;
       }
+      }else{
+
+      if (item.payment_status === "pending") {
+        paid = 0;
+        pendingAmount =  pendingAmt;
+      } else {
+        paid = advance;
+        pendingAmount = 0;
+      }}
 
       collected += paid;
       pending += pendingAmount;
@@ -329,13 +339,23 @@
       let paid = 0;
       let pendingAmount = 0;
 
+      if (item.is_cancelled == true) {
       if (item.payment_status === "pending") {
         paid = 0;
-        pendingAmount = advance + pendingAmt;
+        pendingAmount =  0;
       } else {
         paid = advance;
-        pendingAmount = pendingAmt;
+        pendingAmount = 0;
       }
+      }else{
+
+      if (item.payment_status === "pending") {
+        paid = 0;
+        pendingAmount =  pendingAmt;
+      } else {
+        paid = advance;
+        pendingAmount = 0;
+      }}
 
       return [
         new Date(item.created_at).toLocaleString('en-IN'),
