@@ -31,19 +31,48 @@
 </div>
 
     <!-- Date and Filters -->
-    <div class="flex justify-end items-center gap-2 mb-4">
-      <input id="datePicker" type="date" class="border rounded px-4 py-2 text-sm shadow" />
+    <div class="flex justify-between items-center gap-2 mb-4 flex-wrap">
+      <div>
+        <button id="exportCsvBtn" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded text-sm shadow">
+          📊 Export CSV
+        </button>
+      </div>
       
-      <!-- Agent Filter -->
-      <select id="agentFilter" class="border rounded px-4 py-2 text-sm shadow">
-        <option value="">All Agents</option>
-      </select>
-      
-      <!-- Mechanic Filter -->
-      <select id="mechanicFilter" class="border rounded px-4 py-2 text-sm shadow">
-        <option value="">All Mechanics</option>
-        <option value="unassigned">Unassigned</option>
-      </select>
+      <div class="flex items-center gap-2 flex-wrap">
+        <!-- Date Type Toggle -->
+        <select id="dateType" class="border rounded px-4 py-2 text-sm shadow">
+          <option value="single">Single Date</option>
+          <option value="range">Date Range</option>
+        </select>
+        
+        <!-- Single Date Picker -->
+        <input id="datePicker" type="date" class="border rounded px-4 py-2 text-sm shadow" />
+        
+        <!-- Date Range Pickers (hidden by default) -->
+        <div id="dateRangeContainer" class="flex items-center gap-2" style="display: none;">
+          <input id="startDate" type="date" class="border rounded px-4 py-2 text-sm shadow" />
+          <span class="text-gray-500">to</span>
+          <input id="endDate" type="date" class="border rounded px-4 py-2 text-sm shadow" />
+        </div>
+        
+        <!-- Agent Filter -->
+        <select id="agentFilter" class="border rounded px-4 py-2 text-sm shadow">
+          <option value="">All Agents</option>
+        </select>
+        
+        <!-- Mechanic Filter -->
+        <select id="mechanicFilter" class="border rounded px-4 py-2 text-sm shadow">
+          <option value="">All Mechanics</option>
+          <option value="unassigned">Unassigned</option>
+        </select>
+        
+        <!-- Cancellation Filter (Frontend Only) -->
+        <select id="cancellationFilter" class="border rounded px-4 py-2 text-sm shadow">
+          <option value="all">All Calls</option>
+          <option value="active">Without Cancelled</option>
+          <option value="cancelled">Cancelled Only</option>
+        </select>
+      </div>
     </div>
 
     <!-- Summary Cards -->
@@ -92,7 +121,7 @@
         <thead class="bg-gray-200 text-gray-600">
           <tr>
             <th class="p-3">Image</th>
-            <th class="p-3">Time</th>
+            <th class="p-3" id="timeHeader">Time</th>
             <th class="p-3">Car</th>
             <th class="p-3">Problem</th>
             <th class="p-3">Price</th>
@@ -113,9 +142,16 @@
 
 <script>
   const dateInput = document.getElementById("datePicker");
+  const dateType = document.getElementById("dateType");
+  const dateRangeContainer = document.getElementById("dateRangeContainer");
+  const startDate = document.getElementById("startDate");
+  const endDate = document.getElementById("endDate");
   const agentFilter = document.getElementById("agentFilter");
-  const mechanicFilter = document.getElementById("mechanicFilter"); // New mechanic filter
+  const mechanicFilter = document.getElementById("mechanicFilter");
+  const cancellationFilter = document.getElementById("cancellationFilter");
   const bookingTableBody = document.getElementById("bookingTableBody");
+  const exportCsvBtn = document.getElementById("exportCsvBtn");
+  const timeHeader = document.getElementById("timeHeader");
 
   const totalBookings = document.getElementById("totalBookings");
   const totalCollected = document.getElementById("totalCollected");
@@ -123,9 +159,260 @@
   const totalCancelled = document.getElementById("totalCancelled");
   const totalNotAssigned = document.getElementById("totalNotAssigned");
 
+  // Store current data for CSV export
+  let currentBookingData = [];
+  let allFetchedData = []; // Store all data from API
+
   const formatCurrency = (amount) => '₹' + (parseInt(amount) || 0).toLocaleString();
 
-  async function fetchBookings(date) {
+  // Format date and time based on date type selection
+  const formatDateTime = (dateTimeString) => {
+    const date = new Date(dateTimeString);
+    if (dateType.value === "range") {
+      // Show date and time for date range
+      return date.toLocaleString('en-IN', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+      });
+    } else {
+      // Show only time for single date
+      return date.toLocaleTimeString('en-IN', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+      });
+    }
+  };
+
+  // Update table header based on date type
+  const updateTimeHeader = () => {
+    if (dateType.value === "range") {
+      timeHeader.textContent = "Date & Time";
+    } else {
+      timeHeader.textContent = "Time";
+    }
+  };
+
+  // Apply frontend filters to data
+  const applyFrontendFilters = (data) => {
+    let filteredData = [...data];
+    
+    // Apply mechanic filter
+    const selectedMechanic = mechanicFilter.value;
+    if (selectedMechanic === 'unassigned') {
+      filteredData = filteredData.filter(item => !item.mechanic_name);
+    } else if (selectedMechanic && selectedMechanic !== 'unassigned') {
+      filteredData = filteredData.filter(item => item.mechanic_name === selectedMechanic);
+    }
+    
+    // Apply cancellation filter (frontend only)
+    const selectedCancellation = cancellationFilter.value;
+    if (selectedCancellation === 'cancelled') {
+      filteredData = filteredData.filter(item => item.is_cancelled);
+    } else if (selectedCancellation === 'active') {
+      filteredData = filteredData.filter(item => !item.is_cancelled);
+    }
+    // 'all' option shows everything, no additional filtering needed
+    
+    return filteredData;
+  };
+
+  // Update display with filtered data
+  const updateDisplayWithFilteredData = (data) => {
+    const filteredData = applyFrontendFilters(data);
+    currentBookingData = [...filteredData];
+    
+    // Clear existing table
+    bookingTableBody.innerHTML = '';
+    
+    let count = 0;
+    let collected = 0;
+    let pending = 0;
+    let cancelled = 0;
+    let notAssigned = 0;
+    
+    const reversedData = [...filteredData].reverse();
+    
+    reversedData.forEach(item => {
+      count++;
+
+      const advance = parseInt(item.advance_payment_amount) || 0;
+      const pendingAmt = parseInt(item.pending_payment_amount) || 0;
+
+      let paid = 0;
+      let pendingAmount = 0;
+
+      if (item.payment_status === "pending") {
+        paid = 0;
+        pendingAmount = advance + pendingAmt;
+      } else {
+        paid = advance;
+        pendingAmount = pendingAmt;
+      }
+
+      collected += paid;
+      pending += pendingAmount;
+      if (item.is_cancelled) cancelled++;
+      if (!item.is_cancelled && !item.mechanic) notAssigned++;
+
+      const row = `
+        <tr class="hover:bg-gray-50">
+          <td class="p-3">
+            <img src="${item.car_image}" alt="Car" class="w-12 h-8 object-contain rounded-sm" />
+          </td>
+          <td class="p-3 text-gray-600">${formatDateTime(item.created_at)}</td>
+          <td class="p-3">${item.car}</td>
+          <td class="p-3">${item.problem}</td>
+          <td class="p-3">${item.price}</td>
+          <td class="p-3">
+            ${item.customer_mobile ? 
+              `<a href="https://wa.me/91${item.customer_mobile.replace(/^91/, '')}" target="_blank" class="text-blue-600 hover:text-blue-800 hover:underline">
+                ${item.customer_mobile.replace(/^91/, '')}
+              </a>` 
+              : '-'
+            }
+          </td>
+          <td class="p-3">${item.mechanic_name ?? '-'}</td>
+          <td class="p-3 text-green-600">${formatCurrency(paid)}</td>
+          <td class="p-3 text-yellow-600">${formatCurrency(pendingAmount)}</td>
+          <td class="p-3">${item.agent_name ?? '-'}</td>
+          <td class="p-3 ${item.is_cancelled ? 'text-red-500' : 'text-green-500'} font-bold">
+            ${item.is_cancelled ? 'Yes' : 'No'}
+          </td>
+          <td class="p-3 text-xs">${item.cancellation_reason || '-'}</td>
+          <td class="p-3">
+            <a href="https://instantmechanic.online/booking.html?id=${item.id}" target="_blank" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs">
+              View
+            </a>
+          </td>
+        </tr>
+      `;
+      bookingTableBody.innerHTML += row;
+    });
+
+    // Update counters based on filtered data
+    totalBookings.textContent = count;
+    totalCollected.textContent = formatCurrency(collected);
+    totalPending.textContent = formatCurrency(pending);
+    totalCancelled.textContent = cancelled;
+    totalNotAssigned.textContent = notAssigned;
+  };
+  // CSV Export functionality
+  const exportToCSV = () => {
+    if (currentBookingData.length === 0) {
+      alert('No data to export');
+      return;
+    }
+
+    const headers = [
+      'Date & Time',
+      'Car',
+      'Problem',
+      'Price',
+      'Mobile',
+      'Mechanic',
+      'Paid Amount',
+      'Pending Amount',
+      'Agent',
+      'Cancelled',
+      'Cancellation Reason'
+    ];
+
+    const csvData = currentBookingData.map(item => {
+      const advance = parseInt(item.advance_payment_amount) || 0;
+      const pendingAmt = parseInt(item.pending_payment_amount) || 0;
+
+      let paid = 0;
+      let pendingAmount = 0;
+
+      if (item.payment_status === "pending") {
+        paid = 0;
+        pendingAmount = advance + pendingAmt;
+      } else {
+        paid = advance;
+        pendingAmount = pendingAmt;
+      }
+
+      return [
+        new Date(item.created_at).toLocaleString('en-IN'),
+        item.car || '',
+        item.problem || '',
+        item.price || '',
+        item.customer_mobile ? item.customer_mobile.replace(/^91/, '') : '',
+        item.mechanic_name || 'Unassigned',
+        paid,
+        pendingAmount,
+        item.agent_name || '',
+        item.is_cancelled ? 'Yes' : 'No',
+        item.cancellation_reason || ''
+      ];
+    });
+
+    const csvContent = [headers, ...csvData]
+      .map(row => row.map(cell => `"${cell}"`).join(','))
+      .join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    
+    if (link.download !== undefined) {
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      
+      // Generate filename with current date and filters
+      let filename = 'booking-data';
+      if (dateType.value === "range" && startDate.value && endDate.value) {
+        filename += `_${startDate.value}_to_${endDate.value}`;
+      } else if (dateInput.value) {
+        filename += `_${dateInput.value}`;
+      }
+      if (agentFilter.value) {
+        filename += `_agent-${agentFilter.value}`;
+      }
+      if (mechanicFilter.value) {
+        filename += `_mechanic-${mechanicFilter.value}`;
+      }
+      if (cancellationFilter.value !== 'all') {
+        filename += `_${cancellationFilter.value}`;
+      }
+      filename += '.csv';
+      
+      link.setAttribute('download', filename);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  };
+
+  // Add event listener for export button
+  exportCsvBtn.addEventListener('click', exportToCSV);
+
+  // Toggle between single date and date range
+  dateType.addEventListener("change", () => {
+    updateTimeHeader();
+    if (dateType.value === "range") {
+      dateInput.style.display = "none";
+      dateRangeContainer.style.display = "flex";
+      // Set default range to today if not set
+      if (!startDate.value || !endDate.value) {
+        const today = new Date().toISOString().split('T')[0];
+        startDate.value = today;
+        endDate.value = today;
+      }
+      fetchBookings();
+    } else {
+      dateInput.style.display = "block";
+      dateRangeContainer.style.display = "none";
+      fetchBookings();
+    }
+  });
+
+  async function fetchBookings(dateParam = null) {
     bookingTableBody.innerHTML = '';
     totalBookings.textContent = '0';
     totalCollected.textContent = '₹0';
@@ -142,13 +429,32 @@
     totalAdvancePayment.textContent = '0';
 
     const selectedAgent = agentFilter.value;
-    const selectedMechanic = mechanicFilter.value; // Get selected mechanic
+    const selectedMechanic = mechanicFilter.value;
     
     const agentParam = selectedAgent ? `&agent=${encodeURIComponent(selectedAgent)}` : '';
     const mechanicParam = selectedMechanic ? `&mechanic=${encodeURIComponent(selectedMechanic)}` : '';
 
+    // Determine date parameters based on date type
+    let dateParams = '';
+    if (dateType.value === "range") {
+      const start = startDate.value;
+      const end = endDate.value;
+      if (start && end) {
+        dateParams = `start_date=${start}&end_date=${end}`;
+      } else {
+        return; // Don't proceed if range dates are not set
+      }
+    } else {
+      const singleDate = dateParam || dateInput.value;
+      if (singleDate) {
+        dateParams = `date=${singleDate}`;
+      } else {
+        return; // Don't proceed if single date is not set
+      }
+    }
+
     try {
-      const customerRes = await fetch(`https://ai.instantmechanic.online/bot/api/customer-flow/by-date/?date=${date}${agentParam}${mechanicParam}`);
+      const customerRes = await fetch(`https://ai.instantmechanic.online/bot/api/customer-flow/by-date/?${dateParams}${agentParam}${mechanicParam}`);
       const customerData = await customerRes.json();
       totalCustomers.textContent = customerData.total_customers || 0;
       totalRevenue.textContent = formatCurrency(customerData.total_revenue) || '₹0';
@@ -159,7 +465,7 @@
       totalCustomers.textContent = '0';
     }
 
-    const url = `https://ai.instantmechanic.online/bot/api/booking/by-date/?date=${date}${agentParam}${mechanicParam}`;
+    const url = `https://ai.instantmechanic.online/bot/api/booking/by-date/?${dateParams}${agentParam}${mechanicParam}`;
     const res = await fetch(url);
     let data = await res.json();
 
@@ -210,92 +516,46 @@
       data = data.filter(item => item.mechanic_name === selectedMechanic);
     }
 
-    let count = 0;
-    let collected = 0;
-    let pending = 0;
-    let cancelled = 0;
-    let notAssigned = 0;
-    data.reverse();
+    // Store all fetched data for frontend filtering
+    allFetchedData = [...data];
 
-    data.forEach(item => {
-      count++;
-
-      const advance = parseInt(item.advance_payment_amount) || 0;
-      const pendingAmt = parseInt(item.pending_payment_amount) || 0;
-
-      let paid = 0;
-      let pendingAmount = 0;
-
-      if (item.payment_status === "pending") {
-        paid = 0;
-        pendingAmount = advance + pendingAmt;
-      } else {
-        paid = advance;
-        pendingAmount = pendingAmt;
-      }
-
-      collected += paid;
-      pending += pendingAmount;
-      if (item.is_cancelled) cancelled++;
-      if (!item.is_cancelled && !item.mechanic) notAssigned++;
-
-      const row = `
-        <tr class="hover:bg-gray-50">
-          <td class="p-3">
-            <img src="${item.car_image}" alt="Car" class="w-12 h-8 object-contain rounded-sm" />
-          </td>
-          <td class="p-3 text-gray-600">${new Date(item.created_at).toLocaleTimeString()}</td>
-          <td class="p-3">${item.car}</td>
-          <td class="p-3">${item.problem}</td>
-          <td class="p-3">${item.price}</td>
-          <td class="p-3">
-            ${item.customer_mobile ? 
-              `<a href="https://wa.me/91${item.customer_mobile.replace(/^91/, '')}" target="_blank" class="text-blue-600 hover:text-blue-800 hover:underline">
-                ${item.customer_mobile.replace(/^91/, '')}
-              </a>` 
-              : '-'
-            }
-          </td>
-          <td class="p-3">${item.mechanic_name ?? '-'}</td>
-          <td class="p-3 text-green-600">${formatCurrency(paid)}</td>
-          <td class="p-3 text-yellow-600">${formatCurrency(pendingAmount)}</td>
-          <td class="p-3">${item.agent_name ?? '-'}</td>
-          <td class="p-3 ${item.is_cancelled ? 'text-red-500' : 'text-green-500'} font-bold">
-            ${item.is_cancelled ? 'Yes' : 'No'}
-          </td>
-          <td class="p-3 text-xs">${item.cancellation_reason || '-'}</td>
-          <td class="p-3">
-            <a href="https://instantmechanic.online/booking.html?id=${item.id}" target="_blank" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs">
-              View
-            </a>
-          </td>
-        </tr>
-      `;
-      bookingTableBody.innerHTML += row;
-    });
-
-    totalBookings.textContent = count;
-    totalCancelled.textContent = cancelled;
-    totalNotAssigned.textContent = notAssigned;
+    // Apply frontend filters and update display
+    updateDisplayWithFilteredData(data);
   }
 
   // Default Load
   const today = new Date().toISOString().split('T')[0];
   dateInput.value = today;
-  fetchBookings(today);
+  startDate.value = today;
+  endDate.value = today;
+  updateTimeHeader();
+  fetchBookings();
 
   dateInput.addEventListener("change", () => {
-    fetchBookings(dateInput.value);
+    fetchBookings();
+  });
+
+  startDate.addEventListener("change", () => {
+    fetchBookings();
+  });
+
+  endDate.addEventListener("change", () => {
+    fetchBookings();
   });
 
   // Agent filter change handler
   agentFilter.addEventListener("change", () => {
-    fetchBookings(dateInput.value);
+    fetchBookings();
   });
 
   // Mechanic filter change handler
   mechanicFilter.addEventListener("change", () => {
-    fetchBookings(dateInput.value);
+    fetchBookings();
+  });
+
+  // Cancellation filter change handler (frontend only)
+  cancellationFilter.addEventListener("change", () => {
+    updateDisplayWithFilteredData(allFetchedData);
   });
 </script>
 
