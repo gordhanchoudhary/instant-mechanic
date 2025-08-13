@@ -163,26 +163,44 @@
     const res = await fetch(url);
     let data = await res.json();
 
-    // Populate agent filter dropdown
-    if (agentFilter.options.length <= 1) {
-      const uniqueAgents = [...new Set(data.map(b => b.agent_name).filter(Boolean))];
-      uniqueAgents.forEach(agent => {
-        const option = document.createElement("option");
-        option.value = agent;
-        option.textContent = agent;
-        agentFilter.appendChild(option);
-      });
+    // Update agent filter dropdown
+    const currentSelectedAgent = agentFilter.value; // Remember current selection
+    // Clear existing agent options except the default one
+    while (agentFilter.options.length > 1) {
+      agentFilter.removeChild(agentFilter.lastChild);
+    }
+    
+    const uniqueAgents = [...new Set(data.map(b => b.agent_name).filter(Boolean))];
+    uniqueAgents.forEach(agent => {
+      const option = document.createElement("option");
+      option.value = agent;
+      option.textContent = agent;
+      agentFilter.appendChild(option);
+    });
+    
+    // Restore selection if it still exists in the new list
+    if (currentSelectedAgent && uniqueAgents.includes(currentSelectedAgent)) {
+      agentFilter.value = currentSelectedAgent;
     }
 
-    // Populate mechanic filter dropdown
-    if (mechanicFilter.options.length <= 2) { // 2 because we already have "All Mechanics" and "Unassigned"
-      const uniqueMechanics = [...new Set(data.map(b => b.mechanic_name).filter(Boolean))];
-      uniqueMechanics.forEach(mechanic => {
-        const option = document.createElement("option");
-        option.value = mechanic;
-        option.textContent = mechanic;
-        mechanicFilter.appendChild(option);
-      });
+    // Update mechanic filter dropdown
+    const currentSelectedMechanic = mechanicFilter.value; // Remember current selection
+    // Clear existing mechanic options except the default ones
+    while (mechanicFilter.options.length > 2) {
+      mechanicFilter.removeChild(mechanicFilter.lastChild);
+    }
+    
+    const uniqueMechanics = [...new Set(data.map(b => b.mechanic_name).filter(Boolean))];
+    uniqueMechanics.forEach(mechanic => {
+      const option = document.createElement("option");
+      option.value = mechanic;
+      option.textContent = mechanic;
+      mechanicFilter.appendChild(option);
+    });
+    
+    // Restore selection if it still exists in the new list
+    if (currentSelectedMechanic && (currentSelectedMechanic === 'unassigned' || uniqueMechanics.includes(currentSelectedMechanic))) {
+      mechanicFilter.value = currentSelectedMechanic;
     }
 
     // Client-side filtering for mechanic (in case API doesn't support mechanic filter)
