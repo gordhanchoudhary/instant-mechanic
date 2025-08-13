@@ -1029,7 +1029,7 @@
             confirmBtn.addEventListener('click', function() {
                 if (selectedAgent) {
                     // Save agent name to localStorage
-                    localStorage.setItem('agent_name', selectedAgent);
+                    localStorage.setItem('agent_name_im', selectedAgent);
                     
                     // Hide popup
                     hideAgentPopup();
@@ -1047,7 +1047,7 @@
 
         // Check if agent name exists in localStorage on page load
         function checkAgentName() {
-            const agentName = localStorage.getItem('agent_name');
+            const agentName = localStorage.getItem('agent_name_im');
             if (!agentName) {
                 showAgentPopup();
             }
@@ -1411,7 +1411,7 @@
                     securityAmount: document.getElementById('securityAmount').value || null,
                     isGoMechanicCall: isGoMechanic,
                     timestamp: new Date().toISOString(),
-                    agent: localStorage.getItem("agent_name") || "Harshit"
+                    agent: localStorage.getItem("agent_name_im") || "Harshit"
                 };
 
                 try {
