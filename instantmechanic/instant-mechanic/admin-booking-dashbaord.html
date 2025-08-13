@@ -224,7 +224,15 @@
   // Update display with filtered data
   const updateDisplayWithFilteredData = (data) => {
     const filteredData = applyFrontendFilters(data);
-    currentBookingData = [...filteredData];
+    
+    // Sort by creation time in descending order (newest first)
+    const sortedData = [...filteredData].sort((a, b) => {
+      const dateA = new Date(a.created_at);
+      const dateB = new Date(b.created_at);
+      return dateB - dateA; // Descending order (newest first)
+    });
+    
+    currentBookingData = [...sortedData];
     
     // Clear existing table
     bookingTableBody.innerHTML = '';
@@ -235,9 +243,7 @@
     let cancelled = 0;
     let notAssigned = 0;
     
-    const reversedData = [...filteredData].reverse();
-    
-    reversedData.forEach(item => {
+    sortedData.forEach(item => {
       count++;
 
       const advance = parseInt(item.advance_payment_amount) || 0;
