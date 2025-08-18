@@ -268,6 +268,7 @@
           problem: item.problem,
           amount: pendingAmt
         });
+        totalPendingAmount -= pendingAmt
         // Insurance calls don't add to pending total as they are paid by company
       } else {
         // Regular calls
@@ -292,31 +293,31 @@
     let message = `*Instant Mechanic - Call Summary*\n\n`;
     message += `📅 *Date:* ${dateText}\n`;
     message += `👨‍🔧 *Mechanic:* ${selectedMechanic}\n`;
-    message += `💰 *Total Pending:* ₹${totalPendingAmount.toLocaleString()}\n`;
+    message += `💰 *कुल बकाया:* ₹${totalPendingAmount.toLocaleString()}\n`;
     message += `📞 *Total Calls:* ${totalCalls}\n`;
     message += `❌ *Total Cancelled:* ${totalCancelledCount}\n\n`;
 
     // Paid calls
     if (paidCalls.length > 0) {
-      message += `*✅ PAID CALLS:*\n`;
+      message += `*✅ इन कॉल्स का पेमेंट कंपनी के पास आ गया है :*\n`;
       paidCalls.forEach((call, index) => {
-        message += `${index + 1}. ${call.car}, ${call.problem} - Customer Paid ₹${call.amount} ✅\n`;
+        message += `${index + 1}. ${call.car}, ${call.problem} - ₹${call.amount} ✅\n`;
       });
       message += `\n`;
     }
 
     // Pending calls
     if (pendingCalls.length > 0) {
-      message += `*🚨 PENDING CALLS:*\n`;
+      message += `*🚨 इन कॉल्स का आपके पास आया है जिसका भुक्तान आपको कंपनी को करना है :*\n`;
       pendingCalls.forEach((call, index) => {
-        message += `${index + 1}. ${call.car}, ${call.problem} - Pending ₹${call.amount} 🚨\n`;
+        message += `${index + 1}. ${call.car}, ${call.problem} - बकाया ₹${call.amount} 🚨\n`;
       });
       message += `\n`;
     }
 
     // Insurance calls
     if (insuranceCalls.length > 0) {
-      message += `*🔙 INSURANCE CALLS:*\n`;
+      message += `*🔙 इन्शुरन्स कॉल्स, इसका पेमेंट कंपनी आपको करेगी :*\n`;
       insuranceCalls.forEach((call, index) => {
         message += `${index + 1}. ${call.car}, ${call.problem} - Company Pays ₹${call.amount} 🔙\n`;
       });
@@ -325,7 +326,7 @@
 
     // Cancelled calls
     if (cancelledCalls.length > 0) {
-      message += `*❌ CANCELLED CALLS:*\n`;
+      message += `*❌ कैंसिल कॉल्स:*\n`;
       cancelledCalls.forEach((call, index) => {
         message += `${index + 1}. ${call.car}, ${call.problem}\n`;
       });
