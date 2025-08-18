@@ -81,6 +81,40 @@
       display: inline-block;
       margin-left: 10px;
     }
+
+    /* Custom checkbox styles */
+    .checkbox-container {
+      display: flex;
+      align-items: center;
+      margin: 15px 0;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .checkbox-container input[type="checkbox"] {
+      width: auto;
+      margin: 0;
+      margin-right: 12px;
+      transform: scale(1.2);
+      cursor: pointer;
+    }
+
+    .checkbox-label {
+      font-weight: 500;
+      color: #333;
+      cursor: pointer;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 500;
+      color: #333;
+    }
   </style>
 </head>
 <body>
@@ -97,19 +131,28 @@
     <div id="bookingDetails"></div>
 
     <h3>Update Booking</h3>
-    <label for="mechanicInput">Select Mechanic:</label>
-    <div class="select-container" style="position:relative;">
-      <input type="text" id="mechanicInput" placeholder="Search mechanic by name or number" autocomplete="off">
-      <div id="mechanicDropdown" style="position:absolute; top:100%; left:0; right:0; background:white; border:1px solid #ccc; border-top:none; max-height:200px; overflow-y:auto; z-index:1000; display:none;"></div>
+    
+    <div class="form-group">
+      <label for="mechanicInput">Select Mechanic:</label>
+      <div class="select-container" style="position:relative;">
+        <input type="text" id="mechanicInput" placeholder="Search mechanic by name or number" autocomplete="off">
+        <div id="mechanicDropdown" style="position:absolute; top:100%; left:0; right:0; background:white; border:1px solid #ccc; border-top:none; max-height:200px; overflow-y:auto; z-index:1000; display:none;"></div>
+      </div>
     </div>
 
-    <label for="mechanicExtraPayment">Extra Mechanic Payment (₹):</label>
-    <input type="number" id="mechanicExtraPayment" placeholder="Enter extra payment amount" min="0" step="1">
+    <div class="form-group">
+      <label for="mechanicExtraPayment">Extra Mechanic Payment (₹):</label>
+      <input type="number" id="mechanicExtraPayment" placeholder="Enter extra payment amount" min="0" step="1">
+    </div>
 
-    <label><input type="checkbox" id="markCancelled" onclick="toggleCancelReason()"> Mark as Cancelled</label>
-    <div id="cancelBox" class="hidden">
-      <label>Cancellation Reason:</label>
-      <textarea id="cancelReason"></textarea>
+    <div class="checkbox-container">
+      <input type="checkbox" id="markCancelled">
+      <label for="markCancelled" class="checkbox-label">Mark booking as cancelled</label>
+    </div>
+    
+    <div class="form-group">
+      <label for="cancelReason">Add Remarks or Cancellation Reason:</label>
+      <textarea id="cancelReason" placeholder="Enter remarks or cancellation reason  (optional)"></textarea>
     </div>
 
     <button onclick="updateBooking()">Update Booking</button>
@@ -166,7 +209,7 @@
             <p><strong>Location:</strong> <a href="${data.location}" target="_blank">Map</a></p>
             <p><strong>Is Cancelled:</strong> ${data.is_cancelled ? 'Yes' : 'No'}</p>
             <p><strong>Cancellation Reason:</strong> ${data.cancellation_reason || '-'}</p>
-            <p><strong>Agent:</strong> ${data.agent || '-'}</p>
+            <p><strong>Agent:</strong> ${data.agent_name || '-'}</p>
           `;
 
           details += `
@@ -191,7 +234,6 @@
           // Set cancellation checkbox and reason based on current booking status
           document.getElementById("markCancelled").checked = data.is_cancelled;
           document.getElementById("cancelReason").value = data.cancellation_reason || "";
-          toggleCancelReason(); // Show/hide cancel reason box based on checkbox state
           
           fetchMechanics();
           fetchChat();
@@ -252,12 +294,6 @@
       }
     });
 
-    function toggleCancelReason() {
-      const checkbox = document.getElementById("markCancelled");
-      const cancelBox = document.getElementById("cancelBox");
-      cancelBox.classList.toggle("hidden", !checkbox.checked);
-    }
-
     function updateBooking() {
       const isCancelled = document.getElementById("markCancelled").checked;
       const cancelReason = document.getElementById("cancelReason").value;
@@ -271,7 +307,7 @@
 
       // Only include cancellation fields if the checkbox state has been explicitly set
       updateData.is_cancelled = isCancelled;
-      updateData.cancellation_reason = isCancelled ? cancelReason : "";
+      updateData.cancellation_reason = cancelReason;
 
       if (assignedMechanicId) updateData.mechanic = assignedMechanicId;
 
