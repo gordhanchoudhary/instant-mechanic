@@ -32,9 +32,14 @@
 
     <!-- Date and Filters -->
     <div class="flex justify-between items-center gap-2 mb-4 flex-wrap">
-      <div>
+      <div class="flex items-center gap-2">
         <button id="exportCsvBtn" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded text-sm shadow">
           📊 Export CSV
+        </button>
+        
+        <!-- WhatsApp Button (hidden by default) -->
+        <button id="whatsappBtn" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded text-sm shadow" style="display: none;">
+          📱 Send on WhatsApp
         </button>
       </div>
       
@@ -151,6 +156,7 @@
   const cancellationFilter = document.getElementById("cancellationFilter");
   const bookingTableBody = document.getElementById("bookingTableBody");
   const exportCsvBtn = document.getElementById("exportCsvBtn");
+  const whatsappBtn = document.getElementById("whatsappBtn");
   const timeHeader = document.getElementById("timeHeader");
 
   const totalBookings = document.getElementById("totalBookings");
@@ -195,6 +201,143 @@
     } else {
       timeHeader.textContent = "Time";
     }
+  };
+
+  // Show/hide WhatsApp button based on mechanic filter
+  const updateWhatsAppButtonVisibility = () => {
+    const selectedMechanic = mechanicFilter.value;
+    if (selectedMechanic && selectedMechanic !== 'unassigned') {
+      whatsappBtn.style.display = 'inline-block';
+    } else {
+      whatsappBtn.style.display = 'none';
+    }
+  };
+
+  // Generate WhatsApp message for mechanic
+  const generateWhatsAppMessage = () => {
+    const selectedMechanic = mechanicFilter.value;
+    if (!selectedMechanic || selectedMechanic === 'unassigned') {
+      alert('Please select a specific mechanic first');
+      return;
+    }
+
+    // Get filtered data for the selected mechanic
+    const mechanicData = allFetchedData.filter(item => item.mechanic_name === selectedMechanic);
+    
+    if (mechanicData.length === 0) {
+      alert('No data found for the selected mechanic');
+      return;
+    }
+
+    // Get date for message
+    let dateText = '';
+    if (dateType.value === "range" && startDate.value && endDate.value) {
+      if (startDate.value === endDate.value) {
+        dateText = new Date(startDate.value).toLocaleDateString('en-IN');
+      } else {
+        dateText = `${new Date(startDate.value).toLocaleDateString('en-IN')} to ${new Date(endDate.value).toLocaleDateString('en-IN')}`;
+      }
+    } else if (dateInput.value) {
+      dateText = new Date(dateInput.value).toLocaleDateString('en-IN');
+    }
+
+    // Categorize calls
+    const paidCalls = [];
+    const pendingCalls = [];
+    const insuranceCalls = [];
+    const cancelledCalls = [];
+    
+    let totalPendingAmount = 0;
+    let totalCalls = mechanicData.length;
+    let totalCancelledCount = 0;
+
+    mechanicData.forEach(item => {
+      const advance = parseInt(item.advance_payment_amount) || 0;
+      const pendingAmt = parseInt(item.pending_payment_amount) || 0;
+
+      if (item.is_cancelled) {
+        totalCancelledCount++;
+        cancelledCalls.push({
+          car: item.car,
+          problem: item.problem
+        });
+      } else if (item.is_gomechanic_call) {
+        // Insurance calls logic
+        insuranceCalls.push({
+          car: item.car,
+          problem: item.problem,
+          amount: pendingAmt
+        });
+        totalPendingAmount -= pendingAmt
+        // Insurance calls don't add to pending total as they are paid by company
+      } else {
+        // Regular calls
+        if (item.payment_status === "pending") {
+          pendingCalls.push({
+            car: item.car,
+            problem: item.problem,
+            amount: advance
+          });
+          totalPendingAmount += advance;
+        } else {
+          paidCalls.push({
+            car: item.car,
+            problem: item.problem,
+            amount: advance
+          });
+        }
+      }
+    });
+
+    // Build message
+    let message = `*Instant Mechanic - Call Summary*\n\n`;
+    message += `📅 *Date:* ${dateText}\n`;
+    message += `👨‍🔧 *Mechanic:* ${selectedMechanic}\n`;
+    message += `💰 *कुल बकाया:* ₹${totalPendingAmount.toLocaleString()}\n`;
+    message += `📞 *Total Calls:* ${totalCalls}\n`;
+    message += `❌ *Total Cancelled:* ${totalCancelledCount}\n\n`;
+
+    // Paid calls
+    if (paidCalls.length > 0) {
+      message += `*✅ इन कॉल्स का पेमेंट कंपनी के पास आ गया है :*\n`;
+      paidCalls.forEach((call, index) => {
+        message += `${index + 1}. ${call.car}, ${call.problem} - ₹${call.amount} ✅\n`;
+      });
+      message += `\n\n`;
+    }
+
+    // Pending calls
+    if (pendingCalls.length > 0) {
+      message += `*🚨 इन कॉल्स का आपके पास आया है जिसका भुक्तान आपको कंपनी को करना है :*\n`;
+      pendingCalls.forEach((call, index) => {
+        message += `${index + 1}. ${call.car}, ${call.problem} - *बकाया ₹${call.amount}* 💵\n`;
+      });
+      message += `\n\n`;
+    }
+
+    // Insurance calls
+    if (insuranceCalls.length > 0) {
+      message += `*🔙 इन्शुरन्स कॉल्स, इसका पेमेंट कंपनी आपको करेगी :*\n`;
+      insuranceCalls.forEach((call, index) => {
+        message += `${index + 1}. ${call.car}, ${call.problem} - पेमेंट कंपनी आपको करेगी *₹${call.amount}* 🔙\n`;
+      });
+      message += `\n\n`;
+    }
+
+    // Cancelled calls
+    if (cancelledCalls.length > 0) {
+      message += `*❌ कैंसिल कॉल्स:*\n`;
+      cancelledCalls.forEach((call, index) => {
+        message += `${index + 1}. ${call.car}, ${call.problem} , 00\n`;
+      });
+    }
+
+    // Encode message for WhatsApp URL
+    const encodedMessage = encodeURIComponent(message);
+    const whatsappUrl = `https://wa.me/918393990942?text=${encodedMessage}`;
+    
+    // Open WhatsApp
+    window.open(whatsappUrl, '_blank');
   };
 
   // Apply frontend filters to data
@@ -264,11 +407,16 @@
 
       if (item.payment_status === "pending") {
         paid = 0;
-        pendingAmount =  advance;
+        pendingAmount = advance;
       } else {
         paid = advance;
         pendingAmount = 0;
       }}
+
+      // For insurance calls, subtract from total pending as company pays
+      if (item.is_gomechanic_call && !item.is_cancelled) {
+        pendingAmount = 0; // Insurance calls don't contribute to mechanic pending
+      }
 
       collected += paid;
       pending += pendingAmount;
@@ -317,6 +465,7 @@
     totalCancelled.textContent = cancelled;
     totalNotAssigned.textContent = notAssigned;
   };
+  
   // CSV Export functionality
   const exportToCSV = () => {
     if (currentBookingData.length === 0) {
@@ -415,8 +564,9 @@
     }
   };
 
-  // Add event listener for export button
+  // Add event listeners
   exportCsvBtn.addEventListener('click', exportToCSV);
+  whatsappBtn.addEventListener('click', generateWhatsAppMessage);
 
   // Toggle between single date and date range
   dateType.addEventListener("change", () => {
@@ -545,6 +695,9 @@
     // Store all fetched data for frontend filtering
     allFetchedData = [...data];
 
+    // Update WhatsApp button visibility
+    updateWhatsAppButtonVisibility();
+
     // Apply frontend filters and update display
     updateDisplayWithFilteredData(data);
   }
@@ -576,6 +729,7 @@
 
   // Mechanic filter change handler
   mechanicFilter.addEventListener("change", () => {
+    updateWhatsAppButtonVisibility();
     fetchBookings();
   });
 
