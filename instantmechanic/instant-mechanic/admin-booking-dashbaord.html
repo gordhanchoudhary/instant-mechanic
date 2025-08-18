@@ -301,7 +301,7 @@
     if (paidCalls.length > 0) {
       message += `*✅ इन कॉल्स का पेमेंट कंपनी के पास आ गया है :*\n`;
       paidCalls.forEach((call, index) => {
-        message += `${index + 1}. ${call.car}, ${call.problem} - ₹${call.amount} ✅\n`;
+        message += `${index + 1}. ${call.car}-----${call.problem} - ₹${call.amount} ✅\n`;
       });
       message += `\n\n`;
     }
@@ -310,7 +310,7 @@
     if (pendingCalls.length > 0) {
       message += `*🚨 इन कॉल्स का आपके पास आया है जिसका भुक्तान आपको कंपनी को करना है :*\n`;
       pendingCalls.forEach((call, index) => {
-        message += `${index + 1}. ${call.car}, ${call.problem} - *बकाया ₹${call.amount}* 💵\n`;
+        message += `${index + 1}. ${call.car}-----${call.problem} - *बकाया ₹${call.amount}* 💵\n`;
       });
       message += `\n\n`;
     }
@@ -319,7 +319,7 @@
     if (insuranceCalls.length > 0) {
       message += `*🔙 इन्शुरन्स कॉल्स, इसका पेमेंट कंपनी आपको करेगी :*\n`;
       insuranceCalls.forEach((call, index) => {
-        message += `${index + 1}. ${call.car}, ${call.problem} - पेमेंट कंपनी आपको करेगी *₹${call.amount}* 🔙\n`;
+        message += `${index + 1}. ${call.car}-----${call.problem} - पेमेंट कंपनी आपको करेगी *₹${call.amount}* 🔙\n`;
       });
       message += `\n\n`;
     }
@@ -328,7 +328,7 @@
     if (cancelledCalls.length > 0) {
       message += `*❌ कैंसिल कॉल्स:*\n`;
       cancelledCalls.forEach((call, index) => {
-        message += `${index + 1}. ${call.car}, ${call.problem} , 00\n`;
+        message += `${index + 1}. ${call.car}-----${call.problem} , 00\n`;
       });
     }
 
