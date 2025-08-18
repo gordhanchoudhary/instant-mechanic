@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Booking Dashboard | Instant Mechanic</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen p-6">
+  <div class="max-w-7xl mx-auto">
+    <div class="flex justify-between items-center mb-6">
+  <h1 class="text-3xl font-bold">Instant Mechanic Dashboard</h1>
+  <div class="space-x-2">
+    <a href="https://instantmechanic.online/manual-booking.html" target="_blank"
+       class="bg-green-600 hover:bg-indigo-700 text-white px-4 py-2 rounded text-sm shadow">
+      Manual Booking
+    </a>
+    <a href="https://instantmechanic.online/chat.html" target="_blank"
+       class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded text-sm shadow">
+      View Chat Dashboard
+    </a>
+
+    <a href="https://instantmechanic.online/agent-track.html" target="_blank"
+       class="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded text-sm shadow">
+      View Agent Performace
+    </a>
+    <a href="https://instantmechanic.online/agent.html" target="_blank"
+       class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded text-sm shadow">
+      View Agent Dashboard
+    </a>
+  </div>
+</div>
+
+    <!-- Date and Filters -->
+    <div class="flex justify-between items-center gap-2 mb-4 flex-wrap">
+      <div class="flex items-center gap-2">
+        <button id="exportCsvBtn" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded text-sm shadow">
+          📊 Export CSV
+        </button>
+        
+        <!-- WhatsApp Button (hidden by default) -->
+        <button id="whatsappBtn" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded text-sm shadow" style="display: none;">
+          📱 Send on WhatsApp
+        </button>
+      </div>
+      
+      <div class="flex items-center gap-2 flex-wrap">
+        <!-- Date Type Toggle -->
+        <select id="dateType" class="border rounded px-4 py-2 text-sm shadow">
+          <option value="single">Single Date</option>
+          <option value="range">Date Range</option>
+        </select>
+        
+        <!-- Single Date Picker -->
+        <input id="datePicker" type="date" class="border rounded px-4 py-2 text-sm shadow" />
+        
+        <!-- Date Range Pickers (hidden by default) -->
+        <div id="dateRangeContainer" class="flex items-center gap-2" style="display: none;">
+          <input id="startDate" type="date" class="border rounded px-4 py-2 text-sm shadow" />
+          <span class="text-gray-500">to</span>
+          <input id="endDate" type="date" class="border rounded px-4 py-2 text-sm shadow" />
+        </div>
+        
+        <!-- Agent Filter -->
+        <select id="agentFilter" class="border rounded px-4 py-2 text-sm shadow">
+          <option value="">All Agents</option>
+        </select>
+        
+        <!-- Mechanic Filter -->
+        <select id="mechanicFilter" class="border rounded px-4 py-2 text-sm shadow">
+          <option value="">All Mechanics</option>
+          <option value="unassigned">Unassigned</option>
+        </select>
+        
+        <!-- Cancellation Filter (Frontend Only) -->
+        <select id="cancellationFilter" class="border rounded px-4 py-2 text-sm shadow">
+          <option value="all">All Calls</option>
+          <option value="active">Without Cancelled</option>
+          <option value="cancelled">Cancelled Only</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="grid grid-cols-2 md:grid-cols-8 gap-4 mb-6">
+      <div class="bg-white shadow p-4 rounded-lg text-center">
+        <p class="text-gray-500 text-sm">Total Customers</p>
+        <p id="totalCustomers" class="text-2xl font-bold text-indigo-700">0</p>
+      </div>
+
+      <div class="bg-white shadow p-4 rounded-lg text-center">
+        <p class="text-gray-500 text-sm">Total Bookings</p>
+        <p id="totalBookings" class="text-xl font-bold text-blue-600">0</p>
+      </div>
+
+      <div class="bg-white shadow p-4 rounded-lg text-center">
+        <p class="text-gray-500 text-sm">Total Revenue</p>
+        <p id="totalRevenue" class="text-xl font-bold text-yellow-600">0</p>
+      </div>
+
+      <div class="bg-white shadow p-4 rounded-lg text-center">
+        <p class="text-gray-500 text-sm">Total Advance Payments</p>
+        <p id="totalAdvancePayment" class="text-xl font-bold text-blue-700">0</p>
+      </div>
+
+      <div class="bg-white shadow p-4 rounded-lg text-center">
+        <p class="text-gray-500 text-sm">Total Collected</p>
+        <p id="totalCollected" class="text-xl font-bold text-green-600">₹0</p>
+      </div>
+      <div class="bg-white shadow p-4 rounded-lg text-center">
+        <p class="text-gray-500 text-sm">Total Pending</p>
+        <p id="totalPending" class="text-xl font-bold text-yellow-600">₹0</p>
+      </div>
+      <div class="bg-white shadow p-4 rounded-lg text-center">
+        <p class="text-gray-500 text-sm">Total Cancelled</p>
+        <p id="totalCancelled" class="text-xl font-bold text-red-600">0</p>
+      </div>
+      <div class="bg-white shadow p-4 rounded-lg text-center">
+        <p class="text-gray-500 text-sm">Mech. Not Assigned</p>
+        <p id="totalNotAssigned" class="text-xl font-bold text-purple-600">0</p>
+      </div>
+    </div>
+
+    <!-- Booking Table -->
+    <div class="bg-white shadow rounded-lg overflow-auto">
+      <table class="min-w-full text-sm text-left">
+        <thead class="bg-gray-200 text-gray-600">
+          <tr>
+            <th class="p-3">Image</th>
+            <th class="p-3" id="timeHeader">Time</th>
+            <th class="p-3">Car</th>
+            <th class="p-3">Problem</th>
+            <th class="p-3">Price</th>
+            <th class="p-3">Mobile</th>
+            <th class="p-3">Mechanic</th>
+            <th class="p-3">Paid</th>
+            <th class="p-3">Pending</th>
+            <th class="p-3">Agent</th>
+            <th class="p-3">Cancelled</th>
+            <th class="p-3">Reason</th>
+            <th class="p-3">Action</th>
+          </tr>
+        </thead>
+        <tbody id="bookingTableBody" class="bg-white divide-y divide-gray-200"></tbody>
+      </table>
+    </div>
+  </div>
+
+<script>
+  const dateInput = document.getElementById("datePicker");
+  const dateType = document.getElementById("dateType");
+  const dateRangeContainer = document.getElementById("dateRangeContainer");
+  const startDate = document.getElementById("startDate");
+  const endDate = document.getElementById("endDate");
+  const agentFilter = document.getElementById("agentFilter");
+  const mechanicFilter = document.getElementById("mechanicFilter");
+  const cancellationFilter = document.getElementById("cancellationFilter");
+  const bookingTableBody = document.getElementById("bookingTableBody");
+  const exportCsvBtn = document.getElementById("exportCsvBtn");
+  const whatsappBtn = document.getElementById("whatsappBtn");
+  const timeHeader = document.getElementById("timeHeader");
+
+  const totalBookings = document.getElementById("totalBookings");
+  const totalCollected = document.getElementById("totalCollected");
+  const totalPending = document.getElementById("totalPending");
+  const totalCancelled = document.getElementById("totalCancelled");
+  const totalNotAssigned = document.getElementById("totalNotAssigned");
+
+  // Store current data for CSV export
+  let currentBookingData = [];
+  let allFetchedData = []; // Store all data from API
+
+  const formatCurrency = (amount) => '₹' + (parseInt(amount) || 0).toLocaleString();
+
+  // Format date and time based on date type selection
+  const formatDateTime = (dateTimeString) => {
+    const date = new Date(dateTimeString);
+    if (dateType.value === "range") {
+      // Show date and time for date range
+      return date.toLocaleString('en-IN', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+      });
+    } else {
+      // Show only time for single date
+      return date.toLocaleTimeString('en-IN', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+      });
+    }
+  };
+
+  // Update table header based on date type
+  const updateTimeHeader = () => {
+    if (dateType.value === "range") {
+      timeHeader.textContent = "Date & Time";
+    } else {
+      timeHeader.textContent = "Time";
+    }
+  };
+
+  // Show/hide WhatsApp button based on mechanic filter
+  const updateWhatsAppButtonVisibility = () => {
+    const selectedMechanic = mechanicFilter.value;
+    if (selectedMechanic && selectedMechanic !== 'unassigned') {
+      whatsappBtn.style.display = 'inline-block';
+    } else {
+      whatsappBtn.style.display = 'none';
+    }
+  };
+
+  // Generate WhatsApp message for mechanic
+  const generateWhatsAppMessage = () => {
+    const selectedMechanic = mechanicFilter.value;
+    if (!selectedMechanic || selectedMechanic === 'unassigned') {
+      alert('Please select a specific mechanic first');
+      return;
+    }
+
+    // Get filtered data for the selected mechanic
+    const mechanicData = allFetchedData.filter(item => item.mechanic_name === selectedMechanic);
+    
+    if (mechanicData.length === 0) {
+      alert('No data found for the selected mechanic');
+      return;
+    }
+
+    // Get date for message
+    let dateText = '';
+    if (dateType.value === "range" && startDate.value && endDate.value) {
+      if (startDate.value === endDate.value) {
+        dateText = new Date(startDate.value).toLocaleDateString('en-IN');
+      } else {
+        dateText = `${new Date(startDate.value).toLocaleDateString('en-IN')} to ${new Date(endDate.value).toLocaleDateString('en-IN')}`;
+      }
+    } else if (dateInput.value) {
+      dateText = new Date(dateInput.value).toLocaleDateString('en-IN');
+    }
+
+    // Categorize calls
+    const paidCalls = [];
+    const pendingCalls = [];
+    const insuranceCalls = [];
+    const cancelledCalls = [];
+    
+    let totalPendingAmount = 0;
+    let totalCalls = mechanicData.length;
+    let totalCancelledCount = 0;
+
+    mechanicData.forEach(item => {
+      const advance = parseInt(item.advance_payment_amount) || 0;
+      const pendingAmt = parseInt(item.pending_payment_amount) || 0;
+
+      if (item.is_cancelled) {
+        totalCancelledCount++;
+        cancelledCalls.push({
+          car: item.car,
+          problem: item.problem
+        });
+      } else if (item.is_gomechanic_call) {
+        // Insurance calls logic
+        insuranceCalls.push({
+          car: item.car,
+          problem: item.problem,
+          amount: pendingAmt
+        });
+        // Insurance calls don't add to pending total as they are paid by company
+      } else {
+        // Regular calls
+        if (item.payment_status === "pending") {
+          pendingCalls.push({
+            car: item.car,
+            problem: item.problem,
+            amount: advance
+          });
+          totalPendingAmount += advance;
+        } else {
+          paidCalls.push({
+            car: item.car,
+            problem: item.problem,
+            amount: advance
+          });
+        }
+      }
+    });
+
+    // Build message
+    let message = `*Instant Mechanic - Call Summary*\n\n`;
+    message += `📅 *Date:* ${dateText}\n`;
+    message += `👨‍🔧 *Mechanic:* ${selectedMechanic}\n`;
+    message += `💰 *Total Pending:* ₹${totalPendingAmount.toLocaleString()}\n`;
+    message += `📞 *Total Calls:* ${totalCalls}\n`;
+    message += `❌ *Total Cancelled:* ${totalCancelledCount}\n\n`;
+
+    // Paid calls
+    if (paidCalls.length > 0) {
+      message += `*✅ PAID CALLS:*\n`;
+      paidCalls.forEach((call, index) => {
+        message += `${index + 1}. ${call.car}, ${call.problem} - Customer Paid ₹${call.amount} ✅\n`;
+      });
+      message += `\n`;
+    }
+
+    // Pending calls
+    if (pendingCalls.length > 0) {
+      message += `*🚨 PENDING CALLS:*\n`;
+      pendingCalls.forEach((call, index) => {
+        message += `${index + 1}. ${call.car}, ${call.problem} - Pending ₹${call.amount} 🚨\n`;
+      });
+      message += `\n`;
+    }
+
+    // Insurance calls
+    if (insuranceCalls.length > 0) {
+      message += `*🔙 INSURANCE CALLS:*\n`;
+      insuranceCalls.forEach((call, index) => {
+        message += `${index + 1}. ${call.car}, ${call.problem} - Company Pays ₹${call.amount} 🔙\n`;
+      });
+      message += `\n`;
+    }
+
+    // Cancelled calls
+    if (cancelledCalls.length > 0) {
+      message += `*❌ CANCELLED CALLS:*\n`;
+      cancelledCalls.forEach((call, index) => {
+        message += `${index + 1}. ${call.car}, ${call.problem}\n`;
+      });
+    }
+
+    // Encode message for WhatsApp URL
+    const encodedMessage = encodeURIComponent(message);
+    const whatsappUrl = `https://wa.me/918393990942?text=${encodedMessage}`;
+    
+    // Open WhatsApp
+    window.open(whatsappUrl, '_blank');
+  };
+
+  // Apply frontend filters to data
+  const applyFrontendFilters = (data) => {
+    let filteredData = [...data];
+    
+    // Apply mechanic filter
+    const selectedMechanic = mechanicFilter.value;
+    if (selectedMechanic === 'unassigned') {
+      filteredData = filteredData.filter(item => !item.mechanic_name);
+    } else if (selectedMechanic && selectedMechanic !== 'unassigned') {
+      filteredData = filteredData.filter(item => item.mechanic_name === selectedMechanic);
+    }
+    
+    // Apply cancellation filter (frontend only)
+    const selectedCancellation = cancellationFilter.value;
+    if (selectedCancellation === 'cancelled') {
+      filteredData = filteredData.filter(item => item.is_cancelled);
+    } else if (selectedCancellation === 'active') {
+      filteredData = filteredData.filter(item => !item.is_cancelled);
+    }
+    // 'all' option shows everything, no additional filtering needed
+    
+    return filteredData;
+  };
+
+  // Update display with filtered data
+  const updateDisplayWithFilteredData = (data) => {
+    const filteredData = applyFrontendFilters(data);
+    
+    // Sort by creation time in descending order (newest first)
+    const sortedData = [...filteredData].sort((a, b) => {
+      const dateA = new Date(a.created_at);
+      const dateB = new Date(b.created_at);
+      return dateB - dateA; // Descending order (newest first)
+    });
+    
+    currentBookingData = [...sortedData];
+    
+    // Clear existing table
+    bookingTableBody.innerHTML = '';
+    
+    let count = 0;
+    let collected = 0;
+    let pending = 0;
+    let cancelled = 0;
+    let notAssigned = 0;
+    
+    sortedData.forEach(item => {
+      count++;
+
+      const advance = parseInt(item.advance_payment_amount) || 0;
+      const pendingAmt = parseInt(item.pending_payment_amount) || 0;
+
+      let paid = 0;
+      let pendingAmount = 0;
+
+      if (item.is_cancelled == true) {
+      if (item.payment_status === "pending") {
+        paid = 0;
+        pendingAmount =  0;
+      } else {
+        paid = advance;
+        pendingAmount = 0;
+      }
+      }else{
+
+      if (item.payment_status === "pending") {
+        paid = 0;
+        pendingAmount = advance;
+      } else {
+        paid = advance;
+        pendingAmount = 0;
+      }}
+
+      // For insurance calls, subtract from total pending as company pays
+      if (item.is_gomechanic_call && !item.is_cancelled) {
+        pendingAmount = 0; // Insurance calls don't contribute to mechanic pending
+      }
+
+      collected += paid;
+      pending += pendingAmount;
+      if (item.is_cancelled) cancelled++;
+      if (!item.is_cancelled && !item.mechanic) notAssigned++;
+
+      const row = `
+        <tr class="hover:bg-gray-50">
+          <td class="p-3">
+            <img src="${item.car_image}" alt="Car" class="w-12 h-8 object-contain rounded-sm" />
+          </td>
+          <td class="p-3 text-gray-600">${formatDateTime(item.created_at)}</td>
+          <td class="p-3">${item.car}</td>
+          <td class="p-3">${item.problem}</td>
+          <td class="p-3">${item.price}</td>
+          <td class="p-3">
+            ${item.customer_mobile ? 
+              `<a href="https://wa.me/91${item.customer_mobile.replace(/^91/, '')}" target="_blank" class="text-blue-600 hover:text-blue-800 hover:underline">
+                ${item.customer_mobile.replace(/^91/, '')}
+              </a>` 
+              : '-'
+            }
+          </td>
+          <td class="p-3">${item.mechanic_name ?? '-'}</td>
+          <td class="p-3 text-green-600">${formatCurrency(paid)}</td>
+          <td class="p-3 text-yellow-600">${formatCurrency(pendingAmount)}</td>
+          <td class="p-3">${item.agent_name ?? '-'}</td>
+          <td class="p-3 ${item.is_cancelled ? 'text-red-500' : 'text-green-500'} font-bold">
+            ${item.is_cancelled ? 'Yes' : 'No'}
+          </td>
+          <td class="p-3 text-xs">${item.cancellation_reason || '-'}</td>
+          <td class="p-3">
+            <a href="https://instantmechanic.online/booking.html?id=${item.id}" target="_blank" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs">
+              View
+            </a>
+          </td>
+        </tr>
+      `;
+      bookingTableBody.innerHTML += row;
+    });
+
+    // Update counters based on filtered data
+    totalBookings.textContent = count;
+    totalCollected.textContent = formatCurrency(collected);
+    totalPending.textContent = formatCurrency(pending);
+    totalCancelled.textContent = cancelled;
+    totalNotAssigned.textContent = notAssigned;
+  };
+  
+  // CSV Export functionality
+  const exportToCSV = () => {
+    if (currentBookingData.length === 0) {
+      alert('No data to export');
+      return;
+    }
+
+    const headers = [
+      'Date & Time',
+      'Car',
+      'Problem',
+      'Price',
+      'Mobile',
+      'Mechanic',
+      'Paid Amount',
+      'Pending Amount',
+      'Agent',
+      'Cancelled',
+      'Cancellation Reason'
+    ];
+
+    const csvData = currentBookingData.map(item => {
+      const advance = parseInt(item.advance_payment_amount) || 0;
+      const pendingAmt = parseInt(item.pending_payment_amount) || 0;
+
+      let paid = 0;
+      let pendingAmount = 0;
+
+      if (item.is_cancelled == true) {
+      if (item.payment_status === "pending") {
+        paid = 0;
+        pendingAmount =  0;
+      } else {
+        paid = advance;
+        pendingAmount = 0;
+      }
+      }else{
+
+      if (item.payment_status === "pending") {
+        paid = 0;
+        pendingAmount =  advance;
+      } else {
+        paid = advance;
+        pendingAmount = 0;
+      }}
+
+      return [
+        new Date(item.created_at).toLocaleString('en-IN'),
+        item.car || '',
+        item.problem || '',
+        item.price || '',
+        item.customer_mobile ? item.customer_mobile.replace(/^91/, '') : '',
+        item.mechanic_name || 'Unassigned',
+        paid,
+        pendingAmount,
+        item.agent_name || '',
+        item.is_cancelled ? 'Yes' : 'No',
+        item.cancellation_reason || ''
+      ];
+    });
+
+    const csvContent = [headers, ...csvData]
+      .map(row => row.map(cell => `"${cell}"`).join(','))
+      .join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    
+    if (link.download !== undefined) {
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      
+      // Generate filename with current date and filters
+      let filename = 'booking-data';
+      if (dateType.value === "range" && startDate.value && endDate.value) {
+        filename += `_${startDate.value}_to_${endDate.value}`;
+      } else if (dateInput.value) {
+        filename += `_${dateInput.value}`;
+      }
+      if (agentFilter.value) {
+        filename += `_agent-${agentFilter.value}`;
+      }
+      if (mechanicFilter.value) {
+        filename += `_mechanic-${mechanicFilter.value}`;
+      }
+      if (cancellationFilter.value !== 'all') {
+        filename += `_${cancellationFilter.value}`;
+      }
+      filename += '.csv';
+      
+      link.setAttribute('download', filename);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  };
+
+  // Add event listeners
+  exportCsvBtn.addEventListener('click', exportToCSV);
+  whatsappBtn.addEventListener('click', generateWhatsAppMessage);
+
+  // Toggle between single date and date range
+  dateType.addEventListener("change", () => {
+    updateTimeHeader();
+    if (dateType.value === "range") {
+      dateInput.style.display = "none";
+      dateRangeContainer.style.display = "flex";
+      // Set default range to today if not set
+      if (!startDate.value || !endDate.value) {
+        const today = new Date().toISOString().split('T')[0];
+        startDate.value = today;
+        endDate.value = today;
+      }
+      fetchBookings();
+    } else {
+      dateInput.style.display = "block";
+      dateRangeContainer.style.display = "none";
+      fetchBookings();
+    }
+  });
+
+  async function fetchBookings(dateParam = null) {
+    bookingTableBody.innerHTML = '';
+    totalBookings.textContent = '0';
+    totalCollected.textContent = '₹0';
+    totalPending.textContent = '₹0';
+    totalCancelled.textContent = '0';
+    totalNotAssigned.textContent = '0';
+
+    const totalCustomers = document.getElementById("totalCustomers");
+    const totalRevenue = document.getElementById("totalRevenue");
+    const totalAdvancePayment = document.getElementById("totalAdvancePayment");
+
+    totalCustomers.textContent = '0';
+    totalRevenue.textContent = '0';
+    totalAdvancePayment.textContent = '0';
+
+    const selectedAgent = agentFilter.value;
+    const selectedMechanic = mechanicFilter.value;
+    
+    const agentParam = selectedAgent ? `&agent=${encodeURIComponent(selectedAgent)}` : '';
+    const mechanicParam = selectedMechanic ? `&mechanic=${encodeURIComponent(selectedMechanic)}` : '';
+
+    // Determine date parameters based on date type
+    let dateParams = '';
+    if (dateType.value === "range") {
+      const start = startDate.value;
+      const end = endDate.value;
+      if (start && end) {
+        dateParams = `start_date=${start}&end_date=${end}`;
+      } else {
+        return; // Don't proceed if range dates are not set
+      }
+    } else {
+      const singleDate = dateParam || dateInput.value;
+      if (singleDate) {
+        dateParams = `date=${singleDate}`;
+      } else {
+        return; // Don't proceed if single date is not set
+      }
+    }
+
+    try {
+      const customerRes = await fetch(`https://ai.instantmechanic.online/bot/api/customer-flow/by-date/?${dateParams}${agentParam}${mechanicParam}`);
+      const customerData = await customerRes.json();
+      totalCustomers.textContent = customerData.total_customers || 0;
+      totalRevenue.textContent = formatCurrency(customerData.total_revenue) || '₹0';
+      totalAdvancePayment.textContent = customerData.payment_done_bookings || 0;
+      totalCollected.textContent = formatCurrency(customerData.payment_collected) || '₹0';
+      totalPending.textContent = formatCurrency(customerData.payment_pending) || '₹0';
+    } catch (err) {
+      totalCustomers.textContent = '0';
+    }
+
+    const url = `https://ai.instantmechanic.online/bot/api/booking/by-date/?${dateParams}${agentParam}${mechanicParam}`;
+    const res = await fetch(url);
+    let data = await res.json();
+
+    // Update agent filter dropdown
+    const currentSelectedAgent = agentFilter.value; // Remember current selection
+    // Clear existing agent options except the default one
+    while (agentFilter.options.length > 1) {
+      agentFilter.removeChild(agentFilter.lastChild);
+    }
+    
+    const uniqueAgents = [...new Set(data.map(b => b.agent_name).filter(Boolean))];
+    uniqueAgents.forEach(agent => {
+      const option = document.createElement("option");
+      option.value = agent;
+      option.textContent = agent;
+      agentFilter.appendChild(option);
+    });
+    
+    // Restore selection if it still exists in the new list
+    if (currentSelectedAgent && uniqueAgents.includes(currentSelectedAgent)) {
+      agentFilter.value = currentSelectedAgent;
+    }
+
+    // Update mechanic filter dropdown
+    const currentSelectedMechanic = mechanicFilter.value; // Remember current selection
+    // Clear existing mechanic options except the default ones
+    while (mechanicFilter.options.length > 2) {
+      mechanicFilter.removeChild(mechanicFilter.lastChild);
+    }
+    
+    const uniqueMechanics = [...new Set(data.map(b => b.mechanic_name).filter(Boolean))];
+    uniqueMechanics.forEach(mechanic => {
+      const option = document.createElement("option");
+      option.value = mechanic;
+      option.textContent = mechanic;
+      mechanicFilter.appendChild(option);
+    });
+    
+    // Restore selection if it still exists in the new list
+    if (currentSelectedMechanic && (currentSelectedMechanic === 'unassigned' || uniqueMechanics.includes(currentSelectedMechanic))) {
+      mechanicFilter.value = currentSelectedMechanic;
+    }
+
+    // Client-side filtering for mechanic (in case API doesn't support mechanic filter)
+    if (selectedMechanic === 'unassigned') {
+      data = data.filter(item => !item.mechanic_name);
+    } else if (selectedMechanic && selectedMechanic !== 'unassigned') {
+      data = data.filter(item => item.mechanic_name === selectedMechanic);
+    }
+
+    // Store all fetched data for frontend filtering
+    allFetchedData = [...data];
+
+    // Update WhatsApp button visibility
+    updateWhatsAppButtonVisibility();
+
+    // Apply frontend filters and update display
+    updateDisplayWithFilteredData(data);
+  }
+
+  // Default Load
+  const today = new Date().toISOString().split('T')[0];
+  dateInput.value = today;
+  startDate.value = today;
+  endDate.value = today;
+  updateTimeHeader();
+  fetchBookings();
+
+  dateInput.addEventListener("change", () => {
+    fetchBookings();
+  });
+
+  startDate.addEventListener("change", () => {
+    fetchBookings();
+  });
+
+  endDate.addEventListener("change", () => {
+    fetchBookings();
+  });
+
+  // Agent filter change handler
+  agentFilter.addEventListener("change", () => {
+    fetchBookings();
+  });
+
+  // Mechanic filter change handler
+  mechanicFilter.addEventListener("change", () => {
+    updateWhatsAppButtonVisibility();
+    fetchBookings();
+  });
+
+  // Cancellation filter change handler (frontend only)
+  cancellationFilter.addEventListener("change", () => {
+    updateDisplayWithFilteredData(allFetchedData);
+  });
+</script>
+
+</body>
+</html>
