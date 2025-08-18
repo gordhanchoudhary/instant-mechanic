@@ -476,15 +476,20 @@
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customers</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bookings</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Revenue</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ad Spend</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ROAS</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">CAC</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Conversion</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Performance</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Day & Date</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ad Spend</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Customers</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Bookings</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Conversion</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Cancel</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cancellation %</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Net Bookings</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Revenue</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Profit</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Net Profit</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ROAS</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">CAC</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Performance</th>
                         </tr>
                     </thead>
                     <tbody id="dataTable" class="bg-white divide-y divide-gray-200">
@@ -1461,28 +1466,63 @@
                 const roas = adSpend > 0 ? (item.total_revenue / adSpend).toFixed(1) : 0;
                 const cac = item.total_customers > 0 && adSpend > 0 ? Math.round(adSpend / item.total_customers) : 0;
                 
-                // Calculate performance score including marketing efficiency
+                // New calculations
+                const totalCancelled = item.total_cancelled_booking;
+                const netBookings = item.total_booking - item.total_cancelled_booking;
+                const totalProfit = item.payment_collected + item.payment_pending;
+                const netProfit = totalProfit - adSpend;
+                
+                // Enhanced performance score with more comprehensive metrics
                 const performanceScore = Math.round(
-                    (parseFloat(conversionRate) * 0.3) +
-                    ((100 - parseFloat(cancellationRate)) * 0.2) +
-                    (Math.min(parseFloat(roas) / 3 * 100, 100) * 0.3) +
-                    ((cac > 0 && cac < 300 ? (300 - cac) / 300 * 100 : 0) * 0.2)
+                    (parseFloat(conversionRate) >= 30 ? 25 : parseFloat(conversionRate) >= 20 ? 20 : parseFloat(conversionRate) >= 15 ? 15 : parseFloat(conversionRate) / 15 * 10) + // Conversion (25 points max)
+                    (parseFloat(cancellationRate) <= 10 ? 20 : parseFloat(cancellationRate) <= 15 ? 15 : parseFloat(cancellationRate) <= 20 ? 10 : 5) + // Cancellation (20 points max)
+                    (parseFloat(roas) >= 4 ? 25 : parseFloat(roas) >= 3 ? 20 : parseFloat(roas) >= 2 ? 15 : parseFloat(roas) >= 1 ? 10 : 0) + // ROAS (25 points max)
+                    (netProfit > 0 ? (netProfit / totalProfit * 20) : 0) + // Net Profit Margin (20 points max)
+                    (cac > 0 && cac <= 200 ? 10 : cac <= 300 ? 8 : cac <= 400 ? 5 : 2) // CAC efficiency (10 points max)
                 );
                 
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    <td class="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                         ${new Date(item.date).toLocaleDateString('en-US', { 
                             weekday: 'short', 
                             month: 'short', 
                             day: 'numeric' 
                         })}
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.total_customers}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.total_booking}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">₹${item.total_revenue.toLocaleString()}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-orange-600">₹${Math.round(adSpend).toLocaleString()}</td>
-                    <td class="px-6 py-4 whitespace-nowrap">
+                    <td class="px-4 py-4 whitespace-nowrap text-sm text-orange-600 font-medium">₹${Math.round(adSpend).toLocaleString()}</td>
+                    <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900">${item.total_customers}</td>
+                    <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900">${item.total_booking}</td>
+                    <td class="px-4 py-4 whitespace-nowrap">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                            conversionRate > 30 ? 'bg-green-100 text-green-800' : 
+                            conversionRate > 20 ? 'bg-yellow-100 text-yellow-800' : 
+                            'bg-red-100 text-red-800'
+                        }">
+                            ${conversionRate}%
+                        </span>
+                    </td>
+                    <td class="px-4 py-4 whitespace-nowrap text-sm text-red-600 font-medium">${totalCancelled}</td>
+                    <td class="px-4 py-4 whitespace-nowrap">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                            cancellationRate <= 10 ? 'bg-green-100 text-green-800' : 
+                            cancellationRate <= 20 ? 'bg-yellow-100 text-yellow-800' : 
+                            'bg-red-100 text-red-800'
+                        }">
+                            ${cancellationRate}%
+                        </span>
+                    </td>
+                    <td class="px-4 py-4 whitespace-nowrap text-sm text-blue-600 font-medium">${netBookings}</td>
+                    <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900">₹${item.total_revenue.toLocaleString()}</td>
+                    <td class="px-4 py-4 whitespace-nowrap text-sm text-purple-600 font-medium">₹${Math.round(totalProfit).toLocaleString()}</td>
+                    <td class="px-4 py-4 whitespace-nowrap">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                            netProfit > 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                        }">
+                            ₹${Math.round(netProfit).toLocaleString()}
+                        </span>
+                    </td>
+                    <td class="px-4 py-4 whitespace-nowrap">
                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                             roas > 3 ? 'bg-green-100 text-green-800' : 
                             roas > 2 ? 'bg-yellow-100 text-yellow-800' : 
@@ -1491,7 +1531,7 @@
                             ${roas}x
                         </span>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
+                    <td class="px-4 py-4 whitespace-nowrap">
                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                             cac < 200 ? 'bg-green-100 text-green-800' : 
                             cac < 350 ? 'bg-yellow-100 text-yellow-800' : 
@@ -1500,16 +1540,7 @@
                             ₹${cac}
                         </span>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                            conversionRate > 25 ? 'bg-green-100 text-green-800' : 
-                            conversionRate > 15 ? 'bg-yellow-100 text-yellow-800' : 
-                            'bg-red-100 text-red-800'
-                        }">
-                            ${conversionRate}%
-                        </span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
+                    <td class="px-4 py-4 whitespace-nowrap">
                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                             performanceScore >= 80 ? 'bg-green-100 text-green-800' : 
                             performanceScore >= 60 ? 'bg-yellow-100 text-yellow-800' : 
@@ -1622,31 +1653,46 @@
         }
 
         function exportData() {
-            const headers = ['Date', 'Customers', 'Bookings', 'Revenue', 'Ad Spend', 'ROAS', 'CAC', 'Conversion Rate', 'Performance Score'];
+            const headers = ['Day & Date', 'Ad Spend', 'Total Customers', 'Total Bookings', 'Conversion', 'Total Cancel', 'Cancellation %', 'Net Bookings', 'Revenue', 'Total Profit', 'Net Profit', 'ROAS', 'CAC', 'Performance Score'];
             const csvContent = [
                 headers.join(','),
                 ...currentData.map(item => {
                     const conversionRate = item.total_customers > 0 ? 
                         ((item.total_booking / item.total_customers) * 100).toFixed(1) : 0;
+                    const cancellationRate = item.total_booking > 0 ?
+                        ((item.total_cancelled_booking / item.total_booking) * 100).toFixed(1) : 0;
                     const marketingItem = currentMarketingData.find(m => m.date === item.date);
                     const adSpend = marketingItem ? marketingItem.totalSpend : 0;
                     const roas = adSpend > 0 ? (item.total_revenue / adSpend).toFixed(1) : 0;
                     const cac = item.total_customers > 0 && adSpend > 0 ? Math.round(adSpend / item.total_customers) : 0;
+                    
+                    const totalCancelled = item.total_cancelled_booking;
+                    const netBookings = item.total_booking - item.total_cancelled_booking;
+                    const totalProfit = item.payment_collected + item.payment_pending;
+                    const netProfit = totalProfit - adSpend;
+                    
                     const performanceScore = Math.round(
-                        (parseFloat(conversionRate) * 0.3) +
-                        (Math.min(parseFloat(roas) / 3 * 100, 100) * 0.3) +
-                        ((cac > 0 && cac < 300 ? (300 - cac) / 300 * 100 : 0) * 0.4)
+                        (parseFloat(conversionRate) >= 30 ? 25 : parseFloat(conversionRate) >= 20 ? 20 : parseFloat(conversionRate) >= 15 ? 15 : parseFloat(conversionRate) / 15 * 10) +
+                        (parseFloat(cancellationRate) <= 10 ? 20 : parseFloat(cancellationRate) <= 15 ? 15 : parseFloat(cancellationRate) <= 20 ? 10 : 5) +
+                        (parseFloat(roas) >= 4 ? 25 : parseFloat(roas) >= 3 ? 20 : parseFloat(roas) >= 2 ? 15 : parseFloat(roas) >= 1 ? 10 : 0) +
+                        (netProfit > 0 ? (netProfit / totalProfit * 20) : 0) +
+                        (cac > 0 && cac <= 200 ? 10 : cac <= 300 ? 8 : cac <= 400 ? 5 : 2)
                     );
                     
                     return [
                         item.date,
+                        Math.round(adSpend),
                         item.total_customers,
                         item.total_booking,
+                        conversionRate + '%',
+                        totalCancelled,
+                        cancellationRate + '%',
+                        netBookings,
                         item.total_revenue,
-                        Math.round(adSpend),
+                        Math.round(totalProfit),
+                        Math.round(netProfit),
                         roas + 'x',
                         '₹' + cac,
-                        conversionRate + '%',
                         performanceScore + '/100'
                     ].join(',');
                 })
