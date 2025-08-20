@@ -1,743 +1,1052 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Booking Dashboard | Instant Mechanic</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100 min-h-screen p-6">
-  <div class="max-w-7xl mx-auto">
-    <div class="flex justify-between items-center mb-6">
-  <h1 class="text-3xl font-bold">Instant Mechanic Dashboard</h1>
-  <div class="space-x-2">
-    <a href="https://instantmechanic.online/manual-booking.html" target="_blank"
-       class="bg-green-600 hover:bg-indigo-700 text-white px-4 py-2 rounded text-sm shadow">
-      Manual Booking
-    </a>
-    <a href="https://instantmechanic.online/chat.html" target="_blank"
-       class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded text-sm shadow">
-      View Chat Dashboard
-    </a>
-
-    <a href="https://instantmechanic.online/agent-track.html" target="_blank"
-       class="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded text-sm shadow">
-      View Agent Performace
-    </a>
-    <a href="https://instantmechanic.online/agent.html" target="_blank"
-       class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded text-sm shadow">
-      View Agent Dashboard
-    </a>
-  </div>
-</div>
-
-    <!-- Date and Filters -->
-    <div class="flex justify-between items-center gap-2 mb-4 flex-wrap">
-      <div class="flex items-center gap-2">
-        <button id="exportCsvBtn" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded text-sm shadow">
-          📊 Export CSV
-        </button>
-        
-        <!-- WhatsApp Button (hidden by default) -->
-        <button id="whatsappBtn" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded text-sm shadow" style="display: none;">
-          📱 Send on WhatsApp
-        </button>
-      </div>
-      
-      <div class="flex items-center gap-2 flex-wrap">
-        <!-- Date Type Toggle -->
-        <select id="dateType" class="border rounded px-4 py-2 text-sm shadow">
-          <option value="single">Single Date</option>
-          <option value="range">Date Range</option>
-        </select>
-        
-        <!-- Single Date Picker -->
-        <input id="datePicker" type="date" class="border rounded px-4 py-2 text-sm shadow" />
-        
-        <!-- Date Range Pickers (hidden by default) -->
-        <div id="dateRangeContainer" class="flex items-center gap-2" style="display: none;">
-          <input id="startDate" type="date" class="border rounded px-4 py-2 text-sm shadow" />
-          <span class="text-gray-500">to</span>
-          <input id="endDate" type="date" class="border rounded px-4 py-2 text-sm shadow" />
-        </div>
-        
-        <!-- Agent Filter -->
-        <select id="agentFilter" class="border rounded px-4 py-2 text-sm shadow">
-          <option value="">All Agents</option>
-        </select>
-        
-        <!-- Mechanic Filter -->
-        <select id="mechanicFilter" class="border rounded px-4 py-2 text-sm shadow">
-          <option value="">All Mechanics</option>
-          <option value="unassigned">Unassigned</option>
-        </select>
-        
-        <!-- Cancellation Filter (Frontend Only) -->
-        <select id="cancellationFilter" class="border rounded px-4 py-2 text-sm shadow">
-          <option value="all">All Calls</option>
-          <option value="active">Without Cancelled</option>
-          <option value="cancelled">Cancelled Only</option>
-        </select>
-      </div>
-    </div>
-
-    <!-- Summary Cards -->
-    <div class="grid grid-cols-2 md:grid-cols-8 gap-4 mb-6">
-      <div class="bg-white shadow p-4 rounded-lg text-center">
-        <p class="text-gray-500 text-sm">Total Customers</p>
-        <p id="totalCustomers" class="text-2xl font-bold text-indigo-700">0</p>
-      </div>
-
-      <div class="bg-white shadow p-4 rounded-lg text-center">
-        <p class="text-gray-500 text-sm">Total Bookings</p>
-        <p id="totalBookings" class="text-xl font-bold text-blue-600">0</p>
-      </div>
-
-      <div class="bg-white shadow p-4 rounded-lg text-center">
-        <p class="text-gray-500 text-sm">Total Revenue</p>
-        <p id="totalRevenue" class="text-xl font-bold text-yellow-600">0</p>
-      </div>
-
-      <div class="bg-white shadow p-4 rounded-lg text-center">
-        <p class="text-gray-500 text-sm">Total Advance Payments</p>
-        <p id="totalAdvancePayment" class="text-xl font-bold text-blue-700">0</p>
-      </div>
-
-      <div class="bg-white shadow p-4 rounded-lg text-center">
-        <p class="text-gray-500 text-sm">Total Collected</p>
-        <p id="totalCollected" class="text-xl font-bold text-green-600">₹0</p>
-      </div>
-      <div class="bg-white shadow p-4 rounded-lg text-center">
-        <p class="text-gray-500 text-sm">Total Pending</p>
-        <p id="totalPending" class="text-xl font-bold text-yellow-600">₹0</p>
-      </div>
-      <div class="bg-white shadow p-4 rounded-lg text-center">
-        <p class="text-gray-500 text-sm">Total Cancelled</p>
-        <p id="totalCancelled" class="text-xl font-bold text-red-600">0</p>
-      </div>
-      <div class="bg-white shadow p-4 rounded-lg text-center">
-        <p class="text-gray-500 text-sm">Mech. Not Assigned</p>
-        <p id="totalNotAssigned" class="text-xl font-bold text-purple-600">0</p>
-      </div>
-    </div>
-
-    <!-- Booking Table -->
-    <div class="bg-white shadow rounded-lg overflow-auto">
-      <table class="min-w-full text-sm text-left">
-        <thead class="bg-gray-200 text-gray-600">
-          <tr>
-            <th class="p-3">Image</th>
-            <th class="p-3" id="timeHeader">Time</th>
-            <th class="p-3">Car</th>
-            <th class="p-3">Problem</th>
-            <th class="p-3">Price</th>
-            <th class="p-3">Mobile</th>
-            <th class="p-3">Mechanic</th>
-            <th class="p-3">Paid</th>
-            <th class="p-3">Pending</th>
-            <th class="p-3">Agent</th>
-            <th class="p-3">Cancelled</th>
-            <th class="p-3">Reason</th>
-            <th class="p-3">Action</th>
-          </tr>
-        </thead>
-        <tbody id="bookingTableBody" class="bg-white divide-y divide-gray-200"></tbody>
-      </table>
-    </div>
-  </div>
-
-<script>
-  const dateInput = document.getElementById("datePicker");
-  const dateType = document.getElementById("dateType");
-  const dateRangeContainer = document.getElementById("dateRangeContainer");
-  const startDate = document.getElementById("startDate");
-  const endDate = document.getElementById("endDate");
-  const agentFilter = document.getElementById("agentFilter");
-  const mechanicFilter = document.getElementById("mechanicFilter");
-  const cancellationFilter = document.getElementById("cancellationFilter");
-  const bookingTableBody = document.getElementById("bookingTableBody");
-  const exportCsvBtn = document.getElementById("exportCsvBtn");
-  const whatsappBtn = document.getElementById("whatsappBtn");
-  const timeHeader = document.getElementById("timeHeader");
-
-  const totalBookings = document.getElementById("totalBookings");
-  const totalCollected = document.getElementById("totalCollected");
-  const totalPending = document.getElementById("totalPending");
-  const totalCancelled = document.getElementById("totalCancelled");
-  const totalNotAssigned = document.getElementById("totalNotAssigned");
-
-  // Store current data for CSV export
-  let currentBookingData = [];
-  let allFetchedData = []; // Store all data from API
-
-  const formatCurrency = (amount) => '₹' + (parseInt(amount) || 0).toLocaleString();
-
-  // Format date and time based on date type selection
-  const formatDateTime = (dateTimeString) => {
-    const date = new Date(dateTimeString);
-    if (dateType.value === "range") {
-      // Show date and time for date range
-      return date.toLocaleString('en-IN', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true
-      });
-    } else {
-      // Show only time for single date
-      return date.toLocaleTimeString('en-IN', {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true
-      });
-    }
-  };
-
-  // Update table header based on date type
-  const updateTimeHeader = () => {
-    if (dateType.value === "range") {
-      timeHeader.textContent = "Date & Time";
-    } else {
-      timeHeader.textContent = "Time";
-    }
-  };
-
-  // Show/hide WhatsApp button based on mechanic filter
-  const updateWhatsAppButtonVisibility = () => {
-    const selectedMechanic = mechanicFilter.value;
-    if (selectedMechanic && selectedMechanic !== 'unassigned') {
-      whatsappBtn.style.display = 'inline-block';
-    } else {
-      whatsappBtn.style.display = 'none';
-    }
-  };
-
-  // Generate WhatsApp message for mechanic
-  const generateWhatsAppMessage = () => {
-    const selectedMechanic = mechanicFilter.value;
-    if (!selectedMechanic || selectedMechanic === 'unassigned') {
-      alert('Please select a specific mechanic first');
-      return;
-    }
-
-    // Get filtered data for the selected mechanic
-    const mechanicData = allFetchedData.filter(item => item.mechanic_name === selectedMechanic);
-    
-    if (mechanicData.length === 0) {
-      alert('No data found for the selected mechanic');
-      return;
-    }
-
-    // Get date for message
-    let dateText = '';
-    if (dateType.value === "range" && startDate.value && endDate.value) {
-      if (startDate.value === endDate.value) {
-        dateText = new Date(startDate.value).toLocaleDateString('en-IN');
-      } else {
-        dateText = `${new Date(startDate.value).toLocaleDateString('en-IN')} to ${new Date(endDate.value).toLocaleDateString('en-IN')}`;
-      }
-    } else if (dateInput.value) {
-      dateText = new Date(dateInput.value).toLocaleDateString('en-IN');
-    }
-
-    // Categorize calls
-    const paidCalls = [];
-    const pendingCalls = [];
-    const insuranceCalls = [];
-    const cancelledCalls = [];
-    
-    let totalPendingAmount = 0;
-    let totalCalls = mechanicData.length;
-    let totalCancelledCount = 0;
-
-    mechanicData.forEach(item => {
-      const advance = parseInt(item.advance_payment_amount) || 0;
-      const pendingAmt = parseInt(item.pending_payment_amount) || 0;
-
-      if (item.is_cancelled) {
-        totalCancelledCount++;
-        cancelledCalls.push({
-          car: item.car,
-          problem: item.problem
-        });
-      } else if (item.is_gomechanic_call) {
-        // Insurance calls logic
-        insuranceCalls.push({
-          car: item.car,
-          problem: item.problem,
-          amount: pendingAmt
-        });
-        totalPendingAmount -= pendingAmt
-        // Insurance calls don't add to pending total as they are paid by company
-      } else {
-        // Regular calls
-        if (item.payment_status === "pending") {
-          pendingCalls.push({
-            car: item.car,
-            problem: item.problem,
-            amount: advance
-          });
-          totalPendingAmount += advance;
-        } else {
-          paidCalls.push({
-            car: item.car,
-            problem: item.problem,
-            amount: advance
-          });
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Techzinia - AI-Powered WhatsApp Automation | Automate Customer Support & Sales</title>
+    <meta name="description" content="Automate WhatsApp with AI for customer support, sales & bookings. 24/7 engagement, smart dashboard, boost conversions. Get 2 months FREE CRM access!">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-      }
-    });
 
-    // Build message
-    let message = `*Instant Mechanic - Call Summary*\n\n`;
-    message += `📅 *Date:* ${dateText}\n`;
-    message += `👨‍🔧 *Mechanic:* ${selectedMechanic}\n`;
-    message += `💰 *कुल बकाया:* ₹${totalPendingAmount.toLocaleString()}\n`;
-    message += `📞 *Total Calls:* ${totalCalls}\n`;
-    message += `❌ *Total Cancelled:* ${totalCancelledCount}\n\n`;
+        :root {
+            --primary-color: #25D366;
+            --secondary-color: #128C7E;
+            --accent-color: #34B7F1;
+            --dark-color: #075E54;
+            --text-dark: #2c3e50;
+            --text-light: #7f8c8d;
+            --bg-light: #f8f9fa;
+            --white: #ffffff;
+            --gradient-1: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+            --gradient-2: linear-gradient(135deg, #34B7F1 0%, #25D366 100%);
+            --shadow-light: 0 5px 15px rgba(0,0,0,0.1);
+            --shadow-medium: 0 10px 30px rgba(0,0,0,0.15);
+            --shadow-heavy: 0 20px 60px rgba(0,0,0,0.2);
+        }
 
-    // Paid calls
-    if (paidCalls.length > 0) {
-      message += `*✅ इन कॉल्स का पेमेंट कंपनी के पास आ गया है :*\n`;
-      paidCalls.forEach((call, index) => {
-        message += `${index + 1}. ${call.car}, ${call.problem} - ₹${call.amount} ✅\n`;
-      });
-      message += `\n\n`;
-    }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: var(--text-dark);
+            overflow-x: hidden;
+        }
 
-    // Pending calls
-    if (pendingCalls.length > 0) {
-      message += `*🚨 इन कॉल्स का आपके पास आया है जिसका भुक्तान आपको कंपनी को करना है :*\n`;
-      pendingCalls.forEach((call, index) => {
-        message += `${index + 1}. ${call.car}, ${call.problem} - *बकाया ₹${call.amount}* 💵\n`;
-      });
-      message += `\n\n`;
-    }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
 
-    // Insurance calls
-    if (insuranceCalls.length > 0) {
-      message += `*🔙 इन्शुरन्स कॉल्स, इसका पेमेंट कंपनी आपको करेगी :*\n`;
-      insuranceCalls.forEach((call, index) => {
-        message += `${index + 1}. ${call.car}, ${call.problem} - पेमेंट कंपनी आपको करेगी *₹${call.amount}* 🔙\n`;
-      });
-      message += `\n\n`;
-    }
-
-    // Cancelled calls
-    if (cancelledCalls.length > 0) {
-      message += `*❌ कैंसिल कॉल्स:*\n`;
-      cancelledCalls.forEach((call, index) => {
-        message += `${index + 1}. ${call.car}, ${call.problem} , 00\n`;
-      });
-    }
-
-    // Encode message for WhatsApp URL
-    const encodedMessage = encodeURIComponent(message);
-    const whatsappUrl = `https://wa.me/918393990942?text=${encodedMessage}`;
-    
-    // Open WhatsApp
-    window.open(whatsappUrl, '_blank');
-  };
-
-  // Apply frontend filters to data
-  const applyFrontendFilters = (data) => {
-    let filteredData = [...data];
-    
-    // Apply mechanic filter
-    const selectedMechanic = mechanicFilter.value;
-    if (selectedMechanic === 'unassigned') {
-      filteredData = filteredData.filter(item => !item.mechanic_name);
-    } else if (selectedMechanic && selectedMechanic !== 'unassigned') {
-      filteredData = filteredData.filter(item => item.mechanic_name === selectedMechanic);
-    }
-    
-    // Apply cancellation filter (frontend only)
-    const selectedCancellation = cancellationFilter.value;
-    if (selectedCancellation === 'cancelled') {
-      filteredData = filteredData.filter(item => item.is_cancelled);
-    } else if (selectedCancellation === 'active') {
-      filteredData = filteredData.filter(item => !item.is_cancelled);
-    }
-    // 'all' option shows everything, no additional filtering needed
-    
-    return filteredData;
-  };
-
-  // Update display with filtered data
-  const updateDisplayWithFilteredData = (data) => {
-    const filteredData = applyFrontendFilters(data);
-    
-    // Sort by creation time in descending order (newest first)
-    const sortedData = [...filteredData].sort((a, b) => {
-      const dateA = new Date(a.created_at);
-      const dateB = new Date(b.created_at);
-      return dateB - dateA; // Descending order (newest first)
-    });
-    
-    currentBookingData = [...sortedData];
-    
-    // Clear existing table
-    bookingTableBody.innerHTML = '';
-    
-    let count = 0;
-    let collected = 0;
-    let pending = 0;
-    let cancelled = 0;
-    let notAssigned = 0;
-    
-    sortedData.forEach(item => {
-      count++;
-
-      const advance = parseInt(item.advance_payment_amount) || 0;
-      const pendingAmt = parseInt(item.pending_payment_amount) || 0;
-
-      let paid = 0;
-      let pendingAmount = 0;
-
-      if (item.is_cancelled == true) {
-      if (item.payment_status === "pending") {
-        paid = 0;
-        pendingAmount =  0;
-      } else {
-        paid = advance;
-        pendingAmount = 0;
-      }
-      }else{
-
-      if (item.payment_status === "pending") {
-        paid = 0;
-        pendingAmount = advance;
-      } else {
-        paid = advance;
-        pendingAmount = 0;
-      }}
-
-      // For insurance calls, subtract from total pending as company pays
-      if (item.is_gomechanic_call && !item.is_cancelled) {
-        pendingAmount = 0; // Insurance calls don't contribute to mechanic pending
-      }
-
-      collected += paid;
-      pending += pendingAmount;
-      if (item.is_cancelled) cancelled++;
-      if (!item.is_cancelled && !item.mechanic) notAssigned++;
-
-      const row = `
-        <tr class="hover:bg-gray-50">
-          <td class="p-3">
-            <img src="${item.car_image}" alt="Car" class="w-12 h-8 object-contain rounded-sm" />
-          </td>
-          <td class="p-3 text-gray-600">${formatDateTime(item.created_at)}</td>
-          <td class="p-3">${item.car}</td>
-          <td class="p-3">${item.problem}</td>
-          <td class="p-3">${item.price}</td>
-          <td class="p-3">
-            ${item.customer_mobile ? 
-              `<a href="https://wa.me/91${item.customer_mobile.replace(/^91/, '')}" target="_blank" class="text-blue-600 hover:text-blue-800 hover:underline">
-                ${item.customer_mobile.replace(/^91/, '')}
-              </a>` 
-              : '-'
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
             }
-          </td>
-          <td class="p-3">${item.mechanic_name ?? '-'}</td>
-          <td class="p-3 text-green-600">${formatCurrency(paid)}</td>
-          <td class="p-3 text-yellow-600">${formatCurrency(pendingAmount)}</td>
-          <td class="p-3">${item.agent_name ?? '-'}</td>
-          <td class="p-3 ${item.is_cancelled ? 'text-red-500' : 'text-green-500'} font-bold">
-            ${item.is_cancelled ? 'Yes' : 'No'}
-          </td>
-          <td class="p-3 text-xs">${item.cancellation_reason || '-'}</td>
-          <td class="p-3">
-            <a href="https://instantmechanic.online/booking.html?id=${item.id}" target="_blank" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs">
-              View
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes floatAnimation {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% {
+                box-shadow: 0 0 20px rgba(37, 211, 102, 0.3);
+            }
+            50% {
+                box-shadow: 0 0 30px rgba(37, 211, 102, 0.6);
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .animate-on-scroll {
+            opacity: 0;
+            transition: all 0.6s ease;
+        }
+
+        .animate-on-scroll.animate {
+            opacity: 1;
+            animation: fadeInUp 0.8s ease forwards;
+        }
+
+        /* Header */
+        header {
+            background: var(--gradient-1);
+            padding: 1rem 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow-light);
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--white);
+            text-decoration: none;
+        }
+
+        .cta-header {
+            background: var(--white);
+            color: var(--primary-color);
+            padding: 0.7rem 1.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            animation: pulseGlow 2s infinite;
+        }
+
+        .cta-header:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        /* Hero Section */
+        .hero {
+            background: var(--gradient-1);
+            padding: 120px 0 80px;
+            color: var(--white);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Ccircle cx='9' cy='9' r='9'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;
+            animation: floatAnimation 20s ease-in-out infinite;
+            opacity: 0.1;
+        }
+
+        .hero-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-text h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        .hero-text .subtitle {
+            font-size: 1.3rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        .hero-text p {
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            opacity: 0.8;
+        }
+
+        .hero-visual {
+            position: relative;
+            animation: floatAnimation 6s ease-in-out infinite;
+        }
+
+        .phone-mockup {
+            background: var(--white);
+            border-radius: 30px;
+            padding: 20px;
+            box-shadow: var(--shadow-heavy);
+            max-width: 300px;
+            margin: 0 auto;
+        }
+
+        .whatsapp-ui {
+            background: #e5ddd5;
+            border-radius: 20px;
+            padding: 15px;
+            height: 400px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .chat-header {
+            background: var(--dark-color);
+            color: white;
+            padding: 15px;
+            border-radius: 10px 10px 0 0;
+            margin: -15px -15px 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .chat-bubble {
+            background: var(--primary-color);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 15px 15px 5px 15px;
+            margin: 10px 0;
+            max-width: 80%;
+            margin-left: auto;
+            animation: slideInRight 1s ease;
+        }
+
+        .chat-bubble.user {
+            background: white;
+            color: var(--text-dark);
+            border-radius: 15px 15px 15px 5px;
+            margin-left: 0;
+            margin-right: auto;
+        }
+
+        /* CTA Buttons */
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            background: var(--white);
+            color: var(--primary-color);
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--white);
+            border: 2px solid var(--white);
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .btn-secondary:hover {
+            background: var(--white);
+            color: var(--primary-color);
+            transform: translateY(-3px);
+        }
+
+        /* Features Section */
+        .features {
+            padding: 80px 0;
+            background: var(--bg-light);
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-header h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 1rem;
+        }
+
+        .section-header p {
+            font-size: 1.2rem;
+            color: var(--text-light);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: var(--white);
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: var(--shadow-light);
+            transition: all 0.3s ease;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(37, 211, 102, 0.1), transparent);
+            transition: all 0.5s ease;
+        }
+
+        .feature-card:hover::before {
+            left: 100%;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--gradient-2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+        }
+
+        .feature-card p {
+            color: var(--text-light);
+            line-height: 1.6;
+        }
+
+        /* Dashboard Preview */
+        .dashboard-preview {
+            padding: 80px 0;
+            background: var(--white);
+        }
+
+        .dashboard-mockup {
+            background: var(--bg-light);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: var(--shadow-medium);
+            margin-top: 3rem;
+        }
+
+        .dashboard-header {
+            background: var(--gradient-1);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--white);
+            padding: 1.5rem;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: var(--shadow-light);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .stat-label {
+            color: var(--text-light);
+            margin-top: 0.5rem;
+        }
+
+        /* Industries Section */
+        .industries {
+            padding: 80px 0;
+            background: var(--bg-light);
+        }
+
+        .industries-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 3rem;
+        }
+
+        .industry-card {
+            background: var(--white);
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: var(--shadow-light);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .industry-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .industry-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--gradient-2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        /* Offer Section */
+        .offer {
+            background: var(--gradient-2);
+            color: var(--white);
+            padding: 60px 0;
+            text-align: center;
+            position: relative;
+        }
+
+        .offer-content {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 3rem;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .offer h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .offer-badge {
+            background: #ff4757;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 1rem;
+            animation: pulseGlow 2s infinite;
+        }
+
+        /* Contact Section */
+        .contact {
+            padding: 80px 0;
+            background: var(--white);
+            text-align: center;
+        }
+
+        .whatsapp-button {
+            background: var(--gradient-1);
+            color: white;
+            padding: 1.5rem 3rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-size: 1.2rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 2rem 0;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-medium);
+        }
+
+        .whatsapp-button:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-heavy);
+        }
+
+        /* Footer */
+        footer {
+            background: var(--text-dark);
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .hero-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .hero-text h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero-text .subtitle {
+                font-size: 1.1rem;
+            }
+
+            .cta-buttons {
+                justify-content: center;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .dashboard-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .industries-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .offer-content {
+                padding: 2rem 1rem;
+            }
+
+            .offer h2 {
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 15px;
+            }
+
+            .hero {
+                padding: 100px 0 60px;
+            }
+
+            .hero-text h1 {
+                font-size: 2rem;
+            }
+
+            .btn-primary,
+            .btn-secondary {
+                padding: 0.8rem 1.5rem;
+                font-size: 1rem;
+            }
+
+            .dashboard-stats {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Loading Animation */
+        .loading-dots {
+            display: inline-flex;
+            gap: 3px;
+        }
+
+        .loading-dots span {
+            width: 6px;
+            height: 6px;
+            background: var(--text-light);
+            border-radius: 50%;
+            animation: loadingPulse 1.5s ease-in-out infinite;
+        }
+
+        .loading-dots span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .loading-dots span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes loadingPulse {
+            0%, 80%, 100% {
+                transform: scale(1);
+                opacity: 0.5;
+            }
+            40% {
+                transform: scale(1.2);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <nav class="container">
+            <a href="#" class="logo">📱 Techzinia</a>
+            <a href="https://wa.me/918901339256?text=Hi! I want to know more about Techzinia's AI WhatsApp automation" class="cta-header">
+                📞 Book Free Demo
             </a>
-          </td>
-        </tr>
-      `;
-      bookingTableBody.innerHTML += row;
-    });
+        </nav>
+    </header>
 
-    // Update counters based on filtered data
-    totalBookings.textContent = count;
-    totalCollected.textContent = formatCurrency(collected);
-    totalPending.textContent = formatCurrency(pending);
-    totalCancelled.textContent = cancelled;
-    totalNotAssigned.textContent = notAssigned;
-  };
-  
-  // CSV Export functionality
-  const exportToCSV = () => {
-    if (currentBookingData.length === 0) {
-      alert('No data to export');
-      return;
-    }
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content animate-on-scroll">
+                <div class="hero-text">
+                    <h1>AI-Powered WhatsApp Automation</h1>
+                    <p class="subtitle">Automate Your Customer Support, Sales & Bookings – All on WhatsApp</p>
+                    <p>Engage with customers 24/7, close more sales, and provide instant support using Techzinia's AI-driven WhatsApp assistant. No missed leads. No delayed replies. Just seamless conversations that grow your business.</p>
+                    
+                    <div class="cta-buttons">
+                        <a href="https://wa.me/918901339256?text=Hi! I want to book a free demo of Techzinia" class="btn-primary">
+                            🚀 Get Free Demo
+                        </a>
+                        <a href="#features" class="btn-secondary">
+                            ✨ Learn More
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="hero-visual">
+                    <div class="phone-mockup">
+                        <div class="whatsapp-ui">
+                            <div class="chat-header">
+                                <div style="width: 40px; height: 40px; background: #ddd; border-radius: 50%; display: flex; align-items: center; justify-content: center;">🤖</div>
+                                <div>
+                                    <div style="font-weight: bold;">Techzinia AI</div>
+                                    <div style="font-size: 12px; opacity: 0.8;">Online</div>
+                                </div>
+                            </div>
+                            
+                            <div class="chat-bubble user">Hi, I need help with booking</div>
+                            <div class="chat-bubble">Hello! I'm here to help you with your booking. What service are you looking for?</div>
+                            <div class="chat-bubble user">Car service appointment</div>
+                            <div class="chat-bubble">Perfect! I can schedule that for you. What's your preferred date and time?</div>
+                            <div style="margin-top: 20px; text-align: center; color: #666; font-size: 12px;">
+                                <div class="loading-dots">
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                </div>
+                                <div style="margin-top: 5px;">AI typing...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-    const headers = [
-      'Date & Time',
-      'Car',
-      'Problem',
-      'Price',
-      'Mobile',
-      'Mechanic',
-      'Paid Amount',
-      'Pending Amount',
-      'Agent',
-      'Cancelled',
-      'Cancellation Reason'
-    ];
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="container">
+            <div class="section-header animate-on-scroll">
+                <h2>🚀 Why Choose Techzinia?</h2>
+                <p>Powerful AI automation features that transform your WhatsApp into a sales and support powerhouse</p>
+            </div>
+            
+            <div class="features-grid">
+                <div class="feature-card animate-on-scroll">
+                    <div class="feature-icon">🤖</div>
+                    <h3>AI That Works for You</h3>
+                    <p>Handle queries, bookings, feedback & support automatically with advanced AI that understands context and responds naturally.</p>
+                </div>
+                
+                <div class="feature-card animate-on-scroll">
+                    <div class="feature-icon">📊</div>
+                    <h3>Smart Dashboard</h3>
+                    <p>Manage all conversations, leads & bookings in one intuitive dashboard. Real-time analytics and insights at your fingertips.</p>
+                </div>
+                
+                <div class="feature-card animate-on-scroll">
+                    <div class="feature-icon">🌙</div>
+                    <h3>24/7 Engagement</h3>
+                    <p>Never miss a customer, even after hours. Your AI assistant works around the clock to capture every lead.</p>
+                </div>
+                
+                <div class="feature-card animate-on-scroll">
+                    <div class="feature-icon">📈</div>
+                    <h3>Boost Conversions</h3>
+                    <p>Faster replies = happier customers = more sales. Increase conversion rates by up to 40% with instant responses.</p>
+                </div>
+                
+                <div class="feature-card animate-on-scroll">
+                    <div class="feature-icon">💬</div>
+                    <h3>Click-to-WhatsApp Ads</h3>
+                    <p>Convert ad clicks into instant WhatsApp chats. Seamless integration with Google Ads and Facebook campaigns.</p>
+                </div>
+                
+                <div class="feature-card animate-on-scroll">
+                    <div class="feature-icon">💳</div>
+                    <h3>In-Chat Payments</h3>
+                    <p>Customers can book & pay directly in WhatsApp. Streamlined checkout process that reduces abandonment.</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
-    const csvData = currentBookingData.map(item => {
-      const advance = parseInt(item.advance_payment_amount) || 0;
-      const pendingAmt = parseInt(item.pending_payment_amount) || 0;
+    <!-- Dashboard Preview -->
+    <section class="dashboard-preview">
+        <div class="container">
+            <div class="section-header animate-on-scroll">
+                <h2>Smart Dashboard in Action</h2>
+                <p>See how our intelligent dashboard helps you manage all customer interactions effortlessly</p>
+            </div>
+            
+            <div class="dashboard-mockup animate-on-scroll">
+                <div class="dashboard-header">
+                    <h3>📊 Techzinia Dashboard</h3>
+                    <span>Live Data</span>
+                </div>
+                
+                <div class="dashboard-stats">
+                    <div class="stat-card">
+                        <div class="stat-number">2,847</div>
+                        <div class="stat-label">Active Conversations</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">94%</div>
+                        <div class="stat-label">Response Rate</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">156</div>
+                        <div class="stat-label">Bookings Today</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">₹1.2L</div>
+                        <div class="stat-label">Revenue Generated</div>
+                    </div>
+                </div>
+                
+                <div style="background: white; padding: 1.5rem; border-radius: 15px; box-shadow: var(--shadow-light);">
+                    <h4 style="margin-bottom: 1rem; color: var(--text-dark);">📈 Real-time Analytics</h4>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                        <div style="text-align: center; padding: 1rem; background: var(--bg-light); border-radius: 10px;">
+                            <div style="font-size: 1.2rem; font-weight: bold; color: var(--primary-color);">30%</div>
+                            <div style="font-size: 0.9rem; color: var(--text-light);">More Engagement</div>
+                        </div>
+                        <div style="text-align: center; padding: 1rem; background: var(--bg-light); border-radius: 10px;">
+                            <div style="font-size: 1.2rem; font-weight: bold; color: var(--primary-color);">40%</div>
+                            <div style="font-size: 0.9rem; color: var(--text-light);">Higher Conversions</div>
+                        </div>
+                        <div style="text-align: center; padding: 1rem; background: var(--bg-light); border-radius: 10px;">
+                            <div style="font-size: 1.2rem; font-weight: bold; color: var(--primary-color);">5M+</div>
+                            <div style="font-size: 0.9rem; color: var(--text-light);">Messages/Month</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-      let paid = 0;
-      let pendingAmount = 0;
+    <!-- Industries Section -->
+    <section class="industries">
+        <div class="container">
+            <div class="section-header animate-on-scroll">
+                <h2>🌍 Who Uses Techzinia</h2>
+                <p>Trusted by businesses across industries to automate and grow their WhatsApp presence</p>
+            </div>
+            
+            <div class="industries-grid">
+                <div class="industry-card animate-on-scroll">
+                    <div class="industry-icon">🚗</div>
+                    <div>
+                        <h4>Automobile</h4>
+                        <p>Service reminders, roadside assistance, lead follow-ups</p>
+                    </div>
+                </div>
+                
+                <div class="industry-card animate-on-scroll">
+                    <div class="industry-icon">🛒</div>
+                    <div>
+                        <h4>E-Commerce</h4>
+                        <p>Cart recovery, product catalogs, in-chat checkout</p>
+                    </div>
+                </div>
+                
+                <div class="industry-card animate-on-scroll">
+                    <div class="industry-icon">🏥</div>
+                    <div>
+                        <h4>Healthcare</h4>
+                        <p>Appointment scheduling & patient updates</p>
+                    </div>
+                </div>
+                
+                <div class="industry-card animate-on-scroll">
+                    <div class="industry-icon">🏢</div>
+                    <div>
+                        <h4>Real Estate</h4>
+                        <p>Virtual tours, lead qualification & instant inquiries</p>
+                    </div>
+                </div>
+                
+                <div class="industry-card animate-on-scroll">
+                    <div class="industry-icon">🎓</div>
+                    <div>
+                        <h4>Education</h4>
+                        <p>Student inquiries, course updates, exam notifications</p>
+                    </div>
+                </div>
+                
+                <div class="industry-card animate-on-scroll">
+                    <div class="industry-icon">🔧</div>
+                    <div>
+                        <h4>Service Industry</h4>
+                        <p>Instant quotes & 24/7 support</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-      if (item.is_cancelled == true) {
-      if (item.payment_status === "pending") {
-        paid = 0;
-        pendingAmount =  0;
-      } else {
-        paid = advance;
-        pendingAmount = 0;
-      }
-      }else{
+    <!-- Offer Section -->
+    <section class="offer">
+        <div class="container">
+            <div class="offer-content animate-on-scroll">
+                <div class="offer-badge">⚡ Limited-Time Offer</div>
+                <h2>Get 2 Months FREE Access!</h2>
+                <p style="font-size: 1.2rem; margin-bottom: 2rem; opacity: 0.9;">
+                    Get FREE access to Techzinia's Smart CRM when you sign up today! Manage unlimited leads, track chats, and nurture customers – at no extra cost.
+                </p>
+                <p style="font-size: 1rem; margin-bottom: 2rem;">
+                    <strong>*Offer valid for the first 25 businesses only*</strong>
+                </p>
+                
+                <a href="https://wa.me/918901339256?text=Hi! I want to claim the 2-month FREE CRM offer from Techzinia" class="btn-primary" style="background: var(--white); color: var(--accent-color); font-size: 1.2rem; padding: 1.2rem 2.5rem;">
+                    🎉 Claim FREE Offer Now
+                </a>
+            </div>
+        </div>
+    </section>
 
-      if (item.payment_status === "pending") {
-        paid = 0;
-        pendingAmount =  advance;
-      } else {
-        paid = advance;
-        pendingAmount = 0;
-      }}
+    <!-- Contact Section -->
+    <section class="contact">
+        <div class="container">
+            <div class="animate-on-scroll">
+                <h2 style="font-size: 2.5rem; margin-bottom: 1rem; color: var(--text-dark);">📞 Get Started Today</h2>
+                <p style="font-size: 1.2rem; color: var(--text-light); margin-bottom: 2rem; max-width: 600px; margin-left: auto; margin-right: auto;">
+                    Supercharge your WhatsApp with Techzinia AI. Book a free demo, claim your 2-month free CRM, and start converting conversations into customers.
+                </p>
+                
+                <a href="https://wa.me/918901339256?text=Hi! I want to book a FREE demo of Techzinia's AI WhatsApp automation. Please tell me more!" class="whatsapp-button">
+                    📱 WhatsApp Us: +91 89013 39256
+                </a>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 3rem; max-width: 600px; margin-left: auto; margin-right: auto;">
+                    <div style="text-align: center; padding: 1rem;">
+                        <div style="font-size: 2rem; color: var(--primary-color); margin-bottom: 0.5rem;">✅</div>
+                        <div style="font-weight: 600;">Book a Free Demo</div>
+                    </div>
+                    <div style="text-align: center; padding: 1rem;">
+                        <div style="font-size: 2rem; color: var(--primary-color); margin-bottom: 0.5rem;">🎁</div>
+                        <div style="font-weight: 600;">Claim 2-Month Free CRM</div>
+                    </div>
+                    <div style="text-align: center; padding: 1rem;">
+                        <div style="font-size: 2rem; color: var(--primary-color); margin-bottom: 0.5rem;">🚀</div>
+                        <div style="font-weight: 600;">Start Growing Business</div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 3rem; padding: 2rem; background: var(--bg-light); border-radius: 20px;">
+                    <h3 style="margin-bottom: 1rem;">🤝 End-to-End Support</h3>
+                    <p style="color: var(--text-light);">We don't just give you a tool – we give you success with dedicated onboarding, 24/7 support, and custom solutions for your industry.</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
-      return [
-        new Date(item.created_at).toLocaleString('en-IN'),
-        item.car || '',
-        item.problem || '',
-        item.price || '',
-        item.customer_mobile ? item.customer_mobile.replace(/^91/, '') : '',
-        item.mechanic_name || 'Unassigned',
-        paid,
-        pendingAmount,
-        item.agent_name || '',
-        item.is_cancelled ? 'Yes' : 'No',
-        item.cancellation_reason || ''
-      ];
-    });
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p style="margin-bottom: 1rem;">
+                <strong>Techzinia – Automating WhatsApp. Growing Businesses.</strong>
+            </p>
+            <p style="opacity: 0.8;">
+                © 2025 Techzinia. All Rights Reserved. | 📱 Contact: +91 89013 39256
+            </p>
+        </div>
+    </footer>
 
-    const csvContent = [headers, ...csvData]
-      .map(row => row.map(cell => `"${cell}"`).join(','))
-      .join('\n');
+    <script>
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
 
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    
-    if (link.download !== undefined) {
-      const url = URL.createObjectURL(blob);
-      link.setAttribute('href', url);
-      
-      // Generate filename with current date and filters
-      let filename = 'booking-data';
-      if (dateType.value === "range" && startDate.value && endDate.value) {
-        filename += `_${startDate.value}_to_${endDate.value}`;
-      } else if (dateInput.value) {
-        filename += `_${dateInput.value}`;
-      }
-      if (agentFilter.value) {
-        filename += `_agent-${agentFilter.value}`;
-      }
-      if (mechanicFilter.value) {
-        filename += `_mechanic-${mechanicFilter.value}`;
-      }
-      if (cancellationFilter.value !== 'all') {
-        filename += `_${cancellationFilter.value}`;
-      }
-      filename += '.csv';
-      
-      link.setAttribute('download', filename);
-      link.style.visibility = 'hidden';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
-  };
+        // Animate on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
 
-  // Add event listeners
-  exportCsvBtn.addEventListener('click', exportToCSV);
-  whatsappBtn.addEventListener('click', generateWhatsAppMessage);
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate');
+                }
+            });
+        }, observerOptions);
 
-  // Toggle between single date and date range
-  dateType.addEventListener("change", () => {
-    updateTimeHeader();
-    if (dateType.value === "range") {
-      dateInput.style.display = "none";
-      dateRangeContainer.style.display = "flex";
-      // Set default range to today if not set
-      if (!startDate.value || !endDate.value) {
-        const today = new Date().toISOString().split('T')[0];
-        startDate.value = today;
-        endDate.value = today;
-      }
-      fetchBookings();
-    } else {
-      dateInput.style.display = "block";
-      dateRangeContainer.style.display = "none";
-      fetchBookings();
-    }
-  });
+        // Observe all elements with animate-on-scroll class
+        document.querySelectorAll('.animate-on-scroll').forEach(el => {
+            observer.observe(el);
+        });
 
-  async function fetchBookings(dateParam = null) {
-    bookingTableBody.innerHTML = '';
-    totalBookings.textContent = '0';
-    totalCollected.textContent = '₹0';
-    totalPending.textContent = '₹0';
-    totalCancelled.textContent = '0';
-    totalNotAssigned.textContent = '0';
+        // Chat bubble animation
+        function animateChat() {
+            const bubbles = document.querySelectorAll('.chat-bubble');
+            bubbles.forEach((bubble, index) => {
+                setTimeout(() => {
+                    bubble.style.opacity = '1';
+                    bubble.style.transform = 'translateX(0)';
+                }, index * 800);
+            });
+        }
 
-    const totalCustomers = document.getElementById("totalCustomers");
-    const totalRevenue = document.getElementById("totalRevenue");
-    const totalAdvancePayment = document.getElementById("totalAdvancePayment");
+        // Start chat animation when hero is visible
+        const heroObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    setTimeout(animateChat, 1000);
+                    heroObserver.unobserve(entry.target);
+                }
+            });
+        });
 
-    totalCustomers.textContent = '0';
-    totalRevenue.textContent = '0';
-    totalAdvancePayment.textContent = '0';
+        heroObserver.observe(document.querySelector('.hero'));
 
-    const selectedAgent = agentFilter.value;
-    const selectedMechanic = mechanicFilter.value;
-    
-    const agentParam = selectedAgent ? `&agent=${encodeURIComponent(selectedAgent)}` : '';
-    const mechanicParam = selectedMechanic ? `&mechanic=${encodeURIComponent(selectedMechanic)}` : '';
+        // Add click tracking for demo buttons
+        document.querySelectorAll('a[href*="wa.me"]').forEach(button => {
+            button.addEventListener('click', function() {
+                // You can add analytics tracking here
+                console.log('Demo button clicked');
+            });
+        });
 
-    // Determine date parameters based on date type
-    let dateParams = '';
-    if (dateType.value === "range") {
-      const start = startDate.value;
-      const end = endDate.value;
-      if (start && end) {
-        dateParams = `start_date=${start}&end_date=${end}`;
-      } else {
-        return; // Don't proceed if range dates are not set
-      }
-    } else {
-      const singleDate = dateParam || dateInput.value;
-      if (singleDate) {
-        dateParams = `date=${singleDate}`;
-      } else {
-        return; // Don't proceed if single date is not set
-      }
-    }
+        // Parallax effect for hero background
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const hero = document.querySelector('.hero');
+            const heroBackground = hero.querySelector('::before');
+            
+            if (scrolled < hero.offsetHeight) {
+                hero.style.transform = `translateY(${scrolled * 0.5}px)`;
+            }
+        });
 
-    try {
-      const customerRes = await fetch(`https://ai.instantmechanic.online/bot/api/customer-flow/by-date/?${dateParams}${agentParam}${mechanicParam}`);
-      const customerData = await customerRes.json();
-      totalCustomers.textContent = customerData.total_customers || 0;
-      totalRevenue.textContent = formatCurrency(customerData.total_revenue) || '₹0';
-      totalAdvancePayment.textContent = customerData.payment_done_bookings || 0;
-      totalCollected.textContent = formatCurrency(customerData.payment_collected) || '₹0';
-      totalPending.textContent = formatCurrency(customerData.payment_pending) || '₹0';
-    } catch (err) {
-      totalCustomers.textContent = '0';
-    }
+        // Dynamic stats counter animation
+        function animateCounter(element, target) {
+            const start = 0;
+            const duration = 2000;
+            const startTime = performance.now();
 
-    const url = `https://ai.instantmechanic.online/bot/api/booking/by-date/?${dateParams}${agentParam}${mechanicParam}`;
-    const res = await fetch(url);
-    let data = await res.json();
+            function updateCounter(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const current = Math.floor(progress * target);
+                
+                element.textContent = current.toLocaleString();
+                
+                if (progress < 1) {
+                    requestAnimationFrame(updateCounter);
+                }
+            }
+            
+            requestAnimationFrame(updateCounter);
+        }
 
-    // Update agent filter dropdown
-    const currentSelectedAgent = agentFilter.value; // Remember current selection
-    // Clear existing agent options except the default one
-    while (agentFilter.options.length > 1) {
-      agentFilter.removeChild(agentFilter.lastChild);
-    }
-    
-    const uniqueAgents = [...new Set(data.map(b => b.agent_name).filter(Boolean))];
-    uniqueAgents.forEach(agent => {
-      const option = document.createElement("option");
-      option.value = agent;
-      option.textContent = agent;
-      agentFilter.appendChild(option);
-    });
-    
-    // Restore selection if it still exists in the new list
-    if (currentSelectedAgent && uniqueAgents.includes(currentSelectedAgent)) {
-      agentFilter.value = currentSelectedAgent;
-    }
+        // Animate dashboard stats when visible
+        const statsObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const statNumbers = entry.target.querySelectorAll('.stat-number');
+                    statNumbers.forEach(stat => {
+                        const text = stat.textContent;
+                        const number = parseInt(text.replace(/[^\d]/g, ''));
+                        if (number) {
+                            animateCounter(stat, number);
+                        }
+                    });
+                    statsObserver.unobserve(entry.target);
+                }
+            });
+        });
 
-    // Update mechanic filter dropdown
-    const currentSelectedMechanic = mechanicFilter.value; // Remember current selection
-    // Clear existing mechanic options except the default ones
-    while (mechanicFilter.options.length > 2) {
-      mechanicFilter.removeChild(mechanicFilter.lastChild);
-    }
-    
-    const uniqueMechanics = [...new Set(data.map(b => b.mechanic_name).filter(Boolean))];
-    uniqueMechanics.forEach(mechanic => {
-      const option = document.createElement("option");
-      option.value = mechanic;
-      option.textContent = mechanic;
-      mechanicFilter.appendChild(option);
-    });
-    
-    // Restore selection if it still exists in the new list
-    if (currentSelectedMechanic && (currentSelectedMechanic === 'unassigned' || uniqueMechanics.includes(currentSelectedMechanic))) {
-      mechanicFilter.value = currentSelectedMechanic;
-    }
+        const dashboardStats = document.querySelector('.dashboard-stats');
+        if (dashboardStats) {
+            statsObserver.observe(dashboardStats);
+        }
 
-    // Client-side filtering for mechanic (in case API doesn't support mechanic filter)
-    if (selectedMechanic === 'unassigned') {
-      data = data.filter(item => !item.mechanic_name);
-    } else if (selectedMechanic && selectedMechanic !== 'unassigned') {
-      data = data.filter(item => item.mechanic_name === selectedMechanic);
-    }
-
-    // Store all fetched data for frontend filtering
-    allFetchedData = [...data];
-
-    // Update WhatsApp button visibility
-    updateWhatsAppButtonVisibility();
-
-    // Apply frontend filters and update display
-    updateDisplayWithFilteredData(data);
-  }
-
-  // Default Load
-  const today = new Date().toISOString().split('T')[0];
-  dateInput.value = today;
-  startDate.value = today;
-  endDate.value = today;
-  updateTimeHeader();
-  fetchBookings();
-
-  dateInput.addEventListener("change", () => {
-    fetchBookings();
-  });
-
-  startDate.addEventListener("change", () => {
-    fetchBookings();
-  });
-
-  endDate.addEventListener("change", () => {
-    fetchBookings();
-  });
-
-  // Agent filter change handler
-  agentFilter.addEventListener("change", () => {
-    fetchBookings();
-  });
-
-  // Mechanic filter change handler
-  mechanicFilter.addEventListener("change", () => {
-    updateWhatsAppButtonVisibility();
-    fetchBookings();
-  });
-
-  // Cancellation filter change handler (frontend only)
-  cancellationFilter.addEventListener("change", () => {
-    updateDisplayWithFilteredData(allFetchedData);
-  });
-</script>
-
+        // Preload WhatsApp links for faster loading
+        document.addEventListener('DOMContentLoaded', function() {
+            const whatsappLinks = document.querySelectorAll('a[href*="wa.me"]');
+            whatsappLinks.forEach(link => {
+                const preloadLink = document.createElement('link');
+                preloadLink.rel = 'preload';
+                preloadLink.href = link.href;
+                preloadLink.as = 'document';
+                document.head.appendChild(preloadLink);
+            });
+        });
+    </script>
 </body>
 </html>
