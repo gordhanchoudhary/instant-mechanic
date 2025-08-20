@@ -13,11 +13,9 @@
         
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
+            background-color: #f8fafc;
             color: #1e293b;
-            margin: 0;
-            padding: 0;
+            line-height: 1.6;
         }
         
         .container {
@@ -27,28 +25,22 @@
         }
         
         .header {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            background: white;
+            padding: 20px 30px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             margin-bottom: 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
             gap: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
         }
         
         .header h1 {
-            font-size: 32px;
-            font-weight: 800;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin: 0;
+            font-size: 24px;
+            font-weight: 700;
+            color: #1e293b;
         }
         
         .header-actions {
@@ -57,159 +49,133 @@
         }
         
         .btn {
-            padding: 12px 20px;
+            padding: 8px 16px;
             border: none;
-            border-radius: 12px;
+            border-radius: 6px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             font-size: 14px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
         
-        .btn-primary { 
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-            color: white; 
-        }
-        .btn-success { 
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); 
-            color: white; 
-        }
-        .btn-warning { 
-            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); 
-            color: white; 
-        }
-        .btn-secondary { 
-            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); 
-            color: #374151; 
-        }
+        .btn-primary { background: #3b82f6; color: white; }
+        .btn-success { background: #10b981; color: white; }
         
         .btn:hover { 
-            transform: translateY(-2px); 
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            transform: translateY(-1px); 
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
         }
         
         .filters {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            padding: 25px;
-            border-radius: 20px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             margin-bottom: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
         }
         
         .filters-row {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
             align-items: end;
         }
         
         .filter-group {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 6px;
         }
         
         .filter-group label {
-            font-weight: 700;
+            font-weight: 600;
             color: #374151;
             font-size: 14px;
         }
         
         .filter-input {
-            padding: 12px 16px;
-            border: 2px solid #e5e7eb;
-            border-radius: 12px;
-            transition: all 0.3s ease;
-            background: rgba(255, 255, 255, 0.9);
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            transition: border-color 0.2s;
             font-size: 14px;
         }
         
         .filter-input:focus {
             outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-            background: white;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
         }
         
         .stats {
             display: flex;
-            gap: 20px;
+            gap: 16px;
             margin-bottom: 20px;
             overflow-x: auto;
             padding-bottom: 10px;
         }
         
         .stat-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            padding: 25px;
-            border-radius: 20px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             text-align: center;
-            transition: all 0.3s ease;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            position: relative;
-            overflow: hidden;
-            min-width: 200px;
+            min-width: 160px;
             flex: 1;
-        }
-        
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-        
-        .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+            border: 1px solid #e5e7eb;
         }
         
         .stat-number {
-            font-size: 36px;
-            font-weight: 800;
-            margin-bottom: 8px;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 4px;
+            color: #1e293b;
         }
+        
+        .stat-number.blue { color: #3b82f6; }
+        .stat-number.green { color: #10b981; }
+        .stat-number.orange { color: #f59e0b; }
+        .stat-number.red { color: #ef4444; }
+        .stat-number.purple { color: #8b5cf6; }
+        .stat-number.cyan { color: #06b6d4; }
         
         .stat-label {
             color: #6b7280;
-            font-weight: 600;
-            font-size: 14px;
+            font-weight: 500;
+            font-size: 13px;
         }
         
         .customers-table {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border-radius: 20px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid #e5e7eb;
         }
         
         .table-header {
-            padding: 25px 30px;
-            border-bottom: 2px solid #f1f5f9;
+            padding: 20px 24px;
+            border-bottom: 1px solid #e5e7eb;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: rgba(248, 250, 252, 0.5);
+            background: #f9fafb;
         }
         
         .table-title {
-            font-size: 24px;
-            font-weight: 800;
+            font-size: 18px;
+            font-weight: 700;
             color: #1e293b;
+        }
+        
+        .table-count {
+            color: #6b7280;
+            font-size: 14px;
         }
         
         .table-wrapper {
@@ -222,52 +188,86 @@
         }
         
         th, td {
-            padding: 16px 20px;
+            padding: 12px 16px;
             text-align: left;
             border-bottom: 1px solid #f1f5f9;
+            font-size: 14px;
         }
         
         th {
-            background: rgba(248, 250, 252, 0.8);
-            font-weight: 700;
+            background: #f9fafb;
+            font-weight: 600;
             color: #374151;
-            font-size: 14px;
-            position: sticky;
-            top: 0;
-            z-index: 10;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
         
-        tr:hover {
-            background: rgba(102, 126, 234, 0.05);
-            transform: scale(1.01);
-            transition: all 0.2s ease;
+        tbody tr:hover {
+            background: #f8fafc;
+        }
+        
+        .customer-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        
+        .customer-name {
+            font-weight: 600;
+            color: #1e293b;
+        }
+        
+        .mobile-number {
+            font-family: 'SF Mono', Monaco, monospace;
+            font-weight: 500;
+            color: #3b82f6;
+            font-size: 13px;
+        }
+        
+        .customer-id {
+            font-size: 12px;
+            color: #9ca3af;
+        }
+        
+        .agent-name {
+            font-weight: 600;
+            color: #7c3aed;
         }
         
         .badge {
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
             font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
             display: inline-flex;
             align-items: center;
             gap: 4px;
         }
         
         .badge-success { 
-            background: linear-gradient(135deg, #d1fae5, #a7f3d0); 
+            background: #dcfce7; 
             color: #166534; 
         }
         .badge-warning { 
-            background: linear-gradient(135deg, #fef3c7, #fed7aa); 
+            background: #fef3c7; 
             color: #92400e; 
         }
         .badge-danger { 
-            background: linear-gradient(135deg, #fee2e2, #fecaca); 
+            background: #fee2e2; 
             color: #991b1b; 
         }
         .badge-secondary { 
-            background: linear-gradient(135deg, #f1f5f9, #e2e8f0); 
+            background: #f1f5f9; 
             color: #475569; 
+        }
+        
+        .contact-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
         }
         
         .response-time {
@@ -276,39 +276,86 @@
             gap: 4px;
         }
         
+        .chat-count {
+            background: #eff6ff;
+            color: #1e40af;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            text-align: center;
+            min-width: 24px;
+        }
+        
+        .remarks-cell {
+            max-width: 200px;
+            font-size: 12px;
+        }
+        
+        .remarks-content {
+            background: #fef3c7;
+            padding: 8px;
+            border-radius: 6px;
+            border-left: 3px solid #f59e0b;
+            font-style: italic;
+        }
+        
+        .no-remarks {
+            color: #9ca3af;
+            font-style: italic;
+        }
+        
         .loading {
             text-align: center;
             padding: 60px;
             color: #6b7280;
-            font-size: 18px;
-        }
-        
-        .mobile-number {
-            font-family: 'SF Mono', Monaco, monospace;
-            font-weight: 700;
-            color: #4f46e5;
-        }
-        
-        .agent-name {
-            font-weight: 700;
-            color: #7c3aed;
-            font-size: 15px;
-        }
-        
-        .chat-count {
-            background: linear-gradient(135deg, #eff6ff, #dbeafe);
-            color: #1e40af;
-            padding: 4px 10px;
-            border-radius: 15px;
-            font-size: 12px;
-            font-weight: 700;
+            font-size: 16px;
         }
         
         .no-data {
             text-align: center;
-            padding: 80px 20px;
+            padding: 60px 20px;
             color: #6b7280;
-            font-size: 18px;
+            font-size: 16px;
+        }
+        
+        .created-time {
+            color: #6b7280;
+            font-size: 13px;
+        }
+        
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                align-items: stretch;
+                padding: 16px;
+            }
+            
+            .header h1 {
+                text-align: center;
+                font-size: 20px;
+            }
+            
+            .filters-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats {
+                flex-direction: column;
+            }
+            
+            .container {
+                padding: 10px;
+            }
+            
+            th, td {
+                padding: 8px 6px;
+                font-size: 12px;
+            }
+            
+            .customer-info {
+                min-width: 120px;
+            }
         }
     </style>
 </head>
@@ -379,28 +426,28 @@
         <!-- Stats Cards -->
         <div class="stats" id="statsCards">
             <div class="stat-card">
-                <div class="stat-number" style="color: #3b82f6;" id="totalCustomers">-</div>
-                <div class="stat-label">Total Inactive Customers</div>
+                <div class="stat-number blue" id="totalCustomers">-</div>
+                <div class="stat-label">Total Inactive<br>Customers</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number" style="color: #10b981;" id="withLocation">-</div>
-                <div class="stat-label">With Location</div>
+                <div class="stat-number green" id="withLocation">-</div>
+                <div class="stat-label">With<br>Location</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number" style="color: #f59e0b;" id="contacted">-</div>
+                <div class="stat-number orange" id="contacted">-</div>
                 <div class="stat-label">Contacted</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number" style="color: #ef4444;" id="notContacted">-</div>
-                <div class="stat-label">Not Contacted</div>
+                <div class="stat-number red" id="notContacted">-</div>
+                <div class="stat-label">Not<br>Contacted</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number" style="color: #8b5cf6;" id="nonCarUsers">-</div>
-                <div class="stat-label">Non-Car Users</div>
+                <div class="stat-number purple" id="nonCarUsers">-</div>
+                <div class="stat-label">Non-Car<br>Users</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number" style="color: #06b6d4;" id="avgResponseTime">-</div>
-                <div class="stat-label">Avg Response Time</div>
+                <div class="stat-number cyan" id="avgResponseTime">-</div>
+                <div class="stat-label">Avg Response<br>Time</div>
             </div>
         </div>
 
@@ -408,7 +455,7 @@
         <div class="customers-table">
             <div class="table-header">
                 <h3 class="table-title">Inactive Customers</h3>
-                <div>Total: <span id="filteredCount">0</span> customers</div>
+                <div class="table-count">Total: <span id="filteredCount">0</span> customers</div>
             </div>
             <div class="table-wrapper">
                 <table>
@@ -423,7 +470,7 @@
                             <th>Remarks</th>
                             <th>Chat Count</th>
                             <th>Created At</th>
-                            <th>Actions</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody id="customersTableBody">
@@ -510,12 +557,17 @@
             const notifyTime = new Date(agentNotify.created_at);
             const contactTime = new Date(contact.created_at);
             
-            return Math.floor((contactTime - notifyTime) / 1000); // seconds
+            const seconds = Math.floor((contactTime - notifyTime) / 1000);
+            
+            // If response time is more than 5 minutes (300 seconds), treat as not responded
+            if (seconds > 300) return null;
+            
+            return seconds;
         }
 
         // Format response time
         function formatResponseTime(seconds) {
-            if (seconds === null) return 'N/A';
+            if (seconds === null) return 'Not Responded';
             
             if (seconds < 60) {
                 return `${seconds}s`;
@@ -633,28 +685,28 @@
                 return `
                     <tr>
                         <td>
-                            <div><strong>${customer.name || 'No Name'}</strong></div>
-                            <div class="mobile-number">${customer.mobile}</div>
-                            <div style="font-size: 12px; color: #6b7280;">ID: ${customer.customer_id}</div>
+                            <div class="customer-info">
+                                <div class="customer-name">${customer.name || 'No Name'}</div>
+                                <div class="mobile-number">${customer.mobile}</div>
+                                <div class="customer-id">ID: ${customer.customer_id}</div>
+                            </div>
                         </td>
                         <td>
                             <div class="agent-name">${customer.support_agent || 'Not Assigned'}</div>
                         </td>
                         <td>
-                            <div class="location-badge">
-                                ${customer.location_url 
-                                    ? '<span class="badge badge-success">📍 Has Location</span>' 
-                                    : '<span class="badge badge-secondary">❌ No Location</span>'
-                                }
-                            </div>
+                            ${customer.location_url 
+                                ? '<span class="badge badge-success">📍 Has Location</span>' 
+                                : '<span class="badge badge-secondary">❌ No Location</span>'
+                            }
                         </td>
                         <td>
                             <span class="badge ${customer.is_not_car_user ? 'badge-warning' : 'badge-success'}">
-                                ${customer.is_not_car_user ? '🚶 Non-Car User' : '🚗 Car User'}
+                                ${customer.is_not_car_user ? '🚶 Non-Car' : '🚗 Car User'}
                             </span>
                         </td>
                         <td>
-                            <div style="display: flex; flex-direction: column; gap: 4px;">
+                            <div class="contact-actions">
                                 ${hasWhatsapp ? '<span class="badge badge-success">💬 WhatsApp</span>' : ''}
                                 ${hasCall ? '<span class="badge badge-primary">📞 Call</span>' : ''}
                                 ${hasRemarks ? '<span class="badge badge-warning">📝 Remarks</span>' : ''}
@@ -669,15 +721,15 @@
                             </div>
                         </td>
                         <td>
-                            <div style="max-width: 200px; font-size: 12px; color: #374151;">
+                            <div class="remarks-cell">
                                 ${hasRemarks && remarksText 
-                                    ? `<div style="background: #fef3c7; padding: 8px; border-radius: 6px; border-left: 3px solid #f59e0b;">
-                                         <strong>📝 Agent Remarks:</strong><br>
-                                         <em>"${remarksText}"</em>
+                                    ? `<div class="remarks-content">
+                                         <strong>📝 Remarks:</strong><br>
+                                         "${remarksText}"
                                        </div>` 
                                     : hasRemarks 
-                                        ? '<span class="badge badge-warning">📝 Has Remarks (Empty)</span>'
-                                        : '<span style="color: #9ca3af;">No remarks</span>'
+                                        ? '<span class="badge badge-warning">📝 Has Remarks</span>'
+                                        : '<span class="no-remarks">No remarks</span>'
                                 }
                             </div>
                         </td>
@@ -685,12 +737,12 @@
                             <span class="chat-count">${customer.chat_count}</span>
                         </td>
                         <td>
-                            <div>${new Date(customer.created_at).toLocaleString()}</div>
+                            <div class="created-time">${new Date(customer.created_at).toLocaleDateString()}<br>${new Date(customer.created_at).toLocaleTimeString()}</div>
                         </td>
                         <td>
-                            <button class="btn btn-primary" style="padding: 8px 16px; font-size: 12px;" 
+                            <button class="btn btn-primary" style="padding: 6px 12px; font-size: 12px;" 
                                 onclick="viewChat('${customer.mobile}', '${customer.support_agent || ''}')">
-                                💬 View Chat
+                                💬 View
                             </button>
                         </td>
                     </tr>
@@ -753,53 +805,6 @@
         document.getElementById('carUserFilter').addEventListener('change', applyFilters);
         document.getElementById('contactFilter').addEventListener('change', applyFilters);
         document.getElementById('responseFilter').addEventListener('change', applyFilters);
-
-        // Open mobile popup for chat
-        function openMobilePopup(mobile, agent, customerName) {
-            const popup = document.getElementById('mobilePopup');
-            const overlay = document.getElementById('popupOverlay');
-            const title = document.getElementById('popupTitle');
-            const content = document.getElementById('mobileContent');
-            
-            // Set title
-            title.textContent = `${customerName} - ${mobile}`;
-            
-            // Show popup
-            overlay.classList.add('show');
-            popup.classList.add('show');
-            
-            // Reset content to loading
-            content.innerHTML = `
-                <div class="loading-spinner">
-                    <div class="spinner"></div>
-                    Loading chat...
-                </div>
-            `;
-            
-            // Load chat content
-            const agentParam = agent ? encodeURIComponent(agent) : '';
-            const chatUrl = `https://instantmechanic.online/inactive-cx.html?mobile=${mobile}&agent=${agentParam}`;
-            
-            setTimeout(() => {
-                content.innerHTML = `<iframe src="${chatUrl}" onload="this.style.opacity='1'" style="opacity:0; transition: opacity 0.3s;"></iframe>`;
-            }, 500);
-        }
-        
-        // Close mobile popup
-        function closeMobilePopup() {
-            const popup = document.getElementById('mobilePopup');
-            const overlay = document.getElementById('popupOverlay');
-            
-            overlay.classList.remove('show');
-            popup.classList.remove('show');
-        }
-        
-        // Close popup with Escape key
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                closeMobilePopup();
-            }
-        });
 
         // Initial load
         fetchData();
