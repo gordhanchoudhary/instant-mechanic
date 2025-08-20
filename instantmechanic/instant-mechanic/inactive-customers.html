@@ -450,8 +450,14 @@
         // Fetch data from API
         async function fetchData() {
             try {
+                // Show loading state
+                document.getElementById('customersTableBody').innerHTML = 
+                    '<tr><td colspan="10" class="loading">🔄 Loading data...</td></tr>';
+                
                 const dateValue = document.getElementById('dateFilter').value;
                 const apiUrl = `https://ai.instantmechanic.online/bot/api/inactive-cx-track?date=${dateValue}`;
+                
+                console.log('Fetching data for date:', dateValue);
                 
                 const response = await fetch(apiUrl);
                 if (!response.ok) {
@@ -459,6 +465,8 @@
                 }
                 
                 allCustomers = await response.json();
+                console.log('Fetched customers:', allCustomers.length);
+                
                 updateAgentFilter();
                 applyFilters();
                 updateStats();
@@ -467,7 +475,17 @@
                 document.getElementById('customersTableBody').innerHTML = 
                     `<tr><td colspan="10" style="text-align: center; padding: 40px; color: #ef4444;">
                         ⚠️ Error loading data: ${error.message}
+                        <br><small>Please check the date and try again</small>
                     </td></tr>`;
+                
+                // Reset stats to show error state
+                document.getElementById('totalCustomers').textContent = '-';
+                document.getElementById('withLocation').textContent = '-';
+                document.getElementById('contacted').textContent = '-';
+                document.getElementById('notContacted').textContent = '-';
+                document.getElementById('nonCarUsers').textContent = '-';
+                document.getElementById('avgResponseTime').textContent = '-';
+                document.getElementById('filteredCount').textContent = '0';
             }
         }
 
@@ -526,10 +544,8 @@
             const responseFilter = document.getElementById('responseFilter').value;
 
             filteredCustomers = allCustomers.filter(customer => {
-                // Date filter
-                const customerDate = customer.created_at.split('T')[0];
-                if (dateFilter && customerDate !== dateFilter) return false;
-
+                // Skip date filter here since we're fetching data for specific date from API
+                
                 // Agent filter
                 if (agentFilter && customer.support_agent !== agentFilter) return false;
 
@@ -728,7 +744,10 @@
         }
 
         // Event listeners
-        document.getElementById('dateFilter').addEventListener('change', applyFilters);
+        document.getElementById('dateFilter').addEventListener('change', function() {
+            // When date changes, fetch new data from API
+            fetchData();
+        });
         document.getElementById('agentFilter').addEventListener('change', applyFilters);
         document.getElementById('locationFilter').addEventListener('change', applyFilters);
         document.getElementById('carUserFilter').addEventListener('change', applyFilters);
