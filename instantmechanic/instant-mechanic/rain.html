@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rain Service Control</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #f9f9f9;
+    }
+
+    .container {
+      max-width: 500px;
+      margin: auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 15px;
+    }
+
+    .warning {
+      background: #fff3cd;
+      color: #856404;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 60px;
+      height: 34px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 34px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 26px;
+      width: 26px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: #2196F3;
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(26px);
+    }
+
+    .status {
+      font-weight: bold;
+      margin-left: 10px;
+    }
+
+    .options {
+      margin: 20px 0;
+    }
+
+    .options label {
+      display: block;
+      margin: 8px 0;
+    }
+
+    .price-box {
+      background: #f1f1f1;
+      padding: 15px;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+
+    .price-line {
+      display: flex;
+      justify-content: space-between;
+      margin: 5px 0;
+    }
+
+    .total {
+      font-weight: bold;
+      font-size: 18px;
+      border-top: 1px solid #ccc;
+      margin-top: 10px;
+      padding-top: 10px;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 15px;
+      }
+      .price-line {
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Rain Toggle & Charges</h2>
+
+    <div class="warning">
+      ⚠️ If you turn ON rain mode:  
+      - Normal service base price will be <b>₹1250 + GST</b>  
+      - For <b>major issues</b> or <b>luxury cars</b>, an extra <b>₹200</b> will be charged
+    </div>
+
+    <div style="display:flex;align-items:center;gap:10px;">
+      <label class="switch">
+        <input type="checkbox" id="rainToggle">
+        <span class="slider"></span>
+      </label>
+      <span class="status" id="statusText">Loading...</span>
+    </div>
+
+    <div class="options">
+      <label><input type="checkbox" id="majorIssue"> Major Issue</label>
+      <label><input type="checkbox" id="luxuryCar"> Luxury Car</label>
+    </div>
+
+    <div class="price-box">
+      <div class="price-line"><span>Base Price:</span> <span id="basePrice">₹0</span></div>
+      <div class="price-line"><span>Extra Charges:</span> <span id="extraCharge">₹0</span></div>
+      <div class="price-line"><span>GST (18%):</span> <span id="gstAmount">₹0</span></div>
+      <div class="price-line total"><span>Total:</span> <span id="totalAmount">₹0</span></div>
+    </div>
+  </div>
+
+  <script>
+    const toggle = document.getElementById('rainToggle');
+    const statusText = document.getElementById('statusText');
+    const majorIssue = document.getElementById('majorIssue');
+    const luxuryCar = document.getElementById('luxuryCar');
+
+    const basePriceEl = document.getElementById('basePrice');
+    const extraChargeEl = document.getElementById('extraCharge');
+    const gstAmountEl = document.getElementById('gstAmount');
+    const totalAmountEl = document.getElementById('totalAmount');
+
+    const apiUrl = "https://ai.instantmechanic.online/bot/api/system-constant/1/";
+
+    // Calculate charges
+    function calculateCharges() {
+      let base = toggle.checked ? 1250 : 0;
+      let extra = 0;
+
+      if (majorIssue.checked) extra += 200;
+      if (luxuryCar.checked) extra += 200;
+
+      let gst = Math.round((base + extra) * 0.18);
+      let total = base + extra + gst;
+
+      basePriceEl.textContent = `₹${base}`;
+      extraChargeEl.textContent = `₹${extra}`;
+      gstAmountEl.textContent = `₹${gst}`;
+      totalAmountEl.textContent = `₹${total}`;
+    }
+
+    // Fetch current rain status
+    async function fetchStatus() {
+      try {
+        const res = await fetch(apiUrl);
+        const data = await res.json();
+        toggle.checked = data.raining;
+        statusText.textContent = data.raining ? "Raining ☔" : "Not Raining ☀️";
+        calculateCharges();
+      } catch (error) {
+        statusText.textContent = "Error loading status";
+        console.error(error);
+      }
+    }
+
+    // Update rain status
+    toggle.addEventListener('change', async () => {
+      const raining = toggle.checked;
+      statusText.textContent = "Updating...";
+      calculateCharges();
+
+      try {
+        const res = await fetch(apiUrl, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: 1, raining: raining })
+        });
+
+        if (res.ok) {
+          statusText.textContent = raining ? "Raining ☔" : "Not Raining ☀️";
+        } else {
+          statusText.textContent = "Update failed ❌";
+          toggle.checked = !raining;
+        }
+      } catch (error) {
+        statusText.textContent = "Error updating ❌";
+        toggle.checked = !raining;
+        console.error(error);
+      }
+    });
+
+    // Recalculate on option change
+    majorIssue.addEventListener("change", calculateCharges);
+    luxuryCar.addEventListener("change", calculateCharges);
+
+    // Init
+    fetchStatus();
+  </script>
+</body>
+</html>
