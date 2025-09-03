@@ -365,6 +365,8 @@
             grid-template-columns: repeat(2, 1fr);
             gap: 12px;
             margin-bottom: 20px;
+            max-height: 300px;
+            overflow-y: auto;
         }
 
         .agent-option {
@@ -377,6 +379,7 @@
             font-weight: 500;
             color: #374151;
             background: white;
+            position: relative;
         }
 
         .agent-option:hover {
@@ -390,6 +393,18 @@
             border-color: #667eea;
             background: #667eea;
             color: white;
+        }
+
+        .agent-option.live::after {
+            content: '';
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 8px;
+            height: 8px;
+            background: #10b981;
+            border-radius: 50%;
+            box-shadow: 0 0 0 2px white;
         }
 
         .popup-footer {
@@ -418,6 +433,42 @@
             opacity: 0.5;
             cursor: not-allowed;
             transform: none;
+        }
+
+        /* Loading state for agent grid */
+        .agent-loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            color: #6b7280;
+            font-style: italic;
+        }
+
+        .agent-loading-spinner {
+            width: 24px;
+            height: 24px;
+            border: 2px solid #e5e7eb;
+            border-top: 2px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 12px;
+        }
+
+        .error-state {
+            padding: 20px;
+            text-align: center;
+            color: #991b1b;
+        }
+
+        .retry-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 12px;
         }
 
         @media (max-width: 640px) {
@@ -456,16 +507,11 @@
                 <h2>Select Your Name</h2>
                 <p>Please choose your agent name to continue</p>
             </div>
-            <div class="agent-grid">
-                <div class="agent-option" data-agent="GD">GD</div>
-                <div class="agent-option" data-agent="Harshit">Harshit</div>
-                <div class="agent-option" data-agent="Namira">Namira</div>
-                <div class="agent-option" data-agent="Aqsa">Aqsa</div>
-                <div class="agent-option" data-agent="Mansi">Mansi</div>
-                <div class="agent-option" data-agent="Mehak">Mehak</div>
-                <div class="agent-option" data-agent="Sarb">Sarb</div>
-                <div class="agent-option" data-agent="Anurag">Anurag</div>
-                <div class="agent-option" data-agent="Laksha">Laksha</div>
+            <div class="agent-grid" id="agentGrid">
+                <div class="agent-loading">
+                    <div class="agent-loading-spinner"></div>
+                    Loading agents...
+                </div>
             </div>
             <div class="popup-footer">
                 <button class="confirm-btn" id="confirmAgent" disabled>Confirm</button>
@@ -1008,6 +1054,51 @@
             popup.classList.remove('show');
         }
 
+        // Fetch agents from API
+        async function fetchAgents() {
+            const agentGrid = document.getElementById('agentGrid');
+            
+            try {
+                const response = await fetch('https://ai.instantmechanic.online/bot/api/agent/');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const agents = await response.json();
+                
+                // Filter out deleted agents and sort by name
+                const activeAgents = agents
+                    .filter(agent => !agent.is_deleted)
+                    .sort((a, b) => a.name.localeCompare(b.name));
+                
+                if (activeAgents.length === 0) {
+                    agentGrid.innerHTML = '<div class="error-state">No active agents found</div>';
+                    return;
+                }
+                
+                // Create agent options
+                agentGrid.innerHTML = activeAgents.map(agent => `
+                    <div class="agent-option ${agent.is_live ? 'live' : ''}" data-agent="${agent.name}" data-id="${agent.id}">
+                        ${agent.name}
+                    </div>
+                `).join('');
+                
+                // Initialize agent selection for the loaded agents
+                initializeAgentSelection();
+                
+            } catch (error) {
+                console.error('Error fetching agents:', error);
+                agentGrid.innerHTML = `
+                    <div class="error-state">
+                        Failed to load agents
+                        <br>
+                        <button class="retry-btn" onclick="fetchAgents()">Retry</button>
+                    </div>
+                `;
+            }
+        }
+
         function initializeAgentSelection() {
             const agentOptions = document.querySelectorAll('.agent-option');
             const confirmBtn = document.getElementById('confirmAgent');
@@ -1051,6 +1142,7 @@
             const agentName = localStorage.getItem('agent_name_im');
             if (!agentName) {
                 showAgentPopup();
+                fetchAgents(); // Load agents when showing popup
             }
         }
 
@@ -1254,9 +1346,6 @@
         document.addEventListener('DOMContentLoaded', function() {
             // Check agent name and show popup if needed
             checkAgentName();
-            
-            // Initialize agent selection
-            initializeAgentSelection();
             
             // Initialize dropdown functionality
             initializeProblemDropdown();
