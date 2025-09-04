@@ -115,6 +115,52 @@
       font-weight: 500;
       color: #333;
     }
+
+    /* Security amount specific styles */
+    .security-amount-container {
+      background-color: #f8f9fa;
+      padding: 15px;
+      border-radius: 8px;
+      border: 1px solid #e9ecef;
+      margin: 15px 0;
+    }
+
+    .security-amount-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .security-amount-button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      width: auto;
+      margin: 0;
+    }
+
+    .security-amount-button:hover {
+      background-color: #0056b3;
+    }
+
+    .security-amount-button:disabled {
+      background-color: #6c757d;
+      cursor: not-allowed;
+    }
+
+    /* Pending from mechanic side highlight */
+    .pending-mechanic-highlight {
+      background-color: #fff3cd;
+      padding: 8px;
+      border-radius: 4px;
+      border-left: 4px solid #ffc107;
+      margin: 5px 0;
+    }
   </style>
 </head>
 <body>
@@ -170,6 +216,7 @@
     let assignedMechanicId = null;
     let userChangedMechanic = false;
     let currentExtraPayment = 0;
+    let bookingData = null;
 
     if (localStorage.getItem("agent_login") === "Yes") {
       document.getElementById("loginBox").classList.add("hidden");
@@ -193,14 +240,31 @@
       }
     }
 
+    function calculatePendingFromMechanicSide(data) {
+      const companyPayment = data.company_profit || 0;
+      const advancePayment = data.advance_payment_amount || 0;
+      const paymentStatus = data.payment_status;
+
+      if (paymentStatus === 'pending') {
+        return companyPayment;
+      } else if (paymentStatus === 'partially-paid') {
+        return Math.max(0, companyPayment - advancePayment);
+      } else {
+        return 0;
+      }
+    }
+
     function fetchBooking() {
       if (!bookingId) return alert("Booking ID not provided in URL");
       fetch(`https://ai.instantmechanic.online/bot/api/bookings/${bookingId}/`)
         .then(res => res.json())
         .then(data => {
+          bookingData = data;
           assignedMechanicId = data.mechanic;
           currentExtraPayment = data.mechanic_extra_payment || 0;
-            // Only auto-fill if user has not changed the input manually
+
+          // Calculate pending from mechanic side
+          const pendingFromMechanic = calculatePendingFromMechanicSide(data);
 
           let details = `
             <p><strong>Car:</strong> ${data.car}</p>
@@ -213,11 +277,28 @@
           `;
 
           details += `
+          <p><strong>Total Company Payment:</strong> ₹${data.company_profit || 0}</p>
             <p><strong>Advance Payment:</strong> ₹${data.advance_payment_amount}
               <span class="status-pill ${data.payment_status === 'partially-paid' ? 'status-partial' : 'status-pending'}">
                 ${data.payment_status.replace('_', ' ')}
               </span>
             </p>
+          `;
+
+          // Add the new "Pending from mechanic side" field
+          if (pendingFromMechanic > 0) {
+            details += `
+              <div class="pending-mechanic-highlight">
+                <p><strong>Pending from Mechanic Side:</strong> ₹${pendingFromMechanic}</p>
+              </div>
+            `;
+          } else {
+            details += `
+              <p><strong>Pending from Mechanic Side:</strong> ₹${pendingFromMechanic}</p>
+            `;
+          }
+
+          details += `
             <p><strong>Mechanic Payment:</strong> ₹${data.pending_payment_amount}
               <span class="status-pill ${data.mechanic_payment_status === 'partially-paid' ? 'status-partial' : 'status-pending'}">
                 ${data.mechanic_payment_status.replace('_', ' ')}
@@ -225,6 +306,10 @@
             </p>
             <p><strong>Extra Mechanic Payment:</strong> ₹${data.mechanic_extra_payment || 0}</p>
           `;
+
+          // Add security amount section
+          const securityAmountHtml = createSecurityAmountSection(data);
+          details += securityAmountHtml;
 
           document.getElementById("bookingDetails").innerHTML = details;
           
@@ -237,6 +322,58 @@
           
           fetchMechanics();
           fetchChat();
+        });
+    }
+
+    function createSecurityAmountSection(data) {
+      if (data.advance_payment_amount > 200) {
+        // Check if payment status is partially-paid
+        if (data.payment_status === 'partially-paid') {
+          return `
+            <div class="security-amount-container">
+              <div class="security-amount-row">
+                <span><strong>Security Amount:</strong> : ₹${data.advance_payment_amount}</span>
+              </div>
+              <small style="color: #ff6b6b;">Cannot update security amount - payment is partially paid</small>
+            </div>
+          `;
+        } else {
+          return `
+            <div class="security-amount-container">
+              <div class="security-amount-row">
+                <span><strong>Security Amount:</strong>  ₹${data.advance_payment_amount}</span>
+                <button class="security-amount-button" onclick="updateSecurityAmount()">Set to ₹199</button>
+              </div>
+              <small style="color: #666;">Click button to update security amount to ₹199</small>
+            </div>
+          `;
+        }
+      } else {
+        return `
+        `;
+      }
+    }
+
+    function updateSecurityAmount() {
+      const agentName = localStorage.getItem("agent_name");
+      
+      const updateData = {
+        agent: agentName,
+        advance_payment_amount: 199
+      };
+
+      fetch(`https://ai.instantmechanic.online/bot/api/booking/security-update/${bookingId}/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updateData)
+      })
+        .then(res => res.json())
+        .then(data => {
+          alert("Security amount updated to ₹199 successfully.");
+          fetchBooking(); // Refresh the booking details
+        })
+        .catch(error => {
+          alert("Error updating security amount: " + error.message);
         });
     }
 
