@@ -389,6 +389,7 @@
     sortedData.forEach(item => {
       count++;
 
+      const company_profit = parseInt(item.company_profit) || 0;
       const advance = parseInt(item.advance_payment_amount) || 0;
       const pendingAmt = parseInt(item.pending_payment_amount) || 0;
 
@@ -410,7 +411,7 @@
         pendingAmount = advance;
       } else {
         paid = advance;
-        pendingAmount = 0;
+        pendingAmount = company_profit - advance;
       }}
 
       // For insurance calls, subtract from total pending as company pays
@@ -490,6 +491,7 @@
     const csvData = currentBookingData.map(item => {
       const advance = parseInt(item.advance_payment_amount) || 0;
       const pendingAmt = parseInt(item.pending_payment_amount) || 0;
+      const company_profit = parseInt(item.company_profit) || 0;
 
       let paid = 0;
       let pendingAmount = 0;
@@ -509,7 +511,7 @@
         pendingAmount =  advance;
       } else {
         paid = advance;
-        pendingAmount = 0;
+        pendingAmount = company_profit - advance;
       }}
 
       return [
