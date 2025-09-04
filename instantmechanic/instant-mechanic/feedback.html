@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Instant Mechanic Feedback</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Segoe UI", sans-serif;
+      background: linear-gradient(135deg, #004aad, #009ffd);
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      background: #fff;
+      color: #333;
+      border-radius: 20px;
+      padding: 30px;
+      max-width: 400px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+      position: relative;
+      overflow: hidden;
+    }
+
+    h1 {
+      font-size: 1.6rem;
+      margin-bottom: 10px;
+    }
+
+    p {
+      margin-bottom: 20px;
+      font-size: 0.95rem;
+      color: #666;
+    }
+
+    .stars {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 20px;
+      cursor: pointer;
+    }
+
+    .star {
+      font-size: 2rem;
+      color: #ccc;
+      transition: color 0.2s;
+    }
+
+    .star.active {
+      color: #f4b400;
+    }
+
+    textarea {
+      width: 100%;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      resize: none;
+      margin-bottom: 20px;
+      font-size: 0.9rem;
+    }
+
+    button {
+      background: #004aad;
+      color: #fff;
+      border: none;
+      border-radius: 50px;
+      padding: 12px 25px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background: #00347a;
+    }
+
+    .car {
+    position: absolute;
+    bottom: -20px;
+    left: -120px;
+    width: 80px;
+    animation: drive 6s linear infinite;
+    }
+
+    @keyframes drive {
+    0%   { left: -120px; }
+    100% { left: 100%; }
+    }
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Instant Mechanic</h1>
+    <p>Your roadside assistance partner in Delhi NCR 🚗</p>
+
+    <div class="stars" id="starRating">
+      <span class="star" data-value="1">&#9733;</span>
+      <span class="star" data-value="2">&#9733;</span>
+      <span class="star" data-value="3">&#9733;</span>
+      <span class="star" data-value="4">&#9733;</span>
+      <span class="star" data-value="5">&#9733;</span>
+    </div>
+
+    <textarea id="feedbackMessage" rows="4" placeholder="Write your feedback..."></textarea>
+
+    <button onclick="submitFeedback()">Submit</button>
+
+    <img src="https://cdn-icons-png.flaticon.com/512/3085/3085336.png" alt="Car" class="car">
+  </div>
+
+  <script>
+    let selectedRating = 0;
+    const stars = document.querySelectorAll(".star");
+
+    // ✅ Get booking id from URL query
+    const urlParams = new URLSearchParams(window.location.search);
+    const bookingId = urlParams.get("booking");
+
+    if (!bookingId) {
+      alert("Booking ID is missing in URL (e.g. ?booking=912)");
+    }
+
+    // Hover effect with JS only
+    stars.forEach(star => {
+      star.addEventListener("mouseover", () => {
+        const val = parseInt(star.dataset.value);
+        highlightStars(val);
+      });
+
+      star.addEventListener("mouseout", () => {
+        highlightStars(selectedRating);
+      });
+
+      star.addEventListener("click", async () => {
+        selectedRating = parseInt(star.dataset.value);
+        highlightStars(selectedRating);
+
+        if (selectedRating === 5) {
+          // Auto submit API and redirect
+          try {
+            await fetch("https://ai.instantmechanic.online/bot/api/submit_feedback", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({
+                booking: bookingId,
+                rating: 5,
+                message: ""
+              })
+            });
+          } catch (error) {
+            console.error("Feedback API error:", error);
+          }
+
+          setTimeout(() => {
+            window.location.href = "https://g.page/r/CSFQzkaatJAAEB0/review";
+          }, 800);
+        }
+      });
+    });
+
+    function highlightStars(rating) {
+      stars.forEach(star => {
+        star.classList.toggle("active", parseInt(star.dataset.value) <= rating);
+      });
+    }
+
+    async function submitFeedback() {
+      if (selectedRating === 0) {
+        alert("Please select a star rating.");
+        return;
+      }
+
+      if (selectedRating === 5) {
+        alert("You already submitted a 5-star review. Redirecting...");
+        return;
+      }
+
+      const message = document.getElementById("feedbackMessage").value.trim();
+      if (!message) {
+        alert("Please enter your feedback.");
+        return;
+      }
+
+      try {
+        const response = await fetch("https://ai.instantmechanic.online/bot/api/submit_feedback", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            booking: bookingId,
+            rating: selectedRating,
+            message: message
+          })
+        });
+
+        if (response.ok) {
+          alert("Thank you for your feedback!");
+          document.getElementById("feedbackMessage").value = "";
+          selectedRating = 0;
+          highlightStars(0);
+        } else {
+          alert("Error submitting feedback. Please try again.");
+        }
+      } catch (error) {
+        alert("Something went wrong. Please try again later.");
+      }
+    }
+  </script>
+</body>
+</html>
