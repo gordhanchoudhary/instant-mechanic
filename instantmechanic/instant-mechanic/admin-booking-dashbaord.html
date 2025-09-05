@@ -243,6 +243,7 @@
 
     // Categorize calls
     const paidCalls = [];
+    const halfPaidCalls = [];
     const pendingCalls = [];
     const insuranceCalls = [];
     const cancelledCalls = [];
@@ -252,6 +253,8 @@
     let totalCancelledCount = 0;
 
     mechanicData.forEach(item => {
+      const company_profit = parseInt(item.company_profit) || 0;
+
       const advance = parseInt(item.advance_payment_amount) || 0;
       const pendingAmt = parseInt(item.pending_payment_amount) || 0;
 
@@ -276,15 +279,25 @@
           pendingCalls.push({
             car: item.car,
             problem: item.problem,
-            amount: advance
+            amount: company_profit
           });
-          totalPendingAmount += advance;
-        } else {
+          totalPendingAmount += company_profit;
+        }else if (item.advance_payment_amount !== item.company_profit) {
+  halfPaidCalls.push({
+    car: item.car,
+    problem: item.problem,
+    amount: company_profit - advance,
+    reviced_amount: advance
+  });
+  totalPendingAmount += company_profit - advance;
+}
+         else {
           paidCalls.push({
             car: item.car,
             problem: item.problem,
             amount: advance
           });
+          totalPendingAmount += company_profit - advance;
         }
       }
     });
@@ -299,12 +312,23 @@
 
     // Paid calls
     if (paidCalls.length > 0) {
-      message += `*✅ इन कॉल्स का पेमेंट कंपनी के पास आ गया है :*\n`;
+      message += `*✅ इन कॉल्स का पूरा पेमेंट कंपनी के पास आ गया है :*\n`;
       paidCalls.forEach((call, index) => {
         message += `${index + 1}. ${call.car}-----${call.problem} - ₹${call.amount} ✅\n`;
       });
       message += `\n\n`;
     }
+
+        // Paid calls
+    if (halfPaidCalls.length > 0) {
+      message += `*✅ इन कॉल्स का कुछ पेमेंट कंपनी के पास आ गया है कुछ भुक्तान आपको कंपनी को करना है:*\n`;
+      halfPaidCalls.forEach((call, index) => {
+        message += `${index + 1}. ${call.car}-----${call.problem} - ₹${call.reviced_amount} ✅- *बकाया ₹${call.amount}*\n`;
+      });
+      message += `\n\n`;
+    }
+
+
 
     // Pending calls
     if (pendingCalls.length > 0) {
