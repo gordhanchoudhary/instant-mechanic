@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instant Mechanic - Towing Service</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 10px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #FF6B6B, #4ECDC4);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            opacity: 0.9;
+        }
+
+        .customer-info {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .customer-card {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .customer-avatar {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .customer-details {
+            flex: 1;
+        }
+
+        .customer-name {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .customer-phone {
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            min-height: 600px;
+        }
+
+        .map-container {
+            position: relative;
+        }
+
+        #map {
+            width: 100%;
+            height: 600px;
+        }
+
+        .map-controls {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            z-index: 1000;
+        }
+
+        .search-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .search-box {
+            flex: 1;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 25px;
+            font-size: 14px;
+            background: white;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: #4ECDC4;
+        }
+
+        .mode-toggle {
+            display: flex;
+            background: white;
+            border-radius: 25px;
+            padding: 5px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .mode-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .mode-btn.active {
+            background: #4ECDC4;
+            color: white;
+        }
+
+        .mode-btn:not(.active) {
+            background: transparent;
+            color: #666;
+        }
+
+        .sidebar {
+            padding: 25px;
+            background: #f8f9fa;
+        }
+
+        .location-section {
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .location-card {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #ddd;
+        }
+
+        .location-card.pickup {
+            border-left-color: #FF6B6B;
+        }
+
+        .location-card.drop {
+            border-left-color: #4ECDC4;
+        }
+
+        .location-address {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .location-placeholder {
+            color: #999;
+            font-style: italic;
+        }
+
+        .edit-btn {
+            background: #f1f3f4;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 10px;
+            font-size: 12px;
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .edit-btn:hover {
+            background: #e8eaed;
+        }
+
+        .distance-info {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .distance-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #4ECDC4;
+            margin-bottom: 5px;
+        }
+
+        .distance-label {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .submit-section {
+            margin-top: 30px;
+        }
+
+        .submit-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #FF6B6B, #4ECDC4);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f1f3f4;
+            border-top: 4px solid #4ECDC4;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            background: #fff5f5;
+            color: #e53e3e;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px;
+            border: 1px solid #feb2b2;
+        }
+
+        .instructions {
+            background: #e6fffa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #81e6d9;
+        }
+
+        .instructions h4 {
+            color: #2c7a7b;
+            margin-bottom: 8px;
+        }
+
+        .instructions p {
+            color: #2c7a7b;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                order: -1;
+            }
+
+            #map {
+                height: 400px;
+            }
+
+            .customer-card {
+                justify-content: center;
+                text-align: center;
+            }
+
+            .search-container {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚗 Instant Mechanic</h1>
+            <p>Towing Service Location Selection</p>
+        </div>
+
+        <div id="loading" class="loading">
+            <div class="loading-spinner"></div>
+            <span>Loading customer details...</span>
+        </div>
+
+        <div id="error" class="error" style="display: none;"></div>
+
+        <div id="customer-info" class="customer-info" style="display: none;">
+            <div class="customer-card">
+                <div class="customer-avatar" id="customer-avatar">?</div>
+                <div class="customer-details">
+                    <div class="customer-name" id="customer-name">Loading...</div>
+                    <div class="customer-phone" id="customer-phone">
+                        <span>📞</span>
+                        <span>Loading...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="main-content" class="main-content" style="display: none;">
+            <div class="map-container">
+                <div class="map-controls">
+                    <div class="search-container">
+                        <input type="text" id="search-box" class="search-box" placeholder="Search for locations...">
+                        <div class="mode-toggle">
+                            <button class="mode-btn active" data-mode="pickup">Set Pickup</button>
+                            <button class="mode-btn" data-mode="drop">Set Drop</button>
+                        </div>
+                    </div>
+                </div>
+                <div id="map"></div>
+            </div>
+
+            <div class="sidebar">
+                <div class="instructions">
+                    <h4>📍 How to use:</h4>
+                    <p>1. Toggle between "Set Pickup" and "Set Drop" modes<br>
+                    2. Click on the map or search to set locations<br>
+                    3. Distance will be calculated automatically</p>
+                </div>
+
+                <div class="location-section">
+                    <div class="section-title">
+                        <span>🚗</span>
+                        Pickup Location
+                    </div>
+                    <div class="location-card pickup">
+                        <div id="pickup-address" class="location-address location-placeholder">
+                            Click on map to set pickup location
+                        </div>
+                        <button class="edit-btn" onclick="editPickupLocation()">
+                            <span>✏️</span> Edit
+                        </button>
+                    </div>
+                </div>
+
+                <div class="location-section">
+                    <div class="section-title">
+                        <span>🎯</span>
+                        Drop Location
+                    </div>
+                    <div class="location-card drop">
+                        <div id="drop-address" class="location-address location-placeholder">
+                            Click on map to set drop location
+                        </div>
+                        <button class="edit-btn" onclick="editDropLocation()">
+                            <span>✏️</span> Edit
+                        </button>
+                    </div>
+                </div>
+
+                <div class="location-section">
+                    <div class="section-title">
+                        <span>📏</span>
+                        Distance
+                    </div>
+                    <div class="distance-info">
+                        <div id="distance-value" class="distance-value">--</div>
+                        <div class="distance-label">Kilometers</div>
+                    </div>
+                </div>
+
+                <div class="submit-section">
+                    <button id="submit-btn" class="submit-btn" onclick="submitTowingRequest()" disabled>
+                        Submit Towing Request
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let map;
+        let pickupMarker;
+        let dropMarker;
+        let directionsService;
+        let directionsRenderer;
+        let pickupLocation = null;
+        let dropLocation = null;
+        let currentMode = 'pickup';
+        let customerData = null;
+        let searchBox;
+
+        // Get mobile number from URL params
+        function getMobileFromParams() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('mobile') || '918882786969'; // fallback for demo
+        }
+
+        // Initialize the application
+        async function initApp() {
+            try {
+                await loadCustomerData();
+                await initMap();
+                setupEventListeners();
+            } catch (error) {
+                showError('Failed to initialize application: ' + error.message);
+            }
+        }
+
+        // Load customer data from API
+        async function loadCustomerData() {
+            const mobile = getMobileFromParams();
+            
+            try {
+                const response = await fetch(`https://ai.instantmechanic.online/bot/customer_chats/?mobile=${mobile}`, {
+                    headers: {
+                        'Accept': '*/*',
+                        'Accept-Language': 'en-US,en;q=0.9',
+                        'Origin': 'https://instantmechanic.online',
+                        'Referer': 'https://instantmechanic.online/',
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API Error: ${response.status}`);
+                }
+
+                const result = await response.json();
+                
+                if (result.status === 'success' && result.data && result.data.length > 0) {
+                    customerData = result.data[0];
+                    displayCustomerInfo();
+                    
+                    // Set pickup location from customer data if available
+                    if (customerData.location) {
+                        await setPickupFromUrl(customerData.location);
+                    }
+                } else {
+                    throw new Error('No customer data found');
+                }
+                
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('customer-info').style.display = 'block';
+                document.getElementById('main-content').style.display = 'grid';
+                
+            } catch (error) {
+                console.error('Error loading customer data:', error);
+                showError('Failed to load customer data. Please check the mobile number.');
+            }
+        }
+
+        // Display customer information
+        function displayCustomerInfo() {
+            if (!customerData) return;
+
+            const nameElement = document.getElementById('customer-name');
+            const phoneElement = document.getElementById('customer-phone');
+            const avatarElement = document.getElementById('customer-avatar');
+
+            nameElement.textContent = customerData.name || 'Unknown Customer';
+            phoneElement.innerHTML = `<span>📞</span><span>${customerData.mobile || 'N/A'}</span>`;
+            
+            // Set avatar initial
+            const initial = customerData.name ? customerData.name.charAt(0).toUpperCase() : '?';
+            avatarElement.textContent = initial;
+        }
+
+        // Set pickup location from Google Maps URL
+        async function setPickupFromUrl(locationUrl) {
+            try {
+                const match = locationUrl.match(/q=(-?\d+\.?\d*),(-?\d+\.?\d*)/);
+                if (match) {
+                    const lat = parseFloat(match[1]);
+                    const lng = parseFloat(match[2]);
+                    
+                    pickupLocation = { lat, lng };
+                    
+                    if (map) {
+                        setPickupMarker(pickupLocation);
+                        await updatePickupAddress(pickupLocation);
+                        map.setCenter(pickupLocation);
+                        map.setZoom(15);
+                    }
+                }
+            } catch (error) {
+                console.error('Error parsing location URL:', error);
+            }
+        }
+
+        // Initialize Google Maps
+        async function initMap() {
+            // Default center (Delhi)
+            const defaultCenter = { lat: 28.6139, lng: 77.2090 };
+            
+            map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 12,
+                center: pickupLocation || defaultCenter,
+                mapTypeControl: false,
+                streetViewControl: false,
+                fullscreenControl: false,
+            });
+
+            // Initialize services
+            directionsService = new google.maps.DirectionsService();
+            directionsRenderer = new google.maps.DirectionsRenderer({
+                suppressMarkers: true,
+                polylineOptions: {
+                    strokeColor: '#4ECDC4',
+                    strokeWeight: 4,
+                }
+            });
+            directionsRenderer.setMap(map);
+
+            // Initialize search box
+            const searchInput = document.getElementById('search-box');
+            searchBox = new google.maps.places.SearchBox(searchInput);
+
+            // Set up search box listener
+            searchBox.addListener('places_changed', handlePlacesChanged);
+
+            // Set up map click listener
+            map.addListener('click', handleMapClick);
+
+            // Initialize markers if pickup location exists
+            if (pickupLocation) {
+                setPickupMarker(pickupLocation);
+                await updatePickupAddress(pickupLocation);
+            }
+        }
+
+        // Handle places search
+        function handlePlacesChanged() {
+            const places = searchBox.getPlaces();
+            if (places.length === 0) return;
+
+            const place = places[0];
+            const location = {
+                lat: place.geometry.location.lat(),
+                lng: place.geometry.location.lng()
+            };
+
+            if (currentMode === 'pickup') {
+                setPickupLocation(location);
+            } else {
+                setDropLocation(location);
+            }
+
+            map.setCenter(location);
+            map.setZoom(15);
+        }
+
+        // Handle map clicks
+        function handleMapClick(event) {
+            const location = {
+                lat: event.latLng.lat(),
+                lng: event.latLng.lng()
+            };
+
+            if (currentMode === 'pickup') {
+                setPickupLocation(location);
+            } else {
+                setDropLocation(location);
+            }
+        }
+
+        // Set pickup location
+        async function setPickupLocation(location) {
+            pickupLocation = location;
+            setPickupMarker(location);
+            await updatePickupAddress(location);
+            calculateDistance();
+        }
+
+        // Set drop location
+        async function setDropLocation(location) {
+            dropLocation = location;
+            setDropMarker(location);
+            await updateDropAddress(location);
+            calculateDistance();
+        }
+
+        // Set pickup marker
+        function setPickupMarker(location) {
+            if (pickupMarker) {
+                pickupMarker.setMap(null);
+            }
+            
+            pickupMarker = new google.maps.Marker({
+                position: location,
+                map: map,
+                title: 'Pickup Location',
+                icon: {
+                    path: google.maps.SymbolPath.CIRCLE,
+                    fillColor: '#FF6B6B',
+                    fillOpacity: 1,
+                    strokeColor: '#fff',
+                    strokeWeight: 3,
+                    scale: 12
+                }
+            });
+        }
+
+        // Set drop marker
+        function setDropMarker(location) {
+            if (dropMarker) {
+                dropMarker.setMap(null);
+            }
+            
+            dropMarker = new google.maps.Marker({
+                position: location,
+                map: map,
+                title: 'Drop Location',
+                icon: {
+                    path: google.maps.SymbolPath.CIRCLE,
+                    fillColor: '#4ECDC4',
+                    fillOpacity: 1,
+                    strokeColor: '#fff',
+                    strokeWeight: 3,
+                    scale: 12
+                }
+            });
+        }
+
+        // Update pickup address
+        async function updatePickupAddress(location) {
+            try {
+                const geocoder = new google.maps.Geocoder();
+                const response = await new Promise((resolve, reject) => {
+                    geocoder.geocode({ location }, (results, status) => {
+                        if (status === 'OK') resolve(results);
+                        else reject(new Error(status));
+                    });
+                });
+
+                if (response && response[0]) {
+                    const address = response[0].formatted_address;
+                    document.getElementById('pickup-address').textContent = address;
+                    document.getElementById('pickup-address').classList.remove('location-placeholder');
+                }
+            } catch (error) {
+                console.error('Error getting pickup address:', error);
+                document.getElementById('pickup-address').textContent = `${location.lat.toFixed(6)}, ${location.lng.toFixed(6)}`;
+            }
+        }
+
+        // Update drop address
+        async function updateDropAddress(location) {
+            try {
+                const geocoder = new google.maps.Geocoder();
+                const response = await new Promise((resolve, reject) => {
+                    geocoder.geocode({ location }, (results, status) => {
+                        if (status === 'OK') resolve(results);
+                        else reject(new Error(status));
+                    });
+                });
+
+                if (response && response[0]) {
+                    const address = response[0].formatted_address;
+                    document.getElementById('drop-address').textContent = address;
+                    document.getElementById('drop-address').classList.remove('location-placeholder');
+                }
+            } catch (error) {
+                console.error('Error getting drop address:', error);
+                document.getElementById('drop-address').textContent = `${location.lat.toFixed(6)}, ${location.lng.toFixed(6)}`;
+            }
+        }
+
+        // Calculate distance between pickup and drop
+        async function calculateDistance() {
+            if (!pickupLocation || !dropLocation) {
+                updateDistanceDisplay('--');
+                document.getElementById('submit-btn').disabled = true;
+                return;
+            }
+
+            try {
+                const response = await new Promise((resolve, reject) => {
+                    directionsService.route({
+                        origin: pickupLocation,
+                        destination: dropLocation,
+                        travelMode: google.maps.TravelMode.DRIVING
+                    }, (result, status) => {
+                        if (status === 'OK') resolve(result);
+                        else reject(new Error(status));
+                    });
+                });
+
+                if (response && response.routes && response.routes[0]) {
+                    const route = response.routes[0];
+                    const distance = route.legs[0].distance;
+                    const distanceKm = (distance.value / 1000).toFixed(1);
+                    
+                    updateDistanceDisplay(distanceKm);
+                    directionsRenderer.setDirections(response);
+                    document.getElementById('submit-btn').disabled = false;
+                }
+            } catch (error) {
+                console.error('Error calculating distance:', error);
+                updateDistanceDisplay('Error');
+                document.getElementById('submit-btn').disabled = true;
+            }
+        }
+
+        // Update distance display
+        function updateDistanceDisplay(distance) {
+            document.getElementById('distance-value').textContent = distance;
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Mode toggle buttons
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+                    e.target.classList.add('active');
+                    currentMode = e.target.dataset.mode;
+                    
+                    // Update search placeholder
+                    const searchBox = document.getElementById('search-box');
+                    searchBox.placeholder = currentMode === 'pickup' 
+                        ? 'Search for pickup location...' 
+                        : 'Search for drop location...';
+                });
+            });
+        }
+
+        // Edit pickup location
+        function editPickupLocation() {
+            currentMode = 'pickup';
+            document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector('[data-mode="pickup"]').classList.add('active');
+            document.getElementById('search-box').placeholder = 'Search for pickup location...';
+        }
+
+        // Edit drop location
+        function editDropLocation() {
+            currentMode = 'drop';
+            document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector('[data-mode="drop"]').classList.add('active');
+            document.getElementById('search-box').placeholder = 'Search for drop location...';
+        }
+
+        // Submit towing request
+        async function submitTowingRequest() {
+            if (!pickupLocation || !dropLocation) {
+                alert('Please set both pickup and drop locations');
+                return;
+            }
+
+            const submitBtn = document.getElementById('submit-btn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Submitting...';
+
+            try {
+                const distance = parseFloat(document.getElementById('distance-value').textContent);
+                
+                const requestData = {
+                    mobile: customerData.mobile,
+                    pickup: {
+                        lat: pickupLocation.lat,
+                        lng: pickupLocation.lng,
+                        address: document.getElementById('pickup-address').textContent
+                    },
+                    drop: {
+                        lat: dropLocation.lat,
+                        lng: dropLocation.lng,
+                        address: document.getElementById('drop-address').textContent
+                    },
+                    distance_km: distance
+                };
+
+                console.log('Submitting towing request:', requestData);
+                
+                // Here you would make the API call to submit the towing request
+                // For now, we'll simulate success
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                alert(`Towing request submitted successfully!\n\nPickup: ${requestData.pickup.address}\nDrop: ${requestData.drop.address}\nDistance: ${distance} km`);
+                
+            } catch (error) {
+                console.error('Error submitting towing request:', error);
+                alert('Failed to submit towing request. Please try again.');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit Towing Request';
+            }
+        }
+
+        // Show error message
+        function showError(message) {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('error').textContent = message;
+            document.getElementById('error').style.display = 'block';
+        }
+
+        // Initialize app when page loads
+        window.addEventListener('load', initApp);
+    </script>
+
+    <!-- Google Maps API -->
+    <script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAEFSrFGkBtDgc962tBB4WVlSssDhiZkUI&libraries=places&callback=initApp">
+    </script>
+</body>
+</html>
