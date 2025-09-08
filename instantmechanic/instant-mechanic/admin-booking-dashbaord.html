@@ -71,6 +71,20 @@
           <option value="unassigned">Unassigned</option>
         </select>
         
+        <!-- Booking Type Filter -->
+        <select id="bookingTypeFilter" class="border rounded px-4 py-2 text-sm shadow">
+          <option value="all">All Bookings</option>
+          <option value="manual">Manual Booking</option>
+          <option value="ai">AI Booking</option>
+        </select>
+        
+        <!-- GoMechanic Filter -->
+        <select id="gomechanicFilter" class="border rounded px-4 py-2 text-sm shadow">
+          <option value="all">All Calls</option>
+          <option value="gomechanic">GoMechanic Calls</option>
+          <option value="regular">Regular Calls</option>
+        </select>
+        
         <!-- Cancellation Filter (Frontend Only) -->
         <select id="cancellationFilter" class="border rounded px-4 py-2 text-sm shadow">
           <option value="all">All Calls</option>
@@ -135,6 +149,7 @@
             <th class="p-3">Paid</th>
             <th class="p-3">Pending</th>
             <th class="p-3">Agent</th>
+            <th class="p-3">Type</th>
             <th class="p-3">Cancelled</th>
             <th class="p-3">Reason</th>
             <th class="p-3">Action</th>
@@ -153,6 +168,8 @@
   const endDate = document.getElementById("endDate");
   const agentFilter = document.getElementById("agentFilter");
   const mechanicFilter = document.getElementById("mechanicFilter");
+  const bookingTypeFilter = document.getElementById("bookingTypeFilter");
+  const gomechanicFilter = document.getElementById("gomechanicFilter");
   const cancellationFilter = document.getElementById("cancellationFilter");
   const bookingTableBody = document.getElementById("bookingTableBody");
   const exportCsvBtn = document.getElementById("exportCsvBtn");
@@ -376,6 +393,22 @@
       filteredData = filteredData.filter(item => item.mechanic_name === selectedMechanic);
     }
     
+    // Apply booking type filter
+    const selectedBookingType = bookingTypeFilter.value;
+    if (selectedBookingType === 'manual') {
+      filteredData = filteredData.filter(item => item.notes && item.notes.includes('Manual-booked via Agent'));
+    } else if (selectedBookingType === 'ai') {
+      filteredData = filteredData.filter(item => item.notes && item.notes.includes('Auto-booked via AI'));
+    }
+    
+    // Apply GoMechanic filter
+    const selectedGomechanic = gomechanicFilter.value;
+    if (selectedGomechanic === 'gomechanic') {
+      filteredData = filteredData.filter(item => item.is_gomechanic_call);
+    } else if (selectedGomechanic === 'regular') {
+      filteredData = filteredData.filter(item => !item.is_gomechanic_call);
+    }
+    
     // Apply cancellation filter (frontend only)
     const selectedCancellation = cancellationFilter.value;
     if (selectedCancellation === 'cancelled') {
@@ -448,8 +481,26 @@
       if (item.is_cancelled) cancelled++;
       if (!item.is_cancelled && !item.mechanic) notAssigned++;
 
+      // Determine booking type badge
+      let bookingTypeBadge = '';
+      if (item.notes) {
+        if (item.notes.includes('Manual-booked via Agent')) {
+          bookingTypeBadge = '<span class="inline-block px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">Manual</span>';
+        } else if (item.notes.includes('Auto-booked via AI')) {
+          bookingTypeBadge = '<span class="inline-block px-2 py-1 text-xs font-medium bg-purple-100 text-purple-800 rounded-full">AI</span>';
+        }
+      }
+
+      // Add GoMechanic call indicator if applicable
+      if (item.is_gomechanic_call) {
+        bookingTypeBadge += ' <span class="inline-block px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">GoMech</span>';
+      }
+
+      // Apply light green background for GoMechanic calls
+      const rowClass = item.is_gomechanic_call ? 'hover:bg-green-100 bg-green-50' : 'hover:bg-gray-50';
+
       const row = `
-        <tr class="hover:bg-gray-50">
+        <tr class="${rowClass}">
           <td class="p-3">
             <img src="${item.car_image}" alt="Car" class="w-12 h-8 object-contain rounded-sm" />
           </td>
@@ -469,6 +520,7 @@
           <td class="p-3 text-green-600">${formatCurrency(paid)}</td>
           <td class="p-3 text-yellow-600">${formatCurrency(pendingAmount)}</td>
           <td class="p-3">${item.agent_name ?? '-'}</td>
+          <td class="p-3">${bookingTypeBadge}</td>
           <td class="p-3 ${item.is_cancelled ? 'text-red-500' : 'text-green-500'} font-bold">
             ${item.is_cancelled ? 'Yes' : 'No'}
           </td>
@@ -508,6 +560,8 @@
       'Paid Amount',
       'Pending Amount',
       'Agent',
+      'Booking Type',
+      'GoMechanic Call',
       'Cancelled',
       'Cancellation Reason'
     ];
@@ -538,6 +592,16 @@
         pendingAmount = company_profit - advance;
       }}
 
+      // Determine booking type
+      let bookingType = '';
+      if (item.notes) {
+        if (item.notes.includes('Manual-booked via Agent')) {
+          bookingType = 'Manual';
+        } else if (item.notes.includes('Auto-booked via AI')) {
+          bookingType = 'AI';
+        }
+      }
+
       return [
         new Date(item.created_at).toLocaleString('en-IN'),
         item.car || '',
@@ -548,6 +612,8 @@
         paid,
         pendingAmount,
         item.agent_name || '',
+        bookingType,
+        item.is_gomechanic_call ? 'Yes' : 'No',
         item.is_cancelled ? 'Yes' : 'No',
         item.cancellation_reason || ''
       ];
@@ -576,6 +642,12 @@
       }
       if (mechanicFilter.value) {
         filename += `_mechanic-${mechanicFilter.value}`;
+      }
+      if (bookingTypeFilter.value !== 'all') {
+        filename += `_${bookingTypeFilter.value}`;
+      }
+      if (gomechanicFilter.value !== 'all') {
+        filename += `_${gomechanicFilter.value}`;
       }
       if (cancellationFilter.value !== 'all') {
         filename += `_${cancellationFilter.value}`;
@@ -757,6 +829,16 @@
   mechanicFilter.addEventListener("change", () => {
     updateWhatsAppButtonVisibility();
     fetchBookings();
+  });
+
+  // Booking type filter change handler (frontend only)
+  bookingTypeFilter.addEventListener("change", () => {
+    updateDisplayWithFilteredData(allFetchedData);
+  });
+
+  // GoMechanic filter change handler (frontend only)
+  gomechanicFilter.addEventListener("change", () => {
+    updateDisplayWithFilteredData(allFetchedData);
   });
 
   // Cancellation filter change handler (frontend only)
