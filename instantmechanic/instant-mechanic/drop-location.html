@@ -75,66 +75,136 @@
         }
 
         .location-selector {
-            padding: 20px;
+            padding: 20px 20px 0px 20px;
         }
 
         .location-buttons {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 20px;
+            gap: 15px;
+            margin-bottom: 25px;
         }
 
         .location-btn {
-            background: white;
+            background: #f8fafc;
             border: 2px solid #e2e8f0;
-            padding: 15px;
-            border-radius: 12px;
+            padding: 20px 15px;
+            border-radius: 16px;
             cursor: pointer;
             transition: all 0.3s ease;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             gap: 8px;
             font-weight: 600;
             position: relative;
+            min-height: 100px;
+            font-size: 16px;
         }
 
+        /* Pending state - Light gray background */
+        .location-btn {
+            background: #f8fafc;
+            border-color: #e2e8f0;
+            color: #64748b;
+        }
+
+        /* Active state - Blue background */
         .location-btn.active {
-            border-color: #667eea;
-            background: #667eea;
-            color: white;
+            border-color: #3b82f6;
+            background: #eff6ff;
+            color: #1d4ed8;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.15);
         }
 
+        /* Completed state - Green background */
         .location-btn.completed {
-            border-color: #22c55e;
-            background: #22c55e;
-            color: white;
+            border-color: #10b981;
+            background: #ecfdf5;
+            color: #047857;
+        }
+
+        /* Active + Completed state */
+        .location-btn.active.completed {
+            border-color: #3b82f6;
+            background: #eff6ff;
+            color: #1d4ed8;
         }
 
         .location-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+
+        .location-btn.completed:hover {
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.15);
+        }
+
+        .location-btn.active:hover {
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.2);
+        }
+
+        .location-icon {
+            font-size: 28px;
+            margin-bottom: 4px;
+        }
+
+        .location-text {
+            font-size: 16px;
+            font-weight: 600;
         }
 
         .check-icon {
             position: absolute;
-            top: 5px;
-            right: 5px;
-            width: 16px;
-            height: 16px;
-            background: #22c55e;
+            top: 8px;
+            right: 8px;
+            width: 28px;
+            height: 28px;
+            background: #10b981;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+        }
+
+        /* Status indicator for better clarity */
+        .location-status {
+            position: absolute;
+            bottom: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 11px;
+            font-weight: 500;
+            padding: 2px 8px;
+            border-radius: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .location-btn .location-status.pending {
+            background: #f1f5f9;
+            color: #64748b;
+        }
+
+        .location-btn.active .location-status.current {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .location-btn.completed .location-status.done {
+            background: #d1fae5;
+            color: #047857;
         }
 
         .search-container {
             position: relative;
-            margin-bottom: 20px;
+            margin-bottom: 1px;
         }
 
         .search-box {
@@ -327,12 +397,33 @@
             }
             
             .location-selector {
-                padding: 15px;
+                padding: 15px 15px 5px 15px;
             }
             
             .location-btn {
-                padding: 12px;
+                padding: 12px 10px 30px 10px;
                 font-size: 14px;
+                min-height: 90px;
+            }
+            
+            .location-icon {
+                font-size: 20px;
+            }
+            
+            .location-text {
+                font-size: 13px;
+            }
+            
+            .check-icon {
+                width: 24px;
+                height: 24px;
+                font-size: 14px;
+            }
+            
+            .location-status {
+                font-size: 9px;
+                padding: 2px 8px;
+                bottom: 4px;
             }
             
             .search-box {
@@ -341,7 +432,7 @@
             }
             
             .map-container {
-                height: 380px;
+                height: 360px;
             }
         }
 
@@ -352,10 +443,6 @@
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1>Instant Mechanic</h1>
-            <p>24/7 Towing Service</p>
-        </div>
 
         <div id="customerInfo" class="customer-info hidden">
             <div class="customer-name" id="customerName"></div>
@@ -374,13 +461,15 @@
                 <div class="location-selector">
                     <div class="location-buttons">
                         <button class="location-btn" id="pickupBtn" onclick="selectMode('pickup')">
-                            <span>📍</span>
-                            <span>Pickup</span>
+                            <div class="location-icon">📍</div>
+                            <div class="location-text">Pickup</div>
+                            <div class="location-status pending" id="pickupStatus">Select</div>
                             <div class="check-icon hidden" id="pickupCheck">✓</div>
                         </button>
                         <button class="location-btn" id="dropBtn" onclick="selectMode('drop')">
-                            <span>🎯</span>
-                            <span>Drop</span>
+                            <div class="location-icon">🎯</div>
+                            <div class="location-text">Drop</div>
+                            <div class="location-status pending" id="dropStatus">Select</div>
                             <div class="check-icon hidden" id="dropCheck">✓</div>
                         </button>
                     </div>
@@ -424,7 +513,7 @@
 
             <div class="submit-container">
                 <button class="submit-btn" id="submitBtn" onclick="handleSubmit()">
-                    Book Towing Service
+                    Submit Drop Location
                 </button>
             </div>
         </div>
@@ -700,21 +789,43 @@
             const dropBtn = document.getElementById('dropBtn');
             const pickupCheck = document.getElementById('pickupCheck');
             const dropCheck = document.getElementById('dropCheck');
+            const pickupStatus = document.getElementById('pickupStatus');
+            const dropStatus = document.getElementById('dropStatus');
             
+            // Update pickup button
             if (pickupLocation) {
                 pickupBtn.classList.add('completed');
                 pickupCheck.classList.remove('hidden');
+                pickupStatus.textContent = 'Done';
+                pickupStatus.className = 'location-status done';
             } else {
                 pickupBtn.classList.remove('completed');
                 pickupCheck.classList.add('hidden');
+                if (selectedMode === 'pickup') {
+                    pickupStatus.textContent = 'Current';
+                    pickupStatus.className = 'location-status current';
+                } else {
+                    pickupStatus.textContent = 'Select';
+                    pickupStatus.className = 'location-status pending';
+                }
             }
             
+            // Update drop button  
             if (dropLocation) {
                 dropBtn.classList.add('completed');
                 dropCheck.classList.remove('hidden');
+                dropStatus.textContent = 'Done';
+                dropStatus.className = 'location-status done';
             } else {
                 dropBtn.classList.remove('completed');
                 dropCheck.classList.add('hidden');
+                if (selectedMode === 'drop') {
+                    dropStatus.textContent = 'Current';
+                    dropStatus.className = 'location-status current';
+                } else {
+                    dropStatus.textContent = 'Select';
+                    dropStatus.className = 'location-status pending';
+                }
             }
             
             updateCurrentLocationDisplay();
@@ -902,7 +1013,7 @@
                 if (submitBtn) {
                     submitBtn.disabled = false;
                     submitBtn.style.opacity = '1';
-                    submitBtn.innerHTML = 'Book Towing Service';
+                    submitBtn.innerHTML = 'Save Locations';
                 }
                 
                 alert('Failed to book service. Please try again.');
