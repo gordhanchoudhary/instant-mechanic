@@ -339,16 +339,23 @@
       debugLog('mixpanel.track exists: ' + (window.mixpanel && typeof window.mixpanel.track === 'function'));
       debugLog('mixpanel toString: ' + (window.mixpanel ? window.mixpanel.toString() : 'undefined'));
       debugLog('mixpanelReady flag: ' + mixpanelReady);
+      debugLog('customerMobile: ' + (customerMobile || 'not set'));
       debugLog('==============================');
     }
 
     function debugMixpanel() {
       debugLog('🔧 Manual debug test triggered');
       checkMixpanelStatus();
+      
+      // Use customer mobile if available, otherwise use a fallback
+      const userId = customerMobile || 'debug_user';
+      identifyMixpanelUser(userId);
+      
       trackMixpanelEvent("Debug Test Event", {
         "test": "manual_debug",
         "timestamp": new Date().toISOString(),
-        "booking_id": bookingId || "no_booking_id"
+        "booking_id": bookingId || "no_booking_id",
+        "user_id": userId
       });
     }
 
@@ -376,15 +383,8 @@
         localStorage.setItem("agent_name", agentName);
         localStorage.setItem("mobile_number", mobile);
         
-        // Track agent login
-        waitForMixpanel(() => {
-          identifyMixpanelUser(mobile);
-          trackMixpanelEvent("Agent Login", {
-            "agent_name": agentName,
-            "mobile": mobile,
-            "timestamp": new Date().toISOString()
-          });
-        });
+        // Track agent login - but wait for customer mobile to be available for user identification
+        // We'll identify the customer after booking data is loaded
         
         document.getElementById("loginBox").classList.add("hidden");
         document.getElementById("bookingBox").classList.remove("hidden");
@@ -418,8 +418,17 @@
           originalMechanicId = data.mechanic;
           currentExtraPayment = data.mechanic_extra_payment || 0;
           
-          // Set customer mobile from booking data
+          // Set customer mobile from booking data - THIS IS THE KEY CHANGE
           customerMobile = data.customer_mobile || data.mobile || null;
+          debugLog('📱 Customer mobile set to: ' + customerMobile);
+
+          // Now identify the customer in Mixpanel using their mobile number
+          if (customerMobile) {
+            waitForMixpanel(() => {
+              identifyMixpanelUser(customerMobile);
+              debugLog('👤 Customer identified in Mixpanel: ' + customerMobile);
+            });
+          }
 
           // Calculate pending from mechanic side
           const pendingFromMechanic = calculatePendingFromMechanicSide(data);
@@ -517,7 +526,6 @@
 
     function updateSecurityAmount() {
       const agentName = localStorage.getItem("agent_name");
-      const mobileNumber = localStorage.getItem("mobile_number");
       
       const updateData = {
         agent: agentName,
@@ -533,15 +541,16 @@
         .then(data => {
           debugLog('=== SECURITY UPDATE API RESPONSE ===');
           
-          // Mixpanel event for security amount update
-          if (mobileNumber) {
+          // Mixpanel event for security amount update - using customer mobile as user ID
+          if (customerMobile) {
             waitForMixpanel(() => {
-              identifyMixpanelUser(mobileNumber);
+              identifyMixpanelUser(customerMobile);
               debugLog('🔒 Booking Security Changed event triggered');
               trackMixpanelEvent("Booking Security Changed", {
                 "agent_name": agentName,
                 "booking_id": bookingId,
                 "new_security_amount": 199,
+                "customer_mobile": customerMobile,
                 "timestamp": new Date().toISOString()
               });
             });
@@ -613,11 +622,17 @@
       }
     });
 
+    // Helper function to get mechanic name by ID
+    function getMechanicNameById(mechanicId) {
+      if (!mechanicId) return null;
+      const mechanic = mechanicList.find(m => m.id === mechanicId);
+      return mechanic ? mechanic.name : `Unknown Mechanic (ID: ${mechanicId})`;
+    }
+
     function updateBooking() {
       const isCancelled = document.getElementById("markCancelled").checked;
       const cancelReason = document.getElementById("cancelReason").value;
       const agentName = localStorage.getItem("agent_name");
-      const mobileNumber = localStorage.getItem("mobile_number");
       const extraPayment = document.getElementById("mechanicExtraPayment").value;
 
       const updateData = {
@@ -640,30 +655,38 @@
         .then(data => {
           debugLog('=== BOOKING UPDATE API RESPONSE ===');
           
-          // Mixpanel tracking - ONLY specific events, always use mobileNumber as userId
-          if (mobileNumber) {
+          // Mixpanel tracking - CHANGED: Now using customerMobile as userId instead of agent mobile
+          if (customerMobile) {
             waitForMixpanel(() => {
-              identifyMixpanelUser(mobileNumber);
+              identifyMixpanelUser(customerMobile);
               
               // 1. Track if mechanic was assigned (new assignment)
               if (assignedMechanicId && !originalMechanicId) {
+                const mechanicName = getMechanicNameById(assignedMechanicId);
                 debugLog('👨‍🔧 Mechanic Assigned event triggered');
                 trackMixpanelEvent("Mechanic Assigned", {
                   "agent_name": agentName,
                   "booking_id": bookingId,
+                  "mechanic_name": mechanicName,
                   "mechanic_id": assignedMechanicId,
+                  "customer_mobile": customerMobile,
                   "timestamp": new Date().toISOString()
                 });
               }
               
               // 2. Track if mechanic was reassigned (change from one mechanic to another)
               if (assignedMechanicId && originalMechanicId && assignedMechanicId !== originalMechanicId) {
+                const oldMechanicName = getMechanicNameById(originalMechanicId);
+                const newMechanicName = getMechanicNameById(assignedMechanicId);
                 debugLog('🔄 Mechanic Reassigned event triggered');
                 trackMixpanelEvent("Mechanic Reassigned", {
                   "agent_name": agentName,
                   "booking_id": bookingId,
+                  "old_mechanic_name": oldMechanicName,
+                  "new_mechanic_name": newMechanicName,
                   "old_mechanic_id": originalMechanicId,
                   "new_mechanic_id": assignedMechanicId,
+                  "customer_mobile": customerMobile,
                   "timestamp": new Date().toISOString()
                 });
               }
@@ -675,10 +698,13 @@
                   "agent_name": agentName,
                   "booking_id": bookingId,
                   "cancellation_reason": cancelReason || "No reason provided",
+                  "customer_mobile": customerMobile,
                   "timestamp": new Date().toISOString()
                 });
               }
             });
+          } else {
+            debugLog('⚠️ Customer mobile not available, cannot track Mixpanel events');
           }
           
           alert("Booking updated successfully.");
