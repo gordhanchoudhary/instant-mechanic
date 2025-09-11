@@ -161,6 +161,26 @@
       border-left: 4px solid #ffc107;
       margin: 5px 0;
     }
+
+    /* Debug section styles */
+    .debug-section {
+      margin-top: 20px;
+      padding: 15px;
+      background-color: #f8f9fa;
+      border-radius: 8px;
+      border: 1px solid #e9ecef;
+    }
+
+    .debug-button {
+      background-color: #6c757d;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin: 5px;
+      width: auto;
+    }
   </style>
 </head>
 <body>
@@ -208,15 +228,137 @@
     <div id="chatContainer">
       <div id="chatMessages"></div>
     </div>
+
+    <!-- Debug Section -->
+    <div class="debug-section">
+      <h4>Debug Mixpanel</h4>
+      <button class="debug-button" onclick="debugMixpanel()">Test Mixpanel Event</button>
+      <button class="debug-button" onclick="checkMixpanelStatus()">Check Mixpanel Status</button>
+      <div id="debugOutput" style="margin-top: 10px; padding: 10px; background-color: white; border-radius: 4px; font-family: monospace; font-size: 12px; max-height: 200px; overflow-y: auto;"></div>
+    </div>
   </div>
+
+  <!-- Mixpanel -->
+  <script type="text/javascript">
+    (function(c,a){if(!a.__SV){var b=window;try{var d,m,j,k=b.location,f=k.hash;d=function(a,b){return(m=a.match(RegExp(b+"=([^&]*)")))?m[1]:null};f&&d(f,"state")&&(j=JSON.parse(decodeURIComponent(d(f,"state"))),"mpeditor"===j.action&&(b.sessionStorage.setItem("_mpcehash",f),history.replaceState(j.desiredHash||"",c.title,k.pathname+k.search)))}catch(n){}var l,h;window.mixpanel=a;a._i=[];a.init=function(b,d,g){function c(b,i){var a=i.split(".");2==a.length&&(b=b[a[0]],i=a[1]);b[i]=function(){b.push([i].concat(Array.prototype.slice.call(arguments,0)))}}var e=a;"undefined"!==typeof g?e=a[g]=[]:g="mixpanel";e.people=e.people||[];e.toString=function(b){var a="mixpanel";"mixpanel"!==g&&(a+="."+g);b||(a+=" (stub)");return a};e.people.toString=function(){return e.toString(1)+".people (stub)"};l="disable time_event track track_pageview track_links track_forms track_with_groups add_group set_group remove_group register register_once alias unregister identify name_tag set_config reset opt_in_tracking opt_out_tracking has_opted_in_tracking has_opted_out_tracking clear_opt_in_out_tracking start_batch_senders people.set people.set_once people.unset people.increment people.append people.union people.track_charge people.clear_charges people.delete_user people.remove".split(" ");for(h=0;h<l.length;h++)c(e,l[h]);var f="set set_once union unset remove delete".split(" ");e.get_group=function(){function a(c){b[c]=function(){call2_args=arguments;call2=[c].concat(Array.prototype.slice.call(call2_args,0));e.push([d,call2])}}for(var b={},d=["get_group"].concat(Array.prototype.slice.call(arguments,0)),c=0;c<f.length;c++)a(f[c]);return b};a._i.push([b,d,g])};a.__SV=1.2;b=c.createElement("script");b.type="text/javascript";b.async=!0;b.src="undefined"!==typeof MIXPANEL_CUSTOM_LIB_URL?MIXPANEL_CUSTOM_LIB_URL:"file:"===c.location.protocol&&"//cdn.mxpnl.com/libs/mixpanel-2-latest.min.js".match(/^\/\//)?"https://cdn.mxpnl.com/libs/mixpanel-2-latest.min.js":"//cdn.mxpnl.com/libs/mixpanel-2-latest.min.js";d=c.getElementsByTagName("script")[0];d.parentNode.insertBefore(b,d)}})(document,window.mixpanel||[]);
+    
+    // Initialize Mixpanel
+    console.log('Initializing Mixpanel...');
+    mixpanel.init("afeb927e0d7ee7ddfa033985ab2fe603");
+    console.log('Mixpanel initialized');
+  </script>
 
   <script>
     const bookingId = new URLSearchParams(window.location.search).get("id");
     let mechanicList = [];
     let assignedMechanicId = null;
+    let originalMechanicId = null;
     let userChangedMechanic = false;
     let currentExtraPayment = 0;
     let bookingData = null;
+    let customerMobile = null;
+    let mixpanelReady = false;
+
+    // Debug output function
+    function debugLog(message) {
+      console.log(message);
+      const debugOutput = document.getElementById("debugOutput");
+      if (debugOutput) {
+        debugOutput.innerHTML += new Date().toLocaleTimeString() + ': ' + message + '<br>';
+        debugOutput.scrollTop = debugOutput.scrollHeight;
+      }
+    }
+
+    // Wait for Mixpanel to be ready
+    function waitForMixpanel(callback, maxAttempts = 50, attempt = 1) {
+      if (window.mixpanel && typeof window.mixpanel.track === 'function' && !window.mixpanel.toString().includes('stub')) {
+        mixpanelReady = true;
+        debugLog('✅ Mixpanel is ready');
+        callback();
+      } else if (attempt < maxAttempts) {
+        debugLog(`⏳ Waiting for Mixpanel... (attempt ${attempt})`);
+        setTimeout(() => waitForMixpanel(callback, maxAttempts, attempt + 1), 100);
+      } else {
+        debugLog('❌ Mixpanel failed to load after ' + maxAttempts + ' attempts');
+        console.error('Mixpanel failed to load');
+      }
+    }
+
+    // Helper function to safely track Mixpanel events
+    function trackMixpanelEvent(eventName, properties) {
+      debugLog(`🔄 Attempting to track event: ${eventName}`);
+      
+      if (!mixpanelReady) {
+        debugLog('❌ Mixpanel not ready, queuing event');
+        waitForMixpanel(() => trackMixpanelEvent(eventName, properties));
+        return;
+      }
+
+      try {
+        if (window.mixpanel && typeof window.mixpanel.track === 'function') {
+          debugLog(`✅ Tracking event: ${eventName} with properties: ${JSON.stringify(properties)}`);
+          mixpanel.track(eventName, properties);
+          debugLog('✅ Event tracked successfully');
+        } else {
+          debugLog('❌ Mixpanel track function not available');
+        }
+      } catch (error) {
+        debugLog('❌ Error tracking event: ' + error.message);
+        console.error('Error tracking Mixpanel event:', error);
+      }
+    }
+
+    // Helper function to identify user in Mixpanel
+    function identifyMixpanelUser(userId) {
+      debugLog(`🔄 Attempting to identify user: ${userId}`);
+      
+      if (!mixpanelReady) {
+        debugLog('❌ Mixpanel not ready, queuing identify');
+        waitForMixpanel(() => identifyMixpanelUser(userId));
+        return;
+      }
+
+      try {
+        if (window.mixpanel && typeof window.mixpanel.identify === 'function') {
+          debugLog(`✅ Identifying user: ${userId}`);
+          mixpanel.identify(userId);
+          debugLog('✅ User identified successfully');
+        } else {
+          debugLog('❌ Mixpanel identify function not available');
+        }
+      } catch (error) {
+        debugLog('❌ Error identifying user: ' + error.message);
+        console.error('Error identifying Mixpanel user:', error);
+      }
+    }
+
+    // Debug functions
+    function checkMixpanelStatus() {
+      debugLog('=== MIXPANEL STATUS CHECK ===');
+      debugLog('window.mixpanel exists: ' + (!!window.mixpanel));
+      debugLog('mixpanel.track exists: ' + (window.mixpanel && typeof window.mixpanel.track === 'function'));
+      debugLog('mixpanel toString: ' + (window.mixpanel ? window.mixpanel.toString() : 'undefined'));
+      debugLog('mixpanelReady flag: ' + mixpanelReady);
+      debugLog('==============================');
+    }
+
+    function debugMixpanel() {
+      debugLog('🔧 Manual debug test triggered');
+      checkMixpanelStatus();
+      trackMixpanelEvent("Debug Test Event", {
+        "test": "manual_debug",
+        "timestamp": new Date().toISOString(),
+        "booking_id": bookingId || "no_booking_id"
+      });
+    }
+
+    // Initialize Mixpanel when page loads
+    window.addEventListener('load', function() {
+      debugLog('🚀 Page loaded, initializing Mixpanel...');
+      waitForMixpanel(() => {
+        debugLog('🎉 Mixpanel is now ready for use');
+      });
+    });
 
     if (localStorage.getItem("agent_login") === "Yes") {
       document.getElementById("loginBox").classList.add("hidden");
@@ -232,6 +374,18 @@
       if (/^\d{10}$/.test(mobile) && password === "InstantMech") {
         localStorage.setItem("agent_login", "Yes");
         localStorage.setItem("agent_name", agentName);
+        localStorage.setItem("mobile_number", mobile);
+        
+        // Track agent login
+        waitForMixpanel(() => {
+          identifyMixpanelUser(mobile);
+          trackMixpanelEvent("Agent Login", {
+            "agent_name": agentName,
+            "mobile": mobile,
+            "timestamp": new Date().toISOString()
+          });
+        });
+        
         document.getElementById("loginBox").classList.add("hidden");
         document.getElementById("bookingBox").classList.remove("hidden");
         fetchBooking();
@@ -261,7 +415,11 @@
         .then(data => {
           bookingData = data;
           assignedMechanicId = data.mechanic;
+          originalMechanicId = data.mechanic;
           currentExtraPayment = data.mechanic_extra_payment || 0;
+          
+          // Set customer mobile from booking data
+          customerMobile = data.customer_mobile || data.mobile || null;
 
           // Calculate pending from mechanic side
           const pendingFromMechanic = calculatePendingFromMechanicSide(data);
@@ -322,6 +480,10 @@
           
           fetchMechanics();
           fetchChat();
+        })
+        .catch(error => {
+          console.error('Error fetching booking:', error);
+          alert('Error fetching booking: ' + error.message);
         });
     }
 
@@ -349,13 +511,13 @@
           `;
         }
       } else {
-        return `
-        `;
+        return ``;
       }
     }
 
     function updateSecurityAmount() {
       const agentName = localStorage.getItem("agent_name");
+      const mobileNumber = localStorage.getItem("mobile_number");
       
       const updateData = {
         agent: agentName,
@@ -369,10 +531,27 @@
       })
         .then(res => res.json())
         .then(data => {
+          debugLog('=== SECURITY UPDATE API RESPONSE ===');
+          
+          // Mixpanel event for security amount update
+          if (mobileNumber) {
+            waitForMixpanel(() => {
+              identifyMixpanelUser(mobileNumber);
+              debugLog('🔒 Booking Security Changed event triggered');
+              trackMixpanelEvent("Booking Security Changed", {
+                "agent_name": agentName,
+                "booking_id": bookingId,
+                "new_security_amount": 199,
+                "timestamp": new Date().toISOString()
+              });
+            });
+          }
+          
           alert("Security amount updated to ₹199 successfully.");
           fetchBooking(); // Refresh the booking details
         })
         .catch(error => {
+          console.error('Error updating security amount:', error);
           alert("Error updating security amount: " + error.message);
         });
     }
@@ -383,6 +562,9 @@
         .then(data => {
           mechanicList = data;
           populateMechanicDropdown(data);
+        })
+        .catch(error => {
+          console.error('Error fetching mechanics:', error);
         });
     }
 
@@ -435,6 +617,7 @@
       const isCancelled = document.getElementById("markCancelled").checked;
       const cancelReason = document.getElementById("cancelReason").value;
       const agentName = localStorage.getItem("agent_name");
+      const mobileNumber = localStorage.getItem("mobile_number");
       const extraPayment = document.getElementById("mechanicExtraPayment").value;
 
       const updateData = {
@@ -455,11 +638,55 @@
       })
         .then(res => res.json())
         .then(data => {
+          debugLog('=== BOOKING UPDATE API RESPONSE ===');
+          
+          // Mixpanel tracking - ONLY specific events, always use mobileNumber as userId
+          if (mobileNumber) {
+            waitForMixpanel(() => {
+              identifyMixpanelUser(mobileNumber);
+              
+              // 1. Track if mechanic was assigned (new assignment)
+              if (assignedMechanicId && !originalMechanicId) {
+                debugLog('👨‍🔧 Mechanic Assigned event triggered');
+                trackMixpanelEvent("Mechanic Assigned", {
+                  "agent_name": agentName,
+                  "booking_id": bookingId,
+                  "mechanic_id": assignedMechanicId,
+                  "timestamp": new Date().toISOString()
+                });
+              }
+              
+              // 2. Track if mechanic was reassigned (change from one mechanic to another)
+              if (assignedMechanicId && originalMechanicId && assignedMechanicId !== originalMechanicId) {
+                debugLog('🔄 Mechanic Reassigned event triggered');
+                trackMixpanelEvent("Mechanic Reassigned", {
+                  "agent_name": agentName,
+                  "booking_id": bookingId,
+                  "old_mechanic_id": originalMechanicId,
+                  "new_mechanic_id": assignedMechanicId,
+                  "timestamp": new Date().toISOString()
+                });
+              }
+              
+              // 3. Track if booking was cancelled
+              if (isCancelled && (!bookingData || !bookingData.is_cancelled)) {
+                debugLog('❌ Booking Cancelled event triggered');
+                trackMixpanelEvent("Booking Cancelled", {
+                  "agent_name": agentName,
+                  "booking_id": bookingId,
+                  "cancellation_reason": cancelReason || "No reason provided",
+                  "timestamp": new Date().toISOString()
+                });
+              }
+            });
+          }
+          
           alert("Booking updated successfully.");
           userChangedMechanic = false;
           fetchBooking();
         })
         .catch(error => {
+          console.error('Error updating booking:', error);
           alert("Error updating booking: " + error.message);
         });
     }
@@ -490,8 +717,15 @@
               chatContainer.appendChild(div);
             });
           }
+        })
+        .catch(error => {
+          console.error('Error fetching chat:', error);
         });
     }
+
+    // Make debug functions globally available
+    window.debugMixpanel = debugMixpanel;
+    window.checkMixpanelStatus = checkMixpanelStatus;
   </script>
 </body>
 </html>
