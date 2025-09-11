@@ -4,6 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Book Mechanic Service - Instant Mechanic</title>
+    
+    <!-- Mixpanel -->
+    <script type="text/javascript">
+        (function(c,a){if(!a.__SV){var b=window;try{var d,m,j,k=b.location,f=k.hash;d=function(a,b){return(m=a.match(RegExp(b+"=([^&]*)")))?m[1]:null};f&&d(f,"state")&&(j=JSON.parse(decodeURIComponent(d(f,"state"))),"mpeditor"===j.action&&(b.sessionStorage.setItem("_mpcehash",f),history.replaceState(j.desiredHash||"",c.title,k.pathname+k.search)))}catch(n){}var l,h;window.mixpanel=a;a._i=[];a.init=function(b,d,g){function c(b,i){var a=i.split(".");2==a.length&&(b=b[a[0]],i=a[1]);b[i]=function(){b.push([i].concat(Array.prototype.slice.call(arguments,0)))}}var e=a;"undefined"!==
+        typeof g?e=a[g]=[]:g="mixpanel";e.people=e.people||[];e.toString=function(b){var a="mixpanel";"mixpanel"!==g&&(a+="."+g);b||(a+=" (stub)");return a};e.people.toString=function(){return e.toString(1)+".people (stub)"};l="disable time_event track track_pageview track_links track_forms track_with_groups add_group set_group remove_group register register_once alias unregister identify name_tag set_config reset opt_in_tracking opt_out_tracking has_opted_in_tracking has_opted_out_tracking clear_opt_in_out_tracking start_batch_senders people.set people.set_once people.unset people.increment people.append people.union people.track_charge people.clear_charges people.delete_user people.remove".split(" ");
+        for(h=0;h<l.length;h++)c(e,l[h]);var f="set_config people.set people.set_once people.unset people.increment people.append people.union people.track_charge people.clear_charges people.delete_user".split(" ");for(h=0;h<f.length;h++)c(e,f[h]);a._i.push([b,d,g])};a.__SV=1.2;b=c.createElement("script");b.type="text/javascript";b.async=!0;b.src="undefined"!==typeof MIXPANEL_CUSTOM_LIB_URL?MIXPANEL_CUSTOM_LIB_URL:"file:"===c.location.protocol&&"//cdn4.mxpnl.com/libs/mixpanel-2-latest.min.js".match(/^\/\//)?"https://cdn4.mxpnl.com/libs/mixpanel-2-latest.min.js":"//cdn4.mxpnl.com/libs/mixpanel-2-latest.min.js";
+        d=c.getElementsByTagName("script")[0];d.parentNode.insertBefore(b,d)}})(document,window.mixpanel||[]);
+        
+        // Initialize Mixpanel
+        mixpanel.init("afeb927e0d7ee7ddfa033985ab2fe603", {debug: true});
+    </script>
+    
     <style>
         * {
             margin: 0;
@@ -1043,6 +1055,31 @@
             'e6 - BYD'
         ];
 
+        // Mixpanel tracking function
+        function trackMixpanelEvent(eventName, properties = {}) {
+            try {
+                const mobile = document.getElementById('mobile').value;
+                const userId = mobile ? `91${mobile}` : null;
+                const agentName = localStorage.getItem('agent_name_im') || 'Unknown';
+
+                // Set user identity
+                if (userId) {
+                    mixpanel.identify(userId);
+                }
+
+                // Add agent_name to all events
+                const eventProperties = {
+                    ...properties,
+                    agent_name: agentName
+                };
+
+                mixpanel.track(eventName, eventProperties);
+                console.log(`Mixpanel event tracked: ${eventName}`, eventProperties);
+            } catch (error) {
+                console.error('Mixpanel tracking error:', error);
+            }
+        }
+
         // Agent Selection Popup Functions
         function showAgentPopup() {
             const popup = document.getElementById('agentPopup');
@@ -1491,14 +1528,21 @@
                 // Check if GoMechanic toggle is active
                 const isGoMechanic = document.getElementById('goMechanicToggle').classList.contains('active');
 
+                // Get form values
+                const price = parseFloat(document.getElementById('price').value) || 0;
+                const mechanicPayout = parseFloat(document.getElementById('securityAmount').value) || 0;
+                const carModel = document.getElementById('carModel').value;
+                const problem = document.getElementById('description').value;
+                const location = document.getElementById('location').value;
+
                 // Collect form data
                 const formData = {
                     mobile: '91' + mobile,
-                    description: document.getElementById('description').value,
-                    price:  document.getElementById('price').value || null,
-                    carModel: document.getElementById('carModel').value,
-                    location: document.getElementById('location').value,
-                    securityAmount: document.getElementById('securityAmount').value || null,
+                    description: problem,
+                    price: price || null,
+                    carModel: carModel,
+                    location: location,
+                    securityAmount: mechanicPayout || null,
                     isGoMechanicCall: isGoMechanic,
                     timestamp: new Date().toISOString(),
                     agent: localStorage.getItem("agent_name_im") || "Harshit"
@@ -1515,6 +1559,20 @@
                     });
 
                     if (response.ok) {
+                        // Track Mixpanel event for successful booking
+                        trackMixpanelEvent("Booking Confirmed", {
+                            "booking_type": "Manual Booking",
+                            "car": carModel,
+                            "price": price,
+                            "problem": problem,
+                            "location": location,
+                            "remarks": null,
+                            "company_profit": price - mechanicPayout,
+                            "security_asked": 199, // Fixed as per your requirement
+                            "mechanic_payout": mechanicPayout,
+                            "total_price": price
+                        });
+
                         successMessage.style.display = 'block';
                         form.reset();
                         // Reset toggles to default state and restore default values
@@ -1535,6 +1593,21 @@
                     setTimeout(() => {
                         errorMessage.style.display = 'none';
                         successMessage.style.display = 'block';
+                        
+                        // Track Mixpanel event even for demo success
+                        trackMixpanelEvent("Booking Confirmed", {
+                            "booking_type": "Manual Booking",
+                            "car": carModel,
+                            "price": price,
+                            "problem": problem,
+                            "location": location,
+                            "remarks": null,
+                            "company_profit": price - mechanicPayout,
+                            "security_asked": 199,
+                            "mechanic_payout": mechanicPayout,
+                            "total_price": price
+                        });
+                        
                         form.reset();
                         document.getElementById('goMechanicToggle').classList.remove('active');
                         togglePriceAndSecurityVisibility(false); // Show price and security fields
