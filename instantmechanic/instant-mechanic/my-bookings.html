@@ -7,6 +7,12 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <style>body { font-family: 'Inter', sans-serif; }</style>
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAEFSrFGkBtDgc962tBB4WVlSssDhiZkUI"></script>
+  
+  <!-- Mixpanel SDK -->
+  <script type="text/javascript">
+    (function(c,a){if(!a.__SV){var b=window;try{var d,m,j,k=b.location,f=k.hash;d=function(a,b){return(m=a.match(RegExp(b+"=([^&]*)")))?m[1]:null};f&&d(f,"state")&&(j=JSON.parse(decodeURIComponent(d(f,"state"))),"mpeditor"===j.action&&(b.sessionStorage.setItem("_mpcehash",f),history.replaceState(j.desiredHash||"",c.title,k.pathname+k.search)))}catch(n){}var l,h;window.mixpanel=a;a._i=[];a.init=function(b,d,g){function c(b,i){var a=i.split(".");2==a.length&&(b=b[a[0]],i=a[1]);b[i]=function(){b.push([i].concat(Array.prototype.slice.call(arguments,0)))}}var e=a;"undefined"!==typeof g?e=a[g]=[]:g="mixpanel";e.people=e.people||[];e.toString=function(b){var a="mixpanel";"mixpanel"!==g&&(a+="."+g);b||(a+=" (stub)");return a};e.people.toString=function(){return e.toString(1)+".people (stub)"};l="disable time_event track track_pageview track_links track_forms register register_once alias unregister identify name_tag set_config reset opt_in_tracking opt_out_tracking has_opted_in_tracking has_opted_out_tracking clear_opt_in_out_tracking start_batch_senders people.set people.set_once people.unset people.increment people.append people.union people.track_charge people.clear_charges people.delete_user".split(" ");for(h=0;h<l.length;h++)c(e,l[h]);a._i.push([b,d,g])};a.__SV=1.2;b=c.createElement("script");b.type="text/javascript";b.async=!0;b.src="undefined"!==typeof MIXPANEL_CUSTOM_LIB_URL?MIXPANEL_CUSTOM_LIB_URL:"file:"===c.location.protocol&&"//cdn4.mxpnl.com/libs/mixpanel-2-latest.min.js".match(/^\/\//)?"https://cdn4.mxpnl.com/libs/mixpanel-2-latest.min.js":"//cdn4.mxpnl.com/libs/mixpanel-2-latest.min.js";d=c.getElementsByTagName("script")[0];d.parentNode.insertBefore(b,d)}})(document,window.mixpanel||[]);
+    mixpanel.init('afeb927e0d7ee7ddfa033985ab2fe603');
+  </script>
 </head>
 <body class="bg-[#F4F5F9] flex flex-col items-center min-h-screen">
 <!-- Car Number Popup (Mandatory) -->
@@ -144,11 +150,22 @@
   const isPaid = localStorage.getItem('paid') === 'true';
   const hasVehicleNumber = localStorage.getItem('vehicleNumber');
 
+  // Initialize Mixpanel with user ID
+  if (mobile) {
+    const userId = `${mobile}`;
+    mixpanel.identify(userId);
+    
+    // Track page load event
+    mixpanel.track('Customer opened Payment page', {
+      mobile: mobile,
+      user_id: userId,
+      timestamp: new Date().toISOString()
+    });
+  }
+
   if(carNumber == "y" && !hasVehicleNumber){
     showCarNumberPopup();
   }
-
-
 
     if (isPaid && hasVehicleNumber) {
     showAfterPaymentUI();
@@ -413,8 +430,6 @@ function showAfterPaymentUI() {
       document.getElementById('price').textContent = data.price;
       document.getElementById('carImage').src = data.car_image;
 
-
-
       if (data.payment_status === "partially-paid" && !isPaid) {
         localStorage.setItem('paid', 'true');
         localStorage.removeItem(`booking_timer_${mobile}`);
@@ -422,7 +437,6 @@ function showAfterPaymentUI() {
       }
       agent_mobile =  data.agent_mobile
       localStorage.setItem("mechanicMobile",agent_mobile )
-
 
       
 try {
@@ -450,7 +464,6 @@ if (isPaid) {
     Paid (₹${data.advance_payment_amount})
   `;
 
-
   // If mechanic is assigned
   if (data.mechanic) {
     fetch(`https://ai.instantmechanic.online/bot/api/mechanic/${data.mechanic}/`)
@@ -472,13 +485,22 @@ if (isPaid) {
   }
 }
 
-
-
       localStorage.setItem('booking_id', data.id);
 
   }
 
   document.getElementById('payNow').addEventListener('click', () => {
+    // Track payment initiation
+    if (mobile) {
+      mixpanel.track('Customer initiated payment', {
+        mobile: mobile,
+        user_id: `${mobile}`,
+        amount: window.amountToPay / 100,
+        booking_id: localStorage.getItem('booking_id'),
+        timestamp: new Date().toISOString()
+      });
+    }
+
     const options = {
       key: 'rzp_live_NYD17iu2Juy3A5',
       amount: window.amountToPay,
@@ -503,13 +525,34 @@ document.getElementById('cancelBooking').addEventListener('click', () => {
   const mechanicNumber = localStorage.getItem("mechanicMobile");
 
   if (mechanicNumber) {
+    // Track mechanic call
+    if (mobile) {
+      mixpanel.track('Customer Called mechanic', {
+        mobile: mobile,
+        user_id: `${mobile}`,
+        mechanic_mobile: mechanicNumber,
+        booking_id: localStorage.getItem('booking_id'),
+        timestamp: new Date().toISOString()
+      });
+    }
+    
     window.location.href = `tel:+91${mechanicNumber}`;
     console.log("******", mechanicNumber)
   } else {
+    // Track instant mechanic team call
+    if (mobile) {
+      mixpanel.track('Customer Called instant mechanic team', {
+        mobile: mobile,
+        user_id: `${mobile}`,
+        support_number: '9266961110',
+        booking_id: localStorage.getItem('booking_id'),
+        timestamp: new Date().toISOString()
+      });
+    }
+    
     window.location.href = 'tel:+919266961110';
   }
 });
-
 
   document.getElementById('ring').addEventListener('click', () => {
     window.location.href='https://wa.me/918700199791';
@@ -540,9 +583,6 @@ document.getElementById('cancelBooking').addEventListener('click', () => {
         return [null, null];
     }
 }
-
-
-
 
   startCountdown();
   fetchBookingDetails();
