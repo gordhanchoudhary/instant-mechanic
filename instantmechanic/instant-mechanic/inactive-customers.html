@@ -242,7 +242,7 @@
         /* Main Stats Grid - Single Line Layout */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(8, 1fr);
+            grid-template-columns: repeat(10, 1fr);
             gap: 15px;
             margin-bottom: 30px;
         }
@@ -566,7 +566,7 @@
         
         @media (max-width: 1400px) {
             .stats-grid {
-                grid-template-columns: repeat(4, 1fr);
+                grid-template-columns: repeat(5, 1fr);
                 gap: 15px;
             }
         }
@@ -861,6 +861,16 @@
                 <div class="stat-label">Avg Chat Count</div>
                 <div class="stat-sublabel">Per Customer</div>
             </div>
+            <div class="stat-card">
+                <div class="stat-number orange" id="cancelledCalls">-</div>
+                <div class="stat-label">Cancelled Users</div>
+                <div class="stat-sublabel">All Bookings Cancelled</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number green" id="netBookings">-</div>
+                <div class="stat-label">Net Bookings</div>
+                <div class="stat-sublabel">Active Bookings</div>
+            </div>
         </div>
 
         <!-- Customers Table -->
@@ -925,6 +935,15 @@
             businessOverviewVisible = !businessOverviewVisible;
             saveBusinessOverviewPreference(businessOverviewVisible);
             initializeBusinessOverview();
+        }
+
+        // NEW CANCELLATION LOGIC: Check if ALL bookings are cancelled for a customer
+        function isFullyCancelled(customer) {
+            if (customer.booking_details.length === 0) return false;
+            
+            // Check if ALL bookings are cancelled
+            const allCancelled = customer.booking_details.every(booking => booking.is_cancelled === true);
+            return allCancelled;
         }
 
         // Calculate agent response time in seconds
@@ -1163,7 +1182,7 @@
             updateBusinessMetrics();
         }
 
-        // Update business metrics
+        // Update business metrics with corrected cancellation logic
         function updateBusinessMetrics() {
             const total = filteredCustomers.length;
             
@@ -1175,13 +1194,15 @@
                 c.booking_details.some(b => b.payment_status === 'paid' || b.payment_status === 'partially-paid')
             ).length;
             
-            // Booking metrics
+            // Booking metrics - CORRECTED CANCELLATION LOGIC
             const totalBookings = filteredCustomers.reduce((sum, c) => sum + c.booking_details.length, 0);
             const aiBookings = filteredCustomers.reduce((sum, c) => 
                 sum + c.booking_details.filter(b => b.booking_type === 'AI').length, 0);
             const manualBookings = filteredCustomers.reduce((sum, c) => 
                 sum + c.booking_details.filter(b => b.booking_type === 'Manual').length, 0);
-            const cancelledBookings = filteredCustomers.filter(c => c.is_booking_cancelled).length;
+            
+            // NEW: Only count customers where ALL bookings are cancelled
+            const fullyCancelledUsers = filteredCustomers.filter(c => isFullyCancelled(c)).length;
             
             // Agent response metrics
             const responseTimes = filteredCustomers.map(c => calculateResponseTime(c));
@@ -1203,6 +1224,12 @@
             const nonCarUsers = filteredCustomers.filter(c => c.is_not_car_user).length;
             const avgChatCount = total > 0 ? 
                 Math.round(filteredCustomers.reduce((sum, c) => sum + c.chat_count, 0) / total) : 0;
+            
+            // NEW: Net bookings calculation - count customers with at least one active booking
+            const activeBookingUsers = filteredCustomers.filter(c => {
+                if (c.booking_details.length === 0) return false;
+                return !isFullyCancelled(c); // Has bookings and not fully cancelled
+            }).length;
 
             // Update funnel
             document.getElementById('funnelChat').textContent = total;
@@ -1227,9 +1254,9 @@
             document.getElementById('manualBookings').textContent = manualBookings;
             document.getElementById('manualBookingsPct').textContent = 
                 totalBookings > 0 ? `(${Math.round((manualBookings/totalBookings)*100)}%)` : '(0%)';
-            document.getElementById('cancelledBookings').textContent = cancelledBookings;
+            document.getElementById('cancelledBookings').textContent = fullyCancelledUsers;
             document.getElementById('cancelledBookingsPct').textContent = 
-                hasBookings > 0 ? `(${Math.round((cancelledBookings/hasBookings)*100)}%)` : '(0%)';
+                hasBookings > 0 ? `(${Math.round((fullyCancelledUsers/hasBookings)*100)}%)` : '(0%)';
 
             // Update agent performance
             document.getElementById('avgResponseTime').textContent = 
@@ -1253,6 +1280,8 @@
             document.getElementById('repeatUsers').textContent = repeatUsers;
             document.getElementById('nonCarUsers').textContent = nonCarUsers;
             document.getElementById('avgChatPerCustomer').textContent = avgChatCount;
+            document.getElementById('cancelledCalls').textContent = fullyCancelledUsers;
+            document.getElementById('netBookings').textContent = activeBookingUsers;
             document.getElementById('filteredCount').textContent = total;
         }
 
@@ -1263,7 +1292,8 @@
                 'totalBookings', 'aiBookings', 'manualBookings', 'cancelledBookings',
                 'avgResponseTime', 'excellentResponse', 'agentContacted', 'noResponse',
                 'totalCustomers', 'withLocation', 'priceShared', 'hasBookings', 
-                'paidCustomers', 'repeatUsers', 'nonCarUsers', 'avgChatPerCustomer', 'filteredCount'
+                'paidCustomers', 'repeatUsers', 'nonCarUsers', 'avgChatPerCustomer', 
+                'cancelledCalls', 'netBookings', 'filteredCount'
             ];
             elements.forEach(id => {
                 document.getElementById(id).textContent = '-';
@@ -1307,7 +1337,7 @@
             }).join('');
         }
 
-        // Render booking summary
+        // Render booking summary with updated cancellation logic
         function renderBookingSummary(customer) {
             if (customer.booking_details.length === 0) {
                 return '<span class="badge badge-secondary">No Bookings</span>';
@@ -1316,6 +1346,7 @@
             const aiCount = customer.booking_details.filter(b => b.booking_type === 'AI').length;
             const manualCount = customer.booking_details.filter(b => b.booking_type === 'Manual').length;
             const cancelledCount = customer.booking_details.filter(b => b.is_cancelled).length;
+            const isFullyCanc = isFullyCancelled(customer);
             
             let html = `<div class="booking-summary">`;
             html += `<div class="booking-count">${customer.booking_details.length} Booking${customer.booking_details.length > 1 ? 's' : ''}</div>`;
@@ -1327,8 +1358,10 @@
             if (manualCount > 0) {
                 html += `<span class="booking-type-badge manual-badge">Manual: ${manualCount}</span>`;
             }
-            if (cancelledCount > 0) {
-                html += `<span class="booking-type-badge badge-danger">Cancelled: ${cancelledCount}</span>`;
+            if (isFullyCanc) {
+                html += `<span class="booking-type-badge badge-danger">All Cancelled</span>`;
+            } else if (cancelledCount > 0) {
+                html += `<span class="booking-type-badge badge-warning">Partial Cancel: ${cancelledCount}</span>`;
             }
             
             html += `</div></div>`;
@@ -1452,12 +1485,12 @@
             }).join('');
         }
 
-        // Export to CSV
+        // Export to CSV with updated cancellation logic
         function exportCSV() {
             const headers = [
                 'Customer ID', 'Name', 'Mobile', 'Agent', 'Team', 'Journey Stage', 'Is Repeat User',
                 'Location Shared', 'Price Shared', 'Total Bookings', 'AI Bookings', 'Manual Bookings',
-                'Booking Cancelled', 'User Type', 'Response Time (s)', 'Response Category', 
+                'Fully Cancelled', 'Partial Cancellations', 'User Type', 'Response Time (s)', 'Response Category', 
                 'Chat Count', 'Calls', 'WhatsApp', 'Agent Remarks', 'First Chat Time', 'Created At'
             ];
             
@@ -1469,6 +1502,9 @@
                 const responseCategory = getResponseTimeCategory(responseTime);
                 const latestRemark = customer.recalls_agent_remarks.length > 0 ? 
                     customer.recalls_agent_remarks[customer.recalls_agent_remarks.length - 1].remarks || 'No remarks' : 'No remarks';
+                
+                const cancelledCount = customer.booking_details.filter(b => b.is_cancelled).length;
+                const isFullyCanc = isFullyCancelled(customer);
                 
                 return [
                     customer.customer_id,
@@ -1483,7 +1519,8 @@
                     customer.booking_details.length,
                     aiBookings,
                     manualBookings,
-                    customer.is_booking_cancelled ? 'Yes' : 'No',
+                    isFullyCanc ? 'Yes' : 'No',
+                    cancelledCount,
                     customer.is_not_car_user ? 'Non-Car User' : 'Car User',
                     responseTime || 'No Response',
                     responseCategory,
