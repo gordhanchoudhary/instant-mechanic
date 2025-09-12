@@ -1,331 +1,324 @@
 [
-    {
-        "name": "Chevrolet",
-        "is_luxury": false,
-        "is_popular": false,
-        "id": 1,
-        "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/chevrolte.png"
-    },
-    {
-        "name": "Daewoo",
-        "is_luxury": false,
-        "is_popular": false,
-        "id": 2,
-        "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/daewoo.png"
-    },
-    {
-        "name": "Datsun",
-        "is_luxury": false,
-        "is_popular": false,
-        "id": 3,
-        "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/datsun.png"
-    },
-    {
-        "name": "Fiat",
-        "is_luxury": false,
-        "is_popular": false,
-        "id": 4,
-        "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/fiat.png"
-    },
-    {
-        "name": "Ford",
-        "is_luxury": false,
-        "is_popular": false,
-        "id": 5,
-        "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/ford.png"
-    },
-    {
-        "name": "Honda",
-        "is_luxury": false,
-        "is_popular": false,
-        "id": 6,
-        "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/honda.png"
-    },
-    {
-        "name": "Hyundai",
-        "is_luxury": false,
-        "is_popular": false,
-        "id": 7,
-        "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/hyundai.png"
-    },
-    {
-        "name": "Mahindra",
-        "is_luxury": false,
-        "is_popular": false,
-        "id": 8,
-        "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/mahindra.png"
-    },
-    {
-        "name": "Maruti Suzuki",
-        "is_luxury": false,
-        "is_popular": false,
-        "id": 9,
-        "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/maruti suzuki.png"
-    },
-    {
-        "name": "Mitsubishi",
-        "is_luxury": false,
-        "is_popular": false,
-        "id": 10,
-        "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/mistubushi.png"
-    },
-    {
-        "name": "Nissan",
-        "is_luxury": false,
-        "is_popular": false,
-        "id": 11,
-        "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/nissan.png"
-    },
-    {
-        "name": "Renault",
-        "is_luxury": false,
-        "is_popular": false,
-        "id": 12,
-        "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/renault.png"
-    },
-    {
-        "name": "Skoda",
-        "is_luxury": false,
-        "is_popular": false,
-        "id": 13,
-        "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/skoda.png"
-    },
-    {
-        "name": "Tata",
-        "is_luxury": false,
-        "is_popular": false,
-        "id": 14,
-        "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/tata.png"
-    },
-    {
-        "name": "Toyota",
-        "is_luxury": false,
-        "is_popular": false,
-        "id": 15,
-        "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/toyota.png"
-    },
-    {
-        "name": "Volkswagen",
-        "is_luxury": false,
-        "is_popular": false,
-        "id": 16,
-        "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/volkswagen.png"
-    },
-    {
-        "name": "Aston Martin",
-        "is_luxury": false,
-        "is_popular": false,
-        "id": 17,
-        "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/astin martin.png"
-    },
-    {
-        "name": "Audi",
-        "is_luxury": false,
-        "is_popular": false,
-        "id": 18,
-        "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/audi.png"
-    },
-    {
-        "name": "Bentley",
-        "is_luxury": false,
-        "is_popular": false,
-        "id": 19,
-        "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/bentlry.png"
-    },
-    {
-        "name": "BMW",
-        "is_luxury": false,
-        "is_popular": false,
-        "id": 20,
-        "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/bmw.png"
-    },
-    {
-        "name": "Ferrari",
-        "is_luxury": false,
-        "is_popular": false,
-        "id": 21,
-        "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/ferrari.png"
-    },
-    {
-        "name": "Jaguar",
-        "is_luxury": false,
-        "is_popular": false,
-        "id": 22,
-        "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/Jaguar.png"
-    },
-    {
-        "name": "Lamborghini",
-        "is_luxury": false,
-        "is_popular": false,
-        "id": 23,
-        "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/lamborgini.png"
-    },
-    {
-        "name": "Land Rover",
-        "is_luxury": false,
-        "is_popular": false,
-        "id": 24,
-        "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/land rover.png"
-    },
-    {
-        "name": "Maserati",
-        "is_luxury": false,
-        "is_popular": false,
-        "id": 25,
-        "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/maserati.png"
-    },
-    {
-        "name": "Mercedes",
-        "is_luxury": false,
-        "is_popular": false,
-        "id": 26,
-        "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/mercedes.png"
-    },
-    {
-        "name": "Mini",
-        "is_luxury": false,
-        "is_popular": false,
-        "id": 27,
-        "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/mini coper.png"
-    },
-    {
-        "name": "Porsche",
-        "is_luxury": false,
-        "is_popular": false,
-        "id": 28,
-        "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/porshe.png"
-    },
-    {
-        "name": "Rolls Royce",
-        "is_luxury": false,
-        "is_popular": false,
-        "id": 29,
-        "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/rolls royse.png"
-    },
-    {
-        "name": "Volvo",
-        "is_luxury": false,
-        "is_popular": false,
-        "id": 30,
-        "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/volvo.png"
-    },
-    {
-        "name": "Force",
-        "is_luxury": false,
-        "is_popular": false,
-        "id": 31,
-        "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/forse.png"
-    },
-    {
-        "name": "Isuzu",
-        "is_luxury": false,
-        "is_popular": false,
-        "id": 32,
-        "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/isuzu.png"
-    },
-    {
-        "name": "Hindustan Motors",
-        "is_luxury": false,
-        "is_popular": false,
-        "id": 33,
-        "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/Hindustan_motors.png"
-    },
-    {
-        "name": "Jeep",
-        "is_luxury": false,
-        "is_popular": false,
-        "id": 34,
-        "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/jeep.png"
-    },
-    {
-        "name": "Opel",
-        "is_luxury": false,
-        "is_popular": false,
-        "id": 35,
-        "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/opel.png"
-    },
-    {
-        "name": "Ssangyong",
-        "is_luxury": false,
-        "is_popular": false,
-        "id": 36,
-        "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/Ssangyong Logo_Transparent.png"
-    },
-    {
-        "name": "MG",
-        "is_luxury": false,
-        "is_popular": false,
-        "id": 37,
-        "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/MG.png"
-    },
-    {
-        "name": "Kia",
-        "is_luxury": false,
-        "is_popular": false,
-        "id": 38,
-        "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/kia.png"
-    },
-    {
-        "name": "Photon",
-        "is_luxury": false,
-        "is_popular": false,
-        "id": 39,
-        "brand_logo": "https://gomechprod.blob.core.windows.net/gm-retail-app/thumbnails/brand-39.jpeg"
-    },
-    {
-        "name": "Jayem",
-        "is_luxury": false,
-        "is_popular": false,
-        "id": 40,
-        "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/chevrolte.png"
-    },
-    {
-        "name": "DC",
-        "is_luxury": false,
-        "is_popular": false,
-        "id": 41,
-        "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/DC%20Logo%20(1).jpg"
-    },
-    {
-        "name": "Lexus",
-        "is_luxury": false,
-        "is_popular": false,
-        "id": 42,
-        "brand_logo": "https://gomechprod.blob.core.windows.net/gm-retail-app/thumbnails/brand-42.jpeg"
-    },
-    {
-        "name": "Citroen",
-        "is_luxury": false,
-        "is_popular": false,
-        "id": 43,
-        "brand_logo": "https://gomechprod.blob.core.windows.net/gm-retail-app/thumbnails/brand-43.jpeg"
-    },
-    {
-        "name": "Premier",
-        "is_luxury": false,
-        "is_popular": false,
-        "id": 44,
-        "brand_logo": "https://gomechprod.blob.core.windows.net/gm-retail-app/thumbnails/brand-44.jpeg"
-    },
-    {
-        "name": "Hummer",
-        "is_luxury": false,
-        "is_popular": false,
-        "id": 45,
-        "brand_logo": "https://gomechprod.blob.core.windows.net/gm-retail-app/thumbnails/brand-45.jpeg"
-    },
-    {
-        "name": "BYD",
-        "is_luxury": false,
-        "is_popular": false,
-        "id": 46,
-        "brand_logo": "https://gomechprod.blob.core.windows.net/gm-retail-app/thumbnails/brand-46.jpeg"
-    },
-    {
-        "name": "Two Wheeler",
-        "is_luxury": false,
-        "is_popular": true,
-        "id": 47,
-        "brand_logo": "https://drive.google.com/file/d/1LVI7g_dJwBYXdI145oO9Z-38HzLOM5hx/view?usp=sharing"
-    }
-]
+  {
+    "name": "Maruti Suzuki",
+    "is_luxury": false,
+    "is_popular": true,
+    "id": 9,
+    "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/maruti suzuki.png"
+  },
+  {
+    "name": "Hyundai",
+    "is_luxury": false,
+    "is_popular": true,
+    "id": 7,
+    "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/hyundai.png"
+  },
+  {
+    "name": "Tata",
+    "is_luxury": false,
+    "is_popular": true,
+    "id": 14,
+    "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/tata.png"
+  },
+  {
+    "name": "Mahindra",
+    "is_luxury": false,
+    "is_popular": true,
+    "id": 8,
+    "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/mahindra.png"
+  },
+  {
+    "name": "Kia",
+    "is_luxury": false,
+    "is_popular": true,
+    "id": 38,
+    "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/kia.png"
+  },
+  {
+    "name": "Toyota",
+    "is_luxury": false,
+    "is_popular": true,
+    "id": 15,
+    "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/toyota.png"
+  },
+  {
+    "name": "Honda",
+    "is_luxury": false,
+    "is_popular": true,
+    "id": 6,
+    "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/honda.png"
+  },
+  {
+    "name": "Renault",
+    "is_luxury": false,
+    "is_popular": false,
+    "id": 12,
+    "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/renault.png"
+  },
+  {
+    "name": "Volkswagen",
+    "is_luxury": false,
+    "is_popular": false,
+    "id": 16,
+    "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/volkswagen.png"
+  },
+  {
+    "name": "Skoda",
+    "is_luxury": false,
+    "is_popular": false,
+    "id": 13,
+    "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/skoda.png"
+  },
+  {
+    "name": "Nissan",
+    "is_luxury": false,
+    "is_popular": false,
+    "id": 11,
+    "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/nissan.png"
+  },
+  {
+    "name": "MG",
+    "is_luxury": false,
+    "is_popular": false,
+    "id": 37,
+    "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/MG.png"
+  },
+  {
+    "name": "Ford",
+    "is_luxury": false,
+    "is_popular": false,
+    "id": 5,
+    "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/ford.png"
+  },
+  {
+    "name": "Mercedes",
+    "is_luxury": true,
+    "is_popular": false,
+    "id": 26,
+    "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/mercedes.png"
+  },
+  {
+    "name": "BMW",
+    "is_luxury": true,
+    "is_popular": false,
+    "id": 20,
+    "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/bmw.png"
+  },
+  {
+    "name": "Audi",
+    "is_luxury": true,
+    "is_popular": false,
+    "id": 18,
+    "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/audi.png"
+  },
+  {
+    "name": "Jaguar",
+    "is_luxury": true,
+    "is_popular": false,
+    "id": 22,
+    "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/Jaguar.png"
+  },
+  {
+    "name": "Land Rover",
+    "is_luxury": true,
+    "is_popular": false,
+    "id": 24,
+    "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/land rover.png"
+  },
+  {
+    "name": "Volvo",
+    "is_luxury": true,
+    "is_popular": false,
+    "id": 30,
+    "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/volvo.png"
+  },
+  {
+    "name": "Lexus",
+    "is_luxury": true,
+    "is_popular": false,
+    "id": 42,
+    "brand_logo": "https://gomechprod.blob.core.windows.net/gm-retail-app/thumbnails/brand-42.jpeg"
+  },
+  {
+    "name": "Porsche",
+    "is_luxury": true,
+    "is_popular": false,
+    "id": 28,
+    "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/porshe.png"
+  },
+  {
+    "name": "Mini",
+    "is_luxury": true,
+    "is_popular": false,
+    "id": 27,
+    "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/mini coper.png"
+  },
+  {
+    "name": "Maserati",
+    "is_luxury": true,
+    "is_popular": false,
+    "id": 25,
+    "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/maserati.png"
+  },
+  {
+    "name": "Ferrari",
+    "is_luxury": true,
+    "is_popular": false,
+    "id": 21,
+    "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/ferrari.png"
+  },
+  {
+    "name": "Lamborghini",
+    "is_luxury": true,
+    "is_popular": false,
+    "id": 23,
+    "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/lamborgini.png"
+  },
+  {
+    "name": "Rolls Royce",
+    "is_luxury": true,
+    "is_popular": false,
+    "id": 29,
+    "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/rolls royse.png"
+  },
+  {
+    "name": "Bentley",
+    "is_luxury": true,
+    "is_popular": false,
+    "id": 19,
+    "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/bentlry.png"
+  },
+  {
+    "name": "Aston Martin",
+    "is_luxury": true,
+    "is_popular": false,
+    "id": 17,
+    "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/astin martin.png"
+  },
+  {
+    "name": "Hummer",
+    "is_luxury": true,
+    "is_popular": false,
+    "id": 45,
+    "brand_logo": "https://gomechprod.blob.core.windows.net/gm-retail-app/thumbnails/brand-45.jpeg"
+  },
+  {
+    "name": "Jeep",
+    "is_luxury": false,
+    "is_popular": false,
+    "id": 34,
+    "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/jeep.png"
+  },
+  {
+    "name": "Fiat",
+    "is_luxury": false,
+    "is_popular": false,
+    "id": 4,
+    "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/fiat.png"
+  },
+  {
+    "name": "Mitsubishi",
+    "is_luxury": false,
+    "is_popular": false,
+    "id": 10,
+    "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/mistubushi.png"
+  },
+  {
+    "name": "Chevrolet",
+    "is_luxury": false,
+    "is_popular": false,
+    "id": 1,
+    "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/chevrolte.png"
+  },
+  {
+    "name": "Datsun",
+    "is_luxury": false,
+    "is_popular": false,
+    "id": 3,
+    "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/datsun.png"
+  },
+  {
+    "name": "Daewoo",
+    "is_luxury": false,
+    "is_popular": false,
+    "id": 2,
+    "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/daewoo.png"
+  },
+  {
+    "name": "Opel",
+    "is_luxury": false,
+    "is_popular": false,
+    "id": 35,
+    "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/opel.png"
+  },
+  {
+    "name": "Premier",
+    "is_luxury": false,
+    "is_popular": false,
+    "id": 44,
+    "brand_logo": "https://gomechprod.blob.core.windows.net/gm-retail-app/thumbnails/brand-44.jpeg"
+  },
+  {
+    "name": "Hindustan Motors",
+    "is_luxury": false,
+    "is_popular": false,
+    "id": 33,
+    "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/Hindustan_motors.png"
+  },
+  {
+    "name": "Force",
+    "is_luxury": false,
+    "is_popular": false,
+    "id": 31,
+    "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/forse.png"
+  },
+  {
+    "name": "Isuzu",
+    "is_luxury": false,
+    "is_popular": false,
+    "id": 32,
+    "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/isuzu.png"
+  },
+  {
+    "name": "Ssangyong",
+    "is_luxury": false,
+    "is_popular": false,
+    "id": 36,
+    "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/Ssangyong Logo_Transparent.png"
+  },
+  {
+    "name": "Photon",
+    "is_luxury": false,
+    "is_popular": false,
+    "id": 39,
+    "brand_logo": "https://gomechprod.blob.core.windows.net/gm-retail-app/thumbnails/brand-39.jpeg"
+  },
+  {
+    "name": "Jayem",
+    "is_luxury": false,
+    "is_popular": false,
+    "id": 40,
+    "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/chevrolte.png"
+  },
+  {
+    "name": "DC",
+    "is_luxury": false,
+    "is_popular": false,
+    "id": 41,
+    "brand_logo": "https://gomechprod.blob.core.windows.net/carimagepath/general/logo/DC%20Logo%20(1).jpg"
+  },
+  {
+    "name": "BYD",
+    "is_luxury": false,
+    "is_popular": false,
+    "id": 46,
+    "brand_logo": "https://gomechprod.blob.core.windows.net/gm-retail-app/thumbnails/brand-46.jpeg"
+  },
+  {
+    "name": "Citroen",
+    "is_luxury": false,
+    "is_popular": false,
+    "id": 43,
+    "brand_logo": "https://gomechprod.blob.core.windows.net/gm-retail-app/thumbnails/brand-43.jpeg"
+  },
+ ]
