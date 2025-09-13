@@ -2390,7 +2390,6 @@ function makeCallWithTracking() {
 </script>
 
 
-
 <script>
 (function() {
   // Check if popup was already shown (lifetime check)
@@ -2505,7 +2504,7 @@ function makeCallWithTracking() {
         messages: [
           'Hey! Flat tire? Don\'t worry! 🚗',
           'Instant puncture repair in just 10 minutes! We carry complete repair kit & spare tire assistance.',
-          '💯 5000+ punctures fixed across Delhi NCR. Get back on road quickly!'
+          '💯 900+ punctures fixed across Delhi NCR. Get back on road quickly!'
         ],
         ctaText: '🔧 Fix Tire Issue NOW'
       },
@@ -2685,6 +2684,13 @@ function makeCallWithTracking() {
       overflow-y: auto;
       scrollbar-width: thin;
       scrollbar-color: rgba(0,0,0,0.2) transparent;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    
+    /* Hover effect for chat area */
+    .wa-popup-chat:hover {
+      background-color: #e0d8d0;
     }
     
     /* WhatsApp Message Bubble - Received */
@@ -3103,7 +3109,7 @@ function makeCallWithTracking() {
   }
 
   // Show popup with timing
-  const popupDelay = personalizedContent.isLocationBased ? 3000 : 4000;
+  const popupDelay = personalizedContent.isLocationBased ? 7000 : 8000;
   
   setTimeout(() => {
     const overlay = document.getElementById('waPopupOverlay');
@@ -3151,6 +3157,12 @@ function makeCallWithTracking() {
     if (e.target.id === 'waChatButton' || e.target.closest('#waChatButton')) {
       e.preventDefault();
       redirectToWhatsApp('button');
+    }
+    
+    // Handle chat area click (NEW - ADDED FOR CHAT SCREEN CLICKS)
+    if (e.target.id === 'waPopupChat' || e.target.closest('#waPopupChat')) {
+      e.preventDefault();
+      redirectToWhatsApp('chat_area');
     }
     
     // Handle close button
