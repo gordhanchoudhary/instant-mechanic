@@ -496,6 +496,184 @@
             font-weight: 600;
         }
 
+        /* Coupon Section */
+        .coupon-section {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border: 2px dashed var(--primary-color);
+            border-radius: 15px;
+            padding: 18px;
+            margin: 18px 0;
+            transition: all 0.3s ease;
+        }
+
+        .coupon-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .coupon-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .coupon-toggle {
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 4px;
+            transition: transform 0.3s ease;
+        }
+
+        .coupon-toggle.expanded {
+            transform: rotate(180deg);
+        }
+
+        .coupon-input-section {
+            display: none;
+            animation: slideDown 0.3s ease;
+        }
+
+        .coupon-input-section.active {
+            display: block;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .coupon-input-group {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .coupon-input {
+            flex: 1;
+            padding: 10px 12px;
+            border: 2px solid var(--gray-200);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .coupon-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .coupon-input.success {
+            border-color: var(--accent-color);
+            background: #f0fdf4;
+        }
+
+        .coupon-input.error {
+            border-color: #ef4444;
+            background: #fef2f2;
+        }
+
+        .apply-coupon-btn {
+            background: var(--primary-color);
+            color: var(--white);
+            border: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            min-width: 60px;
+        }
+
+        .apply-coupon-btn:hover {
+            background: #1d4ed8;
+        }
+
+        .apply-coupon-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .coupon-message {
+            font-size: 0.85rem;
+            padding: 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .coupon-message.success {
+            color: var(--accent-color);
+        }
+
+        .coupon-message.error {
+            color: #ef4444;
+        }
+
+        .coupon-savings {
+            background: var(--accent-color);
+            color: var(--white);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-align: center;
+            margin-top: 8px;
+        }
+
+        /* Final Price Section */
+        .final-price-section {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border-radius: 12px;
+            padding: 15px;
+            margin: 15px 0;
+            border: 1px solid var(--secondary-color);
+        }
+
+        .price-breakdown {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+        }
+
+        .price-row.total {
+            border-top: 2px solid var(--secondary-color);
+            padding-top: 8px;
+            margin-top: 8px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--dark-color);
+        }
+
+        .price-row .discount {
+            color: var(--accent-color);
+            font-weight: 600;
+        }
+
         .service-details {
             margin-bottom: 18px;
         }
@@ -1070,6 +1248,26 @@
                 font-size: 1.3rem;
             }
 
+            .coupon-section {
+                padding: 15px;
+                margin: 15px 0;
+            }
+
+            .coupon-input-group {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .apply-coupon-btn {
+                width: 100%;
+                padding: 12px 16px;
+            }
+
+            .final-price-section {
+                padding: 12px;
+                margin: 12px 0;
+            }
+
             .service-info {
                 gap: 8px;
                 padding: 10px;
@@ -1380,33 +1578,36 @@
         let selectedCar = null;
         let selectedService = null;
         let userMobile = null;
+        let appliedCoupon = null;
+        let couponDiscount = 0;
 
         // Get mobile from URL params
-function getMobileFromURL() {
-    const urlParams = new URLSearchParams(window.location.search);
-    let mobile = urlParams.get('mobile');
-    
-    if (!mobile) return null;
-    
-    // URL decode the mobile parameter
-    mobile = decodeURIComponent(mobile);
-    
-    // Extract only the mobile number part (remove any extra data after '/')
-    if (mobile.includes('/')) {
-        mobile = mobile.split('/')[0];
-    }
-    
-    // Remove any non-digit characters and country code prefix
-    mobile = mobile.replace(/[^0-9]/g, '');
-    
-    // Handle Indian mobile numbers - remove country code if present
-    if (mobile.startsWith('91') && mobile.length === 12) {
-        mobile = mobile.substring(2); // Remove '91' prefix
-    }
-    
-    // Return only if it's a valid 10-digit mobile number
-    return mobile.length === 10 ? mobile : null;
-}
+        function getMobileFromURL() {
+            const urlParams = new URLSearchParams(window.location.search);
+            let mobile = urlParams.get('mobile');
+            
+            if (!mobile) return null;
+            
+            // URL decode the mobile parameter
+            mobile = decodeURIComponent(mobile);
+            
+            // Extract only the mobile number part (remove any extra data after '/')
+            if (mobile.includes('/')) {
+                mobile = mobile.split('/')[0];
+            }
+            
+            // Remove any non-digit characters and country code prefix
+            mobile = mobile.replace(/[^0-9]/g, '');
+            
+            // Handle Indian mobile numbers - remove country code if present
+            if (mobile.startsWith('91') && mobile.length === 12) {
+                mobile = mobile.substring(2); // Remove '91' prefix
+            }
+            
+            // Return only if it's a valid 10-digit mobile number
+            return mobile.length === 10 ? mobile : null;
+        }
+
         // Initialize Mixpanel tracking
         function initializeTracking() {
             const mobile = getMobileFromURL();
@@ -1653,6 +1854,135 @@ function getMobileFromURL() {
             return imageMap[serviceName] || "assets/img/basic.jpg";
         }
 
+        // Toggle coupon section
+        function toggleCouponSection(serviceIndex) {
+            const couponInput = document.getElementById(`coupon-input-${serviceIndex}`);
+            const couponToggle = document.getElementById(`coupon-toggle-${serviceIndex}`);
+            
+            if (couponInput.classList.contains('active')) {
+                couponInput.classList.remove('active');
+                couponToggle.classList.remove('expanded');
+            } else {
+                couponInput.classList.add('active');
+                couponToggle.classList.add('expanded');
+            }
+        }
+
+        // Apply coupon
+        function applyCoupon(serviceIndex, originalPrice) {
+            const couponInput = document.getElementById(`coupon-code-${serviceIndex}`);
+            const applyBtn = document.getElementById(`apply-btn-${serviceIndex}`);
+            const messageDiv = document.getElementById(`coupon-message-${serviceIndex}`);
+            const couponCode = couponInput.value.trim().toUpperCase();
+            
+            // Clear previous states
+            couponInput.classList.remove('success', 'error');
+            messageDiv.innerHTML = '';
+            
+            if (!couponCode) {
+                showCouponMessage(serviceIndex, 'Please enter a coupon code', 'error');
+                couponInput.classList.add('error');
+                return;
+            }
+            
+            // Show loading
+            applyBtn.disabled = true;
+            applyBtn.innerHTML = '<div class="spinner" style="width: 16px; height: 16px; margin: 0;"></div>';
+            
+            setTimeout(() => {
+                if (couponCode === 'INSTANT500') {
+                    // Valid coupon
+                    appliedCoupon = {
+                        code: couponCode,
+                        discount: 500,
+                        serviceIndex: serviceIndex
+                    };
+                    couponDiscount = 500;
+                    
+                    couponInput.classList.add('success');
+                    showCouponMessage(serviceIndex, 'Coupon applied successfully! ₹500 discount added.', 'success');
+                    showCouponSavings(serviceIndex, 500);
+                    updateFinalPrice(serviceIndex, originalPrice);
+                    
+                    // Track successful coupon application
+                    mixpanel.track('Coupon Applied Successfully', {
+                        'Coupon Code': couponCode,
+                        'Discount Amount': 500,
+                        'Service Index': serviceIndex,
+                        'Original Price': originalPrice,
+                        'Mobile': userMobile,
+                        'Timestamp': new Date().toISOString()
+                    });
+                    
+                    // Disable further coupon attempts for this service
+                    applyBtn.style.display = 'none';
+                    couponInput.disabled = true;
+                    
+                } else {
+                    // Invalid coupon
+                    couponInput.classList.add('error');
+                    showCouponMessage(serviceIndex, 'Invalid coupon code. Please try again.', 'error');
+                    
+                    // Track failed coupon attempt
+                    mixpanel.track('Coupon Application Failed', {
+                        'Coupon Code': couponCode,
+                        'Service Index': serviceIndex,
+                        'Mobile': userMobile,
+                        'Timestamp': new Date().toISOString()
+                    });
+                }
+                
+                // Reset button
+                applyBtn.disabled = false;
+                applyBtn.innerHTML = 'Apply';
+            }, 1000);
+        }
+
+        // Show coupon message
+        function showCouponMessage(serviceIndex, message, type) {
+            const messageDiv = document.getElementById(`coupon-message-${serviceIndex}`);
+            const icon = type === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-circle';
+            messageDiv.innerHTML = `<i class="${icon}"></i> ${message}`;
+            messageDiv.className = `coupon-message ${type}`;
+        }
+
+        // Show coupon savings
+        function showCouponSavings(serviceIndex, savings) {
+            const savingsDiv = document.getElementById(`coupon-savings-${serviceIndex}`);
+            savingsDiv.innerHTML = `🎉 You saved ₹${savings} with this coupon!`;
+            savingsDiv.style.display = 'block';
+        }
+
+        // Update final price
+        function updateFinalPrice(serviceIndex, originalPrice) {
+            const finalPriceDiv = document.getElementById(`final-price-${serviceIndex}`);
+            const basePrice = originalPrice + 300; // Add base 300
+            const finalPrice = basePrice - couponDiscount;
+            
+            finalPriceDiv.innerHTML = `
+                <div class="price-breakdown">
+                    <div class="price-row">
+                        <span>Service Price:</span>
+                        <span>₹${originalPrice}</span>
+                    </div>
+                    <div class="price-row">
+                        <span>Service Charges:</span>
+                        <span>₹300</span>
+                    </div>
+                    ${couponDiscount > 0 ? `
+                    <div class="price-row">
+                        <span class="discount">Coupon Discount (${appliedCoupon.code}):</span>
+                        <span class="discount">-₹${couponDiscount}</span>
+                    </div>` : ''}
+                    <div class="price-row total">
+                        <span>Total Amount:</span>
+                        <span>₹${finalPrice}</span>
+                    </div>
+                </div>
+            `;
+            finalPriceDiv.style.display = 'block';
+        }
+
         // Display services
         function displayServices(services) {
             updateProgress(4);
@@ -1671,9 +2001,11 @@ function getMobileFromURL() {
                 const visibleInclusions = inclusions.slice(0, 5);
                 const hiddenInclusions = inclusions.slice(5);
                 
-                const discountedPrice = parseInt(service.discounted_price) + 500;
-                const savings = parseInt(service.price) - discountedPrice;
-                const discountPercentage = Math.round((savings / parseInt(service.price)) * 100);
+                // Add 300 to the API price as base price
+                const basePrice = parseInt(service.discounted_price) + 300;
+                const originalPrice = parseInt(service.price);
+                const savings = originalPrice - basePrice;
+                const discountPercentage = Math.round((savings / originalPrice) * 100);
                 
                 serviceCard.innerHTML = `
                     <div class="service-header">
@@ -1686,8 +2018,43 @@ function getMobileFromURL() {
                         
                         <div class="price-section">
                             <span class="original-price">₹${service.price}</span>
-                            <span class="discounted-price">₹${discountedPrice}</span>
+                            <span class="discounted-price">₹${basePrice}</span>
                             <span class="discount-badge">Save ${discountPercentage}%</span>
+                        </div>
+                        
+                        <!-- Coupon Section -->
+                        <div class="coupon-section">
+                            <div class="coupon-header">
+                                <div class="coupon-title">
+                                    <i class="fas fa-ticket-alt"></i>
+                                    Have a Coupon Code?
+                                </div>
+                                <button class="coupon-toggle" id="coupon-toggle-${index}" onclick="toggleCouponSection(${index})">
+                                    <i class="fas fa-chevron-down"></i>
+                                </button>
+                            </div>
+                            
+                            <div class="coupon-input-section" id="coupon-input-${index}">
+                                <div class="coupon-input-group">
+                                    <input 
+                                        type="text" 
+                                        class="coupon-input" 
+                                        id="coupon-code-${index}" 
+                                        placeholder="Enter coupon code (e.g. INSTANT500)"
+                                        maxlength="15"
+                                    >
+                                    <button class="apply-coupon-btn" id="apply-btn-${index}" onclick="applyCoupon(${index}, ${parseInt(service.discounted_price)})">
+                                        Apply
+                                    </button>
+                                </div>
+                                <div class="coupon-message" id="coupon-message-${index}"></div>
+                                <div class="coupon-savings" id="coupon-savings-${index}" style="display: none;"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Final Price Section -->
+                        <div class="final-price-section" id="final-price-${index}" style="display: none;">
+                            <!-- Price breakdown will be populated here -->
                         </div>
                         
                         <div class="service-details">
@@ -1733,7 +2100,7 @@ function getMobileFromURL() {
                             </div>
                         </div>
                         
-                        <button class="book-service-btn" onclick="bookService('${service.name}', ${discountedPrice})">
+                        <button class="book-service-btn" onclick="bookService('${service.name}', ${basePrice}, ${index})">
                             <i class="fas fa-calendar-check"></i> Book Service Now
                         </button>
                     </div>
@@ -1758,10 +2125,19 @@ function getMobileFromURL() {
         }
 
         // Book service
-        function bookService(serviceName, price) {
+        function bookService(serviceName, basePrice, serviceIndex) {
+            // Calculate final price including any applied coupon
+            let finalPrice = basePrice;
+            if (appliedCoupon && appliedCoupon.serviceIndex === serviceIndex) {
+                finalPrice = basePrice - couponDiscount;
+            }
+            
             selectedService = {
                 name: serviceName,
-                price: price
+                basePrice: basePrice,
+                finalPrice: finalPrice,
+                couponApplied: appliedCoupon ? appliedCoupon.code : null,
+                discountAmount: couponDiscount
             };
 
             // Check if mobile number is available
@@ -1843,6 +2219,14 @@ function getMobileFromURL() {
                 document.getElementById('loadingState').classList.remove('hidden');
                 updateSectionTitle('Processing Your Booking...', 'Please wait while we confirm your service booking');
                 
+                // Prepare booking message
+                let bookingMessage = `Service Booking: ${selectedService.name} for ${brand} ${carName}`;
+                if (selectedService.couponApplied) {
+                    bookingMessage += ` - Original Price: ₹${selectedService.basePrice} - Coupon Applied: ${selectedService.couponApplied} (₹${selectedService.discountAmount} discount) - Final Price: ₹${selectedService.finalPrice}`;
+                } else {
+                    bookingMessage += ` - Price: ₹${selectedService.finalPrice}`;
+                }
+                
                 // Call the booking API
                 const bookingResponse = await fetch('https://ai.instantmechanic.online/bot/service-query/', {
                     method: 'POST',
@@ -1851,29 +2235,38 @@ function getMobileFromURL() {
                     },
                     body: JSON.stringify({
                         mobile: userMobile,
-                        message: `Service Booking: ${selectedService.name} for ${brand} ${carName} - Price: ₹${selectedService.price}`
+                        message: bookingMessage
                     })
                 });
                 
                 const bookingData = await bookingResponse.json();
                 
                 // Track booking confirmation
-                mixpanel.track('Service Booking Confirmed', {
+                const trackingData = {
                     'Service': selectedService.name,
                     'Brand': brand,
                     'Car Model': carName,
-                    'Price': selectedService.price,
+                    'Base Price': selectedService.basePrice,
+                    'Final Price': selectedService.finalPrice,
                     'Mobile': userMobile,
                     'Booking Status': 'Confirmed',
                     'Timestamp': new Date().toISOString()
-                });
+                };
+                
+                if (selectedService.couponApplied) {
+                    trackingData['Coupon Used'] = selectedService.couponApplied;
+                    trackingData['Discount Amount'] = selectedService.discountAmount;
+                    trackingData['Coupon Savings'] = selectedService.discountAmount;
+                }
+                
+                mixpanel.track('Service Booking Confirmed', trackingData);
                 
                 // Track Facebook Pixel event
                 if (typeof fbq !== 'undefined') {
                     fbq('track', 'Purchase', {
                         content_name: selectedService.name,
                         content_category: 'Car Service',
-                        value: selectedService.price,
+                        value: selectedService.finalPrice,
                         currency: 'INR'
                     });
                 }
@@ -1907,7 +2300,7 @@ function getMobileFromURL() {
             
             // Populate booking details
             const detailsContainer = document.getElementById('bookingDetails');
-            detailsContainer.innerHTML = `
+            let detailsHTML = `
                 <div class="detail-row">
                     <span class="detail-label">Service:</span>
                     <span class="detail-value">${selectedService.name}</span>
@@ -1919,19 +2312,43 @@ function getMobileFromURL() {
                 <div class="detail-row">
                     <span class="detail-label">Mobile:</span>
                     <span class="detail-value">+91 ${userMobile}</span>
+                </div>`;
+            
+            if (selectedService.couponApplied) {
+                detailsHTML += `
+                <div class="detail-row">
+                    <span class="detail-label">Base Price:</span>
+                    <span class="detail-value">₹${selectedService.basePrice}</span>
                 </div>
                 <div class="detail-row">
-                    <span class="detail-label">Price:</span>
-                    <span class="detail-value">₹${selectedService.price}</span>
+                    <span class="detail-label">Coupon Applied:</span>
+                    <span class="detail-value">${selectedService.couponApplied} (-₹${selectedService.discountAmount})</span>
+                </div>`;
+            }
+            
+            detailsHTML += `
+                <div class="detail-row">
+                    <span class="detail-label">Final Price:</span>
+                    <span class="detail-value">₹${selectedService.finalPrice}</span>
                 </div>
                 <div class="detail-row">
                     <span class="detail-label">Booking ID:</span>
                     <span class="detail-value">#IM${Date.now().toString().slice(-6)}</span>
-                </div>
-            `;
+                </div>`;
+            
+            detailsContainer.innerHTML = detailsHTML;
             
             // Update WhatsApp link
-            const message = `Hi Instant Mechanic team! 👋\n\nMy service booking details:\n🔧 Service: ${selectedService.name}\n🚗 Vehicle: ${brand} ${carName}\n💰 Price: ₹${selectedService.price}\n📱 Mobile: ${userMobile}\n\nPlease confirm my appointment. Thank you!`;
+            let message = `Hi Instant Mechanic team! 👋\n\nMy service booking details:\n🔧 Service: ${selectedService.name}\n🚗 Vehicle: ${brand} ${carName}`;
+            
+            if (selectedService.couponApplied) {
+                message += `\n💰 Base Price: ₹${selectedService.basePrice}\n🎟️ Coupon: ${selectedService.couponApplied} (₹${selectedService.discountAmount} off)\n💵 Final Price: ₹${selectedService.finalPrice}`;
+            } else {
+                message += `\n💰 Price: ₹${selectedService.finalPrice}`;
+            }
+            
+            message += `\n📱 Mobile: ${userMobile}\n\nPlease confirm my appointment. Thank you!`;
+            
             const whatsappLink = document.getElementById('whatsappLink');
             whatsappLink.href = `https://wa.me/919266961110?text=${encodeURIComponent(message)}`;
             
