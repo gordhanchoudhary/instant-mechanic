@@ -2389,15 +2389,179 @@ function makeCallWithTracking() {
 }
 </script>
 
+
+
 <script>
 (function() {
-  // Check if popup was already shown
+  // Check if popup was already shown (lifetime check)
   if (localStorage.getItem('instantMechanicWhatsAppPopupShown')) {
     return;
   }
 
-  // WhatsApp popup styles
+  // Get search keyword from URL parameters
+  function getSearchKeyword() {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get('keyword') || 
+           urlParams.get('q') || 
+           urlParams.get('query') || 
+           urlParams.get('search') ||
+           urlParams.get('utm_term') ||
+           '';
+  }
+
+  // Extract location from search term
+  function extractLocation(keyword) {
+    const searchTerm = keyword.toLowerCase();
+    const locations = {
+      'gurugram': ['gurugram', 'gurgaon'],
+      'delhi': ['delhi', 'new delhi', 'south delhi', 'north delhi', 'east delhi', 'west delhi'],
+      'noida': ['noida', 'greater noida'],
+      'ghaziabad': ['ghaziabad', 'gaziyabad', 'gaziabad'],
+      'faridabad': ['faridabad', 'faridabaad']
+    };
+
+    for (const [key, variants] of Object.entries(locations)) {
+      for (const variant of variants) {
+        if (searchTerm.includes(variant)) {
+          return key;
+        }
+      }
+    }
+    return null;
+  }
+
+  // Categorize search intent and return personalized messages
+  function getPersonalizedMessages(keyword) {
+    const searchTerm = keyword.toLowerCase();
+    const detectedLocation = extractLocation(keyword);
+    
+    // Location-specific messages (highest priority)
+    if (detectedLocation) {
+      const locationMessages = {
+        gurugram: {
+          messages: [
+            `Hey! Looking for instant car help in Gurugram? 📍`,
+            `We're the #1 roadside assistance in Gurugram! Covering all areas - DLF, Cyber City, MG Road, Sohna Road, Golf Course Road & more.`,
+            `⚡ 10-minute arrival guarantee in Gurugram with 50+ mechanics on standby 24x7!`
+          ],
+          ctaText: '🚗 Get Help in Gurugram NOW'
+        },
+        delhi: {
+          messages: [
+            `Hey! Need instant mechanic in Delhi? 🚗`,
+            `Fastest roadside assistance across all Delhi! From CP to Dwarka, Rohini to Saket - we're everywhere!`,
+            `🎯 200+ expert mechanics across Delhi. Average arrival time: just 8 minutes!`
+          ],
+          ctaText: '⚡ Get Delhi Mechanic NOW'
+        },
+        noida: {
+          messages: [
+            `Hey! Car trouble in Noida? We're here! 📍`,
+            `Complete coverage across Noida & Greater Noida - from Sector 1 to 150, Film City to Pari Chowk!`,
+            `✅ Noida's most trusted roadside assistance with 40+ mechanics ready 24x7!`
+          ],
+          ctaText: '🔧 Get Noida Mechanic NOW'
+        },
+        ghaziabad: {
+          messages: [
+            `Hey! Need urgent car help in Ghaziabad? 🚨`,
+            `From Indirapuram to Vaishali, Kaushambi to Raj Nagar - instant mechanic service across Ghaziabad!`,
+            `🏃 Super-fast 10-minute arrival in all Ghaziabad areas. Available 24x7!`
+          ],
+          ctaText: '🚗 Get Ghaziabad Help NOW'
+        },
+        faridabad: {
+          messages: [
+            `Hey! Stuck in Faridabad? Help is here! 📍`,
+            `Complete Faridabad coverage - Old Faridabad to Sector 89, Ballabgarh to Greater Faridabad!`,
+            `⭐ Faridabad's fastest roadside assistance. 30+ mechanics ready to help 24x7!`
+          ],
+          ctaText: '⚡ Get Faridabad Mechanic NOW'
+        }
+      };
+
+      const locationData = locationMessages[detectedLocation];
+      
+      // Track location match
+      if (typeof mixpanel !== 'undefined') {
+        mixpanel.track('WhatsApp Popup Location Matched', {
+          location: detectedLocation,
+          keyword: keyword,
+          timestamp: new Date().toISOString()
+        });
+      }
+
+      return {
+        ...locationData,
+        location: detectedLocation,
+        isLocationBased: true
+      };
+    }
+    
+    // Define keyword patterns for each category
+    const categories = {
+      puncture: {
+        keywords: ['puncture', 'tire change', 'flat tire', 'tyre', 'stepney'],
+        messages: [
+          'Hey! Flat tire? Don\'t worry! 🚗',
+          'Instant puncture repair in just 10 minutes! We carry complete repair kit & spare tire assistance.',
+          '💯 5000+ punctures fixed across Delhi NCR. Get back on road quickly!'
+        ],
+        ctaText: '🔧 Fix Tire Issue NOW'
+      },
+      battery: {
+        keywords: ['battery', 'jump start', 'self start', 'starting issue', 'car won\'t start', 'ignition'],
+        messages: [
+          'Hey! Car battery dead? We\'ll fix it! 🔋',
+          'Instant jump start service! Can deliver & install new battery in 30 minutes. All brands available!',
+          '⚡ Don\'t get stranded! Testing equipment + replacement batteries for all cars.'
+        ],
+        ctaText: '🔋 Fix Battery NOW'
+      },
+      fuel: {
+        keywords: ['fuel', 'petrol', 'diesel', 'empty tank', 'out of fuel', 'no fuel'],
+        messages: [
+          'Hey! Ran out of fuel? Relax! ⛽',
+          'Emergency fuel delivery in 15 minutes! We bring petrol/diesel to your exact location.',
+          '🚗 No pushing, no waiting! Quick fuel delivery 24x7 across Delhi NCR!'
+        ],
+        ctaText: '⛽ Order Fuel NOW'
+      },
+      default: {
+        keywords: [],
+        messages: [
+          'Hey! Mansi here from Instant Mechanic 👋',
+          'Car trouble? Get instant roadside assistance in 10 minutes - battery, puncture, fuel & more!',
+          '✅ 500+ expert mechanics across Delhi NCR. Available 24x7. No waiting!'
+        ],
+        ctaText: '💬 Chat with Mansi NOW'
+      }
+    };
+
+    // Check each category for keyword match
+    for (const [catKey, catData] of Object.entries(categories)) {
+      if (catKey === 'default') continue;
+      
+      for (const pattern of catData.keywords) {
+        if (searchTerm.includes(pattern)) {
+          return {
+            ...catData,
+            isLocationBased: false
+          };
+        }
+      }
+    }
+
+    return {
+      ...categories.default,
+      isLocationBased: false
+    };
+  }
+
+  // WhatsApp authentic styles
   const styles = `
+    @import url('https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;500;600&display=swap');
+    
     .wa-popup-overlay {
       position: fixed;
       top: 0;
@@ -2405,6 +2569,7 @@ function makeCallWithTracking() {
       width: 100%;
       height: 100%;
       background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(2px);
       z-index: 99998;
       display: none;
       animation: fadeIn 0.3s ease;
@@ -2414,23 +2579,36 @@ function makeCallWithTracking() {
       position: fixed;
       bottom: 20px;
       right: 20px;
-      width: 360px;
-      max-width: 90%;
-      background: #fff;
+      width: 420px;
+      max-width: calc(100% - 40px);
+      background: #e5ddd5;
       border-radius: 12px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.25);
       z-index: 99999;
       display: none;
-      animation: slideUp 0.4s ease;
+      animation: slideUp 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
       overflow: hidden;
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif;
     }
     
+    /* WhatsApp Header - Exact color match */
     .wa-popup-header {
       background: #075e54;
-      padding: 10px 15px;
+      padding: 10px 16px;
       display: flex;
       align-items: center;
       justify-content: space-between;
+      position: relative;
+    }
+    
+    .wa-popup-header::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: rgba(0,0,0,0.08);
     }
     
     .wa-popup-profile {
@@ -2443,56 +2621,76 @@ function makeCallWithTracking() {
       width: 40px;
       height: 40px;
       border-radius: 50%;
-      background: #fff;
+      background: #ddd;
+      overflow: hidden;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: bold;
-      color: #075e54;
-      font-size: 18px;
+      position: relative;
+    }
+    
+    .wa-popup-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
     
     .wa-popup-info {
       color: #fff;
+      flex: 1;
     }
     
     .wa-popup-name {
       font-size: 16px;
       font-weight: 500;
       margin: 0;
+      line-height: 1.2;
     }
     
     .wa-popup-status {
-      font-size: 12px;
+      font-size: 13px;
       opacity: 0.9;
       margin: 2px 0 0;
+      font-weight: 400;
     }
     
     .wa-popup-close {
-      color: #fff;
-      font-size: 20px;
+      color: rgba(255,255,255,0.8);
+      font-size: 22px;
       cursor: pointer;
-      padding: 5px;
+      padding: 6px;
       line-height: 1;
-      opacity: 0.8;
-      transition: opacity 0.2s;
+      transition: all 0.2s;
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     
     .wa-popup-close:hover {
-      opacity: 1;
+      background: rgba(255,255,255,0.1);
+      color: #fff;
     }
     
+    /* WhatsApp Chat Background - Authentic pattern */
     .wa-popup-chat {
-      background: #e5ddd5 url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%23e5ddd5"/><path d="M0 50h50v50H0z" fill="%23dad3cc" opacity="0.1"/></svg>');
-      padding: 20px 15px;
-      min-height: 200px;
-      max-height: 300px;
+      background-color: #e5ddd5;
+      background-image: 
+        url("data:image/svg+xml,%3Csvg width='200' height='200' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3Cpattern id='a' patternUnits='userSpaceOnUse' width='50' height='50'%3E%3Cpath d='M0 10h50M10 0v50M0 20h50M20 0v50M0 30h50M30 0v50M0 40h50M40 0v50' stroke='%23d4cfc7' stroke-width='0.5' opacity='0.5'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='200' height='200' fill='url(%23a)'/%3E%3C/svg%3E");
+      padding: 20px 12px;
+      min-height: 350px;
+      max-height: 400px;
       overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(0,0,0,0.2) transparent;
     }
     
+    /* WhatsApp Message Bubble - Received */
     .wa-message {
       display: flex;
-      margin-bottom: 12px;
+      margin-bottom: 8px;
       animation: messageSlide 0.3s ease;
       opacity: 0;
       animation-fill-mode: forwards;
@@ -2500,52 +2698,57 @@ function makeCallWithTracking() {
     
     .wa-message-bubble {
       background: #fff;
-      padding: 8px 12px;
-      border-radius: 7px;
+      padding: 8px 12px 8px 9px;
+      border-radius: 7.5px;
       max-width: 85%;
-      box-shadow: 0 1px 1px rgba(0,0,0,0.1);
+      box-shadow: 0 1px 0.5px rgba(0,0,0,0.13);
       position: relative;
+      word-wrap: break-word;
     }
     
+    /* WhatsApp bubble tail */
     .wa-message-bubble::before {
       content: '';
       position: absolute;
       top: 0;
       left: -8px;
-      width: 0;
-      height: 0;
-      border-style: solid;
-      border-width: 0 8px 10px 0;
-      border-color: transparent #fff transparent transparent;
+      width: 8px;
+      height: 13px;
+      background: #fff;
+      clip-path: polygon(100% 0, 0 50%, 100% 100%);
     }
     
     .wa-message-text {
       margin: 0;
-      font-size: 14px;
-      line-height: 1.4;
+      font-size: 14.2px;
+      line-height: 19px;
       color: #303030;
+      font-weight: 400;
     }
     
     .wa-message-time {
       font-size: 11px;
-      color: #999;
-      margin-top: 4px;
-      display: block;
+      color: rgba(0,0,0,0.45);
+      margin-top: 3px;
+      display: inline-block;
+      font-weight: 400;
     }
     
+    /* Action area with WhatsApp green */
     .wa-popup-action {
-      padding: 15px;
-      background: #f7f7f7;
-      border-top: 1px solid #e0e0e0;
+      padding: 12px;
+      background: #f0f0f0;
+      border-top: 1px solid rgba(0,0,0,0.08);
     }
     
+    /* WhatsApp style button */
     .wa-chat-button {
       width: 100%;
       background: #25d366;
       color: #fff;
       border: none;
-      padding: 12px 20px;
-      border-radius: 25px;
+      padding: 12px 24px;
+      border-radius: 24px;
       font-size: 15px;
       font-weight: 500;
       cursor: pointer;
@@ -2553,32 +2756,54 @@ function makeCallWithTracking() {
       align-items: center;
       justify-content: center;
       gap: 8px;
-      transition: background 0.2s;
+      transition: all 0.2s;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+      text-transform: none;
+      letter-spacing: normal;
+      font-family: inherit;
     }
     
     .wa-chat-button:hover {
-      background: #20ba5a;
+      background: #22c35e;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.25);
     }
     
+    .wa-chat-button:active {
+      transform: translateY(0);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+    
+    .wa-chat-button svg {
+      width: 20px;
+      height: 20px;
+      fill: currentColor;
+    }
+    
+    /* Typing indicator - WhatsApp style */
     .wa-typing {
-      display: flex;
+      display: inline-flex;
       align-items: center;
-      gap: 4px;
-      padding: 10px;
       background: #fff;
-      border-radius: 15px;
-      width: fit-content;
-      margin-bottom: 12px;
+      padding: 8px 12px;
+      border-radius: 7.5px;
+      margin-bottom: 8px;
+      box-shadow: 0 1px 0.5px rgba(0,0,0,0.13);
       opacity: 0;
       animation: messageSlide 0.3s ease forwards;
+    }
+    
+    .wa-typing-dots {
+      display: flex;
+      gap: 4px;
     }
     
     .wa-typing-dot {
       width: 8px;
       height: 8px;
-      background: #999;
+      background: #9CA3AF;
       border-radius: 50%;
-      animation: typingDot 1.4s infinite;
+      animation: typing 1.4s infinite;
     }
     
     .wa-typing-dot:nth-child(2) {
@@ -2589,33 +2814,141 @@ function makeCallWithTracking() {
       animation-delay: 0.4s;
     }
     
+    /* Badges */
+    .wa-offer-badge {
+      background: #ff5252;
+      color: white;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 500;
+      display: inline-block;
+      margin-top: 6px;
+      animation: pulse 2s infinite;
+    }
+    
+    .wa-location-badge {
+      background: #008069;
+      color: white;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 500;
+      display: inline-block;
+      margin-top: 6px;
+    }
+    
+    /* Animations */
     @keyframes fadeIn {
       from { opacity: 0; }
       to { opacity: 1; }
     }
     
     @keyframes slideUp {
-      from { transform: translateY(100px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
+      from { 
+        transform: translateY(100px) scale(0.9); 
+        opacity: 0; 
+      }
+      to { 
+        transform: translateY(0) scale(1); 
+        opacity: 1; 
+      }
     }
     
     @keyframes messageSlide {
-      from { transform: translateX(-20px); opacity: 0; }
-      to { transform: translateX(0); opacity: 1; }
+      from { 
+        transform: translateX(-20px); 
+        opacity: 0; 
+      }
+      to { 
+        transform: translateX(0); 
+        opacity: 1; 
+      }
     }
     
-    @keyframes typingDot {
-      0%, 60%, 100% { transform: translateY(0); }
-      30% { transform: translateY(-10px); }
+    @keyframes typing {
+      0%, 60%, 100% { 
+        transform: scale(1); 
+        opacity: 1;
+      }
+      30% { 
+        transform: scale(1.3); 
+        opacity: 0.5;
+      }
     }
     
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+    
+    /* Scrollbar styling - WhatsApp style */
+    .wa-popup-chat::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    .wa-popup-chat::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    
+    .wa-popup-chat::-webkit-scrollbar-thumb {
+      background: rgba(0,0,0,0.3);
+      border-radius: 3px;
+    }
+    
+    .wa-popup-chat::-webkit-scrollbar-thumb:hover {
+      background: rgba(0,0,0,0.4);
+    }
+    
+    /* Mobile responsive */
     @media (max-width: 480px) {
       .wa-popup-container {
         right: 10px;
-        bottom: 10px;
         left: 10px;
-        width: auto;
+        bottom: 10px;
+        width: calc(100% - 20px);
+        max-width: none;
       }
+      
+      .wa-popup-chat {
+        min-height: 320px;
+        max-height: 360px;
+      }
+      
+      .wa-message-bubble {
+        max-width: 90%;
+      }
+    }
+    
+    /* Location based button animation */
+    .wa-chat-button.location-based {
+      background: #008069;
+      animation: locationPulse 2s infinite;
+    }
+    
+    .wa-chat-button.location-based:hover {
+      background: #00735f;
+    }
+    
+    @keyframes locationPulse {
+      0%, 100% { box-shadow: 0 1px 3px rgba(0,128,105,0.3); }
+      50% { box-shadow: 0 1px 8px rgba(0,128,105,0.5); }
+    }
+    
+    /* Urgent button animation */
+    .wa-chat-button.urgent {
+      background: #ff5252;
+      animation: urgentPulse 1.5s infinite;
+    }
+    
+    .wa-chat-button.urgent:hover {
+      background: #ff3838;
+    }
+    
+    @keyframes urgentPulse {
+      0%, 100% { box-shadow: 0 1px 3px rgba(255,82,82,0.3); }
+      50% { box-shadow: 0 1px 8px rgba(255,82,82,0.5); }
     }
   `;
 
@@ -2624,16 +2957,34 @@ function makeCallWithTracking() {
   styleSheet.textContent = styles;
   document.head.appendChild(styleSheet);
 
-  // Create popup HTML
+  // Get personalized content based on search keyword
+  const searchKeyword = getSearchKeyword();
+  const personalizedContent = getPersonalizedMessages(searchKeyword);
+
+  // Determine button class based on content type
+  let buttonClass = '';
+  if (personalizedContent.isLocationBased) {
+    buttonClass = 'location-based';
+  } else if (personalizedContent.messages[0].includes('emergency') || 
+             personalizedContent.messages[0].includes('urgent')) {
+    buttonClass = 'urgent';
+  }
+
+  // Create WhatsApp SVG icon
+  const whatsappIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 175.216 175.552"><path fill="#fff" d="M87.184 25.227c-33.733 0-61.166 27.423-61.178 61.13a60.98 60.98 0 0 0 9.349 32.535l1.455 2.312-6.179 22.559 23.146-6.069 2.235 1.324c9.387 5.571 20.15 8.518 31.126 8.524h.023c33.707 0 61.14-27.426 61.153-61.135a60.75 60.75 0 0 0-17.895-43.251 60.75 60.75 0 0 0-43.235-17.929z"/><path fill="#25d366" d="M87.184 30.227c-31.075 0-56.166 25.082-56.178 56.13.004 10.98 3.216 21.503 9.075 30.456l-9.107 33.249 34.019-8.92a56.004 56.004 0 0 0 26.145 6.524h.023c31.05 0 56.14-25.084 56.153-56.135-.01-15.025-5.859-29.135-16.475-39.711-10.617-10.575-24.699-16.393-39.655-16.393zm28.247 80.342c-1.229 3.45-7.108 6.588-10.04 6.978-2.623.348-5.967.495-9.626-.605-2.282-.682-5.208-1.584-8.962-3.125-15.767-6.471-26.05-22.66-26.835-23.707-.786-1.046-6.41-8.523-6.41-16.259s4.059-11.52 5.498-13.089c1.44-1.569 3.145-1.962 4.191-1.962s2.091.003 3.003.055c.963.061 2.254-.364 3.525 2.687 1.271 3.052 4.32 10.56 4.712 11.344.393.784.655 1.7.131 2.746-.524 1.047-2.49 4.033-3.537 5.472-.441.571-.899 1.187-.386 2.33.513 1.144 2.279 3.758 4.892 6.087 3.355 2.988 6.189 3.914 7.068 4.351.879.437 1.396.365 1.92-.22.524-.584 2.265-2.641 2.87-3.555.605-.914 1.211-.784 2.035-.479.825.305 5.234 2.466 6.134 2.913.9.447 1.498.672 1.718 1.025.22.354.22 2.047-1.009 5.498z"/></svg>`;
+
+  // Create popup HTML with authentic WhatsApp styling
   const popupHTML = `
     <div class="wa-popup-overlay" id="waPopupOverlay"></div>
     <div class="wa-popup-container" id="waPopupContainer">
       <div class="wa-popup-header">
         <div class="wa-popup-profile">
-          <div class="wa-popup-avatar">M</div>
+          <div class="wa-popup-avatar">
+            <img src="https://i.ibb.co/8gVX8rSF/image.png" alt="Mansi" onerror="this.style.display='none'; this.parentElement.innerHTML='<span style=\"font-size: 18px; font-weight: 500; color: #666;\">M</span>';">
+          </div>
           <div class="wa-popup-info">
             <p class="wa-popup-name">Mansi - Instant Mechanic</p>
-            <p class="wa-popup-status">Online</p>
+            <p class="wa-popup-status">online</p>
           </div>
         </div>
         <span class="wa-popup-close" id="waPopupClose">&times;</span>
@@ -2642,11 +2993,9 @@ function makeCallWithTracking() {
         <!-- Messages will be added here -->
       </div>
       <div class="wa-popup-action">
-        <button class="wa-chat-button" id="waChatButton">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
-          </svg>
-          Chat with Mansi
+        <button class="wa-chat-button ${buttonClass}" id="waChatButton">
+          ${whatsappIcon}
+          <span>${personalizedContent.ctaText}</span>
         </button>
       </div>
     </div>
@@ -2657,37 +3006,51 @@ function makeCallWithTracking() {
   popupDiv.innerHTML = popupHTML;
   document.body.appendChild(popupDiv);
 
-  // Get current time
+  // Get current time in WhatsApp format
   function getCurrentTime() {
     const now = new Date();
-    return now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+    let hours = now.getHours();
+    let minutes = now.getMinutes();
+    minutes = minutes < 10 ? '0' + minutes : minutes;
+    hours = hours < 10 ? '0' + hours : hours;
+    return `${hours}:${minutes}`;
   }
 
-  // Show message with animation
-  function showMessage(text, delay = 0) {
+  // Show message with WhatsApp animation
+  function showMessage(text, delay = 0, includeBadge = '') {
     const chatContainer = document.getElementById('waPopupChat');
     
     setTimeout(() => {
       // Show typing indicator
       const typingHTML = `
         <div class="wa-typing" id="waTyping">
-          <div class="wa-typing-dot"></div>
-          <div class="wa-typing-dot"></div>
-          <div class="wa-typing-dot"></div>
+          <div class="wa-typing-dots">
+            <div class="wa-typing-dot"></div>
+            <div class="wa-typing-dot"></div>
+            <div class="wa-typing-dot"></div>
+          </div>
         </div>
       `;
       chatContainer.insertAdjacentHTML('beforeend', typingHTML);
       chatContainer.scrollTop = chatContainer.scrollHeight;
       
-      // Replace typing with actual message after 1.5 seconds
+      // Replace typing with actual message
       setTimeout(() => {
         const typing = document.getElementById('waTyping');
         if (typing) typing.remove();
+        
+        let badge = '';
+        if (includeBadge === 'offer') {
+          badge = '<span class="wa-offer-badge">Limited Time: 20% OFF</span>';
+        } else if (includeBadge === 'location') {
+          badge = '<span class="wa-location-badge">📍 Serving Your Area</span>';
+        }
         
         const messageHTML = `
           <div class="wa-message">
             <div class="wa-message-bubble">
               <p class="wa-message-text">${text}</p>
+              ${badge}
               <span class="wa-message-time">${getCurrentTime()}</span>
             </div>
           </div>
@@ -2695,17 +3058,53 @@ function makeCallWithTracking() {
         chatContainer.insertAdjacentHTML('beforeend', messageHTML);
         chatContainer.scrollTop = chatContainer.scrollHeight;
         
-        // Play notification sound (optional)
+        // Play WhatsApp notification sound (optional)
         try {
           const audio = new Audio('data:audio/wav;base64,UklGRkQCAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YSACAACAgICAgICAgICAgICAgICAgICAgICAgICAgICA');
-          audio.volume = 0.3;
+          audio.volume = 0.15;
           audio.play().catch(() => {});
         } catch(e) {}
       }, 1500);
     }, delay);
   }
 
-  // Show popup after 6 seconds
+  // Function to redirect to WhatsApp
+  function redirectToWhatsApp(source) {
+    // Track conversion
+    if (typeof mixpanel !== 'undefined') {
+      mixpanel.track('WhatsApp Popup Conversion', {
+        timestamp: new Date().toISOString(),
+        page_url: window.location.href,
+        search_keyword: searchKeyword,
+        button_text: personalizedContent.ctaText,
+        personalized: searchKeyword ? 'yes' : 'no',
+        is_location_based: personalizedContent.isLocationBased,
+        location: personalizedContent.location || 'none',
+        source: source
+      });
+    }
+    
+    // Set localStorage to not show again
+    localStorage.setItem('instantMechanicWhatsAppPopupShown', 'true');
+    
+    // Create personalized WhatsApp message
+    let whatsappMessage = '';
+    if (personalizedContent.isLocationBased && personalizedContent.location) {
+      const locationName = personalizedContent.location.charAt(0).toUpperCase() + personalizedContent.location.slice(1);
+      whatsappMessage = encodeURIComponent(`Hi, I need urgent car help in ${locationName}. ${searchKeyword}`);
+    } else if (searchKeyword) {
+      whatsappMessage = encodeURIComponent(`Hi, I need help with: ${searchKeyword}`);
+    } else {
+      whatsappMessage = encodeURIComponent(`Hi, I need urgent roadside assistance!`);
+    }
+    
+    // Redirect to WhatsApp
+    window.location.href = `https://wa.me/message/R7LYR65MG47ZB1${whatsappMessage ? '?text=' + whatsappMessage : ''}`;
+  }
+
+  // Show popup with timing
+  const popupDelay = personalizedContent.isLocationBased ? 3000 : 4000;
+  
   setTimeout(() => {
     const overlay = document.getElementById('waPopupOverlay');
     const container = document.getElementById('waPopupContainer');
@@ -2713,64 +3112,89 @@ function makeCallWithTracking() {
     overlay.style.display = 'block';
     container.style.display = 'block';
     
-    // Show first message immediately
-    showMessage('Hey! Mansi this side from Instant Mechanic 👋', 500);
+    // Show personalized messages with WhatsApp timing
+    showMessage(personalizedContent.messages[0], 500);
+    showMessage(personalizedContent.messages[1], 3500);
     
-    // Show second message after 3 seconds
-    showMessage('Are you facing any issue with your car? We provide instant roadside assistance in just 10 minutes!', 3500);
+    // Determine badge type for third message
+    let badgeType = '';
+    if (personalizedContent.isLocationBased) {
+      badgeType = 'location';
+    } else {
+      const offerCategories = ['puncture', 'battery', 'emergency24x7'];
+      const shouldShowOffer = offerCategories.some(cat => 
+        personalizedContent.messages[0].toLowerCase().includes(cat.substring(0, 4))
+      );
+      if (shouldShowOffer) badgeType = 'offer';
+    }
+    
+    if (personalizedContent.messages[2]) {
+      showMessage(personalizedContent.messages[2], 6500, badgeType);
+    }
     
     // Track popup shown
     if (typeof mixpanel !== 'undefined') {
       mixpanel.track('WhatsApp Popup Shown', {
         timestamp: new Date().toISOString(),
-        page_url: window.location.href
+        page_url: window.location.href,
+        search_keyword: searchKeyword,
+        personalized: searchKeyword ? 'yes' : 'no',
+        category: personalizedContent.isLocationBased ? 'location' : 'service',
+        location: personalizedContent.location || 'none'
       });
     }
-  }, 6000);
+  }, popupDelay);
 
-  // Handle chat button click
+  // Handle all click events
   document.addEventListener('click', function(e) {
+    // Handle chat button click
     if (e.target.id === 'waChatButton' || e.target.closest('#waChatButton')) {
-      // Track conversion
-      if (typeof mixpanel !== 'undefined') {
-        mixpanel.track('WhatsApp Popup Conversion', {
-          timestamp: new Date().toISOString(),
-          page_url: window.location.href
-        });
-      }
-      
-      // Set localStorage to not show again
-      localStorage.setItem('instantMechanicWhatsAppPopupShown', 'true');
-      
-      // Redirect to WhatsApp
-      window.location.href = 'https://wa.me/message/R7LYR65MG47ZB1';
+      e.preventDefault();
+      redirectToWhatsApp('button');
     }
     
     // Handle close button
     if (e.target.id === 'waPopupClose') {
+      e.preventDefault();
       document.getElementById('waPopupOverlay').style.display = 'none';
       document.getElementById('waPopupContainer').style.display = 'none';
       
-      // Set localStorage to not show again
-      localStorage.setItem('instantMechanicWhatsAppPopupShown', 'true');
-      
-      // Track close event
-      if (typeof mixpanel !== 'undefined') {
-        mixpanel.track('WhatsApp Popup Closed', {
-          timestamp: new Date().toISOString(),
-          page_url: window.location.href
-        });
-      }
+      setTimeout(() => {
+        redirectToWhatsApp('close');
+      }, 100);
     }
     
     // Handle overlay click
     if (e.target.id === 'waPopupOverlay') {
+      e.preventDefault();
       document.getElementById('waPopupOverlay').style.display = 'none';
       document.getElementById('waPopupContainer').style.display = 'none';
-      localStorage.setItem('instantMechanicWhatsAppPopupShown', 'true');
+      
+      setTimeout(() => {
+        redirectToWhatsApp('overlay');
+      }, 100);
     }
   });
+
+  // Handle ESC key
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      const container = document.getElementById('waPopupContainer');
+      if (container && container.style.display === 'block') {
+        e.preventDefault();
+        document.getElementById('waPopupOverlay').style.display = 'none';
+        container.style.display = 'none';
+        
+        setTimeout(() => {
+          redirectToWhatsApp('escape');
+        }, 100);
+      }
+    }
+  });
+
 })();
 </script>
+
+
   </body>
 </html>
