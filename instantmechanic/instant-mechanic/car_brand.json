@@ -44,6 +44,5 @@
   {"name":"Jayem","is_luxury":false,"is_popular":false,"id":40,"brand_logo":"https://gomechprod.blob.core.windows.net/carimagepath/general/logo/chevrolte.png"},
   {"name":"DC","is_luxury":false,"is_popular":false,"id":41,"brand_logo":"https://gomechprod.blob.core.windows.net/carimagepath/general/logo/DC%20Logo%20(1).jpg"},
   {"name":"BYD","is_luxury":false,"is_popular":false,"id":46,"brand_logo":"https://gomechprod.blob.core.windows.net/gm-retail-app/thumbnails/brand-46.jpeg"},
-  {"name":"Citroen","is_luxury":false,"is_popular":false,"id":43,"brand_logo":"https://gomechprod.blob.core.windows.net/gm-retail-app/thumbnails/brand-43.jpeg"},
-  {"name":"Two Wheeler","is_luxury":false,"is_popular":true,"id":47,"brand_logo":"https://drive.google.com/uc?export=view&id=1LVI7g_dJwBYXdI145oO9Z-38HzLOM5hx"}
+  {"name":"Citroen","is_luxury":false,"is_popular":false,"id":43,"brand_logo":"https://gomechprod.blob.core.windows.net/gm-retail-app/thumbnails/brand-43.jpeg"}
 ]
