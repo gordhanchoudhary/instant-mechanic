@@ -1382,11 +1382,31 @@
         let userMobile = null;
 
         // Get mobile from URL params
-        function getMobileFromURL() {
-            const urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get('mobile');
-        }
-
+function getMobileFromURL() {
+    const urlParams = new URLSearchParams(window.location.search);
+    let mobile = urlParams.get('mobile');
+    
+    if (!mobile) return null;
+    
+    // URL decode the mobile parameter
+    mobile = decodeURIComponent(mobile);
+    
+    // Extract only the mobile number part (remove any extra data after '/')
+    if (mobile.includes('/')) {
+        mobile = mobile.split('/')[0];
+    }
+    
+    // Remove any non-digit characters and country code prefix
+    mobile = mobile.replace(/[^0-9]/g, '');
+    
+    // Handle Indian mobile numbers - remove country code if present
+    if (mobile.startsWith('91') && mobile.length === 12) {
+        mobile = mobile.substring(2); // Remove '91' prefix
+    }
+    
+    // Return only if it's a valid 10-digit mobile number
+    return mobile.length === 10 ? mobile : null;
+}
         // Initialize Mixpanel tracking
         function initializeTracking() {
             const mobile = getMobileFromURL();
