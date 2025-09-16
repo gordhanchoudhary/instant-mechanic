@@ -3207,6 +3207,42 @@ function makeCallWithTracking() {
 })();
 </script>
 
+	  <script>
+(function() {
+  var logBox = document.createElement("div");
+  logBox.style.position = "fixed";
+  logBox.style.bottom = "0";
+  logBox.style.left = "0";
+  logBox.style.width = "100%";
+  logBox.style.maxHeight = "40%";
+  logBox.style.overflowY = "auto";
+  logBox.style.background = "rgba(0,0,0,0.8)";
+  logBox.style.color = "lime";
+  logBox.style.fontSize = "12px";
+  logBox.style.zIndex = "99999";
+  logBox.style.padding = "5px";
+  document.body.appendChild(logBox);
+
+  function printLog(type, args) {
+    var msg = document.createElement("div");
+    msg.textContent = "[" + type + "] " + Array.from(args).join(" ");
+    logBox.appendChild(msg);
+    logBox.scrollTop = logBox.scrollHeight;
+  }
+
+  ["log", "error", "warn"].forEach(function(type) {
+    var old = console[type];
+    console[type] = function() {
+      old.apply(console, arguments);
+      printLog(type, arguments);
+    }
+  });
+
+  console.log("✅ Mobile logger ready...");
+})();
+</script>
+
+
 
   </body>
 </html>
