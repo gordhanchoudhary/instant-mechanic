@@ -1006,7 +1006,7 @@
             recentPayoutsEl.textContent = todayPayouts;
         }
 
-        // Update mechanic pending table
+// Update mechanic pending table
         function updateMechanicPendingTable() {
             const tbody = document.getElementById('mechanicPendingTableBody');
             
@@ -1046,7 +1046,7 @@
                     </td>
                     <td>
                         ${Math.abs(item.pending_balance) > 0 ? 
-                            `<button class="btn-settle" onclick="settlePending('${item.mechanic_name}', ${Math.abs(item.pending_balance)})">
+                            `<button class="btn-settle" onclick="settlePending('${item.mechanic_name}', ${item.pending_balance})">
                                 <i class="fas fa-credit-card"></i>
                                 Settle Pending
                             </button>` : 
@@ -1056,7 +1056,6 @@
                 </tr>
             `).join('');
         }
-
         // Update daily payouts table
         function updateDailyPayoutsTable() {
             const tbody = document.getElementById('dailyPayoutsTableBody');
