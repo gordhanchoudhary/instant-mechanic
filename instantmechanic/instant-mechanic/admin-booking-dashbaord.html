@@ -161,6 +161,17 @@
   </div>
 
 <script>
+  /*
+   * URL Parameters Support:
+   * - date: Single date filter (YYYY-MM-DD format)
+   * - start_date & end_date: Date range filter (YYYY-MM-DD format)
+   * - mechanic: Mechanic name or "unassigned"
+   * - cancelled: "true" (cancelled only), "false" (active only), "all" (show all)
+   * 
+   * Example URLs:
+   * ?date=2024-01-15&mechanic=John Doe&cancelled=false
+   * ?start_date=2024-01-15&end_date=2024-01-20&cancelled=true
+   */
   const dateInput = document.getElementById("datePicker");
   const dateType = document.getElementById("dateType");
   const dateRangeContainer = document.getElementById("dateRangeContainer");
@@ -686,6 +697,59 @@
     }
   });
 
+  // Function to get URL parameters
+  const getUrlParams = () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    return {
+      date: urlParams.get('date'),
+      start_date: urlParams.get('start_date'),
+      end_date: urlParams.get('end_date'),
+      mechanic: urlParams.get('mechanic'),
+      cancelled: urlParams.get('cancelled')
+    };
+  };
+
+  // Function to apply URL parameters as pre-filters
+  const applyUrlParameters = () => {
+    const params = getUrlParams();
+    
+    // Apply date parameters
+    if (params.start_date && params.end_date) {
+      // Use date range if both start_date and end_date are provided
+      dateType.value = 'range';
+      startDate.value = params.start_date;
+      endDate.value = params.end_date;
+      dateInput.style.display = "none";
+      dateRangeContainer.style.display = "flex";
+      updateTimeHeader();
+    } else if (params.date) {
+      // Use single date if only date parameter is provided
+      dateType.value = 'single';
+      dateInput.value = params.date;
+      dateInput.style.display = "block";
+      dateRangeContainer.style.display = "none";
+      updateTimeHeader();
+    }
+    
+    // Apply mechanic parameter
+    if (params.mechanic) {
+      // We'll need to set this after the API call populates the dropdown
+      // Store it temporarily to set later
+      window.urlMechanicParam = params.mechanic;
+    }
+    
+    // Apply cancelled parameter
+    if (params.cancelled) {
+      if (params.cancelled === 'true') {
+        cancellationFilter.value = 'cancelled';
+      } else if (params.cancelled === 'false') {
+        cancellationFilter.value = 'active';
+      } else if (params.cancelled === 'all') {
+        cancellationFilter.value = 'all';
+      }
+    }
+  };
+
   async function fetchBookings(dateParam = null) {
     bookingTableBody.innerHTML = '';
     totalBookings.textContent = '0';
@@ -783,6 +847,15 @@
       mechanicFilter.value = currentSelectedMechanic;
     }
 
+    // Apply URL mechanic parameter if it exists and wasn't already set
+    if (window.urlMechanicParam && !mechanicFilter.value) {
+      if (window.urlMechanicParam === 'unassigned' || uniqueMechanics.includes(window.urlMechanicParam)) {
+        mechanicFilter.value = window.urlMechanicParam;
+      }
+      // Clear the temporary parameter so it doesn't interfere with manual changes
+      delete window.urlMechanicParam;
+    }
+
     // Client-side filtering for mechanic (in case API doesn't support mechanic filter)
     if (selectedMechanic === 'unassigned') {
       data = data.filter(item => !item.mechanic_name);
@@ -800,11 +873,23 @@
     updateDisplayWithFilteredData(data);
   }
 
+  // Apply URL parameters first
+  applyUrlParameters();
+
   // Default Load
   const today = new Date().toISOString().split('T')[0];
-  dateInput.value = today;
-  startDate.value = today;
-  endDate.value = today;
+  
+  // Only set defaults if URL parameters haven't set them already
+  if (!dateInput.value) {
+    dateInput.value = today;
+  }
+  if (!startDate.value) {
+    startDate.value = today;
+  }
+  if (!endDate.value) {
+    endDate.value = today;
+  }
+  
   updateTimeHeader();
   fetchBookings();
 
