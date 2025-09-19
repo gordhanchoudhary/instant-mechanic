@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Instant Mechanic — Candidates</title>
+  <style>
+    :root{font-family:Inter,ui-sans-serif,system-ui,Segoe UI,Roboto,"Helvetica Neue",Arial;}
+    body{margin:0;background:#f6f8fb;color:#0f172a}
+    .wrap{max-width:720px;margin:36px auto;padding:20px}
+    .card{background:#fff;border-radius:12px;padding:18px;box-shadow:0 6px 18px rgba(15,23,42,0.06)}
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:10px 8px;text-align:left;border-bottom:1px solid #eef2f7}
+    th{font-size:13px;color:#475569}
+    td.name{font-weight:600}
+    .btn{display:inline-block;padding:8px 12px;border-radius:8px;text-decoration:none;font-weight:600;cursor:pointer}
+    .btn-wh{background:#25D366;color:white}
+    .btn-disabled{background:#94a3b8;color:#fff;cursor:default;opacity:0.9}
+    input[type=search]{width:100%;padding:10px;border-radius:8px;border:1px solid #e2e8f0;margin-bottom:12px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <input id="search" type="search" placeholder="Search by name or phone" />
+      <table id="candidates-table">
+        <thead>
+          <tr><th>Name</th><th>Phone</th><th>Action</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    const CANDIDATES = [
+      {name: 'Kushagra Baranwal', phone: '9200065009'},
+      {name: 'Harsh', phone: '9350125961'},
+      {name: 'aryan sagar', phone: '7906223490'},
+      {name: 'sudhanshu jee popular', phone: '8529734993'},
+      {name: 'Abhishek', phone: '9588153221'},
+      {name: 'Deepak', phone: '8307130658'},
+      {name: 'Tirumalasetty Asritha', phone: '9441655809'},
+      {name: 'Shiv Narayan Kumar Yadav', phone: '6287039665'},
+      {name: 'Devesh Kumar Srivastav', phone: '9837689940'},
+      {name: 'Ganesh Muttepod', phone: '7385863423'},
+      {name: 'Raman Kumar', phone: '7533801905'},
+      {name: 'Sahil kumar', phone: '9996697534'},
+      {name: 'Anirwan Banerjee', phone: '9560504288'},
+      {name: 'Harsh Kumar', phone: '9306077267'},
+      {name: 'Yogesh', phone: '9306039517'},
+      {name: 'Manish Yadav', phone: '9729461589'},
+      {name: 'SUDHIR BHARTI', phone: '7417849938'},
+      {name: 'Lokendra Singh', phone: '8529361561'}
+    ];
+
+    function sentKey(phone){ return `sent_${phone}`; }
+    function isSent(phone){ return localStorage.getItem(sentKey(phone)) === '1'; }
+    function markSent(phone){ localStorage.setItem(sentKey(phone), '1'); }
+
+    // Summarized hiring message
+    function buildMessage(name){
+      return `Hi *${name}*, this is *Harshit Chauhan*, Founder of Instant Mechanic.\n\nWe’re hiring an *Entrepreneur in Residence (EIR)* Intern. You’ll work closely with the founders on operations, growth, fundraising & strategy, driving experiments in AI automation and scaling in the $60,000 Cr+ auto-service market.\n\nLocation: Gurugram | Duration: 6 months | Perks: Work with founders, equity opportunities, and fast-track growth.\n\nIf you’re looking to start your own venture someday, this is your launchpad 🚀.\n\nInterested? Reply here or share your profile at hr@instantmechanic.online.`;
+    }
+
+    function renderList(filter){
+      const tbody = document.querySelector('#candidates-table tbody');
+      tbody.innerHTML = '';
+      const q = (filter||'').toLowerCase();
+      CANDIDATES.forEach(c=>{
+        if(q && !(c.name.toLowerCase().includes(q)||c.phone.includes(q))) return;
+        const tr = document.createElement('tr');
+        const tdName = document.createElement('td'); tdName.className='name'; tdName.textContent = c.name;
+        const tdPhone = document.createElement('td'); tdPhone.textContent = c.phone;
+        const tdAction = document.createElement('td');
+
+        const sendBtn = document.createElement('button');
+        sendBtn.className = 'btn btn-wh';
+        sendBtn.textContent = isSent(c.phone) ? 'Sent' : 'Message';
+        if(isSent(c.phone)) sendBtn.classList.add('btn-disabled');
+        sendBtn.onclick = ()=>{
+          if(isSent(c.phone)) return;
+          const msg = encodeURIComponent(buildMessage(c.name));
+          const url = `https://wa.me/91${c.phone}?text=${msg}`;
+          window.open(url, '_blank');
+          markSent(c.phone);
+          renderList(filter);
+        };
+
+        const openBtn = document.createElement('button');
+        openBtn.className = 'btn';
+        openBtn.textContent = 'Open';
+        openBtn.style.background='#e2e8f0';
+        openBtn.onclick = ()=>{
+          const url = new URL(window.location.href);
+          url.searchParams.set('phone', c.phone);
+          window.location.href = url.toString();
+        };
+
+        tdAction.appendChild(sendBtn);
+        tdAction.appendChild(document.createTextNode(' '));
+        tdAction.appendChild(openBtn);
+
+        tr.appendChild(tdName); tr.appendChild(tdPhone); tr.appendChild(tdAction);
+        tbody.appendChild(tr);
+      });
+    }
+
+    document.getElementById('search').addEventListener('input', e=>renderList(e.target.value));
+    renderList('');
+  </script>
+</body>
+</html>
