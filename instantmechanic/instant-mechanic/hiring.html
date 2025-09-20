@@ -34,24 +34,52 @@
 
   <script>
     const CANDIDATES = [
-      {name: 'Kushagra Baranwal', phone: '9200065009'},
-      {name: 'Harsh', phone: '9350125961'},
-      {name: 'aryan sagar', phone: '7906223490'},
-      {name: 'sudhanshu jee popular', phone: '8529734993'},
-      {name: 'Abhishek', phone: '9588153221'},
-      {name: 'Deepak', phone: '8307130658'},
-      {name: 'Tirumalasetty Asritha', phone: '9441655809'},
-      {name: 'Shiv Narayan Kumar Yadav', phone: '6287039665'},
-      {name: 'Devesh Kumar Srivastav', phone: '9837689940'},
-      {name: 'Ganesh Muttepod', phone: '7385863423'},
-      {name: 'Raman Kumar', phone: '7533801905'},
-      {name: 'Sahil kumar', phone: '9996697534'},
-      {name: 'Anirwan Banerjee', phone: '9560504288'},
-      {name: 'Harsh Kumar', phone: '9306077267'},
-      {name: 'Yogesh', phone: '9306039517'},
-      {name: 'Manish Yadav', phone: '9729461589'},
-      {name: 'SUDHIR BHARTI', phone: '7417849938'},
-      {name: 'Lokendra Singh', phone: '8529361561'}
+      {name: 'Varun Saini', phone: '9205152506'},
+      {name: 'Deepak Sharma', phone: '6397757543'},
+      {name: 'Rajat Vijay Kumar', phone: '7840052465'},
+      {name: 'Grisha Sankhla', phone: '9811428821'},
+      {name: 'Rajeev Bhatt', phone: '7717747809'},
+      {name: 'Navya Banerjee', phone: '8194882675'},
+      {name: 'Samridh Seth', phone: '9212345617'},
+      {name: 'Vishnu Priya', phone: '8588081422'},
+      {name: 'Dikshansh Shrivastav', phone: '9799397404'},
+      {name: 'Himanshu Sinha', phone: '8340714774'},
+      {name: 'Pooja Dalal', phone: '9870131501'},
+      {name: 'Priya Choudhary', phone: '8894856838'},
+      {name: 'Chaitanya K', phone: '9440772269'},
+      {name: 'ARVIND SHYAMA RAJA BABU', phone: '9392729928'},
+      {name: 'Samarth Vaishnav', phone: '9343398584'},
+      {name: 'Doni Francis', phone: '6379669004'},
+      {name: 'Hitesh Kumar', phone: '8510974229'},
+      {name: 'Amruta Adwani', phone: '8999761608'},
+      {name: 'Preeti Kumari', phone: '9650840350'},
+      {name: 'Rohit Yadav', phone: '8053627330'},
+      {name: 'Dinesh Bairwa', phone: '6376177191'},
+      {name: 'RAJDEEP DUTTA', phone: '7872876325'},
+      {name: 'Jatin Singh', phone: '7307731458'},
+      {name: 'Prashant Prashant Yadav', phone: '9389092360'},
+      {name: 'Mishti', phone: '8588987162'},
+      {name: 'Abhishek Kumar Mishra', phone: '7004197301'},
+      {name: 'Vidhi Singh', phone: '9368541474'},
+      {name: 'Kishan Thakur', phone: '8882308188'},
+      {name: 'Srinithya Madasu', phone: '6303298564'},
+      {name: 'Rakesh Saini', phone: '8209188472'},
+      {name: 'Rachana A', phone: '6366335546'},
+      {name: 'Yashmit Gauba', phone: '7428805096'},
+      {name: 'Ananya Jain', phone: '8923830573'},
+      {name: 'Om', phone: '9711271928'},
+      {name: 'Sakira Thesni', phone: '9496865067'},
+      {name: 'Manasvi Avadhanula', phone: '9958582766'},
+      {name: 'Bhavani Pasham', phone: '9652816704'},
+      {name: 'Jayshree Venkatachalapathi', phone: '8217268795'},
+      {name: 'Laxmi Gurjar', phone: '6378182019'},
+      {name: 'Sadasivuni Durga', phone: '7893766438'},
+      {name: 'SNEHA KUMARI', phone: '7903297738'},
+      {name: 'Loveleen Kaur', phone: '6284346712'},
+      {name: 'Sanjana Mittal', phone: '9354926671'},
+      {name: 'Pragya Sharma', phone: '8839422714'},
+      {name: 'Bushra Mirza', phone: '9716958786'},
+      {name: 'Neetu Dahiya', phone: '9619574925'}
     ];
 
     function sentKey(phone){ return `sent_${phone}`; }
@@ -60,7 +88,7 @@
 
     // Summarized hiring message
     function buildMessage(name){
-      return `Hi *${name}*, this is *Harshit Chauhan*, Founder of Instant Mechanic.\n\nWe’re hiring an *Entrepreneur in Residence (EIR)* Intern. You’ll work closely with the founders on operations, growth, fundraising & strategy, driving experiments in AI automation and scaling in the $60,000 Cr+ auto-service market.\n\nLocation: Gurugram | Duration: 6 months | Perks: Work with founders, equity opportunities, and fast-track growth.\n\nIf you’re looking to start your own venture someday, this is your launchpad 🚀.\n\nInterested? Reply here or share your profile at hr@instantmechanic.online.`;
+      return `Hi *${name}*, this is *Harshit Chauhan*, Founder of Instant Mechanic.\n\nWe're hiring an *Entrepreneur in Residence (EIR)* Intern. You'll work closely with the founders on operations, growth, fundraising & strategy, driving experiments in AI automation and scaling in the $60,000 Cr+ auto-service market.\n\nLocation: Gurugram | Duration: 6 months | Perks: Work with founders, equity opportunities, and fast-track growth.\n\nIf you're looking to start your own venture someday, this is your launchpad 🚀.\n\nInterested? Reply here or share your profile at hr@instantmechanic.online.`;
     }
 
     function renderList(filter){
