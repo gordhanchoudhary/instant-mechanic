@@ -11,19 +11,16 @@
       padding: 10px;
       background: #f4f4f4;
     }
-
     h2 {
       text-align: center;
       margin-bottom: 20px;
     }
-
     .container {
       display: flex;
       flex-wrap: wrap;
       gap: 15px;
       justify-content: center;
     }
-
     .card {
       background: white;
       padding: 15px;
@@ -31,30 +28,58 @@
       box-shadow: 0 0 8px rgba(0,0,0,0.1);
       width: 300px;
       box-sizing: border-box;
+      position: relative;
     }
-
+    .priority-badge {
+      position: absolute;
+      top: 5px;
+      right: 10px;
+      font-size: 11px;
+      padding: 2px 6px;
+      border-radius: 12px;
+      font-weight: bold;
+    }
+    .priority-both {
+      background: #9c27b0;
+      color: white;
+    }
+    .priority-live {
+      background: #4CAF50;
+      color: white;
+    }
+    .priority-inactive {
+      background: #ff9800;
+      color: white;
+    }
     .card h3 {
-      margin: 0 0 5px;
+      margin: 0 0 10px;
     }
-
     .card p {
       margin: 5px 0;
       font-size: 14px;
     }
-
+    .toggle-container {
+      display: flex;
+      align-items: center;
+      margin: 10px 0;
+      gap: 15px;
+    }
+    .toggle-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
     .switch {
       position: relative;
       display: inline-block;
       width: 50px;
       height: 26px;
     }
-
     .switch input {
       opacity: 0;
       width: 0;
       height: 0;
     }
-
     .slider {
       position: absolute;
       cursor: pointer;
@@ -66,7 +91,6 @@
       transition: 0.4s;
       border-radius: 26px;
     }
-
     .slider:before {
       position: absolute;
       content: "";
@@ -78,18 +102,26 @@
       transition: 0.4s;
       border-radius: 50%;
     }
-
     input:checked + .slider {
       background-color: #4CAF50;
     }
-
     input:checked + .slider:before {
       transform: translateX(24px);
     }
-
+    .switch.inactive input:checked + .slider {
+      background-color: #ff9800;
+    }
+    .toggle-label {
+      font-size: 14px;
+      min-width: 60px;
+    }
     @media (max-width: 500px) {
       .card {
         width: 90%;
+      }
+      .toggle-container {
+        flex-direction: column;
+        align-items: flex-start;
       }
     }
   </style>
@@ -97,38 +129,108 @@
 <body>
   <h2>Agent List</h2>
   <div class="container" id="agentList"></div>
-
   <script>
     const API_URL = "https://ai.instantmechanic.online/bot/api/agent/";
-
+    
+    // Store agents globally to maintain order
+    let currentAgents = [];
+    
     // Fetch all agents
-    async function fetchAgents() {
-      const res = await fetch(API_URL);
-      const agents = await res.json();
-      displayAgents(agents);
+    async function fetchAgents(shouldSort = true) {
+      try {
+        const res = await fetch(API_URL);
+        const agents = await res.json();
+        
+        if (shouldSort) {
+          // Only sort on initial load/reload
+          currentAgents = sortAgents(agents);
+        } else {
+          // Update existing agents without changing order
+          currentAgents = currentAgents.map(existingAgent => {
+            const updatedAgent = agents.find(a => a.id === existingAgent.id);
+            return updatedAgent || existingAgent;
+          });
+        }
+        
+        displayAgents(currentAgents);
+      } catch (err) {
+        console.error("Error fetching agents:", err);
+      }
     }
-
+    
+    // Sort agents based on boolean flags priority
+    function sortAgents(agents) {
+      return agents.sort((a, b) => {
+        // Priority 1: Both true
+        const aBothTrue = a.is_live && a.is_inactive_team_member;
+        const bBothTrue = b.is_live && b.is_inactive_team_member;
+        
+        if (aBothTrue && !bBothTrue) return -1;
+        if (!aBothTrue && bBothTrue) return 1;
+        
+        // Priority 2: Only is_live true
+        const aOnlyLive = a.is_live && !a.is_inactive_team_member;
+        const bOnlyLive = b.is_live && !b.is_inactive_team_member;
+        
+        if (aOnlyLive && !bOnlyLive) return -1;
+        if (!aOnlyLive && bOnlyLive) return 1;
+        
+        // Priority 3: Only is_inactive_team_member true
+        const aOnlyInactive = !a.is_live && a.is_inactive_team_member;
+        const bOnlyInactive = !b.is_live && b.is_inactive_team_member;
+        
+        if (aOnlyInactive && !bOnlyInactive) return -1;
+        if (!aOnlyInactive && bOnlyInactive) return 1;
+        
+        // Priority 4: Both false (maintain original order)
+        return 0;
+      });
+    }
+    
     // Display agents
     function displayAgents(agents) {
       const container = document.getElementById("agentList");
       container.innerHTML = "";
-
       agents.forEach(agent => {
         const card = document.createElement("div");
         card.className = "card";
+        
+        // Determine priority badge
+        let priorityBadge = "";
+        if (agent.is_live && agent.is_inactive_team_member) {
+          priorityBadge = '<span class="priority-badge priority-both">BOTH</span>';
+        } else if (agent.is_live && !agent.is_inactive_team_member) {
+          priorityBadge = '<span class="priority-badge priority-live">LIVE</span>';
+        } else if (!agent.is_live && agent.is_inactive_team_member) {
+          priorityBadge = '<span class="priority-badge priority-inactive">INACTIVE Customer Support </span>';
+        }
+        
         card.innerHTML = `
+          ${priorityBadge}
           <h3>${agent.name}</h3>
           <p><strong>Mobile:</strong> ${agent.mobile}</p>
           <p><strong>Total Chats:</strong> ${agent.total_chats}</p>
-          <label class="switch">
-            <input type="checkbox" ${agent.is_live ? "checked" : ""} onchange="toggleLive(${agent.id}, this.checked)">
-            <span class="slider"></span>
-          </label> <span>Live</span>
+          <div class="toggle-container">
+            <div class="toggle-item">
+              <label class="switch">
+                <input type="checkbox" ${agent.is_live ? "checked" : ""} onchange="toggleLive(${agent.id}, this.checked)">
+                <span class="slider"></span>
+              </label>
+              <span class="toggle-label">Live</span>
+            </div>
+            <div class="toggle-item">
+              <label class="switch inactive">
+                <input type="checkbox" ${agent.is_inactive_team_member ? "checked" : ""} onchange="toggleInactive(${agent.id}, this.checked)">
+                <span class="slider"></span>
+              </label>
+              <span class="toggle-label">Inactive CS</span>
+            </div>
+          </div>
         `;
         container.appendChild(card);
       });
     }
-
+    
     // Toggle is_live
     async function toggleLive(agentId, isLive) {
       try {
@@ -139,15 +241,49 @@
           },
           body: JSON.stringify({ is_live: isLive })
         });
-
         if (!res.ok) {
-          alert("Failed to update agent");
+          alert("Failed to update live status");
+        } else {
+          // Update the local agent data without re-sorting
+          updateLocalAgent(agentId, { is_live: isLive });
         }
       } catch (err) {
-        alert("Error: " + err);
+        alert("Error updating live status: " + err);
       }
     }
-
+    
+    // Toggle is_inactive_team_member
+    async function toggleInactive(agentId, isInactive) {
+      try {
+        const res = await fetch(`${API_URL}${agentId}/`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ is_inactive_team_member: isInactive })
+        });
+        if (!res.ok) {
+          alert("Failed to update inactive status");
+        } else {
+          // Update the local agent data without re-sorting
+          updateLocalAgent(agentId, { is_inactive_team_member: isInactive });
+        }
+      } catch (err) {
+        alert("Error updating inactive status: " + err);
+      }
+    }
+    
+    // Update local agent data and refresh display
+    function updateLocalAgent(agentId, updates) {
+      currentAgents = currentAgents.map(agent => {
+        if (agent.id === agentId) {
+          return { ...agent, ...updates };
+        }
+        return agent;
+      });
+      displayAgents(currentAgents);
+    }
+    
     // Initial load
     fetchAgents();
   </script>
