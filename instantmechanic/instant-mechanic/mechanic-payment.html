@@ -292,6 +292,167 @@
             font-weight: 600;
         }
 
+        /* New styles for expandable rows and historical data */
+        .payout-row {
+            transition: background-color 0.3s ease;
+        }
+
+        .payout-row.has-history {
+            cursor: pointer;
+        }
+
+        .expand-btn {
+            background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e0 100%);
+            border: none;
+            padding: 6px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #4a5568;
+            transition: all 0.3s ease;
+        }
+
+        .expand-btn:hover {
+            background: linear-gradient(135deg, #cbd5e0 0%, #a0aec0 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .expand-btn.expanded {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .expand-btn i {
+            transition: transform 0.3s ease;
+        }
+
+        .expand-btn.expanded i {
+            transform: rotate(180deg);
+        }
+
+        .history-container {
+            display: none;
+            animation: slideDown 0.3s ease;
+        }
+
+        .history-container.show {
+            display: table-row;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .history-content {
+            background: linear-gradient(135deg, #fef5e7 0%, #fdebd0 100%);
+            border-left: 4px solid #f39c12;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 20px;
+        }
+
+        .history-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            color: #7a5916;
+            font-weight: 600;
+        }
+
+        .history-header i {
+            color: #f39c12;
+            font-size: 1.2rem;
+        }
+
+        .history-item {
+            background: white;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #fad5a5;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr auto;
+            gap: 15px;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .history-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(243, 156, 18, 0.2);
+        }
+
+        .history-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .history-label {
+            font-size: 0.75rem;
+            color: #718096;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 2px;
+        }
+
+        .history-value {
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .history-date {
+            color: #7a5916;
+            font-size: 0.85rem;
+        }
+
+        .history-badge {
+            background: #f39c12;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .no-history {
+            text-align: center;
+            padding: 20px;
+            color: #718096;
+            font-style: italic;
+        }
+
+        .live-badge {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            margin-left: 8px;
+        }
+
+        .live-badge i {
+            font-size: 0.6rem;
+        }
+
         .confirmation-modal {
             display: none;
             position: fixed;
@@ -591,6 +752,11 @@
                 margin: 10% auto;
                 width: 95%;
             }
+
+            .history-item {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
         }
 
         .mechanic-name-link {
@@ -799,7 +965,7 @@
                     </thead>
                     <tbody id="dailyPayoutsTableBody">
                         <tr>
-                            <td colspan="5" class="loading">
+                            <td colspan="6" class="loading">
                                 <i class="fas fa-spinner"></i>
                                 Loading data...
                             </td>
@@ -1002,11 +1168,11 @@
 
             // Recent payouts (today)
             const today = new Date().toISOString().split('T')[0];
-            const todayPayouts = paymentData.daily_payouts.filter(p => p.payout_date === today).length;
+            const todayPayouts = paymentData.daily_payouts.filter(p => p.payout_date === today && !p.is_deleted).length;
             recentPayoutsEl.textContent = todayPayouts;
         }
 
-// Update mechanic pending table
+        // Update mechanic pending table
         function updateMechanicPendingTable() {
             const tbody = document.getElementById('mechanicPendingTableBody');
             
@@ -1056,7 +1222,8 @@
                 </tr>
             `).join('');
         }
-        // Update daily payouts table
+
+        // Update daily payouts table with historical data support
         function updateDailyPayoutsTable() {
             const tbody = document.getElementById('dailyPayoutsTableBody');
             const dailyPayoutsSection = document.getElementById('dailyPayoutsSection');
@@ -1082,23 +1249,214 @@
                 return;
             }
 
-            tbody.innerHTML = paymentData.daily_payouts.map(item => `
-                <tr>
-                    <td>${formatDate(item.payout_date)}</td>
-                    <td>${item.mechanic_name}</td>
-                    <td class="${item.pending_amount >= 0 ? 'amount-positive' : 'amount-negative'}">
-                        ${formatCurrency(item.pending_amount)}
-                    </td>
-                    <td>${item.total_calls || 0}</td>
-                    <td>${item.remarks || '-'}</td>
-                    <td>
-                        <button class="btn-primary" onclick="viewDetails('${item.payout_date}', '${mechanicFilter}')" style="padding: 6px 12px; font-size: 0.85rem;">
-                            <i class="fas fa-eye"></i>
-                            View Details
-                        </button>
-                    </td>
-                </tr>
-            `).join('');
+            // Group payouts by date and mechanic
+            const groupedPayouts = {};
+            paymentData.daily_payouts.forEach(item => {
+                const key = `${item.payout_date}_${item.mechanic_name}`;
+                if (!groupedPayouts[key]) {
+                    groupedPayouts[key] = {
+                        live: [],
+                        historical: []
+                    };
+                }
+                
+                if (!item.is_deleted) {
+                    groupedPayouts[key].live.push(item);
+                } else {
+                    groupedPayouts[key].historical.push(item);
+                }
+            });
+
+            // Sort live and historical data by created_at (newest first)
+            Object.values(groupedPayouts).forEach(group => {
+                group.live.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+                group.historical.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+            });
+
+            // Generate table rows
+            let rows = [];
+            Object.keys(groupedPayouts).sort((a, b) => {
+                const dateA = new Date(groupedPayouts[a].live[0]?.payout_date || groupedPayouts[a].historical[0]?.payout_date);
+                const dateB = new Date(groupedPayouts[b].live[0]?.payout_date || groupedPayouts[b].historical[0]?.payout_date);
+                return dateB - dateA;
+            }).forEach((key, keyIndex) => {
+                const group = groupedPayouts[key];
+                const hasHistory = group.historical.length > 0;
+                const hasLiveData = group.live.length > 0;
+                
+                // Show all live entries
+                if (hasLiveData) {
+                    group.live.forEach((item, index) => {
+                        const rowId = `payout-row-${key.replace(/[^a-zA-Z0-9]/g, '-')}-${index}`;
+                        const isFirstLiveEntry = index === 0;
+                        
+                        rows.push(`
+                            <tr class="payout-row ${hasHistory && isFirstLiveEntry ? 'has-history' : ''}" id="${rowId}">
+                                <td>${formatDate(item.payout_date)}</td>
+                                <td>
+                                    ${item.mechanic_name}
+                                    <span class="live-badge"><i class="fas fa-circle"></i> Live</span>
+                                </td>
+                                <td class="${item.pending_amount >= 0 ? 'amount-positive' : 'amount-negative'}">
+                                    ${formatCurrency(item.pending_amount)}
+                                </td>
+                                <td>${item.total_calls || 0}</td>
+                                <td>${item.remarks || '-'}</td>
+                                <td>
+                                    <div style="display: flex; gap: 8px; align-items: center;">
+                                        ${hasHistory && isFirstLiveEntry ? `
+                                            <button class="expand-btn" onclick="toggleHistory('${rowId}')">
+                                                <i class="fas fa-chevron-down"></i>
+                                                History (${group.historical.length})
+                                            </button>
+                                        ` : ''}
+                                        <button class="btn-primary" onclick="viewDetails('${item.payout_date}', '${mechanicFilter}')" style="padding: 6px 12px; font-size: 0.85rem;">
+                                            <i class="fas fa-eye"></i>
+                                            View Details
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        `);
+
+                        // Add history container row only after the first live entry
+                        if (hasHistory && isFirstLiveEntry) {
+                            rows.push(`
+                                <tr class="history-container" id="${rowId}-history" style="display: none;">
+                                    <td colspan="6">
+                                        <div class="history-content">
+                                            <div class="history-header">
+                                                <i class="fas fa-history"></i>
+                                                <span>Historical Records for ${formatDate(item.payout_date)}</span>
+                                            </div>
+                                            ${group.historical.map(hist => `
+                                                <div class="history-item">
+                                                    <div>
+                                                        <div class="history-label">Amount</div>
+                                                        <div class="history-value ${hist.pending_amount >= 0 ? 'amount-positive' : 'amount-negative'}">
+                                                            ${formatCurrency(hist.pending_amount)}
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <div class="history-label">Calls</div>
+                                                        <div class="history-value">${hist.total_calls || 0}</div>
+                                                    </div>
+                                                    <div>
+                                                        <div class="history-label">Created</div>
+                                                        <div class="history-date">${formatDateTime(hist.created_at)}</div>
+                                                    </div>
+                                                    <div>
+                                                        <div class="history-label">Remarks</div>
+                                                        <div class="history-value" style="font-size: 0.85rem;">${hist.remarks || '-'}</div>
+                                                    </div>
+                                                    <div style="display: flex; align-items: center; justify-content: flex-end;">
+                                                        <span class="history-badge">
+                                                            <i class="fas fa-archive"></i>
+                                                            Historical
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            `).join('')}
+                                        </div>
+                                    </td>
+                                </tr>
+                            `);
+                        }
+                    });
+                } else if (group.historical.length > 0) {
+                    // If there's no live data but only historical data, show historical as archived
+                    const firstHistorical = group.historical[0];
+                    const rowId = `payout-row-${key.replace(/[^a-zA-Z0-9]/g, '-')}-archived`;
+                    
+                    rows.push(`
+                        <tr class="payout-row has-history" id="${rowId}" style="opacity: 0.7;">
+                            <td>${formatDate(firstHistorical.payout_date)}</td>
+                            <td>
+                                ${firstHistorical.mechanic_name}
+                                <span class="history-badge"><i class="fas fa-archive"></i> Archived</span>
+                            </td>
+                            <td class="${firstHistorical.pending_amount >= 0 ? 'amount-positive' : 'amount-negative'}">
+                                ${formatCurrency(firstHistorical.pending_amount)}
+                            </td>
+                            <td>${firstHistorical.total_calls || 0}</td>
+                            <td>${firstHistorical.remarks || '-'}</td>
+                            <td>
+                                <div style="display: flex; gap: 8px; align-items: center;">
+                                    <button class="expand-btn" onclick="toggleHistory('${rowId}')">
+                                        <i class="fas fa-chevron-down"></i>
+                                        All History (${group.historical.length})
+                                    </button>
+                                    <button class="btn-primary" onclick="viewDetails('${firstHistorical.payout_date}', '${mechanicFilter}')" style="padding: 6px 12px; font-size: 0.85rem;">
+                                        <i class="fas fa-eye"></i>
+                                        View Details
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    `);
+
+                    rows.push(`
+                        <tr class="history-container" id="${rowId}-history" style="display: none;">
+                            <td colspan="6">
+                                <div class="history-content">
+                                    <div class="history-header">
+                                        <i class="fas fa-history"></i>
+                                        <span>All Historical Records for ${formatDate(firstHistorical.payout_date)}</span>
+                                    </div>
+                                    ${group.historical.map(hist => `
+                                        <div class="history-item">
+                                            <div>
+                                                <div class="history-label">Amount</div>
+                                                <div class="history-value ${hist.pending_amount >= 0 ? 'amount-positive' : 'amount-negative'}">
+                                                    ${formatCurrency(hist.pending_amount)}
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <div class="history-label">Calls</div>
+                                                <div class="history-value">${hist.total_calls || 0}</div>
+                                            </div>
+                                            <div>
+                                                <div class="history-label">Created</div>
+                                                <div class="history-date">${formatDateTime(hist.created_at)}</div>
+                                            </div>
+                                            <div>
+                                                <div class="history-label">Remarks</div>
+                                                <div class="history-value" style="font-size: 0.85rem;">${hist.remarks || '-'}</div>
+                                            </div>
+                                            <div style="display: flex; align-items: center; justify-content: flex-end;">
+                                                <span class="history-badge">
+                                                    <i class="fas fa-archive"></i>
+                                                    Historical
+                                                </span>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </td>
+                        </tr>
+                    `);
+                }
+            });
+
+            tbody.innerHTML = rows.join('');
+        }
+
+        // Toggle history visibility
+        function toggleHistory(rowId) {
+            const historyRow = document.getElementById(`${rowId}-history`);
+            const expandBtn = document.querySelector(`#${rowId} .expand-btn`);
+            
+            if (historyRow) {
+                const isVisible = historyRow.style.display !== 'none';
+                
+                if (isVisible) {
+                    historyRow.style.display = 'none';
+                    expandBtn.classList.remove('expanded');
+                } else {
+                    historyRow.style.display = 'table-row';
+                    expandBtn.classList.add('expanded');
+                }
+            }
         }
 
         // View details function
@@ -1324,8 +1682,12 @@
         // Close modal when clicking outside
         window.onclick = function(event) {
             const modal = document.getElementById('createPaymentModal');
+            const confirmModal = document.getElementById('confirmationModal');
             if (event.target === modal) {
                 closeCreateModal();
+            }
+            if (event.target === confirmModal) {
+                closeConfirmationModal();
             }
         }
     </script>
