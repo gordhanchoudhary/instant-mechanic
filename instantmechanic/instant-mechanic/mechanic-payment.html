@@ -1394,7 +1394,7 @@
             const whatsappMessage = `नमस्ते ${mechanicName} जी 🙏, आपका कुल बकाया ${formatCurrency(pendingAmount)} है,🚨🚨 ${istTimeString} बजे तक का हिसाब। अगर हिसाब में कोई गलती लगे या कुछ पूछना हो, तो आप सीधे मुझे कॉल 📞 कर सकते हो। Mehak – 7426967410 Team Instant Mechanic`;
 
             // Create WhatsApp URL
-            const whatsappUrl = `https://wa.me/${mechanic.mobile}?text=${encodeURIComponent(whatsappMessage)}`;
+            const whatsappUrl = `https://wa.me/91${mechanic.mobile}?text=${encodeURIComponent(whatsappMessage)}`;
             
             // Open WhatsApp
             window.open(whatsappUrl, '_blank');
