@@ -1394,7 +1394,7 @@
             const whatsappMessage = `नमस्ते ${mechanicName} जी 🙏, आपका कुल बकाया ${formatCurrency(pendingAmount)} है,🚨🚨 ${istTimeString} बजे तक का हिसाब। अगर हिसाब में कोई गलती लगे या कुछ पूछना हो, तो आप सीधे मुझे कॉल 📞 कर सकते हो। Mehak – 7426967410 Team Instant Mechanic`;
 
             // Create WhatsApp URL
-            const whatsappUrl = `https://wa.me/91${mechanic.mobile}?text=${encodeURIComponent(whatsappMessage)}`;
+            const whatsappUrl = `https://wa.me/${mechanic.mobile}?text=${encodeURIComponent(whatsappMessage)}`;
             
             // Open WhatsApp
             window.open(whatsappUrl, '_blank');
@@ -1505,23 +1505,29 @@
             // Create combined entries array with only live payouts
             const allEntries = [];
             
-            // Add only live payout entries
+            // Add ALL live payout entries (multiple payouts per date if they exist)
             Object.keys(payoutsByDate).forEach(date => {
                 const dateGroup = payoutsByDate[date];
                 
-                // Get the latest live entry for this date
+                // Add ALL live entries for this date (not just the latest one)
                 if (dateGroup.live.length > 0) {
-                    const latestLive = dateGroup.live.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))[0];
-                    allEntries.push({
-                        type: 'payout',
-                        date: latestLive.created_at || latestLive.payout_date,
-                        payout_date: latestLive.payout_date,
-                        data: latestLive,
-                        // UPDATED: Use payout_date as primary sort criteria for payouts
-                        sortDate: new Date(latestLive.payout_date + 'T00:00:00'),
-                        hasHistory: dateGroup.historical.length > 0,
-                        historicalCount: dateGroup.historical.length,
-                        historicalData: dateGroup.historical.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+                    // Sort live payouts by created_at (latest first)
+                    const sortedLivePayouts = dateGroup.live.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+                    
+                    // Add each live payout as a separate entry
+                    sortedLivePayouts.forEach((livePayout, index) => {
+                        allEntries.push({
+                            type: 'payout',
+                            date: livePayout.created_at || livePayout.payout_date,
+                            payout_date: livePayout.payout_date,
+                            data: livePayout,
+                            // Use payout_date as primary sort criteria for payouts
+                            sortDate: new Date(livePayout.payout_date + 'T00:00:00'),
+                            // Only show historical data for the first (latest) live payout of each date
+                            hasHistory: index === 0 && dateGroup.historical.length > 0,
+                            historicalCount: dateGroup.historical.length,
+                            historicalData: dateGroup.historical.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+                        });
                     });
                 }
             });
