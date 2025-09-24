@@ -1,522 +1,793 @@
 <!DOCTYPE html>
-<html class="no-js" lang="en">
-  <head>
-    <!-- Meta Tags -->
-    <meta charset="utf-8">
-    <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="author" content="ThemeServices">
-    <!-- Favicon Icon -->
-    <link rel="icon" href="assets/img/favicon.png">
-    <!-- Site Title -->
-    <title>Shared on THEMELOCK.COM - Cripar – Car Repair Services HTML Template</title>
-    <link rel="stylesheet" href="assets/css/bootstrap.min.css">
-    <link rel="stylesheet" href="assets/css/fontawesome.min.css">
-    <link rel="stylesheet" href="assets/css/animate.css">
-    <link rel="stylesheet" href="assets/css/slick.min.css">
-    <link rel="stylesheet" href="assets/css/odometer.css">
-    <link rel="stylesheet" href="assets/css/style.css">
-    <!-- Meta Pixel Code -->
-<script>
-  !function(f,b,e,v,n,t,s)
-  {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-  n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-  if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-  n.queue=[];t=b.createElement(e);t.async=!0;
-  t.src=v;s=b.getElementsByTagName(e)[0];
-  s.parentNode.insertBefore(t,s)}(window, document,'script',
-  'https://connect.facebook.net/en_US/fbevents.js');
-  fbq('init', '479182611911558');
-  fbq('track', 'PageView');
-  </script>
-  <noscript><img height="1" width="1" style="display:none"
-  src="https://www.facebook.com/tr?id=479182611911558&ev=PageView&noscript=1"
-  /></noscript>
-  <!-- End Meta Pixel Code -->
-  </head>
-  <body>
-    <!-- Start Preloader -->
-    <div class="cs_center cs_heading_bg" id="preloader">
-      <div class="preloader-inner">
-        <div class="spinner">
-          <img src="assets/img/preloader_logo.svg" alt="img">
-          <img src="assets/img/icons/wheel.svg" alt="img" class="wheel">
-        </div>
-        <div class="loading-text">
-          <img src="assets/img/logo.svg" alt="img">
-        </div>
-      </div>
-    </div>
-    <!-- End Preloader -->
-    <!-- Start Header Section -->
-    <header class="cs_site_header cs_style_1 cs_heading_color cs_sticky_header">
-      <div class="cs_top_header">
-        <div class="container-fluid">
-          <div class="cs_top_header_in">
-            <div class="cs_top_header_left">
-              <ul class="cs_header_contact_list cs_mp_0">
-                <li>
-                  <i class="fa-solid fa-phone-volume"></i>
-                  <a href="tel:+111(564)56825">+111 (564) 568 25</a>
-                </li>
-                <li>
-                  <i class="fa-solid fa-envelope"></i>
-                  <a href="mailto:cripar@gmail.com">cripar@gmail.com</a>
-                </li>
-                <li>
-                  <i class="fa-solid fa-location-dot"></i>
-                  <span>Abu Dhabi - United Arab Emirates</span>
-                </li>
-              </ul>
-            </div>
-            <div class="cs_top_header_right">
-              <div class="cs_header_social_links_wrap">
-                <div class="cs_header_social_links">
-                  <a href="#" class="cs_social_btn cs_center">
-                    <i class="fa-brands fa-linkedin-in"></i>
-                  </a>
-                  <a href="#" class="cs_social_btn cs_center">
-                    <i class="fa-brands fa-twitter"></i>
-                  </a>
-                  <a href="#" class="cs_social_btn cs_center">
-                    <i class="fa-brands fa-youtube"></i>
-                  </a>
-                  <a href="#" class="cs_social_btn cs_center">
-                    <i class="fa-brands fa-facebook-f"></i>
-                  </a>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instant Mechanic - 24x7 Professional Car Roadside Assistance | Delhi NCR</title>
+    <meta name="description" content="Professional 24x7 car roadside assistance services in Delhi NCR. Battery jump start, car lockout, fuel delivery, tyre repair, and emergency towing. Call +91 9266961110 for immediate help.">
+    
+    <!-- SEO Meta Tags -->
+    <meta name="keywords" content="car mechanic Delhi NCR,roadside assistance,mobile mechanic,car repair,emergency towing,battery jump start,fuel delivery,instant mechanic">
+    <meta name="author" content="Instant Mechanic">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="Instant Mechanic - Professional 24x7 Car Roadside Assistance">
+    <meta property="og:description" content="Professional roadside assistance services in Delhi NCR. Quick response, expert technicians, transparent pricing.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://instantmechanic.in">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#1f2937',
+                        secondary: '#3b82f6',
+                        accent: '#10b981',
+                        warning: '#f59e0b'
+                    },
+                    animation: {
+                        'float': 'float 3s ease-in-out infinite',
+                        'pulse-soft': 'pulse-soft 2s ease-in-out infinite',
+                        'slide-up': 'slideUp 0.5s ease-out'
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        @keyframes pulse-soft {
+            0%, 100% { opacity: 0.8; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.05); }
+        }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .card-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        /* Mobile optimizations */
+        @media (max-width: 768px) {
+            .mobile-padding {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+            
+            .mobile-text {
+                font-size: 0.875rem;
+                line-height: 1.25rem;
+            }
+        }
+        
+        /* WhatsApp button pulse */
+        .whatsapp-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: .8;
+                transform: scale(1.05);
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="bg-primary text-white py-2">
+            <div class="container mx-auto px-4">
+                <div class="flex items-center justify-between text-sm">
+                    <div class="flex items-center">
+                        <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
+                        </svg>
+                        <span class="font-medium">24/7 Professional Service</span>
+                    </div>
+                    <a href="tel:+919266961110" class="font-bold hover:text-accent transition-colors">
+                        📞 +91 9266961110
+                    </a>
                 </div>
-              </div>
             </div>
-          </div>
         </div>
-      </div>
-      <div class="cs_main_header">
-        <div class="container-fluid">
-          <div class="cs_main_header_in">
-            <div class="cs_main_header_left">
-              <div class="cs_logo_wrap">
-                <a class="cs_site_branding" href="index.html">
-                  <img src="assets/img/logo.svg" alt="Logo" >
-                </a>
-                <div class="cs_logo_bg_shape cs_accent_color">
-                  <svg width="509" height="141" viewBox="0 0 509 141" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M74 0H487L508.5 70.5L473.5 141H74V0Z" fill="currentColor" />
-                    <path d="M54 141H472.5L488.5 70.5L443.5 0H54V141Z" fill="white" />
-                    <path d="M0 0H443L464.5 70.5L443 141H0V0Z" fill="currentColor" />
-                  </svg>
-                  <img src="assets/img/logo_shape_pattern.svg" alt="">
+        
+        <nav class="container mx-auto px-4">
+            <div class="flex items-center justify-between h-20">
+                <div class="flex items-center space-x-3">
+                    <div class="w-12 h-12 bg-gradient-to-br from-secondary to-accent rounded-xl flex items-center justify-center shadow-lg">
+                        <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold text-primary">Instant Mechanic</h1>
+                        <p class="text-sm text-secondary font-semibold">Professional Service</p>
+                    </div>
                 </div>
-              </div>
-            </div>
-            <div class="cs_main_header_center">
-              <div class="cs_nav cs_fs_18 cs_semibold cs_heading_color cs_heading_font">
-                <div class="cs_nav_list_wrap">
-                  <ul class="cs_nav_list">
-                    <li class="menu-item-has-children">
-                      <a href="index.html">Home</a>
-                      <ul>
-                        <li><a href="index.html">Home V1</a></li>
-                        <li><a href="home-v2.html">Home V2</a></li>
-                      </ul>
-                    </li>
-                    <li class="menu-item-has-children">
-                      <a href="services.html">Services</a>
-                      <ul>
-                        <li><a href="services.html">Services</a></li>
-                        <li><a href="service-details.html">Service Details</a></li>
-                      </ul>
-                    </li>
-                    <li class="menu-item-has-children">
-                      <a href="portfolio.html">Portfolio</a>
-                      <ul>
-                        <li><a href="portfolio.html">Portfolio</a></li>
-                        <li><a href="portfolio-details.html">Portfolio Details</a></li>
-                      </ul>
-                    </li>
-                    <li class="menu-item-has-children">
-                      <a href="#">Pages</a>
-                      <ul>
-                        <li><a href="about.html">About</a></li>
-                        <li><a href="team.html">Team</a></li>
-                        <li><a href="team-details.html">Team Details</a></li>
-                      </ul>
-                    </li>
-                    <li class="menu-item-has-children">
-                      <a href="blog.html">News</a>
-                      <ul>
-                        <li><a href="blog.html">Blogs</a></li>
-                        <li><a href="blog-details.html">Blog Details</a></li>
-                      </ul>
-                    </li>
-                    <li><a href="contact.html">Contact</a></li>
-                  </ul>
+                
+                <div class="hidden lg:flex items-center space-x-8">
+                    <nav class="flex space-x-6">
+                        <a href="#home" class="text-gray-700 hover:text-secondary font-medium transition-colors">Home</a>
+                        <a href="#services" class="text-gray-700 hover:text-secondary font-medium transition-colors">Services</a>
+                        <a href="#about" class="text-gray-700 hover:text-secondary font-medium transition-colors">About</a>
+                        <a href="#contact" class="text-gray-700 hover:text-secondary font-medium transition-colors">Contact</a>
+                    </nav>
+                    
+                    <div class="flex items-center space-x-4">
+                        <div class="text-right">
+                            <div class="text-sm text-gray-600">Emergency Line</div>
+                            <div class="text-lg font-bold text-primary">9266961110</div>
+                        </div>
+                        <a href="tel:+919266961110" class="bg-secondary hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-bold shadow-lg transition-all duration-300 hover:scale-105">
+                            📞 Call Now
+                        </a>
+                    </div>
                 </div>
-              </div>
-            </div>
-            <div class="cs_main_header_right">
-              <div class="position-relative d-flex">
-                <button class="cs_circle_btn cs_center cs_search_tobble_btn" type="button">
-                  <i class="fa-solid fa-magnifying-glass"></i>
+                
+                <!-- Mobile menu button -->
+                <button class="lg:hidden p-2" onclick="toggleMobileMenu()">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                    </svg>
                 </button>
-                <div class="cs_header_search_wrap">
-                  <form action="#" class="cs_header_search">
-                    <input type="text" class="cs_header_search_input" placeholder="Search For Anything">
-                    <button class="cs_header_search_btn cs_center">
-                      <i class="fa-solid fa-magnifying-glass"></i>
-                    </button>
-                  </form>
-                </div>
-              </div>
-              <a href="contact.html" class="cs_btn cs_style_1">
-                <span>Get a Quote</span>
-                <i class="fa-solid fa-arrow-right"></i>
-              </a>
             </div>
-          </div>
+        </nav>
+        
+        <!-- Mobile menu -->
+        <div id="mobileMenu" class="lg:hidden hidden bg-white border-t">
+            <div class="px-4 py-4 space-y-3">
+                <a href="#home" class="block py-2 text-gray-700 hover:text-secondary">Home</a>
+                <a href="#services" class="block py-2 text-gray-700 hover:text-secondary">Services</a>
+                <a href="#about" class="block py-2 text-gray-700 hover:text-secondary">About</a>
+                <a href="#contact" class="block py-2 text-gray-700 hover:text-secondary">Contact</a>
+                <a href="tel:+919266961110" class="block bg-secondary text-white px-4 py-3 rounded-lg font-bold text-center">📞 Call +91 9266961110</a>
+            </div>
         </div>
-      </div>
     </header>
-    <div class="cs_site_header_spacing_140"></div>
-    <!-- End Header Section -->
-    <!-- Start Page Heading -->
-    <section class="cs_page_heading cs_bg_filed cs_center cs_primary_bg" data-src="assets/img/page_heading_1.jpg">
-      <div class="container">
-        <h1 class="cs_white_color cs_semibold cs_white_color cs_mb_10 cs_fs_50">Blog</h1>
-        <ol class="breadcrumb cs_heading_font">
-          <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-          <li class="breadcrumb-item active">Blog</li>
-        </ol>
-      </div>
+
+    <!-- Hero Section -->
+    <section id="home" class="gradient-bg text-white py-12 lg:py-20 relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10">
+            <div class="absolute top-20 left-10 w-32 h-32 bg-white rounded-full animate-float"></div>
+            <div class="absolute bottom-20 right-10 w-24 h-24 bg-white rounded-full animate-float" style="animation-delay: 1s;"></div>
+            <div class="absolute top-1/2 left-1/4 w-16 h-16 bg-white rounded-full animate-float" style="animation-delay: 2s;"></div>
+        </div>
+        
+        <div class="container mx-auto px-4 relative z-10">
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <div class="text-center lg:text-left animate-slide-up">
+                    <div class="inline-flex items-center bg-white/20 backdrop-blur-sm rounded-full px-4 py-2 mb-6">
+                        <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
+                        </svg>
+                        <span class="text-sm font-medium">Available 24/7 • Delhi NCR</span>
+                    </div>
+                    
+                    <h1 class="text-4xl lg:text-6xl font-bold leading-tight mb-6">
+                        Professional<br>
+                        <span class="text-accent">Instant Mechanic</span><br>
+                        <span class="text-2xl lg:text-4xl text-white/90">Service in Delhi NCR</span>
+                    </h1>
+                    
+                    <p class="text-xl lg:text-2xl text-white/90 mb-8 leading-relaxed">
+                        Expert roadside assistance, emergency towing, battery service, and professional car repairs. Fast response, transparent pricing, and reliable service.
+                    </p>
+                    
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                        <a href="tel:+919266961110" class="bg-accent hover:bg-green-600 text-white px-8 py-4 rounded-lg font-bold text-lg shadow-lg transition-all duration-300 hover:scale-105 flex items-center justify-center">
+                            📞 Call +91 9266961110
+                        </a>
+                        <a href="https://wa.me/message/R7LYR65MG47ZB1" class="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white px-8 py-4 rounded-lg font-bold text-lg border border-white/30 transition-all duration-300 hover:scale-105 flex items-center justify-center">
+                            💬 WhatsApp Chat
+                        </a>
+                    </div>
+                    
+                    <div class="mt-8 flex items-center justify-center lg:justify-start space-x-8 text-sm">
+                        <div class="flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-accent" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span>5000+ Happy Customers</span>
+                        </div>
+                        <div class="flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-accent" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
+                            </svg>
+                            <span>15 Min Response</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="relative">
+                    <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-white/20">
+                        <h3 class="text-2xl font-bold mb-6 text-center">Emergency Assistance</h3>
+                        
+                        <div class="bg-white/20 backdrop-blur-sm rounded-xl p-6 mb-6">
+                            <div class="flex items-center justify-between">
+                                <span class="text-lg font-medium">24×7 Helpline</span>
+                                <span class="text-3xl font-bold text-accent">9266961110</span>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4 mb-6">
+                            <div class="bg-white/10 rounded-xl p-4 text-center">
+                                <div class="text-3xl font-bold text-accent">15</div>
+                                <div class="text-sm opacity-90">Min Response</div>
+                            </div>
+                            <div class="bg-white/10 rounded-xl p-4 text-center">
+                                <div class="text-3xl font-bold text-accent">24/7</div>
+                                <div class="text-sm opacity-90">Available</div>
+                            </div>
+                        </div>
+                        
+                        <a href="tel:+919266961110" class="w-full bg-accent hover:bg-green-600 text-white py-4 rounded-xl font-bold text-lg shadow-lg transition-all duration-300 hover:scale-105 block text-center">
+                            📞 Call for Emergency
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
     </section>
-    <!-- End Page Heading -->
-    <!-- Start Blog Section -->
-    <section class="position-relative">
-      <div class="cs_height_120 cs_height_lg_80"></div>
-      <div class="container">
-        <div class="row cs_row_gap_30 cs_gap_y_30">
-          <div class="col-lg-4">
-            <div class="cs_post cs_style_1 cs_type_1">
-              <a href="blog-details.html" class="cs_post_thumbnail cs_mb_16 position-relative">
-                <img src="assets/img/post_img_4.jpg" alt="Post Image">
-                <div class="cs_post_date cs_accent_bg cs_fs_18 cs_semibold cs_white_color cs_center position-absolute">10 Oct</div>
-              </a>
-              <div class="cs_post_content_wrapper">
-                <div class="cs_post_content">
-                  <div class="cs_post_meta_wrapper cs_mb_11">
-                    <div class="cs_post_meta">
-                      <span class="cs_accent_color"><i class="fa-regular fa-comments"></i></span>
-                      <span class="cs_heading_color">02 Comments</span>
-                    </div>
-                    <div class="cs_post_meta">
-                      <span class="cs_accent_color"><i class="fa-regular fa-user"></i></span>
-                      <span class="cs_heading_color">Admin</span>
-                    </div>
-                  </div>
-                  <h3 class="cs_fs_20 cs_semibold cs_mb_5"><a href="blog-details.html"> We specialize in a wide range of car repairs including engine work</a></h3>
-                  <p class="cs_mb_15">The old engine oil is drained and replaced with fresh oil, and the oil filter</p>
-                  <a href="blog-details.html" class="cs_text_btn cs_style_1 cs_white_bg cs_accent_color">
-                    <i class="fa-solid fa-angles-right"></i>
-                  </a>
-                </div>
-              </div>
+
+    <!-- Services Section -->
+    <section id="services" class="py-16 lg:py-24 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl lg:text-5xl font-bold text-primary mb-4">Professional Services</h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">Comprehensive automotive assistance with expert technicians, modern equipment, and transparent pricing across Delhi NCR.</p>
             </div>
-          </div>
-          <div class="col-lg-4">
-            <div class="cs_post cs_style_1 cs_type_1">
-              <a href="blog-details.html" class="cs_post_thumbnail cs_mb_16 position-relative">
-                <img src="assets/img/post_img_5.jpg" alt="Post Image">
-                <div class="cs_post_date cs_accent_bg cs_fs_18 cs_semibold cs_white_color cs_center position-absolute">10 Oct</div>
-              </a>
-              <div class="cs_post_content_wrapper">
-                <div class="cs_post_content">
-                  <div class="cs_post_meta_wrapper cs_mb_11">
-                    <div class="cs_post_meta">
-                      <span class="cs_accent_color"><i class="fa-regular fa-comments"></i></span>
-                      <span class="cs_heading_color">02 Comments</span>
+            
+            <!-- Service Icons -->
+            <div class="grid grid-cols-2 md:grid-cols-6 gap-6 mb-16">
+                <div class="text-center group cursor-pointer">
+                    <div class="w-16 h-16 mx-auto bg-blue-100 rounded-2xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                        <svg class="w-8 h-8 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M11 3a1 1 0 10-2 0v1a1 1 0 10-2 0V3a3 3 0 016 0v1h2a1 1 0 100-2h-2V1a1 1 0 10-2 0v1zM9 5a1 1 0 000 2v6a1 1 0 102 0V7a1 1 0 100-2H9z"/>
+                        </svg>
                     </div>
-                    <div class="cs_post_meta">
-                      <span class="cs_accent_color"><i class="fa-regular fa-user"></i></span>
-                      <span class="cs_heading_color">Admin</span>
-                    </div>
-                  </div>
-                  <h3 class="cs_fs_20 cs_semibold cs_mb_5"><a href="blog-details.html">The repair time varies depending on the service</a></h3>
-                  <p class="cs_mb_15">we offer a warranty on all parts and labor to ensure your peace of mind.</p>
-                  <a href="blog-details.html" class="cs_text_btn cs_style_1 cs_white_bg cs_accent_color">
-                    <i class="fa-solid fa-angles-right"></i>
-                  </a>
+                    <span class="text-sm font-medium text-gray-700">Battery Service</span>
                 </div>
-              </div>
-            </div>
-          </div>
-          <div class="col-lg-4">
-            <div class="cs_post cs_style_1 cs_type_1">
-              <a href="blog-details.html" class="cs_post_thumbnail cs_mb_16 position-relative">
-                <img src="assets/img/post_img_6.jpg" alt="Post Image">
-                <div class="cs_post_date cs_accent_bg cs_fs_18 cs_semibold cs_white_color cs_center position-absolute">10 Oct</div>
-              </a>
-              <div class="cs_post_content_wrapper">
-                <div class="cs_post_content">
-                  <div class="cs_post_meta_wrapper cs_mb_11">
-                    <div class="cs_post_meta">
-                      <span class="cs_accent_color"><i class="fa-regular fa-comments"></i></span>
-                      <span class="cs_heading_color">02 Comments</span>
+                <div class="text-center group cursor-pointer">
+                    <div class="w-16 h-16 mx-auto bg-purple-100 rounded-2xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                        <svg class="w-8 h-8 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z"/>
+                        </svg>
                     </div>
-                    <div class="cs_post_meta">
-                      <span class="cs_accent_color"><i class="fa-regular fa-user"></i></span>
-                      <span class="cs_heading_color">Admin</span>
-                    </div>
-                  </div>
-                  <h3 class="cs_fs_20 cs_semibold cs_mb_5"><a href="blog-details.html">we offer emergency repair services to get you back</a></h3>
-                  <p class="cs_mb_15">You can get an estimate by visiting our shop, calling us, or filling out the online form</p>
-                  <a href="blog-details.html" class="cs_text_btn cs_style_1 cs_white_bg cs_accent_color">
-                    <i class="fa-solid fa-angles-right"></i>
-                  </a>
+                    <span class="text-sm font-medium text-gray-700">Car Lockout</span>
                 </div>
-              </div>
-            </div>
-          </div>
-          <div class="col-lg-4">
-            <div class="cs_post cs_style_1 cs_type_1">
-              <a href="blog-details.html" class="cs_post_thumbnail cs_mb_16 position-relative">
-                <img src="assets/img/post_img_7.jpg" alt="Post Image">
-                <div class="cs_post_date cs_accent_bg cs_fs_18 cs_semibold cs_white_color cs_center position-absolute">15 Sep</div>
-              </a>
-              <div class="cs_post_content_wrapper">
-                <div class="cs_post_content">
-                  <div class="cs_post_meta_wrapper cs_mb_11">
-                    <div class="cs_post_meta">
-                      <span class="cs_accent_color"><i class="fa-regular fa-comments"></i></span>
-                      <span class="cs_heading_color">12 Comments</span>
+                <div class="text-center group cursor-pointer">
+                    <div class="w-16 h-16 mx-auto bg-green-100 rounded-2xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                        <svg class="w-8 h-8 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"/>
+                        </svg>
                     </div>
-                    <div class="cs_post_meta">
-                      <span class="cs_accent_color"><i class="fa-regular fa-user"></i></span>
-                      <span class="cs_heading_color">Noyon</span>
-                    </div>
-                  </div>
-                  <h3 class="cs_fs_20 cs_semibold cs_mb_5"><a href="blog-details.html">Hire certified mechanics and provide ongoing training to keep</a></h3>
-                  <p class="cs_mb_15">Encourage satisfied customers to leave positive kinds reviews on platforms like Google and Yelp.</p>
-                  <a href="blog-details.html" class="cs_text_btn cs_style_1 cs_white_bg cs_accent_color">
-                    <i class="fa-solid fa-angles-right"></i>
-                  </a>
+                    <span class="text-sm font-medium text-gray-700">Fuel Delivery</span>
                 </div>
-              </div>
-            </div>
-          </div>
-          <div class="col-lg-4">
-            <div class="cs_post cs_style_1 cs_type_1">
-              <a href="blog-details.html" class="cs_post_thumbnail cs_mb_16 position-relative">
-                <img src="assets/img/post_img_8.jpg" alt="Post Image">
-                <div class="cs_post_date cs_accent_bg cs_fs_18 cs_semibold cs_white_color cs_center position-absolute">10 Aug</div>
-              </a>
-              <div class="cs_post_content_wrapper">
-                <div class="cs_post_content">
-                  <div class="cs_post_meta_wrapper cs_mb_11">
-                    <div class="cs_post_meta">
-                      <span class="cs_accent_color"><i class="fa-regular fa-comments"></i></span>
-                      <span class="cs_heading_color">10 Comments</span>
+                <div class="text-center group cursor-pointer">
+                    <div class="w-16 h-16 mx-auto bg-orange-100 rounded-2xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                        <svg class="w-8 h-8 text-orange-600" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10 2L3 7v11a1 1 0 001 1h3a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1h3a1 1 0 001-1V7l-7-5z"/>
+                        </svg>
                     </div>
-                    <div class="cs_post_meta">
-                      <span class="cs_accent_color"><i class="fa-regular fa-user"></i></span>
-                      <span class="cs_heading_color">Lalin</span>
-                    </div>
-                  </div>
-                  <h3 class="cs_fs_20 cs_semibold cs_mb_5"><a href="blog-details.html">Invest in high-quality diagnostic lifts and other essential</a></h3>
-                  <p class="cs_mb_15">Share repair tips, showcase completed projects, and  Facebook, Instagram, and YouTube.</p>
-                  <a href="blog-details.html" class="cs_text_btn cs_style_1 cs_white_bg cs_accent_color">
-                    <i class="fa-solid fa-angles-right"></i>
-                  </a>
+                    <span class="text-sm font-medium text-gray-700">Tyre Service</span>
                 </div>
-              </div>
-            </div>
-          </div>
-          <div class="col-lg-4">
-            <div class="cs_post cs_style_1 cs_type_1">
-              <a href="blog-details.html" class="cs_post_thumbnail cs_mb_16 position-relative">
-                <img src="assets/img/post_img_9.jpg" alt="Post Image">
-                <div class="cs_post_date cs_accent_bg cs_fs_18 cs_semibold cs_white_color cs_center position-absolute">10 Oct</div>
-              </a>
-              <div class="cs_post_content_wrapper">
-                <div class="cs_post_content">
-                  <div class="cs_post_meta_wrapper cs_mb_11">
-                    <div class="cs_post_meta">
-                      <span class="cs_accent_color"><i class="fa-regular fa-comments"></i></span>
-                      <span class="cs_heading_color">17 Comments</span>
+                <div class="text-center group cursor-pointer">
+                    <div class="w-16 h-16 mx-auto bg-red-100 rounded-2xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                        <svg class="w-8 h-8 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"/>
+                        </svg>
                     </div>
-                    <div class="cs_post_meta">
-                      <span class="cs_accent_color"><i class="fa-regular fa-user"></i></span>
-                      <span class="cs_heading_color">Noyon</span>
-                    </div>
-                  </div>
-                  <h3 class="cs_fs_20 cs_semibold cs_mb_5"><a href="blog-details.html">Encourage satisfied customers to leave positive review</a></h3>
-                  <p class="cs_mb_15">We’ll provide an estimated time after diagnosis on the complexity of the issue.</p>
-                  <a href="blog-details.html" class="cs_text_btn cs_style_1 cs_white_bg cs_accent_color">
-                    <i class="fa-solid fa-angles-right"></i>
-                  </a>
+                    <span class="text-sm font-medium text-gray-700">Towing</span>
                 </div>
-              </div>
+                <div class="text-center group cursor-pointer">
+                    <div class="w-16 h-16 mx-auto bg-indigo-100 rounded-2xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                        <svg class="w-8 h-8 text-indigo-600" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"/>
+                        </svg>
+                    </div>
+                    <span class="text-sm font-medium text-gray-700">Repairs</span>
+                </div>
             </div>
-          </div>
+            
+            <!-- Detailed Services -->
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Battery Jump Start -->
+                <div class="bg-white rounded-2xl shadow-lg border border-gray-100 card-hover overflow-hidden">
+                    <div class="h-48 bg-gradient-to-br from-blue-500 to-blue-600 relative">
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <svg class="w-16 h-16 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M11 3a1 1 0 10-2 0v1a1 1 0 10-2 0V3a3 3 0 016 0v1h2a1 1 0 100-2h-2V1a1 1 0 10-2 0v1zM9 5a1 1 0 000 2v6a1 1 0 102 0V7a1 1 0 100-2H9z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-primary mb-3">Battery Jump Start</h3>
+                        <p class="text-gray-600 mb-4">Professional battery service with diagnostic check and jump start to get your car running immediately.</p>
+                        <ul class="space-y-2 mb-6">
+                            <li class="flex items-center text-sm text-gray-600">
+                                <svg class="w-4 h-4 text-accent mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                </svg>
+                                Quick Response Service
+                            </li>
+                            <li class="flex items-center text-sm text-gray-600">
+                                <svg class="w-4 h-4 text-accent mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                </svg>
+                                Battery Health Check
+                            </li>
+                        </ul>
+                        <a href="tel:+919266961110" class="w-full bg-secondary hover:bg-blue-700 text-white py-3 rounded-lg font-bold transition-all duration-300 hover:scale-105 block text-center">
+                            📞 Call +91 9266961110
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Car Lockout -->
+                <div class="bg-white rounded-2xl shadow-lg border border-gray-100 card-hover overflow-hidden">
+                    <div class="h-48 bg-gradient-to-br from-purple-500 to-purple-600 relative">
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <svg class="w-16 h-16 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-primary mb-3">Car Lockout Service</h3>
+                        <p class="text-gray-600 mb-4">Professional locksmith service for car lockouts with no damage guarantee and key replacement options.</p>
+                        <ul class="space-y-2 mb-6">
+                            <li class="flex items-center text-sm text-gray-600">
+                                <svg class="w-4 h-4 text-accent mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                </svg>
+                                No Damage Entry
+                            </li>
+                            <li class="flex items-center text-sm text-gray-600">
+                                <svg class="w-4 h-4 text-accent mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                </svg>
+                                All Car Models
+                            </li>
+                        </ul>
+                        <a href="tel:+919266961110" class="w-full bg-secondary hover:bg-blue-700 text-white py-3 rounded-lg font-bold transition-all duration-300 hover:scale-105 block text-center">
+                            📞 Call +91 9266961110
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Emergency Towing -->
+                <div class="bg-white rounded-2xl shadow-lg border border-gray-100 card-hover overflow-hidden">
+                    <div class="h-48 bg-gradient-to-br from-red-500 to-red-600 relative">
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <svg class="w-16 h-16 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-primary mb-3">Emergency Towing</h3>
+                        <p class="text-gray-600 mb-4">Professional towing service for all vehicle types with safe transport and damage-free handling.</p>
+                        <ul class="space-y-2 mb-6">
+                            <li class="flex items-center text-sm text-gray-600">
+                                <svg class="w-4 h-4 text-accent mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                </svg>
+                                Safe Transport
+                            </li>
+                            <li class="flex items-center text-sm text-gray-600">
+                                <svg class="w-4 h-4 text-accent mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                </svg>
+                                24/7 Available
+                            </li>
+                        </ul>
+                        <a href="tel:+919266961110" class="w-full bg-secondary hover:bg-blue-700 text-white py-3 rounded-lg font-bold transition-all duration-300 hover:scale-105 block text-center">
+                            📞 Call +91 9266961110
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- CTA Section -->
+            <div class="mt-16 bg-gradient-to-r from-secondary to-accent rounded-3xl p-10 text-white text-center">
+                <h3 class="text-3xl font-bold mb-4">Need Emergency Assistance?</h3>
+                <p class="text-xl mb-8 opacity-90">Our expert team is available 24/7 to help you with any automotive emergency in Delhi NCR</p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                    <div class="flex items-center bg-white/20 backdrop-blur-sm px-6 py-3 rounded-xl">
+                        <svg class="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
+                        </svg>
+                        <span class="font-medium">Average Response: 15 Minutes</span>
+                    </div>
+                    <a href="tel:+919266961110" class="bg-white text-secondary hover:bg-gray-100 px-8 py-4 rounded-xl font-bold shadow-lg transition-all duration-300 hover:scale-105">
+                        📞 Call +91 9266961110
+                    </a>
+                </div>
+            </div>
         </div>
-      </div>
-      <div class="cs_height_120 cs_height_lg_80"></div>
     </section>
-    <!-- End Blog Section -->
-    <!-- Start Footer -->
-    <footer class="cs_footer cs_style_1 cs_bg_filed cs_heading_bg" data-src="assets/img/footer_bg.jpg">
-      <div class="container">
-        <div class="cs_footer_newsletter cs_style_1">
-          <div class="cs_footer_newsletter_left cs_accent_bg cs_center">
-            <img src="assets/img/footer_logo.svg" alt="Logo"  class="wow zoomIn">
-          </div>
-          <div class="cs_footer_newsletter_right">
-            <h3 class="cs_fs_24 cs_semibold cs_white_color mb-0">Subscribe now to get latest updates</h3>
-            <form action="#" class="cs_footer_newsletter_form">
-              <input type="text" placeholder="Enter Your Email">
-              <button class="cs_btn cs_style_1">
-                <span>Subscribe</span>
-              </button>
-            </form>
-          </div>
+
+    <!-- About Section -->
+    <section id="about" class="py-16 lg:py-24 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <div class="space-y-6">
+                    <h2 class="text-4xl lg:text-5xl font-bold text-primary">About Instant Mechanic</h2>
+                    <p class="text-lg text-gray-600 leading-relaxed">
+                        With extensive experience in automotive services, Instant Mechanic has become Delhi NCR's trusted partner for professional roadside assistance and emergency repairs. We understand that vehicle problems can occur anytime, anywhere, which is why we're committed to providing fast, reliable, and expert service 24/7.
+                    </p>
+                    <p class="text-lg text-gray-600 leading-relaxed">
+                        Our team of certified technicians uses modern equipment and follows industry best practices to ensure you receive the highest quality service when you need it most.
+                    </p>
+                    
+                    <div class="space-y-4">
+                        <h3 class="text-2xl font-bold text-primary">Why Choose Instant Mechanic?</h3>
+                        <div class="grid gap-3">
+                            <div class="flex items-start">
+                                <svg class="w-6 h-6 text-accent mr-3 mt-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                </svg>
+                                <span class="text-gray-700">Certified and experienced technicians</span>
+                            </div>
+                            <div class="flex items-start">
+                                <svg class="w-6 h-6 text-accent mr-3 mt-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                </svg>
+                                <span class="text-gray-700">Modern equipment and professional tools</span>
+                            </div>
+                            <div class="flex items-start">
+                                <svg class="w-6 h-6 text-accent mr-3 mt-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                </svg>
+                                <span class="text-gray-700">Transparent pricing with no hidden costs</span>
+                            </div>
+                            <div class="flex items-start">
+                                <svg class="w-6 h-6 text-accent mr-3 mt-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                </svg>
+                                <span class="text-gray-700">Quick response times across Delhi NCR</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="space-y-6">
+                    <div class="grid grid-cols-2 gap-6">
+                        <div class="bg-white rounded-2xl p-6 text-center shadow-lg card-hover">
+                            <div class="w-12 h-12 bg-blue-100 rounded-xl mx-auto mb-4 flex items-center justify-center">
+                                <svg class="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"/>
+                                </svg>
+                            </div>
+                            <div class="text-3xl font-bold text-primary">5000+</div>
+                            <div class="text-gray-600">Happy Customers</div>
+                        </div>
+                        
+                        <div class="bg-white rounded-2xl p-6 text-center shadow-lg card-hover">
+                            <div class="w-12 h-12 bg-green-100 rounded-xl mx-auto mb-4 flex items-center justify-center">
+                                <svg class="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
+                                </svg>
+                            </div>
+                            <div class="text-3xl font-bold text-primary">24/7</div>
+                            <div class="text-gray-600">Service</div>
+                        </div>
+                        
+                        <div class="bg-white rounded-2xl p-6 text-center shadow-lg card-hover">
+                            <div class="w-12 h-12 bg-purple-100 rounded-xl mx-auto mb-4 flex items-center justify-center">
+                                <svg class="w-6 h-6 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                            </div>
+                            <div class="text-3xl font-bold text-primary">100%</div>
+                            <div class="text-gray-600">Professional</div>
+                        </div>
+                        
+                        <div class="bg-white rounded-2xl p-6 text-center shadow-lg card-hover">
+                            <div class="w-12 h-12 bg-accent/20 rounded-xl mx-auto mb-4 flex items-center justify-center">
+                                <svg class="w-6 h-6 text-accent" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
+                                </svg>
+                            </div>
+                            <div class="text-3xl font-bold text-primary">15</div>
+                            <div class="text-gray-600">Min Response</div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-2xl p-8 shadow-lg">
+                        <h4 class="text-xl font-bold text-primary mb-4">Our Mission</h4>
+                        <p class="text-gray-600 leading-relaxed">
+                            To provide reliable, fast, and professional automotive assistance that gives our customers peace of mind and gets them safely back on the road across Delhi NCR.
+                        </p>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
-      <div class="cs_main_footer cs_white_color">
-        <div class="container">
-          <div class="cs_footer_row">
-            <div class="cs_footer_col">
-              <div class="cs_footer_widget">
-                <h2 class="cs_footer_widget_title cs_fs_24 cs_semibold cs_white_color cs_mb_10">About</h2>
-                <div class="cs_footer_widget_seperator">
-                  <span class="cs_accent_bg"></span>
-                  <span class="cs_white_bg"></span>
-                  <span class="cs_white_bg"></span>
-                </div>
-                <div class="cs_text_widget">
-                  <p>Phosfluorescently transform out-of-the-box paradigms whereas accurate supply chains. Continually</p>
-                </div>
-                <div class="cs_social_btns cs_style_1">
-                  <a href="#" class="cs_social_btn cs_center">
-                    <i class="fa-brands fa-linkedin-in"></i>
-                  </a>
-                  <a href="#" class="cs_social_btn cs_center">
-                    <i class="fa-brands fa-twitter"></i>
-                  </a>
-                  <a href="#" class="cs_social_btn cs_center">
-                    <i class="fa-brands fa-youtube"></i>
-                  </a>
-                  <a href="#" class="cs_social_btn cs_center">
-                    <i class="fa-brands fa-facebook-f"></i>
-                  </a>
-                </div>
-              </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-16 lg:py-24 bg-primary text-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl lg:text-5xl font-bold mb-4">Emergency Contact</h2>
+                <p class="text-xl text-white/80 max-w-3xl mx-auto">
+                    Need immediate assistance? Our professional team is available 24/7 to help you with any automotive emergency.
+                </p>
             </div>
-            <div class="cs_footer_col">
-              <div class="cs_footer_widget">
-                <h2 class="cs_footer_widget_title cs_fs_24 cs_semibold cs_white_color cs_mb_10">Explore</h2>
-                <div class="cs_footer_widget_seperator">
-                  <span class="cs_accent_bg"></span>
-                  <span class="cs_white_bg"></span>
-                  <span class="cs_white_bg"></span>
+            
+            <div class="grid lg:grid-cols-3 gap-8">
+                <div class="space-y-6">
+                    <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-6">
+                        <div class="flex items-center mb-4">
+                            <svg class="w-8 h-8 text-accent mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/>
+                            </svg>
+                            <h3 class="text-2xl font-bold">Emergency Helpline</h3>
+                        </div>
+                        <div class="text-3xl font-bold mb-2">+91 9266961110</div>
+                        <p class="text-white/80">Available 24/7 • 365 Days</p>
+                        <a href="tel:+919266961110" class="mt-4 w-full bg-accent hover:bg-green-600 text-white py-3 rounded-lg font-bold transition-all duration-300 hover:scale-105 block text-center">
+                            📞 Call Now
+                        </a>
+                    </div>
+                    
+                    <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-6">
+                        <div class="space-y-4">
+                            <div class="flex items-center">
+                                <svg class="w-6 h-6 text-accent mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
+                                </svg>
+                                <div>
+                                    <div class="font-semibold">Service Areas</div>
+                                    <div class="text-white/80 text-sm">Delhi & NCR</div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center">
+                                <svg class="w-6 h-6 text-accent mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
+                                </svg>
+                                <div>
+                                    <div class="font-semibold">Response Time</div>
+                                    <div class="text-white/80 text-sm">15-30 minutes</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <ul class="cs_footer_menu">
-                  <li>
-                    <a href="service-details.html">Adult In Car Lessons</a>
-                  </li>
-                  <li>
-                    <a href="service-details.html">Defensive Driving</a>
-                  </li>
-                  <li>
-                    <a href="service-details.html">Defensive Driving</a>
-                  </li>
-                  <li>
-                    <a href="service-details.html">Initial driving lesson</a>
-                  </li>
-                  <li>
-                    <a href="service-details.html">Woman Education</a>
-                  </li>
-                </ul>
-              </div>
-            </div>
-            <div class="cs_footer_col">
-              <div class="cs_footer_widget">
-                <h2 class="cs_footer_widget_title cs_fs_24 cs_semibold cs_white_color cs_mb_10">Contact Us</h2>
-                <div class="cs_footer_widget_seperator">
-                  <span class="cs_accent_bg"></span>
-                  <span class="cs_white_bg"></span>
-                  <span class="cs_white_bg"></span>
+                
+                <div class="lg:col-span-2">
+                    <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-8">
+                        <h3 class="text-2xl font-bold mb-6">Request Service</h3>
+                        <form class="space-y-6">
+                            <div class="grid md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium mb-2">Full Name</label>
+                                    <input type="text" class="w-full px-4 py-3 rounded-lg bg-white/20 border border-white/30 text-white placeholder-white/70 focus:outline-none focus:border-accent" placeholder="Enter your name" required>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-2">Phone Number</label>
+                                    <input type="tel" class="w-full px-4 py-3 rounded-lg bg-white/20 border border-white/30 text-white placeholder-white/70 focus:outline-none focus:border-accent" placeholder="+91 XXXXX XXXXX" required>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Current Location</label>
+                                <input type="text" class="w-full px-4 py-3 rounded-lg bg-white/20 border border-white/30 text-white placeholder-white/70 focus:outline-none focus:border-accent" placeholder="Enter your location" required>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Service Required</label>
+                                <select class="w-full px-4 py-3 rounded-lg bg-white/20 border border-white/30 text-white focus:outline-none focus:border-accent" required>
+                                    <option value="">Select service type</option>
+                                    <option value="battery">Battery Jump Start</option>
+                                    <option value="lockout">Car Lockout</option>
+                                    <option value="towing">Emergency Towing</option>
+                                    <option value="fuel">Fuel Delivery</option>
+                                    <option value="tyre">Tyre Service</option>
+                                    <option value="repair">Minor Repairs</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Problem Description</label>
+                                <textarea class="w-full px-4 py-3 rounded-lg bg-white/20 border border-white/30 text-white placeholder-white/70 focus:outline-none focus:border-accent" rows="4" placeholder="Describe your problem"></textarea>
+                            </div>
+                            
+                            <div class="flex flex-col sm:flex-row gap-4">
+                                <button type="submit" class="flex-1 bg-accent hover:bg-green-600 text-white py-4 rounded-lg font-bold shadow-lg transition-all duration-300 hover:scale-105">
+                                    Submit Request
+                                </button>
+                                <a href="tel:+919266961110" class="flex-1 bg-white/20 border-2 border-accent text-accent hover:bg-accent hover:text-white py-4 rounded-lg font-bold text-center transition-all duration-300">
+                                    📞 Call +91 9266961110
+                                </a>
+                            </div>
+                        </form>
+                    </div>
                 </div>
-                <ul class="cs_footer_contact_list cs_mp_0">
-                  <li>
-                    <i class="fa-solid fa-location-dot cs_center"></i>
-                    Musaffah - M-6 - Abu Dhabi United Arab Emirates
-                  </li>
-                  <li>
-                    <i class="fa-solid fa-phone cs_center"></i>
-                    <a href="tel:+(163)-5565-06979">+(163)-5565-06979</a> <br>
-                    <a href="tel:+(163)-5565-07989">+(163)-5565-07989</a>
-                  </li>
-                  <li>
-                    <i class="fa-solid fa-envelope cs_center"></i>
-                    <a href="mailto:cripar@gmail.com">cripar@gmail.com</a>
-                  </li>
-                </ul>
-              </div>
             </div>
-            <div class="cs_footer_col">
-              <div class="cs_footer_widget">
-                <h2 class="cs_footer_widget_title cs_fs_24 cs_semibold cs_white_color cs_mb_10">Working Hours:</h2>
-                <div class="cs_footer_widget_seperator">
-                  <span class="cs_accent_bg"></span>
-                  <span class="cs_white_bg"></span>
-                  <span class="cs_white_bg"></span>
-                </div>
-                <ul class="cs_working_hours">
-                  <li>
-                    <span>Thu - Fri</span>
-                    <span>9:00 AM - 7:00 PM</span>
-                  </li>
-                  <li>
-                    <span>Mon - Wed</span>
-                    <span>8:00 AM - 10:00 PM</span>
-                  </li>
-                  <li>
-                    <span>Saturday</span>
-                    <span>7:00 AM - 9:00 PM</span>
-                  </li>
-                  <li>
-                    <span>Sunday</span>
-                    <span>Close</span>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
         </div>
-      </div>
-      <div class="cs_footer_bottom cs_white_color">
-        <div class="container">
-          <div class="cs_footer_bottom_in">
-            <div class="cs_footer_copyright">
-              Copyright © 2024 <a href="#">Cripar</a>. All Rights Reserved.
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white">
+        <div class="bg-secondary py-4">
+            <div class="container mx-auto px-4">
+                <div class="flex flex-col md:flex-row items-center justify-between text-center md:text-left">
+                    <div class="mb-4 md:mb-0">
+                        <h3 class="text-xl font-bold">Need Emergency Assistance?</h3>
+                        <p class="text-blue-100">Available 24/7 in Delhi NCR</p>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <div>
+                            <div class="text-2xl font-bold">+91 9266961110</div>
+                            <div class="text-blue-100 text-sm">Call for Immediate Help</div>
+                        </div>
+                        <a href="tel:+919266961110" class="bg-white text-secondary hover:bg-gray-100 px-6 py-3 rounded-lg font-bold shadow-lg transition-all duration-300 hover:scale-105">
+                            📞 Call Now
+                        </a>
+                    </div>
+                </div>
             </div>
-            <div>
-              <img src="assets/img/payment_card.svg" alt="">
-            </div>
-          </div>
         </div>
-      </div>
+        
+        <div class="container mx-auto px-4 py-12">
+            <div class="grid lg:grid-cols-4 gap-8">
+                <div class="space-y-4">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-12 h-12 bg-gradient-to-br from-secondary to-accent rounded-xl flex items-center justify-center">
+                            <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold">Instant Mechanic</h3>
+                            <p class="text-gray-400">Professional Service</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-400 leading-relaxed">
+                        Your trusted partner for professional automotive assistance in Delhi NCR. Fast, reliable, and expert service when you need it most.
+                    </p>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-semibold mb-6">Our Services</h4>
+                    <ul class="space-y-3 text-gray-400">
+                        <li class="hover:text-accent transition-colors cursor-pointer">Battery Jump Start</li>
+                        <li class="hover:text-accent transition-colors cursor-pointer">Car Lockout Service</li>
+                        <li class="hover:text-accent transition-colors cursor-pointer">Emergency Towing</li>
+                        <li class="hover:text-accent transition-colors cursor-pointer">Fuel Delivery</li>
+                        <li class="hover:text-accent transition-colors cursor-pointer">Tyre Services</li>
+                        <li class="hover:text-accent transition-colors cursor-pointer">Minor Repairs</li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-semibold mb-6">Service Areas</h4>
+                    <ul class="space-y-3 text-gray-400">
+                        <li class="hover:text-accent transition-colors cursor-pointer">Delhi</li>
+                        <li class="hover:text-accent transition-colors cursor-pointer">Gurgaon</li>
+                        <li class="hover:text-accent transition-colors cursor-pointer">Noida</li>
+                        <li class="hover:text-accent transition-colors cursor-pointer">Faridabad</li>
+                        <li class="hover:text-accent transition-colors cursor-pointer">Ghaziabad</li>
+                        <li class="hover:text-accent transition-colors cursor-pointer">Greater Noida</li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-semibold mb-6">Contact Info</h4>
+                    <div class="space-y-4">
+                        <div class="flex items-center">
+                            <svg class="w-5 h-5 text-accent mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/>
+                            </svg>
+                            <div>
+                                <div class="font-semibold">24/7 Helpline</div>
+                                <a href="tel:+919266961110" class="text-accent hover:text-green-300 font-bold">+91 9266961110</a>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center">
+                            <svg class="w-5 h-5 text-accent mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
+                            </svg>
+                            <div>
+                                <div class="font-semibold">Available</div>
+                                <div class="text-gray-400">24/7 • 365 Days</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 mt-12 pt-8">
+                <div class="flex flex-col md:flex-row justify-between items-center text-center md:text-left">
+                    <p class="text-gray-400 text-sm">
+                        © 2024 Instant Mechanic. All rights reserved.
+                    </p>
+                    <div class="flex space-x-6 mt-4 md:mt-0 text-sm">
+                        <a href="#" class="text-gray-400 hover:text-accent transition-colors">Privacy Policy</a>
+                        <a href="#" class="text-gray-400 hover:text-accent transition-colors">Terms of Service</a>
+                        <a href="#" class="text-gray-400 hover:text-accent transition-colors">Support</a>
+                    </div>
+                </div>
+            </div>
+        </div>
     </footer>
-    <!-- End Footer -->
-    <!-- Start Scroll Top Button -->
-    <div class="cs_scroll_top_btn cs_accent_bg cs_white_color cs_center cs_radius_50">
-      <svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" viewBox="0 0 32 32"><path fill="currentColor" d="M16 4L6 14l1.41 1.41L15 7.83V28h2V7.83l7.59 7.58L26 14z"/></svg>
+
+    <!-- WhatsApp Float Button -->
+    <div class="fixed bottom-6 right-6 z-50">
+        <a href="https://wa.me/message/R7LYR65MG47ZB1" class="whatsapp-pulse bg-green-500 hover:bg-green-600 text-white w-16 h-16 rounded-full shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-110">
+            <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.465 3.488"/>
+            </svg>
+        </a>
     </div>
-    <!-- End Scroll Top Button -->
-    <!-- Script -->
-    <script src="assets/js/jquery-3.6.0.min.js"></script>
-    <script src="assets/js/wow.min.js"></script>
-    <script src="assets/js/jquery.slick.min.js"></script>
-    <script src="assets/js/ripples.min.js"></script>
-    <script src="assets/js/odometer.js"></script>
-    <script src="assets/js/main.js"></script>
-  </body>
+
+    <!-- Mobile Bottom CTA -->
+    <div class="fixed bottom-0 left-0 right-0 z-40 bg-white border-t shadow-lg p-4 lg:hidden">
+        <a href="tel:+919266961110" class="w-full bg-secondary hover:bg-blue-700 text-white py-4 rounded-lg font-bold text-lg shadow-lg transition-all duration-300 hover:scale-105 block text-center">
+            📞 Call +91 9266961110 - Emergency Help
+        </a>
+    </div>
+
+    <script>
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('hidden');
+        }
+        
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+        
+        // Close mobile menu when clicking on links
+        document.querySelectorAll('#mobileMenu a').forEach(link => {
+            link.addEventListener('click', () => {
+                document.getElementById('mobileMenu').classList.add('hidden');
+            });
+        });
+    </script>
+</body>
 </html>
