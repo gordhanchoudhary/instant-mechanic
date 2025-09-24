@@ -2073,5 +2073,304 @@
             }
         }
     </script>
+
+    <script>
+// Fix for stamp overlapping with buttons - update the paid stamp positioning
+const originalUpdateCombinedHistoryList = updateCombinedHistoryList;
+
+updateCombinedHistoryList = function() {
+    const combinedHistoryList = document.getElementById('combinedHistoryList');
+    const mechanicFilter = document.getElementById('mechanicNameFilter').value;
+    
+    if (!mechanicFilter) {
+        combinedHistoryList.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-user-check"></i>
+                <div>Please select a mechanic to view history</div>
+            </div>
+        `;
+        return;
+    }
+
+    // Get filtered payouts for this mechanic
+    const mechanicPayouts = paymentData.daily_payouts.filter(p => p.mechanic_name === mechanicFilter);
+    
+    // Group payouts by date to find live vs historical
+    const payoutsByDate = {};
+    mechanicPayouts.forEach(payout => {
+        if (!payoutsByDate[payout.payout_date]) {
+            payoutsByDate[payout.payout_date] = {
+                live: [],
+                historical: []
+            };
+        }
+        
+        if (payout.is_deleted) {
+            payoutsByDate[payout.payout_date].historical.push(payout);
+        } else {
+            payoutsByDate[payout.payout_date].live.push(payout);
+        }
+    });
+
+    // Create combined entries array with only live payouts
+    const allEntries = [];
+    
+    // Add ALL live payout entries (multiple payouts per date if they exist)
+    Object.keys(payoutsByDate).forEach(date => {
+        const dateGroup = payoutsByDate[date];
+        
+        // Add ALL live entries for this date (not just the latest one)
+        if (dateGroup.live.length > 0) {
+            // Sort live payouts by created_at (latest first)
+            const sortedLivePayouts = dateGroup.live.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+            
+            // Add each live payout as a separate entry
+            sortedLivePayouts.forEach((livePayout, index) => {
+                allEntries.push({
+                    type: 'payout',
+                    date: livePayout.created_at || livePayout.payout_date,
+                    payout_date: livePayout.payout_date,
+                    data: livePayout,
+                    // Use payout_date as primary sort criteria for payouts
+                    sortDate: new Date(livePayout.payout_date + 'T00:00:00'),
+                    // Only show historical data for the first (latest) live payout of each date
+                    hasHistory: index === 0 && dateGroup.historical.length > 0,
+                    historicalCount: dateGroup.historical.length,
+                    historicalData: dateGroup.historical.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+                });
+            });
+        }
+    });
+    
+    // Add hisab entries only if toggle is on
+    if (showWhatsAppMessages && mechanicHisabData) {
+        mechanicHisabData.forEach(hisab => {
+            allEntries.push({
+                type: 'whatsapp',
+                date: hisab.created_at,
+                data: hisab,
+                sortDate: new Date(hisab.created_at)
+            });
+        });
+    }
+    
+    // UPDATED: Enhanced sorting - payout entries by payout_date (latest first), WhatsApp by created_at
+    allEntries.sort((a, b) => {
+        // If both are payouts, sort by payout_date (latest first)
+        if (a.type === 'payout' && b.type === 'payout') {
+            return new Date(b.data.payout_date) - new Date(a.data.payout_date);
+        }
+        // If both are WhatsApp, sort by created_at (latest first)
+        if (a.type === 'whatsapp' && b.type === 'whatsapp') {
+            return new Date(b.data.created_at) - new Date(a.data.created_at);
+        }
+        // Mixed types: sort by their respective dates
+        return b.sortDate - a.sortDate;
+    });
+    
+    if (allEntries.length === 0) {
+        combinedHistoryList.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-calendar-times"></i>
+                <div>No data found for this mechanic</div>
+            </div>
+        `;
+        return;
+    }
+
+    // Render entries
+    let listHtml = '';
+    
+    allEntries.forEach((entry, index) => {
+        if (entry.type === 'payout') {
+            const payout = entry.data;
+            const isPaid = payout.payment_transfer === true;
+            
+            listHtml += `
+                <div class="history-entry payout-entry" id="entry-${index}" style="position: relative;">
+                    ${isPaid ? `
+                        <div class="paid-stamp-overlay" style="
+                            position: absolute;
+                            top: 15px;
+                            left: 90%;
+                            transform: translateX(-50%);
+                            width: 70px;
+                            height: 70px;
+                            background-image: url('https://i.ibb.co/zVJswVBy/image-removebg-preview-14.png');
+                            background-size: contain;
+                            background-repeat: no-repeat;
+                            background-position: center;
+                            z-index: 10;
+                            opacity: 0.85;
+                            pointer-events: none;
+                        "></div>
+                    ` : ''}
+                    <div class="history-entry-header" style="${isPaid ? 'padding-top: 35px;' : ''}">
+                        <div class="history-entry-datetime">
+                            ${formatDateTime(entry.date)}
+                        </div>
+                        <div class="history-entry-main-content">
+                            <div class="payout-date-highlight">
+                                <i class="fas fa-calendar-alt"></i>
+                                ${formatDate(payout.payout_date)}
+                                ${isPaid ? '<span class="live-badge" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); margin-left: 8px;"><i class="fas fa-check"></i> PAID</span>' : ''}
+                            </div>
+                            <div class="entry-meta-info">
+                                <div class="meta-item">
+                                    <span class="meta-label">Calls:</span>
+                                    <span>${payout.total_calls || 0}</span>
+                                </div>
+                                ${payout.remarks ? `
+                                    <div class="meta-item">
+                                        <span class="meta-label">Remarks:</span>
+                                        <span>${payout.remarks}</span>
+                                    </div>
+                                ` : ''}
+                                ${isPaid ? `
+                                    <div class="meta-item">
+                                        <span class="meta-label">Payment:</span>
+                                        <span style="color: #10b981; font-weight: 700;">Transferred</span>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                        <div class="history-entry-type live-payout">
+                            <i class="fas fa-circle"></i>
+                            Live Payment
+                        </div>
+                        <div class="history-entry-amount ${payout.pending_amount >= 0 ? 'positive' : 'negative'}">
+                            ${formatCurrency(payout.pending_amount)}
+                        </div>
+                        <div class="history-entry-actions">
+                            ${entry.hasHistory ? `
+                                <button class="history-entry-expand" onclick="toggleHistoricalData(${index})" id="expand-btn-${index}">
+                                    <i class="fas fa-chevron-down"></i> 
+                                    History (${entry.historicalCount})
+                                </button>
+                            ` : ''}
+                            <button class="btn btn-primary" onclick="viewDetails('${payout.payout_date}', '${mechanicFilter}')" style="padding: 8px 16px; font-size: 0.8rem;">
+                                <i class="fas fa-eye"></i>
+                                View Details
+                            </button>
+                        </div>
+                    </div>
+                    ${entry.hasHistory ? `
+                        <div class="historical-data-container" id="historical-${index}" style="display: none;">
+                            <div class="historical-header">
+                                <i class="fas fa-history"></i>
+                                <span>Historical Records for ${formatDate(payout.payout_date)}</span>
+                            </div>
+                            <div class="historical-entries">
+                                ${entry.historicalData.map(hist => `
+                                    <div class="historical-entry">
+                                        <div class="historical-entry-header">
+                                            <div class="historical-datetime">${formatDateTime(hist.created_at)}</div>
+                                            <div class="historical-amount ${hist.pending_amount >= 0 ? 'positive' : 'negative'}">
+                                                ${formatCurrency(hist.pending_amount)}
+                                            </div>
+                                        </div>
+                                        <div class="historical-details">
+                                            <div class="detail-row"><strong>Calls:</strong> ${hist.total_calls || 0}</div>
+                                            ${hist.remarks ? `<div class="detail-row"><strong>Remarks:</strong> ${hist.remarks}</div>` : ''}
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        } else if (entry.type === 'whatsapp') {
+            const hisab = entry.data;
+            listHtml += `
+                <div class="history-entry whatsapp-entry">
+                    <div class="history-entry-header">
+                        <div class="history-entry-datetime">
+                            ${formatDateTime(entry.date)}
+                        </div>
+                        <div class="history-entry-main-content">
+                            <div class="payout-date-highlight" style="color: #25d366;">
+                                <i class="fab fa-whatsapp"></i>
+                                WhatsApp Message Sent
+                            </div>
+                            <div class="entry-meta-info">
+                                <div class="whatsapp-message-details" style="margin: 0; background: none; border: none; padding: 0;">
+                                    ${hisab.message}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="history-entry-type whatsapp">
+                            <i class="fab fa-whatsapp"></i>
+                            WhatsApp
+                        </div>
+                        <div class="history-entry-amount ${hisab.pending_amount >= 0 ? 'positive' : 'negative'}">
+                            ${formatCurrency(hisab.pending_amount)}
+                        </div>
+                        <div class="history-entry-actions">
+                            <div class="hisab-status">
+                                <i class="fas fa-check-circle"></i>
+                                Hisab Sent
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+    });
+    
+    combinedHistoryList.innerHTML = listHtml;
+};
+
+// Updated CSS styles for better positioning
+const paidStampStyles = `
+<style>
+@media (max-width: 1024px) {
+    .paid-stamp-overlay {
+        width: 60px !important;
+        height: 60px !important;
+        top: 12px !important;
+    }
+    
+    .history-entry-header[style*="padding-top"] {
+        padding-top: 25px !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .paid-stamp-overlay {
+        width: 50px !important;
+        height: 50px !important;
+        top: 10px !important;
+    }
+    
+    .history-entry-header[style*="padding-top"] {
+        padding-top: 20px !important;
+    }
+}
+
+.history-entry.payout-entry {
+    overflow: visible;
+}
+
+.paid-stamp-overlay {
+    animation: fadeInStamp 0.5s ease-in-out;
+}
+
+@keyframes fadeInStamp {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) scale(0.8) rotate(-5deg);
+    }
+    to {
+        opacity: 0.85;
+        transform: translateX(-50%) scale(1) rotate(0deg);
+    }
+}
+</style>
+`;
+
+// Inject the styles
+document.head.insertAdjacentHTML('beforeend', paidStampStyles);
+</script>
 </body>
 </html>
