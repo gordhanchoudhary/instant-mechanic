@@ -1395,7 +1395,7 @@
 
             // Replace "अ" and "PM/AM" issues
             istTimeString = istTimeString
-            .replace('अ.', 'AM')   // some systems show "अ."
+            .replace('अ', '')   // some systems show "अ."
             .replace('PM', 'PM')
             .replace('am', 'AM')
             .replace('pm', 'PM');
