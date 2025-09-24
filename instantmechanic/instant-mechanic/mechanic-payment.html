@@ -1380,17 +1380,28 @@
 
             // Create proper IST timestamp
             const now = new Date();
-            const istTimeString = now.toLocaleString('hi-IN', {
-                timeZone: 'Asia/Kolkata',
-                day: 'numeric',
-                month: 'long',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: true
-            });
 
-            const whatsappMessage = `नमस्ते ${mechanicName} जी 🙏\n\nआपका कुल बकाया ${formatCurrency(pendingAmount)} है 🚨🚨\n\n${istTimeString} बजे तक का हिसाब।\n\nअगर हिसाब में कोई गलती लगे या कुछ पूछना हो,\nतो आप सीधे मुझे कॉल 📞 कर सकते हो।\n\n👉 हिसाब देखे: https://instantmechanic.online/mechanic-view.html?mechanic=${encodeURIComponent(mechanicName)}\n\nMehak – +91 89682 73229\nTeam Instant Mechanic`;
+            const options = {
+            timeZone: 'Asia/Kolkata',
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric',
+            hour: 'numeric',
+            minute: 'numeric',
+            hour12: true
+            };
+
+            let istTimeString = now.toLocaleString('hi-IN', options);
+
+            // Replace "अ" and "PM/AM" issues
+            istTimeString = istTimeString
+            .replace('अ.', 'AM')   // some systems show "अ."
+            .replace('PM', 'PM')
+            .replace('am', 'AM')
+            .replace('pm', 'PM');
+
+
+            const whatsappMessage = `नमस्ते *${mechanicName}* जी 🙏\n\nआपका कुल बकाया *${formatCurrency(pendingAmount)}* है 🚨🚨\n\nये *${istTimeString}* बजे तक का हिसाब।\n\nअगर हिसाब में कोई गलती लगे या कुछ पूछना हो,\nतो आप सीधे मुझे कॉल 📞 कर सकते हो।\n\n👉 हिसाब देखे: https://instantmechanic.online/mechanic-view.html?mechanic=${encodeURIComponent(mechanicName)}\n\nMehak – +91 89682 73229\nTeam Instant Mechanic`;
 
 
             // Create WhatsApp URL
