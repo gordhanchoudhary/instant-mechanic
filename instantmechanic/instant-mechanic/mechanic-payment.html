@@ -1390,11 +1390,11 @@
                 hour12: true
             });
 
-            // Format the WhatsApp message with line breaks
-            const whatsappMessage = `नमस्ते ${mechanicName} जी 🙏\n\nआपका कुल बकाया ${formatCurrency(pendingAmount)} है 🚨🚨\n\n${istTimeString} बजे तक का हिसाब।\n\nअगर हिसाब में कोई गलती लगे या कुछ पूछना हो,\nतो आप सीधे मुझे कॉल 📞 कर सकते हो।\n\nMehak – +91 89682 73229\nTeam Instant Mechanic`;
+            const whatsappMessage = `नमस्ते ${mechanicName} जी 🙏\n\nआपका कुल बकाया ${formatCurrency(pendingAmount)} है 🚨🚨\n\n${istTimeString} बजे तक का हिसाब।\n\nअगर हिसाब में कोई गलती लगे या कुछ पूछना हो,\nतो आप सीधे मुझे कॉल 📞 कर सकते हो।\n\n👉 हिसाब देखे: https://instantmechanic.online/mechanic-view.html?mechanic=${encodeURIComponent(mechanicName)}\n\nMehak – +91 89682 73229\nTeam Instant Mechanic`;
+
 
             // Create WhatsApp URL
-            const whatsappUrl = `https://wa.me/${mechanic.mobile}?text=${encodeURIComponent(whatsappMessage)}`;
+            const whatsappUrl = `https://wa.me/91${mechanic.mobile}?text=${encodeURIComponent(whatsappMessage)}`;
 
             // Open WhatsApp
             window.open(whatsappUrl, '_blank');
