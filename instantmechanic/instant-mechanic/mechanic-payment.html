@@ -1610,10 +1610,7 @@
                                         ` : ''}
                                     </div>
                                 </div>
-                                <div class="history-entry-type live-payout">
-                                    <i class="fas fa-circle"></i>
-                                    Live Payment
-                                </div>
+
                                 <div class="history-entry-amount ${payout.pending_amount >= 0 ? 'positive' : 'negative'}">
                                     ${formatCurrency(payout.pending_amount)}
                                 </div>
@@ -2245,10 +2242,7 @@ updateCombinedHistoryList = function() {
                                 ` : ''}
                             </div>
                         </div>
-                        <div class="history-entry-type live-payout">
-                            <i class="fas fa-circle"></i>
-                            Live Payment
-                        </div>
+
                         <div class="history-entry-amount ${payout.pending_amount >= 0 ? 'positive' : 'negative'}">
                             ${formatCurrency(payout.pending_amount)}
                         </div>
