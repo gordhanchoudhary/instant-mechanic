@@ -333,6 +333,7 @@
             opacity: 0;
             visibility: hidden;
             transition: all 0.3s ease;
+            backdrop-filter: blur(4px);
         }
 
         .popup-overlay.show {
@@ -483,6 +484,210 @@
             margin-top: 12px;
         }
 
+        /* Existing Booking Popup Styles */
+        .existing-booking-popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10001;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(4px);
+        }
+
+        .existing-booking-popup.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .existing-booking-content {
+            background: white;
+            padding: 35px;
+            border-radius: 20px;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.25);
+            max-width: 480px;
+            width: 90%;
+            transform: scale(0.9) translateY(20px);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .existing-booking-popup.show .existing-booking-content {
+            transform: scale(1) translateY(0);
+        }
+
+        .existing-booking-header {
+            text-align: center;
+            margin-bottom: 28px;
+            position: relative;
+        }
+
+        .warning-icon {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            font-size: 28px;
+            color: white;
+            box-shadow: 0 8px 20px rgba(251, 191, 36, 0.3);
+        }
+
+        .existing-booking-header h2 {
+            color: #1f2937;
+            font-size: 26px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            line-height: 1.2;
+        }
+
+        .existing-booking-header p {
+            color: #6b7280;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+
+        .booking-details {
+            background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+            padding: 24px;
+            border-radius: 16px;
+            margin-bottom: 28px;
+            border-left: 4px solid #3b82f6;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .booking-details::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.1), transparent);
+            transform: translateX(30px) translateY(-30px);
+        }
+
+        .booking-detail-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+            position: relative;
+        }
+
+        .booking-detail-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: #374151;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            flex-shrink: 0;
+            margin-right: 16px;
+        }
+
+        .detail-value {
+            color: #1f2937;
+            font-size: 16px;
+            font-weight: 500;
+            text-align: right;
+            flex: 1;
+            word-break: break-word;
+        }
+
+        .price-value {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 16px;
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+        }
+
+        .time-ago {
+            background: #fef3c7;
+            color: #92400e;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            border: 1px solid #fcd34d;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 14px;
+            margin-top: 30px;
+        }
+
+        .popup-button {
+            flex: 1;
+            padding: 14px 24px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .popup-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .popup-button:hover::before {
+            left: 100%;
+        }
+
+        .cancel-btn {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+        }
+
+        .cancel-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.4);
+        }
+
+        .continue-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .continue-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
         @media (max-width: 640px) {
             .container {
                 margin: 10px;
@@ -508,6 +713,30 @@
             .popup-content {
                 padding: 25px 20px;
             }
+
+            .existing-booking-content {
+                padding: 25px 20px;
+                margin: 10px;
+            }
+
+            .existing-booking-header h2 {
+                font-size: 22px;
+            }
+
+            .warning-icon {
+                width: 56px;
+                height: 56px;
+                font-size: 24px;
+            }
+
+            .button-group {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .booking-details {
+                padding: 20px;
+            }
         }
     </style>
 </head>
@@ -527,6 +756,24 @@
             </div>
             <div class="popup-footer">
                 <button class="confirm-btn" id="confirmAgent" disabled>Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Existing Booking Popup -->
+    <div class="existing-booking-popup" id="existingBookingPopup">
+        <div class="existing-booking-content">
+            <div class="existing-booking-header">
+                <div class="warning-icon">⚠️</div>
+                <h2>Existing Booking Found</h2>
+                <p>User has an active booking from the last hour</p>
+            </div>
+            <div class="booking-details" id="existingBookingDetails">
+                <!-- Booking details will be populated dynamically -->
+            </div>
+            <div class="button-group">
+                <button class="popup-button cancel-btn" id="cancelExistingBooking">Cancel</button>
+                <button class="popup-button continue-btn" id="continueWithBooking">Continue</button>
             </div>
         </div>
     </div>
@@ -1080,6 +1327,90 @@
             }
         }
 
+        // Function to check for existing bookings
+        async function checkExistingBooking(mobile) {
+            try {
+                const response = await fetch(`https://ai.instantmechanic.online/bot/api/booking-details?mobile=91${mobile}`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': '*/*',
+                        'Accept-Language': 'en-US,en;q=0.9',
+                        'Connection': 'keep-alive',
+                        'Origin': 'https://instantmechanic.online',
+                        'Referer': 'https://instantmechanic.online/',
+                        'Sec-Fetch-Dest': 'empty',
+                        'Sec-Fetch-Mode': 'cors',
+                        'Sec-Fetch-Site': 'same-site',
+                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36'
+                    }
+                });
+
+                if (response.ok) {
+                    const bookingData = await response.json();
+                    console.log('Booking data:', bookingData);
+                    
+                    // Check if booking was created in the last hour
+                    const bookingTime = new Date(bookingData.created_at);
+                    const currentTime = new Date();
+                    const timeDifference = currentTime - bookingTime;
+                    const oneHourInMs = 60 * 60 * 1000; // 1 hour in milliseconds
+
+                    if (timeDifference <= oneHourInMs) {
+                        // Show existing booking popup
+                        showExistingBookingPopup(bookingData, timeDifference);
+                        return true; // Found recent booking
+                    }
+                }
+                
+                return false; // No recent booking found
+            } catch (error) {
+                console.error('Error checking existing booking:', error);
+                return false; // Continue with booking if API fails
+            }
+        }
+
+        // Function to show existing booking popup
+        function showExistingBookingPopup(bookingData, timeDifference) {
+            const popup = document.getElementById('existingBookingPopup');
+            const detailsContainer = document.getElementById('existingBookingDetails');
+            
+            // Calculate time ago
+            const minutesAgo = Math.floor(timeDifference / (1000 * 60));
+            const timeAgoText = minutesAgo < 60 ? `${minutesAgo} minutes ago` : `${Math.floor(minutesAgo / 60)} hour(s) ago`;
+            
+            // Populate booking details
+            detailsContainer.innerHTML = `
+                <div class="booking-detail-item">
+                    <span class="detail-label">Problem</span>
+                    <span class="detail-value">${bookingData.problem || 'Not specified'}</span>
+                </div>
+                <div class="booking-detail-item">
+                    <span class="detail-label">Price</span>
+                    <span class="detail-value price-value">₹${bookingData.price || 'N/A'}</span>
+                </div>
+                <div class="booking-detail-item">
+                    <span class="detail-label">Car</span>
+                    <span class="detail-value">${bookingData.car || 'Not specified'}</span>
+                </div>
+                <div class="booking-detail-item">
+                    <span class="detail-label">Status</span>
+                    <span class="detail-value">${bookingData.is_cancelled ? 'Cancelled' : 'Active'}</span>
+                </div>
+                <div class="booking-detail-item">
+                    <span class="detail-label">Booked</span>
+                    <span class="detail-value time-ago">${timeAgoText}</span>
+                </div>
+            `;
+            
+            popup.classList.add('show');
+        }
+
+        // Function to hide existing booking popup
+        function hideExistingBookingPopup() {
+            const popup = document.getElementById('existingBookingPopup');
+            popup.classList.remove('show');
+        }
+
         // Agent Selection Popup Functions
         function showAgentPopup() {
             const popup = document.getElementById('agentPopup');
@@ -1379,6 +1710,29 @@
             return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
         }
 
+        // Process booking function
+        async function processBooking(formData) {
+            try {
+                // Replace with your actual API endpoint
+                const response = await fetch('https://ai.instantmechanic.online/bot/api/mannual-booking', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                if (response.ok) {
+                    return { success: true };
+                } else {
+                    throw new Error('Booking failed');
+                }
+            } catch (error) {
+                console.error('Booking error:', error);
+                throw error;
+            }
+        }
+
         // Initialize form
         document.addEventListener('DOMContentLoaded', function() {
             // Check agent name and show popup if needed
@@ -1387,6 +1741,25 @@
             // Initialize dropdown functionality
             initializeProblemDropdown();
             initializeCarModelDropdown();
+
+            // Initialize existing booking popup event handlers
+            document.getElementById('cancelExistingBooking').addEventListener('click', function() {
+                hideExistingBookingPopup();
+                // Reset form loading state
+                const bookBtn = document.getElementById('bookBtn');
+                const btnText = bookBtn.querySelector('.btn-text');
+                const loading = bookBtn.querySelector('.loading');
+                bookBtn.disabled = false;
+                btnText.style.display = 'inline';
+                loading.style.display = 'none';
+            });
+
+            document.getElementById('continueWithBooking').addEventListener('click', async function() {
+                hideExistingBookingPopup();
+                
+                // Proceed with booking
+                await submitBookingForm();
+            });
 
             // Function to fetch customer location from API
             async function fetchCustomerLocation(mobile) {
@@ -1498,37 +1871,23 @@
                 }
             });
 
-            // Form submission
-            const form = document.getElementById('bookingForm');
-            const bookBtn = document.getElementById('bookBtn');
-            const btnText = bookBtn.querySelector('.btn-text');
-            const loading = bookBtn.querySelector('.loading');
-            const successMessage = document.getElementById('successMessage');
-            const errorMessage = document.getElementById('errorMessage');
-
-            form.addEventListener('submit', async function(e) {
-                e.preventDefault();
+            // Function to handle booking submission
+            async function submitBookingForm() {
+                const bookBtn = document.getElementById('bookBtn');
+                const btnText = bookBtn.querySelector('.btn-text');
+                const loading = bookBtn.querySelector('.loading');
+                const successMessage = document.getElementById('successMessage');
+                const errorMessage = document.getElementById('errorMessage');
 
                 // Hide previous messages
                 successMessage.style.display = 'none';
                 errorMessage.style.display = 'none';
 
-                // Validate mobile number
-                const mobile = document.getElementById('mobile').value;
-                if (mobile.length !== 10) {
-                    alert('Please enter a valid 10-digit mobile number');
-                    return;
-                }
-
-                // Show loading state
-                bookBtn.disabled = true;
-                btnText.style.display = 'none';
-                loading.style.display = 'flex';
-
                 // Check if GoMechanic toggle is active
                 const isGoMechanic = document.getElementById('goMechanicToggle').classList.contains('active');
 
                 // Get form values
+                const mobile = document.getElementById('mobile').value;
                 const price = parseFloat(document.getElementById('price').value) || 0;
                 const mechanicPayout = parseFloat(document.getElementById('securityAmount').value) || 0;
                 const carModel = document.getElementById('carModel').value;
@@ -1549,42 +1908,31 @@
                 };
 
                 try {
-                    // Replace with your actual API endpoint
-                    const response = await fetch('https://ai.instantmechanic.online/bot/api/mannual-booking', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify(formData)
+                    await processBooking(formData);
+
+                    // Track Mixpanel event for successful booking
+                    trackMixpanelEvent("Booking Confirmed", {
+                        "booking_type": "Manual Booking",
+                        "car": carModel,
+                        "price": price,
+                        "problem": problem,
+                        "location": location,
+                        "remarks": null,
+                        "company_profit": price - mechanicPayout,
+                        "security_asked": 199, // Fixed as per your requirement
+                        "mechanic_payout": mechanicPayout,
+                        "total_price": price
                     });
 
-                    if (response.ok) {
-                        // Track Mixpanel event for successful booking
-                        trackMixpanelEvent("Booking Confirmed", {
-                            "booking_type": "Manual Booking",
-                            "car": carModel,
-                            "price": price,
-                            "problem": problem,
-                            "location": location,
-                            "remarks": null,
-                            "company_profit": price - mechanicPayout,
-                            "security_asked": 199, // Fixed as per your requirement
-                            "mechanic_payout": mechanicPayout,
-                            "total_price": price
-                        });
-
-                        successMessage.style.display = 'block';
-                        form.reset();
-                        // Reset toggles to default state and restore default values
-                        document.getElementById('goMechanicToggle').classList.remove('active');
-                        togglePriceAndSecurityVisibility(false); // Show price and security fields
-                        document.getElementById('price').value = '742';
-                        const calculatedSecurity = calculateSecurityAmount('742');
-                        document.getElementById('securityAmount').value = calculatedSecurity;
-                        securityAmountManuallySet = false;
-                    } else {
-                        throw new Error('Booking failed');
-                    }
+                    successMessage.style.display = 'block';
+                    document.getElementById('bookingForm').reset();
+                    // Reset toggles to default state and restore default values
+                    document.getElementById('goMechanicToggle').classList.remove('active');
+                    togglePriceAndSecurityVisibility(false); // Show price and security fields
+                    document.getElementById('price').value = '742';
+                    const calculatedSecurity = calculateSecurityAmount('742');
+                    document.getElementById('securityAmount').value = calculatedSecurity;
+                    securityAmountManuallySet = false;
                 } catch (error) {
                     console.error('Booking error:', error);
                     errorMessage.style.display = 'block';
@@ -1608,7 +1956,7 @@
                             "total_price": price
                         });
                         
-                        form.reset();
+                        document.getElementById('bookingForm').reset();
                         document.getElementById('goMechanicToggle').classList.remove('active');
                         togglePriceAndSecurityVisibility(false); // Show price and security fields
                         document.getElementById('price').value = '742';
@@ -1624,6 +1972,37 @@
                         loading.style.display = 'none';
                     }, 1500);
                 }
+            }
+
+            // Form submission with existing booking check
+            const form = document.getElementById('bookingForm');
+            const bookBtn = document.getElementById('bookBtn');
+            const btnText = bookBtn.querySelector('.btn-text');
+            const loading = bookBtn.querySelector('.loading');
+
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+
+                // Validate mobile number
+                const mobile = document.getElementById('mobile').value;
+                if (mobile.length !== 10) {
+                    alert('Please enter a valid 10-digit mobile number');
+                    return;
+                }
+
+                // Show loading state
+                bookBtn.disabled = true;
+                btnText.style.display = 'none';
+                loading.style.display = 'flex';
+
+                // Check for existing booking first
+                const hasExistingBooking = await checkExistingBooking(mobile);
+                
+                if (!hasExistingBooking) {
+                    // No existing booking, proceed directly
+                    await submitBookingForm();
+                }
+                // If existing booking found, popup will be shown and user can choose to continue or cancel
             });
         });
     </script>
