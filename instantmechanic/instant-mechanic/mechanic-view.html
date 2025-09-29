@@ -625,9 +625,9 @@
       const iconBgColor = isPositive ? 'bg-green-100' : 'bg-red-100';
       const iconColor = isPositive ? 'text-green-600' : 'text-red-600';
       
-      // Check if total_calls is 0 or not present
-      const totalCalls = parseInt(payout.total_calls) || 0;
-      const showCallsInfo = totalCalls > 0;
+      // Check if total_calls is 0 or not present - more robust checking
+      const totalCalls = payout.total_calls ? parseInt(payout.total_calls) : 0;
+      const showCallsInfo = totalCalls > 0 && !isNaN(totalCalls);
       
       div.innerHTML = `
         <div class="flex items-center justify-between mb-4">
@@ -652,14 +652,16 @@
             </div>
           </div>
         </div>
-        <div class="flex items-center justify-between">
-          <div class="bg-gray-50 rounded-xl p-3 flex-1 mr-4">
+        <div class="space-y-3">
+          <div class="bg-gray-50 rounded-xl p-3">
             <p class="text-sm text-gray-600 leading-relaxed">${payout.remarks}</p>
           </div>
           ${showCallsInfo ? `
-            <button onclick="viewCallsForDate('${payout.payout_date}')" class="bg-blue-500 hover:bg-blue-600 text-white text-sm px-4 py-2 rounded-xl transition-all duration-200 font-semibold shadow-sm hover:shadow-lg active:scale-95">
-              कॉल्स देखें
-            </button>
+            <div class="flex justify-end">
+              <button onclick="viewCallsForDate('${payout.payout_date}')" class="bg-blue-500 hover:bg-blue-600 text-white text-sm px-4 py-2 rounded-xl transition-all duration-200 font-semibold shadow-sm hover:shadow-lg active:scale-95">
+                कॉल्स देखें
+              </button>
+            </div>
           ` : ''}
         </div>
       `;
