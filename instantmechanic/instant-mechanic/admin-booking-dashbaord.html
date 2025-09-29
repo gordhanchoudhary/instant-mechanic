@@ -65,6 +65,12 @@
           <option value="">All Agents</option>
         </select>
         
+        <!-- Secondary Agent Filter -->
+        <select id="secondaryAgentFilter" class="border rounded px-4 py-2 text-sm shadow">
+          <option value="">All Secondary Agents</option>
+          <option value="no_agent">No Agent</option>
+        </select>
+        
         <!-- Mechanic Filter -->
         <select id="mechanicFilter" class="border rounded px-4 py-2 text-sm shadow">
           <option value="">All Mechanics</option>
@@ -149,6 +155,7 @@
             <th class="p-3">Paid</th>
             <th class="p-3">Pending</th>
             <th class="p-3">Agent</th>
+            <th class="p-3">Secondary Agent</th>
             <th class="p-3">Type</th>
             <th class="p-3">Cancelled</th>
             <th class="p-3">Reason</th>
@@ -167,10 +174,11 @@
    * - start_date & end_date: Date range filter (YYYY-MM-DD format)
    * - mechanic: Mechanic name or "unassigned"
    * - cancelled: "true" (cancelled only), "false" (active only), "all" (show all)
+   * - secondary_agent: Secondary agent name or "no_agent" (for records with no secondary agent)
    * 
    * Example URLs:
-   * ?date=2024-01-15&mechanic=John Doe&cancelled=false
-   * ?start_date=2024-01-15&end_date=2024-01-20&cancelled=true
+   * ?date=2024-01-15&mechanic=John Doe&cancelled=false&secondary_agent=Mayank
+   * ?start_date=2024-01-15&end_date=2024-01-20&cancelled=true&secondary_agent=no_agent
    */
   const dateInput = document.getElementById("datePicker");
   const dateType = document.getElementById("dateType");
@@ -178,6 +186,7 @@
   const startDate = document.getElementById("startDate");
   const endDate = document.getElementById("endDate");
   const agentFilter = document.getElementById("agentFilter");
+  const secondaryAgentFilter = document.getElementById("secondaryAgentFilter");
   const mechanicFilter = document.getElementById("mechanicFilter");
   const bookingTypeFilter = document.getElementById("bookingTypeFilter");
   const gomechanicFilter = document.getElementById("gomechanicFilter");
@@ -404,6 +413,14 @@
       filteredData = filteredData.filter(item => item.mechanic_name === selectedMechanic);
     }
     
+    // Apply secondary agent filter
+    const selectedSecondaryAgent = secondaryAgentFilter.value;
+    if (selectedSecondaryAgent === 'no_agent') {
+      filteredData = filteredData.filter(item => !item.secondary_agent);
+    } else if (selectedSecondaryAgent) {
+      filteredData = filteredData.filter(item => item.secondary_agent === selectedSecondaryAgent);
+    }
+    
     // Apply booking type filter
     const selectedBookingType = bookingTypeFilter.value;
     if (selectedBookingType === 'manual') {
@@ -531,6 +548,7 @@
           <td class="p-3 text-green-600">${formatCurrency(paid)}</td>
           <td class="p-3 text-yellow-600">${formatCurrency(pendingAmount)}</td>
           <td class="p-3">${item.agent_name ?? '-'}</td>
+          <td class="p-3">${item.secondary_agent ?? 'No Agent'}</td>
           <td class="p-3">${bookingTypeBadge}</td>
           <td class="p-3 ${item.is_cancelled ? 'text-red-500' : 'text-green-500'} font-bold">
             ${item.is_cancelled ? 'Yes' : 'No'}
@@ -571,6 +589,7 @@
       'Paid Amount',
       'Pending Amount',
       'Agent',
+      'Secondary Agent',
       'Booking Type',
       'GoMechanic Call',
       'Cancelled',
@@ -623,6 +642,7 @@
         paid,
         pendingAmount,
         item.agent_name || '',
+        item.secondary_agent || 'No Agent',
         bookingType,
         item.is_gomechanic_call ? 'Yes' : 'No',
         item.is_cancelled ? 'Yes' : 'No',
@@ -650,6 +670,9 @@
       }
       if (agentFilter.value) {
         filename += `_agent-${agentFilter.value}`;
+      }
+      if (secondaryAgentFilter.value) {
+        filename += `_secondary-agent-${secondaryAgentFilter.value}`;
       }
       if (mechanicFilter.value) {
         filename += `_mechanic-${mechanicFilter.value}`;
@@ -705,6 +728,7 @@
       start_date: urlParams.get('start_date'),
       end_date: urlParams.get('end_date'),
       mechanic: urlParams.get('mechanic'),
+      secondary_agent: urlParams.get('secondary_agent'),
       cancelled: urlParams.get('cancelled')
     };
   };
@@ -738,6 +762,13 @@
       window.urlMechanicParam = params.mechanic;
     }
     
+    // Apply secondary agent parameter
+    if (params.secondary_agent) {
+      // We'll need to set this after the API call populates the dropdown
+      // Store it temporarily to set later
+      window.urlSecondaryAgentParam = params.secondary_agent;
+    }
+    
     // Apply cancelled parameter
     if (params.cancelled) {
       if (params.cancelled === 'true') {
@@ -767,9 +798,11 @@
     totalAdvancePayment.textContent = '0';
 
     const selectedAgent = agentFilter.value;
+    const selectedSecondaryAgent = secondaryAgentFilter.value;
     const selectedMechanic = mechanicFilter.value;
     
     const agentParam = selectedAgent ? `&agent=${encodeURIComponent(selectedAgent)}` : '';
+    const secondaryAgentParam = selectedSecondaryAgent ? `&secondary_agent=${encodeURIComponent(selectedSecondaryAgent)}` : '';
     const mechanicParam = selectedMechanic ? `&mechanic=${encodeURIComponent(selectedMechanic)}` : '';
 
     // Determine date parameters based on date type
@@ -792,7 +825,7 @@
     }
 
     try {
-      const customerRes = await fetch(`https://ai.instantmechanic.online/bot/api/customer-flow/by-date/?${dateParams}${agentParam}${mechanicParam}`);
+      const customerRes = await fetch(`https://ai.instantmechanic.online/bot/api/customer-flow/by-date/?${dateParams}${agentParam}${secondaryAgentParam}${mechanicParam}`);
       const customerData = await customerRes.json();
       totalCustomers.textContent = customerData.total_customers || 0;
       totalRevenue.textContent = formatCurrency(customerData.total_revenue) || '₹0';
@@ -803,7 +836,7 @@
       totalCustomers.textContent = '0';
     }
 
-    const url = `https://ai.instantmechanic.online/bot/api/booking/by-date/?${dateParams}${agentParam}${mechanicParam}`;
+    const url = `https://ai.instantmechanic.online/bot/api/booking/by-date/?${dateParams}${agentParam}${secondaryAgentParam}${mechanicParam}`;
     const res = await fetch(url);
     let data = await res.json();
 
@@ -825,6 +858,26 @@
     // Restore selection if it still exists in the new list
     if (currentSelectedAgent && uniqueAgents.includes(currentSelectedAgent)) {
       agentFilter.value = currentSelectedAgent;
+    }
+
+    // Update secondary agent filter dropdown
+    const currentSelectedSecondaryAgent = secondaryAgentFilter.value; // Remember current selection
+    // Clear existing secondary agent options except the default ones (All Secondary Agents and No Agent)
+    while (secondaryAgentFilter.options.length > 2) {
+      secondaryAgentFilter.removeChild(secondaryAgentFilter.lastChild);
+    }
+    
+    const uniqueSecondaryAgents = [...new Set(data.map(b => b.secondary_agent).filter(Boolean))];
+    uniqueSecondaryAgents.forEach(agent => {
+      const option = document.createElement("option");
+      option.value = agent;
+      option.textContent = agent;
+      secondaryAgentFilter.appendChild(option);
+    });
+    
+    // Restore selection if it still exists in the new list
+    if (currentSelectedSecondaryAgent && (currentSelectedSecondaryAgent === 'no_agent' || uniqueSecondaryAgents.includes(currentSelectedSecondaryAgent))) {
+      secondaryAgentFilter.value = currentSelectedSecondaryAgent;
     }
 
     // Update mechanic filter dropdown
@@ -854,6 +907,15 @@
       }
       // Clear the temporary parameter so it doesn't interfere with manual changes
       delete window.urlMechanicParam;
+    }
+
+    // Apply URL secondary agent parameter if it exists and wasn't already set
+    if (window.urlSecondaryAgentParam && !secondaryAgentFilter.value) {
+      if (window.urlSecondaryAgentParam === 'no_agent' || uniqueSecondaryAgents.includes(window.urlSecondaryAgentParam)) {
+        secondaryAgentFilter.value = window.urlSecondaryAgentParam;
+      }
+      // Clear the temporary parameter so it doesn't interfere with manual changes
+      delete window.urlSecondaryAgentParam;
     }
 
     // Client-side filtering for mechanic (in case API doesn't support mechanic filter)
@@ -907,6 +969,11 @@
 
   // Agent filter change handler
   agentFilter.addEventListener("change", () => {
+    fetchBookings();
+  });
+
+  // Secondary Agent filter change handler
+  secondaryAgentFilter.addEventListener("change", () => {
     fetchBookings();
   });
 
