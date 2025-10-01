@@ -629,6 +629,18 @@
           mechanicEarning = pendingPayment + mechanicExtra;
         }
         
+        // Calculate company outstanding based on payment status
+        let companyOutstanding = 0;
+        if (!item.is_cancelled) {
+          if (item.payment_status === "pending") {
+            companyOutstanding = parseInt(item.company_profit) || 0;
+          } else if (item.payment_status === "partially-paid") {
+            const companyProfit = parseInt(item.company_profit) || 0;
+            const advancePayment = parseInt(item.advance_payment_amount) || 0;
+            companyOutstanding = Math.max(0, companyProfit - advancePayment);
+          }
+        }
+        
         earnings += mechanicEarning;
 
         if (item.is_cancelled) {
@@ -648,14 +660,14 @@
               <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
               </svg>
-               कैंसिल की गई कॉल्स
+              रद्द की गई कॉल्स
             </h3>
           `;
           callsList.appendChild(sectionHeader);
         }
 
         // Create call card
-        const callCard = createCallCard(item, mechanicEarning);
+        const callCard = createCallCard(item, mechanicEarning, companyOutstanding);
         callsList.appendChild(callCard);
       });
 
@@ -675,7 +687,7 @@
       }, 150);
     }
 
-    function createCallCard(item, mechanicEarning) {
+    function createCallCard(item, mechanicEarning, companyOutstanding) {
       const div = document.createElement('div');
       
       // Set background color based on call status with enhanced styling
@@ -692,7 +704,7 @@
             </svg>
           </div>
         `;
-        statusBadge = '<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-red-200 text-red-800 border-2 border-red-300 card-shadow"> कैंसिल</span>';
+        statusBadge = '<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-red-200 text-red-800 border-2 border-red-300 card-shadow">रद्द</span>';
       } else {
         cardClass += 'border-green-300 border-l-green-500 hover:shadow-green-100';
         statusIcon = `
@@ -702,7 +714,7 @@
             </svg>
           </div>
         `;
-        statusBadge = '<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-green-200 text-green-800 border-2 border-green-300 card-shadow">✅</span>';
+        statusBadge = '<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-green-200 text-green-800 border-2 border-green-300 card-shadow">पूरा</span>';
       }
       
       div.className = cardClass;
@@ -763,17 +775,27 @@
                   </div>
                   ${badges}
                 </div>
-                <div class="bg-white rounded-xl card-shadow border-2 ${item.is_cancelled ? 'border-red-200 bg-red-50' : 'border-green-200 bg-green-50'} p-2 ml-2">
-                  <div class="text-center">
-                    <p class="text-xs ${item.is_cancelled ? 'text-red-600' : 'text-green-600'} font-semibold mb-1">मेरी कमाई</p>
-                    <p class="text-sm font-bold ${item.is_cancelled ? 'text-red-600' : 'text-green-600'}">${formatCurrency(mechanicEarning)}</p>
+                <div class="flex items-center space-x-2 ml-2">
+                  <div class="bg-white rounded-xl card-shadow border-2 ${item.is_cancelled ? 'border-green-200 bg-green-50' : 'border-green-200 bg-green-50'} p-2">
+                    <div class="text-center">
+                      <p class="text-xs text-green-600 font-semibold mb-1">मेरी कमाई</p>
+                      <p class="text-sm font-bold text-green-600">${formatCurrency(mechanicEarning)}</p>
+                    </div>
                   </div>
+                  ${!item.is_cancelled ? `
+                    <div class="bg-white rounded-xl card-shadow border-2 border-red-200 bg-red-50 p-2">
+                      <div class="text-center">
+                        <p class="text-xs text-red-600 font-semibold mb-1">कंपनी बकाया</p>
+                        <p class="text-sm font-bold text-red-600">${formatCurrency(companyOutstanding)}</p>
+                      </div>
+                    </div>
+                  ` : ''}
                 </div>
               </div>
             </div>
             ${item.is_cancelled && item.cancellation_reason ? `
               <div class="mt-4 p-3 bg-red-100 rounded-xl border-2 border-red-200">
-                <p class="text-xs text-red-700"><strong> कैंसिल करने का कारण:</strong> ${item.cancellation_reason}</p>
+                <p class="text-xs text-red-700"><strong>रद्द करने का कारण:</strong> ${item.cancellation_reason}</p>
               </div>
             ` : ''}
           </div>
