@@ -648,7 +648,7 @@
               <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
               </svg>
-              रद्द की गई कॉल्स
+               कैंसिल की गई कॉल्स
             </h3>
           `;
           callsList.appendChild(sectionHeader);
@@ -692,7 +692,7 @@
             </svg>
           </div>
         `;
-        statusBadge = '<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-red-200 text-red-800 border-2 border-red-300 card-shadow">रद्द</span>';
+        statusBadge = '<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-red-200 text-red-800 border-2 border-red-300 card-shadow"> कैंसिल</span>';
       } else {
         cardClass += 'border-green-300 border-l-green-500 hover:shadow-green-100';
         statusIcon = `
@@ -702,7 +702,7 @@
             </svg>
           </div>
         `;
-        statusBadge = '<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-green-200 text-green-800 border-2 border-green-300 card-shadow">पूरा</span>';
+        statusBadge = '<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-green-200 text-green-800 border-2 border-green-300 card-shadow">✅</span>';
       }
       
       div.className = cardClass;
@@ -773,7 +773,7 @@
             </div>
             ${item.is_cancelled && item.cancellation_reason ? `
               <div class="mt-4 p-3 bg-red-100 rounded-xl border-2 border-red-200">
-                <p class="text-xs text-red-700"><strong>रद्द करने का कारण:</strong> ${item.cancellation_reason}</p>
+                <p class="text-xs text-red-700"><strong> कैंसिल करने का कारण:</strong> ${item.cancellation_reason}</p>
               </div>
             ` : ''}
           </div>
@@ -852,38 +852,38 @@
       
       div.innerHTML = `
         <div class="flex items-start justify-between mb-4">
-          <div class="flex items-center space-x-4 flex-1 min-w-0">
-            <div class="bg-gradient-to-br ${iconBgColor} rounded-2xl p-4 card-shadow animate-float flex-shrink-0">
-              <svg class="w-6 h-6 ${iconColor}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="flex items-center space-x-3 flex-1 min-w-0">
+            <div class="bg-gradient-to-br ${iconBgColor} rounded-2xl p-3 card-shadow animate-float flex-shrink-0">
+              <svg class="w-5 h-5 ${iconColor}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path>
               </svg>
             </div>
-            <div class="flex-1 min-w-0 pr-4">
-              <h3 class="font-bold text-gray-900 text-lg mb-2 truncate">${formatDate(payout.payout_date)}</h3>
+            <div class="flex-1 min-w-0">
+              <h3 class="font-bold text-gray-900 mb-2" style="font-size: 16px !important; line-height: 1.2 !important;">${formatDate(payout.payout_date)}</h3>
               <div class="flex items-center space-x-2 flex-wrap">
-                ${showCallsInfo ? `<p class="text-sm text-gray-700 bg-white bg-opacity-80 backdrop-blur-sm px-3 py-1 rounded-xl font-bold border-2 border-gray-200 card-shadow">${totalCalls} कॉल्स</p>` : ''}
-                <span class="text-xs ${badgeColor} px-3 py-1 rounded-full font-bold border-2 card-shadow">
+                ${showCallsInfo ? `<p class="text-gray-700 bg-white bg-opacity-80 backdrop-blur-sm px-3 py-1 rounded-xl font-bold border-2 border-gray-200 card-shadow" style="font-size: 12px !important;">${totalCalls} कॉल्स</p>` : ''}
+                <span class="text-xs ${badgeColor} px-3 py-1 rounded-full font-bold border-2 card-shadow" style="font-size: 11px !important;">
                   ${isPositive ? 'आपने कंपनी को भेजा' : 'कंपनी का पेमेंट'}
                 </span>
               </div>
             </div>
           </div>
-          <div class="bg-white border-2 border-gray-200 rounded-2xl px-4 py-3 card-shadow flex-shrink-0">
-            <span class="font-bold text-lg ${amountColor} whitespace-nowrap">${formatCurrency(Math.abs(payout.pending_amount))}</span>
+          <div class="bg-white border-2 border-gray-200 rounded-2xl px-3 py-2 card-shadow flex-shrink-0" style="min-width: 80px;">
+            <span class="font-bold ${amountColor} whitespace-nowrap block text-center" style="font-size: 15px !important; line-height: 1.2 !important;">${formatCurrency(Math.abs(payout.pending_amount))}</span>
           </div>
         </div>
         
         ${showRemarks ? `
           <div class="mb-4">
             <div class="bg-white bg-opacity-80 backdrop-blur-sm rounded-2xl p-4 border-2 border-gray-200 card-shadow">
-              <p class="text-sm text-gray-700 leading-relaxed font-medium">${formattedRemarks}</p>
+              <p class="text-gray-700 leading-relaxed font-medium" style="font-size: 13px !important; line-height: 1.4 !important;">${formattedRemarks}</p>
             </div>
           </div>
         ` : ''}
         
         ${showCallsInfo ? `
           <div class="flex justify-end">
-            <button onclick="viewCallsForDate('${payout.payout_date}')" class="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white text-sm px-6 py-3 rounded-2xl transition-all duration-200 font-bold card-shadow hover:shadow-xl active:scale-95 card-hover">
+            <button onclick="viewCallsForDate('${payout.payout_date}')" class="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-6 py-3 rounded-2xl transition-all duration-200 font-bold card-shadow hover:shadow-xl active:scale-95 card-hover" style="font-size: 13px !important;">
               कॉल्स देखें
             </button>
           </div>
