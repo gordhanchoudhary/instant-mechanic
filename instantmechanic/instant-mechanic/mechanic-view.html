@@ -732,10 +732,30 @@
       
       div.innerHTML = `
         <div class="flex items-start space-x-4">
-          <div class="relative flex-shrink-0">
-            <img src="${item.car_image}" alt="Car" class="w-16 h-16 object-contain rounded-xl card-shadow border-2 border-gray-200 bg-white p-2 card-hover" />
-            ${statusIcon}
+          <div class="flex-shrink-0">
+            <div class="relative mb-3">
+              <img src="${item.car_image}" alt="Car" class="w-16 h-16 object-contain rounded-xl card-shadow border-2 border-gray-200 bg-white p-2 card-hover" />
+              ${statusIcon}
+            </div>
+            <!-- Payment boxes below car image -->
+            <div class="space-y-2">
+              <div class="bg-white rounded-xl card-shadow border-2 border-green-200 bg-green-50 p-2 w-20">
+                <div class="text-center">
+                  <p class="text-xs text-green-600 font-semibold mb-1">मेरी कमाई</p>
+                  <p class="text-sm font-bold text-green-600">${formatCurrency(mechanicEarning)}</p>
+                </div>
+              </div>
+              ${!item.is_cancelled ? `
+                <div class="bg-white rounded-xl card-shadow border-2 border-red-200 bg-red-50 p-2 w-20">
+                  <div class="text-center">
+                    <p class="text-xs text-red-600 font-semibold mb-1">कंपनी बकाया</p>
+                    <p class="text-sm font-bold text-red-600">${formatCurrency(companyOutstanding)}</p>
+                  </div>
+                </div>
+              ` : ''}
+            </div>
           </div>
+          
           <div class="flex-1 min-w-0">
             <div class="mb-3">
               <div class="flex items-start justify-between mb-2">
@@ -768,29 +788,11 @@
               
               <p class="text-gray-600 text-sm leading-relaxed line-clamp-2 mb-3">${item.problem}</p>
               
-              <div class="flex items-center justify-between">
-                <div class="flex items-center space-x-2 flex-wrap flex-1">
-                  <div class="bg-gray-100 rounded-lg px-3 py-1">
-                    <span class="text-xs text-gray-600 font-medium">${formatDateTime(item.created_at)}</span>
-                  </div>
-                  ${badges}
+              <div class="flex items-center space-x-2 flex-wrap">
+                <div class="bg-gray-100 rounded-lg px-3 py-1">
+                  <span class="text-xs text-gray-600 font-medium">${formatDateTime(item.created_at)}</span>
                 </div>
-                <div class="flex items-center space-x-2 ml-2">
-                  <div class="bg-white rounded-xl card-shadow border-2 ${item.is_cancelled ? 'border-green-200 bg-green-50' : 'border-green-200 bg-green-50'} p-2">
-                    <div class="text-center">
-                      <p class="text-xs text-green-600 font-semibold mb-1">मेरी कमाई</p>
-                      <p class="text-sm font-bold text-green-600">${formatCurrency(mechanicEarning)}</p>
-                    </div>
-                  </div>
-                  ${!item.is_cancelled ? `
-                    <div class="bg-white rounded-xl card-shadow border-2 border-red-200 bg-red-50 p-2">
-                      <div class="text-center">
-                        <p class="text-xs text-red-600 font-semibold mb-1">कंपनी बकाया</p>
-                        <p class="text-sm font-bold text-red-600">${formatCurrency(companyOutstanding)}</p>
-                      </div>
-                    </div>
-                  ` : ''}
-                </div>
+                ${badges}
               </div>
             </div>
             ${item.is_cancelled && item.cancellation_reason ? `
