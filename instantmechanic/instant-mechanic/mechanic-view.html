@@ -390,6 +390,23 @@
     </div>
   </div>
 
+  <!-- Company Outstanding Breakdown Modal -->
+  <div id="breakdownModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden backdrop-blur-sm">
+    <div class="bg-white rounded-3xl p-6 m-4 max-w-sm w-full card-shadow animate-scale-in">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-bold text-gray-900">कंपनी बकाया गणना</h3>
+        <button onclick="closeBreakdown()" class="p-2 hover:bg-gray-100 rounded-full transition-colors">
+          <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+      <div id="breakdownContent" class="space-y-3">
+        <!-- Breakdown content will be populated here -->
+      </div>
+    </div>
+  </div>
+
   <script>
     // Get URL parameters
     const urlParams = new URLSearchParams(window.location.search);
@@ -425,6 +442,10 @@
     const pendingCard = document.getElementById('pendingCard');
     const callsList = document.getElementById('callsList');
     const payoutHistory = document.getElementById('payoutHistory');
+
+    // Breakdown modal elements
+    const breakdownModal = document.getElementById('breakdownModal');
+    const breakdownContent = document.getElementById('breakdownContent');
 
     // Set mechanic name
     mechanicNameEl.textContent = "नमस्कार, " + mechanicName + " 🙏";
@@ -510,6 +531,83 @@
 
     const showLoading = () => loadingSpinner.classList.remove('hidden');
     const hideLoading = () => loadingSpinner.classList.add('hidden');
+
+    // Company outstanding breakdown functions
+    window.showBreakdown = function(item) {
+      const companyProfit = parseInt(item.company_profit) || 0;
+      const advancePayment = parseInt(item.advance_payment_amount) || 0;
+      const mechanicExtraPayment = parseInt(item.mechanic_extra_payment) || 0;
+      const paymentOnQr = parseInt(item.payment_on_qr) || 0;
+      
+      let baseAmount = 0;
+      let breakdownSteps = [];
+      
+      // Calculate base amount based on payment status
+      if (item.payment_status === "pending") {
+        baseAmount = companyProfit;
+        breakdownSteps.push(`<div class="flex justify-between items-center py-2 border-b border-gray-100">
+          <span class="text-gray-600 text-sm">कंपनी प्रॉफिट:</span>
+          <span class="font-bold text-gray-900">${formatCurrency(companyProfit)}</span>
+        </div>`);
+      } else if (item.payment_status === "partially-paid") {
+        baseAmount = Math.max(0, companyProfit - advancePayment);
+        breakdownSteps.push(`<div class="flex justify-between items-center py-2 border-b border-gray-100">
+          <span class="text-gray-600 text-sm">कंपनी प्रॉफिट:</span>
+          <span class="font-bold text-gray-900">${formatCurrency(companyProfit)}</span>
+        </div>`);
+        breakdownSteps.push(`<div class="flex justify-between items-center py-2 border-b border-gray-100">
+          <span class="text-gray-600 text-sm">एडवांस पेमेंट (-):</span>
+          <span class="font-bold text-red-600">-${formatCurrency(advancePayment)}</span>
+        </div>`);
+      }
+      
+      // Add mechanic extra payment deduction
+      if (mechanicExtraPayment > 0) {
+        breakdownSteps.push(`<div class="flex justify-between items-center py-2 border-b border-gray-100">
+          <span class="text-gray-600 text-sm">मैकेनिक एक्स्ट्रा पेमेंट (-):</span>
+          <span class="font-bold text-red-600">-${formatCurrency(mechanicExtraPayment)}</span>
+        </div>`);
+      }
+      
+      // Add QR payment deduction
+      if (paymentOnQr > 0) {
+        breakdownSteps.push(`<div class="flex justify-between items-center py-2 border-b border-gray-100">
+          <span class="text-gray-600 text-sm">एडवांस पेमेंट QR (-):</span>
+          <span class="font-bold text-red-600">-${formatCurrency(paymentOnQr)}</span>
+        </div>`);
+      }
+      
+      // Calculate final amount
+      const finalAmount = Math.max(0, baseAmount - mechanicExtraPayment - paymentOnQr);
+      
+      // Create breakdown HTML
+      breakdownContent.innerHTML = `
+        <div class="bg-gray-50 rounded-xl p-4 mb-4">
+          <h4 class="font-bold text-gray-800 mb-3 text-center">गणना का विवरण</h4>
+          ${breakdownSteps.join('')}
+          <div class="flex justify-between items-center py-3 pt-4 border-t-2 border-gray-300">
+            <span class="text-gray-800 font-bold">अंतिम बकाया राशि:</span>
+            <span class="font-bold text-lg ${finalAmount > 0 ? 'text-red-600' : 'text-green-600'}">${formatCurrency(finalAmount)}</span>
+          </div>
+        </div>
+        <div class="text-xs text-gray-500 text-center leading-relaxed">
+          यह गणना कंपनी की नीति के अनुसार की गई है। किसी भी समस्या के लिए कंपनी से संपर्क करें।
+        </div>
+      `;
+      
+      breakdownModal.classList.remove('hidden');
+    };
+
+    window.closeBreakdown = function() {
+      breakdownModal.classList.add('hidden');
+    };
+
+    // Close modal when clicking outside
+    breakdownModal.addEventListener('click', function(event) {
+      if (event.target === breakdownModal) {
+        closeBreakdown();
+      }
+    });
 
     // Function to extract and format price information
     function formatPriceDisplay(priceString) {
@@ -639,6 +737,11 @@
             const advancePayment = parseInt(item.advance_payment_amount) || 0;
             companyOutstanding = Math.max(0, companyProfit - advancePayment);
           }
+          
+          // Subtract mechanic_extra_payment and payment_on_qr from company outstanding
+          const mechanicExtraPayment = parseInt(item.mechanic_extra_payment) || 0;
+          const paymentOnQr = parseInt(item.payment_on_qr) || 0;
+          companyOutstanding = Math.max(0, companyOutstanding - mechanicExtraPayment - paymentOnQr);
         }
         
         earnings += mechanicEarning;
@@ -746,9 +849,16 @@
                 </div>
               </div>
               ${!item.is_cancelled ? `
-                <div class="bg-white rounded-xl card-shadow border-2 border-red-200 bg-red-50 p-2 w-20">
+                <div class="bg-white rounded-xl card-shadow border-2 border-red-200 bg-red-50 p-2 w-20 relative">
                   <div class="text-center">
-                    <p class="text-xs text-red-600 font-semibold mb-1">कंपनी बकाया</p>
+                    <div class="flex items-center justify-center mb-1">
+                      <p class="text-xs text-red-600 font-semibold">कंपनी बकाया</p>
+                      <button onclick="showBreakdown(${JSON.stringify(item).replace(/"/g, '&quot;')})" class="ml-1 text-red-400 hover:text-red-600 transition-colors">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                      </button>
+                    </div>
                     <p class="text-sm font-bold text-red-600">${formatCurrency(companyOutstanding)}</p>
                   </div>
                 </div>
@@ -830,7 +940,7 @@
           <div class="p-12 text-center animate-fade-in">
             <div class="bg-gradient-to-br from-gray-100 to-gray-200 rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-6 card-shadow animate-bounce-soft">
               <svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
               </svg>
             </div>
             <p class="text-gray-600 font-bold text-xl mb-3">कोई पेमेंट हिस्ट्री उपलब्ध नहीं है</p>
