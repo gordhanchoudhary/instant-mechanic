@@ -212,6 +212,11 @@
       <input type="number" id="mechanicExtraPayment" placeholder="Enter extra payment amount" min="0" step="1">
     </div>
 
+    <div class="form-group">
+      <label for="paymentOnQr">Payment on QR (₹):</label>
+      <input type="number" id="paymentOnQr" placeholder="Enter payment on QR amount" min="0" step="1">
+    </div>
+
     <div class="checkbox-container">
       <input type="checkbox" id="markCancelled">
       <label for="markCancelled" class="checkbox-label">Mark booking as cancelled</label>
@@ -251,6 +256,7 @@
     let originalMechanicId = null;
     let userChangedMechanic = false;
     let currentExtraPayment = 0;
+    let currentPaymentOnQr = 0;
     let bookingData = null;
     let customerMobile = null;
     let mixpanelReady = false;
@@ -413,6 +419,7 @@
           assignedMechanicId = data.mechanic;
           originalMechanicId = data.mechanic;
           currentExtraPayment = data.mechanic_extra_payment || 0;
+          currentPaymentOnQr = data.payment_on_qr || 0;
           
           // Set customer mobile from booking data - THIS IS THE KEY CHANGE
           customerMobile = data.customer_mobile || data.mobile || null;
@@ -468,6 +475,7 @@
               </span>
             </p>
             <p><strong>Extra Mechanic Payment:</strong> ₹${data.mechanic_extra_payment || 0}</p>
+            <p><strong>Payment on QR:</strong> ₹${data.payment_on_qr || 0}</p>
           `;
 
           // Add security amount section
@@ -476,8 +484,9 @@
 
           document.getElementById("bookingDetails").innerHTML = details;
           
-          // Set the extra payment input field
+          // Set the input field values
           document.getElementById("mechanicExtraPayment").value = data.mechanic_extra_payment || 0;
+          document.getElementById("paymentOnQr").value = data.payment_on_qr || 0;
           
           // Set cancellation checkbox and reason based on current booking status
           document.getElementById("markCancelled").checked = data.is_cancelled;
@@ -630,10 +639,12 @@
       const cancelReason = document.getElementById("cancelReason").value;
       const agentName = localStorage.getItem("agent_name");
       const extraPayment = document.getElementById("mechanicExtraPayment").value;
+      const paymentOnQr = document.getElementById("paymentOnQr").value;
 
       const updateData = {
         agent: agentName,
-        mechanic_extra_payment: extraPayment || 0
+        mechanic_extra_payment: extraPayment || 0,
+        payment_on_qr: paymentOnQr || 0
       };
 
       // Only include cancellation fields if the checkbox state has been explicitly set
