@@ -1,0 +1,1855 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instant Mechanic - Enhanced Analytics Dashboard with Marketing Insights</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .card-shadow {
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        .metric-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border: 1px solid #e2e8f0;
+        }
+        .marketing-card {
+            background: linear-gradient(135deg, #fef3c7 0%, #fbbf24 100%);
+            border: 1px solid #f59e0b;
+        }
+        .chart-container {
+            height: 280px !important;
+            max-height: 280px !important;
+        }
+        .small-chart {
+            height: 200px !important;
+            max-height: 200px !important;
+        }
+        .medium-chart {
+            height: 320px !important;
+            max-height: 320px !important;
+        }
+        .benchmark-good { color: #10b981; }
+        .benchmark-warning { color: #f59e0b; }
+        .benchmark-poor { color: #ef4444; }
+        .trend-up { color: #10b981; }
+        .trend-down { color: #ef4444; }
+        .loader {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .roi-excellent { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
+        .roi-good { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
+        .roi-poor { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); }
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="gradient-bg text-white shadow-lg">
+        <div class="container mx-auto px-6 py-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold">Instant Mechanic</h1>
+                    <p class="text-blue-100 mt-1">Enhanced Analytics Dashboard with Marketing Insights</p>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button id="refreshBtn" class="bg-white bg-opacity-20 hover:bg-opacity-30 px-4 py-2 rounded-lg transition-all duration-200">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                        </svg>
+                    </button>
+                    <div id="lastUpdated" class="text-sm text-blue-100"></div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Filters -->
+    <div class="container mx-auto px-6 py-6">
+        <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+            <div class="flex flex-wrap items-center gap-4">
+                <div class="flex items-center space-x-2">
+                    <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.207A1 1 0 013 6.5V4z"></path>
+                    </svg>
+                    <label class="text-sm font-medium text-gray-700">Date Filter:</label>
+                </div>
+                <select id="dateFilter" class="border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <option value="today">Today</option>
+                    <option value="yesterday">Yesterday</option>
+                    <option value="last_7_days" selected>Last 7 Days</option>
+                    <option value="last_15_days">Last 15 Days</option>
+                    <option value="last_30_days">Last 30 Days</option>
+                    <option value="last_3_fridays">Last 3 Fridays</option>
+                    <option value="last_5_sundays">Last 5 Sundays</option>
+                </select>
+
+                <div class="flex items-center space-x-2 ml-8">
+                    <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                    </svg>
+                    <label class="text-sm font-medium text-gray-700">Agent:</label>
+                </div>
+                <select id="agentFilter" class="border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <option value="all" selected>All Agents</option>
+                    <option value="GD">GD</option>
+                    <option value="Namira">Namira</option>
+                    <option value="Aqsa">Aqsa</option>
+                    <option value="Sarb">Sarb</option>
+                    <option value="Mansi">Mansi</option>
+                    <option value="Mehak">Mehak</option>
+                    <option value="Harshit">Harshit</option>
+                </select>
+
+                <button id="applyFilters" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors duration-200 ml-4">
+                    Apply Filters
+                </button>
+                
+                <div id="loadingSpinner" class="loader hidden ml-4"></div>
+            </div>
+        </div>
+
+        <!-- Marketing ROI Overview -->
+        <div class="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl shadow-md p-6 mb-8 border border-orange-200">
+            <h3 class="text-lg font-semibold text-orange-800 mb-6">📢 Marketing ROI & Customer Acquisition Insights</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="bg-white rounded-lg p-4 shadow-sm">
+                    <h4 class="font-medium text-gray-800 mb-2">Total Ad Spend</h4>
+                    <div class="flex items-center justify-between">
+                        <span id="totalAdSpend" class="text-2xl font-bold text-orange-600">₹0</span>
+                        <span id="spendTrend" class="text-sm font-medium text-gray-600">--</span>
+                    </div>
+                    <p class="text-xs text-gray-600 mt-1">Google Ads investment</p>
+                </div>
+                
+                <div class="bg-white rounded-lg p-4 shadow-sm">
+                    <h4 class="font-medium text-gray-800 mb-2">Customer Acquisition Cost</h4>
+                    <div class="flex items-center justify-between">
+                        <span id="customerAcquisitionCost" class="text-2xl font-bold">₹0</span>
+                        <span id="cacStatus" class="text-sm font-medium">--</span>
+                    </div>
+                    <p class="text-xs text-gray-600 mt-1">Cost per acquired customer</p>
+                </div>
+                
+                <div class="bg-white rounded-lg p-4 shadow-sm">
+                    <h4 class="font-medium text-gray-800 mb-2">Return on Ad Spend (ROAS)</h4>
+                    <div class="flex items-center justify-between">
+                        <span id="roas" class="text-2xl font-bold">0x</span>
+                        <span id="roasStatus" class="text-sm font-medium">--</span>
+                    </div>
+                    <p class="text-xs text-gray-600 mt-1">Revenue per ₹1 spent</p>
+                </div>
+                
+                <div class="bg-white rounded-lg p-4 shadow-sm">
+                    <h4 class="font-medium text-gray-800 mb-2">Cost Per Booking</h4>
+                    <div class="flex items-center justify-between">
+                        <span id="costPerBooking" class="text-2xl font-bold">₹0</span>
+                        <span id="cpbStatus" class="text-sm font-medium">--</span>
+                    </div>
+                    <p class="text-xs text-gray-600 mt-1">Marketing cost per booking</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Performance Benchmarks Overview -->
+        <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+            <h3 class="text-lg font-semibold text-gray-800 mb-6">📊 Performance Benchmarks & KPIs</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-4">
+                    <h4 class="font-medium text-blue-800 mb-2">Customer Conversion Rate</h4>
+                    <div class="flex items-center justify-between">
+                        <span id="conversionBenchmark" class="text-2xl font-bold">0%</span>
+                        <span id="conversionStatus" class="text-sm font-medium">--</span>
+                    </div>
+                    <p class="text-xs text-blue-600 mt-1">Target: >55% (Good), >35% (Fair), <30% (Poor)</p>
+                </div>
+                
+                <div class="bg-gradient-to-r from-green-50 to-green-100 rounded-lg p-4">
+                    <h4 class="font-medium text-green-800 mb-2">Revenue per Customer</h4>
+                    <div class="flex items-center justify-between">
+                        <span id="revenuePerCustomerBenchmark" class="text-2xl font-bold">₹0</span>
+                        <span id="revenuePerCustomerStatus" class="text-sm font-medium">--</span>
+                    </div>
+                    <p class="text-xs text-green-600 mt-1">Target: >₹500 (Good), >₹300 (Fair), <₹300 (Poor)</p>
+                </div>
+                
+                <div class="bg-gradient-to-r from-purple-50 to-purple-100 rounded-lg p-4">
+                    <h4 class="font-medium text-purple-800 mb-2">Cancellation Rate</h4>
+                    <div class="flex items-center justify-between">
+                        <span id="cancellationBenchmark" class="text-2xl font-bold">0%</span>
+                        <span id="cancellationStatus" class="text-sm font-medium">--</span>
+                    </div>
+                    <p class="text-xs text-purple-600 mt-1">Target: <10% (Good), <20% (Fair), >20% (Poor)</p>
+                </div>
+                
+                <div class="bg-gradient-to-r from-orange-50 to-orange-100 rounded-lg p-4">
+                    <h4 class="font-medium text-orange-800 mb-2">Payment Collection Rate</h4>
+                    <div class="flex items-center justify-between">
+                        <span id="collectionBenchmark" class="text-2xl font-bold">0%</span>
+                        <span id="collectionStatus" class="text-sm font-medium">--</span>
+                    </div>
+                    <p class="text-xs text-orange-600 mt-1">Target: >60% (Good), >40% (Fair), <40% (Poor)</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Key Metrics Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6 mb-8">
+            <div class="metric-card rounded-xl p-6 card-shadow">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Total Customers</p>
+                        <p id="totalCustomers" class="text-3xl font-bold text-gray-900">0</p>
+                        <p id="customerGrowth" class="text-sm text-green-600 mt-1">+0% from previous period</p>
+                    </div>
+                    <div class="bg-blue-100 p-3 rounded-full">
+                        <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <div class="metric-card rounded-xl p-6 card-shadow">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Total Revenue</p>
+                        <p id="totalRevenue" class="text-3xl font-bold text-gray-900">₹0</p>
+                        <p id="revenueGrowth" class="text-sm text-green-600 mt-1">+0% from previous period</p>
+                    </div>
+                    <div class="bg-green-100 p-3 rounded-full">
+                        <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <div class="metric-card rounded-xl p-6 card-shadow">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Total Bookings</p>
+                        <p id="totalBookings" class="text-3xl font-bold text-gray-900">0</p>
+                        <p id="bookingGrowth" class="text-sm text-blue-600 mt-1">+0% from previous period</p>
+                    </div>
+                    <div class="bg-indigo-100 p-3 rounded-full">
+                        <svg class="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <div class="metric-card rounded-xl p-6 card-shadow">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Payment Collected</p>
+                        <p id="paymentCollected" class="text-3xl font-bold text-gray-900">₹0</p>
+                        <p id="collectionRate" class="text-sm text-blue-600 mt-1">0% collection rate</p>
+                    </div>
+                    <div class="bg-purple-100 p-3 rounded-full">
+                        <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <div class="metric-card rounded-xl p-6 card-shadow">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Advance Payment Rate</p>
+                        <p id="advancePaymentRate" class="text-3xl font-bold text-gray-900">0%</p>
+                        <p id="advancePaymentCount" class="text-sm text-green-600 mt-1">0 bookings</p>
+                    </div>
+                    <div class="bg-emerald-100 p-3 rounded-full">
+                        <svg class="w-8 h-8 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <div class="marketing-card rounded-xl p-6 card-shadow">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-orange-800">Marketing Efficiency</p>
+                        <p id="marketingEfficiency" class="text-3xl font-bold text-orange-900">0%</p>
+                        <p id="efficiencyTrend" class="text-sm text-orange-700 mt-1">Marketing performance</p>
+                    </div>
+                    <div class="bg-orange-200 p-3 rounded-full">
+                        <svg class="w-8 h-8 text-orange-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Marketing Performance Deep Dive -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <!-- Marketing ROI vs Business Performance -->
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">🎯 Marketing ROI vs Business Performance</h3>
+                <div class="medium-chart">
+                    <canvas id="marketingROIChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Campaign Performance Breakdown -->
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">📱 Daily Campaign Spend Breakdown</h3>
+                <div class="medium-chart">
+                    <canvas id="campaignBreakdownChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Business Health Metrics -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">🎯 Business Health Score</h3>
+                <div class="chart-container small-chart">
+                    <canvas id="healthScoreChart"></canvas>
+                </div>
+                <div id="healthScoreDetails" class="mt-4 text-sm">
+                    <!-- Health score breakdown will be inserted here -->
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">⚠️ Operational Issues</h3>
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between p-3 bg-red-50 rounded-lg">
+                        <span class="text-sm font-medium text-red-800">Cancelled Bookings</span>
+                        <span id="cancelledBookings" class="text-red-600 font-bold">0</span>
+                    </div>
+                    <div class="flex items-center justify-between p-3 bg-orange-50 rounded-lg">
+                        <span class="text-sm font-medium text-orange-800">Unassigned Mechanics</span>
+                        <span id="unassignedMechanics" class="text-orange-600 font-bold">0</span>
+                    </div>
+                    <div class="flex items-center justify-between p-3 bg-yellow-50 rounded-lg">
+                        <span class="text-sm font-medium text-yellow-800">Pending Payments</span>
+                        <span id="pendingPayments" class="text-yellow-600 font-bold">₹0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">📈 Growth Trends</h3>
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-gray-600">Daily Avg Customers</span>
+                        <span id="avgDailyCustomers" class="font-semibold">0</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-gray-600">Daily Avg Revenue</span>
+                        <span id="avgDailyRevenue" class="font-semibold">₹0</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-gray-600">Daily Avg Ad Spend</span>
+                        <span id="avgDailyAdSpend" class="font-semibold">₹0</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-gray-600">Booking Success Rate</span>
+                        <span id="bookingSuccessRate" class="font-semibold">0%</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-gray-600">Customer Lifetime Value</span>
+                        <span id="customerLifetimeValue" class="font-semibold">₹0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Enhanced Charts Row 1 -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <!-- Revenue & Bookings Trend -->
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">💰 Revenue vs Bookings vs Ad Spend Trend</h3>
+                <div class="chart-container">
+                    <canvas id="revenueBookingChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Conversion Funnel -->
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">🎯 Conversion Funnel Analysis</h3>
+                <div class="chart-container">
+                    <canvas id="conversionFunnelChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Enhanced Charts Row 2 -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <!-- Payment Analysis -->
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">💳 Payment Collection Analysis</h3>
+                <div class="chart-container">
+                    <canvas id="paymentAnalysisChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Daily Performance Heatmap -->
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">🔥 Daily Performance Heatmap</h3>
+                <div class="chart-container">
+                    <canvas id="performanceHeatmapChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Agent Performance Comparison -->
+        <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+            <h3 class="text-lg font-semibold text-gray-800 mb-6">👥 Agent Performance Comparison</h3>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="chart-container">
+                    <canvas id="agentPerformanceChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="agentEfficiencyChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Marketing Campaign Performance Table -->
+        <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold text-gray-800">📊 Campaign Performance Summary</h3>
+                <button id="exportCampaignData" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg transition-colors duration-200 text-sm">
+                    <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    Export Campaigns
+                </button>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Campaign</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Spend</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Avg Daily Spend</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Performance</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contribution %</th>
+                        </tr>
+                    </thead>
+                    <tbody id="campaignTable" class="bg-white divide-y divide-gray-200">
+                        <!-- Dynamic content will be inserted here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Detailed Performance Table -->
+        <div class="bg-white rounded-xl shadow-md p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold text-gray-800">📊 Detailed Performance Summary</h3>
+                <button id="exportData" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg transition-colors duration-200 text-sm">
+                    <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    Export All Data
+                </button>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Day & Date</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ad Spend</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Customers</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Bookings</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Conversion</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Cancel</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cancellation %</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Net Bookings</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Revenue</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Profit</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Net Profit</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ROAS</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">CAC</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Performance</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dataTable" class="bg-white divide-y divide-gray-200">
+                        <!-- Dynamic content will be inserted here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-6 mt-12">
+        <div class="container mx-auto px-6 text-center">
+            <p>&copy; 2025 Instant Mechanic. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Global variables for dashboard data
+        let dashboardData = [];
+        let marketingData = [];
+        let currentData = [];
+        let currentMarketingData = [];
+        let charts = {};
+
+        // API data correction multiplier for ad spend
+        const AD_SPEND_CORRECTION = 1.5;
+
+        // Initialize dashboard
+        async function initializeDashboard() {
+            document.getElementById('applyFilters').addEventListener('click', applyFilters);
+            document.getElementById('refreshBtn').addEventListener('click', refreshData);
+            document.getElementById('exportData').addEventListener('click', exportData);
+            document.getElementById('exportCampaignData').addEventListener('click', exportCampaignData);
+            
+            await applyFilters();
+            updateLastUpdated();
+        }
+
+        // Calculate marketing ROI metrics with corrected ad spend
+        function calculateMarketingROI() {
+            const totalCustomers = currentData.reduce((sum, item) => sum + item.total_customers, 0);
+            const totalBookings = currentData.reduce((sum, item) => sum + item.total_booking, 0);
+            const totalRevenue = currentData.reduce((sum, item) => sum + item.total_revenue, 0);
+            const totalAdSpend = currentMarketingData.reduce((sum, item) => sum + (item.totalSpend * AD_SPEND_CORRECTION), 0);
+
+            // Customer Acquisition Cost (CAC)
+            const cac = totalCustomers > 0 ? totalAdSpend / totalCustomers : 0;
+            
+            // Return on Ad Spend (ROAS)
+            const roas = totalAdSpend > 0 ? totalRevenue / totalAdSpend : 0;
+            
+            // Cost Per Booking
+            const cpb = totalBookings > 0 ? totalAdSpend / totalBookings : 0;
+            
+            // Marketing Efficiency
+            const marketingEfficiency = totalAdSpend > 0 ? ((totalRevenue - totalAdSpend) / totalAdSpend) * 100 : 0;
+
+            // Update UI
+            document.getElementById('totalAdSpend').textContent = '₹' + Math.round(totalAdSpend).toLocaleString();
+            document.getElementById('customerAcquisitionCost').textContent = '₹' + Math.round(cac);
+            document.getElementById('roas').textContent = roas.toFixed(1) + 'x';
+            document.getElementById('costPerBooking').textContent = '₹' + Math.round(cpb);
+            document.getElementById('marketingEfficiency').textContent = marketingEfficiency.toFixed(1) + '%';
+
+            // Update status indicators
+            updateMarketingStatus('cacStatus', cac, [300, 525], true);
+            updateMarketingStatus('roasStatus', roas, [2, 1.33], false);
+            updateMarketingStatus('cpbStatus', cpb, [225, 375], true);
+            
+            // Efficiency trend
+            const efficiencyTrendText = marketingEfficiency >= 133 ? 'Excellent ROI' :
+                                       marketingEfficiency >= 66 ? 'Good ROI' :
+                                       marketingEfficiency >= -33 ? 'Break-even' : 'Needs optimization';
+            document.getElementById('efficiencyTrend').textContent = efficiencyTrendText;
+
+            return {
+                totalAdSpend,
+                cac,
+                roas,
+                cpb,
+                marketingEfficiency
+            };
+        }
+
+        function updateMarketingStatus(elementId, value, thresholds, reverse = false) {
+            const element = document.getElementById(elementId);
+            let status, className;
+
+            if (reverse) {
+                if (value <= thresholds[0]) {
+                    status = 'Excellent';
+                    className = 'benchmark-good';
+                } else if (value <= thresholds[1]) {
+                    status = 'Good';
+                    className = 'benchmark-warning';
+                } else {
+                    status = 'Needs Improvement';
+                    className = 'benchmark-poor';
+                }
+            } else {
+                if (value >= thresholds[0]) {
+                    status = 'Excellent';
+                    className = 'benchmark-good';
+                } else if (value >= thresholds[1]) {
+                    status = 'Good';
+                    className = 'benchmark-warning';
+                } else {
+                    status = 'Needs Improvement';
+                    className = 'benchmark-poor';
+                }
+            }
+
+            element.textContent = status;
+            element.className = `text-sm font-medium ${className}`;
+        }
+
+        // Calculate performance benchmarks
+        function calculateBenchmarks() {
+            const totalCustomers = currentData.reduce((sum, item) => sum + item.total_customers, 0);
+            const totalBookings = currentData.reduce((sum, item) => sum + item.total_booking, 0);
+            const totalRevenue = currentData.reduce((sum, item) => sum + item.total_revenue, 0);
+            const totalCancelled = currentData.reduce((sum, item) => sum + item.total_cancelled_booking, 0);
+            const totalCollected = currentData.reduce((sum, item) => sum + item.payment_collected, 0);
+
+            // Conversion Rate
+            const conversionRate = totalCustomers > 0 ? (totalBookings / totalCustomers) * 100 : 0;
+            const revenuePerCustomer = totalCustomers > 0 ? totalRevenue / (totalBookings - totalCancelled) : 0;
+            const cancellationRate = totalBookings > 0 ? (totalCancelled / totalBookings) * 100 : 0;
+            const collectionRate = totalRevenue > 0 ? (totalCollected / (totalRevenue * 0.58)) * 100 : 0;
+
+            // Update benchmark displays
+            document.getElementById('conversionBenchmark').textContent = conversionRate.toFixed(1) + '%';
+            document.getElementById('revenuePerCustomerBenchmark').textContent = '₹' + Math.round(revenuePerCustomer);
+            document.getElementById('cancellationBenchmark').textContent = cancellationRate.toFixed(1) + '%';
+            document.getElementById('collectionBenchmark').textContent = collectionRate.toFixed(1) + '%';
+
+            // Update benchmark status
+            updateBenchmarkStatus('conversionStatus', conversionRate, [55, 35], false);
+            updateBenchmarkStatus('revenuePerCustomerStatus', revenuePerCustomer, [742, 550], false);
+            updateBenchmarkStatus('cancellationStatus', cancellationRate, [10, 20], true);
+            updateBenchmarkStatus('collectionStatus', collectionRate, [60, 40], false);
+
+            return {
+                conversion: conversionRate,
+                revenuePerCustomer,
+                cancellation: cancellationRate,
+                collection: collectionRate
+            };
+        }
+
+        function updateBenchmarkStatus(elementId, value, thresholds, reverse = false) {
+            const element = document.getElementById(elementId);
+            let status, className;
+
+            if (reverse) {
+                if (value <= thresholds[0]) {
+                    status = 'Excellent';
+                    className = 'benchmark-good';
+                } else if (value <= thresholds[1]) {
+                    status = 'Good';
+                    className = 'benchmark-warning';
+                } else {
+                    status = 'Needs Improvement';
+                    className = 'benchmark-poor';
+                }
+            } else {
+                if (value >= thresholds[0]) {
+                    status = 'Excellent';
+                    className = 'benchmark-good';
+                } else if (value >= thresholds[1]) {
+                    status = 'Good';
+                    className = 'benchmark-warning';
+                } else {
+                    status = 'Needs Improvement';
+                    className = 'benchmark-poor';
+                }
+            }
+
+            element.textContent = status;
+            element.className = `text-sm font-medium ${className}`;
+        }
+
+        // Get date range based on filter
+        function getDateRange(filter) {
+            const today = new Date();
+            const dates = [];
+            
+            switch(filter) {
+                case 'today':
+                    dates.push(formatDate(today));
+                    break;
+                case 'yesterday':
+                    const yesterday = new Date(today);
+                    yesterday.setDate(yesterday.getDate() - 1);
+                    dates.push(formatDate(yesterday));
+                    break;
+                case 'last_7_days':
+                    for(let i = 6; i >= 0; i--) {
+                        const date = new Date(today);
+                        date.setDate(date.getDate() - i);
+                        dates.push(formatDate(date));
+                    }
+                    break;
+                case 'last_15_days':
+                    for(let i = 14; i >= 0; i--) {
+                        const date = new Date(today);
+                        date.setDate(date.getDate() - i);
+                        dates.push(formatDate(date));
+                    }
+                    break;
+                case 'last_30_days':
+                    for(let i = 29; i >= 0; i--) {
+                        const date = new Date(today);
+                        date.setDate(date.getDate() - i);
+                        dates.push(formatDate(date));
+                    }
+                    break;
+                case 'last_3_fridays':
+                    let fridayCount = 0;
+                    let checkDate = new Date(today);
+                    while(fridayCount < 3) {
+                        if(checkDate.getDay() === 5) {
+                            dates.unshift(formatDate(checkDate));
+                            fridayCount++;
+                        }
+                        checkDate.setDate(checkDate.getDate() - 1);
+                    }
+                    break;
+                case 'last_5_sundays':
+                    let sundayCount = 0;
+                    let checkSundayDate = new Date(today);
+                    while(sundayCount < 5) {
+                        if(checkSundayDate.getDay() === 0) {
+                            dates.unshift(formatDate(checkSundayDate));
+                            sundayCount++;
+                        }
+                        checkSundayDate.setDate(checkSundayDate.getDate() - 1);
+                    }
+                    break;
+            }
+            return dates;
+        }
+
+        function formatDate(date) {
+            return date.getFullYear() + '-' + 
+                   String(date.getMonth() + 1).padStart(2, '0') + '-' + 
+                   String(date.getDate()).padStart(2, '0');
+        }
+
+        async function applyFilters() {
+            const dateFilter = document.getElementById('dateFilter').value;
+            const agentFilter = document.getElementById('agentFilter').value;
+            
+            showLoading(true);
+            
+            try {
+                // Get date range
+                const dateRange = getDateRange(dateFilter);
+                
+                // Fetch both business data and marketing data in parallel
+                const [businessData, adSpendData] = await Promise.all([
+                    fetchDataFromAPI(dateRange, agentFilter),
+                    fetchMarketingDataFromAPI(dateRange)
+                ]);
+                
+                dashboardData = businessData;
+                marketingData = adSpendData;
+                currentData = dashboardData;
+                currentMarketingData = processMarketingData(marketingData);
+                
+                // Update all dashboard components with live data
+                updateMetrics();
+                calculateBenchmarks();
+                calculateMarketingROI();
+                updateCharts();
+                updateTable();
+                updateCampaignTable();
+                updateHealthMetrics();
+                
+            } catch (error) {
+                console.error('Error loading data:', error);
+                alert('Failed to load data from API. Please check your connection and try again.');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        function showLoading(show) {
+            const spinner = document.getElementById('loadingSpinner');
+            if(show) {
+                spinner.classList.remove('hidden');
+            } else {
+                spinner.classList.add('hidden');
+            }
+        }
+
+        function updateMetrics() {
+            const totalCustomers = currentData.reduce((sum, item) => sum + item.total_customers, 0);
+            const totalRevenue = currentData.reduce((sum, item) => sum + item.total_revenue, 0);
+            const totalBookings = currentData.reduce((sum, item) => sum + item.total_booking, 0);
+            const paymentCollected = currentData.reduce((sum, item) => sum + item.payment_collected, 0);
+            const paymentDoneBookings = currentData.reduce((sum, item) => sum + item.payment_done_bookings, 0);
+
+            document.getElementById('totalCustomers').textContent = totalCustomers.toLocaleString();
+            document.getElementById('totalRevenue').textContent = '₹' + totalRevenue.toLocaleString();
+            document.getElementById('totalBookings').textContent = totalBookings.toLocaleString();
+            document.getElementById('paymentCollected').textContent = '₹' + paymentCollected.toLocaleString();
+
+            // Advance payment rate
+            const advancePaymentRate = totalBookings > 0 ? (paymentDoneBookings / totalBookings) * 100 : 0;
+            document.getElementById('advancePaymentRate').textContent = advancePaymentRate.toFixed(1) + '%';
+            document.getElementById('advancePaymentCount').textContent = paymentDoneBookings + ' bookings';
+
+            // Collection rate
+            const collectionRate = totalRevenue > 0 ? (paymentCollected / totalRevenue) * 100 : 0;
+            document.getElementById('collectionRate').textContent = collectionRate.toFixed(1) + '% collection rate';
+
+            // Growth calculations (dummy for demo)
+            document.getElementById('customerGrowth').textContent = '+12% from previous period';
+            document.getElementById('revenueGrowth').textContent = '+8% from previous period';
+            document.getElementById('bookingGrowth').textContent = '+15% from previous period';
+        }
+
+        function updateHealthMetrics() {
+            const totalCancelled = currentData.reduce((sum, item) => sum + item.total_cancelled_booking, 0);
+            const totalUnassigned = currentData.reduce((sum, item) => sum + item.mechanic_not_assined_booking, 0);
+            const totalPending = currentData.reduce((sum, item) => sum + item.payment_pending, 0);
+            const totalCustomers = currentData.reduce((sum, item) => sum + item.total_customers, 0);
+            const totalRevenue = currentData.reduce((sum, item) => sum + item.total_revenue, 0);
+            const totalBookings = currentData.reduce((sum, item) => sum + item.total_booking, 0);
+            const totalAdSpend = currentMarketingData.reduce((sum, item) => sum + (item.totalSpend * AD_SPEND_CORRECTION), 0);
+
+            document.getElementById('cancelledBookings').textContent = totalCancelled;
+            document.getElementById('unassignedMechanics').textContent = totalUnassigned;
+            document.getElementById('pendingPayments').textContent = '₹' + totalPending.toLocaleString();
+
+            // Growth trends with corrected ad spend
+            const avgDailyCustomers = currentData.length > 0 ? Math.round(totalCustomers / currentData.length) : 0;
+            const avgDailyRevenue = currentData.length > 0 ? Math.round(totalRevenue / currentData.length) : 0;
+            const avgDailyAdSpend = currentMarketingData.length > 0 ? Math.round(totalAdSpend / currentMarketingData.length) : 0;
+            const bookingSuccessRate = totalBookings > 0 ? ((totalBookings - totalCancelled) / totalBookings) * 100 : 0;
+            const customerLifetimeValue = totalCustomers > 0 ? Math.round(totalRevenue / totalCustomers) : 0;
+
+            document.getElementById('avgDailyCustomers').textContent = avgDailyCustomers.toLocaleString();
+            document.getElementById('avgDailyRevenue').textContent = '₹' + avgDailyRevenue.toLocaleString();
+            document.getElementById('avgDailyAdSpend').textContent = '₹' + avgDailyAdSpend.toLocaleString();
+            document.getElementById('bookingSuccessRate').textContent = bookingSuccessRate.toFixed(1) + '%';
+            document.getElementById('customerLifetimeValue').textContent = '₹' + customerLifetimeValue.toLocaleString();
+        }
+
+        function updateCharts() {
+            updateHealthScoreChart();
+            updateRevenueBookingChart();
+            updateConversionFunnelChart();
+            updatePaymentAnalysisChart();
+            updatePerformanceHeatmapChart();
+            updateAgentPerformanceChart();
+            updateAgentEfficiencyChart();
+            updateMarketingROIChart();
+            updateCampaignBreakdownChart();
+        }
+
+        function updateMarketingROIChart() {
+            const ctx = document.getElementById('marketingROIChart').getContext('2d');
+            
+            if(charts.marketingROI) {
+                charts.marketingROI.destroy();
+            }
+
+            const labels = currentData.map(item => {
+                const date = new Date(item.date);
+                return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            });
+            
+            const revenueData = currentData.map(item => item.total_revenue);
+            const adSpendData = currentMarketingData.map(item => item.totalSpend * AD_SPEND_CORRECTION);
+            const roasData = currentData.map((item, index) => {
+                const spend = currentMarketingData[index]?.totalSpend * AD_SPEND_CORRECTION || 0;
+                return spend > 0 ? item.total_revenue / spend : 0;
+            });
+
+            charts.marketingROI = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Revenue (₹)',
+                        data: revenueData,
+                        borderColor: 'rgb(59, 130, 246)',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        yAxisID: 'y',
+                        tension: 0.4
+                    }, {
+                        label: 'Ad Spend (₹)',
+                        data: adSpendData,
+                        borderColor: 'rgb(245, 158, 11)',
+                        backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                        yAxisID: 'y',
+                        tension: 0.4
+                    }, {
+                        label: 'ROAS (Revenue/Ad Spend)',
+                        data: roasData,
+                        borderColor: 'rgb(16, 185, 129)',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        yAxisID: 'y1',
+                        tension: 0.4,
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    scales: {
+                        x: {
+                            display: true,
+                        },
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            title: {
+                                display: true,
+                                text: 'Amount (₹)'
+                            }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            title: {
+                                display: true,
+                                text: 'ROAS (x)'
+                            },
+                            grid: {
+                                drawOnChartArea: false,
+                            },
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                afterLabel: function(context) {
+                                    if (context.datasetIndex === 2) {
+                                        const roas = context.parsed.y;
+                                        return roas >= 2 ? 'Excellent ROAS' : roas >= 1.33 ? 'Good ROAS' : roas >= 0.67 ? 'Break-even' : 'Poor ROAS';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateCampaignBreakdownChart() {
+            const ctx = document.getElementById('campaignBreakdownChart').getContext('2d');
+            
+            if(charts.campaignBreakdown) {
+                charts.campaignBreakdown.destroy();
+            }
+
+            // Process campaign data to show daily breakdown with corrected spend
+            const campaignSummary = {};
+            marketingData.forEach(item => {
+                item.spend_data.forEach(campaign => {
+                    if (!campaignSummary[campaign.campaign_name]) {
+                        campaignSummary[campaign.campaign_name] = {
+                            name: campaign.campaign_name,
+                            totalSpend: 0,
+                            dates: {}
+                        };
+                    }
+                    campaignSummary[campaign.campaign_name].totalSpend += (campaign.spend * AD_SPEND_CORRECTION);
+                    campaignSummary[campaign.campaign_name].dates[campaign.date] = (campaign.spend * AD_SPEND_CORRECTION);
+                });
+            });
+
+            // Get top 5 campaigns by spend
+            const topCampaigns = Object.values(campaignSummary)
+                .sort((a, b) => b.totalSpend - a.totalSpend)
+                .slice(0, 5);
+
+            const labels = [...new Set(marketingData.flatMap(item => 
+                item.dates.map(date => {
+                    const d = new Date(date);
+                    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                })
+            ))];
+
+            const colors = [
+                'rgba(59, 130, 246, 0.8)',
+                'rgba(16, 185, 129, 0.8)', 
+                'rgba(245, 158, 11, 0.8)',
+                'rgba(168, 85, 247, 0.8)',
+                'rgba(239, 68, 68, 0.8)'
+            ];
+
+            const datasets = topCampaigns.map((campaign, index) => ({
+                label: campaign.name.substring(0, 20) + '...',
+                data: labels.map(label => {
+                    // Find corresponding date and spend
+                    const dateKey = marketingData.flatMap(item => item.dates)[labels.indexOf(label)];
+                    return campaign.dates[dateKey] || 0;
+                }),
+                backgroundColor: colors[index],
+                stack: 'campaigns'
+            }));
+
+            charts.campaignBreakdown = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            stacked: true
+                        },
+                        y: {
+                            stacked: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '₹' + Math.round(value).toLocaleString();
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ₹' + Math.round(context.parsed.y).toLocaleString();
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateHealthScoreChart() {
+            const ctx = document.getElementById('healthScoreChart').getContext('2d');
+            
+            if(charts.healthScore) {
+                charts.healthScore.destroy();
+            }
+
+            const benchmarks = calculateBenchmarks();
+            const marketingMetrics = calculateMarketingROI();
+            
+            // Enhanced health score including marketing efficiency
+            const healthScore = Math.round((
+                (benchmarks.conversion / 25 * 100) * 0.25 +
+                (benchmarks.revenuePerCustomer / 742 * 100) * 0.2 +
+                ((100 - benchmarks.cancellation) / 100 * 100) * 0.2 +
+                (benchmarks.collection / 80 * 100) * 0.15 +
+                (Math.min(marketingMetrics.roas / 2 * 100, 100)) * 0.2 // ROAS component
+            ) / 4);
+
+            charts.healthScore = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Health Score', 'Room for Improvement'],
+                    datasets: [{
+                        data: [healthScore, 100 - healthScore],
+                        backgroundColor: [
+                            healthScore >= 80 ? '#10b981' : healthScore >= 60 ? '#f59e0b' : '#ef4444',
+                            '#e5e7eb'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '70%',
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+
+            // Update health score details
+            const detailsDiv = document.getElementById('healthScoreDetails');
+            detailsDiv.innerHTML = `
+                <div class="text-center">
+                    <div class="text-3xl font-bold ${healthScore >= 80 ? 'text-green-600' : healthScore >= 60 ? 'text-yellow-600' : 'text-red-600'}">${healthScore}%</div>
+                    <div class="text-sm text-gray-600 mt-1">Overall Health Score</div>
+                </div>
+                <div class="mt-3 space-y-2 text-xs">
+                    <div class="flex justify-between">
+                        <span>Conversion Rate</span>
+                        <span class="${benchmarks.conversion >= 25 ? 'text-green-600' : benchmarks.conversion >= 15 ? 'text-yellow-600' : 'text-red-600'}">${benchmarks.conversion.toFixed(1)}%</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Revenue/Customer</span>
+                        <span class="${benchmarks.revenuePerCustomer >= 742 ? 'text-green-600' : benchmarks.revenuePerCustomer >= 550 ? 'text-yellow-600' : 'text-red-600'}">₹${Math.round(benchmarks.revenuePerCustomer)}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Cancellation Rate</span>
+                        <span class="${benchmarks.cancellation <= 10 ? 'text-green-600' : benchmarks.cancellation <= 20 ? 'text-yellow-600' : 'text-red-600'}">${benchmarks.cancellation.toFixed(1)}%</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Collection Rate</span>
+                        <span class="${benchmarks.collection >= 80 ? 'text-green-600' : benchmarks.collection >= 60 ? 'text-yellow-600' : 'text-red-600'}">${benchmarks.collection.toFixed(1)}%</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Marketing ROAS</span>
+                        <span class="${marketingMetrics.roas >= 2 ? 'text-green-600' : marketingMetrics.roas >= 1.33 ? 'text-yellow-600' : 'text-red-600'}">${marketingMetrics.roas.toFixed(1)}x</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        function updateRevenueBookingChart() {
+            const ctx = document.getElementById('revenueBookingChart').getContext('2d');
+            
+            if(charts.revenueBooking) {
+                charts.revenueBooking.destroy();
+            }
+
+            const labels = currentData.map(item => {
+                const date = new Date(item.date);
+                return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            });
+            
+            const revenueData = currentData.map(item => item.total_revenue);
+            const bookingData = currentData.map(item => item.total_booking);
+            const adSpendData = currentMarketingData.map(item => item.totalSpend * AD_SPEND_CORRECTION);
+
+            charts.revenueBooking = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Revenue (₹)',
+                        data: revenueData,
+                        borderColor: 'rgb(59, 130, 246)',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        yAxisID: 'y',
+                        tension: 0.4
+                    }, {
+                        label: 'Bookings',
+                        data: bookingData,
+                        borderColor: 'rgb(16, 185, 129)',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        yAxisID: 'y1',
+                        tension: 0.4
+                    }, {
+                        label: 'Ad Spend (₹)',
+                        data: adSpendData,
+                        borderColor: 'rgb(245, 158, 11)',
+                        backgroundColor: 'rgba(245, 158, 11, 0.2)',
+                        yAxisID: 'y',
+                        tension: 0.4,
+                        borderDash: [5, 5]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    scales: {
+                        x: {
+                            display: true,
+                        },
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            title: {
+                                display: true,
+                                text: 'Revenue & Ad Spend (₹)'
+                            }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            title: {
+                                display: true,
+                                text: 'Bookings'
+                            },
+                            grid: {
+                                drawOnChartArea: false,
+                            },
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateConversionFunnelChart() {
+            const ctx = document.getElementById('conversionFunnelChart').getContext('2d');
+            
+            if(charts.conversionFunnel) {
+                charts.conversionFunnel.destroy();
+            }
+
+            const totalCustomers = currentData.reduce((sum, item) => sum + item.total_customers, 0);
+            const totalBookings = currentData.reduce((sum, item) => sum + item.total_booking, 0);
+            const totalCancelled = currentData.reduce((sum, item) => sum + item.total_cancelled_booking, 0);
+            const completedBookings = totalBookings - totalCancelled;
+            const paymentDone = currentData.reduce((sum, item) => sum + item.payment_done_bookings, 0);
+
+            const funnelData = [
+                { label: 'Total Customers', value: totalCustomers, color: '#3b82f6' },
+                { label: 'Bookings Created', value: totalBookings, color: '#10b981' },
+                { label: 'Bookings Completed', value: completedBookings, color: '#8b5cf6' },
+                { label: 'Advance Payment', value: paymentDone, color: '#f59e0b' }
+            ];
+
+            charts.conversionFunnel = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: funnelData.map(item => item.label),
+                    datasets: [{
+                        data: funnelData.map(item => item.value),
+                        backgroundColor: funnelData.map(item => item.color),
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                afterLabel: function(context) {
+                                    const percentage = totalCustomers > 0 ? (context.parsed.x / totalCustomers * 100).toFixed(1) : 0;
+                                    return `${percentage}% of total customers`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        function updatePaymentAnalysisChart() {
+            const ctx = document.getElementById('paymentAnalysisChart').getContext('2d');
+            
+            if(charts.paymentAnalysis) {
+                charts.paymentAnalysis.destroy();
+            }
+
+            const labels = currentData.map(item => {
+                const date = new Date(item.date);
+                return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            });
+            
+            const collectedData = currentData.map(item => item.payment_collected);
+            const pendingData = currentData.map(item => item.payment_pending);
+
+            charts.paymentAnalysis = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Collected',
+                        data: collectedData,
+                        backgroundColor: 'rgba(16, 185, 129, 0.8)',
+                        stack: 'payments'
+                    }, {
+                        label: 'Pending',
+                        data: pendingData,
+                        backgroundColor: 'rgba(239, 68, 68, 0.8)',
+                        stack: 'payments'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            stacked: true
+                        },
+                        y: {
+                            stacked: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '₹' + value.toLocaleString();
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updatePerformanceHeatmapChart() {
+            const ctx = document.getElementById('performanceHeatmapChart').getContext('2d');
+            
+            if(charts.performanceHeatmap) {
+                charts.performanceHeatmap.destroy();
+            }
+
+            charts.performanceHeatmap = new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: 'Daily Performance',
+                        data: currentData.map((item, index) => ({
+                            x: index,
+                            y: 0,
+                            r: Math.max(5, (item.total_customers / 10) * 15)
+                        })),
+                        backgroundColor: currentData.map(item => {
+                            const conversionRate = item.total_customers > 0 ? (item.total_booking / item.total_customers) * 100 : 0;
+                            if (conversionRate >= 25) return 'rgba(16, 185, 129, 0.8)';
+                            if (conversionRate >= 15) return 'rgba(245, 158, 11, 0.8)';
+                            return 'rgba(239, 68, 68, 0.8)';
+                        })
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            position: 'bottom',
+                            ticks: {
+                                callback: function(value, index) {
+                                    if (currentData[Math.floor(value)]) {
+                                        const date = new Date(currentData[Math.floor(value)].date);
+                                        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                                    }
+                                    return '';
+                                }
+                            }
+                        },
+                        y: {
+                            display: false
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const item = currentData[Math.floor(context.parsed.x)];
+                                    if (item) {
+                                        const conversionRate = item.total_customers > 0 ? (item.total_booking / item.total_customers) * 100 : 0;
+                                        return `Customers: ${item.total_customers}, Conversion: ${conversionRate.toFixed(1)}%`;
+                                    }
+                                    return '';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateAgentPerformanceChart() {
+            const ctx = document.getElementById('agentPerformanceChart').getContext('2d');
+            
+            if(charts.agentPerformance) {
+                charts.agentPerformance.destroy();
+            }
+
+            // Mock agent data for demo
+            const agentData = [
+                { name: 'GD', customers: 45, bookings: 12, revenue: 8500 },
+                { name: 'Namira', customers: 38, bookings: 15, revenue: 9200 },
+                { name: 'Aqsa', customers: 42, bookings: 11, revenue: 7800 },
+                { name: 'Sarb', customers: 35, bookings: 9, revenue: 6500 },
+                { name: 'Mansi', customers: 40, bookings: 13, revenue: 8100 }
+            ];
+
+            charts.agentPerformance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: agentData.map(agent => agent.name),
+                    datasets: [{
+                        label: 'Customers',
+                        data: agentData.map(agent => agent.customers),
+                        backgroundColor: 'rgba(59, 130, 246, 0.8)',
+                        yAxisID: 'y'
+                    }, {
+                        label: 'Bookings',
+                        data: agentData.map(agent => agent.bookings),
+                        backgroundColor: 'rgba(16, 185, 129, 0.8)',
+                        yAxisID: 'y'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateAgentEfficiencyChart() {
+            const ctx = document.getElementById('agentEfficiencyChart').getContext('2d');
+            
+            if(charts.agentEfficiency) {
+                charts.agentEfficiency.destroy();
+            }
+
+            // Mock efficiency data
+            const efficiencyData = [
+                { name: 'GD', efficiency: 26.7 },
+                { name: 'Namira', efficiency: 39.5 },
+                { name: 'Aqsa', efficiency: 26.2 },
+                { name: 'Sarb', efficiency: 25.7 },
+                { name: 'Mansi', efficiency: 32.5 }
+            ];
+
+            charts.agentEfficiency = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: efficiencyData.map(agent => agent.name),
+                    datasets: [{
+                        label: 'Conversion Rate (%)',
+                        data: efficiencyData.map(agent => agent.efficiency),
+                        backgroundColor: 'rgba(168, 85, 247, 0.2)',
+                        borderColor: 'rgba(168, 85, 247, 1)',
+                        pointBackgroundColor: 'rgba(168, 85, 247, 1)',
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            max: 50
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateTable() {
+            const tableBody = document.getElementById('dataTable');
+            tableBody.innerHTML = '';
+
+            currentData.slice(-10).reverse().forEach((item, index) => {
+                const conversionRate = item.total_customers > 0 ? 
+                    ((item.total_booking / item.total_customers) * 100).toFixed(1) : 0;
+                const cancellationRate = item.total_booking > 0 ?
+                    ((item.total_cancelled_booking / item.total_booking) * 100).toFixed(1) : 0;
+                const marketingItem = currentMarketingData.find(m => m.date === item.date);
+                const adSpend = marketingItem ? (marketingItem.totalSpend * AD_SPEND_CORRECTION) : 0;
+                const roas = adSpend > 0 ? (item.total_revenue / adSpend).toFixed(1) : 0;
+                const cac = item.total_customers > 0 && adSpend > 0 ? Math.round(adSpend / item.total_customers) : 0;
+                
+                // New calculations with corrected ad spend
+                const totalCancelled = item.total_cancelled_booking;
+                const netBookings = item.total_booking - item.total_cancelled_booking;
+                const totalProfit = item.payment_collected + item.payment_pending;
+                const netProfit = totalProfit - adSpend;
+                
+                // Enhanced performance score (adjusted thresholds for corrected ad spend)
+                const performanceScore = Math.round(
+                    (parseFloat(conversionRate) >= 30 ? 25 : parseFloat(conversionRate) >= 20 ? 20 : parseFloat(conversionRate) >= 15 ? 15 : parseFloat(conversionRate) / 15 * 10) + // Conversion (25 points max)
+                    (parseFloat(cancellationRate) <= 10 ? 20 : parseFloat(cancellationRate) <= 15 ? 15 : parseFloat(cancellationRate) <= 20 ? 10 : 5) + // Cancellation (20 points max)
+                    (parseFloat(roas) >= 2.67 ? 25 : parseFloat(roas) >= 2 ? 20 : parseFloat(roas) >= 1.33 ? 15 : parseFloat(roas) >= 0.67 ? 10 : 0) + // Adjusted ROAS (25 points max)
+                    (netProfit > 0 ? (netProfit / totalProfit * 20) : 0) + // Net Profit Margin (20 points max)
+                    (cac > 0 && cac <= 300 ? 10 : cac <= 450 ? 8 : cac <= 600 ? 5 : 2) // Adjusted CAC efficiency (10 points max)
+                );
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        ${new Date(item.date).toLocaleDateString('en-US', { 
+                            weekday: 'short', 
+                            month: 'short', 
+                            day: 'numeric' 
+                        })}
+                    </td>
+                    <td class="px-4 py-4 whitespace-nowrap text-sm text-orange-600 font-medium">₹${Math.round(adSpend).toLocaleString()}</td>
+                    <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900">${item.total_customers}</td>
+                    <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900">${item.total_booking}</td>
+                    <td class="px-4 py-4 whitespace-nowrap">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                            conversionRate > 30 ? 'bg-green-100 text-green-800' : 
+                            conversionRate > 20 ? 'bg-yellow-100 text-yellow-800' : 
+                            'bg-red-100 text-red-800'
+                        }">
+                            ${conversionRate}%
+                        </span>
+                    </td>
+                    <td class="px-4 py-4 whitespace-nowrap text-sm text-red-600 font-medium">${totalCancelled}</td>
+                    <td class="px-4 py-4 whitespace-nowrap">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                            cancellationRate <= 10 ? 'bg-green-100 text-green-800' : 
+                            cancellationRate <= 20 ? 'bg-yellow-100 text-yellow-800' : 
+                            'bg-red-100 text-red-800'
+                        }">
+                            ${cancellationRate}%
+                        </span>
+                    </td>
+                    <td class="px-4 py-4 whitespace-nowrap text-sm text-blue-600 font-medium">${netBookings}</td>
+                    <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900">₹${item.total_revenue.toLocaleString()}</td>
+                    <td class="px-4 py-4 whitespace-nowrap text-sm text-purple-600 font-medium">₹${Math.round(totalProfit).toLocaleString()}</td>
+                    <td class="px-4 py-4 whitespace-nowrap">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                            netProfit > 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                        }">
+                            ₹${Math.round(netProfit).toLocaleString()}
+                        </span>
+                    </td>
+                    <td class="px-4 py-4 whitespace-nowrap">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                            roas > 2 ? 'bg-green-100 text-green-800' : 
+                            roas > 1.33 ? 'bg-yellow-100 text-yellow-800' : 
+                            'bg-red-100 text-red-800'
+                        }">
+                            ${roas}x
+                        </span>
+                    </td>
+                    <td class="px-4 py-4 whitespace-nowrap">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                            cac < 300 ? 'bg-green-100 text-green-800' : 
+                            cac < 525 ? 'bg-yellow-100 text-yellow-800' : 
+                            'bg-red-100 text-red-800'
+                        }">
+                            ₹${cac}
+                        </span>
+                    </td>
+                    <td class="px-4 py-4 whitespace-nowrap">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                            performanceScore >= 80 ? 'bg-green-100 text-green-800' : 
+                            performanceScore >= 60 ? 'bg-yellow-100 text-yellow-800' : 
+                            'bg-red-100 text-red-800'
+                        }">
+                            ${performanceScore}/100
+                        </span>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        function updateCampaignTable() {
+            const campaignTableBody = document.getElementById('campaignTable');
+            campaignTableBody.innerHTML = '';
+
+            // Process campaign data with corrected spend
+            const campaignSummary = {};
+            let totalSpend = 0;
+
+            marketingData.forEach(item => {
+                item.spend_data.forEach(campaign => {
+                    if (!campaignSummary[campaign.campaign_name]) {
+                        campaignSummary[campaign.campaign_name] = {
+                            name: campaign.campaign_name,
+                            totalSpend: 0,
+                            days: 0
+                        };
+                    }
+                    campaignSummary[campaign.campaign_name].totalSpend += (campaign.spend * AD_SPEND_CORRECTION);
+                    campaignSummary[campaign.campaign_name].days++;
+                    totalSpend += (campaign.spend * AD_SPEND_CORRECTION);
+                });
+            });
+
+            // Sort campaigns by total spend
+            const sortedCampaigns = Object.values(campaignSummary)
+                .sort((a, b) => b.totalSpend - a.totalSpend);
+
+            sortedCampaigns.forEach(campaign => {
+                const avgDailySpend = campaign.days > 0 ? campaign.totalSpend / campaign.days : 0;
+                const contribution = totalSpend > 0 ? (campaign.totalSpend / totalSpend * 100) : 0;
+                const performance = avgDailySpend > 3000 ? 'High' : avgDailySpend > 1500 ? 'Medium' : 'Low'; // Adjusted for corrected spend
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        ${campaign.name.length > 30 ? campaign.name.substring(0, 30) + '...' : campaign.name}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">₹${Math.round(campaign.totalSpend).toLocaleString()}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">₹${Math.round(avgDailySpend).toLocaleString()}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                            performance === 'High' ? 'bg-green-100 text-green-800' : 
+                            performance === 'Medium' ? 'bg-yellow-100 text-yellow-800' : 
+                            'bg-red-100 text-red-800'
+                        }">
+                            ${performance}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${contribution.toFixed(1)}%</td>
+                `;
+                campaignTableBody.appendChild(row);
+            });
+        }
+
+        async function refreshData() {
+            showLoading(true);
+            
+            try {
+                // Get current filter values
+                const dateFilter = document.getElementById('dateFilter').value;
+                const agentFilter = document.getElementById('agentFilter').value;
+                const dateRange = getDateRange(dateFilter);
+                
+                // Fetch fresh data from both APIs
+                const [businessData, adSpendData] = await Promise.all([
+                    fetchDataFromAPI(dateRange, agentFilter),
+                    fetchMarketingDataFromAPI(dateRange)
+                ]);
+                
+                dashboardData = businessData;
+                marketingData = adSpendData;
+                currentData = dashboardData;
+                currentMarketingData = processMarketingData(marketingData);
+                
+                // Update all components
+                updateMetrics();
+                calculateBenchmarks();
+                calculateMarketingROI();
+                updateCharts();
+                updateTable();
+                updateCampaignTable();
+                updateHealthMetrics();
+                updateLastUpdated();
+                
+            } catch (error) {
+                console.error('Error refreshing data:', error);
+                alert('Failed to refresh data from API. Please try again.');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        function updateLastUpdated() {
+            const now = new Date();
+            document.getElementById('lastUpdated').textContent = 
+                'Last updated: ' + now.toLocaleTimeString();
+        }
+
+        function exportData() {
+            const headers = ['Day & Date', 'Ad Spend', 'Total Customers', 'Total Bookings', 'Conversion', 'Total Cancel', 'Cancellation %', 'Net Bookings', 'Revenue', 'Total Profit', 'Net Profit', 'ROAS', 'CAC', 'Performance Score'];
+            const csvContent = [
+                headers.join(','),
+                ...currentData.map(item => {
+                    const conversionRate = item.total_customers > 0 ? 
+                        ((item.total_booking / item.total_customers) * 100).toFixed(1) : 0;
+                    const cancellationRate = item.total_booking > 0 ?
+                        ((item.total_cancelled_booking / item.total_booking) * 100).toFixed(1) : 0;
+                    const marketingItem = currentMarketingData.find(m => m.date === item.date);
+                    const adSpend = marketingItem ? (marketingItem.totalSpend * AD_SPEND_CORRECTION) : 0;
+                    const roas = adSpend > 0 ? (item.total_revenue / adSpend).toFixed(1) : 0;
+                    const cac = item.total_customers > 0 && adSpend > 0 ? Math.round(adSpend / item.total_customers) : 0;
+                    
+                    const totalCancelled = item.total_cancelled_booking;
+                    const netBookings = item.total_booking - item.total_cancelled_booking;
+                    const totalProfit = item.payment_collected + item.payment_pending;
+                    const netProfit = totalProfit - adSpend;
+                    
+                    const performanceScore = Math.round(
+                        (parseFloat(conversionRate) >= 30 ? 25 : parseFloat(conversionRate) >= 20 ? 20 : parseFloat(conversionRate) >= 15 ? 15 : parseFloat(conversionRate) / 15 * 10) +
+                        (parseFloat(cancellationRate) <= 10 ? 20 : parseFloat(cancellationRate) <= 15 ? 15 : parseFloat(cancellationRate) <= 20 ? 10 : 5) +
+                        (parseFloat(roas) >= 2.67 ? 25 : parseFloat(roas) >= 2 ? 20 : parseFloat(roas) >= 1.33 ? 15 : parseFloat(roas) >= 0.67 ? 10 : 0) +
+                        (netProfit > 0 ? (netProfit / totalProfit * 20) : 0) +
+                        (cac > 0 && cac <= 300 ? 10 : cac <= 450 ? 8 : cac <= 600 ? 5 : 2)
+                    );
+                    
+                    return [
+                        item.date,
+                        Math.round(adSpend),
+                        item.total_customers,
+                        item.total_booking,
+                        conversionRate + '%',
+                        totalCancelled,
+                        cancellationRate + '%',
+                        netBookings,
+                        item.total_revenue,
+                        Math.round(totalProfit),
+                        Math.round(netProfit),
+                        roas + 'x',
+                        '₹' + cac,
+                        performanceScore + '/100'
+                    ].join(',');
+                })
+            ].join('\n');
+
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'instant_mechanic_enhanced_analytics_with_marketing.csv';
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+        }
+
+        function exportCampaignData() {
+            const campaignSummary = {};
+            let totalSpend = 0;
+
+            marketingData.forEach(item => {
+                item.spend_data.forEach(campaign => {
+                    if (!campaignSummary[campaign.campaign_name]) {
+                        campaignSummary[campaign.campaign_name] = {
+                            name: campaign.campaign_name,
+                            totalSpend: 0,
+                            days: 0
+                        };
+                    }
+                    campaignSummary[campaign.campaign_name].totalSpend += (campaign.spend * AD_SPEND_CORRECTION);
+                    campaignSummary[campaign.campaign_name].days++;
+                    totalSpend += (campaign.spend * AD_SPEND_CORRECTION);
+                });
+            });
+
+            const headers = ['Campaign Name', 'Total Spend', 'Avg Daily Spend', 'Days Active', 'Contribution %'];
+            const csvContent = [
+                headers.join(','),
+                ...Object.values(campaignSummary)
+                    .sort((a, b) => b.totalSpend - a.totalSpend)
+                    .map(campaign => {
+                        const avgDailySpend = campaign.days > 0 ? campaign.totalSpend / campaign.days : 0;
+                        const contribution = totalSpend > 0 ? (campaign.totalSpend / totalSpend * 100) : 0;
+                        
+                        return [
+                            `"${campaign.name}"`,
+                            Math.round(campaign.totalSpend),
+                            Math.round(avgDailySpend),
+                            campaign.days,
+                            contribution.toFixed(1) + '%'
+                        ].join(',');
+                    })
+            ].join('\n');
+
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'instant_mechanic_campaign_performance.csv';
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+        }
+
+        // Process marketing data to aggregate by date
+        function processMarketingData(marketingData) {
+            const processedData = [];
+            
+            marketingData.forEach(item => {
+                item.dates.forEach(date => {
+                    const totalSpend = item.spend_data
+                        .filter(campaign => campaign.date === date)
+                        .reduce((sum, campaign) => sum + campaign.spend, 0);
+                    
+                    processedData.push({
+                        date: date,
+                        totalSpend: totalSpend // Note: multiplier is applied when used in calculations
+                    });
+                });
+            });
+
+            return processedData;
+        }
+
+        // Real API integration function
+        async function fetchDataFromAPI(dates, agent) {
+            try {
+                const dateParam = dates.join(',');
+                const agentParam = agent === 'all' ? '' : `&agent=${agent}`;
+                const url = `https://ai.instantmechanic.online/bot/api/customer_flow_dashboard?date=${dateParam}${agentParam}`;
+                
+                console.log('Fetching live data from:', url);
+                
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log('Live API Response:', data);
+                
+                // Validate and return data
+                if (!Array.isArray(data)) {
+                    throw new Error('API returned invalid data format');
+                }
+                
+                // Filter out any invalid entries
+                return data.filter(item => item && item.date);
+                
+            } catch (error) {
+                console.error('Error fetching live data:', error);
+                throw error; // Re-throw to be handled by calling function
+            }
+        }
+
+        // Marketing data API integration
+        async function fetchMarketingDataFromAPI(dates) {
+            try {
+                const dateParam = dates.join(',');
+                const url = `https://ai.instantmechanic.online/bot/api/get-ad-spend?date=${dateParam}`;
+                
+                console.log('Fetching marketing data from:', url);
+                
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log('Marketing API Response:', data);
+                
+                // Validate and return data
+                if (!data.spend_data || !Array.isArray(data.spend_data)) {
+                    throw new Error('Marketing API returned invalid data format');
+                }
+                
+                return [{
+                    dates: data.dates || dates,
+                    spend_data: data.spend_data
+                }];
+                
+            } catch (error) {
+                console.error('Error fetching marketing data:', error);
+                // Return empty data on error to prevent dashboard from breaking
+                return [{
+                    dates: dates,
+                    spend_data: []
+                }];
+            }
+        }
+
+        // Initialize dashboard when page loads
+        document.addEventListener('DOMContentLoaded', initializeDashboard);
+    </script>
+</body>
+</html>
