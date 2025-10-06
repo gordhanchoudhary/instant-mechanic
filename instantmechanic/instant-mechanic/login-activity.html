@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Agent Performance Dashboard - Instant Mechanic</title>
+    <title>Agent Performance Dashboard - Instant Mechanic</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/date-fns/2.29.3/index.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
@@ -28,7 +27,6 @@
             --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
             --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
             --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
             --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             --gradient-success: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
             --gradient-warning: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
@@ -55,15 +53,12 @@
             backdrop-filter: blur(10px);
         }
 
-        /* Header Styles */
+        /* Header */
         .header {
             background: rgba(255, 255, 255, 0.98);
             border-bottom: 1px solid var(--gray-200);
             padding: 1.5rem 2rem;
             box-shadow: var(--shadow-sm);
-            position: sticky;
-            top: 0;
-            z-index: 50;
             backdrop-filter: blur(20px);
         }
 
@@ -102,10 +97,9 @@
             display: flex;
             align-items: center;
             gap: 1rem;
-            flex-wrap: wrap;
         }
 
-        /* Filter Styles */
+        /* Filters */
         .filters-container {
             background: white;
             border-radius: 1rem;
@@ -132,6 +126,32 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
+        }
+
+        .view-modes {
+            display: flex;
+            background: var(--gray-100);
+            border-radius: 0.75rem;
+            padding: 0.25rem;
+            gap: 0.25rem;
+        }
+
+        .view-mode-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            background: transparent;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--gray-600);
+        }
+
+        .view-mode-btn.active {
+            background: white;
+            color: var(--primary-color);
+            box-shadow: var(--shadow-sm);
         }
 
         .filters-grid {
@@ -195,33 +215,6 @@
             border-color: var(--primary-color);
         }
 
-        /* View Mode Tabs */
-        .view-modes {
-            display: flex;
-            background: var(--gray-100);
-            border-radius: 0.75rem;
-            padding: 0.25rem;
-            gap: 0.25rem;
-        }
-
-        .view-mode-btn {
-            padding: 0.5rem 1rem;
-            border: none;
-            background: transparent;
-            border-radius: 0.5rem;
-            font-size: 0.875rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            color: var(--gray-600);
-        }
-
-        .view-mode-btn.active {
-            background: white;
-            color: var(--primary-color);
-            box-shadow: var(--shadow-sm);
-        }
-
         /* Main Content */
         .dashboard-content {
             padding: 0 2rem 2rem 2rem;
@@ -262,17 +255,9 @@
             background: var(--gradient-primary);
         }
 
-        .kpi-card.success::before {
-            background: var(--gradient-success);
-        }
-
-        .kpi-card.warning::before {
-            background: var(--gradient-warning);
-        }
-
-        .kpi-card.danger::before {
-            background: var(--gradient-danger);
-        }
+        .kpi-card.success::before { background: var(--gradient-success); }
+        .kpi-card.warning::before { background: var(--gradient-warning); }
+        .kpi-card.danger::before { background: var(--gradient-danger); }
 
         .kpi-header {
             display: flex;
@@ -293,25 +278,10 @@
             color: var(--gray-600);
         }
 
-        .kpi-icon.primary {
-            background: rgba(59, 130, 246, 0.1);
-            color: var(--primary-color);
-        }
-
-        .kpi-icon.success {
-            background: rgba(16, 185, 129, 0.1);
-            color: var(--success-color);
-        }
-
-        .kpi-icon.warning {
-            background: rgba(245, 158, 11, 0.1);
-            color: var(--warning-color);
-        }
-
-        .kpi-icon.danger {
-            background: rgba(239, 68, 68, 0.1);
-            color: var(--danger-color);
-        }
+        .kpi-icon.primary { background: rgba(59, 130, 246, 0.1); color: var(--primary-color); }
+        .kpi-icon.success { background: rgba(16, 185, 129, 0.1); color: var(--success-color); }
+        .kpi-icon.warning { background: rgba(245, 158, 11, 0.1); color: var(--warning-color); }
+        .kpi-icon.danger { background: rgba(239, 68, 68, 0.1); color: var(--danger-color); }
 
         .kpi-trend {
             display: flex;
@@ -321,13 +291,8 @@
             font-weight: 500;
         }
 
-        .kpi-trend.positive {
-            color: var(--success-color);
-        }
-
-        .kpi-trend.negative {
-            color: var(--danger-color);
-        }
+        .kpi-trend.positive { color: var(--success-color); }
+        .kpi-trend.negative { color: var(--danger-color); }
 
         .kpi-value {
             font-size: 2rem;
@@ -342,12 +307,25 @@
             font-weight: 500;
         }
 
-        /* Charts Container */
+        /* Charts */
+        .charts-section {
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
         .charts-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
             gap: 1.5rem;
-            margin-bottom: 2rem;
         }
 
         .chart-card {
@@ -355,13 +333,9 @@
             border-radius: 1rem;
             padding: 1.5rem;
             box-shadow: var(--shadow);
-            min-height: 400px;
         }
 
         .chart-header {
-            display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
             margin-bottom: 1.5rem;
             padding-bottom: 1rem;
             border-bottom: 1px solid var(--gray-100);
@@ -379,31 +353,14 @@
             margin-top: 0.25rem;
         }
 
-        /* Content Sections */
-        .content-section {
-            display: none;
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
         }
 
-        .content-section.active {
-            display: block;
-        }
-
-        /* Comparison specific styles */
-        .comparison-controls {
-            background: var(--gray-50);
-            padding: 1rem;
-            border-radius: 0.5rem;
-            margin-bottom: 1rem;
-        }
-
-        .agent-selector {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-        }
-
-        /* Performance Table */
-        .performance-table-container {
+        /* Tables */
+        .table-container {
             background: white;
             border-radius: 1rem;
             box-shadow: var(--shadow);
@@ -429,20 +386,20 @@
             color: var(--gray-600);
         }
 
-        .performance-table {
+        .data-table {
             width: 100%;
             border-collapse: collapse;
             font-size: 0.875rem;
         }
 
-        .performance-table th,
-        .performance-table td {
+        .data-table th,
+        .data-table td {
             padding: 1rem;
             text-align: left;
             border-bottom: 1px solid var(--gray-100);
         }
 
-        .performance-table th {
+        .data-table th {
             background: var(--gray-50);
             font-weight: 600;
             color: var(--gray-700);
@@ -450,7 +407,7 @@
             top: 0;
         }
 
-        .performance-table tr:hover {
+        .data-table tr:hover {
             background: var(--gray-50);
         }
 
@@ -478,7 +435,25 @@
             color: var(--primary-color);
         }
 
-        /* Performance Metrics */
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.375rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .status-badge.live {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success-color);
+        }
+
+        .status-badge.offline {
+            background: rgba(107, 114, 128, 0.1);
+            color: var(--gray-600);
+        }
+
+        /* Performance indicators */
         .metric-value {
             font-weight: 600;
         }
@@ -491,28 +466,35 @@
             color: var(--danger-color);
         }
 
+        .metric-warning {
+            color: var(--warning-color);
+        }
+
         .metric-neutral {
             color: var(--gray-700);
         }
 
-        /* Cancellation Analytics */
-        .cancellation-alert {
-            background: rgba(239, 68, 68, 0.05);
-            border: 1px solid rgba(239, 68, 68, 0.2);
-            border-radius: 0.5rem;
-            padding: 1rem;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
+        /* Highlight for low working hours */
+        .low-hours {
+            background: rgba(239, 68, 68, 0.05) !important;
+            border-left: 3px solid var(--danger-color);
         }
 
-        .cancellation-alert.high {
+        /* Problem indicators */
+        .conversion-problem {
+            color: var(--danger-color);
+            font-weight: 600;
+        }
+
+        .cancellation-problem {
+            color: var(--danger-color);
+            font-weight: 600;
             background: rgba(239, 68, 68, 0.1);
-            border-color: rgba(239, 68, 68, 0.3);
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
         }
 
-        /* Loading States */
+        /* Loading */
         .loading {
             display: flex;
             flex-direction: column;
@@ -537,183 +519,7 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Insights Panel */
-        .insights-panel {
-            background: white;
-            border-radius: 1rem;
-            box-shadow: var(--shadow);
-            padding: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .insights-header {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid var(--gray-100);
-        }
-
-        .insights-header h3 {
-            font-size: 1.125rem;
-            font-weight: 600;
-            color: var(--gray-900);
-        }
-
-        .insight-item {
-            display: flex;
-            align-items: flex-start;
-            gap: 1rem;
-            padding: 1rem;
-            border-radius: 0.5rem;
-            margin-bottom: 1rem;
-            border-left: 3px solid var(--gray-200);
-        }
-
-        .insight-item.success {
-            background: rgba(16, 185, 129, 0.05);
-            border-left-color: var(--success-color);
-        }
-
-        .insight-item.warning {
-            background: rgba(245, 158, 11, 0.05);
-            border-left-color: var(--warning-color);
-        }
-
-        .insight-item.danger {
-            background: rgba(239, 68, 68, 0.05);
-            border-left-color: var(--danger-color);
-        }
-
-        .insight-icon {
-            flex-shrink: 0;
-            width: 1.5rem;
-            height: 1.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 0.375rem;
-            font-size: 0.875rem;
-        }
-
-        .insight-content {
-            flex: 1;
-        }
-
-        .insight-title {
-            font-weight: 600;
-            color: var(--gray-900);
-            margin-bottom: 0.25rem;
-        }
-
-        .insight-description {
-            color: var(--gray-600);
-            font-size: 0.875rem;
-            line-height: 1.5;
-        }
-
-        /* Working Hours Analytics */
-        .shift-analytics {
-            background: white;
-            border-radius: 1rem;
-            box-shadow: var(--shadow);
-            padding: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .shift-summary {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-
-        .shift-metric {
-            background: var(--gray-50);
-            padding: 1rem;
-            border-radius: 0.5rem;
-            text-align: center;
-        }
-
-        .shift-metric-value {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--primary-color);
-            margin-bottom: 0.25rem;
-        }
-
-        .shift-metric-label {
-            font-size: 0.875rem;
-            color: var(--gray-600);
-        }
-
-        /* Responsive Design */
-        @media (max-width: 1024px) {
-            .header-content {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .filters-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .charts-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .kpi-grid {
-                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            }
-        }
-
-        @media (max-width: 768px) {
-            .main-container {
-                padding: 0;
-            }
-
-            .header {
-                padding: 1rem;
-            }
-
-            .filters-container {
-                margin: 1rem;
-                padding: 1rem;
-            }
-
-            .dashboard-content {
-                padding: 0 1rem 2rem 1rem;
-            }
-
-            .performance-table-container {
-                overflow-x: auto;
-            }
-
-            .date-range-buttons {
-                grid-column: span 2;
-            }
-        }
-
-        /* Utility Classes */
-        .text-center { text-align: center; }
-        .text-right { text-align: right; }
-        .font-bold { font-weight: 700; }
-        .font-medium { font-weight: 500; }
-        .text-sm { font-size: 0.875rem; }
-        .text-xs { font-size: 0.75rem; }
-        .mb-4 { margin-bottom: 1rem; }
-        .mt-4 { margin-top: 1rem; }
-        .hidden { display: none; }
-
-        /* Custom Chart Styles */
-        .chart-container {
-            position: relative;
-            height: 300px;
-            width: 100%;
-        }
-
-        /* Action Buttons */
+        /* Action buttons */
         .action-btn {
             display: inline-flex;
             align-items: center;
@@ -744,6 +550,45 @@
             background: var(--primary-dark);
             border-color: var(--primary-dark);
         }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .header-content {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .filters-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .kpi-grid {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 1rem;
+            }
+
+            .filters-container {
+                margin: 1rem;
+                padding: 1rem;
+            }
+
+            .dashboard-content {
+                padding: 0 1rem 2rem 1rem;
+            }
+
+            .table-container {
+                overflow-x: auto;
+            }
+        }
     </style>
 </head>
 <body>
@@ -754,25 +599,11 @@
                 <div class="header-title">
                     <i class="fas fa-chart-line" style="font-size: 2rem; color: var(--primary-color);"></i>
                     <div>
-                        <h1>Agent Performance Analytics</h1>
-                        <div class="header-subtitle">Advanced insights and performance tracking for Instant Mechanic agents</div>
+                        <h1>Agent Performance Dashboard</h1>
+                        <div class="header-subtitle">Real-time insights and performance tracking - Instant Mechanic</div>
                     </div>
                 </div>
                 <div class="header-actions">
-                    <div class="view-modes">
-                        <button class="view-mode-btn active" data-view="overview">
-                            <i class="fas fa-chart-pie"></i> Overview
-                        </button>
-                        <button class="view-mode-btn" data-view="comparison">
-                            <i class="fas fa-balance-scale"></i> Compare
-                        </button>
-                        <button class="view-mode-btn" data-view="trends">
-                            <i class="fas fa-chart-line"></i> Trends
-                        </button>
-                        <button class="view-mode-btn" data-view="shifts">
-                            <i class="fas fa-clock"></i> Shifts
-                        </button>
-                    </div>
                     <button class="action-btn" id="refreshBtn">
                         <i class="fas fa-sync-alt"></i> Refresh
                     </button>
@@ -840,369 +671,226 @@
             <!-- Dashboard Content -->
             <div id="dashboardContent" style="display: none;">
                 
-                <!-- Overview Section -->
-                <div id="overviewSection" class="content-section active">
-                    <!-- Cancellation Alerts -->
-                    <div id="cancellationAlerts"></div>
-                    
-                    <!-- KPI Cards -->
-                    <div class="kpi-grid">
-                        <div class="kpi-card primary">
-                            <div class="kpi-header">
-                                <div class="kpi-icon primary">
-                                    <i class="fas fa-comments"></i>
-                                </div>
-                                <div class="kpi-trend positive" id="chatsTrend">
-                                    <i class="fas fa-arrow-up"></i>
-                                    <span>+0%</span>
-                                </div>
+                <!-- KPI Cards -->
+                <div class="kpi-grid">
+                    <div class="kpi-card primary">
+                        <div class="kpi-header">
+                            <div class="kpi-icon primary">
+                                <i class="fas fa-comments"></i>
                             </div>
-                            <div class="kpi-value" id="totalChats">0</div>
-                            <div class="kpi-label">Total Chats Handled</div>
-                        </div>
-
-                        <div class="kpi-card success">
-                            <div class="kpi-header">
-                                <div class="kpi-icon success">
-                                    <i class="fas fa-calendar-check"></i>
-                                </div>
-                                <div class="kpi-trend positive" id="bookingsTrend">
-                                    <i class="fas fa-arrow-up"></i>
-                                    <span>+0%</span>
-                                </div>
+                            <div class="kpi-trend positive" id="chatsTrend">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>+0%</span>
                             </div>
-                            <div class="kpi-value" id="totalBookings">0</div>
-                            <div class="kpi-label">Total Bookings</div>
                         </div>
-
-                        <div class="kpi-card danger">
-                            <div class="kpi-header">
-                                <div class="kpi-icon danger">
-                                    <i class="fas fa-times-circle"></i>
-                                </div>
-                                <div class="kpi-trend negative" id="cancellationsTrend">
-                                    <i class="fas fa-arrow-up"></i>
-                                    <span>0%</span>
-                                </div>
-                            </div>
-                            <div class="kpi-value" id="totalCancellations">0</div>
-                            <div class="kpi-label">Cancelled Bookings</div>
-                        </div>
-
-                        <div class="kpi-card warning">
-                            <div class="kpi-header">
-                                <div class="kpi-icon warning">
-                                    <i class="fas fa-percentage"></i>
-                                </div>
-                                <div class="kpi-trend" id="cancellationRateTrend">
-                                    <i class="fas fa-minus"></i>
-                                    <span>0%</span>
-                                </div>
-                            </div>
-                            <div class="kpi-value" id="cancellationRate">0%</div>
-                            <div class="kpi-label">Cancellation Rate</div>
-                        </div>
-
-                        <div class="kpi-card success">
-                            <div class="kpi-header">
-                                <div class="kpi-icon success">
-                                    <i class="fas fa-rupee-sign"></i>
-                                </div>
-                                <div class="kpi-trend positive" id="revenueTrend">
-                                    <i class="fas fa-arrow-up"></i>
-                                    <span>+0%</span>
-                                </div>
-                            </div>
-                            <div class="kpi-value" id="totalRevenue">₹0</div>
-                            <div class="kpi-label">Total Revenue</div>
-                        </div>
-
-                        <div class="kpi-card warning">
-                            <div class="kpi-header">
-                                <div class="kpi-icon warning">
-                                    <i class="fas fa-chart-line-down"></i>
-                                </div>
-                                <div class="kpi-trend negative" id="revenueLossTrend">
-                                    <i class="fas fa-arrow-up"></i>
-                                    <span>₹0</span>
-                                </div>
-                            </div>
-                            <div class="kpi-value" id="revenueLoss">₹0</div>
-                            <div class="kpi-label">Revenue Loss (Cancellations)</div>
-                        </div>
+                        <div class="kpi-value" id="totalChats">0</div>
+                        <div class="kpi-label">Total Chats Attended</div>
                     </div>
 
-                    <!-- Charts Grid -->
+                    <div class="kpi-card success">
+                        <div class="kpi-header">
+                            <div class="kpi-icon success">
+                                <i class="fas fa-percentage"></i>
+                            </div>
+                            <div class="kpi-trend" id="conversionTrend">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>0%</span>
+                            </div>
+                        </div>
+                        <div class="kpi-value" id="conversionRate">0%</div>
+                        <div class="kpi-label">Conversion Rate</div>
+                    </div>
+
+                    <div class="kpi-card danger">
+                        <div class="kpi-header">
+                            <div class="kpi-icon danger">
+                                <i class="fas fa-times-circle"></i>
+                            </div>
+                            <div class="kpi-trend" id="cancellationTrend">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>0%</span>
+                            </div>
+                        </div>
+                        <div class="kpi-value" id="cancellationRate">0%</div>
+                        <div class="kpi-label">Cancellation Rate</div>
+                    </div>
+
+                    <div class="kpi-card success">
+                        <div class="kpi-header">
+                            <div class="kpi-icon success">
+                                <i class="fas fa-rupee-sign"></i>
+                            </div>
+                            <div class="kpi-trend positive" id="revenueTrend">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>+0%</span>
+                            </div>
+                        </div>
+                        <div class="kpi-value" id="totalRevenue">₹0</div>
+                        <div class="kpi-label">Total Revenue</div>
+                    </div>
+
+                    <div class="kpi-card warning">
+                        <div class="kpi-header">
+                            <div class="kpi-icon warning">
+                                <i class="fas fa-chart-line-down"></i>
+                            </div>
+                            <div class="kpi-trend negative" id="revenueLossTrend">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>₹0</span>
+                            </div>
+                        </div>
+                        <div class="kpi-value" id="revenueLoss">₹0</div>
+                        <div class="kpi-label">Revenue Lost</div>
+                    </div>
+                </div>
+
+                                <!-- Revenue Loss Table -->
+                <div class="table-container">
+                    <div class="table-header">
+                        <div class="table-title">Revenue Loss Analysis</div>
+                        <div class="table-subtitle">Potential revenue lost due to cancellations</div>
+                    </div>
+                    <div style="overflow-x: auto;">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Agent</th>
+                                    <th>Type</th>
+                                    <th>Total Bookings</th>
+                                    <th>Cancelled Bookings</th>
+                                    <th>Cancellation Rate</th>
+                                    <th>Revenue Earned</th>
+                                    <th>Estimated Revenue Lost</th>
+                                    <th>Recovery Potential</th>
+                                </tr>
+                            </thead>
+                            <tbody id="revenueLossTableBody">
+                                <!-- Table rows will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Date-wise Agent Duration -->
+                <div class="table-container">
+                    <div class="table-header">
+                        <div class="table-title">Date-wise Agent Duration</div>
+                        <div class="table-subtitle">Daily working hours - agents with less than 6 hours are highlighted</div>
+                    </div>
+                    <div style="overflow-x: auto;">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Agent</th>
+                                    <th>Status</th>
+                                    <th>Duration</th>
+                                    <th>Sessions</th>
+                                    <th>Performance</th>
+                                </tr>
+                            </thead>
+                            <tbody id="agentDurationTableBody">
+                                <!-- Table rows will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Detailed Agent Performance -->
+                <div class="table-container">
+                    <div class="table-header">
+                        <div class="table-title">Detailed Agent Performance & Cancellation Analysis</div>
+                        <div class="table-subtitle">Comprehensive performance metrics with advanced analytics</div>
+                    </div>
+                    <div style="overflow-x: auto;">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Agent</th>
+                                    <th>Type</th>
+                                    <th>Working Hours</th>
+                                    <th>Chats</th>
+                                    <th>Bookings</th>
+                                    <th>Cancelled</th>
+                                    <th>Conversion Rate</th>
+                                    <th>Cancellation Rate</th>
+                                    <th>Revenue</th>
+                                    <th>Efficiency</th>
+                                </tr>
+                            </thead>
+                            <tbody id="performanceTableBody">
+                                <!-- Table rows will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Performance Charts -->
+                <div class="charts-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-chart-bar"></i>
+                        Performance Analytics
+                    </h2>
+                    
                     <div class="charts-grid">
-                        <!-- Cancellation Analysis Chart -->
+                        <!-- Main Performance Chart -->
+                        <div class="chart-card" style="grid-column: span 2;">
+                            <div class="chart-header">
+                                <div class="chart-title">Chats, Conversions & Cancellations</div>
+                                <div class="chart-subtitle">Daily performance trends</div>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="mainPerformanceChart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Conversion Rate by Agent -->
                         <div class="chart-card">
                             <div class="chart-header">
-                                <div>
-                                    <div class="chart-title">Cancellation Analytics</div>
-                                    <div class="chart-subtitle">Daily cancellation trends and impact</div>
-                                </div>
+                                <div class="chart-title">Conversion Rate by Agent</div>
+                                <div class="chart-subtitle">Shows total bookings for each agent</div>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="conversionChart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Cancellation Rate by Agent -->
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <div class="chart-title">Cancellation Rate by Agent</div>
+                                <div class="chart-subtitle">Shows cancelled bookings for each agent</div>
                             </div>
                             <div class="chart-container">
                                 <canvas id="cancellationChart"></canvas>
                             </div>
                         </div>
 
-                        <!-- Performance Trends Chart -->
+                        <!-- Agent Productivity -->
                         <div class="chart-card">
                             <div class="chart-header">
-                                <div>
-                                    <div class="chart-title">Performance Trends</div>
-                                    <div class="chart-subtitle">Success rate and conversion trends</div>
-                                </div>
-                            </div>
-                            <div class="chart-container">
-                                <canvas id="trendsChart"></canvas>
-                            </div>
-                        </div>
-
-                        <!-- Agent Cancellation Comparison -->
-                        <div class="chart-card">
-                            <div class="chart-header">
-                                <div>
-                                    <div class="chart-title">Agent Cancellation Analysis</div>
-                                    <div class="chart-subtitle">Cancellation rates by agent</div>
-                                </div>
-                            </div>
-                            <div class="chart-container">
-                                <canvas id="agentCancellationChart"></canvas>
-                            </div>
-                        </div>
-
-                        <!-- Revenue vs Loss Chart -->
-                        <div class="chart-card">
-                            <div class="chart-header">
-                                <div>
-                                    <div class="chart-title">Revenue vs Loss Impact</div>
-                                    <div class="chart-subtitle">Revenue earned vs potential loss due to cancellations</div>
-                                </div>
-                            </div>
-                            <div class="chart-container">
-                                <canvas id="revenueLossChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Performance Table -->
-                    <div class="performance-table-container">
-                        <div class="table-header">
-                            <div class="table-title">Detailed Agent Performance & Cancellation Analysis</div>
-                            <div class="table-subtitle">Comprehensive performance metrics with cancellation impact</div>
-                        </div>
-                        <div style="overflow-x: auto;">
-                            <table class="performance-table">
-                                <thead>
-                                    <tr>
-                                        <th>Agent</th>
-                                        <th>Type</th>
-                                        <th>Chats</th>
-                                        <th>Bookings</th>
-                                        <th>Cancelled</th>
-                                        <th>Success Rate</th>
-                                        <th>Cancellation Rate</th>
-                                        <th>Revenue</th>
-                                        <th>Revenue Loss</th>
-                                        <th>Performance Score</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="performanceTableBody">
-                                    <!-- Table rows will be populated by JavaScript -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Comparison Section -->
-                <div id="comparisonSection" class="content-section">
-                    <div class="comparison-controls">
-                        <h3 style="margin-bottom: 1rem;">Agent Comparison</h3>
-                        <div class="agent-selector">
-                            <div class="filter-group">
-                                <label>Agent 1</label>
-                                <select id="compareAgent1" class="filter-input">
-                                    <option value="">Select Agent</option>
-                                </select>
-                            </div>
-                            <div class="filter-group">
-                                <label>Agent 2</label>
-                                <select id="compareAgent2" class="filter-input">
-                                    <option value="">Select Agent</option>
-                                </select>
-                            </div>
-                            <div class="filter-group">
-                                <label>Agent 3 (Optional)</label>
-                                <select id="compareAgent3" class="filter-input">
-                                    <option value="">Select Agent</option>
-                                </select>
-                            </div>
-                            <div class="filter-group">
-                                <button class="action-btn primary" id="runComparison" style="margin-top: 1.5rem;">
-                                    <i class="fas fa-balance-scale"></i> Compare
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div id="comparisonResults" style="display: none;">
-                        <div class="charts-grid">
-                            <div class="chart-card">
-                                <div class="chart-header">
-                                    <div>
-                                        <div class="chart-title">Performance Comparison</div>
-                                        <div class="chart-subtitle">Key metrics comparison between selected agents</div>
-                                    </div>
-                                </div>
-                                <div class="chart-container">
-                                    <canvas id="comparisonChart"></canvas>
-                                </div>
-                            </div>
-
-                            <div class="chart-card">
-                                <div class="chart-header">
-                                    <div>
-                                        <div class="chart-title">Cancellation Rate Comparison</div>
-                                        <div class="chart-subtitle">Cancellation performance comparison</div>
-                                    </div>
-                                </div>
-                                <div class="chart-container">
-                                    <canvas id="comparisonCancellationChart"></canvas>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="performance-table-container">
-                            <div class="table-header">
-                                <div class="table-title">Detailed Comparison</div>
-                                <div class="table-subtitle">Side-by-side performance metrics</div>
-                            </div>
-                            <div style="overflow-x: auto;">
-                                <table class="performance-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Metric</th>
-                                            <th id="compAgent1Header">Agent 1</th>
-                                            <th id="compAgent2Header">Agent 2</th>
-                                            <th id="compAgent3Header" style="display: none;">Agent 3</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="comparisonTableBody">
-                                        <!-- Comparison rows will be populated by JavaScript -->
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Trends Section -->
-                <div id="trendsSection" class="content-section">
-                    <div class="charts-grid">
-                        <div class="chart-card">
-                            <div class="chart-header">
-                                <div>
-                                    <div class="chart-title">Daily Performance Trends</div>
-                                    <div class="chart-subtitle">Bookings and cancellation trends over time</div>
-                                </div>
-                            </div>
-                            <div class="chart-container">
-                                <canvas id="dailyTrendsChart"></canvas>
-                            </div>
-                        </div>
-
-                        <div class="chart-card">
-                            <div class="chart-header">
-                                <div>
-                                    <div class="chart-title">Success Rate Trends</div>
-                                    <div class="chart-subtitle">Success rate progression over time</div>
-                                </div>
-                            </div>
-                            <div class="chart-container">
-                                <canvas id="successTrendsChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Shifts Section -->
-                <div id="shiftsSection" class="content-section">
-                    <div class="shift-analytics">
-                        <div class="insights-header">
-                            <i class="fas fa-clock" style="color: var(--primary-color);"></i>
-                            <h3>Agent Working Hours Analytics</h3>
-                        </div>
-                        <div class="shift-summary" id="shiftSummary">
-                            <!-- Shift metrics will be populated by JavaScript -->
-                        </div>
-                    </div>
-
-                    <div class="charts-grid">
-                        <div class="chart-card">
-                            <div class="chart-header">
-                                <div>
-                                    <div class="chart-title">Daily Working Hours</div>
-                                    <div class="chart-subtitle">Total working hours by agent per day</div>
-                                </div>
-                            </div>
-                            <div class="chart-container">
-                                <canvas id="workingHoursChart"></canvas>
-                            </div>
-                        </div>
-
-                        <div class="chart-card">
-                            <div class="chart-header">
-                                <div>
-                                    <div class="chart-title">Productivity vs Hours</div>
-                                    <div class="chart-subtitle">Bookings per hour worked analysis</div>
-                                </div>
+                                <div class="chart-title">Agent Productivity</div>
+                                <div class="chart-subtitle">Revenue vs working hours</div>
                             </div>
                             <div class="chart-container">
                                 <canvas id="productivityChart"></canvas>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="performance-table-container">
-                        <div class="table-header">
-                            <div class="table-title">Agent Shift Performance</div>
-                            <div class="table-subtitle">Working hours and productivity analysis</div>
-                        </div>
-                        <div style="overflow-x: auto;">
-                            <table class="performance-table">
-                                <thead>
-                                    <tr>
-                                        <th>Agent</th>
-                                        <th>Total Hours</th>
-                                        <th>Avg Daily Hours</th>
-                                        <th>Sessions</th>
-                                        <th>Bookings</th>
-                                        <th>Bookings/Hour</th>
-                                        <th>Revenue/Hour</th>
-                                        <th>Efficiency Score</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="shiftTableBody">
-                                    <!-- Shift table rows will be populated by JavaScript -->
-                                </tbody>
-                            </table>
+                        <!-- Daily Revenue Trends -->
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <div class="chart-title">Revenue vs Revenue Loss</div>
+                                <div class="chart-subtitle">Daily revenue earned vs lost</div>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="revenueChart"></canvas>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Insights Panel -->
-                <div class="insights-panel">
-                    <div class="insights-header">
-                        <i class="fas fa-lightbulb" style="color: var(--warning-color);"></i>
-                        <h3>Performance Insights & Recommendations</h3>
-                    </div>
-                    <div id="insightsContent">
-                        <!-- Insights will be populated by JavaScript -->
-                    </div>
-                </div>
+
             </div>
         </div>
     </div>
@@ -1232,27 +920,6 @@
 
         // Event listeners
         function initializeEventListeners() {
-            // View mode buttons
-            document.querySelectorAll('.view-mode-btn[data-view]').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    // Update active state for view mode buttons
-                    document.querySelectorAll('.view-mode-btn[data-view]').forEach(b => b.classList.remove('active'));
-                    this.classList.add('active');
-                    
-                    // Show/hide content sections
-                    const view = this.getAttribute('data-view');
-                    document.querySelectorAll('.content-section').forEach(section => {
-                        section.classList.remove('active');
-                    });
-                    document.getElementById(view + 'Section').classList.add('active');
-                    
-                    // Load specific data if needed
-                    if (view === 'shifts') {
-                        updateShiftAnalytics();
-                    }
-                });
-            });
-
             // Date range buttons
             document.querySelectorAll('.date-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
@@ -1305,20 +972,9 @@
                 loadDashboardData();
             });
 
-            // Comparison functionality
-            document.getElementById('runComparison').addEventListener('click', function() {
-                runComparison();
-            });
-
-            // Refresh button
-            document.getElementById('refreshBtn').addEventListener('click', function() {
-                loadDashboardData();
-            });
-
-            // Export button
-            document.getElementById('exportBtn').addEventListener('click', function() {
-                exportData();
-            });
+            // Action buttons
+            document.getElementById('refreshBtn').addEventListener('click', loadDashboardData);
+            document.getElementById('exportBtn').addEventListener('click', exportData);
         }
 
         // Set default dates (today)
@@ -1380,7 +1036,6 @@
                 if (currentFilters.dateRange === 'today' || currentFilters.dateRange === 'yesterday') {
                     dates = [currentFilters.startDate];
                 } else {
-                    // Generate date range
                     const start = new Date(currentFilters.startDate);
                     const end = new Date(currentFilters.endDate);
                     for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
@@ -1416,15 +1071,13 @@
                     performanceData = rawPerformanceData;
                 }
 
-                // Update agent select dropdown (fixed to show all agents)
+                // Update dropdown
                 updateAgentSelect();
 
                 // Update dashboard
                 updateKPIs();
                 updateCharts();
-                updatePerformanceTable();
-                updateCancellationAlerts();
-                generateInsights();
+                updateTables();
 
                 hideLoading();
             } catch (error) {
@@ -1433,14 +1086,13 @@
             }
         }
 
-        // Update agent select dropdown (FIXED)
+        // Update agent select dropdown
         function updateAgentSelect() {
             const agentSelect = document.getElementById('agentSelect');
-            const currentValue = agentSelect.value; // Store current selection
+            const currentValue = agentSelect.value;
             
             agentSelect.innerHTML = '<option value="">All Agents</option>';
             
-            // Always show all agents, regardless of current filter
             allAgents.forEach(agent => {
                 const option = document.createElement('option');
                 option.value = agent;
@@ -1448,37 +1100,9 @@
                 agentSelect.appendChild(option);
             });
             
-            // Restore previous selection if it exists
             if (currentValue && allAgents.includes(currentValue)) {
                 agentSelect.value = currentValue;
             }
-
-            // Update comparison selects
-            updateComparisonSelects();
-        }
-
-        // Update comparison selects
-        function updateComparisonSelects() {
-            const selects = ['compareAgent1', 'compareAgent2', 'compareAgent3'];
-            
-            selects.forEach(selectId => {
-                const select = document.getElementById(selectId);
-                const currentValue = select.value;
-                
-                select.innerHTML = '<option value="">Select Agent</option>';
-                
-                allAgents.forEach(agent => {
-                    const option = document.createElement('option');
-                    option.value = agent;
-                    option.textContent = agent;
-                    select.appendChild(option);
-                });
-                
-                // Restore selection if valid
-                if (currentValue && allAgents.includes(currentValue)) {
-                    select.value = currentValue;
-                }
-            });
         }
 
         // Update KPIs
@@ -1491,273 +1115,207 @@
                 return acc;
             }, { chats: 0, bookings: 0, cancellations: 0, revenue: 0 });
 
-            // Calculate cancellation rate
-            const cancellationRate = totals.bookings > 0 ? 
-                ((totals.cancellations / totals.bookings) * 100).toFixed(1) : 0;
-
-            // Calculate estimated revenue loss (assuming average booking value)
-            const avgBookingValue = totals.bookings > 0 ? 
-                totals.revenue / (totals.bookings - totals.cancellations) : 0;
-            const revenueLoss = totals.cancellations * avgBookingValue;
-
-            document.getElementById('totalChats').textContent = totals.chats.toLocaleString();
-            document.getElementById('totalBookings').textContent = totals.bookings.toLocaleString();
-            document.getElementById('totalCancellations').textContent = totals.cancellations.toLocaleString();
-            document.getElementById('cancellationRate').textContent = cancellationRate + '%';
-            document.getElementById('totalRevenue').textContent = `₹${totals.revenue.toLocaleString()}`;
-            document.getElementById('revenueLoss').textContent = `₹${Math.round(revenueLoss).toLocaleString()}`;
-
-            // Update cancellation rate trend styling
-            const cancellationRateElement = document.getElementById('cancellationRate');
-            const cancellationRateTrend = document.getElementById('cancellationRateTrend');
-            const cancellationRateCard = cancellationRateElement.closest('.kpi-card');
-            
-            if (parseFloat(cancellationRate) > 30) {
-                cancellationRateCard.classList.remove('warning');
-                cancellationRateCard.classList.add('danger');
-                cancellationRateTrend.classList.remove('positive');
-                cancellationRateTrend.classList.add('negative');
-            } else if (parseFloat(cancellationRate) > 20) {
-                cancellationRateCard.classList.remove('danger');
-                cancellationRateCard.classList.add('warning');
-            }
-        }
-
-        // Update cancellation alerts
-        function updateCancellationAlerts() {
-            const alertsContainer = document.getElementById('cancellationAlerts');
-            alertsContainer.innerHTML = '';
-
-            const totals = performanceData.reduce((acc, agent) => {
-                acc.bookings += agent.total_bookings || 0;
-                acc.cancellations += agent.cancelled_bookings || 0;
-                return acc;
-            }, { bookings: 0, cancellations: 0 });
-
+            // Calculate rates
+            const conversionRate = totals.chats > 0 ? 
+                ((totals.bookings / totals.chats) * 100) : 0;
             const cancellationRate = totals.bookings > 0 ? 
                 ((totals.cancellations / totals.bookings) * 100) : 0;
 
+            // Calculate revenue loss
+            const avgBookingValue = (totals.bookings - totals.cancellations) > 0 ? 
+                totals.revenue / (totals.bookings - totals.cancellations) : 0;
+            const revenueLoss = totals.cancellations * avgBookingValue;
+
+            // Update KPI values
+            document.getElementById('totalChats').textContent = totals.chats.toLocaleString();
+            document.getElementById('conversionRate').textContent = conversionRate.toFixed(1) + '%';
+            document.getElementById('cancellationRate').textContent = cancellationRate.toFixed(1) + '%';
+            document.getElementById('totalRevenue').textContent = `₹${totals.revenue.toLocaleString()}`;
+            document.getElementById('revenueLoss').textContent = `₹${Math.round(revenueLoss).toLocaleString()}`;
+
+            // Update KPI card styling based on business rules
+            const conversionCard = document.querySelector('#conversionRate').closest('.kpi-card');
+            const cancellationCard = document.querySelector('#cancellationRate').closest('.kpi-card');
+            
+            // Conversion rate: problem if < 45%
+            if (conversionRate < 45) {
+                conversionCard.classList.remove('success');
+                conversionCard.classList.add('danger');
+            } else {
+                conversionCard.classList.remove('danger');
+                conversionCard.classList.add('success');
+            }
+
+            // Cancellation rate: major problem if > 30%
             if (cancellationRate > 30) {
-                alertsContainer.innerHTML = `
-                    <div class="cancellation-alert high">
-                        <i class="fas fa-exclamation-triangle" style="color: var(--danger-color);"></i>
-                        <div>
-                            <strong>Critical Cancellation Rate!</strong> 
-                            Current rate is ${cancellationRate.toFixed(1)}%. Immediate action required.
-                        </div>
-                    </div>
-                `;
+                cancellationCard.classList.remove('warning');
+                cancellationCard.classList.add('danger');
             } else if (cancellationRate > 20) {
-                alertsContainer.innerHTML = `
-                    <div class="cancellation-alert">
-                        <i class="fas fa-exclamation-circle" style="color: var(--warning-color);"></i>
-                        <div>
-                            <strong>High Cancellation Rate!</strong> 
-                            Current rate is ${cancellationRate.toFixed(1)}%. Consider reviewing processes.
-                        </div>
-                    </div>
-                `;
+                cancellationCard.classList.remove('danger', 'success');
+                cancellationCard.classList.add('warning');
+            } else {
+                cancellationCard.classList.remove('danger', 'warning');
+                cancellationCard.classList.add('success');
             }
         }
 
-        // Update charts
+        // Update all charts
         function updateCharts() {
+            updateMainPerformanceChart();
+            updateConversionChart();
             updateCancellationChart();
-            updateTrendsChart();
-            updateAgentCancellationChart();
-            updateRevenueLossChart();
-            updateDailyTrendsChart();
-            updateSuccessTrendsChart();
+            updateProductivityChart();
+            updateRevenueChart();
+        }
+
+        // Update main performance chart
+        function updateMainPerformanceChart() {
+            const ctx = document.getElementById('mainPerformanceChart').getContext('2d');
+            
+            if (charts.mainPerformance) charts.mainPerformance.destroy();
+
+            // Group data by date
+            const dateGroups = {};
+            performanceData.forEach(agent => {
+                if (!dateGroups[agent.date]) {
+                    dateGroups[agent.date] = {
+                        chats: 0,
+                        bookings: 0,
+                        cancelled: 0
+                    };
+                }
+                dateGroups[agent.date].chats += agent.chats_handled || 0;
+                dateGroups[agent.date].bookings += agent.total_bookings || 0;
+                dateGroups[agent.date].cancelled += agent.cancelled_bookings || 0;
+            });
+
+            const labels = Object.keys(dateGroups).sort();
+            const chatsData = labels.map(date => dateGroups[date].chats);
+            const bookingsData = labels.map(date => dateGroups[date].bookings);
+            const cancelledData = labels.map(date => dateGroups[date].cancelled);
+
+            charts.mainPerformance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels.map(date => new Date(date).toLocaleDateString()),
+                    datasets: [{
+                        label: 'Chats Attended',
+                        data: chatsData,
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        tension: 0.4
+                    }, {
+                        label: 'Conversions',
+                        data: bookingsData,
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        tension: 0.4
+                    }, {
+                        label: 'Cancellations',
+                        data: cancelledData,
+                        borderColor: '#ef4444',
+                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Count'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Update conversion chart
+        function updateConversionChart() {
+            const ctx = document.getElementById('conversionChart').getContext('2d');
+            
+            if (charts.conversion) charts.conversion.destroy();
+
+            const agentTotals = {};
+            performanceData.forEach(agent => {
+                if (!agentTotals[agent.agent]) {
+                    agentTotals[agent.agent] = { chats: 0, bookings: 0 };
+                }
+                agentTotals[agent.agent].chats += agent.chats_handled || 0;
+                agentTotals[agent.agent].bookings += agent.total_bookings || 0;
+            });
+
+            const agents = Object.keys(agentTotals);
+            const conversionRates = agents.map(agent => {
+                return agentTotals[agent].chats > 0 ? 
+                    ((agentTotals[agent].bookings / agentTotals[agent].chats) * 100).toFixed(1) : 0;
+            });
+            const bookingsCount = agents.map(agent => agentTotals[agent].bookings);
+
+            // Color code based on conversion rate (problem if < 45%)
+            const backgroundColors = conversionRates.map(rate => {
+                return parseFloat(rate) < 45 ? '#ef4444' : '#10b981';
+            });
+
+            charts.conversion = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: agents,
+                    datasets: [{
+                        label: 'Conversion Rate (%)',
+                        data: conversionRates,
+                        backgroundColor: backgroundColors,
+                        borderColor: backgroundColors,
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                afterLabel: function(context) {
+                                    const agentName = context.label;
+                                    const bookings = bookingsCount[context.dataIndex];
+                                    return `Total Bookings: ${bookings}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Conversion Rate (%)'
+                            }
+                        }
+                    }
+                }
+            });
         }
 
         // Update cancellation chart
         function updateCancellationChart() {
             const ctx = document.getElementById('cancellationChart').getContext('2d');
             
-            if (charts.cancellation) {
-                charts.cancellation.destroy();
-            }
-
-            // Group data by date
-            const dateGroups = {};
-            performanceData.forEach(agent => {
-                if (!dateGroups[agent.date]) {
-                    dateGroups[agent.date] = {
-                        bookings: 0,
-                        cancelled: 0
-                    };
-                }
-                dateGroups[agent.date].bookings += agent.total_bookings || 0;
-                dateGroups[agent.date].cancelled += agent.cancelled_bookings || 0;
-            });
-
-            const labels = Object.keys(dateGroups).sort();
-            const bookingsData = labels.map(date => dateGroups[date].bookings);
-            const cancelledData = labels.map(date => dateGroups[date].cancelled);
-            const cancellationRates = labels.map(date => {
-                const total = dateGroups[date].bookings;
-                return total > 0 ? ((dateGroups[date].cancelled / total) * 100).toFixed(1) : 0;
-            });
-
-            charts.cancellation = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels.map(date => new Date(date).toLocaleDateString()),
-                    datasets: [{
-                        label: 'Bookings',
-                        data: bookingsData,
-                        borderColor: '#10b981',
-                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                        tension: 0.4,
-                        yAxisID: 'y'
-                    }, {
-                        label: 'Cancelled',
-                        data: cancelledData,
-                        borderColor: '#ef4444',
-                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                        tension: 0.4,
-                        yAxisID: 'y'
-                    }, {
-                        label: 'Cancellation Rate (%)',
-                        data: cancellationRates,
-                        borderColor: '#f59e0b',
-                        backgroundColor: 'rgba(245, 158, 11, 0.1)',
-                        tension: 0.4,
-                        yAxisID: 'y1',
-                        type: 'line'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    interaction: {
-                        intersect: false,
-                    },
-                    scales: {
-                        y: {
-                            type: 'linear',
-                            display: true,
-                            position: 'left',
-                            title: {
-                                display: true,
-                                text: 'Bookings'
-                            }
-                        },
-                        y1: {
-                            type: 'linear',
-                            display: true,
-                            position: 'right',
-                            title: {
-                                display: true,
-                                text: 'Cancellation Rate (%)'
-                            },
-                            grid: {
-                                drawOnChartArea: false,
-                            },
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                        }
-                    }
-                }
-            });
-        }
-
-        // Update trends chart
-        function updateTrendsChart() {
-            const ctx = document.getElementById('trendsChart').getContext('2d');
-            
-            if (charts.trends) {
-                charts.trends.destroy();
-            }
-
-            // Group data by date
-            const dateGroups = {};
-            performanceData.forEach(agent => {
-                if (!dateGroups[agent.date]) {
-                    dateGroups[agent.date] = {
-                        bookings: 0,
-                        cancelled: 0,
-                        chats: 0
-                    };
-                }
-                dateGroups[agent.date].bookings += agent.total_bookings || 0;
-                dateGroups[agent.date].cancelled += agent.cancelled_bookings || 0;
-                dateGroups[agent.date].chats += agent.chats_handled || 0;
-            });
-
-            const labels = Object.keys(dateGroups).sort();
-            const successRates = labels.map(date => {
-                const total = dateGroups[date].bookings;
-                const successful = total - dateGroups[date].cancelled;
-                return total > 0 ? ((successful / total) * 100).toFixed(1) : 0;
-            });
-            const conversionRates = labels.map(date => {
-                const chats = dateGroups[date].chats;
-                const bookings = dateGroups[date].bookings;
-                return chats > 0 ? ((bookings / chats) * 100).toFixed(1) : 0;
-            });
-
-            charts.trends = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels.map(date => new Date(date).toLocaleDateString()),
-                    datasets: [{
-                        label: 'Success Rate (%)',
-                        data: successRates,
-                        borderColor: '#10b981',
-                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                        tension: 0.4
-                    }, {
-                        label: 'Conversion Rate (%)',
-                        data: conversionRates,
-                        borderColor: '#3b82f6',
-                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                        tension: 0.4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    interaction: {
-                        intersect: false,
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            max: 100,
-                            title: {
-                                display: true,
-                                text: 'Percentage (%)'
-                            }
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                        }
-                    }
-                }
-            });
-        }
-
-        // Update agent cancellation chart
-        function updateAgentCancellationChart() {
-            const ctx = document.getElementById('agentCancellationChart').getContext('2d');
-            
-            if (charts.agentCancellation) {
-                charts.agentCancellation.destroy();
-            }
+            if (charts.cancellation) charts.cancellation.destroy();
 
             const agentTotals = {};
             performanceData.forEach(agent => {
                 if (!agentTotals[agent.agent]) {
-                    agentTotals[agent.agent] = {
-                        bookings: 0,
-                        cancelled: 0
-                    };
+                    agentTotals[agent.agent] = { bookings: 0, cancelled: 0 };
                 }
                 agentTotals[agent.agent].bookings += agent.total_bookings || 0;
                 agentTotals[agent.agent].cancelled += agent.cancelled_bookings || 0;
@@ -1765,19 +1323,19 @@
 
             const agents = Object.keys(agentTotals);
             const cancellationRates = agents.map(agent => {
-                const total = agentTotals[agent].bookings;
-                return total > 0 ? ((agentTotals[agent].cancelled / total) * 100).toFixed(1) : 0;
+                return agentTotals[agent].bookings > 0 ? 
+                    ((agentTotals[agent].cancelled / agentTotals[agent].bookings) * 100).toFixed(1) : 0;
             });
+            const cancelledCount = agents.map(agent => agentTotals[agent].cancelled);
 
-            // Color code based on cancellation rate
+            // Color code based on cancellation rate (major problem if > 30%)
             const backgroundColors = cancellationRates.map(rate => {
-                if (parseFloat(rate) > 30) return '#ef4444'; // Red
-                if (parseFloat(rate) > 20) return '#f59e0b'; // Yellow
-                if (parseFloat(rate) > 10) return '#3b82f6'; // Blue
-                return '#10b981'; // Green
+                if (parseFloat(rate) > 30) return '#ef4444'; // Red - Major problem
+                if (parseFloat(rate) > 20) return '#f59e0b'; // Yellow - Warning
+                return '#10b981'; // Green - Good
             });
 
-            charts.agentCancellation = new Chart(ctx, {
+            charts.cancellation = new Chart(ctx, {
                 type: 'bar',
                 data: {
                     labels: agents,
@@ -1792,6 +1350,18 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                afterLabel: function(context) {
+                                    const agentName = context.label;
+                                    const cancelled = cancelledCount[context.dataIndex];
+                                    return `Cancelled Bookings: ${cancelled}`;
+                                }
+                            }
+                        }
+                    },
                     scales: {
                         y: {
                             beginAtZero: true,
@@ -1800,495 +1370,64 @@
                                 text: 'Cancellation Rate (%)'
                             }
                         }
-                    },
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
                     }
                 }
             });
         }
 
-        // Update revenue loss chart
-        function updateRevenueLossChart() {
-            const ctx = document.getElementById('revenueLossChart').getContext('2d');
+        // Update productivity chart
+        function updateProductivityChart() {
+            const ctx = document.getElementById('productivityChart').getContext('2d');
             
-            if (charts.revenueLoss) {
-                charts.revenueLoss.destroy();
-            }
+            if (charts.productivity) charts.productivity.destroy();
 
-            const agentTotals = {};
+            // Calculate productivity metrics
+            const agentProductivity = {};
+            
+            // Get performance data
             performanceData.forEach(agent => {
-                if (!agentTotals[agent.agent]) {
-                    agentTotals[agent.agent] = {
-                        revenue: 0,
-                        bookings: 0,
-                        cancelled: 0
+                if (!agentProductivity[agent.agent]) {
+                    agentProductivity[agent.agent] = { 
+                        revenue: 0, 
+                        workingHours: 0,
+                        bookings: 0
                     };
                 }
-                agentTotals[agent.agent].revenue += agent.total_revenue || 0;
-                agentTotals[agent.agent].bookings += agent.total_bookings || 0;
-                agentTotals[agent.agent].cancelled += agent.cancelled_bookings || 0;
+                agentProductivity[agent.agent].revenue += agent.total_revenue || 0;
+                agentProductivity[agent.agent].bookings += agent.total_bookings || 0;
             });
 
-            const agents = Object.keys(agentTotals);
-            const revenueData = agents.map(agent => agentTotals[agent].revenue);
-            const revenueLossData = agents.map(agent => {
-                const avgBookingValue = (agentTotals[agent].bookings - agentTotals[agent].cancelled) > 0 ? 
-                    agentTotals[agent].revenue / (agentTotals[agent].bookings - agentTotals[agent].cancelled) : 0;
-                return agentTotals[agent].cancelled * avgBookingValue;
-            });
-
-            charts.revenueLoss = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: agents,
-                    datasets: [{
-                        label: 'Revenue Earned (₹)',
-                        data: revenueData,
-                        backgroundColor: 'rgba(16, 185, 129, 0.8)',
-                        yAxisID: 'y'
-                    }, {
-                        label: 'Estimated Revenue Loss (₹)',
-                        data: revenueLossData,
-                        backgroundColor: 'rgba(239, 68, 68, 0.8)',
-                        yAxisID: 'y'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Amount (₹)'
-                            }
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                        }
-                    }
-                }
-            });
-        }
-
-        // Update daily trends chart
-        function updateDailyTrendsChart() {
-            const ctx = document.getElementById('dailyTrendsChart');
-            if (!ctx) return;
-            
-            if (charts.dailyTrends) {
-                charts.dailyTrends.destroy();
-            }
-
-            // Group data by date
-            const dateGroups = {};
-            performanceData.forEach(agent => {
-                if (!dateGroups[agent.date]) {
-                    dateGroups[agent.date] = {
-                        bookings: 0,
-                        cancelled: 0
-                    };
-                }
-                dateGroups[agent.date].bookings += agent.total_bookings || 0;
-                dateGroups[agent.date].cancelled += agent.cancelled_bookings || 0;
-            });
-
-            const labels = Object.keys(dateGroups).sort();
-            const bookingsData = labels.map(date => dateGroups[date].bookings);
-            const cancelledData = labels.map(date => dateGroups[date].cancelled);
-
-            charts.dailyTrends = new Chart(ctx.getContext('2d'), {
-                type: 'line',
-                data: {
-                    labels: labels.map(date => new Date(date).toLocaleDateString()),
-                    datasets: [{
-                        label: 'Bookings',
-                        data: bookingsData,
-                        borderColor: '#10b981',
-                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                        tension: 0.4
-                    }, {
-                        label: 'Cancelled',
-                        data: cancelledData,
-                        borderColor: '#ef4444',
-                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                        tension: 0.4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    interaction: {
-                        intersect: false,
-                    },
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                        }
-                    }
-                }
-            });
-        }
-
-        // Update success trends chart
-        function updateSuccessTrendsChart() {
-            const ctx = document.getElementById('successTrendsChart');
-            if (!ctx) return;
-            
-            if (charts.successTrends) {
-                charts.successTrends.destroy();
-            }
-
-            // Group data by date
-            const dateGroups = {};
-            performanceData.forEach(agent => {
-                if (!dateGroups[agent.date]) {
-                    dateGroups[agent.date] = {
-                        bookings: 0,
-                        cancelled: 0
-                    };
-                }
-                dateGroups[agent.date].bookings += agent.total_bookings || 0;
-                dateGroups[agent.date].cancelled += agent.cancelled_bookings || 0;
-            });
-
-            const labels = Object.keys(dateGroups).sort();
-            const successRates = labels.map(date => {
-                const total = dateGroups[date].bookings;
-                const successful = total - dateGroups[date].cancelled;
-                return total > 0 ? ((successful / total) * 100).toFixed(1) : 0;
-            });
-
-            charts.successTrends = new Chart(ctx.getContext('2d'), {
-                type: 'line',
-                data: {
-                    labels: labels.map(date => new Date(date).toLocaleDateString()),
-                    datasets: [{
-                        label: 'Success Rate (%)',
-                        data: successRates,
-                        borderColor: '#10b981',
-                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                        tension: 0.4,
-                        fill: true
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    interaction: {
-                        intersect: false,
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            max: 100,
-                            title: {
-                                display: true,
-                                text: 'Success Rate (%)'
-                            }
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                        }
-                    }
-                }
-            });
-        }
-
-        // Run comparison
-        function runComparison() {
-            const agent1 = document.getElementById('compareAgent1').value;
-            const agent2 = document.getElementById('compareAgent2').value;
-            const agent3 = document.getElementById('compareAgent3').value;
-
-            if (!agent1 || !agent2) {
-                alert('Please select at least 2 agents to compare');
-                return;
-            }
-
-            const selectedAgents = [agent1, agent2];
-            if (agent3) selectedAgents.push(agent3);
-
-            // Get comparison data
-            const comparisonData = selectedAgents.map(agentName => {
-                const agentData = performanceData.filter(item => item.agent === agentName);
-                return agentData.reduce((acc, item) => {
-                    acc.agent = agentName;
-                    acc.chats += item.chats_handled || 0;
-                    acc.bookings += item.total_bookings || 0;
-                    acc.cancelled += item.cancelled_bookings || 0;
-                    acc.revenue += item.total_revenue || 0;
-                    acc.profit += item.total_profit || 0;
-                    acc.collections += item.total_collections || 0;
-                    return acc;
-                }, {
-                    agent: agentName,
-                    chats: 0,
-                    bookings: 0,
-                    cancelled: 0,
-                    revenue: 0,
-                    profit: 0,
-                    collections: 0
-                });
-            });
-
-            // Show comparison results
-            document.getElementById('comparisonResults').style.display = 'block';
-            
-            // Update headers
-            document.getElementById('compAgent1Header').textContent = agent1;
-            document.getElementById('compAgent2Header').textContent = agent2;
-            const agent3Header = document.getElementById('compAgent3Header');
-            if (agent3) {
-                agent3Header.textContent = agent3;
-                agent3Header.style.display = 'table-cell';
-            } else {
-                agent3Header.style.display = 'none';
-            }
-
-            // Update comparison charts
-            updateComparisonCharts(comparisonData);
-            updateComparisonTable(comparisonData);
-        }
-
-        // Update comparison charts
-        function updateComparisonCharts(comparisonData) {
-            // Performance comparison chart
-            const ctx1 = document.getElementById('comparisonChart').getContext('2d');
-            if (charts.comparison) charts.comparison.destroy();
-
-            const agents = comparisonData.map(item => item.agent);
-            const bookingsData = comparisonData.map(item => item.bookings);
-            const revenueData = comparisonData.map(item => item.revenue);
-
-            charts.comparison = new Chart(ctx1, {
-                type: 'bar',
-                data: {
-                    labels: agents,
-                    datasets: [{
-                        label: 'Bookings',
-                        data: bookingsData,
-                        backgroundColor: 'rgba(59, 130, 246, 0.8)',
-                        yAxisID: 'y'
-                    }, {
-                        label: 'Revenue (₹)',
-                        data: revenueData,
-                        backgroundColor: 'rgba(16, 185, 129, 0.8)',
-                        yAxisID: 'y1'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            type: 'linear',
-                            display: true,
-                            position: 'left',
-                            title: {
-                                display: true,
-                                text: 'Bookings'
-                            }
-                        },
-                        y1: {
-                            type: 'linear',
-                            display: true,
-                            position: 'right',
-                            title: {
-                                display: true,
-                                text: 'Revenue (₹)'
-                            },
-                            grid: {
-                                drawOnChartArea: false,
-                            },
-                        }
-                    }
-                }
-            });
-
-            // Cancellation comparison chart
-            const ctx2 = document.getElementById('comparisonCancellationChart').getContext('2d');
-            if (charts.comparisonCancellation) charts.comparisonCancellation.destroy();
-
-            const cancellationRates = comparisonData.map(item => {
-                return item.bookings > 0 ? ((item.cancelled / item.bookings) * 100).toFixed(1) : 0;
-            });
-
-            charts.comparisonCancellation = new Chart(ctx2, {
-                type: 'doughnut',
-                data: {
-                    labels: agents,
-                    datasets: [{
-                        data: cancellationRates,
-                        backgroundColor: [
-                            '#3b82f6', '#10b981', '#f59e0b'
-                        ]
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom'
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return context.label + ': ' + context.parsed + '% cancellation';
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        // Update comparison table
-        function updateComparisonTable(comparisonData) {
-            const tbody = document.getElementById('comparisonTableBody');
-            tbody.innerHTML = '';
-
-            const metrics = [
-                { label: 'Total Chats', key: 'chats', format: 'number' },
-                { label: 'Total Bookings', key: 'bookings', format: 'number' },
-                { label: 'Cancelled Bookings', key: 'cancelled', format: 'number' },
-                { label: 'Success Rate', key: 'successRate', format: 'percentage' },
-                { label: 'Cancellation Rate', key: 'cancellationRate', format: 'percentage' },
-                { label: 'Conversion Rate', key: 'conversionRate', format: 'percentage' },
-                { label: 'Total Revenue', key: 'revenue', format: 'currency' },
-                { label: 'Total Profit', key: 'profit', format: 'currency' },
-                { label: 'Collections', key: 'collections', format: 'currency' },
-                { label: 'Revenue per Booking', key: 'revenuePerBooking', format: 'currency' }
-            ];
-
-            metrics.forEach(metric => {
-                const row = document.createElement('tr');
-                let html = `<td class="font-medium">${metric.label}</td>`;
-
-                comparisonData.forEach((agent, index) => {
-                    let value;
-                    switch (metric.key) {
-                        case 'successRate':
-                            value = agent.bookings > 0 ? 
-                                (((agent.bookings - agent.cancelled) / agent.bookings) * 100).toFixed(1) + '%' : '0%';
-                            break;
-                        case 'cancellationRate':
-                            value = agent.bookings > 0 ? 
-                                ((agent.cancelled / agent.bookings) * 100).toFixed(1) + '%' : '0%';
-                            break;
-                        case 'conversionRate':
-                            value = agent.chats > 0 ? 
-                                ((agent.bookings / agent.chats) * 100).toFixed(1) + '%' : '0%';
-                            break;
-                        case 'revenuePerBooking':
-                            value = agent.bookings > 0 ? 
-                                '₹' + Math.round(agent.revenue / agent.bookings).toLocaleString() : '₹0';
-                            break;
-                        default:
-                            if (metric.format === 'currency') {
-                                value = '₹' + agent[metric.key].toLocaleString();
-                            } else {
-                                value = agent[metric.key].toLocaleString();
-                            }
-                    }
-
-                    const cellClass = index < 2 ? 'table-cell' : (comparisonData.length > 2 ? 'table-cell' : 'none');
-                    const cellStyle = index === 2 ? 'display: table-cell;' : '';
-                    html += `<td class="metric-value" style="${cellStyle}">${value}</td>`;
-                });
-
-                row.innerHTML = html;
-                tbody.appendChild(row);
-            });
-        }
-
-        // Update shift analytics
-        function updateShiftAnalytics() {
-            if (activityData.length === 0) return;
-
-            const shiftSummary = document.getElementById('shiftSummary');
-            const agentShifts = {};
-
-            // Process activity data
+            // Get working hours from activity data
             activityData.forEach(activity => {
-                if (!activity.end_time || activity.activity_type !== 'Regular') return;
-                
-                if (!agentShifts[activity.agent_name]) {
-                    agentShifts[activity.agent_name] = {
-                        totalHours: 0,
-                        sessions: 0,
-                        days: new Set()
-                    };
+                if (activity.activity_type === 'Regular' && agentProductivity[activity.agent_name]) {
+                    let hours;
+                    if (activity.end_time) {
+                        const start = new Date(activity.start_time);
+                        const end = new Date(activity.end_time);
+                        hours = (end - start) / (1000 * 60 * 60);
+                    } else {
+                        // Agent is live, calculate from start_time to current time
+                        const start = new Date(activity.start_time);
+                        const now = new Date();
+                        hours = (now - start) / (1000 * 60 * 60);
+                    }
+                    agentProductivity[activity.agent_name].workingHours += hours;
                 }
-                
-                const start = new Date(activity.start_time);
-                const end = new Date(activity.end_time);
-                const hours = (end - start) / (1000 * 60 * 60);
-                
-                agentShifts[activity.agent_name].totalHours += hours;
-                agentShifts[activity.agent_name].sessions++;
-                agentShifts[activity.agent_name].days.add(activity.start_time.split('T')[0]);
             });
 
-            // Calculate summary metrics
-            const totalAgents = Object.keys(agentShifts).length;
-            const totalHours = Object.values(agentShifts).reduce((sum, agent) => sum + agent.totalHours, 0);
-            const totalSessions = Object.values(agentShifts).reduce((sum, agent) => sum + agent.sessions, 0);
-            const avgHoursPerAgent = totalAgents > 0 ? (totalHours / totalAgents) : 0;
+            const agents = Object.keys(agentProductivity);
+            const revenuePerHour = agents.map(agent => {
+                const data = agentProductivity[agent];
+                return data.workingHours > 0 ? (data.revenue / data.workingHours) : 0;
+            });
 
-            shiftSummary.innerHTML = `
-                <div class="shift-metric">
-                    <div class="shift-metric-value">${totalAgents}</div>
-                    <div class="shift-metric-label">Active Agents</div>
-                </div>
-                <div class="shift-metric">
-                    <div class="shift-metric-value">${Math.round(totalHours)}h</div>
-                    <div class="shift-metric-label">Total Hours</div>
-                </div>
-                <div class="shift-metric">
-                    <div class="shift-metric-value">${totalSessions}</div>
-                    <div class="shift-metric-label">Total Sessions</div>
-                </div>
-                <div class="shift-metric">
-                    <div class="shift-metric-value">${avgHoursPerAgent.toFixed(1)}h</div>
-                    <div class="shift-metric-label">Avg Hours/Agent</div>
-                </div>
-            `;
-
-            // Update shift charts
-            updateWorkingHoursChart(agentShifts);
-            updateProductivityChart(agentShifts);
-            updateShiftTable(agentShifts);
-        }
-
-        // Update working hours chart
-        function updateWorkingHoursChart(agentShifts) {
-            const ctx = document.getElementById('workingHoursChart');
-            if (!ctx) return;
-            
-            if (charts.workingHours) {
-                charts.workingHours.destroy();
-            }
-
-            const agents = Object.keys(agentShifts);
-            const hoursData = agents.map(agent => Math.round(agentShifts[agent].totalHours * 10) / 10);
-
-            charts.workingHours = new Chart(ctx.getContext('2d'), {
+            charts.productivity = new Chart(ctx, {
                 type: 'bar',
                 data: {
                     labels: agents,
                     datasets: [{
-                        label: 'Total Hours',
-                        data: hoursData,
+                        label: 'Revenue per Hour (₹)',
+                        data: revenuePerHour,
                         backgroundColor: 'rgba(59, 130, 246, 0.8)',
                         borderColor: '#3b82f6',
                         borderWidth: 1
@@ -2297,94 +1436,83 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
                     scales: {
                         y: {
                             beginAtZero: true,
                             title: {
                                 display: true,
-                                text: 'Hours'
+                                text: 'Revenue per Hour (₹)'
                             }
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            display: false
                         }
                     }
                 }
             });
         }
 
-        // Update productivity chart
-        function updateProductivityChart(agentShifts) {
-            const ctx = document.getElementById('productivityChart');
-            if (!ctx) return;
+        // Update revenue chart
+        function updateRevenueChart() {
+            const ctx = document.getElementById('revenueChart').getContext('2d');
             
-            if (charts.productivity) {
-                charts.productivity.destroy();
-            }
+            if (charts.revenue) charts.revenue.destroy();
 
-            // Calculate productivity metrics
-            const agents = Object.keys(agentShifts);
-            const productivityData = agents.map(agentName => {
-                const agentPerf = performanceData.filter(p => p.agent === agentName)
-                    .reduce((acc, p) => {
-                        acc.bookings += p.total_bookings || 0;
-                        acc.revenue += p.total_revenue || 0;
-                        return acc;
-                    }, { bookings: 0, revenue: 0 });
-                
-                const hours = agentShifts[agentName].totalHours;
-                return {
-                    agent: agentName,
-                    bookingsPerHour: hours > 0 ? (agentPerf.bookings / hours) : 0,
-                    revenuePerHour: hours > 0 ? (agentPerf.revenue / hours) : 0
-                };
+            // Group data by date
+            const dateGroups = {};
+            performanceData.forEach(agent => {
+                if (!dateGroups[agent.date]) {
+                    dateGroups[agent.date] = {
+                        revenue: 0,
+                        bookings: 0,
+                        cancelled: 0
+                    };
+                }
+                dateGroups[agent.date].revenue += agent.total_revenue || 0;
+                dateGroups[agent.date].bookings += agent.total_bookings || 0;
+                dateGroups[agent.date].cancelled += agent.cancelled_bookings || 0;
             });
 
-            const bookingsPerHour = productivityData.map(p => Math.round(p.bookingsPerHour * 10) / 10);
-            const revenuePerHour = productivityData.map(p => Math.round(p.revenuePerHour));
+            const labels = Object.keys(dateGroups).sort();
+            const revenueData = labels.map(date => dateGroups[date].revenue);
+            const revenueLossData = labels.map(date => {
+                const successful = dateGroups[date].bookings - dateGroups[date].cancelled;
+                const avgBookingValue = successful > 0 ? dateGroups[date].revenue / successful : 0;
+                return dateGroups[date].cancelled * avgBookingValue;
+            });
 
-            charts.productivity = new Chart(ctx.getContext('2d'), {
-                type: 'scatter',
+            charts.revenue = new Chart(ctx, {
+                type: 'bar',
                 data: {
+                    labels: labels.map(date => new Date(date).toLocaleDateString()),
                     datasets: [{
-                        label: 'Agent Productivity',
-                        data: productivityData.map((p, i) => ({
-                            x: bookingsPerHour[i],
-                            y: revenuePerHour[i],
-                            label: p.agent
-                        })),
+                        label: 'Revenue Earned (₹)',
+                        data: revenueData,
                         backgroundColor: 'rgba(16, 185, 129, 0.8)',
-                        borderColor: '#10b981'
+                        borderColor: '#10b981',
+                        borderWidth: 1
+                    }, {
+                        label: 'Revenue Lost (₹)',
+                        data: revenueLossData,
+                        backgroundColor: 'rgba(239, 68, 68, 0.8)',
+                        borderColor: '#ef4444',
+                        borderWidth: 1
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    scales: {
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Bookings per Hour'
-                            }
-                        },
-                        y: {
-                            title: {
-                                display: true,
-                                text: 'Revenue per Hour (₹)'
-                            }
+                    plugins: {
+                        legend: {
+                            position: 'top'
                         }
                     },
-                    plugins: {
-                        tooltip: {
-                            callbacks: {
-                                title: function(context) {
-                                    return context[0].raw.label;
-                                },
-                                label: function(context) {
-                                    return `Bookings/hr: ${context.parsed.x}, Revenue/hr: ₹${context.parsed.y}`;
-                                }
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Amount (₹)'
                             }
                         }
                     }
@@ -2392,49 +1520,152 @@
             });
         }
 
-        // Update shift table
-        function updateShiftTable(agentShifts) {
-            const tbody = document.getElementById('shiftTableBody');
-            if (!tbody) return;
-            
+        // Update all tables
+        function updateTables() {
+            updateRevenueLossTable();
+            updateAgentDurationTable();
+            updatePerformanceTable();
+        }
+
+        // Update revenue loss table
+        function updateRevenueLossTable() {
+            const tbody = document.getElementById('revenueLossTableBody');
             tbody.innerHTML = '';
 
-            Object.keys(agentShifts).forEach(agentName => {
-                const shiftData = agentShifts[agentName];
-                const agentPerf = performanceData.filter(p => p.agent === agentName)
-                    .reduce((acc, p) => {
-                        acc.bookings += p.total_bookings || 0;
-                        acc.revenue += p.total_revenue || 0;
-                        return acc;
-                    }, { bookings: 0, revenue: 0 });
+            const agentTotals = {};
+            performanceData.forEach(agent => {
+                if (!agentTotals[agent.agent]) {
+                    agentTotals[agent.agent] = {
+                        type: agent.agent_type,
+                        bookings: 0,
+                        cancelled: 0,
+                        revenue: 0
+                    };
+                }
+                agentTotals[agent.agent].bookings += agent.total_bookings || 0;
+                agentTotals[agent.agent].cancelled += agent.cancelled_bookings || 0;
+                agentTotals[agent.agent].revenue += agent.total_revenue || 0;
+            });
 
-                const totalHours = shiftData.totalHours;
-                const avgDailyHours = shiftData.days.size > 0 ? totalHours / shiftData.days.size : 0;
-                const bookingsPerHour = totalHours > 0 ? agentPerf.bookings / totalHours : 0;
-                const revenuePerHour = totalHours > 0 ? agentPerf.revenue / totalHours : 0;
+            // Sort by revenue loss descending
+            const sortedAgents = Object.keys(agentTotals).sort((a, b) => {
+                const lossA = agentTotals[a].cancelled * (agentTotals[a].revenue / (agentTotals[a].bookings - agentTotals[a].cancelled || 1));
+                const lossB = agentTotals[b].cancelled * (agentTotals[b].revenue / (agentTotals[b].bookings - agentTotals[b].cancelled || 1));
+                return lossB - lossA;
+            });
+
+            sortedAgents.forEach(agentName => {
+                const agent = agentTotals[agentName];
+                const cancellationRate = agent.bookings > 0 ? 
+                    ((agent.cancelled / agent.bookings) * 100).toFixed(1) : 0;
                 
-                // Calculate efficiency score
-                const efficiencyScore = Math.min((bookingsPerHour * 20 + (revenuePerHour / 100)), 100);
+                const avgBookingValue = (agent.bookings - agent.cancelled) > 0 ? 
+                    agent.revenue / (agent.bookings - agent.cancelled) : 0;
+                const revenueLoss = agent.cancelled * avgBookingValue;
+                
+                // Recovery Potential Logic:
+                // If cancellation rate < 25% → Recovery Potential = 0 (acceptable level)
+                // If cancellation rate ≥ 25% → Recovery Potential = Revenue loss from excess above 25%
+                let recoveryPotential = 0;
+                if (parseFloat(cancellationRate) >= 25) {
+                    const excessRate = parseFloat(cancellationRate) - 25; // e.g., 37% - 25% = 12%
+                    const excessCancellations = (agent.cancelled * excessRate) / parseFloat(cancellationRate); // Excess bookings above 25%
+                    recoveryPotential = Math.round(excessCancellations * avgBookingValue);
+                }
 
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td class="agent-name">${agentName}</td>
-                    <td class="metric-value">${totalHours.toFixed(1)}h</td>
-                    <td class="metric-value">${avgDailyHours.toFixed(1)}h</td>
-                    <td class="metric-value">${shiftData.sessions}</td>
-                    <td class="metric-value">${agentPerf.bookings}</td>
-                    <td class="metric-value metric-primary">${bookingsPerHour.toFixed(1)}</td>
-                    <td class="metric-value metric-success">₹${Math.round(revenuePerHour)}</td>
                     <td>
-                        <div style="display: flex; align-items: center; gap: 0.5rem;">
-                            <div style="width: 40px; height: 8px; background: var(--gray-200); border-radius: 4px; overflow: hidden;">
-                                <div style="width: ${efficiencyScore}%; height: 100%; background: ${getScoreColor(efficiencyScore)}; border-radius: 4px;"></div>
-                            </div>
-                            <span class="metric-value" style="color: ${getScoreColor(efficiencyScore)};">${Math.round(efficiencyScore)}</span>
-                        </div>
+                        <span class="agent-type-badge ${agent.type === 'primary' || agent.type === 'both' ? 'primary' : 'secondary'}">
+                            ${agent.type === 'both' ? 'Primary' : agent.type}
+                        </span>
                     </td>
+                    <td class="metric-value">${agent.bookings.toLocaleString()}</td>
+                    <td class="metric-value metric-negative">${agent.cancelled.toLocaleString()}</td>
+                    <td class="metric-value ${parseFloat(cancellationRate) > 30 ? 'cancellation-problem' : parseFloat(cancellationRate) > 20 ? 'metric-warning' : 'metric-positive'}">
+                        ${cancellationRate}%
+                    </td>
+                    <td class="metric-value metric-positive">₹${agent.revenue.toLocaleString()}</td>
+                    <td class="metric-value metric-negative">₹${Math.round(revenueLoss).toLocaleString()}</td>
+                    <td class="metric-value metric-warning">₹${recoveryPotential.toLocaleString()}</td>
                 `;
                 tbody.appendChild(row);
+            });
+        }
+
+        // Update agent duration table
+        function updateAgentDurationTable() {
+            const tbody = document.getElementById('agentDurationTableBody');
+            tbody.innerHTML = '';
+
+            // Group activity data by date and agent
+            const datewiseData = {};
+            activityData.forEach(activity => {
+                if (activity.activity_type !== 'Regular') return;
+                
+                const date = activity.start_time.split('T')[0];
+                const agent = activity.agent_name;
+                
+                if (!datewiseData[date]) datewiseData[date] = {};
+                if (!datewiseData[date][agent]) {
+                    datewiseData[date][agent] = {
+                        totalHours: 0,
+                        sessions: 0,
+                        isLive: false
+                    };
+                }
+                
+                let hours;
+                if (activity.end_time) {
+                    const start = new Date(activity.start_time);
+                    const end = new Date(activity.end_time);
+                    hours = (end - start) / (1000 * 60 * 60);
+                } else {
+                    // Agent is live
+                    const start = new Date(activity.start_time);
+                    const now = new Date();
+                    hours = (now - start) / (1000 * 60 * 60);
+                    datewiseData[date][agent].isLive = true;
+                }
+                
+                datewiseData[date][agent].totalHours += hours;
+                datewiseData[date][agent].sessions++;
+            });
+
+            // Sort dates descending
+            const sortedDates = Object.keys(datewiseData).sort().reverse();
+            
+            sortedDates.forEach(date => {
+                const agents = Object.keys(datewiseData[date]);
+                agents.forEach(agentName => {
+                    const data = datewiseData[date][agentName];
+                    const hours = data.totalHours;
+                    const isLowHours = hours < 6;
+                    
+                    const row = document.createElement('tr');
+                    if (isLowHours) {
+                        row.classList.add('low-hours');
+                    }
+                    
+                    row.innerHTML = `
+                        <td>${new Date(date).toLocaleDateString()}</td>
+                        <td class="agent-name">${agentName}</td>
+                        <td>
+                            <span class="status-badge ${data.isLive ? 'live' : 'offline'}">
+                                ${data.isLive ? 'Live' : 'Offline'}
+                            </span>
+                        </td>
+                        <td class="metric-value ${isLowHours ? 'metric-negative' : 'metric-positive'}">
+                            ${hours.toFixed(1)}h
+                        </td>
+                        <td class="metric-value">${data.sessions}</td>
+                        <td class="metric-value ${isLowHours ? 'metric-negative' : 'metric-positive'}">
+                            ${isLowHours ? 'Low Hours' : 'Good'}
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
             });
         }
 
@@ -2442,6 +1673,29 @@
         function updatePerformanceTable() {
             const tbody = document.getElementById('performanceTableBody');
             tbody.innerHTML = '';
+
+            // Calculate agent working hours
+            const agentHours = {};
+            activityData.forEach(activity => {
+                if (activity.activity_type !== 'Regular') return;
+                
+                if (!agentHours[activity.agent_name]) {
+                    agentHours[activity.agent_name] = 0;
+                }
+                
+                let hours;
+                if (activity.end_time) {
+                    const start = new Date(activity.start_time);
+                    const end = new Date(activity.end_time);
+                    hours = (end - start) / (1000 * 60 * 60);
+                } else {
+                    const start = new Date(activity.start_time);
+                    const now = new Date();
+                    hours = (now - start) / (1000 * 60 * 60);
+                }
+                
+                agentHours[activity.agent_name] += hours;
+            });
 
             // Calculate agent totals
             const agentTotals = {};
@@ -2452,17 +1706,13 @@
                         chats: 0,
                         bookings: 0,
                         cancelled: 0,
-                        revenue: 0,
-                        profit: 0,
-                        collections: 0
+                        revenue: 0
                     };
                 }
                 agentTotals[agent.agent].chats += agent.chats_handled || 0;
                 agentTotals[agent.agent].bookings += agent.total_bookings || 0;
                 agentTotals[agent.agent].cancelled += agent.cancelled_bookings || 0;
                 agentTotals[agent.agent].revenue += agent.total_revenue || 0;
-                agentTotals[agent.agent].profit += agent.total_profit || 0;
-                agentTotals[agent.agent].collections += agent.total_collections || 0;
             });
 
             // Sort by revenue descending
@@ -2472,264 +1722,56 @@
 
             sortedAgents.forEach(agentName => {
                 const agent = agentTotals[agentName];
-                const successRate = agent.bookings > 0 ? 
-                    (((agent.bookings - agent.cancelled) / agent.bookings) * 100).toFixed(1) : 0;
+                const workingHours = agentHours[agentName] || 0;
+                
+                const conversionRate = agent.chats > 0 ? 
+                    ((agent.bookings / agent.chats) * 100) : 0;
                 const cancellationRate = agent.bookings > 0 ? 
-                    ((agent.cancelled / agent.bookings) * 100).toFixed(1) : 0;
+                    ((agent.cancelled / agent.bookings) * 100) : 0;
                 
-                // Calculate estimated revenue loss
-                const avgBookingValue = (agent.bookings - agent.cancelled) > 0 ? 
-                    agent.revenue / (agent.bookings - agent.cancelled) : 0;
-                const revenueLoss = agent.cancelled * avgBookingValue;
-                
-                // Calculate performance score (weighted average)
-                const score = calculatePerformanceScore(agent);
+                // Calculate efficiency (revenue per hour)
+                const efficiency = workingHours > 0 ? 
+                    Math.round(agent.revenue / workingHours) : 0;
                 
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>
-                        <div class="agent-name">${agentName}</div>
-                    </td>
+                    <td class="agent-name">${agentName}</td>
                     <td>
                         <span class="agent-type-badge ${agent.type === 'primary' || agent.type === 'both' ? 'primary' : 'secondary'}">
                             ${agent.type === 'both' ? 'Primary' : agent.type}
                         </span>
                     </td>
-                    <td class="metric-value metric-neutral">${agent.chats.toLocaleString()}</td>
-                    <td class="metric-value metric-neutral">${agent.bookings.toLocaleString()}</td>
-                    <td class="metric-value metric-negative">${agent.cancelled.toLocaleString()}</td>
-                    <td class="metric-value ${successRate >= 70 ? 'metric-positive' : successRate >= 50 ? 'metric-neutral' : 'metric-negative'}">
-                        ${successRate}%
+                    <td class="metric-value ${workingHours < 6 ? 'metric-negative' : 'metric-neutral'}">
+                        ${workingHours.toFixed(1)}h
                     </td>
-                    <td class="metric-value ${cancellationRate <= 20 ? 'metric-positive' : cancellationRate <= 30 ? 'metric-neutral' : 'metric-negative'}">
-                        ${cancellationRate}%
+                    <td class="metric-value">${agent.chats.toLocaleString()}</td>
+                    <td class="metric-value">${agent.bookings.toLocaleString()}</td>
+                    <td class="metric-value metric-negative">${agent.cancelled.toLocaleString()}</td>
+                    <td class="metric-value ${conversionRate < 45 ? 'conversion-problem' : conversionRate >= 60 ? 'metric-positive' : 'metric-neutral'}">
+                        ${conversionRate.toFixed(1)}%
+                    </td>
+                    <td class="metric-value ${cancellationRate > 30 ? 'cancellation-problem' : cancellationRate > 20 ? 'metric-warning' : 'metric-positive'}">
+                        ${cancellationRate.toFixed(1)}%
                     </td>
                     <td class="metric-value metric-positive">₹${agent.revenue.toLocaleString()}</td>
-                    <td class="metric-value metric-negative">₹${Math.round(revenueLoss).toLocaleString()}</td>
-                    <td>
-                        <div style="display: flex; align-items: center; gap: 0.5rem;">
-                            <div style="width: 40px; height: 8px; background: var(--gray-200); border-radius: 4px; overflow: hidden;">
-                                <div style="width: ${score}%; height: 100%; background: ${getScoreColor(score)}; border-radius: 4px;"></div>
-                            </div>
-                            <span class="metric-value" style="color: ${getScoreColor(score)};">${score}/100</span>
-                        </div>
-                    </td>
+                    <td class="metric-value metric-primary">₹${efficiency}/hr</td>
                 `;
                 tbody.appendChild(row);
             });
         }
 
-        // Calculate performance score (UPDATED with cancellation penalty)
-        function calculatePerformanceScore(agent) {
-            let score = 0;
-            
-            // Success rate (35% weight) - heavily penalize high cancellations
-            const successRate = agent.bookings > 0 ? 
-                ((agent.bookings - agent.cancelled) / agent.bookings) * 100 : 0;
-            score += (successRate / 100) * 35;
-            
-            // Cancellation penalty (additional -15% for high cancellation rates)
-            const cancellationRate = agent.bookings > 0 ? 
-                ((agent.cancelled / agent.bookings) * 100) : 0;
-            if (cancellationRate > 30) {
-                score -= 15;
-            } else if (cancellationRate > 20) {
-                score -= 10;
-            } else if (cancellationRate > 10) {
-                score -= 5;
-            }
-            
-            // Revenue per booking (25% weight)
-            const revenuePerBooking = agent.bookings > 0 ? agent.revenue / agent.bookings : 0;
-            const maxRevenuePerBooking = 1000; // Assumed max
-            score += Math.min(revenuePerBooking / maxRevenuePerBooking, 1) * 25;
-            
-            // Conversion rate (20% weight) - bookings/chats
-            const conversionRate = agent.chats > 0 ? (agent.bookings / agent.chats) * 100 : 0;
-            score += Math.min(conversionRate / 50, 1) * 20; // Assuming 50% is excellent
-            
-            // Collection efficiency (15% weight)
-            const collectionRate = agent.revenue > 0 ? (agent.collections / agent.revenue) * 100 : 0;
-            score += Math.min(collectionRate / 100, 1) * 15;
-            
-            return Math.max(0, Math.min(100, Math.round(score))); // Ensure 0-100 range
-        }
-
-        // Get score color
-        function getScoreColor(score) {
-            if (score >= 80) return '#10b981'; // Green
-            if (score >= 60) return '#f59e0b'; // Yellow
-            return '#ef4444'; // Red
-        }
-
-        // Generate insights (UPDATED with cancellation focus)
-        function generateInsights() {
-            const insightsContent = document.getElementById('insightsContent');
-            const insights = [];
-
-            // Calculate overall metrics
-            const totals = performanceData.reduce((acc, agent) => {
-                acc.chats += agent.chats_handled || 0;
-                acc.bookings += agent.total_bookings || 0;
-                acc.cancelled += agent.cancelled_bookings || 0;
-                acc.revenue += agent.total_revenue || 0;
-                return acc;
-            }, { chats: 0, bookings: 0, cancelled: 0, revenue: 0 });
-
-            const avgSuccessRate = totals.bookings > 0 ? 
-                ((totals.bookings - totals.cancelled) / totals.bookings) * 100 : 0;
-            const avgCancellationRate = totals.bookings > 0 ? 
-                (totals.cancelled / totals.bookings) * 100 : 0;
-            const conversionRate = totals.chats > 0 ? 
-                (totals.bookings / totals.chats) * 100 : 0;
-
-            // Cancellation-focused insights
-            if (avgCancellationRate > 30) {
-                insights.push({
-                    type: 'danger',
-                    icon: 'fas fa-exclamation-triangle',
-                    title: 'Critical Cancellation Rate!',
-                    description: `${avgCancellationRate.toFixed(1)}% cancellation rate is critically high. Immediate action needed: Review booking confirmation process, improve customer communication, and implement follow-up protocols.`
-                });
-            } else if (avgCancellationRate > 20) {
-                insights.push({
-                    type: 'warning',
-                    icon: 'fas fa-exclamation-circle',
-                    title: 'High Cancellation Rate Alert',
-                    description: `${avgCancellationRate.toFixed(1)}% cancellation rate needs attention. Consider improving service quality checks and customer expectation management.`
-                });
-            } else if (avgCancellationRate < 10) {
-                insights.push({
-                    type: 'success',
-                    icon: 'fas fa-check-circle',
-                    title: 'Excellent Cancellation Control',
-                    description: `Outstanding ${avgCancellationRate.toFixed(1)}% cancellation rate shows excellent service quality and customer satisfaction.`
-                });
-            }
-
-            // Revenue loss analysis
-            const avgBookingValue = (totals.bookings - totals.cancelled) > 0 ? 
-                totals.revenue / (totals.bookings - totals.cancelled) : 0;
-            const estimatedRevenueLoss = totals.cancelled * avgBookingValue;
-            
-            if (estimatedRevenueLoss > 10000) {
-                insights.push({
-                    type: 'danger',
-                    icon: 'fas fa-chart-line-down',
-                    title: 'Significant Revenue Loss',
-                    description: `Estimated ₹${Math.round(estimatedRevenueLoss).toLocaleString()} revenue loss due to cancellations. Focus on reducing cancellation rates to recover potential earnings.`
-                });
-            }
-
-            // Agent-specific cancellation analysis
-            const agentCancellationRates = {};
-            performanceData.forEach(agent => {
-                if (!agentCancellationRates[agent.agent]) {
-                    agentCancellationRates[agent.agent] = { bookings: 0, cancelled: 0 };
-                }
-                agentCancellationRates[agent.agent].bookings += agent.total_bookings || 0;
-                agentCancellationRates[agent.agent].cancelled += agent.cancelled_bookings || 0;
-            });
-
-            const highCancellationAgents = Object.keys(agentCancellationRates).filter(agent => {
-                const rate = agentCancellationRates[agent].bookings > 0 ? 
-                    (agentCancellationRates[agent].cancelled / agentCancellationRates[agent].bookings) * 100 : 0;
-                return rate > 30;
-            });
-
-            if (highCancellationAgents.length > 0) {
-                insights.push({
-                    type: 'warning',
-                    icon: 'fas fa-user-times',
-                    title: 'Agents Need Cancellation Training',
-                    description: `${highCancellationAgents.length} agent(s) have >30% cancellation rates: ${highCancellationAgents.slice(0, 3).join(', ')}. Provide targeted training on booking confirmation and customer service.`
-                });
-            }
-
-            // Success rate insights
-            if (avgSuccessRate >= 80) {
-                insights.push({
-                    type: 'success',
-                    icon: 'fas fa-trophy',
-                    title: 'Excellent Success Rate',
-                    description: `${avgSuccessRate.toFixed(1)}% booking success rate demonstrates strong operational efficiency. Maintain current best practices.`
-                });
-            }
-
-            // Conversion rate insights
-            if (conversionRate < 15) {
-                insights.push({
-                    type: 'warning',
-                    icon: 'fas fa-trending-down',
-                    title: 'Low Chat Conversion',
-                    description: `${conversionRate.toFixed(1)}% chat-to-booking conversion needs improvement. Focus on better lead qualification and persuasive communication techniques.`
-                });
-            }
-
-            // Top performer insight
-            const agentTotals = {};
-            performanceData.forEach(agent => {
-                if (!agentTotals[agent.agent]) {
-                    agentTotals[agent.agent] = { revenue: 0, bookings: 0, cancelled: 0 };
-                }
-                agentTotals[agent.agent].revenue += agent.total_revenue || 0;
-                agentTotals[agent.agent].bookings += agent.total_bookings || 0;
-                agentTotals[agent.agent].cancelled += agent.cancelled_bookings || 0;
-            });
-
-            const sortedByPerformance = Object.keys(agentTotals).sort((a, b) => {
-                const scoreA = calculatePerformanceScore({ 
-                    ...agentTotals[a], 
-                    chats: agentTotals[a].bookings * 2 // Estimate
-                });
-                const scoreB = calculatePerformanceScore({ 
-                    ...agentTotals[b], 
-                    chats: agentTotals[b].bookings * 2 // Estimate
-                });
-                return scoreB - scoreA;
-            });
-
-            if (sortedByPerformance.length > 0) {
-                const topPerformer = sortedByPerformance[0];
-                const topAgent = agentTotals[topPerformer];
-                const cancellationRate = topAgent.bookings > 0 ? 
-                    ((topAgent.cancelled / topAgent.bookings) * 100).toFixed(1) : 0;
-                
-                insights.push({
-                    type: 'success',
-                    icon: 'fas fa-star',
-                    title: 'Top Performer Recognition',
-                    description: `${topPerformer} leads with ₹${topAgent.revenue.toLocaleString()} revenue, ${topAgent.bookings} bookings, and ${cancellationRate}% cancellation rate. Use as best practice model.`
-                });
-            }
-
-            // Render insights
-            insightsContent.innerHTML = insights.map(insight => `
-                <div class="insight-item ${insight.type}">
-                    <div class="insight-icon ${insight.type}">
-                        <i class="${insight.icon}"></i>
-                    </div>
-                    <div class="insight-content">
-                        <div class="insight-title">${insight.title}</div>
-                        <div class="insight-description">${insight.description}</div>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        // Show loading
+        // Show/hide loading
         function showLoading() {
             document.getElementById('loadingState').style.display = 'block';
             document.getElementById('dashboardContent').style.display = 'none';
         }
 
-        // Hide loading
         function hideLoading() {
             document.getElementById('loadingState').style.display = 'none';
             document.getElementById('dashboardContent').style.display = 'block';
         }
 
-        // Export data (UPDATED with cancellation data)
+        // Export data
         function exportData() {
             const csvContent = generateCSV();
             const blob = new Blob([csvContent], { type: 'text/csv' });
@@ -2741,38 +1783,25 @@
             window.URL.revokeObjectURL(url);
         }
 
-        // Generate CSV (UPDATED)
+        // Generate CSV
         function generateCSV() {
             const headers = [
-                'Date', 'Agent', 'Type', 'Chats Handled', 'Total Bookings', 
-                'Cancelled Bookings', 'Success Rate', 'Cancellation Rate',
-                'Total Revenue', 'Total Profit', 'Total Collections', 'Estimated Revenue Loss'
+                'Date', 'Agent', 'Type', 'Chats', 'Bookings', 'Cancelled',
+                'Conversion Rate', 'Cancellation Rate', 'Revenue', 'Working Hours'
             ];
 
-            const rows = performanceData.map(agent => {
-                const successRate = agent.total_bookings > 0 ? 
-                    (((agent.total_bookings - agent.cancelled_bookings) / agent.total_bookings) * 100).toFixed(2) : '0';
-                const cancellationRate = agent.total_bookings > 0 ? 
-                    (((agent.cancelled_bookings || 0) / agent.total_bookings) * 100).toFixed(2) : '0';
-                const avgBookingValue = (agent.total_bookings - (agent.cancelled_bookings || 0)) > 0 ? 
-                    (agent.total_revenue || 0) / (agent.total_bookings - (agent.cancelled_bookings || 0)) : 0;
-                const revenueLoss = (agent.cancelled_bookings || 0) * avgBookingValue;
-
-                return [
-                    agent.date,
-                    agent.agent,
-                    agent.agent_type,
-                    agent.chats_handled || 0,
-                    agent.total_bookings || 0,
-                    agent.cancelled_bookings || 0,
-                    successRate + '%',
-                    cancellationRate + '%',
-                    agent.total_revenue || 0,
-                    agent.total_profit || 0,
-                    agent.total_collections || 0,
-                    Math.round(revenueLoss)
-                ];
-            });
+            const rows = performanceData.map(agent => [
+                agent.date,
+                agent.agent,
+                agent.agent_type,
+                agent.chats_handled || 0,
+                agent.total_bookings || 0,
+                agent.cancelled_bookings || 0,
+                agent.chats_handled > 0 ? (((agent.total_bookings || 0) / agent.chats_handled) * 100).toFixed(2) + '%' : '0%',
+                agent.total_bookings > 0 ? (((agent.cancelled_bookings || 0) / agent.total_bookings) * 100).toFixed(2) + '%' : '0%',
+                agent.total_revenue || 0,
+                'Calculated from activity data'
+            ]);
 
             return [headers, ...rows]
                 .map(row => row.map(field => `"${field}"`).join(','))
