@@ -760,5 +760,213 @@
     window.debugMixpanel = debugMixpanel;
     window.checkMixpanelStatus = checkMixpanelStatus;
   </script>
+
+  <script>
+function addSearchMechanicButton() {
+  // Find the booking details container
+  const bookingDetailsContainer = document.getElementById("bookingDetails");
+  
+  if (bookingDetailsContainer && bookingData && bookingData.location) {
+    // Check if button already exists to avoid duplicates
+    if (document.getElementById("searchMechanicBtn")) {
+      return;
+    }
+    
+    // Create the search mechanic button
+    const searchBtn = document.createElement("button");
+    searchBtn.id = "searchMechanicBtn";
+    searchBtn.textContent = "🔍 Search Mechanic";
+    searchBtn.style.cssText = `
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      margin: 10px 0;
+      width: 100%;
+      transition: background-color 0.3s;
+    `;
+    
+    // Add hover effect
+    searchBtn.addEventListener("mouseenter", function() {
+      this.style.backgroundColor = "#0056b3";
+    });
+    
+    searchBtn.addEventListener("mouseleave", function() {
+      this.style.backgroundColor = "#007bff";
+    });
+    
+    // Add click handler
+    searchBtn.addEventListener("click", function() {
+      const location = bookingData.location;
+      let searchUrl = "https://instantmechanic.online/mechanic-search.html?q=";
+      
+      try {
+        // Check if it's a Google Maps URL
+        if (location.includes("google.com/maps")) {
+          // Extract coordinates from Google Maps URL
+          const coordMatch = location.match(/q=([0-9.-]+),([0-9.-]+)/);
+          if (coordMatch) {
+            const lat = coordMatch[1];
+            const lng = coordMatch[2];
+            searchUrl += `${lat},${lng}`;
+          } else {
+            // Fallback: use the entire location
+            searchUrl += encodeURIComponent(location);
+          }
+        }
+        // Check if it's already an instantmechanic.online URL with query
+        else if (location.includes("instantmechanic.online") && location.includes("q=")) {
+          // Extract the query parameter
+          const queryMatch = location.match(/q=([^&]*)/);
+          if (queryMatch) {
+            searchUrl += queryMatch[1]; // Already URL encoded
+          } else {
+            searchUrl += encodeURIComponent(location);
+          }
+        }
+        // For any other format, encode the entire location
+        else {
+          searchUrl += encodeURIComponent(location);
+        }
+        
+        // Open in new tab
+        window.open(searchUrl, "_blank");
+        
+        // Track the mechanic search action in Mixpanel
+        if (customerMobile) {
+          waitForMixpanel(() => {
+            identifyMixpanelUser(customerMobile);
+            debugLog('🔍 Mechanic Search Initiated event triggered');
+            trackMixpanelEvent("Mechanic Search Initiated", {
+              "agent_name": localStorage.getItem("agent_name"),
+              "booking_id": bookingId,
+              "search_location": location,
+              "search_url": searchUrl,
+              "customer_mobile": customerMobile,
+              "timestamp": new Date().toISOString()
+            });
+          });
+        }
+        
+      } catch (error) {
+        console.error("Error processing location for mechanic search:", error);
+        // Fallback: use original location
+        window.open("https://instantmechanic.online/mechanic-search.html?q=" + encodeURIComponent(location), "_blank");
+      }
+    });
+    
+    // Insert the button at the top of booking details, after the location info
+    const locationParagraph = bookingDetailsContainer.querySelector('p:nth-child(4)'); // Location is typically 4th paragraph
+    if (locationParagraph) {
+      locationParagraph.insertAdjacentElement('afterend', searchBtn);
+    } else {
+      // Fallback: add at the beginning of booking details
+      bookingDetailsContainer.insertBefore(searchBtn, bookingDetailsContainer.firstChild);
+    }
+  }
+}
+
+// Call this function after booking data is loaded
+// Modify the existing fetchBooking function's success callback
+const originalFetchBooking = window.fetchBooking || fetchBooking;
+
+function fetchBooking() {
+  if (!bookingId) return alert("Booking ID not provided in URL");
+  fetch(`https://ai.instantmechanic.online/bot/api/bookings/${bookingId}/`)
+    .then(res => res.json())
+    .then(data => {
+      bookingData = data;
+      assignedMechanicId = data.mechanic;
+      originalMechanicId = data.mechanic;
+      currentExtraPayment = data.mechanic_extra_payment || 0;
+      currentPaymentOnQr = data.payment_on_qr || 0;
+      
+      // Set customer mobile from booking data
+      customerMobile = data.customer_mobile || data.mobile || null;
+      debugLog('📱 Customer mobile set to: ' + customerMobile);
+
+      // Now identify the customer in Mixpanel using their mobile number
+      if (customerMobile) {
+        waitForMixpanel(() => {
+          identifyMixpanelUser(customerMobile);
+          debugLog('👤 Customer identified in Mixpanel: ' + customerMobile);
+        });
+      }
+
+      // Calculate pending from mechanic side
+      const pendingFromMechanic = calculatePendingFromMechanicSide(data);
+
+      let details = `
+        <p><strong>Car:</strong> ${data.car}</p>
+        <p><strong>Problem:</strong> ${data.problem}</p>
+        <p><strong>Price:</strong> ${data.price}</p>
+        <p><strong>Location:</strong> <a href="${data.location}" target="_blank">Map</a></p>
+        <p><strong>Is Cancelled:</strong> ${data.is_cancelled ? 'Yes' : 'No'}</p>
+        <p><strong>Cancellation Reason:</strong> ${data.cancellation_reason || '-'}</p>
+        <p><strong>Agent:</strong> ${data.agent_name || '-'}</p>
+      `;
+
+      details += `
+      <p><strong>Total Company Payment:</strong> ₹${data.company_profit || 0}</p>
+        <p><strong>Advance Payment:</strong> ₹${data.advance_payment_amount}
+          <span class="status-pill ${data.payment_status === 'partially-paid' ? 'status-partial' : 'status-pending'}">
+            ${data.payment_status.replace('_', ' ')}
+          </span>
+        </p>
+      `;
+
+      // Add the new "Pending from mechanic side" field
+      if (pendingFromMechanic > 0) {
+        details += `
+          <div class="pending-mechanic-highlight">
+            <p><strong>Pending from Mechanic Side:</strong> ₹${pendingFromMechanic}</p>
+          </div>
+        `;
+      } else {
+        details += `
+          <p><strong>Pending from Mechanic Side:</strong> ₹${pendingFromMechanic}</p>
+        `;
+      }
+
+      details += `
+        <p><strong>Mechanic Payment:</strong> ₹${data.pending_payment_amount}
+          <span class="status-pill ${data.mechanic_payment_status === 'partially-paid' ? 'status-partial' : 'status-pending'}">
+            ${data.mechanic_payment_status.replace('_', ' ')}
+          </span>
+        </p>
+        <p><strong>Extra Mechanic Payment:</strong> ₹${data.mechanic_extra_payment || 0}</p>
+        <p><strong>Payment on QR:</strong> ₹${data.payment_on_qr || 0}</p>
+      `;
+
+      // Add security amount section
+      const securityAmountHtml = createSecurityAmountSection(data);
+      details += securityAmountHtml;
+
+      document.getElementById("bookingDetails").innerHTML = details;
+      
+      // Add the search mechanic button after details are populated
+      addSearchMechanicButton();
+      
+      // Set the input field values
+      document.getElementById("mechanicExtraPayment").value = data.mechanic_extra_payment || 0;
+      document.getElementById("paymentOnQr").value = data.payment_on_qr || 0;
+      
+      // Set cancellation checkbox and reason based on current booking status
+      document.getElementById("markCancelled").checked = data.is_cancelled;
+      document.getElementById("cancelReason").value = data.cancellation_reason || "";
+      
+      fetchMechanics();
+      fetchChat();
+    })
+    .catch(error => {
+      console.error('Error fetching booking:', error);
+      alert('Error fetching booking: ' + error.message);
+    });
+}
+</script>
 </body>
 </html>
