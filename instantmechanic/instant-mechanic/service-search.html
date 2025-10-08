@@ -668,6 +668,19 @@
         let currentRadius = 3; // Default 3km for historical search
         let currentSearchPosition = null;
         let activeTab = 'current';
+        let debounceTimer = null; // For debouncing slider input
+
+        // Debounce function to limit API calls
+        function debounce(func, wait) {
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(debounceTimer);
+                    func(...args);
+                };
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(later, wait);
+            };
+        }
 
         function setupToggle() {
             const toggleOptions = document.querySelectorAll('.toggle-option');
@@ -750,13 +763,22 @@
             const slider = document.getElementById('radius-slider');
             const radiusValue = document.getElementById('radius-value');
             
+            // Create debounced function for loading historical data
+            const debouncedLoadHistoricalData = debounce((lat, lng, radius) => {
+                loadHistoricalData(lat, lng, radius);
+            }, 1000); // 1 second delay
+            
             slider.addEventListener('input', (e) => {
                 currentRadius = parseFloat(e.target.value);
                 radiusValue.textContent = `${currentRadius} km`;
                 
-                // Reload historical data with new radius
+                // Show loading state immediately for better UX
                 if (activeTab === 'historical' && currentSearchPosition && currentSearchType === 'mechanic') {
-                    loadHistoricalData(currentSearchPosition.lat, currentSearchPosition.lng, currentRadius);
+                    const historicalList = document.getElementById('historical-list');
+                    historicalList.innerHTML = '<div class="loading-historical">Updating results...</div>';
+                    
+                    // Call debounced function
+                    debouncedLoadHistoricalData(currentSearchPosition.lat, currentSearchPosition.lng, currentRadius);
                 }
             });
         }
@@ -855,6 +877,12 @@
             }
 
             currentSearchPosition = null;
+            
+            // Clear any pending debounced API calls
+            if (debounceTimer) {
+                clearTimeout(debounceTimer);
+                debounceTimer = null;
+            }
             
             directionsRenderers.forEach(renderer => renderer.setMap(null));
             directionsRenderers = [];
