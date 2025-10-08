@@ -427,7 +427,7 @@
         function initMap() {
             const mapCenter = { lat: 28.448672834852427, lng: 77.02087468087836 };
             map = new google.maps.Map(document.getElementById("map"), {
-                zoom: 13,
+                zoom: 11, // Zoom out slightly to see more markers
                 center: mapCenter,
                 styles: [
                     {
@@ -438,9 +438,22 @@
                 ]
             });
 
-            // Fetch service data
+            // Fetch service data and setup functionality
             fetchServices();
             setupToggle();
+            
+            // Apply initial filter after services are loaded
+            setTimeout(() => {
+                filterMarkersVisibility();
+            }, 1000);
+        }
+
+        function updateServiceCounts() {
+            const garageCount = allServices.filter(s => s.is_garage).length;
+            const mechanicCount = allServices.filter(s => !s.is_garage).length;
+            
+            document.getElementById("results-count").textContent = 
+                `${garageCount} garages, ${mechanicCount} mechanics available`;
         }
 
         function setupToggle() {
@@ -455,12 +468,29 @@
                     document.getElementById('panel-title').textContent = 
                         currentSearchType === 'garage' ? 'Nearby Garages' : 'Nearby Mechanics';
                     
+                    // Filter visible markers based on toggle
+                    filterMarkersVisibility();
+                    
                     // Refresh search if there's an active search
                     if (blueMarker) {
                         const position = blueMarker.getPosition().toJSON();
                         drawBlueMarkerAndCalculateRoutes(position);
+                    } else {
+                        // Update counts when no active search
+                        updateServiceCounts();
+                        document.getElementById("mechanic-list").innerHTML = 
+                            '<div class="no-results">Enter a location above to find nearby services</div>';
                     }
                 });
+            });
+        }
+
+        function filterMarkersVisibility() {
+            serviceMarkers.forEach(service => {
+                const shouldShow = currentSearchType === 'garage' ? 
+                    service.info.is_garage : !service.info.is_garage;
+                
+                service.marker.setVisible(shouldShow);
             });
         }
 
@@ -488,21 +518,53 @@
                         const position = { lat, lng };
                         const marker = new google.maps.Marker({
                             position,
-                            map: null, // Don't show initially
+                            map: map, // Show all markers by default
                             icon: {
                                 url: service.is_garage ? 
                                     "http://maps.google.com/mapfiles/ms/icons/blue-dot.png" :
                                     "http://maps.google.com/mapfiles/ms/icons/red-dot.png",
+                                scale: 0.8 // Slightly smaller for default view
                             },
+                            title: `${service.name} (${service.is_garage ? 'Garage' : 'Mechanic'})`,
+                            zIndex: 1
+                        });
+
+                        // Add click listener to show info
+                        const infoWindow = new google.maps.InfoWindow({
+                            content: `
+                                <div style="font-family: Arial, sans-serif; max-width: 200px;">
+                                    <h4 style="margin: 0 0 5px 0; color: #333;">${service.name}</h4>
+                                    <p style="margin: 0 0 5px 0; color: #666; font-size: 12px;">
+                                        ${service.is_garage ? '🏢 Garage' : '🔧 Mechanic'}
+                                    </p>
+                                    <p style="margin: 0 0 5px 0; font-size: 12px;">
+                                        ⭐ ${parseFloat(service.rating || 5).toFixed(1)}
+                                    </p>
+                                    <p style="margin: 0; font-size: 12px;">
+                                        📞 <a href="tel:${service.mobile}">${service.mobile}</a>
+                                    </p>
+                                </div>
+                            `
+                        });
+
+                        marker.addListener('click', () => {
+                            // Close any open info windows
+                            serviceMarkers.forEach(s => s.infoWindow && s.infoWindow.close());
+                            infoWindow.open(map, marker);
                         });
 
                         serviceMarkers.push({
                             marker,
                             position,
                             info: service,
+                            infoWindow
                         });
                     }
                 });
+                
+                // Update counts
+                updateServiceCounts();
+                
             } catch (error) {
                 console.error("Error fetching service data:", error);
                 document.getElementById("mechanic-list").innerHTML = 
@@ -520,6 +582,20 @@
             directionsRenderers = [];
             directionsServices = [];
             colorIndex = 0;
+            
+            // Reset all marker styles to default
+            serviceMarkers.forEach(service => {
+                service.marker.setIcon({
+                    url: service.info.is_garage ? 
+                        "http://maps.google.com/mapfiles/ms/icons/blue-dot.png" :
+                        "http://maps.google.com/mapfiles/ms/icons/red-dot.png",
+                    scale: 0.8
+                });
+                service.marker.setZIndex(1);
+            });
+            
+            // Apply current toggle filter
+            filterMarkersVisibility();
             
             const mechanicList = document.getElementById("mechanic-list");
             mechanicList.innerHTML = '<div class="loading">Searching for services...</div>';
@@ -574,8 +650,10 @@
                 map,
                 icon: {
                     url: "http://maps.google.com/mapfiles/ms/icons/green-dot.png",
+                    scale: 1.2
                 },
-                title: "Your Location"
+                title: "Your Location",
+                zIndex: 1000
             });
 
             map.setCenter(position);
@@ -600,6 +678,24 @@
 
                 if (distance <= RADIUS) {
                     nearbyServices.push({ ...service, distance });
+                    
+                    // Highlight nearby service markers
+                    service.marker.setIcon({
+                        url: service.info.is_garage ? 
+                            "http://maps.google.com/mapfiles/ms/icons/blue-dot.png" :
+                            "http://maps.google.com/mapfiles/ms/icons/red-dot.png",
+                        scale: 1.2, // Make nearby markers larger
+                    });
+                    service.marker.setZIndex(100);
+                } else {
+                    // Dim distant markers
+                    service.marker.setIcon({
+                        url: service.info.is_garage ? 
+                            "http://maps.google.com/mapfiles/ms/icons/blue-dot.png" :
+                            "http://maps.google.com/mapfiles/ms/icons/red-dot.png",
+                        scale: 0.6, // Make distant markers smaller
+                    });
+                    service.marker.setZIndex(1);
                 }
             });
 
