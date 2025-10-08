@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historical Mechanic Performance</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #f8f9fa;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem 1rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .location-display {
+            text-align: center;
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-bottom: 1rem;
+        }
+
+        .radius-control {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 1rem;
+            backdrop-filter: blur(10px);
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .radius-label {
+            font-size: 1rem;
+            margin-bottom: 0.75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 500;
+        }
+
+        .radius-value {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            backdrop-filter: blur(5px);
+        }
+
+        .radius-slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.2);
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+            cursor: pointer;
+        }
+
+        .radius-slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: white;
+            cursor: pointer;
+            border: 3px solid #667eea;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            transition: all 0.2s ease;
+        }
+
+        .radius-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+        }
+
+        .radius-slider::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: white;
+            cursor: pointer;
+            border: 3px solid #667eea;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .main-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        .results-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .results-count {
+            font-size: 1.1rem;
+            color: #495057;
+            font-weight: 500;
+        }
+
+        .results-subtitle {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-top: 0.5rem;
+        }
+
+        .mechanic-list {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .historical-mechanic {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border: 1px solid #e9ecef;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .historical-mechanic:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        }
+
+        .mechanic-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .mechanic-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #212529;
+            margin-bottom: 0.5rem;
+        }
+
+        .priority-badge {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 25px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .priority-badge.high {
+            background: linear-gradient(135deg, #28a745, #20c997);
+        }
+
+        .priority-badge.medium {
+            background: linear-gradient(135deg, #ffc107, #fd7e14);
+        }
+
+        .priority-badge.low {
+            background: linear-gradient(135deg, #dc3545, #e74c3c);
+        }
+
+        .rating-container {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .rating {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .stars {
+            color: #ffc107;
+            font-size: 1.1rem;
+        }
+
+        .rating-value {
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .stat-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+
+        .stat-card:hover {
+            background: #e9ecef;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-value.success {
+            color: #28a745;
+        }
+
+        .stat-value.danger {
+            color: #dc3545;
+        }
+
+        .stat-value.info {
+            color: #17a2b8;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: #6c757d;
+            font-weight: 500;
+        }
+
+        .success-rate {
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+            border-radius: 12px;
+            padding: 1rem;
+            margin: 1rem 0;
+            text-align: center;
+        }
+
+        .success-rate-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1976d2;
+            margin-bottom: 0.25rem;
+        }
+
+        .success-rate-label {
+            font-size: 0.9rem;
+            color: #424242;
+            font-weight: 500;
+        }
+
+        .call-button {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            margin-top: 1.5rem;
+        }
+
+        .call-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+            text-decoration: none;
+            color: white;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: #6c757d;
+            font-size: 1.1rem;
+        }
+
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 1rem;
+            vertical-align: middle;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: #6c757d;
+        }
+
+        .no-results-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.3;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .header {
+                padding: 1rem 0.75rem;
+            }
+
+            .header h1 {
+                font-size: 1.3rem;
+            }
+
+            .main-container {
+                padding: 1rem 0.75rem;
+            }
+
+            .historical-mechanic {
+                padding: 1.25rem;
+            }
+
+            .mechanic-header {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+
+            .priority-badge {
+                align-self: flex-start;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 0.75rem;
+            }
+
+            .success-rate-value {
+                font-size: 1.75rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header {
+                padding: 0.75rem 0.5rem;
+            }
+
+            .radius-control {
+                padding: 0.75rem;
+            }
+
+            .main-container {
+                padding: 0.75rem 0.5rem;
+            }
+
+            .historical-mechanic {
+                padding: 1rem;
+            }
+
+            .mechanic-name {
+                font-size: 1.1rem;
+            }
+
+            .call-button {
+                padding: 12px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Historical Mechanic Performance</h1>
+        <div class="location-display" id="location-display">Loading location...</div>
+        
+        <div class="radius-control">
+            <div class="radius-label">
+                <span>Search Radius</span>
+                <span class="radius-value" id="radius-value">3 km</span>
+            </div>
+            <input type="range" class="radius-slider" id="radius-slider" min="0" max="20" value="3" step="0.5">
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="results-header">
+            <div class="results-count" id="results-count">Loading performance data...</div>
+            <div class="results-subtitle">Based on historical service records</div>
+        </div>
+
+        <div class="mechanic-list" id="mechanic-list">
+            <div class="loading">Fetching historical performance data</div>
+        </div>
+    </div>
+
+    <script>
+        let currentRadius = 3;
+        let currentPosition = null;
+        let debounceTimer = null;
+
+        // Debounce function to limit API calls
+        function debounce(func, wait) {
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(debounceTimer);
+                    func(...args);
+                };
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(later, wait);
+            };
+        }
+
+        // Parse URL parameters
+        function getLocationFromURL() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const query = urlParams.get('q');
+            
+            if (!query) {
+                showError('No location parameter provided. Please add ?q=lat,lng or ?q=address to the URL');
+                return null;
+            }
+
+            // Check if it's coordinates (contains comma and numbers)
+            const coordPattern = /^-?\d+\.?\d*\s*,\s*-?\d+\.?\d*$/;
+            
+            if (coordPattern.test(query.trim())) {
+                // Handle as coordinates
+                const coords = query.split(",").map(coord => parseFloat(coord.trim()));
+                
+                if (coords.length === 2 && !isNaN(coords[0]) && !isNaN(coords[1])) {
+                    if (coords[0] >= -90 && coords[0] <= 90 && coords[1] >= -180 && coords[1] <= 180) {
+                        return {
+                            type: 'coordinates',
+                            lat: coords[0],
+                            lng: coords[1],
+                            display: `${coords[0].toFixed(6)}, ${coords[1].toFixed(6)}`
+                        };
+                    } else {
+                        showError('Coordinates out of range. Latitude: -90 to 90, Longitude: -180 to 180');
+                        return null;
+                    }
+                } else {
+                    showError('Invalid coordinates format. Use: ?q=latitude,longitude');
+                    return null;
+                }
+            } else {
+                // Handle as address - need to geocode
+                return {
+                    type: 'address',
+                    address: query,
+                    display: query
+                };
+            }
+        }
+
+        // Geocode address to get coordinates
+        async function geocodeAddress(address) {
+            try {
+                // Using a simple geocoding service (you might want to use Google's geocoding API for better results)
+                const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`);
+                const data = await response.json();
+                
+                if (data && data.length > 0) {
+                    return {
+                        lat: parseFloat(data[0].lat),
+                        lng: parseFloat(data[0].lon),
+                        display: data[0].display_name
+                    };
+                } else {
+                    throw new Error('Address not found');
+                }
+            } catch (error) {
+                console.error('Geocoding error:', error);
+                showError('Could not find the specified address. Please check the address and try again.');
+                return null;
+            }
+        }
+
+        // Load historical data from API
+        async function loadHistoricalData(lat, lng, radius) {
+            const mechanicList = document.getElementById('mechanic-list');
+            mechanicList.innerHTML = '<div class="loading">Loading performance data</div>';
+            
+            try {
+                const response = await fetch(`https://ai.instantmechanic.online/bot/api/find_mechanic?lat=${lat}&long=${lng}&radius=${radius}`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Origin': 'https://instantmechanic.online',
+                        'Referer': 'https://instantmechanic.online/',
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                displayHistoricalData(data);
+                
+            } catch (error) {
+                console.error('Error loading historical data:', error);
+                showError('Error loading performance data. Please try again later.');
+            }
+        }
+
+        // Display historical data
+        function displayHistoricalData(data) {
+            const mechanicList = document.getElementById('mechanic-list');
+            const resultsCount = document.getElementById('results-count');
+            
+            if (!data || Object.keys(data).length === 0) {
+                mechanicList.innerHTML = `
+                    <div class="no-results">
+                        <div class="no-results-icon">🔍</div>
+                        <h3>No Historical Data Available</h3>
+                        <p>No mechanics have performed services in this area within the selected radius.</p>
+                        <p>Try increasing the search radius to find more results.</p>
+                    </div>
+                `;
+                resultsCount.textContent = 'No mechanics found';
+                return;
+            }
+            
+            // Convert object to array and sort by priority (high to low)
+            const mechanicsArray = Object.entries(data).map(([name, details]) => ({
+                name,
+                ...details
+            })).sort((a, b) => b.priority - a.priority);
+            
+            resultsCount.textContent = `Found ${mechanicsArray.length} mechanic${mechanicsArray.length > 1 ? 's' : ''} with historical data`;
+            
+            mechanicList.innerHTML = '';
+            
+            mechanicsArray.forEach(mechanic => {
+                const mechanicDiv = document.createElement('div');
+                mechanicDiv.className = 'historical-mechanic';
+                
+                // Determine priority level for styling
+                let priorityClass = 'high';
+                if (mechanic.priority < 50) priorityClass = 'low';
+                else if (mechanic.priority < 60) priorityClass = 'medium';
+                
+                // Calculate success rate
+                const totalCalls = mechanic.done_calls + mechanic.cancelled_calls;
+                const successRate = totalCalls > 0 ? ((mechanic.done_calls / totalCalls) * 100).toFixed(1) : 0;
+                
+                // Generate star rating
+                const fullStars = Math.floor(mechanic.rating);
+                const hasHalfStar = mechanic.rating % 1 !== 0;
+                const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+                const starsHTML = '★'.repeat(fullStars) + (hasHalfStar ? '☆' : '') + '☆'.repeat(emptyStars);
+                
+                mechanicDiv.innerHTML = `
+                    <div class="mechanic-header">
+                        <div>
+                            <div class="mechanic-name">${mechanic.name}</div>
+                        </div>
+                        <div class="priority-badge ${priorityClass}">
+                            Priority: ${mechanic.priority.toFixed(1)}
+                        </div>
+                    </div>
+                    
+                    <div class="rating-container">
+                        <div class="rating">
+                            <span class="stars">${starsHTML}</span>
+                            <span class="rating-value">${mechanic.rating.toFixed(1)}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="success-rate">
+                        <div class="success-rate-value">${successRate}%</div>
+                        <div class="success-rate-label">Success Rate</div>
+                    </div>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value success">${mechanic.done_calls}</div>
+                            <div class="stat-label">Completed Calls</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value danger">${mechanic.cancelled_calls}</div>
+                            <div class="stat-label">Cancelled Calls</div>
+                        </div>
+                    </div>
+                    
+                    <a class="call-button" href="tel:${mechanic.mobile}">📞 Call ${mechanic.mobile}</a>
+                `;
+                
+                mechanicList.appendChild(mechanicDiv);
+            });
+        }
+
+        // Show error message
+        function showError(message) {
+            const mechanicList = document.getElementById('mechanic-list');
+            mechanicList.innerHTML = `<div class="error">${message}</div>`;
+            
+            const resultsCount = document.getElementById('results-count');
+            resultsCount.textContent = 'Error occurred';
+        }
+
+        // Setup radius slider
+        function setupRadiusSlider() {
+            const slider = document.getElementById('radius-slider');
+            const radiusValue = document.getElementById('radius-value');
+            
+            // Create debounced function for loading historical data
+            const debouncedLoadHistoricalData = debounce((lat, lng, radius) => {
+                loadHistoricalData(lat, lng, radius);
+            }, 1000); // 1 second delay
+            
+            slider.addEventListener('input', (e) => {
+                currentRadius = parseFloat(e.target.value);
+                radiusValue.textContent = `${currentRadius} km`;
+                
+                // Show loading state immediately for better UX
+                if (currentPosition) {
+                    const mechanicList = document.getElementById('mechanic-list');
+                    mechanicList.innerHTML = '<div class="loading">Updating results</div>';
+                    
+                    // Call debounced function
+                    debouncedLoadHistoricalData(currentPosition.lat, currentPosition.lng, currentRadius);
+                }
+            });
+        }
+
+        // Initialize page
+        async function initialize() {
+            const locationData = getLocationFromURL();
+            if (!locationData) return;
+
+            const locationDisplay = document.getElementById('location-display');
+            locationDisplay.textContent = `📍 ${locationData.display}`;
+
+            if (locationData.type === 'coordinates') {
+                currentPosition = { lat: locationData.lat, lng: locationData.lng };
+                loadHistoricalData(currentPosition.lat, currentPosition.lng, currentRadius);
+            } else if (locationData.type === 'address') {
+                locationDisplay.textContent = `📍 ${locationData.display} (Geocoding...)`;
+                const geocoded = await geocodeAddress(locationData.address);
+                if (geocoded) {
+                    currentPosition = { lat: geocoded.lat, lng: geocoded.lng };
+                    locationDisplay.textContent = `📍 ${geocoded.display}`;
+                    loadHistoricalData(currentPosition.lat, currentPosition.lng, currentRadius);
+                }
+            }
+
+            setupRadiusSlider();
+        }
+
+        // Start the application
+        document.addEventListener('DOMContentLoaded', initialize);
+    </script>
+</body>
+</html>
