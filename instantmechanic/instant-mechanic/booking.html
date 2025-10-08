@@ -182,6 +182,40 @@
       margin: 5px;
       width: auto;
     }
+
+    /* Search Mechanic Button Styles */
+    .search-mechanic-btn {
+      background-color: #007bff !important;
+      color: white !important;
+      border: none !important;
+      padding: 12px 20px !important;
+      border-radius: 6px !important;
+      cursor: pointer !important;
+      font-size: 14px !important;
+      font-weight: 500 !important;
+      margin: 10px 0 20px 0 !important;
+      width: 100% !important;
+      transition: background-color 0.3s !important;
+    }
+
+    .search-mechanic-btn:hover {
+      background-color: #0056b3 !important;
+    }
+
+    .booking-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 15px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .booking-title {
+      flex: 1;
+      margin: 0;
+      min-width: 200px;
+    }
   </style>
 </head>
 <body>
@@ -194,7 +228,12 @@
   </div>
 
   <div class="container hidden" id="bookingBox">
-    <h2>Booking Details</h2>
+    <div class="booking-header">
+      <h2 class="booking-title">Booking Details</h2>
+      <button id="searchMechanicBtn" class="search-mechanic-btn" onclick="searchMechanic()" style="display: none;">
+        🔍 Search Mechanic
+      </button>
+    </div>
     <div id="bookingDetails"></div>
 
     <h3>Update Booking</h3>
@@ -369,6 +408,71 @@
       });
     });
 
+    // Search Mechanic Function
+    function searchMechanic() {
+      if (!bookingData || !bookingData.location) {
+        alert("No location data available");
+        return;
+      }
+
+      const location = bookingData.location;
+      let searchUrl = "https://instantmechanic.online/mechanic-search.html?q=";
+      
+      try {
+        // Check if it's a Google Maps URL
+        if (location.includes("google.com/maps")) {
+          // Extract coordinates from Google Maps URL
+          const coordMatch = location.match(/q=([0-9.-]+),([0-9.-]+)/);
+          if (coordMatch) {
+            const lat = coordMatch[1];
+            const lng = coordMatch[2];
+            searchUrl += `${lat},${lng}`;
+          } else {
+            // Fallback: use the entire location
+            searchUrl += encodeURIComponent(location);
+          }
+        }
+        // Check if it's already an instantmechanic.online URL with query
+        else if (location.includes("instantmechanic.online") && location.includes("q=")) {
+          // Extract the query parameter
+          const queryMatch = location.match(/q=([^&]*)/);
+          if (queryMatch) {
+            searchUrl += queryMatch[1]; // Already URL encoded
+          } else {
+            searchUrl += encodeURIComponent(location);
+          }
+        }
+        // For any other format, encode the entire location
+        else {
+          searchUrl += encodeURIComponent(location);
+        }
+        
+        // Open in new tab
+        window.open(searchUrl, "_blank");
+        
+        // Track the mechanic search action in Mixpanel
+        if (customerMobile) {
+          waitForMixpanel(() => {
+            identifyMixpanelUser(customerMobile);
+            debugLog('🔍 Mechanic Search Initiated event triggered');
+            trackMixpanelEvent("Mechanic Search Initiated", {
+              "agent_name": localStorage.getItem("agent_name"),
+              "booking_id": bookingId,
+              "search_location": location,
+              "search_url": searchUrl,
+              "customer_mobile": customerMobile,
+              "timestamp": new Date().toISOString()
+            });
+          });
+        }
+        
+      } catch (error) {
+        console.error("Error processing location for mechanic search:", error);
+        // Fallback: use original location
+        window.open("https://instantmechanic.online/mechanic-search.html?q=" + encodeURIComponent(location), "_blank");
+      }
+    }
+
     if (localStorage.getItem("agent_login") === "Yes") {
       document.getElementById("loginBox").classList.add("hidden");
       document.getElementById("bookingBox").classList.remove("hidden");
@@ -431,6 +535,12 @@
               identifyMixpanelUser(customerMobile);
               debugLog('👤 Customer identified in Mixpanel: ' + customerMobile);
             });
+          }
+
+          // Show the Search Mechanic button now that we have booking data
+          const searchBtn = document.getElementById("searchMechanicBtn");
+          if (searchBtn && data.location) {
+            searchBtn.style.display = "block";
           }
 
           // Calculate pending from mechanic side
@@ -760,85 +870,5 @@
     window.debugMixpanel = debugMixpanel;
     window.checkMixpanelStatus = checkMixpanelStatus;
   </script>
-
-<script>
-// Add Search Mechanic button functionality
-function addSearchMechanicButton() {
-  // Check if booking data and location exist
-  if (!bookingData || !bookingData.location) return;
-  
-  // Check if button already exists to avoid duplicates
-  if (document.getElementById("searchMechanicBtn")) return;
-  
-  // Find the location paragraph to insert button after it
-  const bookingDetailsContainer = document.getElementById("bookingDetails");
-  const locationLink = bookingDetailsContainer.querySelector('a[href*="maps"], a[href*="instantmechanic"]');
-  
-  if (locationLink) {
-    // Create the search mechanic button
-    const searchBtn = document.createElement("button");
-    searchBtn.id = "searchMechanicBtn";
-    searchBtn.textContent = "🔍 Search Mechanic";
-    searchBtn.style.cssText = `
-      background-color: #007bff;
-      color: white;
-      border: none;
-      padding: 12px 20px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 14px;
-      font-weight: 500;
-      margin: 10px 0;
-      width: 100%;
-    `;
-    
-    // Add click handler
-    searchBtn.onclick = function() {
-      const location = bookingData.location;
-      let searchUrl = "https://instantmechanic.online/mechanic-search.html?q=";
-      
-      if (location.includes("google.com/maps")) {
-        // Extract coordinates from Google Maps URL
-        const coordMatch = location.match(/q=([0-9.-]+),([0-9.-]+)/);
-        if (coordMatch) {
-          searchUrl += `${coordMatch[1]},${coordMatch[2]}`;
-        } else {
-          searchUrl += encodeURIComponent(location);
-        }
-      } else if (location.includes("instantmechanic.online") && location.includes("q=")) {
-        // Extract query parameter from instantmechanic URL
-        const queryMatch = location.match(/q=([^&]*)/);
-        searchUrl += queryMatch ? queryMatch[1] : encodeURIComponent(location);
-      } else {
-        searchUrl += encodeURIComponent(location);
-      }
-      
-      window.open(searchUrl, "_blank");
-      
-      // Track in Mixpanel if available
-      if (typeof trackMixpanelEvent === 'function' && customerMobile) {
-        trackMixpanelEvent("Mechanic Search Initiated", {
-          "agent_name": localStorage.getItem("agent_name"),
-          "booking_id": bookingId,
-          "search_location": location,
-          "customer_mobile": customerMobile,
-          "timestamp": new Date().toISOString()
-        });
-      }
-    };
-    
-    // Insert button after location paragraph
-    locationLink.parentElement.insertAdjacentElement('afterend', searchBtn);
-  }
-}
-
-// Hook into existing fetchBooking function
-const originalFetchBooking = fetchBooking;
-fetchBooking = function() {
-  originalFetchBooking.call(this);
-  // Add button after a short delay to ensure DOM is updated
-  setTimeout(addSearchMechanicButton, 100);
-};
-</script>
 </body>
 </html>
