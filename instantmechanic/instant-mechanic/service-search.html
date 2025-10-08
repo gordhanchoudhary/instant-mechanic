@@ -253,11 +253,15 @@
             font-weight: 600;
         }
 
-        .call-button {
-            display: inline-block;
-            width: 100%;
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .action-button {
+            flex: 1;
             padding: 10px;
-            background: linear-gradient(135deg, #28a745, #20c997);
             color: white;
             text-decoration: none;
             border-radius: 8px;
@@ -265,11 +269,32 @@
             font-weight: 500;
             font-size: 0.9rem;
             transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .call-button {
+            background: linear-gradient(135deg, #28a745, #20c997);
         }
 
         .call-button:hover {
             transform: translateY(-1px);
             box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+            color: white;
+            text-decoration: none;
+        }
+
+        .whatsapp-button {
+            background: linear-gradient(135deg, #25d366, #128c7e);
+        }
+
+        .whatsapp-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
+            color: white;
+            text-decoration: none;
         }
 
         .panel-tabs {
@@ -555,6 +580,16 @@
             .panel-tab {
                 font-size: 0.75rem;
                 padding: 0.4rem 0.5rem;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .action-button {
+                font-size: 0.85rem;
+                padding: 10px;
             }
         }
     </style>
