@@ -20,7 +20,7 @@
         .header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 1.5rem 1rem;
+            padding: 1rem;
             box-shadow: 0 4px 20px rgba(0,0,0,0.1);
             position: sticky;
             top: 0;
@@ -28,7 +28,7 @@
         }
 
         .header h1 {
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             font-weight: 600;
             text-align: center;
             margin-bottom: 0.5rem;
@@ -36,23 +36,23 @@
 
         .location-display {
             text-align: center;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             opacity: 0.9;
             margin-bottom: 1rem;
         }
 
         .radius-control {
             background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            padding: 1rem;
+            border-radius: 12px;
+            padding: 0.75rem;
             backdrop-filter: blur(10px);
-            max-width: 400px;
+            max-width: 350px;
             margin: 0 auto;
         }
 
         .radius-label {
-            font-size: 1rem;
-            margin-bottom: 0.75rem;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -62,17 +62,17 @@
         .radius-value {
             background: rgba(255, 255, 255, 0.2);
             color: white;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 0.9rem;
+            padding: 4px 8px;
+            border-radius: 15px;
+            font-size: 0.8rem;
             font-weight: 600;
             backdrop-filter: blur(5px);
         }
 
         .radius-slider {
             width: 100%;
-            height: 8px;
-            border-radius: 4px;
+            height: 6px;
+            border-radius: 3px;
             background: rgba(255, 255, 255, 0.2);
             outline: none;
             -webkit-appearance: none;
@@ -82,64 +82,64 @@
 
         .radius-slider::-webkit-slider-thumb {
             appearance: none;
-            width: 24px;
-            height: 24px;
+            width: 20px;
+            height: 20px;
             border-radius: 50%;
             background: white;
             cursor: pointer;
-            border: 3px solid #667eea;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            border: 2px solid #667eea;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
             transition: all 0.2s ease;
         }
 
         .radius-slider::-webkit-slider-thumb:hover {
             transform: scale(1.1);
-            box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
         }
 
         .radius-slider::-moz-range-thumb {
-            width: 24px;
-            height: 24px;
+            width: 20px;
+            height: 20px;
             border-radius: 50%;
             background: white;
             cursor: pointer;
-            border: 3px solid #667eea;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            border: 2px solid #667eea;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
         }
 
         .main-container {
             max-width: 800px;
             margin: 0 auto;
-            padding: 2rem 1rem;
+            padding: 1rem;
         }
 
         .results-header {
             text-align: center;
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
         }
 
         .results-count {
-            font-size: 1.1rem;
+            font-size: 1rem;
             color: #495057;
             font-weight: 500;
         }
 
         .results-subtitle {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             color: #6c757d;
-            margin-top: 0.5rem;
+            margin-top: 0.25rem;
         }
 
         .mechanic-list {
             display: grid;
-            gap: 1.5rem;
+            gap: 1rem;
         }
 
         .historical-mechanic {
             background: white;
-            border-radius: 16px;
-            padding: 1.5rem;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border-radius: 12px;
+            padding: 1rem;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
             border: 1px solid #e9ecef;
             transition: all 0.3s ease;
             position: relative;
@@ -147,32 +147,35 @@
         }
 
         .historical-mechanic:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.12);
         }
 
         .mechanic-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 1rem;
+            margin-bottom: 0.75rem;
+            gap: 0.5rem;
         }
 
         .mechanic-name {
-            font-size: 1.2rem;
+            font-size: 1rem;
             font-weight: 600;
             color: #212529;
-            margin-bottom: 0.5rem;
+            line-height: 1.3;
+            flex: 1;
         }
 
         .priority-badge {
             background: linear-gradient(135deg, #28a745, #20c997);
             color: white;
-            padding: 6px 12px;
-            border-radius: 25px;
-            font-size: 0.8rem;
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 0.7rem;
             font-weight: 600;
             white-space: nowrap;
+            flex-shrink: 0;
         }
 
         .priority-badge.high {
@@ -190,20 +193,20 @@
         .rating-container {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
-            margin-bottom: 1rem;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
         }
 
         .rating {
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            font-size: 1rem;
+            font-size: 0.9rem;
         }
 
         .stars {
             color: #ffc107;
-            font-size: 1.1rem;
+            font-size: 1rem;
         }
 
         .rating-value {
@@ -211,17 +214,38 @@
             color: #495057;
         }
 
+        .success-rate-compact {
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+            border-radius: 8px;
+            padding: 0.5rem;
+            text-align: center;
+        }
+
+        .success-rate-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #1976d2;
+            line-height: 1;
+        }
+
+        .success-rate-label {
+            font-size: 0.7rem;
+            color: #424242;
+            font-weight: 500;
+            margin-top: 2px;
+        }
+
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 1rem;
-            margin: 1.5rem 0;
+            gap: 0.5rem;
+            margin: 0.75rem 0;
         }
 
         .stat-card {
             background: #f8f9fa;
-            border-radius: 12px;
-            padding: 1rem;
+            border-radius: 8px;
+            padding: 0.5rem;
             text-align: center;
             transition: all 0.2s ease;
         }
@@ -231,9 +255,10 @@
         }
 
         .stat-value {
-            font-size: 1.5rem;
+            font-size: 1.1rem;
             font-weight: 700;
-            margin-bottom: 0.25rem;
+            margin-bottom: 0.1rem;
+            line-height: 1;
         }
 
         .stat-value.success {
@@ -249,83 +274,88 @@
         }
 
         .stat-label {
-            font-size: 0.85rem;
+            font-size: 0.7rem;
             color: #6c757d;
             font-weight: 500;
         }
 
-        .success-rate {
-            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
-            border-radius: 12px;
-            padding: 1rem;
-            margin: 1rem 0;
+        .contact-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+        }
+
+        .contact-buttons.single {
+            grid-template-columns: 1fr;
+        }
+
+        .contact-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 10px;
+            text-decoration: none;
+            border-radius: 8px;
             text-align: center;
-        }
-
-        .success-rate-value {
-            font-size: 2rem;
-            font-weight: 700;
-            color: #1976d2;
-            margin-bottom: 0.25rem;
-        }
-
-        .success-rate-label {
-            font-size: 0.9rem;
-            color: #424242;
-            font-weight: 500;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+            color: white;
         }
 
         .call-button {
-            display: block;
-            width: 100%;
-            padding: 14px;
             background: linear-gradient(135deg, #28a745, #20c997);
-            color: white;
-            text-decoration: none;
-            border-radius: 12px;
-            text-align: center;
-            font-weight: 600;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-            margin-top: 1.5rem;
         }
 
         .call-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.4);
+            text-decoration: none;
+            color: white;
+        }
+
+        .whatsapp-button {
+            background: linear-gradient(135deg, #25d366, #128c7e);
+        }
+
+        .whatsapp-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4);
             text-decoration: none;
             color: white;
         }
 
         .loading {
             text-align: center;
-            padding: 3rem 1rem;
+            padding: 2rem 1rem;
             color: #6c757d;
-            font-size: 1.1rem;
+            font-size: 1rem;
         }
 
         .loading::after {
             content: '';
             display: inline-block;
-            width: 24px;
-            height: 24px;
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #667eea;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #667eea;
             border-radius: 50%;
             animation: spin 1s linear infinite;
-            margin-left: 1rem;
+            margin-left: 0.75rem;
             vertical-align: middle;
         }
 
         .no-results {
             text-align: center;
-            padding: 3rem 1rem;
+            padding: 2rem 1rem;
             color: #6c757d;
         }
 
         .no-results-icon {
-            font-size: 4rem;
-            margin-bottom: 1rem;
+            font-size: 3rem;
+            margin-bottom: 0.75rem;
             opacity: 0.3;
         }
 
@@ -334,7 +364,7 @@
             color: #721c24;
             padding: 1rem;
             border-radius: 8px;
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
             text-align: center;
         }
 
@@ -343,67 +373,122 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Mobile Responsive */
+        /* Mobile Responsive - Optimized for 3-4 cards visible */
         @media (max-width: 768px) {
             .header {
-                padding: 1rem 0.75rem;
+                padding: 0.75rem;
             }
 
             .header h1 {
-                font-size: 1.3rem;
+                font-size: 1.2rem;
             }
 
             .main-container {
-                padding: 1rem 0.75rem;
+                padding: 0.75rem;
             }
 
             .historical-mechanic {
-                padding: 1.25rem;
+                padding: 0.85rem;
             }
 
             .mechanic-header {
-                flex-direction: column;
-                gap: 0.75rem;
+                margin-bottom: 0.5rem;
             }
 
-            .priority-badge {
-                align-self: flex-start;
+            .mechanic-name {
+                font-size: 0.95rem;
+            }
+
+            .rating-container {
+                margin-bottom: 0.5rem;
             }
 
             .stats-grid {
-                grid-template-columns: 1fr;
-                gap: 0.75rem;
+                margin: 0.5rem 0;
+                gap: 0.4rem;
+            }
+
+            .stat-card {
+                padding: 0.4rem;
+            }
+
+            .stat-value {
+                font-size: 1rem;
+            }
+
+            .contact-buttons {
+                margin-top: 0.5rem;
+                gap: 0.4rem;
+            }
+
+            .contact-button {
+                padding: 8px;
+                font-size: 0.8rem;
+            }
+
+            .success-rate-compact {
+                padding: 0.4rem;
             }
 
             .success-rate-value {
-                font-size: 1.75rem;
+                font-size: 1.1rem;
             }
         }
 
         @media (max-width: 480px) {
             .header {
-                padding: 0.75rem 0.5rem;
+                padding: 0.6rem;
             }
 
             .radius-control {
-                padding: 0.75rem;
+                padding: 0.6rem;
             }
 
             .main-container {
-                padding: 0.75rem 0.5rem;
+                padding: 0.6rem;
             }
 
             .historical-mechanic {
-                padding: 1rem;
+                padding: 0.75rem;
             }
 
             .mechanic-name {
-                font-size: 1.1rem;
+                font-size: 0.9rem;
             }
 
-            .call-button {
-                padding: 12px;
-                font-size: 0.9rem;
+            .contact-button {
+                padding: 7px;
+                font-size: 0.75rem;
+            }
+
+            .results-header {
+                margin-bottom: 1rem;
+            }
+
+            .mechanic-list {
+                gap: 0.75rem;
+            }
+        }
+
+        /* Extra compact for very small screens */
+        @media (max-width: 360px) {
+            .historical-mechanic {
+                padding: 0.6rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 0.3rem;
+            }
+
+            .contact-buttons {
+                grid-template-columns: 1fr;
+                gap: 0.3rem;
+            }
+
+            .contact-button {
+                padding: 6px;
+                font-size: 0.7rem;
             }
         }
     </style>
@@ -591,13 +676,38 @@
                 const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
                 const starsHTML = '★'.repeat(fullStars) + (hasHalfStar ? '☆' : '') + '☆'.repeat(emptyStars);
                 
+                // Create contact buttons based on available options
+                let contactButtonsHTML = '';
+                const hasWhatsApp = mechanic.whatsapp && mechanic.whatsapp !== null && mechanic.whatsapp !== '';
+                
+                if (hasWhatsApp) {
+                    // Both call and WhatsApp buttons
+                    contactButtonsHTML = `
+                        <div class="contact-buttons">
+                            <a class="contact-button call-button" href="tel:${mechanic.mobile}">
+                                📞 Call
+                            </a>
+                            <a class="contact-button whatsapp-button" href="${mechanic.whatsapp}" target="_blank">
+                                💬 WhatsApp
+                            </a>
+                        </div>
+                    `;
+                } else {
+                    // Only call button
+                    contactButtonsHTML = `
+                        <div class="contact-buttons single">
+                            <a class="contact-button call-button" href="tel:${mechanic.mobile}">
+                                📞 Call ${mechanic.mobile}
+                            </a>
+                        </div>
+                    `;
+                }
+                
                 mechanicDiv.innerHTML = `
                     <div class="mechanic-header">
-                        <div>
-                            <div class="mechanic-name">${mechanic.name}</div>
-                        </div>
+                        <div class="mechanic-name">${mechanic.name}</div>
                         <div class="priority-badge ${priorityClass}">
-                            Priority: ${mechanic.priority.toFixed(1)}
+                            ${mechanic.priority.toFixed(1)}
                         </div>
                     </div>
                     
@@ -606,25 +716,24 @@
                             <span class="stars">${starsHTML}</span>
                             <span class="rating-value">${mechanic.rating.toFixed(1)}</span>
                         </div>
-                    </div>
-                    
-                    <div class="success-rate">
-                        <div class="success-rate-value">${successRate}%</div>
-                        <div class="success-rate-label">Success Rate</div>
+                        <div class="success-rate-compact">
+                            <div class="success-rate-value">${successRate}%</div>
+                            <div class="success-rate-label">Success</div>
+                        </div>
                     </div>
                     
                     <div class="stats-grid">
                         <div class="stat-card">
                             <div class="stat-value success">${mechanic.done_calls}</div>
-                            <div class="stat-label">Completed Calls</div>
+                            <div class="stat-label">Completed</div>
                         </div>
                         <div class="stat-card">
                             <div class="stat-value danger">${mechanic.cancelled_calls}</div>
-                            <div class="stat-label">Cancelled Calls</div>
+                            <div class="stat-label">Cancelled</div>
                         </div>
                     </div>
                     
-                    <a class="call-button" href="tel:${mechanic.mobile}">📞 Call ${mechanic.mobile}</a>
+                    ${contactButtonsHTML}
                 `;
                 
                 mechanicList.appendChild(mechanicDiv);
