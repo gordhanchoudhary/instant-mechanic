@@ -34,6 +34,54 @@
             margin-bottom: 0.5rem;
         }
 
+        .search-container {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 0.75rem;
+            backdrop-filter: blur(10px);
+            max-width: 400px;
+            margin: 0 auto 1rem;
+            display: none;
+        }
+
+        .search-container.visible {
+            display: block;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+        }
+
+        .search-input::placeholder {
+            color: #666;
+        }
+
+        .search-button {
+            width: 100%;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 0.5rem;
+            backdrop-filter: blur(5px);
+            transition: all 0.2s ease;
+        }
+
+        .search-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
         .location-display {
             text-align: center;
             font-size: 0.85rem;
@@ -167,8 +215,8 @@
             flex: 1;
         }
 
-        .priority-badge {
-            background: linear-gradient(135deg, #28a745, #20c997);
+        .distance-badge {
+            background: linear-gradient(135deg, #17a2b8, #138496);
             color: white;
             padding: 4px 8px;
             border-radius: 20px;
@@ -176,18 +224,54 @@
             font-weight: 600;
             white-space: nowrap;
             flex-shrink: 0;
+            min-width: 60px;
+            text-align: center;
         }
 
-        .priority-badge.high {
-            background: linear-gradient(135deg, #28a745, #20c997);
+        .distance-badge.loading {
+            background: linear-gradient(135deg, #6c757d, #495057);
         }
 
-        .priority-badge.medium {
+        .distance-info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .distance-text {
+            font-size: 0.7rem;
+            font-weight: 600;
+            line-height: 1;
+        }
+
+        .time-text {
+            font-size: 0.6rem;
+            opacity: 0.9;
+            line-height: 1;
+        }
+
+        .get-distance-btn {
             background: linear-gradient(135deg, #ffc107, #fd7e14);
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
         }
 
-        .priority-badge.low {
-            background: linear-gradient(135deg, #dc3545, #e74c3c);
+        .get-distance-btn:hover {
+            background: linear-gradient(135deg, #e0a800, #dc6415);
+            transform: translateY(-1px);
+        }
+
+        .get-distance-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
         }
 
         .rating-container {
@@ -212,27 +296,6 @@
         .rating-value {
             font-weight: 600;
             color: #495057;
-        }
-
-        .success-rate-compact {
-            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
-            border-radius: 8px;
-            padding: 0.5rem;
-            text-align: center;
-        }
-
-        .success-rate-value {
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: #1976d2;
-            line-height: 1;
-        }
-
-        .success-rate-label {
-            font-size: 0.7rem;
-            color: #424242;
-            font-weight: 500;
-            margin-top: 2px;
         }
 
         .stats-grid {
@@ -279,28 +342,28 @@
             font-weight: 500;
         }
 
-        .contact-buttons {
+        .action-buttons {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr 1fr 1fr;
             gap: 0.5rem;
             margin-top: 0.75rem;
         }
 
-        .contact-buttons.single {
-            grid-template-columns: 1fr;
+        .action-buttons.two-buttons {
+            grid-template-columns: 1fr 1fr;
         }
 
-        .contact-button {
+        .action-button {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 0.5rem;
-            padding: 10px;
+            gap: 0.3rem;
+            padding: 8px;
             text-decoration: none;
             border-radius: 8px;
             text-align: center;
             font-weight: 600;
-            font-size: 0.85rem;
+            font-size: 0.75rem;
             transition: all 0.3s ease;
             color: white;
         }
@@ -323,6 +386,17 @@
         .whatsapp-button:hover {
             transform: translateY(-1px);
             box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4);
+            text-decoration: none;
+            color: white;
+        }
+
+        .maps-button {
+            background: linear-gradient(135deg, #4285f4, #1a73e8);
+        }
+
+        .maps-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(66, 133, 244, 0.4);
             text-decoration: none;
             color: white;
         }
@@ -373,7 +447,7 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Mobile Responsive - Optimized for 3-4 cards visible */
+        /* Mobile Responsive */
         @media (max-width: 768px) {
             .header {
                 padding: 0.75rem;
@@ -416,22 +490,14 @@
                 font-size: 1rem;
             }
 
-            .contact-buttons {
+            .action-buttons {
                 margin-top: 0.5rem;
                 gap: 0.4rem;
             }
 
-            .contact-button {
-                padding: 8px;
-                font-size: 0.8rem;
-            }
-
-            .success-rate-compact {
-                padding: 0.4rem;
-            }
-
-            .success-rate-value {
-                font-size: 1.1rem;
+            .action-button {
+                padding: 7px;
+                font-size: 0.7rem;
             }
         }
 
@@ -456,9 +522,9 @@
                 font-size: 0.9rem;
             }
 
-            .contact-button {
-                padding: 7px;
-                font-size: 0.75rem;
+            .action-button {
+                padding: 6px;
+                font-size: 0.65rem;
             }
 
             .results-header {
@@ -470,7 +536,6 @@
             }
         }
 
-        /* Extra compact for very small screens */
         @media (max-width: 360px) {
             .historical-mechanic {
                 padding: 0.6rem;
@@ -481,14 +546,14 @@
                 gap: 0.3rem;
             }
 
-            .contact-buttons {
+            .action-buttons {
                 grid-template-columns: 1fr;
                 gap: 0.3rem;
             }
 
-            .contact-button {
+            .action-button {
                 padding: 6px;
-                font-size: 0.7rem;
+                font-size: 0.65rem;
             }
         }
     </style>
@@ -496,6 +561,12 @@
 <body>
     <div class="header">
         <h1>Historical Mechanic Performance</h1>
+        
+        <div class="search-container" id="search-container">
+            <input type="text" class="search-input" id="search-input" placeholder="Enter your location (e.g., New Delhi, India)">
+            <button class="search-button" id="search-button">Search Location</button>
+        </div>
+        
         <div class="location-display" id="location-display">Loading location...</div>
         
         <div class="radius-control">
@@ -518,10 +589,140 @@
         </div>
     </div>
 
+    <!-- Google Maps API -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCAYQWWFzIfkZqJdQoW7Oi-Vxp6gsc9Xsg&libraries=geometry"></script>
+
     <script>
         let currentRadius = 3;
         let currentPosition = null;
         let debounceTimer = null;
+        let googleMapsLoaded = false;
+
+        // Wait for Google Maps to load
+        function initializeGoogleMaps() {
+            googleMapsLoaded = true;
+            console.log('Google Maps API loaded successfully');
+        }
+
+        // Ensure Google Maps is loaded
+        function waitForGoogleMaps() {
+            return new Promise((resolve) => {
+                if (typeof google !== 'undefined' && google.maps) {
+                    resolve();
+                } else {
+                    const checkGoogleMaps = setInterval(() => {
+                        if (typeof google !== 'undefined' && google.maps) {
+                            clearInterval(checkGoogleMaps);
+                            resolve();
+                        }
+                    }, 100);
+                }
+            });
+        }
+
+        // Calculate distance using Google Maps Distance Matrix API
+        async function calculateDistance(customerLat, customerLng, mechanic, mechanicElement) {
+            await waitForGoogleMaps();
+            
+            return new Promise((resolve) => {
+                const service = new google.maps.DistanceMatrixService();
+                const customerLocation = new google.maps.LatLng(customerLat, customerLng);
+                const mechanicLocation = new google.maps.LatLng(mechanic.lat, mechanic.long);
+
+                service.getDistanceMatrix({
+                    origins: [customerLocation],
+                    destinations: [mechanicLocation],
+                    travelMode: google.maps.TravelMode.DRIVING,
+                    unitSystem: google.maps.UnitSystem.METRIC,
+                    avoidHighways: false,
+                    avoidTolls: false
+                }, (response, status) => {
+                    const distanceBadge = mechanicElement.querySelector('.distance-badge');
+                    
+                    if (status === google.maps.DistanceMatrixStatus.OK) {
+                        const element = response.rows[0].elements[0];
+                        if (element.status === 'OK') {
+                            distanceBadge.innerHTML = `
+                                <div class="distance-info">
+                                    <div class="distance-text">${element.distance.text}</div>
+                                    <div class="time-text">${element.duration.text}</div>
+                                </div>
+                            `;
+                            distanceBadge.classList.remove('loading');
+                            resolve({
+                                distance: element.distance.text,
+                                duration: element.duration.text,
+                                distanceValue: element.distance.value
+                            });
+                            return;
+                        }
+                    }
+                    
+                    // Fallback to straight-line distance
+                    console.error('Distance Matrix request failed for', mechanic.name, ':', status);
+                    const straightDistance = calculateStraightLineDistance(
+                        customerLat, customerLng, mechanic.lat, mechanic.long
+                    );
+                    
+                    distanceBadge.innerHTML = `
+                        <div class="distance-info">
+                            <div class="distance-text">${straightDistance.toFixed(1)} km</div>
+                            <div class="time-text">Est. time</div>
+                        </div>
+                    `;
+                    distanceBadge.classList.remove('loading');
+                    resolve({
+                        distance: `${straightDistance.toFixed(1)} km`,
+                        duration: 'Est. time',
+                        distanceValue: straightDistance * 1000
+                    });
+                });
+            });
+        }
+
+        // Calculate distances for top 5 mechanics
+        async function calculateDistancesForTop5(customerLat, customerLng, mechanicElements) {
+            const top5Elements = mechanicElements.slice(0, 5);
+            
+            // Calculate distances for all top 5 mechanics simultaneously
+            const distancePromises = top5Elements.map((element, index) => {
+                const mechanicData = element.mechanicData;
+                return calculateDistance(customerLat, customerLng, mechanicData, element);
+            });
+            
+            try {
+                await Promise.all(distancePromises);
+            } catch (error) {
+                console.error('Error calculating distances:', error);
+            }
+        }
+
+        // Handle individual distance calculation for non-top-5 mechanics
+        async function handleGetDistance(button, customerLat, customerLng, mechanic, mechanicElement) {
+            button.disabled = true;
+            button.textContent = 'Loading...';
+            
+            try {
+                await calculateDistance(customerLat, customerLng, mechanic, mechanicElement);
+                button.style.display = 'none';
+            } catch (error) {
+                console.error('Error calculating distance:', error);
+                button.disabled = false;
+                button.textContent = 'Get Distance';
+            }
+        }
+
+        // Calculate straight-line distance as fallback
+        function calculateStraightLineDistance(lat1, lng1, lat2, lng2) {
+            const R = 6371; // Earth's radius in km
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLng = (lng2 - lng1) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                    Math.sin(dLng/2) * Math.sin(dLng/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
+        }
 
         // Debounce function to limit API calls
         function debounce(func, wait) {
@@ -541,7 +742,10 @@
             const query = urlParams.get('q');
             
             if (!query) {
-                showError('No location parameter provided. Please add ?q=lat,lng or ?q=address to the URL');
+                // Show search container if no location parameter
+                const searchContainer = document.getElementById('search-container');
+                searchContainer.classList.add('visible');
+                document.getElementById('location-display').textContent = '📍 Enter your location to find mechanics';
                 return null;
             }
 
@@ -578,26 +782,61 @@
             }
         }
 
-        // Geocode address to get coordinates
+        // Geocode address using Google Maps Geocoding API
         async function geocodeAddress(address) {
-            try {
-                // Using a simple geocoding service (you might want to use Google's geocoding API for better results)
-                const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`);
-                const data = await response.json();
+            await waitForGoogleMaps();
+            
+            return new Promise((resolve, reject) => {
+                const geocoder = new google.maps.Geocoder();
                 
-                if (data && data.length > 0) {
-                    return {
-                        lat: parseFloat(data[0].lat),
-                        lng: parseFloat(data[0].lon),
-                        display: data[0].display_name
-                    };
-                } else {
-                    throw new Error('Address not found');
+                geocoder.geocode({ address: address }, (results, status) => {
+                    if (status === google.maps.GeocoderStatus.OK && results.length > 0) {
+                        const result = results[0];
+                        const location = result.geometry.location;
+                        
+                        resolve({
+                            lat: location.lat(),
+                            lng: location.lng(),
+                            display: result.formatted_address
+                        });
+                    } else {
+                        console.error('Geocoding failed:', status);
+                        showError('Could not find the specified address. Please check the address and try again.');
+                        reject(new Error('Geocoding failed'));
+                    }
+                });
+            });
+        }
+
+        // Search location from search input
+        async function searchLocation() {
+            const searchInput = document.getElementById('search-input');
+            const address = searchInput.value.trim();
+            
+            if (!address) {
+                showError('Please enter a location to search');
+                return;
+            }
+
+            document.getElementById('location-display').textContent = `📍 ${address} (Searching...)`;
+            
+            try {
+                const geocoded = await geocodeAddress(address);
+                if (geocoded) {
+                    currentPosition = { lat: geocoded.lat, lng: geocoded.lng };
+                    document.getElementById('location-display').textContent = `📍 ${geocoded.display}`;
+                    
+                    // Hide search container
+                    document.getElementById('search-container').classList.remove('visible');
+                    
+                    // Update URL with coordinates
+                    const newUrl = `${window.location.pathname}?q=${geocoded.lat},${geocoded.lng}`;
+                    window.history.pushState({}, '', newUrl);
+                    
+                    loadHistoricalData(currentPosition.lat, currentPosition.lng, currentRadius);
                 }
             } catch (error) {
-                console.error('Geocoding error:', error);
-                showError('Could not find the specified address. Please check the address and try again.');
-                return null;
+                console.error('Search error:', error);
             }
         }
 
@@ -621,7 +860,7 @@
                 }
                 
                 const data = await response.json();
-                displayHistoricalData(data);
+                await displayHistoricalData(data, lat, lng);
                 
             } catch (error) {
                 console.error('Error loading historical data:', error);
@@ -630,7 +869,7 @@
         }
 
         // Display historical data
-        function displayHistoricalData(data) {
+        async function displayHistoricalData(data, customerLat, customerLng) {
             const mechanicList = document.getElementById('mechanic-list');
             const resultsCount = document.getElementById('results-count');
             
@@ -656,19 +895,13 @@
             resultsCount.textContent = `Found ${mechanicsArray.length} mechanic${mechanicsArray.length > 1 ? 's' : ''} with historical data`;
             
             mechanicList.innerHTML = '';
+            const mechanicElements = [];
             
-            mechanicsArray.forEach(mechanic => {
+            // Create cards for all mechanics immediately
+            mechanicsArray.forEach((mechanic, index) => {
                 const mechanicDiv = document.createElement('div');
                 mechanicDiv.className = 'historical-mechanic';
-                
-                // Determine priority level for styling
-                let priorityClass = 'high';
-                if (mechanic.priority < 50) priorityClass = 'low';
-                else if (mechanic.priority < 60) priorityClass = 'medium';
-                
-                // Calculate success rate
-                const totalCalls = mechanic.done_calls + mechanic.cancelled_calls;
-                const successRate = totalCalls > 0 ? ((mechanic.done_calls / totalCalls) * 100).toFixed(1) : 0;
+                mechanicDiv.mechanicData = mechanic; // Store mechanic data on element
                 
                 // Generate star rating
                 const fullStars = Math.floor(mechanic.rating);
@@ -676,49 +909,68 @@
                 const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
                 const starsHTML = '★'.repeat(fullStars) + (hasHalfStar ? '☆' : '') + '☆'.repeat(emptyStars);
                 
-                // Create contact buttons based on available options
-                let contactButtonsHTML = '';
+                // Create action buttons
                 const hasWhatsApp = mechanic.whatsapp && mechanic.whatsapp !== null && mechanic.whatsapp !== '';
                 
+                let actionButtonsHTML = '';
                 if (hasWhatsApp) {
-                    // Both call and WhatsApp buttons
-                    contactButtonsHTML = `
-                        <div class="contact-buttons">
-                            <a class="contact-button call-button" href="tel:${mechanic.mobile}">
+                    actionButtonsHTML = `
+                        <div class="action-buttons">
+                            <a class="action-button call-button" href="tel:${mechanic.mobile}">
                                 📞 Call
                             </a>
-                            <a class="contact-button whatsapp-button" href="${mechanic.whatsapp}" target="_blank">
-                                💬 WhatsApp
+                            <a class="action-button whatsapp-button" href="${mechanic.whatsapp}" target="_blank">
+                                💬 Chat
+                            </a>
+                            <a class="action-button maps-button" href="https://www.google.com/maps/dir/?api=1&destination=${mechanic.lat},${mechanic.long}" target="_blank">
+                                🗺️ Maps
                             </a>
                         </div>
                     `;
                 } else {
-                    // Only call button
-                    contactButtonsHTML = `
-                        <div class="contact-buttons single">
-                            <a class="contact-button call-button" href="tel:${mechanic.mobile}">
-                                📞 Call ${mechanic.mobile}
+                    actionButtonsHTML = `
+                        <div class="action-buttons two-buttons">
+                            <a class="action-button call-button" href="tel:${mechanic.mobile}">
+                                📞 Call
+                            </a>
+                            <a class="action-button maps-button" href="https://www.google.com/maps/dir/?api=1&destination=${mechanic.lat},${mechanic.long}" target="_blank">
+                                🗺️ Open in Maps
                             </a>
                         </div>
+                    `;
+                }
+                
+                // Determine distance display based on position (top 5 vs rest)
+                let distanceHTML = '';
+                if (index < 5) {
+                    // Top 5 mechanics - show loading distance badge
+                    distanceHTML = `
+                        <div class="distance-badge loading">
+                            <div class="distance-info">
+                                <div class="distance-text">Loading...</div>
+                                <div class="time-text">Calculating</div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    // Rest of mechanics - show "Get Distance" button
+                    distanceHTML = `
+                        <button class="get-distance-btn" onclick="handleGetDistance(this, ${customerLat}, ${customerLng}, mechanicElements[${index}].mechanicData, mechanicElements[${index}])">
+                            Get Distance
+                        </button>
                     `;
                 }
                 
                 mechanicDiv.innerHTML = `
                     <div class="mechanic-header">
                         <div class="mechanic-name">${mechanic.name}</div>
-                        <div class="priority-badge ${priorityClass}">
-                            ${mechanic.priority.toFixed(1)}
-                        </div>
+                        ${distanceHTML}
                     </div>
                     
                     <div class="rating-container">
                         <div class="rating">
                             <span class="stars">${starsHTML}</span>
                             <span class="rating-value">${mechanic.rating.toFixed(1)}</span>
-                        </div>
-                        <div class="success-rate-compact">
-                            <div class="success-rate-value">${successRate}%</div>
-                            <div class="success-rate-label">Success</div>
                         </div>
                     </div>
                     
@@ -733,12 +985,26 @@
                         </div>
                     </div>
                     
-                    ${contactButtonsHTML}
+                    ${actionButtonsHTML}
                 `;
                 
                 mechanicList.appendChild(mechanicDiv);
+                mechanicElements.push(mechanicDiv);
             });
+            
+            // Make mechanicElements globally accessible for button clicks
+            window.mechanicElements = mechanicElements;
+            
+            // Calculate distances for top 5 mechanics in the background
+            try {
+                await calculateDistancesForTop5(customerLat, customerLng, mechanicElements);
+            } catch (error) {
+                console.error('Error calculating distances for top 5:', error);
+            }
         }
+
+        // Make handleGetDistance globally accessible
+        window.handleGetDistance = handleGetDistance;
 
         // Show error message
         function showError(message) {
@@ -774,28 +1040,50 @@
             });
         }
 
+        // Setup search functionality
+        function setupSearch() {
+            const searchButton = document.getElementById('search-button');
+            const searchInput = document.getElementById('search-input');
+            
+            searchButton.addEventListener('click', searchLocation);
+            
+            searchInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    searchLocation();
+                }
+            });
+        }
+
         // Initialize page
         async function initialize() {
+            await waitForGoogleMaps();
+            
             const locationData = getLocationFromURL();
-            if (!locationData) return;
+            
+            if (locationData) {
+                const locationDisplay = document.getElementById('location-display');
+                locationDisplay.textContent = `📍 ${locationData.display}`;
 
-            const locationDisplay = document.getElementById('location-display');
-            locationDisplay.textContent = `📍 ${locationData.display}`;
-
-            if (locationData.type === 'coordinates') {
-                currentPosition = { lat: locationData.lat, lng: locationData.lng };
-                loadHistoricalData(currentPosition.lat, currentPosition.lng, currentRadius);
-            } else if (locationData.type === 'address') {
-                locationDisplay.textContent = `📍 ${locationData.display} (Geocoding...)`;
-                const geocoded = await geocodeAddress(locationData.address);
-                if (geocoded) {
-                    currentPosition = { lat: geocoded.lat, lng: geocoded.lng };
-                    locationDisplay.textContent = `📍 ${geocoded.display}`;
+                if (locationData.type === 'coordinates') {
+                    currentPosition = { lat: locationData.lat, lng: locationData.lng };
                     loadHistoricalData(currentPosition.lat, currentPosition.lng, currentRadius);
+                } else if (locationData.type === 'address') {
+                    locationDisplay.textContent = `📍 ${locationData.display} (Geocoding...)`;
+                    try {
+                        const geocoded = await geocodeAddress(locationData.address);
+                        if (geocoded) {
+                            currentPosition = { lat: geocoded.lat, lng: geocoded.lng };
+                            locationDisplay.textContent = `📍 ${geocoded.display}`;
+                            loadHistoricalData(currentPosition.lat, currentPosition.lng, currentRadius);
+                        }
+                    } catch (error) {
+                        console.error('Geocoding error:', error);
+                    }
                 }
             }
 
             setupRadiusSlider();
+            setupSearch();
         }
 
         // Start the application
