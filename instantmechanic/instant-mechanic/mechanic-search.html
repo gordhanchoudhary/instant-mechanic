@@ -57,6 +57,10 @@
             color: white;
         }
 
+        .open-map-btn.hidden {
+            display: none;
+        }
+
         .search-container {
             background: rgba(255, 255, 255, 0.1);
             border-radius: 12px;
@@ -306,13 +310,13 @@
         .great-match-tag {
             background: linear-gradient(135deg, #28a745, #20c997);
             color: white;
-            padding: 6px 12px;
-            border-radius: 15px;
-            font-size: 0.65rem;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.6rem;
             font-weight: 700;
             position: absolute;
-            top: 8px;
-            right: 8px;
+            top: 12px;
+            left: 12px;
             z-index: 10;
             box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
             animation: pulse 2s infinite;
@@ -671,7 +675,7 @@
             <button class="search-button" id="search-button">Search Location</button>
         </div>
         
-        <a href="#" class="open-map-btn" id="open-map-btn" style="display: none;">
+        <a href="#" class="open-map-btn" id="open-map-btn">
             🗺️ Open My Location on Maps
         </a>
         
@@ -970,6 +974,8 @@
                 const searchContainer = document.getElementById('search-container');
                 searchContainer.classList.add('visible');
                 document.getElementById('location-display').textContent = '📍 Enter your location to find mechanics';
+                // Hide map button when no location
+                document.getElementById('open-map-btn').classList.add('hidden');
                 return null;
             }
 
@@ -1135,7 +1141,7 @@
         function updateMapButton(locationData = null) {
             const mapButton = document.getElementById('open-map-btn');
             if (currentPosition) {
-                mapButton.style.display = 'block';
+                mapButton.classList.remove('hidden');
                 
                 // Use original query if available (for address searches), otherwise use coordinates
                 if (locationData && locationData.originalQuery && locationData.type === 'address') {
@@ -1144,7 +1150,7 @@
                     mapButton.href = `https://www.google.com/maps/search/?api=1&query=${currentPosition.lat},${currentPosition.lng}`;
                 }
             } else {
-                mapButton.style.display = 'none';
+                mapButton.classList.add('hidden');
             }
         }
 
