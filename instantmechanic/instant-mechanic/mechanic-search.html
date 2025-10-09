@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8"
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Historical Mechanic Performance</title>
     <style>
@@ -710,14 +710,9 @@
         let debounceTimer = null;
         let googleMapsLoaded = false;
         let mechanicsWithDistanceData = []; // Cache for mechanics with calculated distances
+        let currentLocationData = null; // Store location data for map button
 
         // Wait for Google Maps to load
-        function initializeGoogleMaps() {
-            googleMapsLoaded = true;
-            console.log('Google Maps API loaded successfully');
-        }
-
-        // Ensure Google Maps is loaded
         function waitForGoogleMaps() {
             return new Promise((resolve) => {
                 if (typeof google !== 'undefined' && google.maps) {
@@ -1123,9 +1118,7 @@
             });
         }
 
-        // Setup map button - stores location data for button clicks
-        let currentLocationData = null;
-        
+        // Setup map button functionality
         function setupMapButton() {
             const mapButton = document.getElementById('open-map-btn');
             
@@ -1148,13 +1141,15 @@
                         mapsUrl = `https://www.google.com/maps/search/?api=1&query=${currentPosition.lat},${currentPosition.lng}`;
                     }
                     
+                    console.log('Opening Google Maps URL:', mapsUrl); // Debug log
+                    
                     // Open in new window/tab
                     window.open(mapsUrl, '_blank', 'noopener,noreferrer');
                 }
             });
         }
 
-        // Update map button visibility  
+        // Update map button visibility and store location data
         function updateMapButton(locationData = null) {
             const mapButton = document.getElementById('open-map-btn');
             
@@ -1167,34 +1162,6 @@
                 mapButton.classList.remove('hidden');
             } else {
                 mapButton.classList.add('hidden');
-            }
-        }
-
-        // Load historical data from API
-        async function loadHistoricalDataOld(lat, lng, radius) {
-            const mechanicList = document.getElementById('mechanic-list');
-            mechanicList.innerHTML = '<div class="loading">Loading performance data</div>';
-            
-            try {
-                const response = await fetch(`https://ai.instantmechanic.online/bot/api/find_mechanic?lat=${lat}&long=${lng}&radius=${radius}`, {
-                    method: 'GET',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Origin': 'https://instantmechanic.online',
-                        'Referer': 'https://instantmechanic.online/',
-                    }
-                });
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
-                const data = await response.json();
-                await displayHistoricalData(data, lat, lng);
-                
-            } catch (error) {
-                console.error('Error loading historical data:', error);
-                showError('Error loading performance data. Please try again later.');
             }
         }
 
@@ -1366,45 +1333,6 @@
             resultsCount.textContent = 'Error occurred';
         }
 
-        // Setup radius slider
-        function setupRadiusSlider() {
-            const slider = document.getElementById('radius-slider');
-            const radiusValue = document.getElementById('radius-value');
-            
-            // Create debounced function for loading historical data
-            const debouncedLoadHistoricalData = debounce((lat, lng, radius) => {
-                loadHistoricalData(lat, lng, radius);
-            }, 1000); // 1 second delay
-            
-            slider.addEventListener('input', (e) => {
-                currentRadius = parseFloat(e.target.value);
-                radiusValue.textContent = `${currentRadius} km`;
-                
-                // Show loading state immediately for better UX
-                if (currentPosition) {
-                    const mechanicList = document.getElementById('mechanic-list');
-                    mechanicList.innerHTML = '<div class="loading">Updating results</div>';
-                    
-                    // Call debounced function
-                    debouncedLoadHistoricalData(currentPosition.lat, currentPosition.lng, currentRadius);
-                }
-            });
-        }
-
-        // Setup search functionality
-        function setupSearch() {
-            const searchButton = document.getElementById('search-button');
-            const searchInput = document.getElementById('search-input');
-            
-            searchButton.addEventListener('click', searchLocation);
-            
-            searchInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    searchLocation();
-                }
-            });
-        }
-
         // Initialize page
         async function initialize() {
             await waitForGoogleMaps();
@@ -1417,6 +1345,7 @@
 
                 if (locationData.type === 'coordinates') {
                     currentPosition = { lat: locationData.lat, lng: locationData.lng };
+                    updateMapButton(locationData);
                     loadHistoricalData(currentPosition.lat, currentPosition.lng, currentRadius);
                 } else if (locationData.type === 'address') {
                     locationDisplay.textContent = `📍 ${locationData.display} (Geocoding...)`;
@@ -1425,6 +1354,7 @@
                         if (geocoded) {
                             currentPosition = { lat: geocoded.lat, lng: geocoded.lng };
                             locationDisplay.textContent = `📍 ${geocoded.display}`;
+                            updateMapButton(locationData);
                             loadHistoricalData(currentPosition.lat, currentPosition.lng, currentRadius);
                         }
                     } catch (error) {
@@ -1435,6 +1365,7 @@
 
             setupRadiusSlider();
             setupSearch();
+            setupMapButton(); // This is the key fix - was missing before!
         }
 
         // Start the application
