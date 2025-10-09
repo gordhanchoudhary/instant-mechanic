@@ -316,7 +316,7 @@
             font-weight: 700;
             position: absolute;
             top: 12px;
-            left: 150px;
+            left: 12px;
             z-index: 10;
             box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
             animation: pulse 2s infinite;
@@ -675,7 +675,7 @@
             <button class="search-button" id="search-button">Search Location</button>
         </div>
         
-        <a href="#" class="open-map-btn" id="open-map-btn">
+        <a href="javascript:void(0)" class="open-map-btn" id="open-map-btn">
             🗺️ Open My Location on Maps
         </a>
         
@@ -1129,26 +1129,35 @@
             
             mapButton.addEventListener('click', (e) => {
                 e.preventDefault();
+                e.stopPropagation();
+                
                 if (currentPosition) {
-                    // Use coordinates for precise location
-                    const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${currentPosition.lat},${currentPosition.lng}`;
+                    // Determine which URL to use based on available data
+                    let mapsUrl;
+                    
+                    // Check if we have location data with original query
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const query = urlParams.get('q');
+                    
+                    if (query && !query.match(/^-?\d+\.?\d*\s*,\s*-?\d+\.?\d*$/)) {
+                        // It's an address query
+                        mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+                    } else {
+                        // It's coordinates or no specific address
+                        mapsUrl = `https://www.google.com/maps/search/?api=1&query=${currentPosition.lat},${currentPosition.lng}`;
+                    }
+                    
+                    console.log('Opening map with URL:', mapsUrl); // Debug log
                     window.open(mapsUrl, '_blank');
                 }
             });
         }
 
-        // Update map button visibility and link
+        // Update map button visibility  
         function updateMapButton(locationData = null) {
             const mapButton = document.getElementById('open-map-btn');
             if (currentPosition) {
                 mapButton.classList.remove('hidden');
-                
-                // Use original query if available (for address searches), otherwise use coordinates
-                if (locationData && locationData.originalQuery && locationData.type === 'address') {
-                    mapButton.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(locationData.originalQuery)}`;
-                } else {
-                    mapButton.href = `https://www.google.com/maps/search/?api=1&query=${currentPosition.lat},${currentPosition.lng}`;
-                }
             } else {
                 mapButton.classList.add('hidden');
             }
