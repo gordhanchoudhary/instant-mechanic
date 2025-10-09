@@ -249,10 +249,28 @@
             flex-shrink: 0;
             min-width: 80px;
             text-align: center;
+            transition: all 0.3s ease;
         }
 
         .distance-badge.loading {
             background: linear-gradient(135deg, #6c757d, #495057);
+            display: none; /* Hide loading badges initially */
+        }
+
+        .distance-badge.loaded {
+            background: linear-gradient(135deg, #17a2b8, #138496);
+            animation: slideInRight 0.5s ease-out;
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
         }
 
         .distance-info {
@@ -277,44 +295,75 @@
         .great-match-tag {
             background: linear-gradient(135deg, #28a745, #20c997);
             color: white;
-            padding: 4px 8px;
-            border-radius: 12px;
+            padding: 6px 10px;
+            border-radius: 15px;
             font-size: 0.65rem;
-            font-weight: 600;
+            font-weight: 700;
             position: absolute;
-            top: -8px;
-            right: -8px;
+            top: -10px;
+            right: -10px;
             z-index: 10;
-            box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
             animation: pulse 2s infinite;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
         }
 
         @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
+            0%, 100% { 
+                transform: scale(1);
+                box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+            }
+            50% { 
+                transform: scale(1.05);
+                box-shadow: 0 6px 20px rgba(40, 167, 69, 0.6);
+            }
         }
 
         .get-distance-btn {
             background: linear-gradient(135deg, #ffc107, #fd7e14);
             color: white;
             border: none;
-            padding: 4px 8px;
+            padding: 6px 12px;
             border-radius: 20px;
             font-size: 0.7rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
             white-space: nowrap;
+            position: relative;
+            overflow: hidden;
         }
 
-        .get-distance-btn:hover {
+        .get-distance-btn:hover:not(:disabled) {
             background: linear-gradient(135deg, #e0a800, #dc6415);
             transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
         }
 
         .get-distance-btn:disabled {
-            background: #6c757d;
+            background: linear-gradient(135deg, #6c757d, #495057);
             cursor: not-allowed;
+            transform: none;
+        }
+
+        .get-distance-btn.loading::after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            border: 2px solid transparent;
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .get-distance-btn.loading {
+            color: transparent;
         }
 
         .rating-container {
@@ -723,7 +772,8 @@
                     avoidHighways: false,
                     avoidTolls: false
                 }, (response, status) => {
-                    const distanceBadge = mechanicElement.querySelector('.distance-badge');
+                    let distanceBadge = mechanicElement.querySelector('.distance-badge');
+                    let getDistanceBtn = mechanicElement.querySelector('.get-distance-btn');
                     
                     if (status === google.maps.DistanceMatrixStatus.OK) {
                         const element = response.rows[0].elements[0];
@@ -742,13 +792,29 @@
                                 mechanicsWithDistanceData.push({ ...mechanic, ...distanceData });
                             }
                             
+                            // Create or update distance badge
+                            if (!distanceBadge) {
+                                // Create new distance badge for mechanics that didn't have one
+                                distanceBadge = document.createElement('div');
+                                distanceBadge.className = 'distance-badge loaded';
+                                const mechanicHeader = mechanicElement.querySelector('.mechanic-header');
+                                if (getDistanceBtn) {
+                                    mechanicHeader.replaceChild(distanceBadge, getDistanceBtn);
+                                } else {
+                                    mechanicHeader.appendChild(distanceBadge);
+                                }
+                            } else {
+                                distanceBadge.classList.remove('loading');
+                                distanceBadge.classList.add('loaded');
+                                distanceBadge.style.display = 'block';
+                            }
+                            
                             distanceBadge.innerHTML = `
                                 <div class="distance-info">
                                     <div class="distance-text">${element.distance.text}</div>
                                     <div class="time-text">${element.duration.text}</div>
                                 </div>
                             `;
-                            distanceBadge.classList.remove('loading');
                             
                             // Check for great match and add tag
                             if (isGreatMatch(mechanic, distanceData)) {
@@ -778,13 +844,28 @@
                         distanceValue: straightDistance * 1000
                     };
                     
+                    // Create or update distance badge
+                    if (!distanceBadge) {
+                        distanceBadge = document.createElement('div');
+                        distanceBadge.className = 'distance-badge loaded';
+                        const mechanicHeader = mechanicElement.querySelector('.mechanic-header');
+                        if (getDistanceBtn) {
+                            mechanicHeader.replaceChild(distanceBadge, getDistanceBtn);
+                        } else {
+                            mechanicHeader.appendChild(distanceBadge);
+                        }
+                    } else {
+                        distanceBadge.classList.remove('loading');
+                        distanceBadge.classList.add('loaded');
+                        distanceBadge.style.display = 'block';
+                    }
+                    
                     distanceBadge.innerHTML = `
                         <div class="distance-info">
                             <div class="distance-text">${straightDistance.toFixed(1)} km</div>
                             <div class="time-text">Est. time</div>
                         </div>
                     `;
-                    distanceBadge.classList.remove('loading');
                     resolve(distanceData);
                 });
             });
@@ -793,15 +874,23 @@
         // Handle individual distance calculation for non-top-5 mechanics
         async function handleGetDistance(button, customerLat, customerLng, mechanic, mechanicElement) {
             button.disabled = true;
-            button.textContent = 'Loading...';
+            button.classList.add('loading');
             
             try {
                 await calculateDistance(customerLat, customerLng, mechanic, mechanicElement);
-                button.style.display = 'none';
+                
+                // Hide the button with animation
+                button.style.opacity = '0';
+                button.style.transform = 'scale(0.8)';
+                
+                setTimeout(() => {
+                    button.style.display = 'none';
+                }, 300);
+                
             } catch (error) {
                 console.error('Error calculating distance:', error);
                 button.disabled = false;
-                button.textContent = 'Get Distance';
+                button.classList.remove('loading');
             }
         }
 
@@ -965,6 +1054,45 @@
             }
         }
 
+        // Setup radius slider
+        function setupRadiusSlider() {
+            const slider = document.getElementById('radius-slider');
+            const radiusValue = document.getElementById('radius-value');
+            
+            // Create debounced function for loading historical data
+            const debouncedLoadHistoricalData = debounce((lat, lng, radius) => {
+                loadHistoricalData(lat, lng, radius);
+            }, 1000); // 1 second delay
+            
+            slider.addEventListener('input', (e) => {
+                currentRadius = parseFloat(e.target.value);
+                radiusValue.textContent = `${currentRadius} km`;
+                
+                // Show loading state immediately for better UX
+                if (currentPosition) {
+                    const mechanicList = document.getElementById('mechanic-list');
+                    mechanicList.innerHTML = '<div class="loading">Updating results</div>';
+                    
+                    // Call debounced function - this will reuse cached distances
+                    debouncedLoadHistoricalData(currentPosition.lat, currentPosition.lng, currentRadius);
+                }
+            });
+        }
+
+        // Setup search functionality
+        function setupSearch() {
+            const searchButton = document.getElementById('search-button');
+            const searchInput = document.getElementById('search-input');
+            
+            searchButton.addEventListener('click', searchLocation);
+            
+            searchInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    searchLocation();
+                }
+            });
+        }
+
         // Setup map button
         function setupMapButton() {
             const mapButton = document.getElementById('open-map-btn');
@@ -1089,47 +1217,26 @@
                 
                 // Determine distance display based on position and cache
                 let distanceHTML = '';
-                if (index < 5) {
-                    if (cachedData) {
-                        // Use cached data
-                        distanceHTML = `
-                            <div class="distance-badge">
-                                <div class="distance-info">
-                                    <div class="distance-text">${cachedData.distance}</div>
-                                    <div class="time-text">${cachedData.duration}</div>
-                                </div>
+                if (cachedData) {
+                    // Use cached data - show immediately
+                    distanceHTML = `
+                        <div class="distance-badge loaded">
+                            <div class="distance-info">
+                                <div class="distance-text">${cachedData.distance}</div>
+                                <div class="time-text">${cachedData.duration}</div>
                             </div>
-                        `;
-                    } else {
-                        // Show loading for top 5 mechanics
-                        distanceHTML = `
-                            <div class="distance-badge loading">
-                                <div class="distance-info">
-                                    <div class="distance-text">Loading...</div>
-                                    <div class="time-text">Calculating</div>
-                                </div>
-                            </div>
-                        `;
-                    }
+                        </div>
+                    `;
+                } else if (index < 5) {
+                    // Top 5 mechanics - show empty space, will be filled silently
+                    distanceHTML = `<div class="distance-placeholder" style="width: 80px; height: 20px;"></div>`;
                 } else {
-                    if (cachedData) {
-                        // Use cached data
-                        distanceHTML = `
-                            <div class="distance-badge">
-                                <div class="distance-info">
-                                    <div class="distance-text">${cachedData.distance}</div>
-                                    <div class="time-text">${cachedData.duration}</div>
-                                </div>
-                            </div>
-                        `;
-                    } else {
-                        // Show "Get Distance" button for non-top-5
-                        distanceHTML = `
-                            <button class="get-distance-btn" onclick="handleGetDistance(this, ${customerLat}, ${customerLng}, window.mechanicElements[${index}].mechanicData, window.mechanicElements[${index}])">
-                                Get Distance
-                            </button>
-                        `;
-                    }
+                    // Rest of mechanics - show "Get Distance" button
+                    distanceHTML = `
+                        <button class="get-distance-btn" onclick="handleGetDistance(this, ${customerLat}, ${customerLng}, window.mechanicElements[${index}].mechanicData, window.mechanicElements[${index}])">
+                            Get Distance
+                        </button>
+                    `;
                 }
                 
                 mechanicDiv.innerHTML = `
@@ -1174,23 +1281,22 @@
             // Make mechanicElements globally accessible for button clicks
             window.mechanicElements = mechanicElements;
             
-            // Calculate distances for top 5 mechanics that don't have cached data
+            // Calculate distances for top 5 mechanics that don't have cached data - silently in background
             const top5NeedingDistance = mechanicElements.slice(0, 5).filter((element, index) => {
                 const mechanic = element.mechanicData;
                 return !mechanicsWithDistanceData.find(m => m.name === mechanic.name);
             });
             
             if (top5NeedingDistance.length > 0) {
-                const distancePromises = top5NeedingDistance.map(element => {
+                // Start distance calculations silently in background
+                top5NeedingDistance.forEach(async (element) => {
                     const mechanicData = element.mechanicData;
-                    return calculateDistance(customerLat, customerLng, mechanicData, element);
+                    try {
+                        await calculateDistance(customerLat, customerLng, mechanicData, element);
+                    } catch (error) {
+                        console.error('Error calculating distance for', mechanicData.name, ':', error);
+                    }
                 });
-                
-                try {
-                    await Promise.all(distancePromises);
-                } catch (error) {
-                    console.error('Error calculating distances for top 5:', error);
-                }
             }
         }
 
