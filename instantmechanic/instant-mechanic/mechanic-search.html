@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8"
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Instant Mechanic AI Suggestion</title>
+    <title>Instant Mechanic AI Finder</title>
     <style>
         * {
             margin: 0;
@@ -668,7 +668,7 @@
 </head>
 <body>
     <div class="header">
-        <h1>Instant Mechanic AI Suggestion</h1>
+        <h1>Instant Mechanic AI Finder</h1>
         
         <div class="search-container" id="search-container">
             <input type="text" class="search-input" id="search-input" placeholder="Enter your location (e.g., New Delhi, India)">
@@ -1217,9 +1217,14 @@
                             <a class="action-button call-button" href="tel:${mechanic.mobile}">
                                 📞 Call
                             </a>
-                            <a class="action-button whatsapp-button" href="${mechanic.whatsapp}" target="_blank">
-                                💬 Chat
-                            </a>
+<a class="action-button whatsapp-button" href="${mechanic.whatsapp}" target="_blank">
+    <img 
+        src="https://cdn-icons-png.freepik.com/512/1383/1383269.png?ga=GA1.1.30113634.1732615020" 
+        alt="WhatsApp Icon" 
+        style="width:18px; height:18px; vertical-align:middle; margin-right:6px;">
+    WhatsApp Group
+</a>
+
                         </div>
                     `;
                 } else {
