@@ -222,6 +222,17 @@
             box-shadow: 0 4px 20px rgba(0,0,0,0.12);
         }
 
+        .historical-mechanic.great-match {
+            background: linear-gradient(135deg, #f8fff9, #e8f5e8);
+            border: 2px solid rgba(40, 167, 69, 0.2);
+            box-shadow: 0 2px 12px rgba(40, 167, 69, 0.15);
+        }
+
+        .historical-mechanic.great-match:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(40, 167, 69, 0.25);
+        }
+
         .mechanic-header {
             display: flex;
             justify-content: space-between;
@@ -295,19 +306,20 @@
         .great-match-tag {
             background: linear-gradient(135deg, #28a745, #20c997);
             color: white;
-            padding: 6px 10px;
+            padding: 6px 12px;
             border-radius: 15px;
             font-size: 0.65rem;
             font-weight: 700;
             position: absolute;
-            top: -10px;
-            right: -10px;
+            top: 8px;
+            right: 8px;
             z-index: 10;
             box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
             animation: pulse 2s infinite;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(5px);
         }
 
         @keyframes pulse {
@@ -816,7 +828,7 @@
                                 </div>
                             `;
                             
-                            // Check for great match and add tag
+                            // Check for great match and add tag + styling
                             if (isGreatMatch(mechanic, distanceData)) {
                                 const existingTag = mechanicElement.querySelector('.great-match-tag');
                                 if (!existingTag) {
@@ -825,6 +837,8 @@
                                     greatMatchTag.textContent = 'Great Match';
                                     mechanicElement.appendChild(greatMatchTag);
                                 }
+                                // Add great match styling to the card
+                                mechanicElement.classList.add('great-match');
                             }
                             
                             resolve(distanceData);
@@ -972,7 +986,8 @@
                             type: 'coordinates',
                             lat: coords[0],
                             lng: coords[1],
-                            display: `${coords[0].toFixed(6)}, ${coords[1].toFixed(6)}`
+                            display: `${coords[0].toFixed(6)}, ${coords[1].toFixed(6)}`,
+                            originalQuery: query
                         };
                     } else {
                         showError('Coordinates out of range. Latitude: -90 to 90, Longitude: -180 to 180');
@@ -987,7 +1002,8 @@
                 return {
                     type: 'address',
                     address: query,
-                    display: query
+                    display: query,
+                    originalQuery: query
                 };
             }
         }
@@ -1038,7 +1054,15 @@
                     
                     // Hide search container and show map button
                     document.getElementById('search-container').classList.remove('visible');
-                    updateMapButton();
+                    
+                    // Create location data for map button
+                    const locationData = {
+                        type: 'address',
+                        originalQuery: address,
+                        display: geocoded.display
+                    };
+                    
+                    updateMapButton(locationData);
                     
                     // Update URL with coordinates
                     const newUrl = `${window.location.pathname}?q=${geocoded.lat},${geocoded.lng}`;
@@ -1100,18 +1124,25 @@
             mapButton.addEventListener('click', (e) => {
                 e.preventDefault();
                 if (currentPosition) {
-                    const mapsUrl = `https://www.google.com/maps/@${currentPosition.lat},${currentPosition.lng},15z`;
+                    // Use coordinates for precise location
+                    const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${currentPosition.lat},${currentPosition.lng}`;
                     window.open(mapsUrl, '_blank');
                 }
             });
         }
 
         // Update map button visibility and link
-        function updateMapButton() {
+        function updateMapButton(locationData = null) {
             const mapButton = document.getElementById('open-map-btn');
             if (currentPosition) {
                 mapButton.style.display = 'block';
-                mapButton.href = `https://www.google.com/maps/@${currentPosition.lat},${currentPosition.lng},15z`;
+                
+                // Use original query if available (for address searches), otherwise use coordinates
+                if (locationData && locationData.originalQuery && locationData.type === 'address') {
+                    mapButton.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(locationData.originalQuery)}`;
+                } else {
+                    mapButton.href = `https://www.google.com/maps/search/?api=1&query=${currentPosition.lat},${currentPosition.lng}`;
+                }
             } else {
                 mapButton.style.display = 'none';
             }
@@ -1269,12 +1300,13 @@
                 mechanicList.appendChild(mechanicDiv);
                 mechanicElements.push(mechanicDiv);
                 
-                // Add great match tag if cached data shows it's a great match
+                // Add great match tag and styling if cached data shows it's a great match
                 if (cachedData && isGreatMatch(mechanic, cachedData)) {
                     const greatMatchTag = document.createElement('div');
                     greatMatchTag.className = 'great-match-tag';
                     greatMatchTag.textContent = 'Great Match';
                     mechanicDiv.appendChild(greatMatchTag);
+                    mechanicDiv.classList.add('great-match');
                 }
             });
             
