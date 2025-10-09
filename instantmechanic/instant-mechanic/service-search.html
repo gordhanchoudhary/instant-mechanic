@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Historical Mechanic Performance</title>
+    <title>Mechanic & Garage Locator</title>
     <style>
         * {
             margin: 0;
@@ -13,358 +13,440 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            height: 100vh;
+            overflow: hidden;
             background-color: #f8f9fa;
-            min-height: 100vh;
         }
 
         .header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             padding: 1rem;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-            position: sticky;
-            top: 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: relative;
             z-index: 1000;
         }
 
         .header h1 {
-            font-size: 1.3rem;
+            font-size: 1.5rem;
             font-weight: 600;
+            margin-bottom: 1rem;
             text-align: center;
-            margin-bottom: 0.5rem;
         }
 
-        .open-map-btn {
-            background: linear-gradient(135deg, #4285f4, #1a73e8);
-            color: white;
-            border: none;
-            padding: 0.6rem 1rem;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: block;
-            margin: 0 auto 1rem;
-            text-decoration: none;
-        }
-
-        .open-map-btn:hover {
-            background: linear-gradient(135deg, #1a73e8, #1557b0);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 15px rgba(66, 133, 244, 0.4);
-            text-decoration: none;
-            color: white;
-        }
-
-        .search-container {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            padding: 0.75rem;
-            backdrop-filter: blur(10px);
-            max-width: 400px;
-            margin: 0 auto 1rem;
-            display: none;
-        }
-
-        .search-container.visible {
-            display: block;
-        }
-
-        .search-input {
-            width: 100%;
-            padding: 0.75rem;
-            border: none;
-            border-radius: 8px;
-            font-size: 1rem;
-            outline: none;
-            background: rgba(255, 255, 255, 0.9);
-            color: #333;
-        }
-
-        .search-input::placeholder {
-            color: #666;
-        }
-
-        .search-button {
-            width: 100%;
-            padding: 0.75rem;
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 0.5rem;
-            backdrop-filter: blur(5px);
-            transition: all 0.2s ease;
-        }
-
-        .search-button:hover {
-            background: rgba(255, 255, 255, 0.3);
-        }
-
-        .location-display {
-            text-align: center;
-            font-size: 0.85rem;
-            opacity: 0.9;
+        .toggle-container {
+            display: flex;
+            justify-content: center;
             margin-bottom: 1rem;
         }
 
-        .radius-control {
+        .toggle {
             background: rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            padding: 0.75rem;
-            backdrop-filter: blur(10px);
-            max-width: 350px;
-            margin: 0 auto;
-        }
-
-        .radius-label {
-            font-size: 0.9rem;
-            margin-bottom: 0.5rem;
+            border-radius: 50px;
+            padding: 4px;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .toggle-option {
+            padding: 8px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
             font-weight: 500;
+            font-size: 0.9rem;
         }
 
-        .radius-value {
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            padding: 4px 8px;
-            border-radius: 15px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            backdrop-filter: blur(5px);
+        .toggle-option.active {
+            background: white;
+            color: #667eea;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
         }
 
-        .radius-slider {
-            width: 100%;
-            height: 6px;
-            border-radius: 3px;
-            background: rgba(255, 255, 255, 0.2);
+        .search-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .search-row {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 12px 16px;
+            border: none;
+            border-radius: 25px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            font-size: 1rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
             outline: none;
-            -webkit-appearance: none;
-            appearance: none;
-            cursor: pointer;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
 
-        .radius-slider::-webkit-slider-thumb {
-            appearance: none;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
+        .search-btn {
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            white-space: nowrap;
+        }
+
+        .search-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .container {
+            display: flex;
+            height: calc(100vh - 180px);
+        }
+
+        #map {
+            flex: 1;
+            height: 100%;
+            min-height: 300px;
+        }
+
+        #info-panel {
+            width: 380px;
             background: white;
-            cursor: pointer;
-            border: 2px solid #667eea;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-            transition: all 0.2s ease;
+            border-left: 1px solid #e9ecef;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
         }
 
-        .radius-slider::-webkit-slider-thumb:hover {
-            transform: scale(1.1);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+        .panel-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e9ecef;
+            background: #f8f9fa;
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
 
-        .radius-slider::-moz-range-thumb {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: white;
-            cursor: pointer;
-            border: 2px solid #667eea;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-        }
-
-        .main-container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 1rem;
-        }
-
-        .results-header {
-            text-align: center;
-            margin-bottom: 1.5rem;
+        .panel-header h3 {
+            font-size: 1.1rem;
+            color: #495057;
+            font-weight: 600;
         }
 
         .results-count {
-            font-size: 1rem;
-            color: #495057;
-            font-weight: 500;
-        }
-
-        .results-subtitle {
             font-size: 0.85rem;
             color: #6c757d;
             margin-top: 0.25rem;
         }
 
         .mechanic-list {
-            display: grid;
-            gap: 1rem;
+            padding: 1rem;
         }
 
-        .historical-mechanic {
+        .mechanic-info {
             background: white;
             border-radius: 12px;
             padding: 1rem;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            margin-bottom: 0.75rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
             border: 1px solid #e9ecef;
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
         }
 
-        .historical-mechanic:hover {
+        .mechanic-info:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+        }
+
+        .mechanic-info::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: var(--route-color, #007bff);
         }
 
         .mechanic-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 0.75rem;
-            gap: 0.5rem;
+            margin-bottom: 0.5rem;
         }
 
         .mechanic-name {
             font-size: 1rem;
             font-weight: 600;
             color: #212529;
-            line-height: 1.3;
-            flex: 1;
+            margin-bottom: 0.25rem;
+            line-height: 1.2;
         }
 
-        .distance-badge {
-            background: linear-gradient(135deg, #17a2b8, #138496);
-            color: white;
-            padding: 8px 12px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            white-space: nowrap;
-            flex-shrink: 0;
-            min-width: 80px;
-            text-align: center;
-        }
-
-        .distance-badge.loading {
-            background: linear-gradient(135deg, #6c757d, #495057);
-        }
-
-        .distance-info {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 3px;
-        }
-
-        .distance-text {
-            font-size: 0.85rem;
-            font-weight: 700;
-            line-height: 1;
-        }
-
-        .time-text {
+        .mechanic-type {
             font-size: 0.7rem;
-            opacity: 0.9;
-            line-height: 1;
+            background: #e9ecef;
+            color: #495057;
+            padding: 3px 6px;
+            border-radius: 10px;
+            text-transform: uppercase;
+            font-weight: 500;
         }
 
-        .great-match-tag {
-            background: linear-gradient(135deg, #28a745, #20c997);
-            color: white;
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 0.65rem;
-            font-weight: 600;
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            z-index: 10;
-            box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-
-        .get-distance-btn {
-            background: linear-gradient(135deg, #ffc107, #fd7e14);
-            color: white;
-            border: none;
-            padding: 4px 8px;
-            border-radius: 20px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            white-space: nowrap;
-        }
-
-        .get-distance-btn:hover {
-            background: linear-gradient(135deg, #e0a800, #dc6415);
-            transform: translateY(-1px);
-        }
-
-        .get-distance-btn:disabled {
-            background: #6c757d;
-            cursor: not-allowed;
+        .mechanic-type.garage {
+            background: #d1ecf1;
+            color: #0c5460;
         }
 
         .rating-container {
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            margin-bottom: 0.75rem;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
         }
 
         .rating {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            font-size: 0.9rem;
-        }
-
-        .stars {
+            gap: 0.25rem;
+            font-size: 0.85rem;
             color: #ffc107;
-            font-size: 1rem;
         }
 
-        .rating-value {
+        .stats {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 0.5rem;
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+
+        .distance-time {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+            font-size: 0.85rem;
+        }
+
+        .distance {
+            color: #28a745;
             font-weight: 600;
-            color: #495057;
         }
 
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 0.5rem;
-            margin: 0.75rem 0;
+        .time {
+            color: #dc3545;
+            font-weight: 600;
         }
 
-        .stat-card {
-            background: #f8f9fa;
-            border-radius: 8px;
-            padding: 0.5rem;
+        .action-buttons {
+            display: flex;
+            gap: 6px;
+            margin-top: 0.75rem;
+        }
+
+        .call-button, .whatsapp-button {
+            display: inline-block;
+            flex: 1;
+            padding: 8px 12px;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
             text-align: center;
-            transition: all 0.2s ease;
+            font-weight: 500;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
         }
 
-        .stat-card:hover {
+        .call-button {
+            background: linear-gradient(135deg, #28a745, #20c997);
+        }
+
+        .call-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+        }
+
+        .whatsapp-button {
+            background: linear-gradient(135deg, #25d366, #128c7e);
+        }
+
+        .whatsapp-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
+        }
+
+        .single-button {
+            width: 100%;
+        }
+
+        .panel-tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .panel-tab {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: #6c757d;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .panel-tab.active {
+            color: #495057;
+            background: white;
+            border-bottom-color: #667eea;
+        }
+
+        .panel-tab:hover {
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .radius-control {
+            padding: 1rem;
+            border-bottom: 1px solid #e9ecef;
+            background: #f8f9fa;
+        }
+
+        .radius-label {
+            font-size: 0.9rem;
+            color: #495057;
+            margin-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .radius-value {
+            background: #667eea;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .radius-slider {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
             background: #e9ecef;
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .radius-slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            border: 2px solid white;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+
+        .radius-slider::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            border: 2px solid white;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+
+        .historical-mechanic {
+            background: white;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border: 1px solid #e9ecef;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .historical-mechanic:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+        }
+
+        .priority-badge {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 15px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .priority-badge.high {
+            background: linear-gradient(135deg, #28a745, #20c997);
+        }
+
+        .priority-badge.medium {
+            background: linear-gradient(135deg, #ffc107, #fd7e14);
+        }
+
+        .priority-badge.low {
+            background: linear-gradient(135deg, #dc3545, #e74c3c);
+        }
+
+        .mechanic-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.25rem;
+            margin: 0.5rem 0;
+            font-size: 0.8rem;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.2rem 0;
+        }
+
+        .stat-label {
+            color: #6c757d;
         }
 
         .stat-value {
-            font-size: 1.1rem;
-            font-weight: 700;
-            margin-bottom: 0.1rem;
-            line-height: 1;
+            font-weight: 600;
+            color: #495057;
         }
 
         .stat-value.success {
@@ -375,80 +457,10 @@
             color: #dc3545;
         }
 
-        .stat-value.info {
-            color: #17a2b8;
-        }
-
-        .stat-label {
-            font-size: 0.7rem;
-            color: #6c757d;
-            font-weight: 500;
-        }
-
-        .action-buttons {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 0.5rem;
-            margin-top: 0.75rem;
-        }
-
-        .action-buttons.single {
-            grid-template-columns: 1fr;
-        }
-
-        .action-button {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.3rem;
-            padding: 8px;
-            text-decoration: none;
-            border-radius: 8px;
-            text-align: center;
-            font-weight: 600;
-            font-size: 0.75rem;
-            transition: all 0.3s ease;
-            color: white;
-        }
-
-        .call-button {
-            background: linear-gradient(135deg, #28a745, #20c997);
-        }
-
-        .call-button:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.4);
-            text-decoration: none;
-            color: white;
-        }
-
-        .whatsapp-button {
-            background: linear-gradient(135deg, #25d366, #128c7e);
-        }
-
-        .whatsapp-button:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4);
-            text-decoration: none;
-            color: white;
-        }
-
-        .maps-button {
-            background: linear-gradient(135deg, #4285f4, #1a73e8);
-        }
-
-        .maps-button:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 15px rgba(66, 133, 244, 0.4);
-            text-decoration: none;
-            color: white;
-        }
-
         .loading {
             text-align: center;
-            padding: 2rem 1rem;
+            padding: 2rem;
             color: #6c757d;
-            font-size: 1rem;
         }
 
         .loading::after {
@@ -460,29 +472,7 @@
             border-top: 2px solid #667eea;
             border-radius: 50%;
             animation: spin 1s linear infinite;
-            margin-left: 0.75rem;
-            vertical-align: middle;
-        }
-
-        .no-results {
-            text-align: center;
-            padding: 2rem 1rem;
-            color: #6c757d;
-        }
-
-        .no-results-icon {
-            font-size: 3rem;
-            margin-bottom: 0.75rem;
-            opacity: 0.3;
-        }
-
-        .error {
-            background: #f8d7da;
-            color: #721c24;
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 1.5rem;
-            text-align: center;
+            margin-left: 0.5rem;
         }
 
         @keyframes spin {
@@ -497,353 +487,251 @@
             }
 
             .header h1 {
-                font-size: 1.2rem;
+                font-size: 1.25rem;
             }
 
-            .main-container {
-                padding: 0.75rem;
+            .search-container {
+                gap: 0.5rem;
             }
 
-            .historical-mechanic {
-                padding: 0.85rem;
+            .search-row {
+                flex-direction: column;
+                gap: 0.5rem;
             }
 
-            .mechanic-header {
+            .search-btn {
+                width: 100%;
+                padding: 14px;
+            }
+
+            .container {
+                flex-direction: column;
+                height: calc(100vh - 160px);
+            }
+
+            #map {
+                height: 35%;
+                min-height: 200px;
+            }
+
+            #info-panel {
+                width: 100%;
+                height: 65%;
+                border-left: none;
+                border-top: 1px solid #e9ecef;
+            }
+
+            .mechanic-info, .historical-mechanic {
                 margin-bottom: 0.5rem;
+                padding: 0.75rem;
             }
 
             .mechanic-name {
                 font-size: 0.95rem;
             }
 
-            .rating-container {
+            .rating {
+                font-size: 0.8rem;
+            }
+
+            .stats {
+                font-size: 0.75rem;
+                gap: 0.5rem;
+            }
+
+            .distance-time {
+                font-size: 0.8rem;
+            }
+
+            .call-button, .whatsapp-button {
+                padding: 6px 8px;
+                font-size: 0.75rem;
+            }
+
+            .toggle-option {
+                padding: 6px 16px;
+                font-size: 0.85rem;
+            }
+
+            .panel-tab {
+                font-size: 0.8rem;
+                padding: 0.5rem 0.75rem;
+            }
+
+            .mechanic-stats {
+                grid-template-columns: 1fr;
+                gap: 0.2rem;
+                font-size: 0.75rem;
+            }
+
+            .radius-control {
+                padding: 0.75rem;
+            }
+
+            .priority-badge {
+                position: static;
+                display: inline-block;
                 margin-bottom: 0.5rem;
-            }
-
-            .stats-grid {
-                margin: 0.5rem 0;
-                gap: 0.4rem;
-            }
-
-            .stat-card {
-                padding: 0.4rem;
-            }
-
-            .stat-value {
-                font-size: 1rem;
-            }
-
-            .action-buttons {
-                margin-top: 0.5rem;
-                gap: 0.4rem;
-            }
-
-            .action-button {
-                padding: 7px;
-                font-size: 0.7rem;
+                font-size: 0.65rem;
+                padding: 2px 6px;
             }
         }
 
         @media (max-width: 480px) {
             .header {
-                padding: 0.6rem;
+                padding: 0.5rem;
             }
 
-            .radius-control {
-                padding: 0.6rem;
+            .search-input {
+                padding: 10px 14px;
+                font-size: 0.9rem;
             }
 
-            .main-container {
-                padding: 0.6rem;
+            .search-btn {
+                padding: 10px;
+                font-size: 0.85rem;
             }
 
-            .historical-mechanic {
-                padding: 0.75rem;
+            #info-panel {
+                height: 70%;
+            }
+
+            #map {
+                height: 30%;
+                min-height: 180px;
+            }
+
+            .panel-tab {
+                font-size: 0.75rem;
+                padding: 0.4rem 0.5rem;
+            }
+
+            .mechanic-info, .historical-mechanic {
+                padding: 0.6rem;
+                margin-bottom: 0.4rem;
             }
 
             .mechanic-name {
                 font-size: 0.9rem;
             }
 
-            .action-button {
-                padding: 6px;
-                font-size: 0.65rem;
-            }
-
-            .results-header {
-                margin-bottom: 1rem;
-            }
-
-            .mechanic-list {
-                gap: 0.75rem;
-            }
-        }
-
-        @media (max-width: 360px) {
-            .historical-mechanic {
-                padding: 0.6rem;
-            }
-
-            .stats-grid {
-                grid-template-columns: 1fr;
-                gap: 0.3rem;
-            }
-
-            .action-buttons {
-                grid-template-columns: 1fr;
-                gap: 0.3rem;
-            }
-
-            .action-button {
-                padding: 6px;
-                font-size: 0.65rem;
+            .call-button, .whatsapp-button {
+                padding: 5px 6px;
+                font-size: 0.7rem;
             }
         }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1>Historical Mechanic Performance</h1>
+        <h1>Service Locator</h1>
         
-        <div class="search-container" id="search-container">
-            <input type="text" class="search-input" id="search-input" placeholder="Enter your location (e.g., New Delhi, India)">
-            <button class="search-button" id="search-button">Search Location</button>
-        </div>
-        
-        <a href="#" class="open-map-btn" id="open-map-btn" style="display: none;">
-            🗺️ Open My Location on Maps
-        </a>
-        
-        <div class="location-display" id="location-display">Loading location...</div>
-        
-        <div class="radius-control">
-            <div class="radius-label">
-                <span>Search Radius</span>
-                <span class="radius-value" id="radius-value">3 km</span>
+        <div class="toggle-container">
+            <div class="toggle">
+                <div class="toggle-option" data-type="mechanic">Mechanic</div>
+                <div class="toggle-option active" data-type="garage">Garage</div>
             </div>
-            <input type="range" class="radius-slider" id="radius-slider" min="0" max="20" value="3" step="0.5">
+        </div>
+
+        <div class="search-container">
+            <div class="search-row">
+                <input id="searchInput" class="search-input" type="text" placeholder="Enter address or coordinates (e.g., Delhi or 28.6,77.2)">
+                <button class="search-btn" onclick="performUniversalSearch()">🔍 Search</button>
+            </div>
         </div>
     </div>
-
-    <div class="main-container">
-        <div class="results-header">
-            <div class="results-count" id="results-count">Loading performance data...</div>
-            <div class="results-subtitle">Based on historical service records</div>
-        </div>
-
-        <div class="mechanic-list" id="mechanic-list">
-            <div class="loading">Fetching historical performance data</div>
+    
+    <div class="container">
+        <div id="map"></div>
+        <div id="info-panel">
+            <div class="panel-header">
+                <h3 id="panel-title">Nearby Garages</h3>
+                <div class="results-count" id="results-count">Search for a location to find services</div>
+            </div>
+            
+            <!-- Tabs for mechanics only -->
+            <div class="panel-tabs" id="panel-tabs" style="display: none;">
+                <div class="panel-tab active" data-tab="current">Current Mechanics</div>
+                <div class="panel-tab" data-tab="historical">Historical Performance</div>
+            </div>
+            
+            <!-- Radius control for historical tab -->
+            <div class="radius-control" id="radius-control" style="display: none;">
+                <div class="radius-label">
+                    <span>Search Radius</span>
+                    <span class="radius-value" id="radius-value">3 km</span>
+                </div>
+                <input type="range" class="radius-slider" id="radius-slider" min="0" max="20" value="3" step="0.5">
+            </div>
+            
+            <!-- Current mechanics/garages tab -->
+            <div class="tab-content active" id="current-tab">
+                <div class="mechanic-list" id="mechanic-list">
+                    <div class="no-results">
+                        Enter a location above to find nearby mechanics and garages
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Historical performance tab -->
+            <div class="tab-content" id="historical-tab">
+                <div class="mechanic-list" id="historical-list">
+                    <div class="no-results">
+                        Search for a location to view historical performance data
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-
-    <!-- Google Maps API -->
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCAYQWWFzIfkZqJdQoW7Oi-Vxp6gsc9Xsg&libraries=geometry"></script>
 
     <script>
-        let currentRadius = 3;
-        let currentPosition = null;
-        let debounceTimer = null;
-        let googleMapsLoaded = false;
-        let mechanicsWithDistanceData = []; // Cache for mechanics with calculated distances
+        let map;
+        let blueMarker = null;
+        let directionsServices = [];
+        let directionsRenderers = [];
+        const serviceMarkers = [];
+        const RADIUS = 15000; // 15 km
+        const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#98D8C8', '#F7DC6F'];
+        let colorIndex = 0;
+        let currentSearchType = 'garage'; // Default to garage
+        let allServices = [];
 
-        // Wait for Google Maps to load
-        function initializeGoogleMaps() {
-            googleMapsLoaded = true;
-            console.log('Google Maps API loaded successfully');
-        }
-
-        // Ensure Google Maps is loaded
-        function waitForGoogleMaps() {
-            return new Promise((resolve) => {
-                if (typeof google !== 'undefined' && google.maps) {
-                    resolve();
-                } else {
-                    const checkGoogleMaps = setInterval(() => {
-                        if (typeof google !== 'undefined' && google.maps) {
-                            clearInterval(checkGoogleMaps);
-                            resolve();
-                        }
-                    }, 100);
-                }
-            });
-        }
-
-        // Parse time duration to minutes for comparison
-        function parseTimeToMinutes(timeStr) {
-            if (!timeStr || timeStr === 'Est. time') return 999;
-            
-            const hourMatch = timeStr.match(/(\d+)\s*h/);
-            const minMatch = timeStr.match(/(\d+)\s*min/);
-            
-            let totalMinutes = 0;
-            if (hourMatch) totalMinutes += parseInt(hourMatch[1]) * 60;
-            if (minMatch) totalMinutes += parseInt(minMatch[1]);
-            
-            return totalMinutes;
-        }
-
-        // Parse distance to kilometers for comparison
-        function parseDistanceToKm(distanceStr) {
-            if (!distanceStr) return 999;
-            
-            const kmMatch = distanceStr.match(/([\d.]+)\s*km/);
-            if (kmMatch) return parseFloat(kmMatch[1]);
-            
-            const mMatch = distanceStr.match(/([\d.]+)\s*m/);
-            if (mMatch) return parseFloat(mMatch[1]) / 1000;
-            
-            return 999;
-        }
-
-        // Check if mechanic is a great match
-        function isGreatMatch(mechanic, distanceData) {
-            if (!distanceData) return false;
-            
-            const timeInMinutes = parseTimeToMinutes(distanceData.duration);
-            const distanceInKm = parseDistanceToKm(distanceData.distance);
-            const callRatio = mechanic.cancelled_calls > 0 ? mechanic.done_calls / mechanic.cancelled_calls : mechanic.done_calls;
-            
-            return (timeInMinutes < 15 || distanceInKm < 2) && callRatio > 1;
-        }
-
-        // Calculate distance using Google Maps Distance Matrix API
-        async function calculateDistance(customerLat, customerLng, mechanic, mechanicElement) {
-            await waitForGoogleMaps();
-            
-            return new Promise((resolve) => {
-                const service = new google.maps.DistanceMatrixService();
-                const customerLocation = new google.maps.LatLng(customerLat, customerLng);
-                const mechanicLocation = new google.maps.LatLng(mechanic.lat, mechanic.long);
-
-                service.getDistanceMatrix({
-                    origins: [customerLocation],
-                    destinations: [mechanicLocation],
-                    travelMode: google.maps.TravelMode.DRIVING,
-                    unitSystem: google.maps.UnitSystem.METRIC,
-                    avoidHighways: false,
-                    avoidTolls: false
-                }, (response, status) => {
-                    const distanceBadge = mechanicElement.querySelector('.distance-badge');
-                    
-                    if (status === google.maps.DistanceMatrixStatus.OK) {
-                        const element = response.rows[0].elements[0];
-                        if (element.status === 'OK') {
-                            const distanceData = {
-                                distance: element.distance.text,
-                                duration: element.duration.text,
-                                distanceValue: element.distance.value
-                            };
-                            
-                            // Store distance data for this mechanic
-                            const mechanicIndex = mechanicsWithDistanceData.findIndex(m => m.name === mechanic.name);
-                            if (mechanicIndex >= 0) {
-                                mechanicsWithDistanceData[mechanicIndex] = { ...mechanic, ...distanceData };
-                            } else {
-                                mechanicsWithDistanceData.push({ ...mechanic, ...distanceData });
-                            }
-                            
-                            distanceBadge.innerHTML = `
-                                <div class="distance-info">
-                                    <div class="distance-text">${element.distance.text}</div>
-                                    <div class="time-text">${element.duration.text}</div>
-                                </div>
-                            `;
-                            distanceBadge.classList.remove('loading');
-                            
-                            // Check for great match and add tag
-                            if (isGreatMatch(mechanic, distanceData)) {
-                                const existingTag = mechanicElement.querySelector('.great-match-tag');
-                                if (!existingTag) {
-                                    const greatMatchTag = document.createElement('div');
-                                    greatMatchTag.className = 'great-match-tag';
-                                    greatMatchTag.textContent = 'Great Match';
-                                    mechanicElement.appendChild(greatMatchTag);
-                                }
-                            }
-                            
-                            resolve(distanceData);
-                            return;
-                        }
+        function initMap() {
+            const mapCenter = { lat: 28.448672834852427, lng: 77.02087468087836 };
+            map = new google.maps.Map(document.getElementById("map"), {
+                zoom: 11, // Zoom out slightly to see more markers
+                center: mapCenter,
+                styles: [
+                    {
+                        featureType: "poi",
+                        elementType: "labels",
+                        stylers: [{ visibility: "off" }]
                     }
-                    
-                    // Fallback to straight-line distance
-                    console.error('Distance Matrix request failed for', mechanic.name, ':', status);
-                    const straightDistance = calculateStraightLineDistance(
-                        customerLat, customerLng, mechanic.lat, mechanic.long
-                    );
-                    
-                    const distanceData = {
-                        distance: `${straightDistance.toFixed(1)} km`,
-                        duration: 'Est. time',
-                        distanceValue: straightDistance * 1000
-                    };
-                    
-                    distanceBadge.innerHTML = `
-                        <div class="distance-info">
-                            <div class="distance-text">${straightDistance.toFixed(1)} km</div>
-                            <div class="time-text">Est. time</div>
-                        </div>
-                    `;
-                    distanceBadge.classList.remove('loading');
-                    resolve(distanceData);
-                });
+                ]
             });
-        }
 
-        // Handle individual distance calculation for non-top-5 mechanics
-        async function handleGetDistance(button, customerLat, customerLng, mechanic, mechanicElement) {
-            button.disabled = true;
-            button.textContent = 'Loading...';
+            // Fetch service data and setup functionality
+            fetchServices();
+            setupToggle();
             
-            try {
-                await calculateDistance(customerLat, customerLng, mechanic, mechanicElement);
-                button.style.display = 'none';
-            } catch (error) {
-                console.error('Error calculating distance:', error);
-                button.disabled = false;
-                button.textContent = 'Get Distance';
-            }
+            // Apply initial filter after services are loaded
+            setTimeout(() => {
+                filterMarkersVisibility();
+            }, 1000);
         }
 
-        // Load historical data and use cached distances if available
-        async function loadHistoricalData(lat, lng, radius) {
-            const mechanicList = document.getElementById('mechanic-list');
-            mechanicList.innerHTML = '<div class="loading">Loading performance data</div>';
+        function updateServiceCounts() {
+            const garageCount = allServices.filter(s => s.is_garage).length;
+            const mechanicCount = allServices.filter(s => !s.is_garage).length;
             
-            try {
-                const response = await fetch(`https://ai.instantmechanic.online/bot/api/find_mechanic?lat=${lat}&long=${lng}&radius=${radius}`, {
-                    method: 'GET',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Origin': 'https://instantmechanic.online',
-                        'Referer': 'https://instantmechanic.online/',
-                    }
-                });
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
-                const data = await response.json();
-                await displayHistoricalData(data, lat, lng);
-                
-            } catch (error) {
-                console.error('Error loading historical data:', error);
-                showError('Error loading performance data. Please try again later.');
-            }
+            document.getElementById("results-count").textContent = 
+                `${garageCount} garages, ${mechanicCount} mechanics available`;
         }
 
-        // Calculate straight-line distance as fallback
-        function calculateStraightLineDistance(lat1, lng1, lat2, lng2) {
-            const R = 6371; // Earth's radius in km
-            const dLat = (lat2 - lat1) * Math.PI / 180;
-            const dLng = (lng2 - lng1) * Math.PI / 180;
-            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-                    Math.sin(dLng/2) * Math.sin(dLng/2);
-            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-            return R * c;
-        }
+        let currentRadius = 3; // Default 3km for historical search
+        let currentSearchPosition = null;
+        let activeTab = 'current';
+        let debounceTimer = null; // For debouncing slider input
 
         // Debounce function to limit API calls
         function debounce(func, wait) {
@@ -857,356 +745,103 @@
             };
         }
 
-        // Parse URL parameters
-        function getLocationFromURL() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const query = urlParams.get('q');
-            
-            if (!query) {
-                // Show search container if no location parameter
-                const searchContainer = document.getElementById('search-container');
-                searchContainer.classList.add('visible');
-                document.getElementById('location-display').textContent = '📍 Enter your location to find mechanics';
-                return null;
-            }
-
-            // Check if it's coordinates (contains comma and numbers)
-            const coordPattern = /^-?\d+\.?\d*\s*,\s*-?\d+\.?\d*$/;
-            
-            if (coordPattern.test(query.trim())) {
-                // Handle as coordinates
-                const coords = query.split(",").map(coord => parseFloat(coord.trim()));
-                
-                if (coords.length === 2 && !isNaN(coords[0]) && !isNaN(coords[1])) {
-                    if (coords[0] >= -90 && coords[0] <= 90 && coords[1] >= -180 && coords[1] <= 180) {
-                        return {
-                            type: 'coordinates',
-                            lat: coords[0],
-                            lng: coords[1],
-                            display: `${coords[0].toFixed(6)}, ${coords[1].toFixed(6)}`
-                        };
-                    } else {
-                        showError('Coordinates out of range. Latitude: -90 to 90, Longitude: -180 to 180');
-                        return null;
-                    }
-                } else {
-                    showError('Invalid coordinates format. Use: ?q=latitude,longitude');
-                    return null;
-                }
-            } else {
-                // Handle as address - need to geocode
-                return {
-                    type: 'address',
-                    address: query,
-                    display: query
-                };
-            }
-        }
-
-        // Geocode address using Google Maps Geocoding API
-        async function geocodeAddress(address) {
-            await waitForGoogleMaps();
-            
-            return new Promise((resolve, reject) => {
-                const geocoder = new google.maps.Geocoder();
-                
-                geocoder.geocode({ address: address }, (results, status) => {
-                    if (status === google.maps.GeocoderStatus.OK && results.length > 0) {
-                        const result = results[0];
-                        const location = result.geometry.location;
-                        
-                        resolve({
-                            lat: location.lat(),
-                            lng: location.lng(),
-                            display: result.formatted_address
-                        });
-                    } else {
-                        console.error('Geocoding failed:', status);
-                        showError('Could not find the specified address. Please check the address and try again.');
-                        reject(new Error('Geocoding failed'));
-                    }
-                });
-            });
-        }
-
-        // Search location from search input
-        async function searchLocation() {
-            const searchInput = document.getElementById('search-input');
-            const address = searchInput.value.trim();
-            
-            if (!address) {
-                showError('Please enter a location to search');
-                return;
-            }
-
-            document.getElementById('location-display').textContent = `📍 ${address} (Searching...)`;
-            
-            try {
-                const geocoded = await geocodeAddress(address);
-                if (geocoded) {
-                    currentPosition = { lat: geocoded.lat, lng: geocoded.lng };
-                    document.getElementById('location-display').textContent = `📍 ${geocoded.display}`;
-                    
-                    // Hide search container and show map button
-                    document.getElementById('search-container').classList.remove('visible');
-                    updateMapButton();
-                    
-                    // Update URL with coordinates
-                    const newUrl = `${window.location.pathname}?q=${geocoded.lat},${geocoded.lng}`;
-                    window.history.pushState({}, '', newUrl);
-                    
-                    // Clear cached distance data for new location
-                    mechanicsWithDistanceData = [];
-                    
-                    loadHistoricalData(currentPosition.lat, currentPosition.lng, currentRadius);
-                }
-            } catch (error) {
-                console.error('Search error:', error);
-            }
-        }
-
-        // Setup map button
-        function setupMapButton() {
-            const mapButton = document.getElementById('open-map-btn');
-            
-            mapButton.addEventListener('click', (e) => {
-                e.preventDefault();
-                if (currentPosition) {
-                    const mapsUrl = `https://www.google.com/maps/@${currentPosition.lat},${currentPosition.lng},15z`;
-                    window.open(mapsUrl, '_blank');
-                }
-            });
-        }
-
-        // Update map button visibility and link
-        function updateMapButton() {
-            const mapButton = document.getElementById('open-map-btn');
-            if (currentPosition) {
-                mapButton.style.display = 'block';
-                mapButton.href = `https://www.google.com/maps/@${currentPosition.lat},${currentPosition.lng},15z`;
-            } else {
-                mapButton.style.display = 'none';
-            }
-        }
-
-        // Load historical data from API
-        async function loadHistoricalDataOld(lat, lng, radius) {
-            const mechanicList = document.getElementById('mechanic-list');
-            mechanicList.innerHTML = '<div class="loading">Loading performance data</div>';
-            
-            try {
-                const response = await fetch(`https://ai.instantmechanic.online/bot/api/find_mechanic?lat=${lat}&long=${lng}&radius=${radius}`, {
-                    method: 'GET',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Origin': 'https://instantmechanic.online',
-                        'Referer': 'https://instantmechanic.online/',
-                    }
-                });
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
-                const data = await response.json();
-                await displayHistoricalData(data, lat, lng);
-                
-            } catch (error) {
-                console.error('Error loading historical data:', error);
-                showError('Error loading performance data. Please try again later.');
-            }
-        }
-
-        // Display historical data
-        async function displayHistoricalData(data, customerLat, customerLng) {
-            const mechanicList = document.getElementById('mechanic-list');
-            const resultsCount = document.getElementById('results-count');
-            
-            if (!data || Object.keys(data).length === 0) {
-                mechanicList.innerHTML = `
-                    <div class="no-results">
-                        <div class="no-results-icon">🔍</div>
-                        <h3>No Historical Data Available</h3>
-                        <p>No mechanics have performed services in this area within the selected radius.</p>
-                        <p>Try increasing the search radius to find more results.</p>
+        // Helper function to create action buttons (call and WhatsApp)
+        function createActionButtons(mobile, whatsapp) {
+            if (whatsapp && whatsapp !== null) {
+                // Both call and WhatsApp buttons
+                return `
+                    <div class="action-buttons">
+                        <a class="call-button" href="tel:${mobile}">📞 Call</a>
+                        <a class="whatsapp-button" href="${whatsapp}" target="_blank">💬 WhatsApp</a>
                     </div>
                 `;
-                resultsCount.textContent = 'No mechanics found';
-                return;
-            }
-            
-            // Convert object to array and sort by priority (high to low)
-            const mechanicsArray = Object.entries(data).map(([name, details]) => ({
-                name,
-                ...details
-            })).sort((a, b) => b.priority - a.priority);
-            
-            resultsCount.textContent = `Found ${mechanicsArray.length} mechanic${mechanicsArray.length > 1 ? 's' : ''} with historical data`;
-            
-            mechanicList.innerHTML = '';
-            const mechanicElements = [];
-            
-            // Create cards for all mechanics immediately
-            mechanicsArray.forEach((mechanic, index) => {
-                const mechanicDiv = document.createElement('div');
-                mechanicDiv.className = 'historical-mechanic';
-                mechanicDiv.style.position = 'relative'; // For great match tag positioning
-                mechanicDiv.mechanicData = mechanic; // Store mechanic data on element
-                
-                // Generate star rating
-                const fullStars = Math.floor(mechanic.rating);
-                const hasHalfStar = mechanic.rating % 1 !== 0;
-                const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
-                const starsHTML = '★'.repeat(fullStars) + (hasHalfStar ? '☆' : '') + '☆'.repeat(emptyStars);
-                
-                // Create action buttons (removed maps button)
-                const hasWhatsApp = mechanic.whatsapp && mechanic.whatsapp !== null && mechanic.whatsapp !== '';
-                
-                let actionButtonsHTML = '';
-                if (hasWhatsApp) {
-                    actionButtonsHTML = `
-                        <div class="action-buttons">
-                            <a class="action-button call-button" href="tel:${mechanic.mobile}">
-                                📞 Call
-                            </a>
-                            <a class="action-button whatsapp-button" href="${mechanic.whatsapp}" target="_blank">
-                                💬 Chat
-                            </a>
-                        </div>
-                    `;
-                } else {
-                    actionButtonsHTML = `
-                        <div class="action-buttons single">
-                            <a class="action-button call-button" href="tel:${mechanic.mobile}">
-                                📞 Call ${mechanic.mobile}
-                            </a>
-                        </div>
-                    `;
-                }
-                
-                // Check if we have cached distance data for this mechanic
-                const cachedData = mechanicsWithDistanceData.find(m => m.name === mechanic.name);
-                
-                // Determine distance display based on position and cache
-                let distanceHTML = '';
-                if (index < 5) {
-                    if (cachedData) {
-                        // Use cached data
-                        distanceHTML = `
-                            <div class="distance-badge">
-                                <div class="distance-info">
-                                    <div class="distance-text">${cachedData.distance}</div>
-                                    <div class="time-text">${cachedData.duration}</div>
-                                </div>
-                            </div>
-                        `;
-                    } else {
-                        // Show loading for top 5 mechanics
-                        distanceHTML = `
-                            <div class="distance-badge loading">
-                                <div class="distance-info">
-                                    <div class="distance-text">Loading...</div>
-                                    <div class="time-text">Calculating</div>
-                                </div>
-                            </div>
-                        `;
-                    }
-                } else {
-                    if (cachedData) {
-                        // Use cached data
-                        distanceHTML = `
-                            <div class="distance-badge">
-                                <div class="distance-info">
-                                    <div class="distance-text">${cachedData.distance}</div>
-                                    <div class="time-text">${cachedData.duration}</div>
-                                </div>
-                            </div>
-                        `;
-                    } else {
-                        // Show "Get Distance" button for non-top-5
-                        distanceHTML = `
-                            <button class="get-distance-btn" onclick="handleGetDistance(this, ${customerLat}, ${customerLng}, window.mechanicElements[${index}].mechanicData, window.mechanicElements[${index}])">
-                                Get Distance
-                            </button>
-                        `;
-                    }
-                }
-                
-                mechanicDiv.innerHTML = `
-                    <div class="mechanic-header">
-                        <div class="mechanic-name">${mechanic.name}</div>
-                        ${distanceHTML}
+            } else {
+                // Only call button
+                return `
+                    <div class="action-buttons">
+                        <a class="call-button single-button" href="tel:${mobile}">📞 Call ${mobile}</a>
                     </div>
-                    
-                    <div class="rating-container">
-                        <div class="rating">
-                            <span class="stars">${starsHTML}</span>
-                            <span class="rating-value">${mechanic.rating.toFixed(1)}</span>
-                        </div>
-                    </div>
-                    
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-value success">${mechanic.done_calls}</div>
-                            <div class="stat-label">Completed</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-value danger">${mechanic.cancelled_calls}</div>
-                            <div class="stat-label">Cancelled</div>
-                        </div>
-                    </div>
-                    
-                    ${actionButtonsHTML}
                 `;
-                
-                mechanicList.appendChild(mechanicDiv);
-                mechanicElements.push(mechanicDiv);
-                
-                // Add great match tag if cached data shows it's a great match
-                if (cachedData && isGreatMatch(mechanic, cachedData)) {
-                    const greatMatchTag = document.createElement('div');
-                    greatMatchTag.className = 'great-match-tag';
-                    greatMatchTag.textContent = 'Great Match';
-                    mechanicDiv.appendChild(greatMatchTag);
-                }
-            });
-            
-            // Make mechanicElements globally accessible for button clicks
-            window.mechanicElements = mechanicElements;
-            
-            // Calculate distances for top 5 mechanics that don't have cached data
-            const top5NeedingDistance = mechanicElements.slice(0, 5).filter((element, index) => {
-                const mechanic = element.mechanicData;
-                return !mechanicsWithDistanceData.find(m => m.name === mechanic.name);
-            });
-            
-            if (top5NeedingDistance.length > 0) {
-                const distancePromises = top5NeedingDistance.map(element => {
-                    const mechanicData = element.mechanicData;
-                    return calculateDistance(customerLat, customerLng, mechanicData, element);
-                });
-                
-                try {
-                    await Promise.all(distancePromises);
-                } catch (error) {
-                    console.error('Error calculating distances for top 5:', error);
-                }
             }
         }
 
-        // Make handleGetDistance globally accessible
-        window.handleGetDistance = handleGetDistance;
-
-        // Show error message
-        function showError(message) {
-            const mechanicList = document.getElementById('mechanic-list');
-            mechanicList.innerHTML = `<div class="error">${message}</div>`;
+        function setupToggle() {
+            const toggleOptions = document.querySelectorAll('.toggle-option');
+            toggleOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    toggleOptions.forEach(opt => opt.classList.remove('active'));
+                    option.classList.add('active');
+                    currentSearchType = option.dataset.type;
+                    
+                    // Update panel title
+                    document.getElementById('panel-title').textContent = 
+                        currentSearchType === 'garage' ? 'Nearby Garages' : 'Nearby Mechanics';
+                    
+                    // Show/hide tabs based on type
+                    const tabsContainer = document.getElementById('panel-tabs');
+                    if (currentSearchType === 'mechanic') {
+                        tabsContainer.style.display = 'flex';
+                    } else {
+                        tabsContainer.style.display = 'none';
+                        // Reset to current tab for garages
+                        switchTab('current');
+                    }
+                    
+                    // Filter visible markers based on toggle
+                    filterMarkersVisibility();
+                    
+                    // Refresh search if there's an active search
+                    if (blueMarker) {
+                        const position = blueMarker.getPosition().toJSON();
+                        currentSearchPosition = position;
+                        drawBlueMarkerAndCalculateRoutes(position);
+                    } else {
+                        // Update counts when no active search
+                        updateServiceCounts();
+                        document.getElementById("mechanic-list").innerHTML = 
+                            '<div class="no-results">Enter a location above to find nearby services</div>';
+                    }
+                });
+            });
             
-            const resultsCount = document.getElementById('results-count');
-            resultsCount.textContent = 'Error occurred';
+            // Setup tab switching
+            setupTabs();
+            setupRadiusSlider();
         }
 
-        // Setup radius slider
+        function setupTabs() {
+            const tabs = document.querySelectorAll('.panel-tab');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabType = tab.dataset.tab;
+                    switchTab(tabType);
+                });
+            });
+        }
+
+        function switchTab(tabType) {
+            // Update active tab
+            document.querySelectorAll('.panel-tab').forEach(tab => {
+                tab.classList.toggle('active', tab.dataset.tab === tabType);
+            });
+            
+            // Update active content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.toggle('active', content.id === `${tabType}-tab`);
+            });
+            
+            // Show/hide radius control
+            const radiusControl = document.getElementById('radius-control');
+            radiusControl.style.display = tabType === 'historical' ? 'block' : 'none';
+            
+            activeTab = tabType;
+            
+            // Load historical data if switching to historical tab and we have a search position
+            if (tabType === 'historical' && currentSearchPosition && currentSearchType === 'mechanic') {
+                loadHistoricalData(currentSearchPosition.lat, currentSearchPosition.lng, currentRadius);
+            }
+        }
+
         function setupRadiusSlider() {
             const slider = document.getElementById('radius-slider');
             const radiusValue = document.getElementById('radius-value');
@@ -1221,64 +856,470 @@
                 radiusValue.textContent = `${currentRadius} km`;
                 
                 // Show loading state immediately for better UX
-                if (currentPosition) {
-                    const mechanicList = document.getElementById('mechanic-list');
-                    mechanicList.innerHTML = '<div class="loading">Updating results</div>';
+                if (activeTab === 'historical' && currentSearchPosition && currentSearchType === 'mechanic') {
+                    const historicalList = document.getElementById('historical-list');
+                    historicalList.innerHTML = '<div class="loading-historical">Updating results...</div>';
                     
                     // Call debounced function
-                    debouncedLoadHistoricalData(currentPosition.lat, currentPosition.lng, currentRadius);
+                    debouncedLoadHistoricalData(currentSearchPosition.lat, currentSearchPosition.lng, currentRadius);
                 }
             });
         }
 
-        // Setup search functionality
-        function setupSearch() {
-            const searchButton = document.getElementById('search-button');
-            const searchInput = document.getElementById('search-input');
-            
-            searchButton.addEventListener('click', searchLocation);
-            
-            searchInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    searchLocation();
-                }
+        function filterMarkersVisibility() {
+            serviceMarkers.forEach(service => {
+                const shouldShow = currentSearchType === 'garage' ? 
+                    service.info.is_garage : !service.info.is_garage;
+                
+                service.marker.setVisible(shouldShow);
             });
         }
 
-        // Initialize page
-        async function initialize() {
-            await waitForGoogleMaps();
-            
-            const locationData = getLocationFromURL();
-            
-            if (locationData) {
-                const locationDisplay = document.getElementById('location-display');
-                locationDisplay.textContent = `📍 ${locationData.display}`;
-
-                if (locationData.type === 'coordinates') {
-                    currentPosition = { lat: locationData.lat, lng: locationData.lng };
-                    loadHistoricalData(currentPosition.lat, currentPosition.lng, currentRadius);
-                } else if (locationData.type === 'address') {
-                    locationDisplay.textContent = `📍 ${locationData.display} (Geocoding...)`;
-                    try {
-                        const geocoded = await geocodeAddress(locationData.address);
-                        if (geocoded) {
-                            currentPosition = { lat: geocoded.lat, lng: geocoded.lng };
-                            locationDisplay.textContent = `📍 ${geocoded.display}`;
-                            loadHistoricalData(currentPosition.lat, currentPosition.lng, currentRadius);
-                        }
-                    } catch (error) {
-                        console.error('Geocoding error:', error);
+        async function fetchServices() {
+            try {
+                const response = await fetch("https://ai.instantmechanic.online/bot/api/mechanic/", {
+                    method: 'GET',
+                    headers: {
+                        'Accept': '*/*',
+                        'Accept-Language': 'en-US,en;q=0.9',
+                        'Origin': 'https://instantmechanic.online',
+                        'Referer': 'https://instantmechanic.online/',
                     }
-                }
+                });
+                
+                const data = await response.json();
+                allServices = data.filter(service => service.lat && service.long && !service.is_deleted);
+                
+                // Create markers for all services
+                allServices.forEach(service => {
+                    const lat = parseFloat(service.lat);
+                    const lng = parseFloat(service.long);
+
+                    if (lat && lng) {
+                        const position = { lat, lng };
+                        const marker = new google.maps.Marker({
+                            position,
+                            map: map, // Show all markers by default
+                            icon: {
+                                url: service.is_garage ? 
+                                    "http://maps.google.com/mapfiles/ms/icons/blue-dot.png" :
+                                    "http://maps.google.com/mapfiles/ms/icons/red-dot.png",
+                                scale: 0.8 // Slightly smaller for default view
+                            },
+                            title: `${service.name} (${service.is_garage ? 'Garage' : 'Mechanic'})`,
+                            zIndex: 1
+                        });
+
+                        // Add click listener to show info
+                        const infoWindow = new google.maps.InfoWindow({
+                            content: `
+                                <div style="font-family: Arial, sans-serif; max-width: 200px;">
+                                    <h4 style="margin: 0 0 5px 0; color: #333;">${service.name}</h4>
+                                    <p style="margin: 0 0 5px 0; color: #666; font-size: 12px;">
+                                        ${service.is_garage ? '🏢 Garage' : '🔧 Mechanic'}
+                                    </p>
+                                    <p style="margin: 0 0 5px 0; font-size: 12px;">
+                                        ⭐ ${parseFloat(service.rating || 5).toFixed(1)}
+                                    </p>
+                                    <p style="margin: 0; font-size: 12px;">
+                                        📞 <a href="tel:${service.mobile}">${service.mobile}</a>
+                                    </p>
+                                </div>
+                            `
+                        });
+
+                        marker.addListener('click', () => {
+                            // Close any open info windows
+                            serviceMarkers.forEach(s => s.infoWindow && s.infoWindow.close());
+                            infoWindow.open(map, marker);
+                        });
+
+                        serviceMarkers.push({
+                            marker,
+                            position,
+                            info: service,
+                            infoWindow
+                        });
+                    }
+                });
+                
+                // Update counts
+                updateServiceCounts();
+                
+            } catch (error) {
+                console.error("Error fetching service data:", error);
+                document.getElementById("mechanic-list").innerHTML = 
+                    '<div class="no-results">Error loading services. Please try again.</div>';
+            }
+        }
+
+        function clearPreviousSearch() {
+            if (blueMarker) {
+                blueMarker.setMap(null);
+                blueMarker = null;
             }
 
-            setupRadiusSlider();
-            setupSearch();
+            currentSearchPosition = null;
+            
+            // Clear any pending debounced API calls
+            if (debounceTimer) {
+                clearTimeout(debounceTimer);
+                debounceTimer = null;
+            }
+            
+            directionsRenderers.forEach(renderer => renderer.setMap(null));
+            directionsRenderers = [];
+            directionsServices = [];
+            colorIndex = 0;
+            
+            // Reset all marker styles to default
+            serviceMarkers.forEach(service => {
+                service.marker.setIcon({
+                    url: service.info.is_garage ? 
+                        "http://maps.google.com/mapfiles/ms/icons/blue-dot.png" :
+                        "http://maps.google.com/mapfiles/ms/icons/red-dot.png",
+                    scale: 0.8
+                });
+                service.marker.setZIndex(1);
+            });
+            
+            // Apply current toggle filter
+            filterMarkersVisibility();
+            
+            const mechanicList = document.getElementById("mechanic-list");
+            mechanicList.innerHTML = '<div class="loading">Searching for services...</div>';
+            
+            // Clear historical data
+            const historicalList = document.getElementById("historical-list");
+            historicalList.innerHTML = '<div class="no-results">Search for a location to view historical performance data</div>';
+            
+            document.getElementById("results-count").textContent = "Searching...";
         }
 
-        // Start the application
-        document.addEventListener('DOMContentLoaded', initialize);
+        function performUniversalSearch() {
+            const searchInput = document.getElementById("searchInput").value.trim();
+            if (!searchInput) return;
+            
+            // Check if input looks like coordinates (contains comma and numbers)
+            const coordPattern = /^-?\d+\.?\d*\s*,\s*-?\d+\.?\d*$/;
+            
+            if (coordPattern.test(searchInput)) {
+                // Handle as coordinates
+                const coords = searchInput.split(",").map(coord => parseFloat(coord.trim()));
+                
+                if (coords.length === 2 && !isNaN(coords[0]) && !isNaN(coords[1])) {
+                    // Validate coordinate ranges
+                    if (coords[0] >= -90 && coords[0] <= 90 && coords[1] >= -180 && coords[1] <= 180) {
+                        const position = { lat: coords[0], lng: coords[1] };
+                        performSearch(position);
+                    } else {
+                        alert("Coordinates out of range. Latitude: -90 to 90, Longitude: -180 to 180");
+                    }
+                } else {
+                    alert("Invalid coordinates format. Use: latitude,longitude (e.g., 28.6,77.2)");
+                }
+            } else {
+                // Handle as address
+                const geocoder = new google.maps.Geocoder();
+                geocoder.geocode({ address: searchInput }, (results, status) => {
+                    if (status === "OK" && results[0]) {
+                        const position = results[0].geometry.location.toJSON();
+                        performSearch(position);
+                    } else {
+                        alert("Location not found. Please try a different address or coordinates.");
+                    }
+                });
+            }
+        }
+
+        function performSearch(position) {
+            clearPreviousSearch();
+            drawBlueMarkerAndCalculateRoutes(position);
+        }
+
+        async function loadHistoricalData(lat, lng, radius) {
+            const historicalList = document.getElementById('historical-list');
+            historicalList.innerHTML = '<div class="loading-historical">Loading historical performance data...</div>';
+            
+            try {
+                const response = await fetch(`https://ai.instantmechanic.online/bot/api/find_mechanic?lat=${lat}&long=${lng}&radius=${radius}`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Origin': 'https://instantmechanic.online',
+                        'Referer': 'https://instantmechanic.online/',
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                displayHistoricalData(data);
+                
+            } catch (error) {
+                console.error('Error loading historical data:', error);
+                historicalList.innerHTML = '<div class="no-results">Error loading historical data. Please try again.</div>';
+            }
+        }
+
+        function displayHistoricalData(data) {
+            const historicalList = document.getElementById('historical-list');
+            
+            if (!data || Object.keys(data).length === 0) {
+                historicalList.innerHTML = '<div class="no-results">No historical data found for this area</div>';
+                return;
+            }
+            
+            // Convert object to array and sort by priority (high to low)
+            const mechanicsArray = Object.entries(data).map(([name, details]) => ({
+                name,
+                ...details
+            })).sort((a, b) => b.priority - a.priority);
+            
+            historicalList.innerHTML = '';
+            
+            mechanicsArray.forEach(mechanic => {
+                const mechanicDiv = document.createElement('div');
+                mechanicDiv.className = 'historical-mechanic';
+                
+                // Determine priority level for styling
+                let priorityClass = 'high';
+                if (mechanic.priority < 50) priorityClass = 'low';
+                else if (mechanic.priority < 60) priorityClass = 'medium';
+                
+                // Calculate success rate
+                const totalCalls = mechanic.done_calls + mechanic.cancelled_calls;
+                const successRate = totalCalls > 0 ? ((mechanic.done_calls / totalCalls) * 100).toFixed(1) : 0;
+                
+                mechanicDiv.innerHTML = `
+                    <div class="priority-badge ${priorityClass}">${mechanic.priority.toFixed(1)}</div>
+                    
+                    <div class="mechanic-name">${mechanic.name}</div>
+                    
+                    <div class="rating-container">
+                        <div class="rating">
+                            <span>${'★'.repeat(Math.floor(mechanic.rating))}${'☆'.repeat(5 - Math.floor(mechanic.rating))}</span>
+                            <span>${mechanic.rating.toFixed(1)}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mechanic-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">Completed</span>
+                            <span class="stat-value success">${mechanic.done_calls}</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Cancelled</span>
+                            <span class="stat-value danger">${mechanic.cancelled_calls}</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Success Rate</span>
+                            <span class="stat-value">${successRate}%</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Priority</span>
+                            <span class="stat-value">${mechanic.priority.toFixed(1)}</span>
+                        </div>
+                    </div>
+                    
+                    ${createActionButtons(mechanic.mobile, mechanic.whatsapp)}
+                `;
+                
+                historicalList.appendChild(mechanicDiv);
+            });
+        }
+
+        function drawBlueMarkerAndCalculateRoutes(position) {
+            currentSearchPosition = position;
+            
+            blueMarker = new google.maps.Marker({
+                position,
+                map,
+                icon: {
+                    url: "http://maps.google.com/mapfiles/ms/icons/green-dot.png",
+                    scale: 1.2
+                },
+                title: "Your Location",
+                zIndex: 1000
+            });
+
+            map.setCenter(position);
+
+            // Filter services based on current toggle selection
+            const filteredServices = serviceMarkers.filter(service => {
+                if (currentSearchType === 'garage') {
+                    return service.info.is_garage === true;
+                } else {
+                    return service.info.is_garage === false;
+                }
+            });
+
+            let nearbyServices = [];
+
+            // Calculate distances and find nearby services
+            filteredServices.forEach((service) => {
+                const distance = google.maps.geometry.spherical.computeDistanceBetween(
+                    new google.maps.LatLng(position),
+                    new google.maps.LatLng(service.position)
+                );
+
+                if (distance <= RADIUS) {
+                    nearbyServices.push({ ...service, distance });
+                    
+                    // Highlight nearby service markers
+                    service.marker.setIcon({
+                        url: service.info.is_garage ? 
+                            "http://maps.google.com/mapfiles/ms/icons/blue-dot.png" :
+                            "http://maps.google.com/mapfiles/ms/icons/red-dot.png",
+                        scale: 1.2, // Make nearby markers larger
+                    });
+                    service.marker.setZIndex(100);
+                } else {
+                    // Dim distant markers
+                    service.marker.setIcon({
+                        url: service.info.is_garage ? 
+                            "http://maps.google.com/mapfiles/ms/icons/blue-dot.png" :
+                            "http://maps.google.com/mapfiles/ms/icons/red-dot.png",
+                        scale: 0.6, // Make distant markers smaller
+                    });
+                    service.marker.setZIndex(1);
+                }
+            });
+
+            if (nearbyServices.length === 0) {
+                document.getElementById("mechanic-list").innerHTML = 
+                    `<div class="no-results">No ${currentSearchType}s found within 15km radius</div>`;
+                document.getElementById("results-count").textContent = "No results found";
+                
+                // For mechanics, still load historical data
+                if (currentSearchType === 'mechanic' && activeTab === 'historical') {
+                    loadHistoricalData(position.lat, position.lng, currentRadius);
+                }
+                return;
+            }
+
+            // Sort by distance
+            nearbyServices.sort((a, b) => a.distance - b.distance);
+            
+            // Limit to top 10 for performance
+            nearbyServices = nearbyServices.slice(0, 10);
+            
+            document.getElementById("results-count").textContent = 
+                `Found ${nearbyServices.length} ${currentSearchType}${nearbyServices.length > 1 ? 's' : ''} nearby`;
+
+            // Calculate routes for nearby services
+            nearbyServices.forEach((service, index) => {
+                calculateAndDrawRoute(position, service.position, service.info, index);
+            });
+            
+            // Load historical data for mechanics if on historical tab
+            if (currentSearchType === 'mechanic' && activeTab === 'historical') {
+                loadHistoricalData(position.lat, position.lng, currentRadius);
+            }
+        }
+
+        function calculateAndDrawRoute(origin, destination, serviceInfo, index) {
+            const color = colors[colorIndex % colors.length];
+            colorIndex++;
+
+            const directionsService = new google.maps.DirectionsService();
+            const directionsRenderer = new google.maps.DirectionsRenderer({
+                map,
+                suppressMarkers: true,
+                polylineOptions: {
+                    strokeColor: color,
+                    strokeWeight: 4,
+                    strokeOpacity: 0.8,
+                },
+            });
+
+            directionsServices.push(directionsService);
+            directionsRenderers.push(directionsRenderer);
+
+            directionsService.route(
+                {
+                    origin,
+                    destination,
+                    travelMode: google.maps.TravelMode.DRIVING,
+                },
+                (response, status) => {
+                    if (status === "OK") {
+                        directionsRenderer.setDirections(response);
+                        const leg = response.routes[0].legs[0];
+                        addServiceInfoToPanel(serviceInfo, leg.distance.text, leg.duration.text, color, index);
+                    } else {
+                        console.error("Directions request failed:", status);
+                    }
+                }
+            );
+        }
+
+        function addServiceInfoToPanel(service, distance, time, color, index) {
+            const mechanicList = document.getElementById("mechanic-list");
+            
+            // Clear loading message on first result
+            if (index === 0) {
+                mechanicList.innerHTML = '';
+            }
+            
+            const serviceDiv = document.createElement("div");
+            serviceDiv.className = "mechanic-info";
+            serviceDiv.style.setProperty('--route-color', color);
+
+            const rating = parseFloat(service.rating) || 5.0;
+            const stars = '★'.repeat(Math.floor(rating)) + (rating % 1 ? '☆' : '');
+            
+            serviceDiv.innerHTML = `
+                <div class="mechanic-header">
+                    <div>
+                        <div class="mechanic-name">${service.name}</div>
+                        <div class="mechanic-type ${service.is_garage ? 'garage' : ''}">${service.is_garage ? 'Garage' : 'Mechanic'}</div>
+                    </div>
+                </div>
+                
+                <div class="rating-container">
+                    <div class="rating">
+                        <span>${stars}</span>
+                        <span>${rating.toFixed(1)}</span>
+                    </div>
+                </div>
+                
+                <div class="stats">
+                    <span>Calls: ${service.total_calls_done || 0}</span>
+                    <span>Earnings: ₹${service.total_earnings || '0'}</span>
+                </div>
+                
+                <div class="distance-time">
+                    <div class="distance">📍 ${distance}</div>
+                    <div class="time">⏱️ ${time}</div>
+                </div>
+                
+                ${createActionButtons(service.mobile, service.whatsapp)}
+            `;
+
+            mechanicList.appendChild(serviceDiv);
+        }
+
+        // Initialize map when page loads
+        window.addEventListener('load', () => {
+            const script = document.createElement("script");
+            script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyCAYQWWFzIfkZqJdQoW7Oi-Vxp6gsc9Xsg&callback=initMap&libraries=geometry`;
+            script.defer = true;
+            script.onerror = () => {
+                document.getElementById("mechanic-list").innerHTML = 
+                    '<div class="no-results">Error loading maps. Please check your internet connection.</div>';
+            };
+            document.head.appendChild(script);
+        });
+
+        // Handle enter key in search input
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('searchInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') performUniversalSearch();
+            });
+        });
     </script>
 </body>
 </html>
