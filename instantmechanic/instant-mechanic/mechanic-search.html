@@ -34,6 +34,29 @@
             margin-bottom: 0.5rem;
         }
 
+        .open-map-btn {
+            background: linear-gradient(135deg, #4285f4, #1a73e8);
+            color: white;
+            border: none;
+            padding: 0.6rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: block;
+            margin: 0 auto 1rem;
+            text-decoration: none;
+        }
+
+        .open-map-btn:hover {
+            background: linear-gradient(135deg, #1a73e8, #1557b0);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(66, 133, 244, 0.4);
+            text-decoration: none;
+            color: white;
+        }
+
         .search-container {
             background: rgba(255, 255, 255, 0.1);
             border-radius: 12px;
@@ -218,13 +241,13 @@
         .distance-badge {
             background: linear-gradient(135deg, #17a2b8, #138496);
             color: white;
-            padding: 4px 8px;
+            padding: 8px 12px;
             border-radius: 20px;
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             font-weight: 600;
             white-space: nowrap;
             flex-shrink: 0;
-            min-width: 60px;
+            min-width: 80px;
             text-align: center;
         }
 
@@ -236,19 +259,39 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 2px;
+            gap: 3px;
         }
 
         .distance-text {
-            font-size: 0.7rem;
-            font-weight: 600;
+            font-size: 0.85rem;
+            font-weight: 700;
             line-height: 1;
         }
 
         .time-text {
-            font-size: 0.6rem;
+            font-size: 0.7rem;
             opacity: 0.9;
             line-height: 1;
+        }
+
+        .great-match-tag {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            z-index: 10;
+            box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
         }
 
         .get-distance-btn {
@@ -344,13 +387,13 @@
 
         .action-buttons {
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-columns: 1fr 1fr;
             gap: 0.5rem;
             margin-top: 0.75rem;
         }
 
-        .action-buttons.two-buttons {
-            grid-template-columns: 1fr 1fr;
+        .action-buttons.single {
+            grid-template-columns: 1fr;
         }
 
         .action-button {
@@ -567,6 +610,10 @@
             <button class="search-button" id="search-button">Search Location</button>
         </div>
         
+        <a href="#" class="open-map-btn" id="open-map-btn" style="display: none;">
+            🗺️ Open My Location on Maps
+        </a>
+        
         <div class="location-display" id="location-display">Loading location...</div>
         
         <div class="radius-control">
@@ -597,6 +644,7 @@
         let currentPosition = null;
         let debounceTimer = null;
         let googleMapsLoaded = false;
+        let mechanicsWithDistanceData = []; // Cache for mechanics with calculated distances
 
         // Wait for Google Maps to load
         function initializeGoogleMaps() {
@@ -618,6 +666,44 @@
                     }, 100);
                 }
             });
+        }
+
+        // Parse time duration to minutes for comparison
+        function parseTimeToMinutes(timeStr) {
+            if (!timeStr || timeStr === 'Est. time') return 999;
+            
+            const hourMatch = timeStr.match(/(\d+)\s*h/);
+            const minMatch = timeStr.match(/(\d+)\s*min/);
+            
+            let totalMinutes = 0;
+            if (hourMatch) totalMinutes += parseInt(hourMatch[1]) * 60;
+            if (minMatch) totalMinutes += parseInt(minMatch[1]);
+            
+            return totalMinutes;
+        }
+
+        // Parse distance to kilometers for comparison
+        function parseDistanceToKm(distanceStr) {
+            if (!distanceStr) return 999;
+            
+            const kmMatch = distanceStr.match(/([\d.]+)\s*km/);
+            if (kmMatch) return parseFloat(kmMatch[1]);
+            
+            const mMatch = distanceStr.match(/([\d.]+)\s*m/);
+            if (mMatch) return parseFloat(mMatch[1]) / 1000;
+            
+            return 999;
+        }
+
+        // Check if mechanic is a great match
+        function isGreatMatch(mechanic, distanceData) {
+            if (!distanceData) return false;
+            
+            const timeInMinutes = parseTimeToMinutes(distanceData.duration);
+            const distanceInKm = parseDistanceToKm(distanceData.distance);
+            const callRatio = mechanic.cancelled_calls > 0 ? mechanic.done_calls / mechanic.cancelled_calls : mechanic.done_calls;
+            
+            return (timeInMinutes < 15 || distanceInKm < 2) && callRatio > 1;
         }
 
         // Calculate distance using Google Maps Distance Matrix API
@@ -642,6 +728,20 @@
                     if (status === google.maps.DistanceMatrixStatus.OK) {
                         const element = response.rows[0].elements[0];
                         if (element.status === 'OK') {
+                            const distanceData = {
+                                distance: element.distance.text,
+                                duration: element.duration.text,
+                                distanceValue: element.distance.value
+                            };
+                            
+                            // Store distance data for this mechanic
+                            const mechanicIndex = mechanicsWithDistanceData.findIndex(m => m.name === mechanic.name);
+                            if (mechanicIndex >= 0) {
+                                mechanicsWithDistanceData[mechanicIndex] = { ...mechanic, ...distanceData };
+                            } else {
+                                mechanicsWithDistanceData.push({ ...mechanic, ...distanceData });
+                            }
+                            
                             distanceBadge.innerHTML = `
                                 <div class="distance-info">
                                     <div class="distance-text">${element.distance.text}</div>
@@ -649,11 +749,19 @@
                                 </div>
                             `;
                             distanceBadge.classList.remove('loading');
-                            resolve({
-                                distance: element.distance.text,
-                                duration: element.duration.text,
-                                distanceValue: element.distance.value
-                            });
+                            
+                            // Check for great match and add tag
+                            if (isGreatMatch(mechanic, distanceData)) {
+                                const existingTag = mechanicElement.querySelector('.great-match-tag');
+                                if (!existingTag) {
+                                    const greatMatchTag = document.createElement('div');
+                                    greatMatchTag.className = 'great-match-tag';
+                                    greatMatchTag.textContent = 'Great Match';
+                                    mechanicElement.appendChild(greatMatchTag);
+                                }
+                            }
+                            
+                            resolve(distanceData);
                             return;
                         }
                     }
@@ -664,6 +772,12 @@
                         customerLat, customerLng, mechanic.lat, mechanic.long
                     );
                     
+                    const distanceData = {
+                        distance: `${straightDistance.toFixed(1)} km`,
+                        duration: 'Est. time',
+                        distanceValue: straightDistance * 1000
+                    };
+                    
                     distanceBadge.innerHTML = `
                         <div class="distance-info">
                             <div class="distance-text">${straightDistance.toFixed(1)} km</div>
@@ -671,30 +785,9 @@
                         </div>
                     `;
                     distanceBadge.classList.remove('loading');
-                    resolve({
-                        distance: `${straightDistance.toFixed(1)} km`,
-                        duration: 'Est. time',
-                        distanceValue: straightDistance * 1000
-                    });
+                    resolve(distanceData);
                 });
             });
-        }
-
-        // Calculate distances for top 5 mechanics
-        async function calculateDistancesForTop5(customerLat, customerLng, mechanicElements) {
-            const top5Elements = mechanicElements.slice(0, 5);
-            
-            // Calculate distances for all top 5 mechanics simultaneously
-            const distancePromises = top5Elements.map((element, index) => {
-                const mechanicData = element.mechanicData;
-                return calculateDistance(customerLat, customerLng, mechanicData, element);
-            });
-            
-            try {
-                await Promise.all(distancePromises);
-            } catch (error) {
-                console.error('Error calculating distances:', error);
-            }
         }
 
         // Handle individual distance calculation for non-top-5 mechanics
@@ -709,6 +802,34 @@
                 console.error('Error calculating distance:', error);
                 button.disabled = false;
                 button.textContent = 'Get Distance';
+            }
+        }
+
+        // Load historical data and use cached distances if available
+        async function loadHistoricalData(lat, lng, radius) {
+            const mechanicList = document.getElementById('mechanic-list');
+            mechanicList.innerHTML = '<div class="loading">Loading performance data</div>';
+            
+            try {
+                const response = await fetch(`https://ai.instantmechanic.online/bot/api/find_mechanic?lat=${lat}&long=${lng}&radius=${radius}`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Origin': 'https://instantmechanic.online',
+                        'Referer': 'https://instantmechanic.online/',
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                await displayHistoricalData(data, lat, lng);
+                
+            } catch (error) {
+                console.error('Error loading historical data:', error);
+                showError('Error loading performance data. Please try again later.');
             }
         }
 
@@ -826,12 +947,16 @@
                     currentPosition = { lat: geocoded.lat, lng: geocoded.lng };
                     document.getElementById('location-display').textContent = `📍 ${geocoded.display}`;
                     
-                    // Hide search container
+                    // Hide search container and show map button
                     document.getElementById('search-container').classList.remove('visible');
+                    updateMapButton();
                     
                     // Update URL with coordinates
                     const newUrl = `${window.location.pathname}?q=${geocoded.lat},${geocoded.lng}`;
                     window.history.pushState({}, '', newUrl);
+                    
+                    // Clear cached distance data for new location
+                    mechanicsWithDistanceData = [];
                     
                     loadHistoricalData(currentPosition.lat, currentPosition.lng, currentRadius);
                 }
@@ -840,8 +965,32 @@
             }
         }
 
+        // Setup map button
+        function setupMapButton() {
+            const mapButton = document.getElementById('open-map-btn');
+            
+            mapButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (currentPosition) {
+                    const mapsUrl = `https://www.google.com/maps/@${currentPosition.lat},${currentPosition.lng},15z`;
+                    window.open(mapsUrl, '_blank');
+                }
+            });
+        }
+
+        // Update map button visibility and link
+        function updateMapButton() {
+            const mapButton = document.getElementById('open-map-btn');
+            if (currentPosition) {
+                mapButton.style.display = 'block';
+                mapButton.href = `https://www.google.com/maps/@${currentPosition.lat},${currentPosition.lng},15z`;
+            } else {
+                mapButton.style.display = 'none';
+            }
+        }
+
         // Load historical data from API
-        async function loadHistoricalData(lat, lng, radius) {
+        async function loadHistoricalDataOld(lat, lng, radius) {
             const mechanicList = document.getElementById('mechanic-list');
             mechanicList.innerHTML = '<div class="loading">Loading performance data</div>';
             
@@ -901,6 +1050,7 @@
             mechanicsArray.forEach((mechanic, index) => {
                 const mechanicDiv = document.createElement('div');
                 mechanicDiv.className = 'historical-mechanic';
+                mechanicDiv.style.position = 'relative'; // For great match tag positioning
                 mechanicDiv.mechanicData = mechanic; // Store mechanic data on element
                 
                 // Generate star rating
@@ -909,7 +1059,7 @@
                 const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
                 const starsHTML = '★'.repeat(fullStars) + (hasHalfStar ? '☆' : '') + '☆'.repeat(emptyStars);
                 
-                // Create action buttons
+                // Create action buttons (removed maps button)
                 const hasWhatsApp = mechanic.whatsapp && mechanic.whatsapp !== null && mechanic.whatsapp !== '';
                 
                 let actionButtonsHTML = '';
@@ -922,43 +1072,64 @@
                             <a class="action-button whatsapp-button" href="${mechanic.whatsapp}" target="_blank">
                                 💬 Chat
                             </a>
-                            <a class="action-button maps-button" href="https://www.google.com/maps/dir/?api=1&destination=${mechanic.lat},${mechanic.long}" target="_blank">
-                                🗺️ Maps
-                            </a>
                         </div>
                     `;
                 } else {
                     actionButtonsHTML = `
-                        <div class="action-buttons two-buttons">
+                        <div class="action-buttons single">
                             <a class="action-button call-button" href="tel:${mechanic.mobile}">
-                                📞 Call
-                            </a>
-                            <a class="action-button maps-button" href="https://www.google.com/maps/dir/?api=1&destination=${mechanic.lat},${mechanic.long}" target="_blank">
-                                🗺️ Open in Maps
+                                📞 Call ${mechanic.mobile}
                             </a>
                         </div>
                     `;
                 }
                 
-                // Determine distance display based on position (top 5 vs rest)
+                // Check if we have cached distance data for this mechanic
+                const cachedData = mechanicsWithDistanceData.find(m => m.name === mechanic.name);
+                
+                // Determine distance display based on position and cache
                 let distanceHTML = '';
                 if (index < 5) {
-                    // Top 5 mechanics - show loading distance badge
-                    distanceHTML = `
-                        <div class="distance-badge loading">
-                            <div class="distance-info">
-                                <div class="distance-text">Loading...</div>
-                                <div class="time-text">Calculating</div>
+                    if (cachedData) {
+                        // Use cached data
+                        distanceHTML = `
+                            <div class="distance-badge">
+                                <div class="distance-info">
+                                    <div class="distance-text">${cachedData.distance}</div>
+                                    <div class="time-text">${cachedData.duration}</div>
+                                </div>
                             </div>
-                        </div>
-                    `;
+                        `;
+                    } else {
+                        // Show loading for top 5 mechanics
+                        distanceHTML = `
+                            <div class="distance-badge loading">
+                                <div class="distance-info">
+                                    <div class="distance-text">Loading...</div>
+                                    <div class="time-text">Calculating</div>
+                                </div>
+                            </div>
+                        `;
+                    }
                 } else {
-                    // Rest of mechanics - show "Get Distance" button
-                    distanceHTML = `
-                        <button class="get-distance-btn" onclick="handleGetDistance(this, ${customerLat}, ${customerLng}, mechanicElements[${index}].mechanicData, mechanicElements[${index}])">
-                            Get Distance
-                        </button>
-                    `;
+                    if (cachedData) {
+                        // Use cached data
+                        distanceHTML = `
+                            <div class="distance-badge">
+                                <div class="distance-info">
+                                    <div class="distance-text">${cachedData.distance}</div>
+                                    <div class="time-text">${cachedData.duration}</div>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        // Show "Get Distance" button for non-top-5
+                        distanceHTML = `
+                            <button class="get-distance-btn" onclick="handleGetDistance(this, ${customerLat}, ${customerLng}, window.mechanicElements[${index}].mechanicData, window.mechanicElements[${index}])">
+                                Get Distance
+                            </button>
+                        `;
+                    }
                 }
                 
                 mechanicDiv.innerHTML = `
@@ -990,16 +1161,36 @@
                 
                 mechanicList.appendChild(mechanicDiv);
                 mechanicElements.push(mechanicDiv);
+                
+                // Add great match tag if cached data shows it's a great match
+                if (cachedData && isGreatMatch(mechanic, cachedData)) {
+                    const greatMatchTag = document.createElement('div');
+                    greatMatchTag.className = 'great-match-tag';
+                    greatMatchTag.textContent = 'Great Match';
+                    mechanicDiv.appendChild(greatMatchTag);
+                }
             });
             
             // Make mechanicElements globally accessible for button clicks
             window.mechanicElements = mechanicElements;
             
-            // Calculate distances for top 5 mechanics in the background
-            try {
-                await calculateDistancesForTop5(customerLat, customerLng, mechanicElements);
-            } catch (error) {
-                console.error('Error calculating distances for top 5:', error);
+            // Calculate distances for top 5 mechanics that don't have cached data
+            const top5NeedingDistance = mechanicElements.slice(0, 5).filter((element, index) => {
+                const mechanic = element.mechanicData;
+                return !mechanicsWithDistanceData.find(m => m.name === mechanic.name);
+            });
+            
+            if (top5NeedingDistance.length > 0) {
+                const distancePromises = top5NeedingDistance.map(element => {
+                    const mechanicData = element.mechanicData;
+                    return calculateDistance(customerLat, customerLng, mechanicData, element);
+                });
+                
+                try {
+                    await Promise.all(distancePromises);
+                } catch (error) {
+                    console.error('Error calculating distances for top 5:', error);
+                }
             }
         }
 
