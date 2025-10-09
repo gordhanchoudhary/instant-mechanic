@@ -675,9 +675,9 @@
             <button class="search-button" id="search-button">Search Location</button>
         </div>
         
-        <a href="javascript:void(0)" class="open-map-btn" id="open-map-btn">
+        <button class="open-map-btn" id="open-map-btn">
             🗺️ Open My Location on Maps
-        </a>
+        </button>
         
         <div class="location-display" id="location-display">Loading location...</div>
         
@@ -1123,32 +1123,33 @@
             });
         }
 
-        // Setup map button
+        // Setup map button - stores location data for button clicks
+        let currentLocationData = null;
+        
         function setupMapButton() {
             const mapButton = document.getElementById('open-map-btn');
             
-            mapButton.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                
+            mapButton.addEventListener('click', () => {
                 if (currentPosition) {
-                    // Determine which URL to use based on available data
                     let mapsUrl;
                     
-                    // Check if we have location data with original query
+                    // Check if we have the original address query from URL
                     const urlParams = new URLSearchParams(window.location.search);
                     const query = urlParams.get('q');
                     
+                    // If it's an address query (not coordinates), use the address
                     if (query && !query.match(/^-?\d+\.?\d*\s*,\s*-?\d+\.?\d*$/)) {
-                        // It's an address query
                         mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+                    } else if (currentLocationData && currentLocationData.originalQuery && currentLocationData.type === 'address') {
+                        // Use stored address from search
+                        mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(currentLocationData.originalQuery)}`;
                     } else {
-                        // It's coordinates or no specific address
+                        // Use coordinates
                         mapsUrl = `https://www.google.com/maps/search/?api=1&query=${currentPosition.lat},${currentPosition.lng}`;
                     }
                     
-                    console.log('Opening map with URL:', mapsUrl); // Debug log
-                    window.open(mapsUrl, '_blank');
+                    // Open in new window/tab
+                    window.open(mapsUrl, '_blank', 'noopener,noreferrer');
                 }
             });
         }
@@ -1156,6 +1157,12 @@
         // Update map button visibility  
         function updateMapButton(locationData = null) {
             const mapButton = document.getElementById('open-map-btn');
+            
+            // Store location data for later use
+            if (locationData) {
+                currentLocationData = locationData;
+            }
+            
             if (currentPosition) {
                 mapButton.classList.remove('hidden');
             } else {
