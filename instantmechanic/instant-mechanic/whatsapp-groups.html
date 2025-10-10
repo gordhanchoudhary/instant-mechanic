@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instant Mechanic - Join WhatsApp Groups</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="whatsapp-pattern" patternUnits="userSpaceOnUse" width="20" height="20"><circle cx="10" cy="10" r="1" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23whatsapp-pattern)"/></svg>');
+            animation: float 20s infinite linear;
+        }
+
+        @keyframes float {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .controls {
+            padding: 30px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .search-container {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 15px 50px 15px 20px;
+            border: 2px solid #e9ecef;
+            border-radius: 50px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #25D366;
+            box-shadow: 0 0 0 3px rgba(37, 211, 102, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+        }
+
+        .filters {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            border: 2px solid #e9ecef;
+            background: white;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .filter-btn.active {
+            background: #25D366;
+            color: white;
+            border-color: #25D366;
+        }
+
+        .filter-btn:hover {
+            border-color: #25D366;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+        }
+
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #25D366;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .mechanics-grid {
+            padding: 30px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .mechanic-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .mechanic-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(37, 211, 102, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .mechanic-card:hover::before {
+            left: 100%;
+        }
+
+        .mechanic-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(37, 211, 102, 0.15);
+            border-color: #25D366;
+        }
+
+        .mechanic-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .mechanic-name {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #2d3436;
+            margin-bottom: 5px;
+        }
+
+        .mechanic-type {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .garage {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .mobile {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+
+        .mechanic-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #6c757d;
+        }
+
+        .info-icon {
+            width: 16px;
+            height: 16px;
+            opacity: 0.7;
+        }
+
+        .rating {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .stars {
+            color: #ffc107;
+        }
+
+        .whatsapp-btn {
+            width: 100%;
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .whatsapp-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .whatsapp-btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .whatsapp-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(37, 211, 102, 0.3);
+        }
+
+        .whatsapp-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .whatsapp-btn:disabled:hover {
+            box-shadow: none;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6c757d;
+        }
+
+        .no-results h3 {
+            margin-bottom: 15px;
+            color: #495057;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 30px;
+            background: #f8f9fa;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #25D366;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #6c757d;
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .mechanics-grid {
+                grid-template-columns: 1fr;
+                padding: 20px;
+            }
+            
+            .filters {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .filter-group {
+                justify-content: center;
+            }
+            
+            .mechanic-info {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔧 Instant Mechanic</h1>
+            <p>Join WhatsApp Groups - Team Directory</p>
+        </div>
+
+        <div class="stats" id="stats">
+            <div class="stat-card">
+                <div class="stat-number" id="totalMechanics">0</div>
+                <div class="stat-label">Total Mechanics</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="garageCount">0</div>
+                <div class="stat-label">Garages</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="mobileCount">0</div>
+                <div class="stat-label">Mobile Mechanics</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="whatsappGroups">0</div>
+                <div class="stat-label">WhatsApp Groups</div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="search-container">
+                <input type="text" class="search-input" placeholder="Search by name, mobile, or location..." id="searchInput">
+                <span class="search-icon">🔍</span>
+            </div>
+            
+            <div class="filters">
+                <div class="filter-group">
+                    <span>Type:</span>
+                    <button class="filter-btn active" data-filter="all">All</button>
+                    <button class="filter-btn" data-filter="garage">Garages</button>
+                    <button class="filter-btn" data-filter="mobile">Mobile</button>
+                </div>
+                
+                <div class="filter-group">
+                    <span>WhatsApp:</span>
+                    <button class="filter-btn" data-filter="has-whatsapp">Has Group</button>
+                    <button class="filter-btn" data-filter="no-whatsapp">No Group</button>
+                </div>
+                
+                <div class="filter-group">
+                    <span>Sort by:</span>
+                    <select id="sortSelect" style="padding: 8px 12px; border: 2px solid #e9ecef; border-radius: 20px; background: white;">
+                        <option value="name">Name</option>
+                        <option value="rating">Rating</option>
+                        <option value="calls">Total Calls</option>
+                        <option value="earnings">Earnings</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div id="loading" class="loading">Loading mechanics data...</div>
+        
+        <div id="mechanicsContainer" class="mechanics-grid" style="display: none;"></div>
+        
+        <div id="noResults" class="no-results" style="display: none;">
+            <h3>No mechanics found</h3>
+            <p>Try adjusting your search or filters</p>
+        </div>
+    </div>
+
+    <script>
+        class MechanicWhatsAppManager {
+            constructor() {
+                this.mechanics = [];
+                this.filteredMechanics = [];
+                this.init();
+            }
+
+            async init() {
+                await this.loadMechanics();
+                this.setupEventListeners();
+                this.renderMechanics();
+                this.updateStats();
+            }
+
+            async loadMechanics() {
+                try {
+                    const response = await fetch('https://ai.instantmechanic.online/bot/api/mechanic/', {
+                        method: 'GET',
+                        headers: {
+                            'Accept': '*/*',
+                            'Accept-Language': 'en-US,en;q=0.9',
+                            'Connection': 'keep-alive',
+                            'Origin': 'https://instantmechanic.online',
+                            'Referer': 'https://instantmechanic.online/',
+                            'Sec-Fetch-Dest': 'empty',
+                            'Sec-Fetch-Mode': 'cors',
+                            'Sec-Fetch-Site': 'same-site',
+                            'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.5 Mobile/15E148 Safari/604.1'
+                        }
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    this.mechanics = await response.json();
+                    this.filteredMechanics = [...this.mechanics];
+                    
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('mechanicsContainer').style.display = 'grid';
+                } catch (error) {
+                    console.error('Error loading mechanics:', error);
+                    document.getElementById('loading').innerHTML = '❌ Failed to load mechanics data. Please try again.';
+                }
+            }
+
+            setupEventListeners() {
+                // Search functionality
+                document.getElementById('searchInput').addEventListener('input', (e) => {
+                    this.filterMechanics();
+                });
+
+                // Filter buttons
+                document.querySelectorAll('.filter-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        // Remove active class from siblings in same group
+                        const group = e.target.parentElement;
+                        group.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                        e.target.classList.add('active');
+                        this.filterMechanics();
+                    });
+                });
+
+                // Sort functionality
+                document.getElementById('sortSelect').addEventListener('change', () => {
+                    this.filterMechanics();
+                });
+            }
+
+            filterMechanics() {
+                const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+                const typeFilter = document.querySelector('[data-filter].active').dataset.filter;
+                const whatsappFilter = document.querySelector('[data-filter="has-whatsapp"].active, [data-filter="no-whatsapp"].active')?.dataset.filter;
+                const sortBy = document.getElementById('sortSelect').value;
+
+                this.filteredMechanics = this.mechanics.filter(mechanic => {
+                    // Search filter
+                    const matchesSearch = !searchTerm || 
+                        mechanic.name.toLowerCase().includes(searchTerm) ||
+                        mechanic.mobile.includes(searchTerm) ||
+                        mechanic.location.toLowerCase().includes(searchTerm) ||
+                        mechanic.city.toLowerCase().includes(searchTerm);
+
+                    // Type filter
+                    let matchesType = true;
+                    if (typeFilter === 'garage') {
+                        matchesType = mechanic.is_garage;
+                    } else if (typeFilter === 'mobile') {
+                        matchesType = !mechanic.is_garage;
+                    }
+
+                    // WhatsApp filter
+                    let matchesWhatsApp = true;
+                    if (whatsappFilter === 'has-whatsapp') {
+                        matchesWhatsApp = !!mechanic.whatsapp_group;
+                    } else if (whatsappFilter === 'no-whatsapp') {
+                        matchesWhatsApp = !mechanic.whatsapp_group;
+                    }
+
+                    return matchesSearch && matchesType && matchesWhatsApp;
+                });
+
+                // Sort mechanics
+                this.filteredMechanics.sort((a, b) => {
+                    switch (sortBy) {
+                        case 'name':
+                            return a.name.localeCompare(b.name);
+                        case 'rating':
+                            return b.rating - a.rating;
+                        case 'calls':
+                            return b.total_calls_done - a.total_calls_done;
+                        case 'earnings':
+                            return parseFloat(b.total_earnings) - parseFloat(a.total_earnings);
+                        default:
+                            return 0;
+                    }
+                });
+
+                this.renderMechanics();
+            }
+
+            renderMechanics() {
+                const container = document.getElementById('mechanicsContainer');
+                const noResults = document.getElementById('noResults');
+
+                if (this.filteredMechanics.length === 0) {
+                    container.style.display = 'none';
+                    noResults.style.display = 'block';
+                    return;
+                }
+
+                container.style.display = 'grid';
+                noResults.style.display = 'none';
+
+                container.innerHTML = this.filteredMechanics.map(mechanic => this.createMechanicCard(mechanic)).join('');
+            }
+
+            createMechanicCard(mechanic) {
+                const hasWhatsApp = !!mechanic.whatsapp_group;
+                const mechanicType = mechanic.is_garage ? 'garage' : 'mobile';
+                
+                return `
+                    <div class="mechanic-card">
+                        <div class="mechanic-header">
+                            <div>
+                                <h3 class="mechanic-name">${mechanic.name}</h3>
+                                <span class="mechanic-type ${mechanicType}">
+                                    ${mechanic.is_garage ? '🏪 Garage' : '🚗 Mobile'}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="mechanic-info">
+                            <div class="info-item">
+                                <span class="info-icon">📱</span>
+                                <span>${mechanic.mobile}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-icon">⭐</span>
+                                <div class="rating">
+                                    <span class="stars">${'★'.repeat(Math.floor(mechanic.rating))}${'☆'.repeat(5 - Math.floor(mechanic.rating))}</span>
+                                    <span>(${mechanic.rating})</span>
+                                </div>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-icon">📞</span>
+                                <span>${mechanic.total_calls_done} calls</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-icon">💰</span>
+                                <span>₹${mechanic.total_earnings}</span>
+                            </div>
+                        </div>
+
+                        ${mechanic.location || mechanic.city ? `
+                            <div class="info-item" style="margin-bottom: 20px; grid-column: 1/-1;">
+                                <span class="info-icon">📍</span>
+                                <span>${[mechanic.location, mechanic.city].filter(Boolean).join(', ')}</span>
+                            </div>
+                        ` : ''}
+
+                        ${hasWhatsApp ? `
+                            <a href="${mechanic.whatsapp_group}" target="_blank" class="whatsapp-btn">
+                                <span>💬</span>
+                                <span>Join WhatsApp Group</span>
+                            </a>
+                        ` : `
+                            <button class="whatsapp-btn" disabled>
+                                <span>❌</span>
+                                <span>No WhatsApp Group</span>
+                            </button>
+                        `}
+                    </div>
+                `;
+            }
+
+            updateStats() {
+                const totalMechanics = this.mechanics.length;
+                const garageCount = this.mechanics.filter(m => m.is_garage).length;
+                const mobileCount = this.mechanics.filter(m => !m.is_garage).length;
+                const whatsappGroups = this.mechanics.filter(m => !!m.whatsapp_group).length;
+
+                document.getElementById('totalMechanics').textContent = totalMechanics;
+                document.getElementById('garageCount').textContent = garageCount;
+                document.getElementById('mobileCount').textContent = mobileCount;
+                document.getElementById('whatsappGroups').textContent = whatsappGroups;
+            }
+        }
+
+        // Initialize the app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            new MechanicWhatsAppManager();
+        });
+    </script>
+</body>
+</html>
