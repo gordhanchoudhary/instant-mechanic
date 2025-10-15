@@ -47,6 +47,38 @@
       position: relative;
     }
 
+    .map-button {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(255,255,255,0.2);
+      border: 2px solid rgba(255,255,255,0.3);
+      color: white;
+      padding: 8px 12px;
+      border-radius: 25px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      backdrop-filter: blur(10px);
+      z-index: 2;
+    }
+
+    .map-button:hover {
+      background: rgba(255,255,255,0.3);
+      border-color: rgba(255,255,255,0.5);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    .map-button:active {
+      transform: translateY(0);
+    }
+
     .header::before {
       content: '';
       position: absolute;
@@ -383,6 +415,13 @@
         padding: 40px 20px 30px;
       }
 
+      .map-button {
+        top: 15px;
+        right: 15px;
+        font-size: 13px;
+        padding: 6px 10px;
+      }
+
       .content {
         padding: 25px 20px 30px;
       }
@@ -459,6 +498,9 @@
 <body>
   <div class="container">
     <div class="header">
+      <a href="#" id="mapButton" class="map-button" target="_blank" style="display: none;">
+        📍 Open Location
+      </a>
       <h1>🔧 Booking Details</h1>
       <p>Instant Mechanic Service</p>
       <div class="booking-id" id="bookingIdDisplay">Loading...</div>
@@ -624,12 +666,19 @@
 
       // Update location
       const locationLink = document.getElementById('locationLink');
+      const mapButton = document.getElementById('mapButton');
+      
       if (data.location) {
         locationLink.href = data.location;
         locationLink.textContent = 'View Service Location';
+        
+        // Show and set map button in header
+        mapButton.href = data.location;
+        mapButton.style.display = 'inline-flex';
       } else {
         locationLink.href = '#';
         locationLink.textContent = 'Location not available';
+        mapButton.style.display = 'none';
       }
 
       // Update agent details
