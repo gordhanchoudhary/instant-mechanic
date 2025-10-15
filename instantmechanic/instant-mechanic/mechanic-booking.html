@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Instant Mechanic - Booking Details</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px 10px;
+    }
+
+    .container {
+      max-width: 480px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+      overflow: hidden;
+      animation: slideIn 0.5s ease-out;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateY(30px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .header {
+      background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+      color: white;
+      padding: 30px 25px;
+      text-align: center;
+      position: relative;
+    }
+
+    .header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="20" cy="20" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="80" cy="30" r="1.5" fill="rgba(255,255,255,0.1)"/><circle cx="30" cy="80" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="70" cy="70" r="1.2" fill="rgba(255,255,255,0.1)"/></svg>');
+    }
+
+    .header h1 {
+      font-size: 28px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .header p {
+      font-size: 16px;
+      opacity: 0.9;
+      position: relative;
+      z-index: 1;
+    }
+
+    .booking-id {
+      background: rgba(255,255,255,0.2);
+      padding: 8px 16px;
+      border-radius: 20px;
+      display: inline-block;
+      margin-top: 15px;
+      font-weight: 500;
+      position: relative;
+      z-index: 1;
+    }
+
+    .content {
+      padding: 30px 25px;
+    }
+
+    .detail-section {
+      margin-bottom: 25px;
+    }
+
+    .detail-row {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 15px;
+      padding: 15px;
+      background: #f8f9fa;
+      border-radius: 12px;
+      border-left: 4px solid #4CAF50;
+      transition: all 0.3s ease;
+    }
+
+    .detail-row:hover {
+      transform: translateX(5px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .detail-icon {
+      width: 24px;
+      height: 24px;
+      margin-right: 15px;
+      color: #4CAF50;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .detail-content {
+      flex: 1;
+    }
+
+    .detail-label {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 4px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .detail-value {
+      font-size: 16px;
+      color: #333;
+      font-weight: 600;
+      line-height: 1.4;
+    }
+
+    .location-link {
+      color: #4CAF50;
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.3s ease;
+    }
+
+    .location-link:hover {
+      color: #45a049;
+      text-decoration: underline;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .status-active {
+      background: #e8f5e8;
+      color: #2e7d32;
+    }
+
+    .status-cancelled {
+      background: #ffebee;
+      color: #c62828;
+    }
+
+    .payment-info {
+      background: linear-gradient(135deg, #e3f2fd 0%, #f1f8e9 100%);
+      padding: 20px;
+      border-radius: 15px;
+      margin: 20px 0;
+      border: 1px solid #e0e0e0;
+    }
+
+    .payment-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      font-size: 16px;
+    }
+
+    .payment-row:last-child {
+      margin-bottom: 0;
+      border-top: 2px solid #4CAF50;
+      padding-top: 12px;
+      font-weight: 700;
+      font-size: 18px;
+      color: #2e7d32;
+    }
+
+    .button-container {
+      display: flex;
+      gap: 15px;
+      margin-top: 30px;
+      flex-direction: column;
+    }
+
+    .action-btn {
+      flex: 1;
+      padding: 16px 20px;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .action-btn::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.3);
+      transition: all 0.3s ease;
+      transform: translate(-50%, -50%);
+    }
+
+    .action-btn:active::before {
+      width: 300px;
+      height: 300px;
+    }
+
+    .accept-btn {
+      background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+      color: white;
+      box-shadow: 0 8px 25px rgba(76, 175, 80, 0.3);
+    }
+
+    .accept-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px rgba(76, 175, 80, 0.4);
+    }
+
+    .cancel-btn {
+      background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+      color: white;
+      box-shadow: 0 8px 25px rgba(244, 67, 54, 0.3);
+    }
+
+    .cancel-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px rgba(244, 67, 54, 0.4);
+    }
+
+    .loading {
+      opacity: 0.7;
+      pointer-events: none;
+    }
+
+    .loading::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 20px;
+      height: 20px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top: 2px solid white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      transform: translate(-50%, -50%);
+    }
+
+    @keyframes spin {
+      0% { transform: translate(-50%, -50%) rotate(0deg); }
+      100% { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+
+    /* Popup Styles */
+    .popup-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.6);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      backdrop-filter: blur(5px);
+    }
+
+    .popup-overlay.show {
+      display: flex;
+    }
+
+    .popup {
+      background: white;
+      border-radius: 20px;
+      padding: 30px;
+      max-width: 400px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+      transform: scale(0.7);
+      transition: transform 0.3s ease;
+      position: relative;
+    }
+
+    .popup-overlay.show .popup {
+      transform: scale(1);
+    }
+
+    .popup-icon {
+      width: 60px;
+      height: 60px;
+      margin: 0 auto 20px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 30px;
+    }
+
+    .popup-icon.success {
+      background: linear-gradient(135deg, #4CAF50, #45a049);
+      color: white;
+    }
+
+    .popup-icon.cancel {
+      background: linear-gradient(135deg, #f44336, #d32f2f);
+      color: white;
+    }
+
+    .popup h3 {
+      font-size: 22px;
+      margin-bottom: 15px;
+      color: #333;
+    }
+
+    .popup p {
+      font-size: 16px;
+      color: #666;
+      line-height: 1.5;
+      margin-bottom: 25px;
+    }
+
+    .popup-btn {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border: none;
+      padding: 12px 30px;
+      border-radius: 25px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .popup-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    .agent-name {
+      color: #4CAF50;
+      font-weight: 700;
+    }
+
+    /* Mobile Optimizations */
+    @media (max-width: 480px) {
+      .container {
+        margin: 0;
+        border-radius: 0;
+        min-height: 100vh;
+      }
+
+      .header {
+        padding: 40px 20px 30px;
+      }
+
+      .content {
+        padding: 25px 20px 30px;
+      }
+
+      .detail-row {
+        padding: 12px;
+        margin-bottom: 12px;
+      }
+
+      .button-container {
+        position: sticky;
+        bottom: 0;
+        background: white;
+        padding: 20px 0 10px;
+        margin: 20px -20px -30px;
+        border-top: 1px solid #e0e0e0;
+      }
+
+      .action-btn {
+        padding: 18px 20px;
+        font-size: 16px;
+      }
+    }
+
+    @media (min-width: 481px) {
+      .button-container {
+        flex-direction: row;
+      }
+    }
+
+    /* Icons using CSS */
+    .icon-car::before { content: '🚗'; }
+    .icon-problem::before { content: '⚙️'; }
+    .icon-price::before { content: '💰'; }
+    .icon-location::before { content: '📍'; }
+    .icon-agent::before { content: '👤'; }
+    .icon-status::before { content: '📋'; }
+
+    /* Loading skeleton animation */
+    .skeleton {
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: loading 1.5s infinite;
+    }
+
+    @keyframes loading {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    .error-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: #666;
+    }
+
+    .error-state h3 {
+      color: #f44336;
+      margin-bottom: 10px;
+    }
+
+    .retry-btn {
+      background: #4CAF50;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 15px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🔧 Booking Details</h1>
+      <p>Instant Mechanic Service</p>
+      <div class="booking-id" id="bookingIdDisplay">Loading...</div>
+    </div>
+
+    <div class="content">
+      <div id="loadingContent">
+        <div class="detail-row skeleton" style="height: 80px; border-radius: 12px;"></div>
+        <div class="detail-row skeleton" style="height: 80px; border-radius: 12px;"></div>
+        <div class="detail-row skeleton" style="height: 80px; border-radius: 12px;"></div>
+        <div class="detail-row skeleton" style="height: 80px; border-radius: 12px;"></div>
+      </div>
+
+      <div id="bookingContent" style="display: none;">
+        <div class="detail-section">
+          <div class="detail-row">
+            <div class="detail-icon icon-car"></div>
+            <div class="detail-content">
+              <div class="detail-label">Vehicle</div>
+              <div class="detail-value" id="carDetails">-</div>
+            </div>
+          </div>
+
+          <div class="detail-row">
+            <div class="detail-icon icon-problem"></div>
+            <div class="detail-content">
+              <div class="detail-label">Problem Description</div>
+              <div class="detail-value" id="problemDetails">-</div>
+            </div>
+          </div>
+
+          <div class="detail-row">
+            <div class="detail-icon icon-location"></div>
+            <div class="detail-content">
+              <div class="detail-label">Service Location</div>
+              <div class="detail-value">
+                <a href="#" id="locationLink" class="location-link" target="_blank">View on Map</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="detail-row">
+            <div class="detail-icon icon-agent"></div>
+            <div class="detail-content">
+              <div class="detail-label">Assigned Agent</div>
+              <div class="detail-value" id="agentDetails">-</div>
+            </div>
+          </div>
+
+          <div class="detail-row">
+            <div class="detail-icon icon-status"></div>
+            <div class="detail-content">
+              <div class="detail-label">Booking Status</div>
+              <div class="detail-value">
+                <span class="status-badge" id="statusBadge">Active</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="payment-info">
+          <div class="payment-row">
+            <span>Service Charge:</span>
+            <span id="serviceCharge">₹0</span>
+          </div>
+          <div class="payment-row">
+            <span>Your Payment:</span>
+            <span id="mechanicPayment">₹0</span>
+          </div>
+        </div>
+
+        <div class="button-container">
+          <button class="action-btn accept-btn" onclick="showAcceptPopup()">
+            ✅ Accept Booking
+          </button>
+          <button class="action-btn cancel-btn" onclick="showCancelPopup()">
+            ❌ Cancel Booking
+          </button>
+        </div>
+      </div>
+
+      <div id="errorContent" class="error-state" style="display: none;">
+        <h3>⚠️ Error Loading Booking</h3>
+        <p>Unable to load booking details. Please check your connection and try again.</p>
+        <button class="retry-btn" onclick="loadBookingData()">🔄 Retry</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Accept Popup -->
+  <div class="popup-overlay" id="acceptPopup">
+    <div class="popup">
+      <div class="popup-icon success">✅</div>
+      <h3>Accept Booking</h3>
+      <p>Please inform <span class="agent-name" id="acceptAgentName">Agent Name</span> that you are accepting this booking and heading to the location.</p>
+      <button class="popup-btn" onclick="closePopup('acceptPopup')">Got it!</button>
+    </div>
+  </div>
+
+  <!-- Cancel Popup -->
+  <div class="popup-overlay" id="cancelPopup">
+    <div class="popup">
+      <div class="popup-icon cancel">❌</div>
+      <h3>Cancel Booking</h3>
+      <p>Please inform <span class="agent-name" id="cancelAgentName">Agent Name</span> that you are cancelling this booking and cannot proceed with the service.</p>
+      <button class="popup-btn" onclick="closePopup('cancelPopup')">Understood</button>
+    </div>
+  </div>
+
+  <script>
+    // Get booking ID from URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const bookingId = urlParams.get('id');
+
+    let bookingData = null;
+
+    // Load booking data when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+      if (!bookingId) {
+        showError('No booking ID provided in URL');
+        return;
+      }
+      loadBookingData();
+    });
+
+    function loadBookingData() {
+      document.getElementById('loadingContent').style.display = 'block';
+      document.getElementById('bookingContent').style.display = 'none';
+      document.getElementById('errorContent').style.display = 'none';
+
+      // Simulate API call - replace with actual API endpoint
+      fetch(`https://ai.instantmechanic.online/bot/api/bookings/${bookingId}/`)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then(data => {
+          bookingData = data;
+          displayBookingData(data);
+        })
+        .catch(error => {
+          console.error('Error loading booking:', error);
+          showError('Failed to load booking details');
+        });
+    }
+
+    function displayBookingData(data) {
+      // Hide loading and show content
+      document.getElementById('loadingContent').style.display = 'none';
+      document.getElementById('errorContent').style.display = 'none';
+      document.getElementById('bookingContent').style.display = 'block';
+
+      // Update booking ID
+      document.getElementById('bookingIdDisplay').textContent = `Booking #${data.id || bookingId}`;
+
+      // Update car details
+      document.getElementById('carDetails').textContent = data.car || 'Not specified';
+
+      // Update problem details
+      document.getElementById('problemDetails').textContent = data.problem || 'Not specified';
+
+      // Update location
+      const locationLink = document.getElementById('locationLink');
+      if (data.location) {
+        locationLink.href = data.location;
+        locationLink.textContent = 'View Service Location';
+      } else {
+        locationLink.href = '#';
+        locationLink.textContent = 'Location not available';
+      }
+
+      // Update agent details
+      document.getElementById('agentDetails').textContent = data.agent_name || 'Not assigned';
+
+      // Update status
+      const statusBadge = document.getElementById('statusBadge');
+      if (data.is_cancelled) {
+        statusBadge.textContent = 'Cancelled';
+        statusBadge.className = 'status-badge status-cancelled';
+        // Disable buttons if cancelled
+        document.querySelectorAll('.action-btn').forEach(btn => {
+          btn.disabled = true;
+          btn.style.opacity = '0.5';
+          btn.style.cursor = 'not-allowed';
+        });
+      } else {
+        statusBadge.textContent = 'Active';
+        statusBadge.className = 'status-badge status-active';
+      }
+
+      // Update payment info
+      document.getElementById('serviceCharge').textContent = `₹${data.price || 0}`;
+      document.getElementById('mechanicPayment').textContent = `₹${data.pending_payment_amount || 0}`;
+
+      // Set agent names in popups
+      const agentName = data.agent_name || 'the assigned agent';
+      document.getElementById('acceptAgentName').textContent = agentName;
+      document.getElementById('cancelAgentName').textContent = agentName;
+    }
+
+    function showError(message) {
+      document.getElementById('loadingContent').style.display = 'none';
+      document.getElementById('bookingContent').style.display = 'none';
+      document.getElementById('errorContent').style.display = 'block';
+      document.querySelector('#errorContent p').textContent = message;
+    }
+
+    function showAcceptPopup() {
+      document.getElementById('acceptPopup').classList.add('show');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function showCancelPopup() {
+      document.getElementById('cancelPopup').classList.add('show');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closePopup(popupId) {
+      document.getElementById(popupId).classList.remove('show');
+      document.body.style.overflow = 'auto';
+    }
+
+    // Close popup when clicking outside
+    document.addEventListener('click', function(event) {
+      if (event.target.classList.contains('popup-overlay')) {
+        event.target.classList.remove('show');
+        document.body.style.overflow = 'auto';
+      }
+    });
+
+    // Prevent popup close when clicking inside popup
+    document.addEventListener('click', function(event) {
+      if (event.target.closest('.popup')) {
+        event.stopPropagation();
+      }
+    });
+
+    // Add some interactive feedback
+    document.querySelectorAll('.action-btn').forEach(btn => {
+      btn.addEventListener('touchstart', function() {
+        this.style.transform = 'scale(0.98)';
+      });
+      
+      btn.addEventListener('touchend', function() {
+        this.style.transform = '';
+      });
+    });
+  </script>
+</body>
+</html>
