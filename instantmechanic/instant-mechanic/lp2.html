@@ -1,0 +1,1277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google Tag Manager -->
+    <script async="" src="https://www.googletagmanager.com/gtm.js?id=GTM-NBCCM89N"></script>
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+      new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+      })(window,document,'script','dataLayer','GTM-NBCCM89N');</script>
+    <!-- End Google Tag Manager -->
+
+    <!-- Meta Pixel Code -->
+    <script>
+      !function(f,b,e,v,n,t,s)
+      {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+      n.queue=[];t=b.createElement(e);t.async=!0;
+      t.src=v;s=b.getElementsByTagName(e)[0];
+      s.parentNode.insertBefore(t,s)}(window, document,'script',
+      'https://connect.facebook.net/en_US/fbevents.js');
+      fbq('init', '479182611911558');
+      fbq('track', 'PageView');
+    </script>
+    <noscript><img height="1" width="1" style="display:none"
+    src="https://www.facebook.com/tr?id=479182611911558&ev=PageView&noscript=1"
+    /></noscript>
+    <!-- End Meta Pixel Code -->
+
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="ThemeServices">
+    <link rel="icon" href="assets/img/favicon.png">
+    <title>Instant Mechanic - Get Mechanic in 10 Minutes</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .container-fluid {
+            width: 100%;
+            padding: 0 15px;
+        }
+
+        /* Header Styles */
+        .cs_site_header {
+            background: #fff;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+
+        .cs_top_header {
+            background: #1a1a1a;
+            padding: 10px 0;
+            color: #fff;
+            font-size: 14px;
+        }
+
+        .cs_top_header_in {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .cs_header_contact_list {
+            list-style: none;
+            display: flex;
+            gap: 30px;
+        }
+
+        .cs_header_contact_list li {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .cs_header_contact_list a {
+            color: #fff;
+            text-decoration: none;
+        }
+
+        .cs_header_social_links {
+            display: flex;
+            gap: 10px;
+        }
+
+        .cs_social_btn {
+            width: 35px;
+            height: 35px;
+            background: #ffba05;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            text-decoration: none;
+            transition: transform 0.3s;
+        }
+
+        .cs_social_btn:hover {
+            transform: scale(1.1);
+        }
+
+        .cs_main_header {
+            padding: 15px 0;
+        }
+
+        .cs_main_header_in {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .cs_site_branding img {
+            height: 50px;
+        }
+
+        .cs_nav_list {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+
+        .cs_nav_list a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+
+        .cs_nav_list a:hover {
+            color: #ffba05;
+        }
+
+        .menu-item-has-children {
+            position: relative;
+        }
+
+        .menu-item-has-children ul {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: #fff;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            list-style: none;
+            padding: 10px 0;
+            min-width: 200px;
+            display: none;
+        }
+
+        .menu-item-has-children:hover ul {
+            display: block;
+        }
+
+        .menu-item-has-children ul a {
+            padding: 8px 20px;
+            display: block;
+        }
+
+        .cs_circle_btn {
+            background-color: #ffba05;
+            border: none;
+            border-radius: 5px;
+            padding: 12px 20px;
+            cursor: pointer;
+            animation: vibrate 0.5s infinite;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        @keyframes vibrate {
+            0% { transform: translateX(-1px); }
+            25% { transform: translateX(2px); }
+            50% { transform: translateX(-2px); }
+            75% { transform: translateX(2px); }
+            100% { transform: translateX(-1px); }
+        }
+
+        .cs_btn {
+            background: #ffba05;
+            color: #fff;
+            padding: 12px 25px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.3s;
+        }
+
+        .cs_btn:hover {
+            background: #e5a704;
+        }
+
+        .cs_site_header_spacing_140 {
+            height: 140px;
+        }
+
+        /* Hero Section */
+        .cs_slider {
+            background: linear-gradient(135deg, #1a1a1a 0%, #333 100%);
+            color: #fff;
+            padding: 100px 0;
+            text-align: center;
+        }
+
+        .cs_hero_title {
+            font-size: 3.5rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .cs_hero_subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 40px;
+            opacity: 0.9;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .cs_hero_btns {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .cs_hero_number {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: rgba(255,255,255,0.1);
+            padding: 15px 25px;
+            border-radius: 50px;
+        }
+
+        .cs_hero_number_icon {
+            width: 50px;
+            height: 50px;
+            background: #ffba05;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .cs_hero_number a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+
+        /* About Section */
+        .cs_about {
+            padding: 100px 0;
+        }
+
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            margin: -15px;
+        }
+
+        .col-xl-6 {
+            flex: 0 0 50%;
+            max-width: 50%;
+            padding: 15px;
+        }
+
+        .cs_about_thumbnail_wrapper {
+            position: relative;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .cs_about_thumbnail img {
+            width: 100%;
+            border-radius: 10px;
+        }
+
+        .cs_phone_call {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: #fff;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: #333;
+        }
+
+        .cs_phone_icon {
+            width: 40px;
+            height: 40px;
+            background: #ffba05;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+        }
+
+        .cs_section_heading {
+            margin-bottom: 50px;
+        }
+
+        .cs_section_subtitle {
+            color: #ffba05;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+        }
+
+        .cs_section_title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            line-height: 1.2;
+        }
+
+        .cs_features_list {
+            margin-bottom: 40px;
+        }
+
+        .cs_iconbox {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .cs_iconbox_icon {
+            width: 60px;
+            height: 60px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .cs_iconbox_title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .cs_list {
+            list-style: none;
+        }
+
+        .cs_list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .cs_list_icon {
+            width: 25px;
+            height: 25px;
+            background: #ffba05;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            flex-shrink: 0;
+            font-size: 12px;
+        }
+
+        .cs_about_btns {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .cs_avatar {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .cs_avatar_thumbnail {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            overflow: hidden;
+        }
+
+        .cs_avatar_thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Service Section */
+        .cs_gray_bg {
+            background: #f8f9fa;
+            padding: 100px 0;
+        }
+
+        .cs_section_heading_left {
+            max-width: 600px;
+        }
+
+        .cs_section_heading_right {
+            margin-top: 20px;
+            opacity: 0.8;
+        }
+
+        .cs_card {
+            background: #fff;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin: 15px;
+            transition: transform 0.3s;
+        }
+
+        .cs_card:hover {
+            transform: translateY(-5px);
+        }
+
+        .cs_card_thumbnail img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+        }
+
+        .cs_card_info {
+            padding: 30px;
+            text-align: center;
+        }
+
+        .cs_card_icon {
+            width: 80px;
+            height: 80px;
+            background: #333;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+        }
+
+        .cs_card_icon img {
+            width: 40px;
+            height: 40px;
+        }
+
+        .cs_card_title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .cs_card_title a {
+            text-decoration: none;
+            color: #333;
+        }
+
+        .cs_card_subtitle {
+            margin-bottom: 20px;
+            opacity: 0.8;
+        }
+
+        .cs_text_btn {
+            color: #ffba05;
+            text-decoration: none;
+            font-weight: bold;
+            text-transform: uppercase;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .cs_btn_icon {
+            width: 30px;
+            height: 30px;
+            background: #ffba05;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+        }
+
+        /* Services Grid */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+
+        /* Why Choose Section */
+        .cs_feature_text {
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+        }
+
+        .col-xl-4 {
+            flex: 0 0 33.333333%;
+            max-width: 33.333333%;
+            padding: 15px;
+        }
+
+        .cs_features_thumbnail_1 img,
+        .cs_features_thumbnail_2 img {
+            width: 100%;
+            border-radius: 15px;
+        }
+
+        .cs_features_thumbnail_3 {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            overflow: hidden;
+        }
+
+        .cs_features_thumbnail_3 img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Footer */
+        .cs_footer {
+            background: #1a1a1a;
+            color: #fff;
+            padding: 60px 0 20px;
+        }
+
+        .cs_footer_row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+        }
+
+        .cs_footer_widget_title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .cs_footer_widget_seperator {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 20px;
+        }
+
+        .cs_footer_widget_seperator span {
+            width: 40px;
+            height: 3px;
+        }
+
+        .cs_accent_bg {
+            background: #ffba05;
+        }
+
+        .cs_white_bg {
+            background: #fff;
+        }
+
+        .cs_footer_menu {
+            list-style: none;
+        }
+
+        .cs_footer_menu li {
+            margin-bottom: 10px;
+        }
+
+        .cs_footer_menu a {
+            color: #ccc;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .cs_footer_menu a:hover {
+            color: #ffba05;
+        }
+
+        .cs_footer_contact_list {
+            list-style: none;
+        }
+
+        .cs_footer_contact_list li {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .cs_footer_contact_list i {
+            width: 20px;
+            color: #ffba05;
+        }
+
+        .cs_footer_contact_list a {
+            color: #ccc;
+            text-decoration: none;
+        }
+
+        .cs_working_hours {
+            list-style: none;
+        }
+
+        .cs_working_hours li {
+            margin-bottom: 10px;
+        }
+
+        .cs_working_hours a {
+            color: #ccc;
+            text-decoration: none;
+        }
+
+        .cs_footer_bottom {
+            border-top: 1px solid #333;
+            padding: 20px 0;
+            margin-top: 40px;
+        }
+
+        .cs_footer_bottom_in {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .cs_footer_copyright a {
+            color: #ffba05;
+            text-decoration: none;
+        }
+
+        /* Scroll Top Button */
+        .cs_scroll_top_btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: #ffba05;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            cursor: pointer;
+            z-index: 1000;
+            transition: transform 0.3s;
+        }
+
+        .cs_scroll_top_btn:hover {
+            transform: scale(1.1);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .cs_hero_title {
+                font-size: 2rem;
+            }
+            
+            .cs_main_header_in {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .cs_nav_list {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .col-xl-6, .col-xl-4 {
+                flex: 0 0 100%;
+                max-width: 100%;
+            }
+            
+            .cs_hero_btns {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .cs_about_btns {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .cs_footer_bottom_in {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .cs_top_header_in {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .cs_header_contact_list {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .desktop-margin {
+                margin-top: 40px;
+            }
+        }
+
+        /* Utility Classes */
+        .text-center { text-align: center; }
+        .mb-0 { margin-bottom: 0; }
+        .cs_mb_18 { margin-bottom: 18px; }
+        .cs_mb_34 { margin-bottom: 34px; }
+        .cs_mb_50 { margin-bottom: 50px; }
+        .position-relative { position: relative; }
+        .position-absolute { position: absolute; }
+        .d-flex { display: flex; }
+        .align-items-center { align-items: center; }
+        .justify-content-center { justify-content: center; }
+        .cs_fs_70 { font-size: 4.375rem; }
+        .cs_fs_50 { font-size: 3.125rem; }
+        .cs_fs_30 { font-size: 1.875rem; }
+        .cs_fs_24 { font-size: 1.5rem; }
+        .cs_fs_18 { font-size: 1.125rem; }
+        .cs_semibold { font-weight: 600; }
+        .cs_white_color { color: #fff; }
+        .cs_heading_color { color: #333; }
+        .cs_accent_color { color: #ffba05; }
+    </style>
+</head>
+
+<body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NBCCM89N"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+
+    <!-- Header Section -->
+    <header class="cs_site_header">
+        <div class="cs_top_header">
+            <div class="container-fluid">
+                <div class="cs_top_header_in">
+                    <div class="cs_top_header_left">
+                        <ul class="cs_header_contact_list">
+                            <li>
+                                <span>📞</span>
+                                <a href="https://wa.me/message/R7LYR65MG47ZB1">+91 9266961110</a>
+                            </li>
+                            <li>
+                                <span>📍</span>
+                                <span>Southern Peripheral Road, Sector 75, Gurgoan, Haryana</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="cs_top_header_right">
+                        <div class="cs_header_social_links">
+                            <a href="https://www.linkedin.com/in/instant-mechanic-65492a33b/" class="cs_social_btn">
+                                <span>in</span>
+                            </a>
+                            <a href="#" class="cs_social_btn">
+                                <span>T</span>
+                            </a>
+                            <a href="https://www.instagram.com/instantmechanic/" class="cs_social_btn">
+                                <span>IG</span>
+                            </a>
+                            <a href="#" class="cs_social_btn">
+                                <span>F</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="cs_main_header">
+            <div class="container-fluid">
+                <div class="cs_main_header_in">
+                    <div class="cs_main_header_left">
+                        <div class="cs_logo_wrap">
+                            <a class="cs_site_branding" href="#home">
+                                <img src="assets/img/logo.svg" alt="Instant Mechanic Logo" class="desktop-margin">
+                            </a>
+                        </div>
+                    </div>
+                    <div class="cs_main_header_center">
+                        <div class="cs_nav">
+                            <ul class="cs_nav_list">
+                                <li><a href="#home">Home</a></li>
+                                <li class="menu-item-has-children">
+                                    <a href="#services">Services</a>
+                                    <ul>
+                                        <li><a href="#services">Battery Jump Start</a></li>
+                                        <li><a href="#services">Towing Crane</a></li>
+                                        <li><a href="#services">Fuel Delivery</a></li>
+                                        <li><a href="#services">Flat Tyre</a></li>
+                                        <li><a href="#services">Key Lockout</a></li>
+                                        <li><a href="#services">Minor Repair</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#services">Car Service</a></li>
+                                <li><a href="#about">About</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="cs_main_header_right">
+                        <a href="https://wa.me/message/R7LYR65MG47ZB1" target="_blank" class="cs_circle_btn">
+                            📞 Call Now
+                        </a>
+                        <a href="https://wa.me/message/R7LYR65MG47ZB1" class="cs_btn">
+                            <span>Get a Quote</span>
+                            <span>→</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="cs_site_header_spacing_140"></div>
+
+    <!-- Hero Section -->
+    <section id="home" class="cs_slider">
+        <div class="container">
+            <div class="cs_hero_text">
+                <h1 class="cs_hero_title">GET YOUR "NEAR BY MECHANIC" IN 10 MINUTES</h1>
+                <p class="cs_hero_subtitle">
+                    From Car Battery Jump Start to Car major repairs. We provide you the best nearby car mechanic with all possible assistance in repairing problems, like Car Battery jump Start, Car Battery replacement, Car Tyre Puncture repair 24/7 Car Towing service, Fuel Delivery, Key Lockout, Car Major Repairs.
+                </p>
+                <div class="cs_hero_btns">
+                    <a href="https://wa.me/message/R7LYR65MG47ZB1" class="cs_btn">
+                        <span>CALL NOW</span>
+                        <span>→</span>
+                    </a>
+                    <div class="cs_hero_number">
+                        <div class="cs_hero_number_icon">
+                            📞
+                        </div>
+                        <a href="https://wa.me/message/R7LYR65MG47ZB1">+91 9266961110</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="cs_about">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-xl-6">
+                    <div class="cs_about_thumbnail_wrapper">
+                        <div class="cs_about_thumbnail">
+                            <img src="assets/img/rsa1.jpg" alt="Roadside Assistance">
+                        </div>
+                        <div class="cs_about_thumbnail">
+                            <img src="assets/img/rsa2.jpg" alt="Car Repair">
+                        </div>
+                        <a href="https://wa.me/message/R7LYR65MG47ZB1" class="cs_phone_call">
+                            <div class="cs_phone_icon">📞</div>
+                            <div class="cs_phone_number">+91 9266961110</div>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-xl-6">
+                    <div class="cs_about_text">
+                        <div class="cs_section_heading">
+                            <h3 class="cs_section_subtitle">About Us</h3>
+                            <h2 class="cs_section_title">24/7 Support: We're here for you whenever you need us, day or night</h2>
+                        </div>
+                        <p style="margin-bottom: 40px;">Are you looking For a Car Mechanic Near Me Contact Us To Get Nearby Car Repair Garage. Get Nearby Car Mechanic in 10 Minutes only.</p>
+                        
+                        <div class="cs_features_list">
+                            <div class="cs_iconbox">
+                                <div class="cs_iconbox_icon">🔧</div>
+                                <h3 class="cs_iconbox_title">Roadside Rescue. Anytime, Anywhere</h3>
+                            </div>
+                            <div class="cs_iconbox">
+                                <div class="cs_iconbox_icon">🚗</div>
+                                <h3 class="cs_iconbox_title">Help on the Road. Just a Call Away</h3>
+                            </div>
+                        </div>
+
+                        <ul class="cs_list">
+                            <li>
+                                <span class="cs_list_icon">✓</span>
+                                <span>Our car mechanics are available 24/7 to get you back on the road</span>
+                            </li>
+                            <li>
+                                <span class="cs_list_icon">✓</span>
+                                <span>Whether it's a car breakdown or another issue, our roadside assistance service can connect you with a qualified mechanic in your area, anytime.</span>
+                            </li>
+                            <li>
+                                <span class="cs_list_icon">✓</span>
+                                <span>Call us for prompt and professional car repair Mechanic, wherever you may be, Trusted and Verified Mechanics.</span>
+                            </li>
+                        </ul>
+
+                        <div class="cs_about_btns">
+                            <a href="https://wa.me/message/R7LYR65MG47ZB1" class="cs_btn">
+                                <span>CALL NOW</span>
+                                <span>→</span>
+                            </a>
+                            <div class="cs_avatar">
+                                <div class="cs_avatar_thumbnail">
+                                    <img src="assets/img/logo.jpg" alt="Instant Mechanic">
+                                </div>
+                                <div class="cs_avatar_info">
+                                    <h3>INSTANT MECHANIC</h3>
+                                    <p>Mechanic in 10 Minutes</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services" class="cs_gray_bg">
+        <div class="container">
+            <div class="cs_section_heading text-center">
+                <h3 class="cs_section_subtitle">Who We Are</h3>
+                <h2 class="cs_section_title">Fast, Reliable Roadside Assistance</h2>
+                <div class="cs_section_heading_right">
+                    At Instant Mechanic, we deliver fast and reliable roadside assistance anywhere in Delhi NCR, Gurgaon, Noida, Ghaziabad, Faridabad. Whether it's a flat tyre, stepney change, jump-start, dead or new battery, towing, fuel delivery, key lockout, or minor repair, our verified Roadside mechanics reach you within 10–15 minutes.
+                </div>
+            </div>
+
+            <div class="services-grid">
+                <div class="cs_card">
+                    <div class="cs_card_thumbnail">
+                        <img src="assets/img/Jumpstart.jpg" alt="Battery Jumpstart">
+                    </div>
+                    <div class="cs_card_info">
+                        <div class="cs_card_icon">
+                            🔋
+                        </div>
+                        <h3 class="cs_card_title">
+                            <a href="#services">Battery Jumpstart & Replacement</a>
+                        </h3>
+                        <p class="cs_card_subtitle">We cover Car Battery Replacement, Car Battery Jumpstart, Doorstep car Battery replacement and all battery issues in your car, Just a call away from you</p>
+                        <a href="#services" class="cs_text_btn">
+                            <span>Read More</span>
+                            <span class="cs_btn_icon">→</span>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="cs_card">
+                    <div class="cs_card_thumbnail">
+                        <img src="assets/img/flatyre1.jpg" alt="Flat Tyre">
+                    </div>
+                    <div class="cs_card_info">
+                        <div class="cs_card_icon">
+                            🛞
+                        </div>
+                        <h3 class="cs_card_title">
+                            <a href="#services">Flat Tyre and Stepni Change</a>
+                        </h3>
+                        <p class="cs_card_subtitle">We handle Car puncture repair, car stepney change, Tyre Puncture Service Just a call away from you</p>
+                        <a href="#services" class="cs_text_btn">
+                            <span>Read More</span>
+                            <span class="cs_btn_icon">→</span>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="cs_card">
+                    <div class="cs_card_thumbnail">
+                        <img src="assets/img/fueldelivery.jpg" alt="Fuel Delivery">
+                    </div>
+                    <div class="cs_card_info">
+                        <div class="cs_card_icon">
+                            ⛽
+                        </div>
+                        <h3 class="cs_card_title">
+                            <a href="#services">Fuel Delivery and Key lock out</a>
+                        </h3>
+                        <p class="cs_card_subtitle">We make sure that your car is back on road with sufficient fuel and Keylock out issue will be solved as soon as possible</p>
+                        <a href="#services" class="cs_text_btn">
+                            <span>Read More</span>
+                            <span class="cs_btn_icon">→</span>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="cs_card">
+                    <div class="cs_card_thumbnail">
+                        <img src="assets/img/TOW.jpg" alt="Towing Service">
+                    </div>
+                    <div class="cs_card_info">
+                        <div class="cs_card_icon">
+                            🚛
+                        </div>
+                        <h3 class="cs_card_title">
+                            <a href="#services">From Major Repairs to 24/7 Car Towing Service</a>
+                        </h3>
+                        <p class="cs_card_subtitle">From Minor issue to Major issue we make sure your safety First and provide the RSA in 10 minutes</p>
+                        <a href="#services" class="cs_text_btn">
+                            <span>Read More</span>
+                            <span class="cs_btn_icon">→</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Why Choose Section -->
+    <section style="padding: 100px 0;">
+        <div class="container">
+            <div class="cs_section_heading text-center">
+                <h3 class="cs_section_subtitle">Why is Instant Mechanic Known For Being the Best Roadside Assistance Services?</h3>
+                <h2 class="cs_section_title">24 Hours Roadside Assistance</h2>
+            </div>
+            
+            <div class="row align-items-center">
+                <div class="col-xl-4">
+                    <div class="cs_features_thumbnail_1">
+                        <img src="assets/img/service2.jpg" alt="Service Image">
+                    </div>
+                </div>
+                <div class="col-xl-4">
+                    <p class="cs_feature_text">For reliable roadside assistance and car repair services, choose us</p>
+                    
+                    <div class="cs_iconbox">
+                        <div class="cs_iconbox_icon">🚗</div>
+                        <div class="cs_iconbox_info">
+                            <h3 class="cs_iconbox_title">We are your trusted partner</h3>
+                            <p>connecting you with highly skilled mechanics for all your vehicle needs.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="cs_iconbox">
+                        <div class="cs_iconbox_icon">🔧</div>
+                        <div class="cs_iconbox_info">
+                            <h3 class="cs_iconbox_title">We provide</h3>
+                            <p>Our team provides expert assistance and top-quality care to get you back on the road quickly and safely</p>
+                        </div>
+                    </div>
+                    
+                    <div class="cs_iconbox">
+                        <div class="cs_iconbox_icon">⚙️</div>
+                        <div class="cs_iconbox_info">
+                            <h3 class="cs_iconbox_title">We Ensure</h3>
+                            <p>From minor repairs to major overhauls, our mechanics are equipped to provide efficient and reliable service</p>
+                        </div>
+                    </div>
+                    
+                    <a href="https://wa.me/message/R7LYR65MG47ZB1" class="cs_btn">
+                        <span>Call Now</span>
+                        <span>→</span>
+                    </a>
+                </div>
+                <div class="col-xl-4">
+                    <div class="cs_features_thumbnail_2 position-relative">
+                        <img src="assets/img/service4.jpg" alt="Service Image">
+                        <div class="cs_features_thumbnail_3">
+                            <img src="assets/img/logo2.jpg" alt="Logo">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="cs_footer">
+        <div class="cs_main_footer">
+            <div class="container">
+                <div class="cs_footer_row">
+                    <div class="cs_footer_col">
+                        <div class="cs_footer_widget">
+                            <h2 class="cs_footer_widget_title">About</h2>
+                            <div class="cs_footer_widget_seperator">
+                                <span class="cs_accent_bg"></span>
+                                <span class="cs_white_bg"></span>
+                                <span class="cs_white_bg"></span>
+                            </div>
+                            <div class="cs_text_widget">
+                                <p>Instant Mechanic is a fast-growing roadside assistance service designed to provide immediate help for car owners when they need it the most.</p>
+                            </div>
+                            <div class="cs_social_btns">
+                                <a href="https://www.linkedin.com/in/instant-mechanic-65492a33b/" class="cs_social_btn">in</a>
+                                <a href="#" class="cs_social_btn">T</a>
+                                <a href="https://www.instagram.com/instantmechanic/" class="cs_social_btn">IG</a>
+                                <a href="#" class="cs_social_btn">F</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="cs_footer_col">
+                        <div class="cs_footer_widget">
+                            <h2 class="cs_footer_widget_title">Explore</h2>
+                            <div class="cs_footer_widget_seperator">
+                                <span class="cs_accent_bg"></span>
+                                <span class="cs_white_bg"></span>
+                                <span class="cs_white_bg"></span>
+                            </div>
+                            <ul class="cs_footer_menu">
+                                <li><a href="#services">Battery Jumpstart</a></li>
+                                <li><a href="#services">24 Hour Car Towing</a></li>
+                                <li><a href="#services">Flat Tyre</a></li>
+                                <li><a href="#services">Key Lockout</a></li>
+                                <li><a href="#services">Fuel Delivery</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="cs_footer_col">
+                        <div class="cs_footer_widget">
+                            <h2 class="cs_footer_widget_title">Contact Us</h2>
+                            <div class="cs_footer_widget_seperator">
+                                <span class="cs_accent_bg"></span>
+                                <span class="cs_white_bg"></span>
+                                <span class="cs_white_bg"></span>
+                            </div>
+                            <ul class="cs_footer_contact_list">
+                                <li>
+                                    <span>📍</span>
+                                    Sector 75, Gurgoan
+                                </li>
+                                <li>
+                                    <span>📞</span>
+                                    <a href="https://wa.me/message/R7LYR65MG47ZB1">+91 9266961110</a>
+                                </li>
+                                <li>
+                                    <span>✉️</span>
+                                    <a href="mailto:info.instantmechanic@gmail.com">info.instantmechanic@gmail.com</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="cs_footer_col">
+                        <div class="cs_footer_widget">
+                            <h2 class="cs_footer_widget_title">Policies</h2>
+                            <div class="cs_footer_widget_seperator">
+                                <span class="cs_accent_bg"></span>
+                                <span class="cs_white_bg"></span>
+                                <span class="cs_white_bg"></span>
+                            </div>
+                            <ul class="cs_working_hours">
+                                <li><a href="#terms">Terms & Conditions</a></li>
+                                <li><a href="#privacy">Privacy Policy</a></li>
+                                <li><a href="#cancellation">Cancellation Policy</a></li>
+                                <li><a href="#refund">Refund Policy</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="cs_footer_bottom">
+            <div class="container">
+                <div class="cs_footer_bottom_in">
+                    <div class="cs_footer_copyright">
+                        Copyright © 2024 <a href="#home">Instant Mechanic</a>. All Rights Reserved.
+                    </div>
+                    <div>
+                        Payment Methods Accepted
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scroll Top Button -->
+    <div class="cs_scroll_top_btn" onclick="scrollToTop()">
+        ↑
+    </div>
+
+    <script>
+        // Scroll to top functionality
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        // Show/hide scroll top button
+        window.addEventListener('scroll', function() {
+            const scrollBtn = document.querySelector('.cs_scroll_top_btn');
+            if (window.pageYOffset > 300) {
+                scrollBtn.style.display = 'flex';
+            } else {
+                scrollBtn.style.display = 'none';
+            }
+        });
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Google Sheet tracking script
+        (function() {
+            var sheetURL = "https://script.google.com/macros/s/AKfycbwIh0hQ7oVQo9ZDTA8PxeZnIa7a8E3U2dE386o82b3ANsmjFS_o7V_Z_gSJOf3NEosd/exec";
+        
+            function getParams() {
+                var params = {};
+                var queryString = window.location.search.substring(1);
+                if (!queryString) return params;
+        
+                var vars = queryString.split("&");
+                for (var i = 0; i < vars.length; i++) {
+                    var pair = vars[i].split("=");
+                    params[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1] || "");
+                }
+                return params;
+            }
+        
+            function sendToGoogleSheet() {
+                var params = getParams();
+                if (Object.keys(params).length > 0) {
+                    var url = sheetURL + "?" + new URLSearchParams(params).toString();
+        
+                    setTimeout(() => {
+                        fetch(url, { mode: "no-cors" })
+                            .catch(error => console.error("Error sending data:", error));
+                    }, 2000);
+                }
+            }
+        
+            window.addEventListener("load", sendToGoogleSheet);
+        })();
+    </script>
+</body>
+</html>
