@@ -2008,7 +2008,7 @@
     </script>
 
     <script>
-// Unified Location Handler
+// Unified Location Handler - Improved Version
 class LocationUnifier {
     constructor(apiKey) {
         this.apiKey = apiKey;
@@ -2038,29 +2038,30 @@ class LocationUnifier {
     // Extract coordinates from Google Maps share URL
     extractFromShareUrl(url) {
         try {
-            // Handle goo.gl short URLs and other Google Maps URLs
             const patterns = [
-                // Pattern for: https://maps.app.goo.gl/...
-                /maps\.app\.goo\.gl\/([A-Za-z0-9]+)/,
-                // Pattern for: https://www.google.com/maps/@28.4105614,77.0473984,14z
-                /@(-?\d+\.?\d*),(-?\d+\.?\d*)/,
                 // Pattern for: https://www.google.com/maps?q=28.63542175293,77.252059936523
                 /[?&]q=(-?\d+\.?\d*),(-?\d+\.?\d*)/,
-                // Pattern for: https://maps.google.com/maps?q=28.63542175293,77.252059936523
-                /maps\.google\.com.*[?&]q=(-?\d+\.?\d*),(-?\d+\.?\d*)/
+                // Pattern for: https://www.google.com/maps/@28.4105614,77.0473984,14z
+                /@(-?\d+\.?\d*),(-?\d+\.?\d*)/,
+                // Pattern for place coordinates in URLs
+                /!3d(-?\d+\.?\d*)!4d(-?\d+\.?\d*)/,
+                // Pattern for center parameter
+                /center=(-?\d+\.?\d*),(-?\d+\.?\d*)/,
+                // Pattern for ll parameter
+                /ll=(-?\d+\.?\d*),(-?\d+\.?\d*)/,
+                // Pattern for coordinates in various formats
+                /(-?\d{1,3}\.\d{6,}),?\s*(-?\d{1,3}\.\d{6,})/
             ];
 
             for (let pattern of patterns) {
                 const match = url.match(pattern);
-                if (match) {
-                    if (match.length === 2) {
-                        // This is a shortened URL, we'll need to resolve it
-                        return null;
-                    } else if (match.length === 3) {
-                        return {
-                            lat: parseFloat(match[1]),
-                            lng: parseFloat(match[2])
-                        };
+                if (match && match.length >= 3) {
+                    const lat = parseFloat(match[1]);
+                    const lng = parseFloat(match[2]);
+                    
+                    // Validate coordinates are reasonable for Earth
+                    if (lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
+                        return { lat, lng };
                     }
                 }
             }
@@ -2079,10 +2080,13 @@ class LocationUnifier {
             const match = input.trim().match(coordPattern);
             
             if (match) {
-                return {
-                    lat: parseFloat(match[1]),
-                    lng: parseFloat(match[2])
-                };
+                const lat = parseFloat(match[1]);
+                const lng = parseFloat(match[2]);
+                
+                // Validate coordinates
+                if (lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
+                    return { lat, lng };
+                }
             }
             return null;
         } catch (error) {
@@ -2113,19 +2117,92 @@ class LocationUnifier {
         });
     }
 
-    // Resolve shortened Google Maps URLs
+    // Resolve shortened URLs using multiple methods
     async resolveShortUrl(url) {
+        const methods = [
+            () => this.resolveViaHttp(url),
+            () => this.resolveViaProxy(url),
+            () => this.resolveViaGoogleAPI(url)
+        ];
+
+        for (const method of methods) {
+            try {
+                const result = await method();
+                if (result) {
+                    return result;
+                }
+            } catch (error) {
+                console.warn('Resolution method failed:', error.message);
+                continue;
+            }
+        }
+
+        return null;
+    }
+
+    // Method 1: Direct HTTP request (may fail due to CORS)
+    async resolveViaHttp(url) {
         try {
             const response = await fetch(url, {
-                method: 'HEAD',
-                redirect: 'follow'
+                method: 'GET',
+                redirect: 'follow',
+                mode: 'cors'
             });
-            
-            const resolvedUrl = response.url;
-            return this.extractFromShareUrl(resolvedUrl);
+
+            if (response.ok) {
+                const finalUrl = response.url;
+                return this.extractFromShareUrl(finalUrl);
+            }
         } catch (error) {
-            console.error('Error resolving short URL:', error);
-            return null;
+            throw new Error('Direct HTTP resolution failed');
+        }
+        return null;
+    }
+
+    // Method 2: Using CORS proxy
+    async resolveViaProxy(url) {
+        const proxyUrls = [
+            `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+            `https://cors-anywhere.herokuapp.com/${url}`,
+            `https://thingproxy.freeboard.io/fetch/${url}`
+        ];
+
+        for (const proxyUrl of proxyUrls) {
+            try {
+                const response = await fetch(proxyUrl);
+                if (response.ok) {
+                    const text = await response.text();
+                    const coords = this.extractFromShareUrl(text);
+                    if (coords) {
+                        return coords;
+                    }
+                }
+            } catch (error) {
+                continue;
+            }
+        }
+        
+        throw new Error('Proxy resolution failed');
+    }
+
+    // Method 3: Try using Google Places API to find place from shortened URL
+    async resolveViaGoogleAPI(url) {
+        if (!this.geocoder) {
+            throw new Error('Google API not available');
+        }
+
+        try {
+            // Extract potential place ID from URL if present
+            const placeIdMatch = url.match(/place\/([A-Za-z0-9_-]+)/);
+            if (placeIdMatch) {
+                // This would require Places API - simplified approach
+                return null;
+            }
+
+            // Try geocoding the URL directly (Google sometimes handles URLs)
+            return await this.geocodeAddress(url);
+        } catch (error) {
+            throw new Error('Google API resolution failed');
         }
     }
 
@@ -2156,21 +2233,24 @@ class LocationUnifier {
                 return `https://www.google.com/maps?q=${coordsFromUrl.lat},${coordsFromUrl.lng}`;
             }
 
-            // If it's a goo.gl or other shortened URL, try to resolve it
-            if (trimmedInput.includes('goo.gl') || trimmedInput.includes('maps.app')) {
+            // If it's a shortened URL, try to resolve it
+            if (this.isShortUrl(trimmedInput)) {
+                console.log('Attempting to resolve shortened URL:', trimmedInput);
+                
                 try {
                     const resolvedCoords = await this.resolveShortUrl(trimmedInput);
                     if (resolvedCoords) {
                         return `https://www.google.com/maps?q=${resolvedCoords.lat},${resolvedCoords.lng}`;
                     }
                 } catch (error) {
-                    console.warn('Failed to resolve short URL:', error);
+                    console.warn('Failed to resolve short URL, trying geocoding as fallback:', error);
                 }
             }
 
             // Try to geocode as an address using Google Maps API
             if (this.geocoder) {
                 try {
+                    console.log('Attempting to geocode as address:', trimmedInput);
                     const geocodedCoords = await this.geocodeAddress(trimmedInput);
                     return `https://www.google.com/maps?q=${geocodedCoords.lat},${geocodedCoords.lng}`;
                 } catch (error) {
@@ -2187,15 +2267,32 @@ class LocationUnifier {
             return trimmedInput; // Fallback to original input
         }
     }
+
+    // Helper method to identify shortened URLs
+    isShortUrl(url) {
+        const shortUrlPatterns = [
+            /goo\.gl/,
+            /maps\.app\.goo\.gl/,
+            /t\.co/,
+            /bit\.ly/,
+            /tinyurl\.com/,
+            /short/i
+        ];
+
+        return shortUrlPatterns.some(pattern => pattern.test(url));
+    }
 }
 
 // Initialize the location unifier with your Google Maps API key
+// ⚠️ IMPORTANT: Replace 'YOUR_GOOGLE_MAPS_API_KEY' with your actual API key
 const locationUnifier = new LocationUnifier('AIzaSyCAYQWWFzIfkZqJdQoW7Oi-Vxp6gsc9Xsg');
 
 // Function to handle location input processing
 async function processLocationInput(input) {
     try {
+        console.log('Processing location input:', input);
         const unifiedLocation = await locationUnifier.unifyLocation(input);
+        console.log('Unified location result:', unifiedLocation);
         return unifiedLocation;
     } catch (error) {
         console.error('Location processing error:', error);
@@ -2211,25 +2308,44 @@ document.addEventListener('DOMContentLoaded', function() {
     if (locationInput) {
         // Add visual indicator for location processing
         const locationWrapper = locationInput.parentElement;
-        const processingIndicator = document.createElement('div');
-        processingIndicator.style.cssText = `
-            position: absolute;
-            right: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 16px;
-            height: 16px;
-            border: 2px solid #e5e7eb;
-            border-top: 2px solid #667eea;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            display: none;
-        `;
-        
-        if (locationWrapper.style.position !== 'relative') {
-            locationWrapper.style.position = 'relative';
+        if (!locationWrapper.querySelector('.processing-indicator')) {
+            const processingIndicator = document.createElement('div');
+            processingIndicator.className = 'processing-indicator';
+            processingIndicator.style.cssText = `
+                position: absolute;
+                right: 12px;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 16px;
+                height: 16px;
+                border: 2px solid #e5e7eb;
+                border-top: 2px solid #667eea;
+                border-radius: 50%;
+                animation: spin 1s linear infinite;
+                display: none;
+                z-index: 10;
+            `;
+            
+            // Add CSS animation if not already present
+            if (!document.querySelector('#location-processing-styles')) {
+                const style = document.createElement('style');
+                style.id = 'location-processing-styles';
+                style.textContent = `
+                    @keyframes spin {
+                        0% { transform: rotate(0deg); }
+                        100% { transform: rotate(360deg); }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+            
+            if (locationWrapper.style.position !== 'relative') {
+                locationWrapper.style.position = 'relative';
+            }
+            locationWrapper.appendChild(processingIndicator);
         }
-        locationWrapper.appendChild(processingIndicator);
+
+        const processingIndicator = locationWrapper.querySelector('.processing-indicator');
 
         // Process location when user finishes typing (debounced)
         let locationTimeout;
@@ -2237,84 +2353,85 @@ document.addEventListener('DOMContentLoaded', function() {
             clearTimeout(locationTimeout);
             
             locationTimeout = setTimeout(async () => {
-                const inputValue = this.value.trim();
-                
-                // Skip processing if input is empty or already processing
-                if (!inputValue || processingLocation) return;
-                
-                // Skip if already in correct format
-                if (inputValue.startsWith('https://www.google.com/maps?q=') && 
-                    /[?&]q=(-?\d+\.?\d*),(-?\d+\.?\d*)/.test(inputValue)) {
-                    return;
-                }
-
-                processingLocation = true;
-                processingIndicator.style.display = 'block';
-
-                try {
-                    const unifiedLocation = await processLocationInput(inputValue);
-                    
-                    // Only update if the result is different and is in the correct format
-                    if (unifiedLocation !== inputValue && 
-                        unifiedLocation.startsWith('https://www.google.com/maps?q=')) {
-                        this.value = unifiedLocation;
-                        
-                        // Add visual feedback
-                        this.style.borderColor = '#10b981';
-                        setTimeout(() => {
-                            this.style.borderColor = '';
-                        }, 1500);
-                    }
-                } catch (error) {
-                    console.error('Location processing failed:', error);
-                } finally {
-                    processingLocation = false;
-                    processingIndicator.style.display = 'none';
-                }
-            }, 1000); // 1 second delay after user stops typing
+                await processLocationField(this, processingIndicator);
+            }, 1500); // 1.5 second delay after user stops typing
         });
 
         // Also process on blur (when user leaves the field)
         locationInput.addEventListener('blur', async function() {
-            const inputValue = this.value.trim();
+            clearTimeout(locationTimeout); // Cancel any pending timeout
+            await processLocationField(this, processingIndicator);
+        });
+
+        // Process location field function
+        async function processLocationField(inputElement, indicator) {
+            const inputValue = inputElement.value.trim();
             
-            if (!inputValue || processingLocation) return;
-            
-            // Skip if already in correct format
-            if (inputValue.startsWith('https://www.google.com/maps?q=') && 
-                /[?&]q=(-?\d+\.?\d*),(-?\d+\.?\d*)/.test(inputValue)) {
+            // Skip processing if input is empty, already processing, or already in correct format
+            if (!inputValue || 
+                processingLocation || 
+                (inputValue.startsWith('https://www.google.com/maps?q=') && 
+                 /[?&]q=(-?\d+\.?\d*),(-?\d+\.?\d*)/.test(inputValue))) {
                 return;
             }
 
             processingLocation = true;
-            processingIndicator.style.display = 'block';
+            indicator.style.display = 'block';
+            
+            // Add visual feedback that processing started
+            inputElement.style.borderColor = '#fbbf24'; // Yellow border while processing
 
             try {
                 const unifiedLocation = await processLocationInput(inputValue);
                 
+                // Only update if the result is different and is in the correct format
                 if (unifiedLocation !== inputValue && 
                     unifiedLocation.startsWith('https://www.google.com/maps?q=')) {
-                    this.value = unifiedLocation;
+                    inputElement.value = unifiedLocation;
                     
-                    // Add visual feedback
-                    this.style.borderColor = '#10b981';
-                    setTimeout(() => {
-                        this.style.borderColor = '';
-                    }, 1500);
+                    // Success feedback - green border
+                    inputElement.style.borderColor = '#10b981';
+                    console.log('Location successfully unified from:', inputValue, 'to:', unifiedLocation);
+                } else {
+                    // No change or fallback - return to normal
+                    inputElement.style.borderColor = '#6b7280';
+                    if (unifiedLocation === inputValue) {
+                        console.log('Location unchanged (could not unify):', inputValue);
+                    }
                 }
             } catch (error) {
                 console.error('Location processing failed:', error);
+                // Error feedback - red border briefly
+                inputElement.style.borderColor = '#ef4444';
             } finally {
                 processingLocation = false;
-                processingIndicator.style.display = 'none';
+                indicator.style.display = 'none';
+                
+                // Reset border color after delay
+                setTimeout(() => {
+                    inputElement.style.borderColor = '';
+                }, 2000);
             }
-        });
+        }
     }
 });
 
-// Make functions available globally for debugging
+// Make functions available globally for debugging/testing
 window.locationUnifier = locationUnifier;
 window.processLocationInput = processLocationInput;
+
+// Test function for debugging
+window.testLocationUnifier = async function(testUrl) {
+    console.log('Testing URL:', testUrl);
+    try {
+        const result = await processLocationInput(testUrl);
+        console.log('Result:', result);
+        return result;
+    } catch (error) {
+        console.error('Test failed:', error);
+        return null;
+    }
+};
 </script>
 </body>
 </html>
