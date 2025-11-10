@@ -413,6 +413,29 @@
             margin-bottom: 10px;
         }
 
+        /* Back Button */
+        .back-btn {
+            background: transparent;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+        }
+
+        .back-btn:hover {
+            background: var(--primary-color);
+            color: var(--white);
+            transform: translateY(-1px);
+        }
+
         /* Service Cards */
         .service-card {
             background: var(--white);
@@ -1318,6 +1341,11 @@
             .btn-secondary, .btn-primary {
                 flex: none;
             }
+
+            .back-btn {
+                font-size: 0.85rem;
+                padding: 8px 14px;
+            }
         }
 
         /* Extra small screens */
@@ -1478,6 +1506,12 @@
 
         <!-- Dynamic Content -->
         <div class="content-container">
+            <!-- Back Button -->
+            <button class="back-btn hidden" id="backBtn" onclick="goBack()">
+                <i class="fas fa-arrow-left"></i>
+                Back
+            </button>
+
             <!-- Section Title -->
             <div class="section-title" id="sectionTitle">
                 <h1>Choose Your Car Brand</h1>
@@ -1581,15 +1615,91 @@
         let appliedCoupon = null;
         let couponDiscount = 0;
 
-        // Get mobile from URL params
-        function getMobileFromURL() {
+        // URL parameter handling for direct access
+        function getURLParams() {
             const urlParams = new URLSearchParams(window.location.search);
-            let mobile = urlParams.get('mobile');
+            return {
+                mobile: extractMobile(urlParams.get('mobile')),
+                brand_id: urlParams.get('brand_id'),
+                brand_name: urlParams.get('brand_name') || urlParams.get('brand'), // Support both formats
+                car_id: urlParams.get('car_id'),
+                car_name: urlParams.get('car_name') || urlParams.get('car'), // Support both formats
+                car_image: urlParams.get('car_image')
+            };
+        }
+
+        // Update URL with current selection for easy agent sharing
+        function updateURLWithSelection(brandName, carName, carId, brandId, carImage) {
+            const url = new URL(window.location);
             
-            if (!mobile) return null;
+            // Clear all existing parameters first
+            url.search = '';
+            
+            // Add brand_id and car_id for reliable matching
+            url.searchParams.set('brand_id', brandId);
+            url.searchParams.set('car_id', carId);
+            
+            // Update browser URL without page reload
+            window.history.replaceState({}, '', url);
+            
+            // Show notification for agents
+            showAgentNotification(`Clean URL ready: ?brand_id=${brandId}&car_id=${carId}`);
+        }
+
+        // Show notification for agents when URL is updated
+        function showAgentNotification(message) {
+            // Create notification element if it doesn't exist
+            let notification = document.getElementById('agent-notification');
+            if (!notification) {
+                notification = document.createElement('div');
+                notification.id = 'agent-notification';
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+                    color: white;
+                    padding: 12px 20px;
+                    border-radius: 12px;
+                    font-size: 14px;
+                    font-weight: 600;
+                    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+                    z-index: 9999;
+                    opacity: 0;
+                    transform: translateY(-20px);
+                    transition: all 0.3s ease;
+                    max-width: 300px;
+                    line-height: 1.4;
+                `;
+                document.body.appendChild(notification);
+            }
+            
+            notification.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-link" style="font-size: 16px;"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            // Show notification
+            setTimeout(() => {
+                notification.style.opacity = '1';
+                notification.style.transform = 'translateY(0)';
+            }, 100);
+            
+            // Hide notification after 4 seconds
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                notification.style.transform = 'translateY(-20px)';
+            }, 4000);
+        }
+
+        // Extract mobile from URL parameter (handles various formats)
+        function extractMobile(mobileParam) {
+            if (!mobileParam) return null;
             
             // URL decode the mobile parameter
-            mobile = decodeURIComponent(mobile);
+            let mobile = decodeURIComponent(mobileParam);
             
             // Extract only the mobile number part (remove any extra data after '/')
             if (mobile.includes('/')) {
@@ -1610,22 +1720,34 @@
 
         // Initialize Mixpanel tracking
         function initializeTracking() {
-            const mobile = getMobileFromURL();
-            if (mobile && isValidMobile(mobile)) {
-                userMobile = mobile;
-                mixpanel.identify(mobile);
+            const urlParams = getURLParams();
+            
+            if (urlParams.mobile && isValidMobile(urlParams.mobile)) {
+                userMobile = urlParams.mobile;
+                mixpanel.identify(userMobile);
                 mixpanel.people.set({
-                    "$phone": mobile,
+                    "$phone": userMobile,
                     "Last Seen": new Date()
                 });
             }
 
-            // Track page view
-            mixpanel.track('Service Page Opened', {
+            // Track page view with additional context
+            const trackingData = {
                 'Source': 'Service Selection Page',
                 'Mobile': userMobile,
                 'Timestamp': new Date().toISOString()
-            });
+            };
+
+            // Add direct access parameters if present
+            if (urlParams.brand_id || urlParams.car_id) {
+                trackingData['Direct Access'] = true;
+                trackingData['Brand ID'] = urlParams.brand_id;
+                trackingData['Car ID'] = urlParams.car_id;
+                trackingData['Brand Name'] = urlParams.brand_name;
+                trackingData['Car Name'] = urlParams.car_name;
+            }
+
+            mixpanel.track('Service Page Opened', trackingData);
         }
 
         // Validate mobile number
@@ -1634,11 +1756,273 @@
             return mobileRegex.test(mobile);
         }
 
+        // Check for direct access and bypass steps if needed
+        function checkDirectAccess() {
+            const urlParams = getURLParams();
+            
+            // If we have both brand_id and car_id, find the matching data
+            if (urlParams.brand_id && urlParams.car_id) {
+                const brandId = parseInt(urlParams.brand_id);
+                const carId = urlParams.car_id; // Keep as string since car_type_id can be string
+                
+                
+                // Find matching brand from loaded data by ID
+                let matchingBrand = brands.find(b => b.id === brandId);
+                
+                // Find matching car from loaded data by car_type_id (handle both string and number)
+                let matchingCar = cars.find(c => 
+                    c.car_type_id === carId || 
+                    c.car_type_id === parseInt(carId) || 
+                    c.car_type_id.toString() === carId.toString()
+                );
+                
+                // Debug: Show cars for this brand
+                if (matchingBrand) {
+                    const brandCars = cars.filter(c => c.brand && c.brand.id === brandId);
+                }
+                
+                
+                if (matchingBrand && matchingCar) {
+                    selectedBrand = matchingBrand;
+                    selectedCar = matchingCar;
+                    
+                    // Store in localStorage for consistency
+                    localStorage.setItem('selectedBrand', JSON.stringify(selectedBrand));
+                    localStorage.setItem("selectedCarId", selectedCar.car_type_id);
+                    localStorage.setItem("selectedCarName", selectedCar.name);
+                    localStorage.setItem("carImage", selectedCar.image_path);
+                    localStorage.setItem("brand", selectedCar.brand.name);
+                    localStorage.setItem("carName", selectedCar.name);
+
+                    // Track direct access
+                    mixpanel.track('Direct Service Access', {
+                        'Brand': selectedBrand.name,
+                        'Car Model': selectedCar.name,
+                        'Car ID': selectedCar.car_type_id,
+                        'Fuel Type': selectedCar.fuel_type,
+                        'Mobile': userMobile,
+                        'Access Type': 'Agent Shared Link',
+                        'URL Format': 'ID Based',
+                        'Timestamp': new Date().toISOString()
+                    });
+
+                    // Skip to pricing page
+                    skipToPricingPage();
+                    return true;
+                } else if (matchingBrand && !matchingCar) {
+                    // Brand exists but car doesn't - show available cars for this brand
+                    selectedBrand = matchingBrand;
+                    localStorage.setItem('selectedBrand', JSON.stringify(selectedBrand));
+                    
+                    // Skip to car selection for this brand
+                    skipToCarSelection();
+                    return true;
+                } else {
+                    // If exact match not found, show error or fallback to normal flow
+                    showDirectAccessError(`Brand ID: ${brandId}`, `Car ID: ${carId}`);
+                    return false;
+                }
+            }
+            
+            // If we only have brand_id, find matching brand
+            else if (urlParams.brand_id) {
+                const brandId = parseInt(urlParams.brand_id);
+                
+                let matchingBrand = brands.find(b => b.id === brandId);
+                
+                if (matchingBrand) {
+                    selectedBrand = matchingBrand;
+                    localStorage.setItem('selectedBrand', JSON.stringify(selectedBrand));
+                    
+                    // Track partial direct access
+                    mixpanel.track('Direct Brand Access', {
+                        'Brand': selectedBrand.name,
+                        'Brand ID': selectedBrand.id,
+                        'Mobile': userMobile,
+                        'Access Type': 'Agent Shared Link',
+                        'URL Format': 'ID Based',
+                        'Timestamp': new Date().toISOString()
+                    });
+
+                    // Skip to car selection
+                    skipToCarSelection();
+                    return true;
+                } else {
+                    console.log('Brand not found by ID:', brandId);
+                }
+            }
+            
+            // Fallback: check for legacy text-based parameters
+            else if (urlParams.brand && urlParams.car) {
+                // Clean and normalize the URL parameters
+                const brandName = decodeURIComponent(urlParams.brand).trim();
+                const carName = decodeURIComponent(urlParams.car).trim();
+                
+                
+                // Find matching brand from loaded data (case insensitive, flexible matching)
+                let matchingBrand = brands.find(b => {
+                    const dbBrandName = b.name.toLowerCase().trim();
+                    const searchBrandName = brandName.toLowerCase().trim();
+                    
+                    // Direct match or contains match (for brands like "Maruti Suzuki" vs "Maruti")
+                    return dbBrandName === searchBrandName || 
+                           dbBrandName.includes(searchBrandName) || 
+                           searchBrandName.includes(dbBrandName);
+                });
+                
+                // Find matching car from loaded data (case insensitive, flexible matching)
+                let matchingCar = null;
+                if (matchingBrand) {
+                    matchingCar = cars.find(c => {
+                        const dbCarName = c.name.toLowerCase().trim();
+                        const searchCarName = carName.toLowerCase().trim();
+                        const sameBrand = c.brand && c.brand.name.toLowerCase().trim() === matchingBrand.name.toLowerCase().trim();
+                        
+                        return sameBrand && (
+                            dbCarName === searchCarName || 
+                            dbCarName.includes(searchCarName) || 
+                            searchCarName.includes(dbCarName)
+                        );
+                    });
+                }
+                
+                if (matchingBrand && matchingCar) {
+                    selectedBrand = matchingBrand;
+                    selectedCar = matchingCar;
+                    
+                    // Store in localStorage for consistency
+                    localStorage.setItem('selectedBrand', JSON.stringify(selectedBrand));
+                    localStorage.setItem("selectedCarId", selectedCar.car_type_id);
+                    localStorage.setItem("selectedCarName", selectedCar.name);
+                    localStorage.setItem("carImage", selectedCar.image_path);
+                    localStorage.setItem("brand", selectedCar.brand.name);
+                    localStorage.setItem("carName", selectedCar.name);
+
+                    // Update URL to ID-based format for future sharing
+                    updateURLWithSelection(selectedBrand.name, selectedCar.name, selectedCar.car_type_id, selectedBrand.id, selectedCar.image_path);
+
+                    // Skip to pricing page
+                    skipToPricingPage();
+                    return true;
+                }
+            }
+            
+            return false;
+        }
+        
+        // Show error when direct access parameters don't match database
+        function showDirectAccessError(brandName, carName) {
+            updateSectionTitle('Vehicle Not Found', `We couldn't find ${brandName} ${carName} in our database`);
+            
+            const container = document.getElementById('brandContainer');
+            container.innerHTML = `
+                <div class="text-center" style="padding: 40px; grid-column: 1 / -1;">
+                    <i class="fas fa-search" style="font-size: 3rem; color: var(--gray-400); margin-bottom: 20px;"></i>
+                    <h3 style="color: var(--gray-600); margin-bottom: 15px;">Vehicle Not Found</h3>
+                    <p style="color: var(--gray-500); margin-bottom: 20px;">
+                        We couldn't find "<strong>${brandName} ${carName}</strong>" in our database.<br>
+                        Please select your vehicle from the available options below.
+                    </p>
+                    <button onclick="location.reload()" class="btn-primary" style="padding: 12px 20px; margin-right: 10px;">
+                        <i class="fas fa-refresh"></i> Start Over
+                    </button>
+                    <a href="tel:+919266961110" class="cta-button">
+                        <i class="fas fa-phone"></i> Call for Help
+                    </a>
+                </div>
+            `;
+            
+            // After showing error, load normal brand selection
+            setTimeout(() => {
+                displayBrands();
+            }, 2000);
+        }
+
+        // Skip to car selection page
+        function skipToCarSelection() {
+            updateProgress(2);
+            updateSectionTitle('Select Your Car Model', `Choose your ${selectedBrand.name} model`);
+            
+            // Hide brand container and show loading
+            document.getElementById('brandContainer').classList.add('hidden');
+            document.getElementById('backBtn').classList.remove('hidden');
+            document.getElementById('loadingState').classList.remove('hidden');
+            
+            setTimeout(() => {
+                document.getElementById('loadingState').classList.add('hidden');
+                displayCars(selectedBrand.id);
+            }, 800);
+        }
+
+        // Skip directly to pricing page
+        function skipToPricingPage() {
+            updateProgress(4);
+            updateSectionTitle('Choose Your Service', `Perfect service packages for your ${selectedBrand.name} ${selectedCar.name}`);
+            
+            // Hide all selection containers
+            document.getElementById('brandContainer').classList.add('hidden');
+            document.getElementById('carContainer').classList.add('hidden');
+            document.getElementById('backBtn').classList.remove('hidden');
+            
+            // Show selected car
+            displaySelectedCar(selectedCar);
+            
+            // Load services directly
+            loadServices(selectedCar.car_type_id);
+        }
+
+        // Go back functionality
+        function goBack() {
+            if (currentStep === 4) {
+                // From service selection back to car selection
+                updateProgress(3);
+                updateSectionTitle('Your Selected Vehicle', 'Review your selection and choose a service');
+                document.getElementById('serviceContainer').classList.add('hidden');
+                document.getElementById('selectedCarDisplay').classList.remove('hidden');
+                
+                // If we came from direct access, go back to car selection
+                const urlParams = getURLParams();
+                if (urlParams.brand_id && urlParams.car_id) {
+                    skipToCarSelection();
+                }
+            } else if (currentStep === 3) {
+                // From car selection back to brand selection (only if not direct access)
+                const urlParams = getURLParams();
+                if (!urlParams.brand_id) {
+                    updateProgress(2);
+                    updateSectionTitle('Select Your Car Model', 'Choose the specific model of your car');
+                    document.getElementById('selectedCarDisplay').classList.add('hidden');
+                    document.getElementById('carContainer').classList.remove('hidden');
+                }
+            } else if (currentStep === 2) {
+                // From car selection back to brand selection
+                updateProgress(1);
+                updateSectionTitle('Choose Your Car Brand', 'Select your car brand to get started with our premium service experience');
+                document.getElementById('carContainer').classList.add('hidden');
+                document.getElementById('brandContainer').classList.remove('hidden');
+                document.getElementById('backBtn').classList.add('hidden');
+                selectedBrand = null;
+                selectedCar = null;
+            }
+        }
+
         // Initialize application
         document.addEventListener('DOMContentLoaded', function() {
             initializeTracking();
-            loadBrandData();
-            loadCarData();
+            
+            // Load data first, then check for direct access
+            Promise.all([loadBrandData(), loadCarData()]).then(() => {
+
+                
+                // Now check for direct access after data is loaded
+                if (!checkDirectAccess()) {
+                    // Normal flow - display brands if no direct access
+                    displayBrands();
+                }
+            }).catch(error => {
+                // Fallback to normal flow
+                displayBrands();
+            });
         });
 
         // Load brand data
@@ -1646,9 +2030,9 @@
             try {
                 const response = await fetch('car_brand.json');
                 brands = await response.json();
-                displayBrands();
+                return Promise.resolve();
             } catch (error) {
-                console.error('Error loading brands:', error);
+                return Promise.reject(error);
             }
         }
 
@@ -1657,9 +2041,9 @@
             try {
                 const response = await fetch('car.json');
                 cars = await response.json();
-                console.log("Car data loaded:", cars);
+                return Promise.resolve();
             } catch (error) {
-                console.error('Error loading cars:', error);
+                return Promise.reject(error);
             }
         }
 
@@ -1697,10 +2081,11 @@
             });
             
             updateProgress(2);
-            updateSectionTitle('Select Your Car Model', 'Choose the specific model of your car');
+            updateSectionTitle('Select Your Car Model', `Choose your ${brand.name} model`);
             
-            // Hide brand container and show loading
+            // Hide brand container and show loading, show back button
             document.getElementById('brandContainer').classList.add('hidden');
+            document.getElementById('backBtn').classList.remove('hidden');
             document.getElementById('loadingState').classList.remove('hidden');
             
             setTimeout(() => {
@@ -1767,6 +2152,9 @@
             localStorage.setItem("brand", car.brand.name);
             localStorage.setItem("carName", car.name);
             
+            // Update URL with selected brand and car for easy sharing by agents
+            updateURLWithSelection(car.brand.name, car.name, car.car_type_id, car.brand.id, car.image_path);
+            
             // Track car selection
             mixpanel.track('Service Page - Car Selected', {
                 'Brand': car.brand.name,
@@ -1785,8 +2173,12 @@
             // Show selected car
             displaySelectedCar(car);
             
-            // Load services
-            loadServices(car.car_type_id);
+            // Add small delay before showing services
+            setTimeout(() => {
+                updateProgress(4);
+                updateSectionTitle('Choose Your Service', `Perfect service packages for your ${car.brand.name} ${car.name}`);
+                loadServices(car.car_type_id);
+            }, 1500);
         }
 
         // Display selected car
@@ -1796,7 +2188,8 @@
             
             const carName = `${car.brand.name} ${car.name}`;
             container.innerHTML = `
-                <img src="${car.image_path}" alt="Selected Car" loading="lazy" class="fade-in">
+                <img src="${car.image_path}" alt="Selected Car" loading="lazy" class="fade-in" 
+                     onerror="this.src='assets/img/default-car.jpg'">
                 <h2 class="fade-in">${carName}</h2>
             `;
         }
@@ -1819,29 +2212,76 @@
                 
                 document.getElementById('loadingState').classList.add('hidden');
                 
-                if (data.status && data.data.length > 0) {
-                    const services = data.data[0].services;
-                    const extractedServices = services.map(service => ({
-                        name: service.name || "N/A",
-                        service_tag: service.service_tag || "Every 3 Month",
-                        price: service.package_details[0].strikethrough || "N/A",
-                        discounted_price: service.package_details[0].total || "N/A",
-                        image: getServiceImage(service.name),
-                        description: service.desc_details || {},
-                        inclusion: service.desc_details?.inclusion || [],
-                        time_taken: service.desc_details?.time_taken || "N/A",
-                        warranty: service.desc_details?.warranty || "N/A"
-                    }));
+if (data.status && data.data.length > 0) {
+    const services = data.data[0].services;
+    
+    // Filter to only show "Standard Service"
+    const standardService = services.find(service => 
+        service.name && service.name.toLowerCase().includes('standard')
+    );
+    
+    if (standardService) {
+        const extractedServices = [{
+            name: standardService.name || "N/A",
+            service_tag: standardService.service_tag || "Every 3 Month",
+            price: standardService.package_details[0].strikethrough || "N/A",
+            discounted_price: standardService.package_details[0].total || "N/A",
+            image: getServiceImage(standardService.name),
+            description: standardService.desc_details || {},
+            inclusion: standardService.desc_details?.inclusion || [],
+            time_taken: standardService.desc_details?.time_taken || "N/A",
+            warranty: standardService.desc_details?.warranty || "N/A"
+        }];
 
-                    displayServices(extractedServices);
-                } else {
-                    console.error("No services found in response.");
-                }
+        displayServices(extractedServices);
+    } else {
+        // If Standard Service not found, show no services message
+        displayNoServicesMessage();
+    }
+} else {
+    displayNoServicesMessage();
+}
             } catch (error) {
                 document.getElementById('loadingState').classList.add('hidden');
-                console.error("Error fetching services:", error);
-                alert("Failed to fetch services. Please try again.");
+                displayErrorMessage();
             }
+        }
+
+        // Display no services message
+        function displayNoServicesMessage() {
+            const container = document.getElementById('serviceContainer');
+            container.classList.remove('hidden');
+            container.innerHTML = `
+                <div class="text-center" style="padding: 40px;">
+                    <i class="fas fa-exclamation-circle" style="font-size: 3rem; color: var(--gray-400); margin-bottom: 20px;"></i>
+                    <h3 style="color: var(--gray-600); margin-bottom: 10px;">No Services Available</h3>
+                    <p style="color: var(--gray-500);">We couldn't find services for this vehicle. Please contact us directly.</p>
+                    <a href="tel:+919266961110" class="cta-button" style="display: inline-block; margin-top: 20px;">
+                        <i class="fas fa-phone"></i> Call Now
+                    </a>
+                </div>
+            `;
+        }
+
+        // Display error message
+        function displayErrorMessage() {
+            const container = document.getElementById('serviceContainer');
+            container.classList.remove('hidden');
+            container.innerHTML = `
+                <div class="text-center" style="padding: 40px;">
+                    <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: var(--secondary-color); margin-bottom: 20px;"></i>
+                    <h3 style="color: var(--gray-600); margin-bottom: 10px;">Unable to Load Services</h3>
+                    <p style="color: var(--gray-500);">There was an error loading services. Please try again or contact us.</p>
+                    <div style="margin-top: 20px; display: flex; gap: 15px; justify-content: center;">
+                        <button onclick="loadServices(selectedCar.car_type_id)" class="btn-primary" style="padding: 10px 20px;">
+                            <i class="fas fa-refresh"></i> Try Again
+                        </button>
+                        <a href="tel:+919266961110" class="cta-button">
+                            <i class="fas fa-phone"></i> Call Now
+                        </a>
+                    </div>
+                </div>
+            `;
         }
 
         // Get service image
@@ -1985,9 +2425,6 @@
 
         // Display services
         function displayServices(services) {
-            updateProgress(4);
-            updateSectionTitle('Choose Your Service', 'Select the perfect service package for your vehicle');
-            
             const container = document.getElementById('serviceContainer');
             container.classList.remove('hidden');
             container.innerHTML = '';
@@ -2276,7 +2713,6 @@
                 showSuccessPage();
                 
             } catch (error) {
-                console.error('Booking error:', error);
                 document.getElementById('loadingState').classList.add('hidden');
                 
                 // Track error
@@ -2430,6 +2866,27 @@
                 e.returnValue = 'Are you sure you want to leave? Your progress will be lost.';
             }
         });
+
+        // Generate direct service URL for agents
+        function generateDirectServiceURL(brandId, brandName, carId, carName, carImage, mobile) {
+            const baseURL = window.location.origin + window.location.pathname;
+            const params = new URLSearchParams();
+            
+            if (mobile) params.set('mobile', mobile);
+            if (brandId) params.set('brand_id', brandId);
+            if (brandName) params.set('brand_name', brandName);
+            if (carId) params.set('car_id', carId);
+            if (carName) params.set('car_name', carName);
+            if (carImage) params.set('car_image', carImage);
+            
+            return `${baseURL}?${params.toString()}`;
+        }
+
+        // Example usage for agents:
+        // Direct to brand selection: ?mobile=9876543210&brand_id=1&brand_name=Maruti
+        // Direct to pricing page: ?mobile=9876543210&brand_id=1&brand_name=Maruti&car_id=123&car_name=Swift&car_image=image_url
+        
+
     </script>
 </body>
 </html>
