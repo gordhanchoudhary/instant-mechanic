@@ -115,6 +115,40 @@
       font-size: 14px;
       min-width: 60px;
     }
+    
+    /* Alert/Warning styles */
+    .alert {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #f44336;
+      color: white;
+      padding: 15px 20px;
+      border-radius: 5px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      z-index: 1000;
+      font-weight: bold;
+      text-align: center;
+      min-width: 300px;
+      animation: slideDown 0.3s ease-out;
+    }
+    
+    .alert.warning {
+      background: #ff9800;
+    }
+    
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+    }
+    
     @media (max-width: 500px) {
       .card {
         width: 90%;
@@ -122,6 +156,12 @@
       .toggle-container {
         flex-direction: column;
         align-items: flex-start;
+      }
+      .alert {
+        left: 10px;
+        right: 10px;
+        transform: none;
+        min-width: auto;
       }
     }
   </style>
@@ -134,6 +174,32 @@
     
     // Store agents globally to maintain order
     let currentAgents = [];
+    
+    // Show alert message
+    function showAlert(message, type = 'error') {
+      // Remove existing alert if any
+      const existingAlert = document.querySelector('.alert');
+      if (existingAlert) {
+        existingAlert.remove();
+      }
+      
+      const alert = document.createElement('div');
+      alert.className = `alert ${type}`;
+      alert.textContent = message;
+      document.body.appendChild(alert);
+      
+      // Auto remove after 5 seconds
+      setTimeout(() => {
+        if (alert.parentNode) {
+          alert.remove();
+        }
+      }, 5000);
+    }
+    
+    // Count live agents
+    function countLiveAgents() {
+      return currentAgents.filter(agent => agent.is_live).length;
+    }
     
     // Fetch all agents
     async function fetchAgents(shouldSort = true) {
@@ -155,6 +221,7 @@
         displayAgents(currentAgents);
       } catch (err) {
         console.error("Error fetching agents:", err);
+        showAlert("Failed to fetch agents data");
       }
     }
     
@@ -231,8 +298,24 @@
       });
     }
     
-    // Toggle is_live
+    // Toggle is_live with validation
     async function toggleLive(agentId, isLive) {
+      // If trying to make an agent inactive (turn off live status)
+      if (!isLive) {
+        const currentLiveCount = countLiveAgents();
+        
+        // Check if this is the last live agent
+        if (currentLiveCount <= 1) {
+          // Prevent the action and show warning
+          showAlert("Cannot deactivate the last live agent! At least one agent must remain live.", 'warning');
+          
+          // Revert the toggle switch back to checked
+          const checkbox = event.target;
+          checkbox.checked = true;
+          return;
+        }
+      }
+      
       try {
         const res = await fetch(`${API_URL}${agentId}/`, {
           method: "PATCH",
@@ -241,18 +324,32 @@
           },
           body: JSON.stringify({ is_live: isLive })
         });
+        
         if (!res.ok) {
-          alert("Failed to update live status");
+          showAlert("Failed to update live status");
+          // Revert the toggle switch
+          const checkbox = event.target;
+          checkbox.checked = !isLive;
         } else {
           // Update the local agent data without re-sorting
           updateLocalAgent(agentId, { is_live: isLive });
+          
+          // Show success message
+          const agent = currentAgents.find(a => a.id === agentId);
+          if (agent) {
+            const action = isLive ? 'activated' : 'deactivated';
+            showAlert(`${agent.name} has been ${action} successfully!`, 'success');
+          }
         }
       } catch (err) {
-        alert("Error updating live status: " + err);
+        showAlert("Error updating live status: " + err.message);
+        // Revert the toggle switch
+        const checkbox = event.target;
+        checkbox.checked = !isLive;
       }
     }
     
-    // Toggle is_inactive_team_member
+    // Toggle is_inactive_team_member (no validation needed as per requirement)
     async function toggleInactive(agentId, isInactive) {
       try {
         const res = await fetch(`${API_URL}${agentId}/`, {
@@ -262,14 +359,28 @@
           },
           body: JSON.stringify({ is_inactive_team_member: isInactive })
         });
+        
         if (!res.ok) {
-          alert("Failed to update inactive status");
+          showAlert("Failed to update inactive status");
+          // Revert the toggle switch
+          const checkbox = event.target;
+          checkbox.checked = !isInactive;
         } else {
           // Update the local agent data without re-sorting
           updateLocalAgent(agentId, { is_inactive_team_member: isInactive });
+          
+          // Show success message
+          const agent = currentAgents.find(a => a.id === agentId);
+          if (agent) {
+            const action = isInactive ? 'marked as inactive CS' : 'removed from inactive CS';
+            showAlert(`${agent.name} has been ${action} successfully!`, 'success');
+          }
         }
       } catch (err) {
-        alert("Error updating inactive status: " + err);
+        showAlert("Error updating inactive status: " + err.message);
+        // Revert the toggle switch
+        const checkbox = event.target;
+        checkbox.checked = !isInactive;
       }
     }
     
@@ -283,6 +394,15 @@
       });
       displayAgents(currentAgents);
     }
+    
+    // Add success alert style
+    const style = document.createElement('style');
+    style.textContent = `
+      .alert.success {
+        background: #4CAF50;
+      }
+    `;
+    document.head.appendChild(style);
     
     // Initial load
     fetchAgents();
