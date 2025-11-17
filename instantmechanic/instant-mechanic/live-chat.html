@@ -2199,9 +2199,12 @@
         <!-- Dynamic messages and poll will be added here -->
       </div>
       <div class="wa-widget-action">
-        <button class="wa-widget-button ${buttonClass}" id="waWidgetButton">
-          <span>${personalizedContent.ctaText}</span>
-        </button>
+<a href="https://wa.me/message/R7LYR65MG47ZB1" target="_blank" style="text-decoration:none;">
+  <button class="wa-widget-button ${buttonClass}" id="waWidgetButton">
+    <span>${personalizedContent.ctaText}</span>
+  </button>
+</a>
+
       </div>
     </div>
   `;
@@ -2485,7 +2488,6 @@
       }
       
       // INSTANTLY redirect to WhatsApp
-      redirectToWhatsApp('poll_selection', radio.value);
     }
   });
 
