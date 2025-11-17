@@ -2450,7 +2450,7 @@ const optionsHTML = pollOptions.map(option => `
       
       // 1. Show mechanic messages first (personalized messages)
       showMechanicMessage(personalizedContent.messages[0], 100);
-      showMechanicMessage(personalizedContent.messages[1], 800);
+      showMechanicMessage(personalizedContent.messages[1], 1200);
       
       // Determine badge type for third message
       let badgeType = '';
@@ -2461,11 +2461,11 @@ const optionsHTML = pollOptions.map(option => `
       }
       
       if (personalizedContent.messages[2]) {
-        showMechanicMessage(personalizedContent.messages[2], 2000, badgeType);
+        showMechanicMessage(personalizedContent.messages[2], 2200, badgeType);
       }
       
       // 2. Show customer poll options with enhanced prioritization
-      showCustomerPoll(4000);
+      showCustomerPoll(3800);
       
       // Track enhanced widget shown
       if (typeof mixpanel !== 'undefined') {
