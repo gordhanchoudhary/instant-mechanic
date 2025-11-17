@@ -489,6 +489,9 @@
     <div class="cs_site_header_spacing_140"></div>
     <!-- End Header Section -->
 
+    <!-- INSTANT WHATSAPP WIDGET - NOW LOADS IMMEDIATELY -->
+    <div id="instantWhatsAppWidget"></div>
+
     <!-- Start Hero Section with SEO Optimized Content -->
     <section class="cs_slider cs_style_1">
       <div class="cs_slider_container" data-autoplay="0" data-loop="1" data-speed="900" data-center="0" data-variable-width="0" data-slides-per-view="1">
@@ -1324,13 +1327,11 @@
       }
     </script>
 
-    <!-- WhatsApp Popup Script - Enhanced for SEO -->
+    <!-- INSTANT WHATSAPP WIDGET SCRIPT - LOADS IMMEDIATELY, NO POPUP BEHAVIOR -->
+<!-- ENHANCED SMART WHATSAPP WIDGET SCRIPT -->
 <script>
 (function() {
-  // Check if popup was already shown (lifetime check)
-
-
-  // Get search keyword from URL parameters
+  // Enhanced function to get search keyword from URL parameters including utm_term and hsa_kw
   function getSearchKeyword() {
     const urlParams = new URLSearchParams(window.location.search);
     return urlParams.get('keyword') || 
@@ -1338,18 +1339,19 @@
            urlParams.get('query') || 
            urlParams.get('search') ||
            urlParams.get('utm_term') ||
+           urlParams.get('hsa_kw') ||
            '';
   }
 
-  // Extract location from search term
+  // Enhanced location extraction with more comprehensive matching
   function extractLocation(keyword) {
     const searchTerm = keyword.toLowerCase();
     const locations = {
-      'gurugram': ['gurugram', 'gurgaon'],
-      'delhi': ['delhi', 'new delhi', 'south delhi', 'north delhi', 'east delhi', 'west delhi'],
-      'noida': ['noida', 'greater noida'],
-      'ghaziabad': ['ghaziabad', 'gaziyabad', 'gaziabad'],
-      'faridabad': ['faridabad', 'faridabaad']
+      'gurugram': ['gurugram', 'gurgaon', 'sector', 'dlf', 'cyber city', 'mg road', 'golf course'],
+      'delhi': ['delhi', 'new delhi', 'south delhi', 'north delhi', 'east delhi', 'west delhi', 'cp', 'dwarka', 'rohini', 'saket'],
+      'noida': ['noida', 'greater noida', 'film city', 'pari chowk'],
+      'ghaziabad': ['ghaziabad', 'gaziyabad', 'gaziabad', 'indirapuram', 'vaishali', 'kaushambi'],
+      'faridabad': ['faridabad', 'faridabaad', 'ballabgarh']
     };
 
     for (const [key, variants] of Object.entries(locations)) {
@@ -1362,10 +1364,93 @@
     return null;
   }
 
-  // Categorize search intent and return personalized messages
+  // Enhanced problem detection from keywords
+  function extractProblem(keyword) {
+    const searchTerm = keyword.toLowerCase();
+    const problems = {
+      'car-not-starting': {
+        keywords: ['car not starting', 'self start', 'starting issue', 'ignition problem', 'wont start', "won't start", 'engine not starting'],
+        displayName: 'Car Not Starting',
+        icon: '🚗'
+      },
+      'battery-jumpstart': {
+        keywords: ['battery', 'jump start', 'jumpstart', 'battery dead', 'battery down', 'battery issue', 'battery problem'],
+        displayName: 'Battery Jump Start', 
+        icon: '🔋'
+      },
+      'tyre-puncture': {
+        keywords: ['puncture', 'tire change', 'flat tire', 'tyre', 'stepney', 'wheel problem', 'tyre burst'],
+        displayName: 'Tyre Puncture',
+        icon: '🛞'
+      },
+      'fuel-delivery': {
+        keywords: ['fuel', 'petrol', 'diesel', 'empty tank', 'out of fuel', 'no fuel', 'fuel delivery'],
+        displayName: 'Fuel Delivery',
+        icon: '⛽'
+      },
+      'towing': {
+        keywords: ['towing', 'breakdown', 'car broke down', 'crane', 'vehicle stuck', 'accident'],
+        displayName: 'Car Towing',
+        icon: '🚛'
+      },
+      'key-lockout': {
+        keywords: ['key locked', 'keys inside', 'car locked', 'lockout', 'key problem'],
+        displayName: 'Key Lockout',
+        icon: '🔑'
+      }
+    };
+
+    for (const [key, problemData] of Object.entries(problems)) {
+      for (const pattern of problemData.keywords) {
+        if (searchTerm.includes(pattern)) {
+          return {
+            key: key,
+            ...problemData
+          };
+        }
+      }
+    }
+    return null;
+  }
+
+  // Generate mechanic name based on detected location/problem
+  function generateMechanicName(detectedLocation, detectedProblem) {
+    if (detectedLocation) {
+      const locationNames = {
+        'gurugram': 'Gurugram',
+        'delhi': 'Delhi', 
+        'noida': 'Noida',
+        'ghaziabad': 'Ghaziabad',
+        'faridabad': 'Faridabad'
+      };
+      return `Gurpreet (${locationNames[detectedLocation]} Mechanic)`;
+    }
+    
+    if (detectedProblem) {
+      return `Gurpreet (${detectedProblem.displayName} Mechanic)`;
+    }
+    
+    return 'Gurpreet (NearBy Car Mechanic)';
+  }
+
+  // Generate status with distance and ETA
+  function generateMechanicStatus(detectedLocation) {
+    const distances = {
+      'gurugram': '1.2KM from you • will reach in 8 min',
+      'delhi': '2.1KM from you • will reach in 12 min',
+      'noida': '1.8KM from you • will reach in 10 min', 
+      'ghaziabad': '2.5KM from you • will reach in 15 min',
+      'faridabad': '1.9KM from you • will reach in 11 min'
+    };
+    
+    return detectedLocation ? distances[detectedLocation] : '1.2KM from you • will reach in 12 min';
+  }
+
+  // Enhanced categorize search intent with problem detection
   function getPersonalizedMessages(keyword) {
     const searchTerm = keyword.toLowerCase();
     const detectedLocation = extractLocation(keyword);
+    const detectedProblem = extractProblem(keyword);
     
     // Location-specific messages (highest priority)
     if (detectedLocation) {
@@ -1374,7 +1459,7 @@
           messages: [
             `Hey! Looking for instant car help in Gurugram? 📍`,
             `We're the #1 roadside assistance in Gurugram! Covering all areas - DLF, Cyber City, MG Road, Sohna Road, Golf Course Road & more.`,
-            `⚡ 10-minute arrival guarantee in Gurugram with 50+ mechanics on standby 24x7!`
+            `⚡ 8-minute arrival guarantee in Gurugram with 50+ mechanics on standby 24x7!`
           ],
           ctaText: '🚗 Get Help in Gurugram NOW'
         },
@@ -1382,7 +1467,7 @@
           messages: [
             `Hey! Need instant mechanic in Delhi? 🚗`,
             `Fastest roadside assistance across all Delhi! From CP to Dwarka, Rohini to Saket - we're everywhere!`,
-            `🎯 200+ expert mechanics across Delhi. Average arrival time: just 8 minutes!`
+            `🎯 200+ expert mechanics across Delhi. Average arrival time: just 12 minutes!`
           ],
           ctaText: '⚡ Get Delhi Mechanic NOW'
         },
@@ -1398,7 +1483,7 @@
           messages: [
             `Hey! Need urgent car help in Ghaziabad? 🚨`,
             `From Indirapuram to Vaishali, Kaushambi to Raj Nagar - instant mechanic service across Ghaziabad!`,
-            `🏃 Super-fast 10-minute arrival in all Ghaziabad areas. Available 24x7!`
+            `🏃 Super-fast 15-minute arrival in all Ghaziabad areas. Available 24x7!`
           ],
           ctaText: '🚗 Get Ghaziabad Help NOW'
         },
@@ -1416,7 +1501,7 @@
       
       // Track location match
       if (typeof mixpanel !== 'undefined') {
-        mixpanel.track('WhatsApp Popup Location Matched', {
+        mixpanel.track('WhatsApp Widget Location Matched', {
           location: detectedLocation,
           keyword: keyword,
           timestamp: new Date().toISOString()
@@ -1426,88 +1511,140 @@
       return {
         ...locationData,
         location: detectedLocation,
-        isLocationBased: true
+        isLocationBased: true,
+        detectedProblem: detectedProblem
       };
     }
     
-    // Define keyword patterns for each category
-    const categories = {
-      puncture: {
-        keywords: ['puncture', 'tire change', 'flat tire', 'tyre', 'stepney'],
-        messages: [
-          'Hey! Flat tire? Don\'t worry! 🚗',
-          'Instant puncture repair in just 10 minutes! We carry complete repair kit & spare tire assistance.',
-          '💯 900+ punctures fixed across Delhi NCR. Get back on road quickly!'
-        ],
-        ctaText: '🔧 Fix Tire Issue NOW'
-      },
-      battery: {
-        keywords: ['battery', 'jump start', 'self start', 'starting issue', 'car won\'t start', 'ignition'],
-        messages: [
-          'Hey! Car battery dead? We\'ll fix it! 🔋',
-          'Instant jump start service! Can deliver & install new battery in 30 minutes. All brands available!',
-          '⚡ Don\'t get stranded! Testing equipment + replacement batteries for all cars.'
-        ],
-        ctaText: '🔋 Fix Battery NOW'
-      },
-      fuel: {
-        keywords: ['fuel', 'petrol', 'diesel', 'empty tank', 'out of fuel', 'no fuel'],
-        messages: [
-          'Hey! Ran out of fuel? Relax! ⛽',
-          'Emergency fuel delivery in 15 minutes! We bring petrol/diesel to your exact location.',
-          '🚗 No pushing, no waiting! Quick fuel delivery 24x7 across Delhi NCR!'
-        ],
-        ctaText: '⛽ Order Fuel NOW'
-      },
-      default: {
-        keywords: [],
-        messages: [
-          'Hey! Gurpreet here from Instant Mechanic 👋',
-          'Car trouble? Get instant roadside assistance in 10 minutes - battery, puncture, fuel & more!',
-          '✅ 500+ expert mechanics across Delhi NCR. Available 24x7. No waiting!'
-        ],
-        ctaText: '📞 Contact Mechanic NOW '
-      }
-    };
-
-    // Check each category for keyword match
-    for (const [catKey, catData] of Object.entries(categories)) {
-      if (catKey === 'default') continue;
-      
-      for (const pattern of catData.keywords) {
-        if (searchTerm.includes(pattern)) {
-          return {
-            ...catData,
-            isLocationBased: false
-          };
+    // Problem-specific messages (if no location detected)
+    if (detectedProblem) {
+      const problemMessages = {
+        'car-not-starting': {
+          messages: [
+            'Hey! Car won\'t start? Don\'t panic! 🚗',
+            'Expert diagnosis & instant fix! We carry jump leads, battery testers & replacement parts.',
+            '💯 95% cars fixed on-spot. Get back on road in 20 minutes!'
+          ],
+          ctaText: '🔧 Fix Starting Issue NOW'
+        },
+        'battery-jumpstart': {
+          messages: [
+            'Hey! Car battery dead? We\'ll fix it! 🔋',
+            'Instant jump start service! Can deliver & install new battery in 30 minutes. All brands available!',
+            '⚡ Don\'t get stranded! Testing equipment + replacement batteries for all cars.'
+          ],
+          ctaText: '🔋 Fix Battery NOW'
+        },
+        'tyre-puncture': {
+          messages: [
+            'Hey! Flat tire? Don\'t worry! 🛞',
+            'Instant puncture repair in just 10 minutes! We carry complete repair kit & spare tire assistance.',
+            '💯 900+ punctures fixed across Delhi NCR. Get back on road quickly!'
+          ],
+          ctaText: '🔧 Fix Tire Issue NOW'
+        },
+        'fuel-delivery': {
+          messages: [
+            'Hey! Ran out of fuel? Relax! ⛽',
+            'Emergency fuel delivery in 15 minutes! We bring petrol/diesel to your exact location.',
+            '🚗 No pushing, no waiting! Quick fuel delivery 24x7 across Delhi NCR!'
+          ],
+          ctaText: '⛽ Order Fuel NOW'
+        },
+        'towing': {
+          messages: [
+            'Hey! Need towing service? We\'re ready! 🚛',
+            'Professional car towing with modern equipment! Safe transport to any location in Delhi NCR.',
+            '🔒 Fully insured towing. Multiple crane sizes available for all vehicles!'
+          ],
+          ctaText: '🚛 Get Towing NOW'
+        },
+        'key-lockout': {
+          messages: [
+            'Hey! Keys locked inside? No problem! 🔑',
+            'Expert lockout service without damaging your car! Professional tools & techniques.',
+            '🚗 90+ car models expertise. Quick & safe key retrieval in 20 minutes!'
+          ],
+          ctaText: '🔑 Unlock Car NOW'
         }
+      };
+
+      if (problemMessages[detectedProblem.key]) {
+        return {
+          ...problemMessages[detectedProblem.key],
+          isLocationBased: false,
+          detectedProblem: detectedProblem
+        };
       }
     }
-
+    
+    // Default messages
     return {
-      ...categories.default,
-      isLocationBased: false
+      messages: [
+        'Hey! Gurpreet here from Instant Mechanic 👋',
+        'Car trouble? Get instant roadside assistance in 10 minutes - battery, puncture, fuel & more!',
+        '✅ 500+ expert mechanics across Delhi NCR. Available 24x7. No waiting!'
+      ],
+      ctaText: '📞 Contact Mechanic NOW',
+      isLocationBased: false,
+      detectedProblem: detectedProblem
     };
   }
 
-  // WhatsApp authentic styles
+  // Generate enhanced poll options with detected problem prioritized
+  function generatePollOptions(detectedProblem) {
+    const defaultOptions = [
+      {
+        key: 'car-not-starting',
+        icon: '🚗',
+        text: 'Car Not Starting'
+      },
+      {
+        key: 'tyre-puncture', 
+        icon: '🛞',
+        text: 'Tyre Puncture'
+      },
+      {
+        key: 'battery-jumpstart',
+        icon: '🔋', 
+        text: 'Battery Jump Start'
+      },
+      {
+        key: 'towing',
+        icon: '🚛',
+        text: 'Towing'
+      },
+      {
+        key: 'other',
+        icon: '⚙️',
+        text: 'Other'
+      }
+    ];
+
+    // If problem detected, prioritize it and add if not in list
+    if (detectedProblem) {
+      // Remove detected problem from default list if exists
+      const filteredOptions = defaultOptions.filter(opt => opt.key !== detectedProblem.key);
+      
+      // Add detected problem at top with highlighting
+      const prioritizedOption = {
+        key: detectedProblem.key,
+        icon: detectedProblem.icon,
+        text: `${detectedProblem.displayName} ⭐`,
+        isDetected: true
+      };
+
+      return [prioritizedOption, ...filteredOptions];
+    }
+
+    return defaultOptions;
+  }
+
+  // WhatsApp authentic styles (keeping existing styles unchanged)
   const styles = `
     @import url('https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;500;600&display=swap');
     
-    .wa-popup-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.5);
-      backdrop-filter: blur(2px);
-      z-index: 99998;
-      display: none;
-      animation: fadeIn 0.3s ease;
-    }
-    
-    .wa-popup-container {
+    .wa-widget-container {
       position: fixed;
       bottom: 20px;
       right: 20px;
@@ -1517,14 +1654,13 @@
       border-radius: 12px;
       box-shadow: 0 10px 40px rgba(0,0,0,0.25);
       z-index: 99999;
-      display: none;
-      animation: slideUp 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
       overflow: hidden;
       font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      animation: slideUpInstant 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
     }
     
     /* WhatsApp Header - Exact color match */
-    .wa-popup-header {
+    .wa-widget-header {
       background: #075e54;
       padding: 10px 16px;
       display: flex;
@@ -1533,7 +1669,7 @@
       position: relative;
     }
     
-    .wa-popup-header::after {
+    .wa-widget-header::after {
       content: '';
       position: absolute;
       bottom: 0;
@@ -1543,13 +1679,13 @@
       background: rgba(0,0,0,0.08);
     }
     
-    .wa-popup-profile {
+    .wa-widget-profile {
       display: flex;
       align-items: center;
       gap: 12px;
     }
     
-    .wa-popup-avatar {
+    .wa-widget-avatar {
       width: 40px;
       height: 40px;
       border-radius: 50%;
@@ -1561,59 +1697,39 @@
       position: relative;
     }
     
-    .wa-popup-avatar img {
+    .wa-widget-avatar img {
       width: 100%;
       height: 100%;
       object-fit: cover;
     }
     
-    .wa-popup-info {
+    .wa-widget-info {
       color: #fff;
       flex: 1;
     }
     
-    .wa-popup-name {
+    .wa-widget-name {
       font-size: 16px;
       font-weight: 500;
       margin: 0;
       line-height: 1.2;
     }
     
-    .wa-popup-status {
+    .wa-widget-status {
       font-size: 13px;
       opacity: 0.9;
       margin: 2px 0 0;
       font-weight: 400;
     }
     
-    .wa-popup-close {
-      color: rgba(255,255,255,0.8);
-      font-size: 22px;
-      cursor: pointer;
-      padding: 6px;
-      line-height: 1;
-      transition: all 0.2s;
-      border-radius: 50%;
-      width: 32px;
-      height: 32px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    
-    .wa-popup-close:hover {
-      background: rgba(255,255,255,0.1);
-      color: #fff;
-    }
-    
     /* WhatsApp Chat Background - Authentic pattern */
-    .wa-popup-chat {
+    .wa-widget-chat {
       background-color: #e5ddd5;
       background-image: 
         url("data:image/svg+xml,%3Csvg width='200' height='200' id='a' patternUnits='userSpaceOnUse' width='50' height='50'%3E%3Cpath d='M0 10h50M10 0v50M0 20h50M20 0v50M0 30h50M30 0v50M0 40h50M40 0v50' stroke='%23d4cfc7' stroke-width='0.5' opacity='0.5'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='200' height='200' fill='url(%23a)'/%3E%3C/svg%3E");
       padding: 20px 12px;
-      min-height: 350px;
-      max-height: 400px;
+      min-height: 650px; /* Increased from 350px */
+      max-height: 500px; /* Increased from 400px */
       overflow-y: auto;
       scrollbar-width: thin;
       scrollbar-color: rgba(0,0,0,0.2) transparent;
@@ -1622,20 +1738,20 @@
     }
     
     /* Hover effect for chat area */
-    .wa-popup-chat:hover {
+    .wa-widget-chat:hover {
       background-color: #e0d8d0;
     }
     
     /* WhatsApp Message Bubble - Received */
-    .wa-message {
+    .wa-widget-message {
       display: flex;
       margin-bottom: 8px;
-      animation: messageSlide 0.3s ease;
+      animation: messageSlideInstant 0.3s ease;
       opacity: 0;
       animation-fill-mode: forwards;
     }
     
-    .wa-message-bubble {
+    .wa-widget-message-bubble {
       background: #fff;
       padding: 8px 12px 8px 9px;
       border-radius: 7.5px;
@@ -1646,7 +1762,7 @@
     }
     
     /* WhatsApp bubble tail */
-    .wa-message-bubble::before {
+    .wa-widget-message-bubble::before {
       content: '';
       position: absolute;
       top: 0;
@@ -1657,7 +1773,7 @@
       clip-path: polygon(100% 0, 0 50%, 100% 100%);
     }
     
-    .wa-message-text {
+    .wa-widget-message-text {
       margin: 0;
       font-size: 14.2px;
       line-height: 19px;
@@ -1665,7 +1781,7 @@
       font-weight: 400;
     }
     
-    .wa-message-time {
+    .wa-widget-message-time {
       font-size: 11px;
       color: rgba(0,0,0,0.45);
       margin-top: 3px;
@@ -1674,14 +1790,14 @@
     }
     
     /* Action area with WhatsApp green */
-    .wa-popup-action {
+    .wa-widget-action {
       padding: 12px;
       background: #f0f0f0;
       border-top: 1px solid rgba(0,0,0,0.08);
     }
     
     /* WhatsApp style button */
-    .wa-chat-button {
+    .wa-widget-button {
       width: 100%;
       background: #25d366;
       color: #fff;
@@ -1702,25 +1818,25 @@
       font-family: inherit;
     }
     
-    .wa-chat-button:hover {
+    .wa-widget-button:hover {
       background: #22c35e;
       transform: translateY(-1px);
       box-shadow: 0 2px 5px rgba(0,0,0,0.25);
     }
     
-    .wa-chat-button:active {
+    .wa-widget-button:active {
       transform: translateY(0);
       box-shadow: 0 1px 3px rgba(0,0,0,0.2);
     }
     
-    .wa-chat-button svg {
+    .wa-widget-button svg {
       width: 20px;
       height: 20px;
       fill: currentColor;
     }
     
     /* Typing indicator - WhatsApp style */
-    .wa-typing {
+    .wa-widget-typing {
       display: inline-flex;
       align-items: center;
       background: #fff;
@@ -1729,32 +1845,32 @@
       margin-bottom: 8px;
       box-shadow: 0 1px 0.5px rgba(0,0,0,0.13);
       opacity: 0;
-      animation: messageSlide 0.3s ease forwards;
+      animation: messageSlideInstant 0.3s ease forwards;
     }
     
-    .wa-typing-dots {
+    .wa-widget-typing-dots {
       display: flex;
       gap: 4px;
     }
     
-    .wa-typing-dot {
+    .wa-widget-typing-dot {
       width: 8px;
       height: 8px;
       background: #9CA3AF;
       border-radius: 50%;
-      animation: typing 1.4s infinite;
+      animation: typingInstant 1.4s infinite;
     }
     
-    .wa-typing-dot:nth-child(2) {
+    .wa-widget-typing-dot:nth-child(2) {
       animation-delay: 0.2s;
     }
     
-    .wa-typing-dot:nth-child(3) {
+    .wa-widget-typing-dot:nth-child(3) {
       animation-delay: 0.4s;
     }
     
     /* Badges */
-    .wa-offer-badge {
+    .wa-widget-offer-badge {
       background: #ff5252;
       color: white;
       padding: 4px 8px;
@@ -1763,10 +1879,10 @@
       font-weight: 500;
       display: inline-block;
       margin-top: 6px;
-      animation: pulse 2s infinite;
+      animation: pulseInstant 2s infinite;
     }
     
-    .wa-location-badge {
+    .wa-widget-location-badge {
       background: #008069;
       color: white;
       padding: 4px 8px;
@@ -1778,12 +1894,7 @@
     }
     
     /* Animations */
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-    
-    @keyframes slideUp {
+    @keyframes slideUpInstant {
       from { 
         transform: translateY(100px) scale(0.9); 
         opacity: 0; 
@@ -1794,7 +1905,7 @@
       }
     }
     
-    @keyframes messageSlide {
+    @keyframes messageSlideInstant {
       from { 
         transform: translateX(-20px); 
         opacity: 0; 
@@ -1805,7 +1916,7 @@
       }
     }
     
-    @keyframes typing {
+    @keyframes typingInstant {
       0%, 60%, 100% { 
         transform: scale(1); 
         opacity: 1;
@@ -1816,33 +1927,33 @@
       }
     }
     
-    @keyframes pulse {
+    @keyframes pulseInstant {
       0% { transform: scale(1); }
       50% { transform: scale(1.05); }
       100% { transform: scale(1); }
     }
     
     /* Scrollbar styling - WhatsApp style */
-    .wa-popup-chat::-webkit-scrollbar {
+    .wa-widget-chat::-webkit-scrollbar {
       width: 6px;
     }
     
-    .wa-popup-chat::-webkit-scrollbar-track {
+    .wa-widget-chat::-webkit-scrollbar-track {
       background: transparent;
     }
     
-    .wa-popup-chat::-webkit-scrollbar-thumb {
+    .wa-widget-chat::-webkit-scrollbar-thumb {
       background: rgba(0,0,0,0.3);
       border-radius: 3px;
     }
     
-    .wa-popup-chat::-webkit-scrollbar-thumb:hover {
+    .wa-widget-chat::-webkit-scrollbar-thumb:hover {
       background: rgba(0,0,0,0.4);
     }
     
     /* Mobile responsive */
     @media (max-width: 480px) {
-      .wa-popup-container {
+      .wa-widget-container {
         right: 10px;
         left: 10px;
         bottom: 10px;
@@ -1850,44 +1961,193 @@
         max-width: none;
       }
       
-      .wa-popup-chat {
-        min-height: 438px;
-        max-height: 360px;
+      .wa-widget-chat {
+        min-height: 400px;
+        max-height: 500px;
       }
       
-      .wa-message-bubble {
+      .wa-widget-message-bubble {
         max-width: 90%;
       }
     }
     
     /* Location based button animation */
-    .wa-chat-button.location-based {
+    .wa-widget-button.location-based {
       background: #008069;
-      animation: locationPulse 2s infinite;
+      animation: locationPulseInstant 2s infinite;
     }
     
-    .wa-chat-button.location-based:hover {
+    .wa-widget-button.location-based:hover {
       background: #00735f;
     }
     
-    @keyframes locationPulse {
+    @keyframes locationPulseInstant {
       0%, 100% { box-shadow: 0 1px 3px rgba(0,128,105,0.3); }
       50% { box-shadow: 0 1px 8px rgba(0,128,105,0.5); }
     }
     
     /* Urgent button animation */
-    .wa-chat-button.urgent {
+    .wa-widget-button.urgent {
       background: #ff5252;
-      animation: urgentPulse 1.5s infinite;
+      animation: urgentPulseInstant 1.5s infinite;
     }
     
-    .wa-chat-button.urgent:hover {
+    .wa-widget-button.urgent:hover {
       background: #ff3838;
     }
     
-    @keyframes urgentPulse {
+    @keyframes urgentPulseInstant {
       0%, 100% { box-shadow: 0 1px 3px rgba(255,82,82,0.3); }
       50% { box-shadow: 0 1px 8px rgba(255,82,82,0.5); }
+    }
+    
+    /* Customer Side Message (Right aligned) */
+    .wa-widget-customer-message {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 8px;
+      animation: messageSlideCustomer 0.3s ease;
+      opacity: 0;
+      animation-fill-mode: forwards;
+    }
+    
+    .wa-widget-customer-bubble {
+      background: #dcf8c6;
+      padding: 8px 12px 8px 12px;
+      border-radius: 7.5px;
+      max-width: 85%;
+      box-shadow: 0 1px 0.5px rgba(0,0,0,0.13);
+      position: relative;
+      word-wrap: break-word;
+    }
+    
+    /* Customer bubble tail (right side) */
+    .wa-widget-customer-bubble::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: -8px;
+      width: 8px;
+      height: 13px;
+      background: #dcf8c6;
+      clip-path: polygon(0 0, 100% 50%, 0 100%);
+    }
+    
+    /* WhatsApp Poll Style Options */
+    .wa-widget-poll-container {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 8px;
+      animation: messageSlideCustomer 0.3s ease;
+      opacity: 0;
+      animation-fill-mode: forwards;
+    }
+    
+    .wa-widget-poll-bubble {
+      background: #dcf8c6;
+      padding: 12px;
+      border-radius: 7.5px;
+      max-width: 85%;
+      box-shadow: 0 1px 0.5px rgba(0,0,0,0.13);
+      position: relative;
+      word-wrap: break-word;
+    }
+    
+    /* Customer poll bubble tail (right side) */
+    .wa-widget-poll-bubble::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: -8px;
+      width: 8px;
+      height: 13px;
+      background: #dcf8c6;
+      clip-path: polygon(0 0, 100% 50%, 0 100%);
+    }
+    
+    .wa-widget-poll-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #075e54;
+      margin: 0 0 8px 0;
+      text-align: left;
+    }
+    
+    .wa-widget-poll-options {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    
+    .wa-widget-poll-option {
+      display: flex;
+      align-items: center;
+      padding: 8px 10px;
+      background: rgba(255,255,255,0.7);
+      border: 1px solid rgba(0,0,0,0.1);
+      border-radius: 15px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 13px;
+      font-weight: 500;
+      color: #333;
+    }
+    
+    .wa-widget-poll-option:hover {
+      background: rgba(255,255,255,0.9);
+      border-color: #25d366;
+      transform: scale(1.02);
+    }
+    
+    /* Detected problem option styling */
+    .wa-widget-poll-option.detected {
+      background: rgba(37, 211, 102, 0.15);
+      border: 1px solid #25d366;
+      font-weight: 600;
+    }
+    
+    .wa-widget-poll-option.detected:hover {
+      background: rgba(37, 211, 102, 0.25);
+      border-color: #22c35e;
+    }
+    
+    .wa-widget-poll-option input[type="radio"] {
+      margin-right: 8px;
+      width: 14px;
+      height: 14px;
+      accent-color: #25d366;
+    }
+    
+    .wa-widget-poll-option-icon {
+      margin-right: 6px;
+      font-size: 14px;
+      width: 16px;
+      text-align: center;
+    }
+    
+    .wa-widget-poll-option-text {
+      flex: 1;
+      font-size: 13px;
+    }
+    
+    .wa-widget-poll-time {
+      font-size: 11px;
+      color: rgba(0,0,0,0.45);
+      margin-top: 8px;
+      text-align: right;
+      font-weight: 400;
+    }
+    
+    /* Customer message slide animation */
+    @keyframes messageSlideCustomer {
+      from { 
+        transform: translateX(20px); 
+        opacity: 0; 
+      }
+      to { 
+        transform: translateX(0); 
+        opacity: 1; 
+      }
     }
   `;
 
@@ -1896,9 +2156,18 @@
   styleSheet.textContent = styles;
   document.head.appendChild(styleSheet);
 
-  // Get personalized content based on search keyword
+  // Get personalized content based on search keyword with enhanced detection
   const searchKeyword = getSearchKeyword();
   const personalizedContent = getPersonalizedMessages(searchKeyword);
+  const detectedLocation = extractLocation(searchKeyword);
+  const detectedProblem = extractProblem(searchKeyword);
+
+  // Generate dynamic mechanic name and status
+  const mechanicName = generateMechanicName(detectedLocation, detectedProblem);
+  const mechanicStatus = generateMechanicStatus(detectedLocation);
+  
+  // Generate enhanced poll options
+  const pollOptions = generatePollOptions(detectedProblem);
 
   // Determine button class based on content type
   let buttonClass = '';
@@ -1912,36 +2181,30 @@
   // Create WhatsApp SVG icon
   const whatsappIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 175.216 175.552"><path fill="#fff" d="M87.184 25.227c-33.733 0-61.166 27.423-61.178 61.13a60.98 60.98 0 0 0 9.349 32.535l1.455 2.312-6.179 22.559 23.146-6.069 2.235 1.324c9.387 5.571 20.15 8.518 31.126 8.524h.023c33.707 0 61.14-27.426 61.153-61.135a60.75 60.75 0 0 0-17.895-43.251 60.75 60.75 0 0 0-43.235-17.929z"/><path fill="#25d366" d="M87.184 30.227c-31.075 0-56.166 25.082-56.178 56.13.004 10.98 3.216 21.503 9.075 30.456l-9.107 33.249 34.019-8.92a56.004 56.004 0 0 0 26.145 6.524h.023c31.05 0 56.14-25.084 56.153-56.135-.01-15.025-5.859-29.135-16.475-39.711-10.617-10.575-24.699-16.393-39.655-16.393zm28.247 80.342c-1.229 3.45-7.108 6.588-10.04 6.978-2.623.348-5.967.495-9.626-.605-2.282-.682-5.208-1.584-8.962-3.125-15.767-6.471-26.05-22.66-26.835-23.707-.786-1.046-6.41-8.523-6.41-16.259s4.059-11.52 5.498-13.089c1.44-1.569 3.145-1.962 4.191-1.962s2.091.003 3.003.055c.963.061 2.254-.364 3.525 2.687 1.271 3.052 4.32 10.56 4.712 11.344.393.784.655 1.7.131 2.746-.524 1.047-2.49 4.033-3.537 5.472-.441.571-.899 1.187-.386 2.33.513 1.144 2.279 3.758 4.892 6.087 3.355 2.988 6.189 3.914 7.068 4.351.879.437 1.396.365 1.92-.22.524-.584 2.265-2.641 2.87-3.555.605-.914 1.211-.784 2.035-.479.825.305 5.234 2.466 6.134 2.913.9.447 1.498.672 1.718 1.025.22.354.22 2.047-1.009 5.498z"/></svg>`;
 
-  // Create popup HTML with authentic WhatsApp styling
-  const popupHTML = `
-    <div class="wa-popup-overlay" id="waPopupOverlay"></div>
-    <div class="wa-popup-container" id="waPopupContainer">
-      <div class="wa-popup-header">
-        <div class="wa-popup-profile">
-          <div class="wa-popup-avatar">
-            <img src="https://www.sunnyautocare.com/wp-content/uploads/2022/04/indian-mechanic.png" alt="Gurpreet" onerror="this.style.display='none'; this.parentElement.innerHTML='<span style=\"font-size: 18px; font-weight: 500; color: #666;\"></span>
+  // Create widget HTML with dynamic content
+  const widgetHTML = `
+    <div class="wa-widget-container" id="waWidgetContainer">
+      <div class="wa-widget-header">
+        <div class="wa-widget-profile">
+          <div class="wa-widget-avatar">
+            <img src="https://www.sunnyautocare.com/wp-content/uploads/2022/04/indian-mechanic.png" alt="Gurpreet" onerror="this.style.display='none'; this.parentElement.innerHTML='<span style=\"font-size: 18px; font-weight: 500; color: #666;\">GM</span>'">
           </div>
-          <div class="wa-popup-info">
-            <p class="wa-popup-name">Gurpreet (NearBy Car Mechanic)</p>
-            <p class="wa-popup-status">online</p>
+          <div class="wa-widget-info">
+            <p class="wa-widget-name">${mechanicName}</p>
+            <p class="wa-widget-status">${mechanicStatus}</p>
           </div>
         </div>
       </div>
-      <div class="wa-popup-chat" id="waPopupChat">
-        <!-- Messages will be added here -->
+      <div class="wa-widget-chat" id="waWidgetChat">
+        <!-- Dynamic messages and poll will be added here -->
       </div>
-      <div class="wa-popup-action">
-        <button class="wa-chat-button ${buttonClass}" id="waChatButton">
+      <div class="wa-widget-action">
+        <button class="wa-widget-button ${buttonClass}" id="waWidgetButton">
           <span>${personalizedContent.ctaText}</span>
         </button>
       </div>
     </div>
   `;
-
-  // Add popup to page
-  const popupDiv = document.createElement('div');
-  popupDiv.innerHTML = popupHTML;
-  document.body.appendChild(popupDiv);
 
   // Get current time in WhatsApp format
   function getCurrentTime() {
@@ -1953,18 +2216,19 @@
     return `${hours}:${minutes}`;
   }
 
-  // Show message with WhatsApp animation
-  function showMessage(text, delay = 0, includeBadge = '') {
-    const chatContainer = document.getElementById('waPopupChat');
+  // Show mechanic message with WhatsApp animation (unchanged)
+  function showMechanicMessage(text, delay = 0, includeBadge = '') {
+    const chatContainer = document.getElementById('waWidgetChat');
+    if (!chatContainer) return;
     
     setTimeout(() => {
       // Show typing indicator
       const typingHTML = `
-        <div class="wa-typing" id="waTyping">
-          <div class="wa-typing-dots">
-            <div class="wa-typing-dot"></div>
-            <div class="wa-typing-dot"></div>
-            <div class="wa-typing-dot"></div>
+        <div class="wa-widget-typing" id="waWidgetTyping">
+          <div class="wa-widget-typing-dots">
+            <div class="wa-widget-typing-dot"></div>
+            <div class="wa-widget-typing-dot"></div>
+            <div class="wa-widget-typing-dot"></div>
           </div>
         </div>
       `;
@@ -1973,22 +2237,22 @@
       
       // Replace typing with actual message
       setTimeout(() => {
-        const typing = document.getElementById('waTyping');
+        const typing = document.getElementById('waWidgetTyping');
         if (typing) typing.remove();
         
         let badge = '';
         if (includeBadge === 'offer') {
-          badge = '<span class="wa-offer-badge">Limited Time: 20% OFF</span>';
+          badge = '<span class="wa-widget-offer-badge">Limited Time: 20% OFF</span>';
         } else if (includeBadge === 'location') {
-          badge = '<span class="wa-location-badge">📍 Serving Your Area</span>';
+          badge = '<span class="wa-widget-location-badge">📍 Serving Your Area</span>';
         }
         
         const messageHTML = `
-          <div class="wa-message">
-            <div class="wa-message-bubble">
-              <p class="wa-message-text">${text}</p>
+          <div class="wa-widget-message">
+            <div class="wa-widget-message-bubble">
+              <p class="wa-widget-message-text">${text}</p>
               ${badge}
-              <span class="wa-message-time">${getCurrentTime()}</span>
+              <span class="wa-widget-message-time">${getCurrentTime()}</span>
             </div>
           </div>
         `;
@@ -2005,135 +2269,229 @@
     }, delay);
   }
 
-  // Function to redirect to WhatsApp
-  function redirectToWhatsApp(source) {
-    // Track conversion
+  // Show customer poll with enhanced options
+  function showCustomerPoll(delay = 0) {
+    const chatContainer = document.getElementById('waWidgetChat');
+    if (!chatContainer) return;
+    
+    setTimeout(() => {
+      const optionsHTML = pollOptions.map(option => `
+        <label class="wa-widget-poll-option ${option.isDetected ? 'detected' : ''}" data-problem="${option.key}">
+          <input type="radio" name="carProblemPoll" value="${option.key}">
+          <span class="wa-widget-poll-option-icon">${option.icon}</span>
+          <span class="wa-widget-poll-option-text">${option.text}</span>
+        </label>
+      `).join('');
+      
+      const pollHTML = `
+        <div class="wa-widget-poll-container">
+          <div class="wa-widget-poll-bubble">
+            <p class="wa-widget-poll-title">🔧 What's your car problem?</p>
+            <div class="wa-widget-poll-options">
+              ${optionsHTML}
+            </div>
+            <span class="wa-widget-poll-time">${getCurrentTime()}</span>
+          </div>
+        </div>
+      `;
+      chatContainer.insertAdjacentHTML('beforeend', pollHTML);
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+    }, delay);
+  }
+
+  // Function to redirect to WhatsApp with enhanced problem-specific message
+  function redirectToWhatsApp(source, selectedProblem = null) {
+    // Enhanced problem-specific messages
+    const problemMessages = {
+      'car-not-starting': {
+        message: "Hi, my car is not starting. I need immediate help!",
+        urgency: "URGENT",
+        service: "Car Starting Issue"
+      },
+      'tyre-puncture': {
+        message: "Hi, I have a tyre puncture and need immediate assistance!",
+        urgency: "URGENT", 
+        service: "Tyre Puncture Repair"
+      },
+      'battery-jumpstart': {
+        message: "Hi, my car battery is dead. I need jump start service immediately!",
+        urgency: "URGENT",
+        service: "Battery Jump Start"
+      },
+      'towing': {
+        message: "Hi, I need car towing service. Please help me immediately!",
+        urgency: "URGENT",
+        service: "Car Towing Service"
+      },
+      'fuel-delivery': {
+        message: "Hi, I ran out of fuel. I need emergency fuel delivery!",
+        urgency: "URGENT",
+        service: "Emergency Fuel Delivery"
+      },
+      'key-lockout': {
+        message: "Hi, my keys are locked inside the car. I need lockout assistance!",
+        urgency: "URGENT", 
+        service: "Car Key Lockout Service"
+      },
+      'other': {
+        message: "Hi, I need roadside assistance for my car. Please help me!",
+        urgency: "HELP NEEDED",
+        service: "General Roadside Assistance"
+      }
+    };
+
+    // Track conversion with enhanced data
     if (typeof mixpanel !== 'undefined') {
-      mixpanel.track('WhatsApp Popup Conversion', {
+      mixpanel.track('WhatsApp Widget Conversion', {
         timestamp: new Date().toISOString(),
         page_url: window.location.href,
         search_keyword: searchKeyword,
         button_text: personalizedContent.ctaText,
         personalized: searchKeyword ? 'yes' : 'no',
         is_location_based: personalizedContent.isLocationBased,
-        location: personalizedContent.location || 'none',
-        source: source
+        location: detectedLocation || 'none',
+        detected_problem: detectedProblem ? detectedProblem.key : 'none',
+        mechanic_name: mechanicName,
+        mechanic_status: mechanicStatus,
+        source: source,
+        widget_type: 'enhanced_smart',
+        selected_problem: selectedProblem || 'none',
+        problem_selection_used: selectedProblem ? 'yes' : 'no',
+        poll_options_count: pollOptions.length
       });
     }
     
-    // Set localStorage to not show again
-    localStorage.setItem('instantMechanicWhatsAppPopupShown', 'true');
-    
-    // Create personalized WhatsApp message
+    // Create enhanced personalized WhatsApp message
     let whatsappMessage = '';
-    if (personalizedContent.isLocationBased && personalizedContent.location) {
-      const locationName = personalizedContent.location.charAt(0).toUpperCase() + personalizedContent.location.slice(1);
-      whatsappMessage = encodeURIComponent(`Hi, I need urgent car help in ${locationName}. ${searchKeyword}`);
-    } else if (searchKeyword) {
-      whatsappMessage = encodeURIComponent(`Hi, I need help with: ${searchKeyword}`);
+    
+    // If customer selected a specific problem
+    if (selectedProblem && problemMessages[selectedProblem]) {
+      const problemData = problemMessages[selectedProblem];
+      let locationInfo = '';
+      
+      // Add location if available
+      if (detectedLocation) {
+        const locationName = detectedLocation.charAt(0).toUpperCase() + detectedLocation.slice(1);
+        locationInfo = `\nLocation: ${locationName}`;
+      }
+      
+      whatsappMessage = encodeURIComponent(
+        `${problemData.message}${locationInfo}\n\nService Needed: ${problemData.service}\nUrgency: ${problemData.urgency}\n\n⭐ Found you through Google Search - 4.8 Rated Service\nKeyword: ${searchKeyword}`
+      );
+    }
+    // Location-based personalization
+    else if (detectedLocation) {
+      const locationName = detectedLocation.charAt(0).toUpperCase() + detectedLocation.slice(1);
+      let problemInfo = detectedProblem ? `\nProblem: ${detectedProblem.displayName}` : '';
+      whatsappMessage = encodeURIComponent(`Hi, I need urgent car help in ${locationName}.${problemInfo}\n\nKeyword: ${searchKeyword}\n⭐ 4.8 Rated Service`);
+    }
+    // Problem-specific personalization
+    else if (detectedProblem) {
+      whatsappMessage = encodeURIComponent(`Hi, I need help with: ${detectedProblem.displayName}\n\nKeyword: ${searchKeyword}\n⭐ 4.8 Rated Service`);
+    }
+    // General personalization with keyword
+    else if (searchKeyword) {
+      whatsappMessage = encodeURIComponent(`Hi, I need help with: ${searchKeyword}\n\n⭐ 4.8 Rated Service`);
     } else {
-      whatsappMessage = encodeURIComponent(`Hi, I need urgent roadside assistance!`);
+      whatsappMessage = encodeURIComponent(`Hi, I need urgent roadside assistance!\n\n⭐ 4.8 Rated Service`);
     }
     
     // Redirect to WhatsApp
     window.location.href = `https://wa.me/message/R7LYR65MG47ZB1${whatsappMessage ? '?text=' + whatsappMessage : ''}`;
   }
 
-  // Show popup with timing
-  const popupDelay = personalizedContent.isLocationBased ? 100 : 200;
-  
-  setTimeout(() => {
-    const overlay = document.getElementById('waPopupOverlay');
-    const container = document.getElementById('waPopupContainer');
-    
-    overlay.style.display = 'block';
-    container.style.display = 'block';
-    
-    // Show personalized messages with WhatsApp timing
-    showMessage(personalizedContent.messages[0], 500);
-    showMessage(personalizedContent.messages[1], 3500);
-    
-    // Determine badge type for third message
-    let badgeType = '';
-    if (personalizedContent.isLocationBased) {
-      badgeType = 'location';
-    } else {
-      const offerCategories = ['puncture', 'battery', 'emergency24x7'];
-      const shouldShowOffer = offerCategories.some(cat => 
-        personalizedContent.messages[0].toLowerCase().includes(cat.substring(0, 4))
-      );
-      if (shouldShowOffer) badgeType = 'offer';
+  // LOAD WIDGET IMMEDIATELY with enhanced personalization
+  function loadWidget() {
+    const targetElement = document.getElementById('instantWhatsAppWidget');
+    if (targetElement) {
+      targetElement.innerHTML = widgetHTML;
+      
+      // 1. Show mechanic messages first (personalized messages)
+      showMechanicMessage(personalizedContent.messages[0], 100);
+      showMechanicMessage(personalizedContent.messages[1], 2500);
+      
+      // Determine badge type for third message
+      let badgeType = '';
+      if (personalizedContent.isLocationBased) {
+        badgeType = 'location';
+      } else if (detectedProblem) {
+        badgeType = 'offer';
+      }
+      
+      if (personalizedContent.messages[2]) {
+        showMechanicMessage(personalizedContent.messages[2], 4500, badgeType);
+      }
+      
+      // 2. Show customer poll options with enhanced prioritization
+      showCustomerPoll(6500);
+      
+      // Track enhanced widget shown
+      if (typeof mixpanel !== 'undefined') {
+        mixpanel.track('Enhanced WhatsApp Widget Shown', {
+          timestamp: new Date().toISOString(),
+          page_url: window.location.href,
+          search_keyword: searchKeyword,
+          personalized: searchKeyword ? 'yes' : 'no',
+          category: personalizedContent.isLocationBased ? 'location' : (detectedProblem ? 'problem' : 'general'),
+          location: detectedLocation || 'none',
+          detected_problem: detectedProblem ? detectedProblem.key : 'none',
+          mechanic_name: mechanicName,
+          mechanic_status: mechanicStatus,
+          widget_type: 'enhanced_smart',
+          poll_options_count: pollOptions.length,
+          prioritized_option: detectedProblem ? detectedProblem.key : 'none'
+        });
+      }
     }
-    
-    if (personalizedContent.messages[2]) {
-      showMessage(personalizedContent.messages[2], 6500, badgeType);
-    }
-    
-    // Track popup shown
-    if (typeof mixpanel !== 'undefined') {
-      mixpanel.track('WhatsApp Popup Shown', {
-        timestamp: new Date().toISOString(),
-        page_url: window.location.href,
-        search_keyword: searchKeyword,
-        personalized: searchKeyword ? 'yes' : 'no',
-        category: personalizedContent.isLocationBased ? 'location' : 'service',
-        location: personalizedContent.location || 'none'
-      });
-    }
-  }, popupDelay);
+  }
 
-  // Handle all click events
+  // Handle all click events (unchanged logic)
   document.addEventListener('click', function(e) {
-    // Handle chat button click
-    if (e.target.id === 'waChatButton' || e.target.closest('#waChatButton')) {
+    // Handle widget button click
+    if (e.target.id === 'waWidgetButton' || e.target.closest('#waWidgetButton')) {
       e.preventDefault();
       redirectToWhatsApp('button');
     }
     
-    // Handle chat area click (NEW - ADDED FOR CHAT SCREEN CLICKS)
-    if (e.target.id === 'waPopupChat' || e.target.closest('#waPopupChat')) {
-      e.preventDefault();
-      redirectToWhatsApp('chat_area');
+    // Handle chat area click
+    if (e.target.id === 'waWidgetChat' || e.target.closest('#waWidgetChat')) {
+      if (!e.target.closest('.wa-widget-poll-container')) {
+        e.preventDefault();
+        redirectToWhatsApp('chat_area');
+      }
     }
     
-    // Handle close button
-    if (e.target.id === 'waPopupClose') {
-      e.preventDefault();
-      document.getElementById('waPopupOverlay').style.display = 'none';
-      document.getElementById('waPopupContainer').style.display = 'none';
+    // Handle poll option clicks - INSTANT REDIRECT
+    if (e.target.closest('.wa-widget-poll-option')) {
+      const option = e.target.closest('.wa-widget-poll-option');
+      const radio = option.querySelector('input[type="radio"]');
       
-      setTimeout(() => {
-        redirectToWhatsApp('close');
-      }, 100);
-    }
-    
-    // Handle overlay click
-    if (e.target.id === 'waPopupOverlay') {
-      e.preventDefault();
-      document.getElementById('waPopupOverlay').style.display = 'none';
-      document.getElementById('waPopupContainer').style.display = 'none';
+      // Check the radio button
+      radio.checked = true;
       
-      setTimeout(() => {
-        redirectToWhatsApp('overlay');
-      }, 100);
+      // Track problem selection
+      if (typeof mixpanel !== 'undefined') {
+        mixpanel.track('Enhanced Problem Selection Made', {
+          selected_problem: radio.value,
+          timestamp: new Date().toISOString(),
+          page_url: window.location.href,
+          selection_method: 'poll_click',
+          was_detected_problem: detectedProblem && detectedProblem.key === radio.value,
+          was_prioritized: option.classList.contains('detected')
+        });
+      }
+      
+      // INSTANTLY redirect to WhatsApp
+      redirectToWhatsApp('poll_selection', radio.value);
     }
   });
 
-  // Handle ESC key
-  document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-      const container = document.getElementById('waPopupContainer');
-      if (container && container.style.display === 'block') {
-        e.preventDefault();
-        document.getElementById('waPopupOverlay').style.display = 'none';
-        container.style.display = 'none';
-        
-        setTimeout(() => {
-          redirectToWhatsApp('escape');
-        }, 100);
-      }
-    }
-  });
+  // LOAD WIDGET IMMEDIATELY WHEN DOM IS READY
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', loadWidget);
+  } else {
+    loadWidget();
+  }
 
 })();
 </script>
