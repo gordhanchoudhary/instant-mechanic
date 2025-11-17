@@ -2276,11 +2276,14 @@
     
     setTimeout(() => {
       const optionsHTML = pollOptions.map(option => `
-        <label class="wa-widget-poll-option ${option.isDetected ? 'detected' : ''}" data-problem="${option.key}">
-          <input type="radio" name="carProblemPoll" value="${option.key}">
-          <span class="wa-widget-poll-option-icon">${option.icon}</span>
-          <span class="wa-widget-poll-option-text">${option.text}</span>
-        </label>
+<a href="https://wa.me/message/R7LYR65MG47ZB1" target="_blank" style="text-decoration:none;">
+  <label class="wa-widget-poll-option ${option.isDetected ? 'detected' : ''}" data-problem="${option.key}">
+    <input type="radio" name="carProblemPoll" value="${option.key}">
+    <span class="wa-widget-poll-option-icon">${option.icon}</span>
+    <span class="wa-widget-poll-option-text">${option.text}</span>
+  </label>
+</a>
+
       `).join('');
       
       const pollHTML = `
