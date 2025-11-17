@@ -343,6 +343,43 @@
         75% { transform: translateX(2px); }
         100% { transform: translateX(-1px); }
       }
+
+      /* Fake radio button circle */
+.wa-widget-poll-option-radio {
+  width: 14px;
+  height: 14px;
+  border: 2px solid #ccc;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 8px;
+  position: relative;
+  background: white;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+/* Hover effect on fake radio button */
+.wa-widget-poll-option:hover .wa-widget-poll-option-radio {
+  border-color: #25d366;
+}
+
+/* Detected problem option gets pre-selected appearance */
+.wa-widget-poll-option.detected .wa-widget-poll-option-radio {
+  border-color: #25d366;
+  background: #25d366;
+}
+
+/* Add inner dot for detected option */
+.wa-widget-poll-option.detected .wa-widget-poll-option-radio::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 6px;
+  height: 6px;
+  background: white;
+  border-radius: 50%;
+}
   
       /* Icon styles */
       .cs_circle_btn i {
@@ -2278,16 +2315,15 @@
     if (!chatContainer) return;
     
     setTimeout(() => {
-      const optionsHTML = pollOptions.map(option => `
-<a href="https://wa.me/message/R7LYR65MG47ZB1" target="_blank" style="text-decoration:none;">
-  <label class="wa-widget-poll-option ${option.isDetected ? 'detected' : ''}" data-problem="${option.key}">
-    <input type="radio" name="carProblemPoll" value="${option.key}">
-    <span class="wa-widget-poll-option-icon">${option.icon}</span>
-    <span class="wa-widget-poll-option-text">${option.text}</span>
-  </label>
-</a>
-
-      `).join('');
+const optionsHTML = pollOptions.map(option => `
+  <a href="https://wa.me/message/R7LYR65MG47ZB1" target="_blank" style="text-decoration:none;">
+    <div class="wa-widget-poll-option ${option.isDetected ? 'detected' : ''}" data-problem="${option.key}">
+      <span class="wa-widget-poll-option-radio"></span>
+      <span class="wa-widget-poll-option-icon">${option.icon}</span>
+      <span class="wa-widget-poll-option-text">${option.text}</span>
+    </div>
+  </a>
+`).join('');
       
       const pollHTML = `
         <div class="wa-widget-poll-container">
@@ -2454,10 +2490,7 @@
   // Handle all click events (unchanged logic)
   document.addEventListener('click', function(e) {
     // Handle widget button click
-    if (e.target.id === 'waWidgetButton' || e.target.closest('#waWidgetButton')) {
-      e.preventDefault();
-      redirectToWhatsApp('button');
-    }
+
     
     // Handle chat area click
     if (e.target.id === 'waWidgetChat' || e.target.closest('#waWidgetChat')) {
@@ -2467,28 +2500,7 @@
       }
     }
     
-    // Handle poll option clicks - INSTANT REDIRECT
-    if (e.target.closest('.wa-widget-poll-option')) {
-      const option = e.target.closest('.wa-widget-poll-option');
-      const radio = option.querySelector('input[type="radio"]');
-      
-      // Check the radio button
-      radio.checked = true;
-      
-      // Track problem selection
-      if (typeof mixpanel !== 'undefined') {
-        mixpanel.track('Enhanced Problem Selection Made', {
-          selected_problem: radio.value,
-          timestamp: new Date().toISOString(),
-          page_url: window.location.href,
-          selection_method: 'poll_click',
-          was_detected_problem: detectedProblem && detectedProblem.key === radio.value,
-          was_prioritized: option.classList.contains('detected')
-        });
-      }
-      
-      // INSTANTLY redirect to WhatsApp
-    }
+
   });
 
   // LOAD WIDGET IMMEDIATELY WHEN DOM IS READY
