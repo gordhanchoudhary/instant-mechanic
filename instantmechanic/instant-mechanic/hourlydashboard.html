@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Instant Mechanic – Hourly Business Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <!-- Data labels plugin -->
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 16px;
+      background: #f3f4f6;
+    }
+    .page {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    h1 {
+      text-align: center;
+      margin: 4px 0;
+      font-size: 26px;
+      font-weight: 600;
+    }
+    .subtitle {
+      text-align: center;
+      font-size: 13px;
+      color: #555;
+      margin-bottom: 12px;
+    }
+    .controls {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      font-size: 13px;
+    }
+    .controls input[type="date"] {
+      padding: 4px 8px;
+      border-radius: 6px;
+      border: 1px solid #d1d5db;
+      font-size: 13px;
+    }
+    #dateInfo {
+      color: #666;
+    }
+    .section-title {
+      margin: 18px 0 8px;
+      font-size: 18px;
+      font-weight: 600;
+      color: #111827;
+    }
+
+    /* Section 1 – 2×2 grid (Graphs 1–4) */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+
+    /* Section 2 – 1 graph per row (Graphs 5–8) */
+    .grid-1 {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+
+    .card {
+      background: #ffffff;
+      border-radius: 14px;
+      padding: 10px 14px 12px;
+      box-shadow: 0 8px 16px rgba(15, 23, 42, 0.06);
+      border: 1px solid #e5e7eb;
+      display: flex;
+      flex-direction: column;
+      height: 340px;
+    }
+    .card h2 {
+      font-size: 15px;
+      margin: 0 0 4px;
+      color: #111827;
+      font-weight: 600;
+    }
+    .card canvas {
+      flex: 1;
+      margin-top: 6px;
+    }
+    .meta {
+      font-size: 11px;
+      color: #6b7280;
+      text-align: right;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <h1>Instant Mechanic – Hourly Business Dashboard</h1>
+    <div class="subtitle">
+      Bars = Hour-wise numbers &nbsp; | &nbsp; Lines = Cumulative / Efficiency metrics
+    </div>
+
+    <!-- Date picker -->
+    <div class="controls">
+      <label for="datePicker">Select date:</label>
+      <input type="date" id="datePicker" />
+      <span id="dateInfo"></span>
+    </div>
+
+    <!-- SECTION 1: Core metrics (Graphs 1–4) -->
+    <div class="section-title">Section 1 – Core Metrics (Graphs 1–4)</div>
+    <div class="grid-2">
+      <div class="card">
+        <h2>Customers</h2>
+        <canvas id="customersChart"></canvas>
+      </div>
+      <div class="card">
+        <h2>Revenue</h2>
+        <canvas id="revenueChart"></canvas>
+      </div>
+      <div class="card">
+        <h2>Bookings</h2>
+        <canvas id="bookingsChart"></canvas>
+      </div>
+      <div class="card">
+        <h2>Cancelled Bookings</h2>
+        <canvas id="cancelledChart"></canvas>
+      </div>
+    </div>
+
+    <!-- SECTION 2: Advanced graphs (5–8) -->
+    <div class="section-title">Section 2 – Performance vs Ad Spend (Graphs 5–8)</div>
+    <div class="grid-1">
+      <div class="card">
+        <h2>Graph 5 – Customers, Bookings & Conversion Rate</h2>
+        <canvas id="graph5"></canvas>
+      </div>
+      <div class="card">
+        <h2>Graph 6 – Ad Spend, Customers & Cost per Customer</h2>
+        <canvas id="graph6"></canvas>
+      </div>
+      <div class="card">
+        <h2>Graph 7 – Ad Spend, Bookings & Cost per Booking</h2>
+        <canvas id="graph7"></canvas>
+      </div>
+      <div class="card">
+        <h2>Graph 8 – Revenue, Spend & ROAS</h2>
+        <canvas id="graph8"></canvas>
+      </div>
+    </div>
+
+    <div class="meta" id="lastUpdated"></div>
+  </div>
+
+  <script>
+    Chart.register(ChartDataLabels);
+
+    // 👉 PUT YOUR SHEET CSV LINK HERE
+    // Example: "https://docs.google.com/spreadsheets/d/XXX/export?format=csv"
+    const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRITGlgze6lR0qQuVRrQJkmkQYtua21eMj2Pgwf0IbP25DSWa2__0zCfnxE53xY1a1cdJGv3TqXREci/pub?output=csv";
+
+    let allRows = [];
+    let availableDates = [];
+    let latestDateKey = null;
+    let selectedDateKey = null;
+    const charts = {};
+
+    function parseIndianDateAndKey(str) {
+      const [d, m, y] = str.split("-").map(Number);
+      const dateObj = new Date(y, m - 1, d);
+      const dateKey = `${y}-${String(m).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+      return { dateObj, dateKey };
+    }
+
+    function parseCsv(text) {
+      const rows = text.trim().split("\n").map(r => r.split(","));
+      const header = rows[0].map(h => h.trim());
+
+      const idxDate   = header.indexOf("date");
+      const idxTime   = header.indexOf("Time");
+      const idxCust   = header.indexOf("total_customers");
+      const idxRev    = header.indexOf("total_revenue");
+      const idxBook   = header.indexOf("total_booking");
+      const idxCancel = header.indexOf("total_cancelled_booking");
+      const idxSpend  = header.indexOf("total_spend"); // NEW cumulative spend column
+
+      if (idxDate === -1 || idxTime === -1 || idxCust === -1 ||
+          idxRev === -1 || idxBook === -1 || idxCancel === -1 || idxSpend === -1) {
+        alert("Missing columns. Required: date, Time, total_customers, total_revenue, total_booking, total_cancelled_booking, total_spend");
+        return null;
+      }
+
+      const data = rows.slice(1).map(r => {
+        const { dateObj, dateKey } = parseIndianDateAndKey(r[idxDate]);
+        const timeRaw = r[idxTime] || "00:00:00";
+        const hourStr = timeRaw.split(":")[0];
+        const hour = Number(hourStr);
+
+        return {
+          dateObj,
+          dateKey,
+          hour,
+          total_customers: Number(r[idxCust] || 0),
+          total_revenue: Number(r[idxRev] || 0),
+          total_booking: Number(r[idxBook] || 0),
+          total_cancelled: Number(r[idxCancel] || 0),
+          total_spend: Number(r[idxSpend] || 0)
+        };
+      });
+
+      if (!data.length) return null;
+
+      const dateSet = new Set(data.map(r => r.dateKey));
+      const dateList = Array.from(dateSet).sort();
+      const lastDateKey = dateList[dateList.length - 1];
+
+      return { rows: data, dateKeys: dateList, latestDateKey: lastDateKey };
+    }
+
+    function computeSeries(rows, key) {
+      const cumulative = [];
+      const hourly = [];
+      rows.forEach((row, i) => {
+        const value = row[key];
+        cumulative.push(value);
+        hourly.push(i === 0 ? value : value - rows[i-1][key]);
+      });
+      return { cumulative, hourly };
+    }
+
+    function createOrUpdateChart(id, config) {
+      const ctx = document.getElementById(id).getContext("2d");
+      if (charts[id]) {
+        charts[id].data = config.data;
+        charts[id].options = config.options;
+        charts[id].update();
+      } else {
+        charts[id] = new Chart(ctx, config);
+      }
+    }
+
+    function baseBarLineOptions(xLabel, yLabelLeft) {
+      return {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: "index", intersect: false },
+        plugins: {
+          legend: { position: "bottom", labels: { boxWidth: 14, font: { size: 11 } } },
+          datalabels: {
+            color: "#374151",
+            font: { size: 10, weight: "500" },
+            clamp: true,
+            clip: false
+          },
+          tooltip: {
+            callbacks: {
+              label: function(ctx) {
+                const v = ctx.parsed.y ?? 0;
+                return ctx.dataset.label + ": " + v.toLocaleString("en-IN");
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            title: { display: true, text: xLabel, font: { size: 11 } },
+            ticks: { autoSkip: false, font: { size: 10 } }
+          },
+          y: {
+            beginAtZero: true,
+            title: { display: !!yLabelLeft, text: yLabelLeft }
+          }
+        }
+      };
+    }
+
+    function renderDashboardForDate(dateKey) {
+      if (!allRows.length) return;
+
+      const rows = allRows
+        .filter(r => r.dateKey === dateKey)
+        .sort((a, b) => a.hour - b.hour);
+
+      const dateInfo = document.getElementById("dateInfo");
+      if (!rows.length) {
+        dateInfo.textContent = "No data for this date.";
+        Object.values(charts).forEach(ch => {
+          ch.data.labels = [];
+          ch.data.datasets.forEach(d => d.data = []);
+          ch.update();
+        });
+        return;
+      }
+
+      const hours = rows.map(r => r.hour);
+
+      // core metrics
+      const customers = computeSeries(rows, "total_customers");
+      const revenue   = computeSeries(rows, "total_revenue");
+      const bookings  = computeSeries(rows, "total_booking");
+      const cancelled = computeSeries(rows, "total_cancelled");
+      const spend     = computeSeries(rows, "total_spend");
+
+      const hourlyCustomers = customers.hourly;
+      const hourlyRevenue   = revenue.hourly;
+      const hourlyBookings  = bookings.hourly;
+      const hourlyCancelled = cancelled.hourly;
+      const hourlySpend     = spend.hourly;
+
+      // derived metrics
+      const conversionRate = hourlyCustomers.map((c, i) =>
+        c > 0 ? (hourlyBookings[i] / c) * 100 : 0
+      );
+      const costPerCustomer = hourlyCustomers.map((c, i) =>
+        c > 0 ? hourlySpend[i] / c : 0
+      );
+      const costPerBooking = hourlyBookings.map((b, i) =>
+        b > 0 ? hourlySpend[i] / b : 0
+      );
+      const roas = hourlySpend.map((s, i) =>
+        s > 0 ? (hourlyRevenue[i] / s) : 0
+      );
+
+      // ---------- Graphs 1–4 ----------
+      const baseOptions = baseBarLineOptions("Hour of Day", "");
+
+      createOrUpdateChart("customersChart", {
+        type: "bar",
+        data: {
+          labels: hours,
+          datasets: [
+            {
+              type: "bar",
+              label: "Hourly Customers",
+              data: hourlyCustomers,
+              backgroundColor: "rgba(251, 146, 60, 0.55)",
+              borderColor: "rgba(251, 146, 60, 1)",
+              borderWidth: 1,
+              datalabels: {
+                anchor: "end",
+                align: "start",
+                formatter: v => v ? v.toLocaleString("en-IN") : ""
+              }
+            },
+            {
+              type: "line",
+              label: "Cumulative Customers",
+              data: customers.cumulative,
+              borderColor: "rgba(239, 68, 68, 1)",
+              borderWidth: 2,
+              tension: 0.25,
+              pointRadius: 3,
+              fill: false,
+              datalabels: {
+                anchor: "end",
+                align: "end",
+                formatter: v => v ? v.toLocaleString("en-IN") : ""
+              }
+            }
+          ]
+        },
+        options: JSON.parse(JSON.stringify(baseOptions))
+      });
+
+      createOrUpdateChart("revenueChart", {
+        type: "bar",
+        data: {
+          labels: hours,
+          datasets: [
+            {
+              type: "bar",
+              label: "Hourly Revenue",
+              data: hourlyRevenue,
+              backgroundColor: "rgba(251, 146, 60, 0.55)",
+              borderColor: "rgba(251, 146, 60, 1)",
+              borderWidth: 1,
+              datalabels: {
+                anchor: "end",
+                align: "start",
+                formatter: v => v ? v.toLocaleString("en-IN") : ""
+              }
+            },
+            {
+              type: "line",
+              label: "Cumulative Revenue",
+              data: revenue.cumulative,
+              borderColor: "rgba(239, 68, 68, 1)",
+              borderWidth: 2,
+              tension: 0.25,
+              pointRadius: 3,
+              fill: false,
+              datalabels: {
+                anchor: "end",
+                align: "end",
+                formatter: v => v ? v.toLocaleString("en-IN") : ""
+              }
+            }
+          ]
+        },
+        options: JSON.parse(JSON.stringify(baseOptions))
+      });
+
+      createOrUpdateChart("bookingsChart", {
+        type: "bar",
+        data: {
+          labels: hours,
+          datasets: [
+            {
+              type: "bar",
+              label: "Hourly Bookings",
+              data: hourlyBookings,
+              backgroundColor: "rgba(251, 146, 60, 0.55)",
+              borderColor: "rgba(251, 146, 60, 1)",
+              borderWidth: 1,
+              datalabels: {
+                anchor: "end",
+                align: "start",
+                formatter: v => v ? v.toLocaleString("en-IN") : ""
+              }
+            },
+            {
+              type: "line",
+              label: "Cumulative Bookings",
+              data: bookings.cumulative,
+              borderColor: "rgba(239, 68, 68, 1)",
+              borderWidth: 2,
+              tension: 0.25,
+              pointRadius: 3,
+              fill: false,
+              datalabels: {
+                anchor: "end",
+                align: "end",
+                formatter: v => v ? v.toLocaleString("en-IN") : ""
+              }
+            }
+          ]
+        },
+        options: JSON.parse(JSON.stringify(baseOptions))
+      });
+
+      createOrUpdateChart("cancelledChart", {
+        type: "bar",
+        data: {
+          labels: hours,
+          datasets: [
+            {
+              type: "bar",
+              label: "Hourly Cancelled Bookings",
+              data: hourlyCancelled,
+              backgroundColor: "rgba(251, 146, 60, 0.55)",
+              borderColor: "rgba(251, 146, 60, 1)",
+              borderWidth: 1,
+              datalabels: {
+                anchor: "end",
+                align: "start",
+                formatter: v => v ? v.toLocaleString("en-IN") : ""
+              }
+            },
+            {
+              type: "line",
+              label: "Cumulative Cancelled Bookings",
+              data: cancelled.cumulative,
+              borderColor: "rgba(239, 68, 68, 1)",
+              borderWidth: 2,
+              tension: 0.25,
+              pointRadius: 3,
+              fill: false,
+              datalabels: {
+                anchor: "end",
+                align: "end",
+                formatter: v => v ? v.toLocaleString("en-IN") : ""
+              }
+            }
+          ]
+        },
+        options: JSON.parse(JSON.stringify(baseOptions))
+      });
+
+      // ---------- Graph 5 ----------
+      createOrUpdateChart("graph5", {
+        type: "bar",
+        data: {
+          labels: hours,
+          datasets: [
+            {
+              type: "bar",
+              label: "Hourly Customers",
+              data: hourlyCustomers,
+              backgroundColor: "#4e79a7",
+              datalabels: {
+                anchor: "end", align: "start",
+                formatter: v => v ? v : ""
+              }
+            },
+            {
+              type: "bar",
+              label: "Hourly Bookings",
+              data: hourlyBookings,
+              backgroundColor: "#f28e2b",
+              datalabels: {
+                anchor: "end", align: "start",
+                formatter: v => v ? v : ""
+              }
+            },
+            {
+              type: "line",
+              label: "Conversion Rate (%)",
+              data: conversionRate,
+              borderColor: "red",
+              borderWidth: 2,
+              yAxisID: "y1",
+              tension: 0.2,
+              pointRadius: 3,
+              datalabels: {
+                anchor: "end",
+                align: "end",
+                formatter: v => v ? v.toFixed(1) + "%" : ""
+              }
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: "index", intersect: false },
+          plugins: {
+            legend: { position: "bottom" },
+            datalabels: {
+              color: "#374151",
+              font: { size: 10, weight: "500" }
+            }
+          },
+          scales: {
+            x: { title: { display: true, text: "Hour of Day" } },
+            y: {
+              beginAtZero: true,
+              title: { display: true, text: "Customers / Bookings" }
+            },
+            y1: {
+              position: "right",
+              beginAtZero: true,
+              title: { display: true, text: "Conversion Rate (%)" },
+              grid: { drawOnChartArea: false }
+            }
+          }
+        }
+      });
+
+      // ---------- Graph 6 ----------
+      createOrUpdateChart("graph6", {
+        type: "bar",
+        data: {
+          labels: hours,
+          datasets: [
+            {
+              type: "bar",
+              label: "Hourly Ad Spend (₹)",
+              data: hourlySpend,
+              backgroundColor: "#e15759",
+              datalabels: {
+                anchor: "end", align: "start",
+                formatter: v => v ? "₹" + v.toLocaleString("en-IN") : ""
+              }
+            },
+            {
+              type: "bar",
+              label: "Hourly Customers",
+              data: hourlyCustomers,
+              backgroundColor: "#4e79a7",
+              datalabels: {
+                anchor: "end", align: "start",
+                formatter: v => v ? v : ""
+              }
+            },
+            {
+              type: "line",
+              label: "Cost per Customer (₹)",
+              data: costPerCustomer,
+              borderColor: "green",
+              borderWidth: 2,
+              yAxisID: "y1",
+              tension: 0.2,
+              pointRadius: 3,
+              datalabels: {
+                anchor: "end",
+                align: "end",
+                formatter: v => v ? "₹" + v.toFixed(0) : ""
+              }
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: "index", intersect: false },
+          plugins: {
+            legend: { position: "bottom" },
+            datalabels: {
+              color: "#374151",
+              font: { size: 10, weight: "500" }
+            }
+          },
+          scales: {
+            x: { title: { display: true, text: "Hour of Day" } },
+            y: {
+              beginAtZero: true,
+              title: { display: true, text: "Spend (₹) / Customers" }
+            },
+            y1: {
+              position: "right",
+              beginAtZero: true,
+              title: { display: true, text: "Cost per Customer (₹)" },
+              grid: { drawOnChartArea: false }
+            }
+          }
+        }
+      });
+
+      // ---------- Graph 7 ----------
+      createOrUpdateChart("graph7", {
+        type: "bar",
+        data: {
+          labels: hours,
+          datasets: [
+            {
+              type: "bar",
+              label: "Hourly Bookings",
+              data: hourlyBookings,
+              backgroundColor: "#4e79a7",
+              datalabels: {
+                anchor: "end", align: "start",
+                formatter: v => v ? v : ""
+              }
+            },
+            {
+              type: "bar",
+              label: "Hourly Ad Spend (₹)",
+              data: hourlySpend,
+              backgroundColor: "#e15759",
+              datalabels: {
+                anchor: "end", align: "start",
+                formatter: v => v ? "₹" + v.toLocaleString("en-IN") : ""
+              }
+            },
+            {
+              type: "line",
+              label: "Cost per Booking (₹)",
+              data: costPerBooking,
+              borderColor: "green",
+              borderWidth: 2,
+              yAxisID: "y1",
+              tension: 0.2,
+              pointRadius: 3,
+              datalabels: {
+                anchor: "end",
+                align: "end",
+                formatter: v => v ? "₹" + v.toFixed(0) : ""
+              }
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: "index", intersect: false },
+          plugins: {
+            legend: { position: "bottom" },
+            datalabels: {
+              color: "#374151",
+              font: { size: 10, weight: "500" }
+            }
+          },
+          scales: {
+            x: { title: { display: true, text: "Hour of Day" } },
+            y: {
+              beginAtZero: true,
+              title: { display: true, text: "Bookings / Spend (₹)" }
+            },
+            y1: {
+              position: "right",
+              beginAtZero: true,
+              title: { display: true, text: "Cost per Booking (₹)" },
+              grid: { drawOnChartArea: false }
+            }
+          }
+        }
+      });
+
+      // ---------- Graph 8: Revenue + Spend (bars) + ROAS (line) ----------
+createOrUpdateChart("graph8", {
+  type: "bar",
+  data: {
+    labels: hours,
+    datasets: [
+      {
+        type: "bar",
+        label: "Hourly Revenue (₹)",
+        data: hourlyRevenue,
+        backgroundColor: "#4e79a7",
+        datalabels: {
+          anchor: "end",
+          align: "start",
+          formatter: v => v ? "₹" + v.toLocaleString("en-IN") : ""
+        }
+      },
+      {
+        type: "bar",
+        label: "Hourly Ad Spend (₹)",
+        data: hourlySpend,
+        backgroundColor: "#e15759",
+        // HIDE text labels for spend to avoid clutter
+        datalabels: {
+          display: false
+        }
+      },
+      {
+        type: "line",
+        label: "ROAS (x)",
+        data: roas,
+        borderColor: "green",
+        borderWidth: 2,
+        yAxisID: "y1",
+        tension: 0.2,
+        pointRadius: 3,
+        datalabels: {
+          anchor: "end",
+          align: "end",
+          // show ROAS only when meaningful and round to 1 decimal
+          formatter: v => (v && v > 0.2) ? v.toFixed(1) + "x" : ""
+        }
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: { mode: "index", intersect: false },
+    plugins: {
+      legend: { position: "bottom" },
+      datalabels: {
+        color: "#374151",
+        font: { size: 10, weight: "500" }
+      }
+    },
+    scales: {
+      x: { title: { display: true, text: "Hour of Day" } },
+      y: {
+        beginAtZero: true,
+        title: { display: true, text: "Revenue / Spend (₹)" }
+      },
+      y1: {
+        position: "right",
+        beginAtZero: true,
+        title: { display: true, text: "ROAS (x)" },
+        grid: { drawOnChartArea: false }
+      }
+    }
+  }
+});
+
+      const [y,m,d] = dateKey.split("-");
+      dateInfo.textContent = `Showing data for: ${d}-${m}-${y}`;
+    }
+
+    async function refreshDashboard() {
+      try {
+        const cacheBust = (SHEET_CSV_URL.includes("?") ? "&" : "?") + "cb=" + Date.now();
+        const res = await fetch(SHEET_CSV_URL + cacheBust);
+        const text = await res.text();
+        const parsed = parseCsv(text);
+        if (!parsed) return;
+
+        allRows = parsed.rows;
+        availableDates = parsed.dateKeys;
+        latestDateKey = parsed.latestDateKey;
+
+        const datePicker = document.getElementById("datePicker");
+        if (!selectedDateKey || !availableDates.includes(selectedDateKey)) {
+          selectedDateKey = latestDateKey;
+        }
+
+        datePicker.min = availableDates[0];
+        datePicker.max = latestDateKey;
+        datePicker.value = selectedDateKey;
+
+        renderDashboardForDate(selectedDateKey);
+
+        document.getElementById("lastUpdated").textContent =
+          "Last updated: " + new Date().toLocaleString("en-IN") +
+          " | Available dates: " + availableDates.join(", ");
+      } catch (e) {
+        console.error("Error loading sheet:", e);
+        document.getElementById("lastUpdated").textContent =
+          "Error loading data. Check console.";
+      }
+    }
+
+    document.getElementById("datePicker").addEventListener("change", e => {
+      selectedDateKey = e.target.value;
+      renderDashboardForDate(selectedDateKey);
+    });
+
+    refreshDashboard();
+    setInterval(refreshDashboard, 5 * 60 * 1000);
+  </script>
+</body>
+</html>
