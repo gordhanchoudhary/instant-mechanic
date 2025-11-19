@@ -163,18 +163,18 @@
         <div class="summary-values" id="summaryRevenue"></div>
       </div>
       <div class="summary-card">
-        <div class="summary-title">Avg Cost / Customer (₹)</div>
+        <div class="summary-title">Customers & Avg CPC (₹)</div>
         <div class="summary-subtitle">Cumulative up to 2nd, 5th, 10th, 17th, 23rd hr</div>
         <div class="summary-values" id="summaryCPCust"></div>
       </div>
       <div class="summary-card">
-        <div class="summary-title">Avg Cost / Booking (₹)</div>
+        <div class="summary-title">Bookings, CPB & Conv%</div>
         <div class="summary-subtitle">Cumulative up to 2nd, 5th, 10th, 17th, 23rd hr</div>
         <div class="summary-values" id="summaryCPBook"></div>
       </div>
       <div class="summary-card">
-        <div class="summary-title">ROAS (x)</div>
-        <div class="summary-subtitle">Cumulative up to 2nd, 5th, 10th, 17th, 23rd hr</div>
+        <div class="summary-title">Cancellations & ROAS</div>
+        <div class="summary-subtitle">Cancelled, Cancel %, ROAS (cum up to 2,5,10,17,23 hr)</div>
         <div class="summary-values" id="summaryROAS"></div>
       </div>
     </div>
@@ -235,7 +235,7 @@
     Chart.register(ChartDataLabels);
 
     // 👉 Your Sheet CSV link
-    const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTGlnFKI4M5RKKbU-DVD2ZMvXmcWXrCbn66l5j-0xnsJrMlAgQrUUNleVkZylxUaXLuEVeA6jeBSs_0/pub?gid=1708068657&single=true&output=csv";
+    const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTGlnFKI4M5RKKbU-DVD2ZMvXmcWXrCbn66l5j-0xnsJrMlAgQrUUNleVkZylxUaXLuEVeA6jeBSs_0/pub?gid=1312322610&single=true&output=csv";
 
     let allRows = [];
     let availableDates = [];
@@ -368,7 +368,7 @@
     }
 
     // 🔹 Update summary cards based on cumulative series
-    function updateSummaryCards(hours, customers, revenue, bookings, spend) {
+    function updateSummaryCards(hours, customers, revenue, bookings, spend, cancelled) {
       const checkpoints = [2, 5, 10, 17, 23]; // hours of day
       const fmtMoney = v => "₹" + Math.round(v).toLocaleString("en-IN");
       const fmtMoney0 = v => "₹" + (v || 0).toFixed(0);
@@ -402,20 +402,38 @@
           return;
         }
 
-        const cumSpend   = spend.cumulative[idx];
-        const cumRevenue = revenue.cumulative[idx];
-        const cumCust    = customers.cumulative[idx];
-        const cumBook    = bookings.cumulative[idx];
+        const cumSpend    = spend.cumulative[idx];
+        const cumRevenue  = revenue.cumulative[idx];
+        const cumCust     = customers.cumulative[idx];
+        const cumBook     = bookings.cumulative[idx];
+        const cumCancel   = cancelled.cumulative[idx];
 
-        const avgCPCust = cumCust > 0 ? cumSpend / cumCust : 0;
-        const avgCPBook = cumBook > 0 ? cumSpend / cumBook : 0;
-        const roas      = cumSpend > 0 ? cumRevenue / cumSpend : 0;
+        const avgCPCust   = cumCust > 0 ? cumSpend / cumCust : 0;
+        const avgCPBook   = cumBook > 0 ? cumSpend / cumBook : 0;
+        const roas        = cumSpend > 0 ? cumRevenue / cumSpend : 0;
+        const conv        = (cumCust > 0) ? (cumBook / cumCust) * 100 : null;
+        const cancelRate  = (cumBook > 0) ? (cumCancel / cumBook) * 100 : null;
+        const convStr     = conv !== null ? conv.toFixed(1) + "%" : "—";
+        const cancelStr   = cancelRate !== null ? cancelRate.toFixed(1) + "%" : "—";
 
+        // Card 1 & 2: just cumulative money
         linesSpend.push(`${label} → ${fmtMoney(cumSpend)}`);
         linesRevenue.push(`${label} → ${fmtMoney(cumRevenue)}`);
-        linesCPCust.push(`${label} → ${fmtMoney0(avgCPCust)}`);
-        linesCPBook.push(`${label} → ${fmtMoney0(avgCPBook)}`);
-        linesROAS.push(`${label} → ${fmtRoas(roas)}`);
+
+        // Card 3: customers + avg CPC
+        linesCPCust.push(
+          `${label} → ${cumCust.toLocaleString("en-IN")} cust, ${fmtMoney0(avgCPCust)} CPC`
+        );
+
+        // Card 4: bookings + avg CPB + conversion %
+        linesCPBook.push(
+          `${label} → ${cumBook.toLocaleString("en-IN")} book, ${fmtMoney0(avgCPBook)} CPB, ${convStr} Conv`
+        );
+
+        // Card 5: cancellations + cancel % + ROAS
+        linesROAS.push(
+          `${label} → ${cumCancel.toLocaleString("en-IN")} canc, ${cancelStr} Canc, ${fmtRoas(roas)} ROAS`
+        );
       });
 
       summarySpendEl.innerHTML   = linesSpend.join("<br>");
@@ -465,7 +483,7 @@
       const hourlySpend     = spend.hourly;
 
       // 🔹 Update summary cards (cumulative up to key hours)
-      updateSummaryCards(hours, customers, revenue, bookings, spend);
+      updateSummaryCards(hours, customers, revenue, bookings, spend, cancelled);
 
       // derived metrics
       const conversionRate = hourlyCustomers.map((c, i) =>
