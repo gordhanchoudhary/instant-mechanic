@@ -34,6 +34,45 @@
       color: #555;
       margin-bottom: 12px;
     }
+
+    /* 🔹 Summary cards row */
+    .summary-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 14px;
+      justify-content: space-between;
+    }
+    .summary-card {
+      flex: 1 1 230px;
+      min-width: 230px;
+      background: linear-gradient(135deg, #ffffff, #f9fafb);
+      border-radius: 14px;
+      padding: 8px 12px 10px;
+      box-shadow: 0 8px 16px rgba(15, 23, 42, 0.04);
+      border: 1px solid #e5e7eb;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .summary-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #111827;
+    }
+    .summary-subtitle {
+      font-size: 11px;
+      color: #6b7280;
+    }
+    .summary-values {
+      font-size: 11px;
+      line-height: 1.35;
+      color: #111827;
+      margin-top: 3px;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
     .controls {
       display: flex;
       justify-content: center;
@@ -48,6 +87,7 @@
       border-radius: 6px;
       border: 1px solid #d1d5db;
       font-size: 13px;
+      background: #ffffff;
     }
     #dateInfo {
       color: #666;
@@ -108,6 +148,35 @@
     <h1>Instant Mechanic – Hourly Business Dashboard</h1>
     <div class="subtitle">
       Bars = Hour-wise numbers &nbsp; | &nbsp; Lines = Cumulative / Efficiency metrics
+    </div>
+
+    <!-- 🔹 Summary cards -->
+    <div class="summary-row">
+      <div class="summary-card">
+        <div class="summary-title">Total Spend (₹)</div>
+        <div class="summary-subtitle">Cumulative up to 2nd, 5th, 10th, 17th, 23rd hr</div>
+        <div class="summary-values" id="summarySpend"></div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-title">Total Revenue (₹)</div>
+        <div class="summary-subtitle">Cumulative up to 2nd, 5th, 10th, 17th, 23rd hr</div>
+        <div class="summary-values" id="summaryRevenue"></div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-title">Avg Cost / Customer (₹)</div>
+        <div class="summary-subtitle">Cumulative up to 2nd, 5th, 10th, 17th, 23rd hr</div>
+        <div class="summary-values" id="summaryCPCust"></div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-title">Avg Cost / Booking (₹)</div>
+        <div class="summary-subtitle">Cumulative up to 2nd, 5th, 10th, 17th, 23rd hr</div>
+        <div class="summary-values" id="summaryCPBook"></div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-title">ROAS (x)</div>
+        <div class="summary-subtitle">Cumulative up to 2nd, 5th, 10th, 17th, 23rd hr</div>
+        <div class="summary-values" id="summaryROAS"></div>
+      </div>
     </div>
 
     <!-- Date picker -->
@@ -174,6 +243,12 @@
     let selectedDateKey = null;
     const charts = {};
 
+    const summarySpendEl   = document.getElementById("summarySpend");
+    const summaryRevenueEl = document.getElementById("summaryRevenue");
+    const summaryCPCustEl  = document.getElementById("summaryCPCust");
+    const summaryCPBookEl  = document.getElementById("summaryCPBook");
+    const summaryROASEl    = document.getElementById("summaryROAS");
+
     // 🔹 Helper: get today's dateKey in yyyy-mm-dd (matches your dateKey format)
     function getTodayKey() {
       const today = new Date();
@@ -200,7 +275,7 @@
       const idxRev    = header.indexOf("total_revenue");
       const idxBook   = header.indexOf("total_booking");
       const idxCancel = header.indexOf("total_cancelled_booking");
-      const idxSpend  = header.indexOf("total_spend"); // NEW cumulative spend column
+      const idxSpend  = header.indexOf("total_spend"); // cumulative spend column
 
       if (idxDate === -1 || idxTime === -1 || idxCust === -1 ||
           idxRev === -1 || idxBook === -1 || idxCancel === -1 || idxSpend === -1) {
@@ -292,6 +367,64 @@
       };
     }
 
+    // 🔹 Update summary cards based on cumulative series
+    function updateSummaryCards(hours, customers, revenue, bookings, spend) {
+      const checkpoints = [2, 5, 10, 17, 23]; // hours of day
+      const fmtMoney = v => "₹" + Math.round(v).toLocaleString("en-IN");
+      const fmtMoney0 = v => "₹" + (v || 0).toFixed(0);
+      const fmtRoas = v => (v && v > 0 ? v.toFixed(1) + "x" : "—");
+
+      if (!hours.length) {
+        summarySpendEl.textContent   = "No data";
+        summaryRevenueEl.textContent = "No data";
+        summaryCPCustEl.textContent  = "No data";
+        summaryCPBookEl.textContent  = "No data";
+        summaryROASEl.textContent    = "No data";
+        return;
+      }
+
+      const linesSpend   = [];
+      const linesRevenue = [];
+      const linesCPCust  = [];
+      const linesCPBook  = [];
+      const linesROAS    = [];
+
+      checkpoints.forEach(h => {
+        const label = h + "h";
+        const idx = hours.indexOf(h);
+
+        if (idx === -1) {
+          linesSpend.push(`${label} → —`);
+          linesRevenue.push(`${label} → —`);
+          linesCPCust.push(`${label} → —`);
+          linesCPBook.push(`${label} → —`);
+          linesROAS.push(`${label} → —`);
+          return;
+        }
+
+        const cumSpend   = spend.cumulative[idx];
+        const cumRevenue = revenue.cumulative[idx];
+        const cumCust    = customers.cumulative[idx];
+        const cumBook    = bookings.cumulative[idx];
+
+        const avgCPCust = cumCust > 0 ? cumSpend / cumCust : 0;
+        const avgCPBook = cumBook > 0 ? cumSpend / cumBook : 0;
+        const roas      = cumSpend > 0 ? cumRevenue / cumSpend : 0;
+
+        linesSpend.push(`${label} → ${fmtMoney(cumSpend)}`);
+        linesRevenue.push(`${label} → ${fmtMoney(cumRevenue)}`);
+        linesCPCust.push(`${label} → ${fmtMoney0(avgCPCust)}`);
+        linesCPBook.push(`${label} → ${fmtMoney0(avgCPBook)}`);
+        linesROAS.push(`${label} → ${fmtRoas(roas)}`);
+      });
+
+      summarySpendEl.innerHTML   = linesSpend.join("<br>");
+      summaryRevenueEl.innerHTML = linesRevenue.join("<br>");
+      summaryCPCustEl.innerHTML  = linesCPCust.join("<br>");
+      summaryCPBookEl.innerHTML  = linesCPBook.join("<br>");
+      summaryROASEl.innerHTML    = linesROAS.join("<br>");
+    }
+
     function renderDashboardForDate(dateKey) {
       if (!allRows.length) return;
 
@@ -307,6 +440,12 @@
           ch.data.datasets.forEach(d => d.data = []);
           ch.update();
         });
+        // Clear summary cards
+        summarySpendEl.textContent   = "No data";
+        summaryRevenueEl.textContent = "No data";
+        summaryCPCustEl.textContent  = "No data";
+        summaryCPBookEl.textContent  = "No data";
+        summaryROASEl.textContent    = "No data";
         return;
       }
 
@@ -324,6 +463,9 @@
       const hourlyBookings  = bookings.hourly;
       const hourlyCancelled = cancelled.hourly;
       const hourlySpend     = spend.hourly;
+
+      // 🔹 Update summary cards (cumulative up to key hours)
+      updateSummaryCards(hours, customers, revenue, bookings, spend);
 
       // derived metrics
       const conversionRate = hourlyCustomers.map((c, i) =>
