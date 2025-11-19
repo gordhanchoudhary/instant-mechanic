@@ -1,0 +1,14 @@
+{
+  "rewrites": [
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "host",
+          "value": "instant-tow.online"
+        }
+      ],
+      "destination": "/towing-web.html"
+    }
+  ]
+}
