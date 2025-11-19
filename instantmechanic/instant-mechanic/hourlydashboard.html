@@ -165,8 +165,7 @@
   <script>
     Chart.register(ChartDataLabels);
 
-    // 👉 PUT YOUR SHEET CSV LINK HERE
-    // Example: "https://docs.google.com/spreadsheets/d/XXX/export?format=csv"
+    // 👉 Your Sheet CSV link
     const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTGlnFKI4M5RKKbU-DVD2ZMvXmcWXrCbn66l5j-0xnsJrMlAgQrUUNleVkZylxUaXLuEVeA6jeBSs_0/pub?gid=1312322610&single=true&output=csv";
 
     let allRows = [];
@@ -174,6 +173,15 @@
     let latestDateKey = null;
     let selectedDateKey = null;
     const charts = {};
+
+    // 🔹 Helper: get today's dateKey in yyyy-mm-dd (matches your dateKey format)
+    function getTodayKey() {
+      const today = new Date();
+      const yyyy = today.getFullYear();
+      const mm   = String(today.getMonth() + 1).padStart(2, "0");
+      const dd   = String(today.getDate()).padStart(2, "0");
+      return `${yyyy}-${mm}-${dd}`;
+    }
 
     function parseIndianDateAndKey(str) {
       const [d, m, y] = str.split("-").map(Number);
@@ -697,76 +705,74 @@
       });
 
       // ---------- Graph 8: Revenue + Spend (bars) + ROAS (line) ----------
-createOrUpdateChart("graph8", {
-  type: "bar",
-  data: {
-    labels: hours,
-    datasets: [
-      {
+      createOrUpdateChart("graph8", {
         type: "bar",
-        label: "Hourly Revenue (₹)",
-        data: hourlyRevenue,
-        backgroundColor: "#4e79a7",
-        datalabels: {
-          anchor: "end",
-          align: "start",
-          formatter: v => v ? "₹" + v.toLocaleString("en-IN") : ""
+        data: {
+          labels: hours,
+          datasets: [
+            {
+              type: "bar",
+              label: "Hourly Revenue (₹)",
+              data: hourlyRevenue,
+              backgroundColor: "#4e79a7",
+              datalabels: {
+                anchor: "end",
+                align: "start",
+                formatter: v => v ? "₹" + v.toLocaleString("en-IN") : ""
+              }
+            },
+            {
+              type: "bar",
+              label: "Hourly Ad Spend (₹)",
+              data: hourlySpend,
+              backgroundColor: "#e15759",
+              datalabels: {
+                display: false   // hide to reduce clutter
+              }
+            },
+            {
+              type: "line",
+              label: "ROAS (x)",
+              data: roas,
+              borderColor: "green",
+              borderWidth: 2,
+              yAxisID: "y1",
+              tension: 0.2,
+              pointRadius: 3,
+              datalabels: {
+                anchor: "end",
+                align: "end",
+                formatter: v => (v && v > 0.2) ? v.toFixed(1) + "x" : ""
+              }
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: "index", intersect: false },
+          plugins: {
+            legend: { position: "bottom" },
+            datalabels: {
+              color: "#374151",
+              font: { size: 10, weight: "500" }
+            }
+          },
+          scales: {
+            x: { title: { display: true, text: "Hour of Day" } },
+            y: {
+              beginAtZero: true,
+              title: { display: true, text: "Revenue / Spend (₹)" }
+            },
+            y1: {
+              position: "right",
+              beginAtZero: true,
+              title: { display: true, text: "ROAS (x)" },
+              grid: { drawOnChartArea: false }
+            }
+          }
         }
-      },
-      {
-        type: "bar",
-        label: "Hourly Ad Spend (₹)",
-        data: hourlySpend,
-        backgroundColor: "#e15759",
-        // HIDE text labels for spend to avoid clutter
-        datalabels: {
-          display: false
-        }
-      },
-      {
-        type: "line",
-        label: "ROAS (x)",
-        data: roas,
-        borderColor: "green",
-        borderWidth: 2,
-        yAxisID: "y1",
-        tension: 0.2,
-        pointRadius: 3,
-        datalabels: {
-          anchor: "end",
-          align: "end",
-          // show ROAS only when meaningful and round to 1 decimal
-          formatter: v => (v && v > 0.2) ? v.toFixed(1) + "x" : ""
-        }
-      }
-    ]
-  },
-  options: {
-    responsive: true,
-    maintainAspectRatio: false,
-    interaction: { mode: "index", intersect: false },
-    plugins: {
-      legend: { position: "bottom" },
-      datalabels: {
-        color: "#374151",
-        font: { size: 10, weight: "500" }
-      }
-    },
-    scales: {
-      x: { title: { display: true, text: "Hour of Day" } },
-      y: {
-        beginAtZero: true,
-        title: { display: true, text: "Revenue / Spend (₹)" }
-      },
-      y1: {
-        position: "right",
-        beginAtZero: true,
-        title: { display: true, text: "ROAS (x)" },
-        grid: { drawOnChartArea: false }
-      }
-    }
-  }
-});
+      });
 
       const [y,m,d] = dateKey.split("-");
       dateInfo.textContent = `Showing data for: ${d}-${m}-${y}`;
@@ -785,8 +791,19 @@ createOrUpdateChart("graph8", {
         latestDateKey = parsed.latestDateKey;
 
         const datePicker = document.getElementById("datePicker");
-        if (!selectedDateKey || !availableDates.includes(selectedDateKey)) {
-          selectedDateKey = latestDateKey;
+        const todayKey = getTodayKey();
+
+        // Decide which date to show:
+        // 1) If nothing selected yet → try today's date, else latest date
+        // 2) If previously selected date no longer exists → same fallback
+        if (!selectedDateKey) {
+          selectedDateKey = availableDates.includes(todayKey)
+            ? todayKey
+            : latestDateKey;
+        } else if (!availableDates.includes(selectedDateKey)) {
+          selectedDateKey = availableDates.includes(todayKey)
+            ? todayKey
+            : latestDateKey;
         }
 
         datePicker.min = availableDates[0];
