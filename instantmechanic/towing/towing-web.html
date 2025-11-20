@@ -1,0 +1,1238 @@
+<!DOCTYPE html>
+<!--
+    STANDALONE CAR RESCUE WEBSITE - 100% MOBILE RESPONSIVE
+    
+    TO ADD YOUR IMAGES:
+    Option 1: Use online base64 converter
+    1. Go to https://www.base64-image.de/ or similar
+    2. Upload each image from src/assets/
+    3. Copy the base64 data URL
+    4. Replace the placeholder data URLs in the HTML below (search for "data:image")
+    
+    Option 2: Use local images folder
+    1. Create an "images" folder next to this HTML file
+    2. Copy images from src/assets/ to images/
+    3. The paths are already set to "images/filename.jpg"
+    
+    This file works without images but looks better with them!
+-->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>24/7 Car Towing Crane Service & Multi-Brand Garage | Delhi NCR</title>
+    <meta name="description" content="Professional 24/7 car towing crane service with flatbed and underlift cranes. Expert multi-brand garage repair for accidents, breakdowns & more in Delhi NCR, Gurugram, Noida.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html {
+            overflow-x: hidden;
+            width: 100%;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f9fafb;
+            color: #1a1a1a;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 1rem;
+            }
+        }
+
+        /* Header */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #e5e7eb;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        
+        @media (max-width: 768px) {
+            .logo {
+                font-size: 1.25rem;
+            }
+        }
+
+        .logo-primary {
+            color: #f97316;
+        }
+
+        .header-buttons {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+        
+        @media (max-width: 768px) {
+            .header-buttons {
+                gap: 0.5rem;
+            }
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: none;
+            font-size: 0.875rem;
+        }
+        
+        @media (max-width: 768px) {
+            .btn {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.8125rem;
+            }
+        }
+
+        .btn-primary {
+            background: #f97316;
+            color: white;
+            box-shadow: 0 0 20px rgba(249, 115, 22, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: #ea580c;
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #f97316;
+            color: #f97316;
+        }
+
+        .btn-outline:hover {
+            background: #f97316;
+            color: white;
+        }
+
+        /* Hero Section */
+        .hero {
+            position: relative;
+            min-height: 600px;
+            display: flex;
+            align-items: center;
+             background: linear-gradient(rgba(255, 255, 255, 0.58), rgba(255, 255, 255, 0.85)), url('assets/images/hero-towing.jpg');
+            background-position: center;
+        }
+        
+        /* Add hero background image when available */
+        .hero.has-image {
+            background: linear-gradient(rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.85)), url('assets/images/hero-towing.jpg');
+            background-size: cover;
+            background-position: center;
+        }
+        
+        @media (max-width: 768px) {
+            .hero {
+                min-height: 500px;
+                padding: 2rem 0;
+            }
+        }
+
+        .hero-content {
+            text-align: center;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+        
+        @media (max-width: 768px) {
+            .hero-content {
+                padding: 1.5rem 1rem;
+            }
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+        
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .hero h1 {
+                font-size: 1.75rem;
+            }
+        }
+
+        .hero-highlight {
+            color: #f97316;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: #4b5563;
+            margin-bottom: 2rem;
+        }
+        
+        @media (max-width: 768px) {
+            .hero p {
+                font-size: 1rem;
+            }
+        }
+
+        .hero-features {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+        
+        @media (max-width: 768px) {
+            .hero-features {
+                gap: 1rem;
+                margin: 1.5rem 0;
+            }
+        }
+
+        .hero-feature {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1rem;
+        }
+        
+        @media (max-width: 768px) {
+            .hero-feature {
+                font-size: 0.875rem;
+            }
+        }
+
+        /* Section Styles */
+        section {
+            padding: 5rem 0;
+        }
+        
+        @media (max-width: 768px) {
+            section {
+                padding: 3rem 0;
+            }
+        }
+
+        .section-dark {
+            background: #ffffff;
+        }
+
+        .section-darker {
+            background: #f3f4f6;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        @media (max-width: 768px) {
+            .section-title {
+                margin-bottom: 2rem;
+            }
+        }
+
+        .section-title h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+        
+        @media (max-width: 768px) {
+            .section-title h2 {
+                font-size: 1.875rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .section-title h2 {
+                font-size: 1.5rem;
+            }
+        }
+
+        .section-title p {
+            font-size: 1.25rem;
+            color: #6b7280;
+        }
+        
+        @media (max-width: 768px) {
+            .section-title p {
+                font-size: 1rem;
+            }
+        }
+
+        /* Card Grid */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        
+        @media (max-width: 768px) {
+            .card-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+        }
+
+        .card {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 1rem;
+            padding: 2rem;
+            transition: all 0.3s;
+        }
+        
+        @media (max-width: 768px) {
+            .card {
+                padding: 1.5rem;
+            }
+        }
+
+        .card:hover {
+            border-color: #f97316;
+            box-shadow: 0 0 20px rgba(249, 115, 22, 0.3);
+            transform: translateY(-5px);
+        }
+
+        .card-icon {
+            width: 3rem;
+            height: 3rem;
+            background: #f97316;
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: #1a1a1a;
+        }
+        
+        @media (max-width: 768px) {
+            .card h3 {
+                font-size: 1.25rem;
+            }
+        }
+
+        .card p {
+            color: #6b7280;
+            line-height: 1.7;
+        }
+
+        .card-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 0.5rem;
+            margin-top: 1rem;
+        }
+        
+        @media (max-width: 768px) {
+            .card-image {
+                height: 180px;
+            }
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+        
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+                margin: 2rem 0;
+            }
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 2rem;
+            background: #ffffff;
+            border: 2px solid #f97316;
+            border-radius: 1rem;
+        }
+        
+        @media (max-width: 768px) {
+            .stat-card {
+                padding: 1.5rem;
+            }
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #f97316;
+            margin-bottom: 0.5rem;
+        }
+        
+        @media (max-width: 768px) {
+            .stat-number {
+                font-size: 2rem;
+            }
+        }
+
+        /* Service Areas */
+        .areas-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        @media (max-width: 768px) {
+            .areas-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.75rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .areas-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .area-card {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        
+        @media (max-width: 768px) {
+            .area-card {
+                padding: 1rem;
+            }
+        }
+
+        .area-card:hover {
+            border-color: #f97316;
+            box-shadow: 0 0 15px rgba(249, 115, 22, 0.3);
+        }
+
+        /* Contact Form */
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        
+        @media (max-width: 768px) {
+            .contact-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+                margin-bottom: 2rem;
+            }
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            color: #1a1a1a;
+            font-family: inherit;
+        }
+
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        /* Map */
+        .map-container {
+            text-align: center;
+            margin: 3rem 0;
+        }
+        
+        @media (max-width: 768px) {
+            .map-container {
+                margin: 2rem 0;
+            }
+            
+            .map-container h3 {
+                font-size: 1.25rem;
+            }
+        }
+
+        .map-image {
+            max-width: 100%;
+            width: 100%;
+            height: auto;
+            border-radius: 1rem;
+            border: 2px solid #e5e7eb;
+        }
+        
+        @media (max-width: 768px) {
+            .map-image {
+                border-radius: 0.75rem;
+            }
+        }
+
+        /* Footer */
+        footer {
+            background: #f3f4f6;
+            border-top: 1px solid #e5e7eb;
+            padding: 3rem 0 1rem;
+        }
+        
+        @media (max-width: 768px) {
+            footer {
+                padding: 2rem 0 1rem;
+            }
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+            margin-bottom: 2rem;
+        }
+        
+        @media (max-width: 768px) {
+            .footer-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+                margin-bottom: 1.5rem;
+            }
+        }
+
+        .footer-section h3 {
+            margin-bottom: 1rem;
+            color: #f97316;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-section a {
+            color: #6b7280;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-section a:hover {
+            color: #f97316;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid #e5e7eb;
+            color: #6b7280;
+        }
+        
+        @media (max-width: 768px) {
+            .footer-bottom {
+                padding-top: 1.5rem;
+                font-size: 0.875rem;
+            }
+        }
+
+        /* Animation */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate {
+            animation: fadeInUp 0.6s ease-out;
+        }
+        
+        /* Mobile-specific utilities */
+        @media (max-width: 768px) {
+            .header-content {
+                padding: 0.75rem 0;
+            }
+            
+            h1, h2, h3, h4, h5, h6 {
+                word-wrap: break-word;
+                overflow-wrap: break-word;
+            }
+            
+            /* Ensure cards and containers don't overflow */
+            .container > * {
+                max-width: 100%;
+            }
+            
+            /* Better touch targets */
+            .btn, a, button {
+                min-height: 44px;
+                min-width: 44px;
+            }
+            
+            /* Hero CTA buttons responsive */
+            .hero .header-buttons {
+                flex-wrap: wrap;
+                margin-top: 1.5rem !important;
+            }
+            
+            .hero .btn {
+                font-size: 1rem !important;
+                padding: 0.875rem 1.5rem !important;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .header-buttons {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .btn {
+                flex: 1;
+                justify-content: center;
+                max-width: 150px;
+            }
+            
+            .hero .btn {
+                font-size: 0.9rem !important;
+                padding: 0.75rem 1.25rem !important;
+                min-width: auto;
+                flex: 1 1 auto;
+            }
+            
+            .hero .header-buttons {
+                gap: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <span class="logo-primary">Car</span><span>Rescue</span>
+                </div>
+                <div class="header-buttons">
+                    <a href="tel:+919876543210" class="btn btn-primary">
+                        📞 Call Now
+                    </a>
+                    <a href="https://wa.me/919876543210" target="_blank" class="btn btn-outline">
+                        💬 WhatsApp
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content animate">
+                <h1>
+                    24/7 Emergency <span class="hero-highlight">Car Towing</span><br>
+                    & Multi-Brand Garage Services
+                </h1>
+                <p>Fast, reliable crane services with expert garage repairs across Delhi NCR</p>
+                <div class="hero-features">
+                    <div class="hero-feature">✓ 24/7 Availability</div>
+                    <div class="hero-feature">✓ 15 Min Response</div>
+                    <div class="hero-feature">✓ Expert Technicians</div>
+                </div>
+                <div class="header-buttons" style="justify-content: center; margin-top: 2rem;">
+                    <a href="tel:+919876543210" class="btn btn-primary" style="font-size: 1.1rem; padding: 1rem 2rem;">
+                        📞 Call Now
+                    </a>
+                    <a href="https://wa.me/919876543210" target="_blank" class="btn btn-outline" style="font-size: 1.1rem; padding: 1rem 2rem;">
+                        💬 WhatsApp Us
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Towing Services -->
+    <section class="section-dark">
+        <div class="container">
+            <div class="section-title animate">
+                <h2>Professional <span class="hero-highlight">Towing Services</span></h2>
+                <p>State-of-the-art equipment for safe vehicle transportation</p>
+            </div>
+            <div class="card-grid">
+                <div class="card animate">
+                    <div class="card-icon">🚙</div>
+                    <h3>Accident Vehicle Towing</h3>
+                    <p>Specialized handling of damaged vehicles with care and precision. Quick response to accident sites.</p>
+                    <img src="assets/images/accident-towing.jpg" alt="Accident Vehicle Towing" class="card-image" loading="lazy" onerror="this.style.display='none'">
+                </div>
+                <div class="card animate">
+                    <div class="card-icon">🏗️</div>
+                    <h3>Flatbed Crane Service</h3>
+                    <p>Safest option for luxury and sports cars. Complete vehicle protection during transport.</p>
+                    <img src="assets/images/flatbed-crane.jpg" alt="Flatbed Crane Service" class="card-image" loading="lazy" onerror="this.style.display='none'">
+                </div>
+                <div class="card animate">
+                    <div class="card-icon">🔧</div>
+                    <h3>Underlift Crane Service</h3>
+                    <p>Efficient towing for regular vehicles. Quick pickup and secure transportation.</p>
+                    <img src="assets/images/underlift-crane.jpg" alt="Underlift Crane Service" class="card-image" loading="lazy" onerror="this.style.display='none'">
+                </div>
+            </div>
+            <div class="card" style="margin-top: 3rem; text-align: center; background: linear-gradient(135deg, #f97316, #ea580c);">
+                <h3 style="font-size: 1.75rem;">✨ Towing + Workshop Repairs Included</h3>
+                <p style="color: white; font-size: 1.1rem;">We don't just tow - we fix! All towing services include expert garage repairs at our partner workshops.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Garage Services -->
+    <section class="section-darker">
+        <div class="container">
+            <div class="section-title animate">
+                <h2>Multi-Brand <span class="hero-highlight">Garage Services</span></h2>
+                <p>Expert repairs for all car brands with genuine parts</p>
+            </div>
+            <div class="card-grid">
+                <div class="card animate">
+                    <div class="card-icon">🔩</div>
+                    <h3>Complete Car Repair</h3>
+                    <p>Full-service repairs for all mechanical and electrical issues with warranty.</p>
+                    <img src="assets/images/garage-repair.jpg" alt="Complete Car Repair" class="card-image" loading="lazy" onerror="this.style.display='none'">
+                </div>
+                <div class="card animate">
+                    <div class="card-icon">⚙️</div>
+                    <h3>Engine Overhaul</h3>
+                    <p>Expert engine diagnostics and complete overhaul services by certified technicians.</p>
+                    <img src="assets/images/garage-engine.jpg" alt="Engine Overhaul" class="card-image" loading="lazy" onerror="this.style.display='none'">
+                </div>
+                <div class="card animate">
+                    <div class="card-icon">🎨</div>
+                    <h3>Body Paint & Denting</h3>
+                    <p>Professional painting and denting services to restore your car's original look.</p>
+                    <img src="assets/images/garage-paint.jpg" alt="Body Paint & Denting" class="card-image" loading="lazy" onerror="this.style.display='none'">
+                </div>
+            </div>
+
+            <div class="stats-grid" style="margin-top: 4rem;">
+                <div class="stat-card animate">
+                    <div class="stat-number">100%</div>
+                    <div>Original Parts</div>
+                </div>
+                <div class="stat-card animate">
+                    <div class="stat-number">24/7</div>
+                    <div>Support Available</div>
+                </div>
+                <div class="stat-card animate">
+                    <div class="stat-number">500+</div>
+                    <div>Happy Customers</div>
+                </div>
+            </div>
+
+            
+
+            <div class="map-container animate">
+                <h3 style="margin-bottom: 1.5rem; font-size: 1.75rem;">10+ garages serving entire region</h3>
+                <img src="assets/images/delhi-ncr-map.png" alt="Delhi NCR Service Map" class="map-image" loading="lazy" onerror="this.style.display='none'; this.parentElement.innerHTML='<p style=color:#f97316;text-align:center;padding:2rem;>Service Map: All Delhi NCR Areas Covered</p>'">
+            </div>
+        </div>
+    </section>
+
+    <!-- Before & After Gallery -->
+    <section class="section-dark">
+        <div class="container">
+            <div class="section-title animate">
+                <h2><span class="hero-highlight">Before & After</span> Gallery</h2>
+                <p>See the quality of our work - From damaged to brand new condition</p>
+            </div>
+            
+            <div class="card-grid" style="grid-template-columns: 1fr;">
+                <!-- Gallery Item 1 -->
+                <div class="card animate" style="padding: 0; overflow: hidden;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr;">
+                        <!-- Before -->
+                        <div style="position: relative; aspect-ratio: 4/3; background: #e5e7eb; display: flex; align-items: center; justify-content: center; border-right: 1px solid #d1d5db;">
+                            <div style="text-align: center; padding: 1rem;">
+                                <div style="position: absolute; top: 0.75rem; left: 0.75rem; padding: 0.25rem 0.75rem; background: #ef4444; color: white; font-size: 0.75rem; font-weight: 600; border-radius: 9999px;">
+                                    BEFORE
+                                </div>
+                                <div style="color: #6b7280; font-weight: 500;">
+                                    Before Image 1
+                                </div>
+                                <p style="font-size: 0.875rem; color: #9ca3af; margin-top: 0.5rem;">
+                                    Upload your photos here
+                                </p>
+                            </div>
+                        </div>
+                        <!-- After -->
+                        <div style="position: relative; aspect-ratio: 4/3; background: #e5e7eb; display: flex; align-items: center; justify-content: center;">
+                            <div style="text-align: center; padding: 1rem;">
+                                <div style="position: absolute; top: 0.75rem; right: 0.75rem; padding: 0.25rem 0.75rem; background: #f97316; color: white; font-size: 0.75rem; font-weight: 600; border-radius: 9999px;">
+                                    AFTER
+                                </div>
+                                <div style="color: #6b7280; font-weight: 500;">
+                                    After Image 1
+                                </div>
+                                <p style="font-size: 0.875rem; color: #9ca3af; margin-top: 0.5rem;">
+                                    Upload your photos here
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gallery Item 2 -->
+                <div class="card animate" style="padding: 0; overflow: hidden;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr;">
+                        <!-- Before -->
+                        <div style="position: relative; aspect-ratio: 4/3; background: #e5e7eb; display: flex; align-items: center; justify-content: center; border-right: 1px solid #d1d5db;">
+                            <div style="text-align: center; padding: 1rem;">
+                                <div style="position: absolute; top: 0.75rem; left: 0.75rem; padding: 0.25rem 0.75rem; background: #ef4444; color: white; font-size: 0.75rem; font-weight: 600; border-radius: 9999px;">
+                                    BEFORE
+                                </div>
+                                <div style="color: #6b7280; font-weight: 500;">
+                                    Before Image 2
+                                </div>
+                                <p style="font-size: 0.875rem; color: #9ca3af; margin-top: 0.5rem;">
+                                    Upload your photos here
+                                </p>
+                            </div>
+                        </div>
+                        <!-- After -->
+                        <div style="position: relative; aspect-ratio: 4/3; background: #e5e7eb; display: flex; align-items: center; justify-content: center;">
+                            <div style="text-align: center; padding: 1rem;">
+                                <div style="position: absolute; top: 0.75rem; right: 0.75rem; padding: 0.25rem 0.75rem; background: #f97316; color: white; font-size: 0.75rem; font-weight: 600; border-radius: 9999px;">
+                                    AFTER
+                                </div>
+                                <div style="color: #6b7280; font-weight: 500;">
+                                    After Image 2
+                                </div>
+                                <p style="font-size: 0.875rem; color: #9ca3af; margin-top: 0.5rem;">
+                                    Upload your photos here
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gallery Item 3 -->
+                <div class="card animate" style="padding: 0; overflow: hidden;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr;">
+                        <!-- Before -->
+                        <div style="position: relative; aspect-ratio: 4/3; background: #e5e7eb; display: flex; align-items: center; justify-content: center; border-right: 1px solid #d1d5db;">
+                            <div style="text-align: center; padding: 1rem;">
+                                <div style="position: absolute; top: 0.75rem; left: 0.75rem; padding: 0.25rem 0.75rem; background: #ef4444; color: white; font-size: 0.75rem; font-weight: 600; border-radius: 9999px;">
+                                    BEFORE
+                                </div>
+                                <div style="color: #6b7280; font-weight: 500;">
+                                    Before Image 3
+                                </div>
+                                <p style="font-size: 0.875rem; color: #9ca3af; margin-top: 0.5rem;">
+                                    Upload your photos here
+                                </p>
+                            </div>
+                        </div>
+                        <!-- After -->
+                        <div style="position: relative; aspect-ratio: 4/3; background: #e5e7eb; display: flex; align-items: center; justify-content: center;">
+                            <div style="text-align: center; padding: 1rem;">
+                                <div style="position: absolute; top: 0.75rem; right: 0.75rem; padding: 0.25rem 0.75rem; background: #f97316; color: white; font-size: 0.75rem; font-weight: 600; border-radius: 9999px;">
+                                    AFTER
+                                </div>
+                                <div style="color: #6b7280; font-weight: 500;">
+                                    After Image 3
+                                </div>
+                                <p style="font-size: 0.875rem; color: #9ca3af; margin-top: 0.5rem;">
+                                    Upload your photos here
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gallery Item 4 -->
+                <div class="card animate" style="padding: 0; overflow: hidden;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr;">
+                        <!-- Before -->
+                        <div style="position: relative; aspect-ratio: 4/3; background: #e5e7eb; display: flex; align-items: center; justify-content: center; border-right: 1px solid #d1d5db;">
+                            <div style="text-align: center; padding: 1rem;">
+                                <div style="position: absolute; top: 0.75rem; left: 0.75rem; padding: 0.25rem 0.75rem; background: #ef4444; color: white; font-size: 0.75rem; font-weight: 600; border-radius: 9999px;">
+                                    BEFORE
+                                </div>
+                                <div style="color: #6b7280; font-weight: 500;">
+                                    Before Image 4
+                                </div>
+                                <p style="font-size: 0.875rem; color: #9ca3af; margin-top: 0.5rem;">
+                                    Upload your photos here
+                                </p>
+                            </div>
+                        </div>
+                        <!-- After -->
+                        <div style="position: relative; aspect-ratio: 4/3; background: #e5e7eb; display: flex; align-items: center; justify-content: center;">
+                            <div style="text-align: center; padding: 1rem;">
+                                <div style="position: absolute; top: 0.75rem; right: 0.75rem; padding: 0.25rem 0.75rem; background: #f97316; color: white; font-size: 0.75rem; font-weight: 600; border-radius: 9999px;">
+                                    AFTER
+                                </div>
+                                <div style="color: #6b7280; font-weight: 500;">
+                                    After Image 4
+                                </div>
+                                <p style="font-size: 0.875rem; color: #9ca3af; margin-top: 0.5rem;">
+                                    Upload your photos here
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 2.5rem;">
+                <p style="color: #9ca3af; font-style: italic;">
+                    * Upload your actual before-after photos to replace these placeholders
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="section-dark">
+        <div class="container">
+            <div class="section-title animate">
+                <h2>How It <span class="hero-highlight">Works</span></h2>
+                <p>Simple 4-step process to get your car rescued</p>
+            </div>
+            <div class="card-grid">
+                <div class="card animate">
+                    <div class="card-icon">📞</div>
+                    <h3>1. Contact Us</h3>
+                    <p>Call or WhatsApp us anytime, 24/7. We're always ready to help.</p>
+                </div>
+                <div class="card animate">
+                    <div class="card-icon">📍</div>
+                    <h3>2. Share Location</h3>
+                    <p>Tell us your location and we'll dispatch the nearest crane immediately.</p>
+                </div>
+                <div class="card animate">
+                    <div class="card-icon">🚛</div>
+                    <h3>3. Quick Pickup</h3>
+                    <p>Our expert team arrives within 15-30 minutes to safely tow your vehicle.</p>
+                </div>
+                <div class="card animate">
+                    <div class="card-icon">🔧</div>
+                    <h3>4. Expert Repair</h3>
+                    <p>Vehicle is taken to our garage where skilled technicians handle repairs.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Why Choose Us -->
+    <section class="section-darker">
+        <div class="container">
+            <div class="section-title animate">
+                <h2>Why Choose <span class="hero-highlight">Us</span></h2>
+                <p>Trusted by thousands of customers across Delhi NCR</p>
+            </div>
+            <div class="card-grid">
+                <div class="card animate">
+                    <div class="card-icon">⚡</div>
+                    <h3>24/7 Emergency Service</h3>
+                    <p>We're always available, day or night, whenever you need us most.</p>
+                </div>
+                <div class="card animate">
+                    <div class="card-icon">🎯</div>
+                    <h3>15-Min Response Time</h3>
+                    <p>Fastest response in Delhi NCR with strategically located cranes.</p>
+                </div>
+                <div class="card animate">
+                    <div class="card-icon">👨‍🔧</div>
+                    <h3>Expert Technicians</h3>
+                    <p>Certified professionals with years of experience in all car brands.</p>
+                </div>
+                <div class="card animate">
+                    <div class="card-icon">💰</div>
+                    <h3>Transparent Pricing</h3>
+                    <p>No hidden charges. Clear pricing discussed upfront before service.</p>
+                </div>
+                <div class="card animate">
+                    <div class="card-icon">🛡️</div>
+                    <h3>Insurance Assistance</h3>
+                    <p>We help with insurance claims and paperwork for accident cases.</p>
+                </div>
+                <div class="card animate">
+                    <div class="card-icon">⭐</div>
+                    <h3>Quality Guarantee</h3>
+                    <p>All repairs come with warranty and we use only genuine parts.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Service Areas -->
+    <section class="section-dark">
+        <div class="container">
+            <div class="section-title animate">
+                <h2>Service <span class="hero-highlight">Areas</span></h2>
+                <p>We serve the entire Delhi NCR region with fast response times</p>
+            </div>
+            <div class="areas-grid">
+                <div class="area-card animate">📍 Delhi NCR</div>
+                <div class="area-card animate">📍 Gurugram</div>
+                <div class="area-card animate">📍 Noida</div>
+                <div class="area-card animate">📍 Faridabad</div>
+                <div class="area-card animate">📍 Ghaziabad</div>
+                <div class="area-card animate">📍 Greater Noida</div>
+                <div class="area-card animate">📍 New Delhi</div>
+                <div class="area-card animate">📍 Dwarka</div>
+            </div>
+            <div style="text-align: center; margin-top: 2rem;">
+                <p style="color: #6b7280;">Don't see your area? <span style="color: #f97316; font-weight: 600;">Call us</span> - we may still be able to help!</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Form -->
+    <section class="section-darker" id="contact">
+        <div class="container">
+            <div class="section-title animate">
+                <h2>Get in <span class="hero-highlight">Touch</span></h2>
+                <p>Reach out to us for emergency assistance or booking</p>
+            </div>
+            
+            <div class="contact-grid">
+                <div class="card animate">
+                    <div class="card-icon">📞</div>
+                    <h3>Phone</h3>
+                    <p><a href="tel:+919876543210" style="color: #f97316;">+91 98765 43210</a></p>
+                </div>
+                <div class="card animate">
+                    <div class="card-icon">💬</div>
+                    <h3>WhatsApp</h3>
+                    <p><a href="https://wa.me/919876543210" target="_blank" style="color: #f97316;">Chat with us</a></p>
+                </div>
+                <div class="card animate">
+                    <div class="card-icon">✉️</div>
+                    <h3>Email</h3>
+                    <p><a href="mailto:support@carrescue.com" style="color: #f97316;">support@carrescue.com</a></p>
+                </div>
+                <div class="card animate">
+                    <div class="card-icon">📍</div>
+                    <h3>Location</h3>
+                    <p>Delhi NCR, India</p>
+                </div>
+            </div>
+
+            <div class="card animate" style="margin-top: 3rem;">
+                <h3 style="margin-bottom: 1.5rem; text-align: center; font-size: 1.75rem;">Book Your Service</h3>
+                <form id="contactForm">
+                    <div class="form-group">
+                        <label for="name">Full Name *</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Phone Number *</label>
+                        <input type="tel" id="phone" name="phone" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="car">Car Model *</label>
+                        <input type="text" id="car" name="car" placeholder="e.g., Maruti Swift, Honda City" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="issue">Issue Description *</label>
+                        <textarea id="issue" name="issue" placeholder="Describe your problem..." required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="location">Location *</label>
+                        <input type="text" id="location" name="location" placeholder="Your current location" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%; padding: 1rem; font-size: 1.1rem;">
+                        📱 Send via WhatsApp
+                    </button>
+                </form>
+                <div style="text-align: center; margin-top: 1rem;">
+                    <p style="color: #6b7280;">Or call us directly: <a href="tel:+919876543210" style="color: #f97316; font-weight: 600;">+91 98765 43210</a></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-section">
+                    <div class="logo" style="margin-bottom: 1rem;">
+                        <span class="logo-primary">Car</span><span>Rescue</span>
+                    </div>
+                    <p style="color: #6b7280;">Your trusted partner for 24/7 emergency car towing and multi-brand garage services across Delhi NCR.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="#services">Services</a></li>
+                        <li><a href="#about">About Us</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                        <li><a href="#areas">Service Areas</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Services</h3>
+                    <ul>
+                        <li><a href="#">Car Towing</a></li>
+                        <li><a href="#">Accident Recovery</a></li>
+                        <li><a href="#">Garage Repair</a></li>
+                        <li><a href="#">Emergency Service</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Contact Info</h3>
+                    <ul>
+                        <li>📞 +91 98765 43210</li>
+                        <li>💬 WhatsApp Available</li>
+                        <li>✉️ support@carrescue.com</li>
+                        <li>📍 Delhi NCR, India</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 CarRescue. All rights reserved. | <a href="#" style="color: #6b7280;">Privacy Policy</a> | <a href="#" style="color: #6b7280;">Terms of Service</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+
+        // Form submission handler
+        document.getElementById('contactForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                name: document.getElementById('name').value,
+                phone: document.getElementById('phone').value,
+                car: document.getElementById('car').value,
+                issue: document.getElementById('issue').value,
+                location: document.getElementById('location').value
+            };
+            
+            const message = `Hello! I need car service.\n\n` +
+                          `Name: ${formData.name}\n` +
+                          `Phone: ${formData.phone}\n` +
+                          `Car Model: ${formData.car}\n` +
+                          `Issue: ${formData.issue}\n` +
+                          `Location: ${formData.location}`;
+            
+            const whatsappUrl = `https://wa.me/919876543210?text=${encodeURIComponent(message)}`;
+            window.open(whatsappUrl, '_blank');
+            
+            // Reset form
+            this.reset();
+            alert('Redirecting to WhatsApp...');
+        });
+
+        // Intersection Observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.card, .section-title, .hero-content').forEach(el => {
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>
