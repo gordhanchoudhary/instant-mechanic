@@ -6,7 +6,7 @@
   <title>Booking Details | Instant Mechanic</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>body { font-family: 'Inter', sans-serif; }</style>
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAUvC9Xsv8EO1al8H4rMix8FnkiOOMo1D4"></script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAhQ7pefYjHolK8tjYqgdSZ7XXZSUaglp4"></script>
   
   <!-- Mixpanel SDK -->
   <script type="text/javascript">
@@ -560,7 +560,7 @@ document.getElementById('cancelBooking').addEventListener('click', () => {
   });
 
   async function getLatLngFromAddress(address) {
-    const apiKey = 'AIzaSyAUvC9Xsv8EO1al8H4rMix8FnkiOOMo1D4';  // replace with your actual key
+    const apiKey = 'AIzaSyAhQ7pefYjHolK8tjYqgdSZ7XXZSUaglp4';  // replace with your actual key
     const encodedAddress = encodeURIComponent(address);
     const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodedAddress}&key=${apiKey}`;
 
