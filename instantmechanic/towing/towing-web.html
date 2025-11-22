@@ -30,7 +30,7 @@
         * {
             margin: 0;
             padding: 0;
-            /* box-sizing: border-box; */
+            box-sizing: border-box;
         }
         
         html {
@@ -240,6 +240,7 @@
             .hero-features {
                 gap: 1rem;
                 margin: 1.5rem 0;
+                justify-content: center;
             }
         }
 
@@ -253,6 +254,7 @@
         @media (max-width: 768px) {
             .hero-feature {
                 font-size: 0.875rem;
+                justify-content: center;
             }
         }
 
@@ -439,9 +441,9 @@
         /* Service Areas */
         .areas-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            grid-template-columns: repeat(4, 1fr);
             gap: 1rem;
-            max-width: 800px;
+            max-width: 1000px;
             margin: 0 auto;
         }
         
@@ -449,12 +451,6 @@
             .areas-grid {
                 grid-template-columns: repeat(2, 1fr);
                 gap: 0.75rem;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .areas-grid {
-                grid-template-columns: 1fr;
             }
         }
 
@@ -886,7 +882,7 @@
                         <!-- After -->
                         <div style="position: relative; aspect-ratio: 4/3; background: #e5e7eb; display: flex; align-items: center; justify-content: center;">
                             <div style="text-align: center; /*! padding: 1rem; */">
-                                <div style="position: absolute; top: 0.75rem; left: 0.75rem; padding: 0.25rem 0.75rem; background: #f97316; color: white; font-size: 0.5rem; font-weight: 600; border-radius: 9999px;">
+                                <div style="position: absolute; top: 0.75rem; right: 0.75rem; padding: 0.25rem 0.75rem; background: #f97316; color: white; font-size: 0.5rem; font-weight: 600; border-radius: 9999px;">
                                     AFTER
                                 </div>
                                 <div style="color: #6b7280; font-weight: 500;">
@@ -904,7 +900,7 @@
                         <!-- Before -->
                         <div class="before-after-item" style="position: relative; aspect-ratio: 4/3; background: #e5e7eb; display: flex; align-items: center; justify-content: center; border-right: 1px solid #d1d5db;">
                             <div style="text-align: center; /*! padding: 1rem; */">
-                                <div style="position: absolute; top: 0.75rem; left: 0.75rem; padding: 0.25rem 0.75rem; background: #ef4444; color: white; font-size: 0.5rem; font-weight: 600; border-radius: 9999px;">
+                                <div style="position: absolute; top: 0.75rem; left: 0.75rem; padding: 0.25rem 0.75rem; background: #ef4444; color: white; font-size: 0.75rem; font-weight: 600; border-radius: 9999px;">
                                     BEFORE
                                 </div>
                                 <div style="color: #6b7280; font-weight: 500;">
@@ -916,7 +912,7 @@
                         <!-- After -->
                         <div style="position: relative; aspect-ratio: 4/3; background: #e5e7eb; display: flex; align-items: center; justify-content: center;">
                             <div style="text-align: center; /*! padding: 1rem; */">
-                                <div style="position: absolute; top: 0.75rem; left: 0.75rem; padding: 0.25rem 0.75rem; background: #f97316; color: white; font-size: 0.5rem; font-weight: 600; border-radius: 9999px;">
+                                <div style="position: absolute; top: 0.75rem; right: 0.75rem; padding: 0.25rem 0.75rem; background: #f97316; color: white; font-size: 0.75rem; font-weight: 600; border-radius: 9999px;">
                                     AFTER
                                 </div>
                                 <div style="color: #6b7280; font-weight: 500;">
@@ -934,7 +930,7 @@
                         <!-- Before -->
                         <div class="before-after-item" style="position: relative; aspect-ratio: 4/3; background: #e5e7eb; display: flex; align-items: center; justify-content: center; border-right: 1px solid #d1d5db;">
                             <div style="text-align: center; /*! padding: 1rem; */">
-                                <div style="position: absolute; top: 0.75rem; left: 0.75rem; padding: 0.25rem 0.75rem; background: #ef4444; color: white; font-size: 0.5rem; font-weight: 600; border-radius: 9999px;">
+                                <div style="position: absolute; top: 0.75rem; left: 0.75rem; padding: 0.25rem 0.75rem; background: #ef4444; color: white; font-size: 0.75rem; font-weight: 600; border-radius: 9999px;">
                                     BEFORE
                                 </div>
                                 <div style="color: #6b7280; font-weight: 500;">
@@ -946,7 +942,7 @@
                         <!-- After -->
                         <div style="position: relative; aspect-ratio: 4/3; background: #e5e7eb; display: flex; align-items: center; justify-content: center;">
                             <div style="text-align: center; /*! padding: 1rem; */">
-                                <div style="position: absolute; top: 0.75rem; left: 0.75rem; padding: 0.25rem 0.75rem; background: #f97316; color: white; font-size: 0.5rem; font-weight: 600; border-radius: 9999px;">
+                                <div style="position: absolute; top: 0.75rem; right: 0.75rem; padding: 0.25rem 0.75rem; background: #f97316; color: white; font-size: 0.75rem; font-weight: 600; border-radius: 9999px;">
                                     AFTER
                                 </div>
                                 <div style="color: #6b7280; font-weight: 500;">
@@ -968,38 +964,128 @@
 
 
     
-    <!-- How It Works -->
+     <!-- How It Works -->
     <section class="section-dark">
         <div class="container">
             <div class="section-title animate">
                 <h2>How It <span class="hero-highlight">Works</span></h2>
                 <p>Simple 4-step process to get your car rescued</p>
             </div>
-            <div class="card-grid">
-                <div class="card animate">
-                    <div class="card-icon">📞</div>
-                    <h3>1. Contact Us</h3>
-                    <p>Call or WhatsApp us anytime, 24/7. We're always ready to help.</p>
-                </div>
-                <div class="card animate">
-                    <div class="card-icon">📍</div>
-                    <h3>2. Share Location</h3>
-                    <p>Tell us your location and we'll dispatch the nearest crane immediately.</p>
-                </div>
-                <div class="card animate">
-                    <div class="card-icon">🚛</div>
-                    <h3>3. Quick Pickup</h3>
-                    <p>Our expert team arrives within 15-30 minutes to safely tow your vehicle.</p>
-                </div>
-                <div class="card animate">
-                    <div class="card-icon">🔧</div>
-                    <h3>4. Expert Repair</h3>
-                    <p>Vehicle is taken to our garage where skilled technicians handle repairs.</p>
+            
+            <div style="display: flex; flex-direction: column; gap: 2rem; max-width: 1200px; margin: 0 auto;">
+                <!-- Desktop: Horizontal Flow -->
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
+                    <!-- Step 1 -->
+                    <div class="flowchart-step animate">
+                        <div style="background: linear-gradient(135deg, #fff, #fff); width: 4rem; height: 4rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; font-size: 2rem;">
+                            📞
+                        </div>
+                        <div style="background: linear-gradient(135deg, #f97316, #ea580c); color: rgb(255, 255, 255); width: 2.5rem; height: 2.5rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.25rem; margin: 0 auto 1rem;">
+                            1
+                        </div>
+                        <h3 style="color: rgb(0, 0, 0); font-size: 1.25rem; font-weight: bold; margin-bottom: 0.75rem;">Contact Us</h3>
+                        <p style="color: #9ca3af;">Call or WhatsApp us anytime, 24/7. We're always ready to help.</p>
+                    </div>
+                    
+                    <!-- Arrow 1 -->
+                    <div class="flowchart-arrow">
+                        <svg width="60" height="24" viewBox="0 0 60 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M0 12H58M58 12L48 2M58 12L48 22" stroke="#f97316" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                        </svg>
+                    </div>
+                    
+                    <!-- Step 2 -->
+                    <div class="flowchart-step animate">
+                        <div style="background: linear-gradient(135deg, #fff, #fff); width: 4rem; height: 4rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; font-size: 2rem;">
+                            📍
+                        </div>
+                        <div style="background: linear-gradient(135deg, #f97316, #ea580c); color: white; width: 2.5rem; height: 2.5rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.25rem; margin: 0 auto 1rem;">
+                            2
+                        </div>
+                        <h3 style="color: black; font-size: 1.25rem; font-weight: bold; margin-bottom: 0.75rem;">Share Location</h3>
+                        <p style="color: #9ca3af;">Tell us your location and we'll dispatch the nearest crane immediately.</p>
+                    </div>
+                    
+                    <!-- Arrow 2 -->
+                    <div class="flowchart-arrow">
+                        <svg width="60" height="24" viewBox="0 0 60 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M0 12H58M58 12L48 2M58 12L48 22" stroke="#f97316" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                        </svg>
+                    </div>
+                    
+                    <!-- Step 3 -->
+                    <div class="flowchart-step animate">
+                        <div style="background: linear-gradient(135deg, #fff, #fff); width: 4rem; height: 4rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; font-size: 2rem;">
+                            🚛
+                        </div>
+                        <div style="background: linear-gradient(135deg, #f97316, #ea580c); color: white; width: 2.5rem; height: 2.5rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.25rem; margin: 0 auto 1rem;">
+                            3
+                        </div>
+                        <h3 style="color: black; font-size: 1.25rem; font-weight: bold; margin-bottom: 0.75rem;">Quick Pickup</h3>
+                        <p style="color: #9ca3af;">Our expert team arrives within 15-30 minutes to safely tow your vehicle.</p>
+                    </div>
+                    
+                    <!-- Arrow 3 -->
+                    <div class="flowchart-arrow">
+                        <svg width="60" height="24" viewBox="0 0 60 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M0 12H58M58 12L48 2M58 12L48 22" stroke="#f97316" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                        </svg>
+                    </div>
+                    
+                    <!-- Step 4 -->
+                    <div class="flowchart-step animate">
+                        <div style="background: linear-gradient(135deg, #fff, #fff); width: 4rem; height: 4rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; font-size: 2rem;">
+                            🔧
+                        </div>
+                        <div style="background: linear-gradient(135deg, #f97316, #ea580c); color: white; width: 2.5rem; height: 2.5rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.25rem; margin: 0 auto 1rem;">
+                            4
+                        </div>
+                        <h3 style="color: black; font-size: 1.25rem; font-weight: bold; margin-bottom: 0.75rem;">Expert Repair</h3>
+                        <p style="color: #9ca3af;">Vehicle is taken to our garage where skilled technicians handle repairs.</p>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
-
+<style>
+        .flowchart-step {
+            flex: 1;
+            text-align: center;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 1rem;
+            border: 1px solid rgba(249, 115, 22, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .flowchart-step:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(249, 115, 22, 0.4);
+            transform: translateY(-5px);
+        }
+        
+        .flowchart-arrow {
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+        }
+        
+        @media (max-width: 768px) {
+            .container > div > div {
+                flex-direction: column !important;
+            }
+            
+            .flowchart-arrow {
+                transform: rotate(90deg);
+                margin: 0.5rem 0;
+            }
+            
+            .flowchart-step {
+                width: 100%;
+            }
+        }
+    </style>
+    
     <!-- Why Choose Us -->
     <section class="section-darker">
         <div class="container">
@@ -1042,7 +1128,7 @@
         </div>
     </section>
 
-    <!-- Service Areas -->
+   <!-- Service Areas -->
     <section class="section-dark">
         <div class="container">
             <div class="section-title animate">
@@ -1053,13 +1139,12 @@
                 <div class="area-card animate">📍 Delhi NCR</div>
                 <div class="area-card animate">📍 Gurugram</div>
                 <div class="area-card animate">📍 Noida</div>
-                 <div class="area-card animate">📍 Greater Noida</div>
                 <div class="area-card animate">📍 Faridabad</div>
                 <div class="area-card animate">📍 Ghaziabad</div>
+                <div class="area-card animate">📍 Greater Noida</div>
                
-             
             </div>
-            
+
         </div>
     </section>
 
