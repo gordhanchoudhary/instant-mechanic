@@ -62,26 +62,6 @@
             opacity: 0.9;
         }
 
-        .customer-info {
-            background: var(--bg-secondary);
-            padding: 15px 20px;
-            border-bottom: 1px solid var(--border-light);
-        }
-
-        .customer-name {
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 5px;
-        }
-
-        .customer-mobile {
-            color: var(--text-secondary);
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
         .loading {
             display: flex;
             justify-content: center;
@@ -634,16 +614,8 @@
             <p>Professional Towing Service</p>
         </div>
 
-        <div id="customerInfo" class="customer-info hidden">
-            <div class="customer-name" id="customerName"></div>
-            <div class="customer-mobile">
-                <span>📞</span>
-                <span id="customerMobile"></span>
-            </div>
-        </div>
-
         <div id="loadingDiv" class="loading">
-            <div>Loading customer data...</div>
+            <div>Loading...</div>
         </div>
 
         <div id="mainContent" class="hidden">
@@ -1162,7 +1134,6 @@
         ];
 
         // Global variables
-        let customerData = null;
         let map = null;
         let pickupLocation = null;
         let dropLocation = null;
@@ -1184,8 +1155,18 @@
         // Initialize the application
         async function init() {
             setupCarDropdown();
-            await fetchCustomerData();
+            initializeApp();
             initializeMap();
+        }
+
+        // Initialize app without customer data fetching
+        function initializeApp() {
+            // Start with pickup mode selection
+            selectMode('pickup');
+            
+            // Show main content immediately
+            document.getElementById('loadingDiv').classList.add('hidden');
+            document.getElementById('mainContent').classList.remove('hidden');
         }
 
         // Setup car dropdown functionality
@@ -1283,61 +1264,9 @@
             closeCarDropdown();
         }
 
-        // Get mobile number from URL or use hardcoded value
+        // Get mobile number - hardcoded as requested
         function getMobileFromUrl() {
             return '918393990942'; // Hardcoded as requested
-        }
-
-        // Fetch customer data from API
-        async function fetchCustomerData() {
-            try {
-                const mobile = getMobileFromUrl();
-                const response = await fetch(`https://ai.instantmechanic.online/bot/customer_chats/?mobile=${mobile}`);
-                const data = await response.json();
-                
-                if (data.status === 'success' && data.data.length > 0) {
-                    customerData = data.data[0];
-                    displayCustomerInfo();
-                    
-                    if (customerData.location) {
-                        const coords = extractCoordsFromUrl(customerData.location);
-                        if (coords) {
-                            pickupLocation = {
-                                lat: coords.lat,
-                                lng: coords.lng,
-                                address: 'Current Location',
-                                fromApi: true
-                            };
-                            updateLocationStatus();
-                            showCurrentLocation();
-                            selectMode('drop');
-                        }
-                    }
-                }
-                
-                if (!pickupLocation) {
-                    selectMode('pickup');
-                } else {
-                    selectMode('drop');
-                }
-                
-                document.getElementById('loadingDiv').classList.add('hidden');
-                document.getElementById('mainContent').classList.remove('hidden');
-            } catch (error) {
-                console.error('Error fetching customer data:', error);
-                selectMode('pickup');
-                document.getElementById('loadingDiv').classList.add('hidden');
-                document.getElementById('mainContent').classList.remove('hidden');
-            }
-        }
-
-        // Display customer information
-        function displayCustomerInfo() {
-            if (customerData) {
-                document.getElementById('customerName').textContent = customerData.name;
-                document.getElementById('customerMobile').textContent = customerData.mobile;
-                document.getElementById('customerInfo').classList.remove('hidden');
-            }
         }
 
         // Extract coordinates from Google Maps URL
