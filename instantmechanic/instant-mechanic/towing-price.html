@@ -117,7 +117,7 @@
             background: white;
             box-shadow: var(--shadow-soft);
             color: var(--text-primary);
-            cursor: pointer;
+            cursor: text;
         }
 
         .car-dropdown:focus {
@@ -134,6 +134,7 @@
             font-size: 18px;
             pointer-events: none;
             transition: transform 0.3s ease;
+            cursor: pointer;
         }
 
         .dropdown-arrow.open {
@@ -182,6 +183,13 @@
             padding: 20px;
             text-align: center;
             color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        .input-helper {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 8px;
             font-style: italic;
         }
 
@@ -630,14 +638,16 @@
                             type="text" 
                             class="car-dropdown" 
                             id="carDropdown" 
-                            placeholder="Search and select your car model..."
+                            placeholder="Type to search or manually enter your car model..."
                             autocomplete="off"
-                            readonly
                         >
                         <div class="dropdown-arrow" id="dropdownArrow">▼</div>
                         <div class="car-options" id="carOptions">
-                            <div class="no-results">Start typing to search car models...</div>
+                            <div class="no-results">Start typing to search car models or enter manually...</div>
                         </div>
+                    </div>
+                    <div class="input-helper">
+                        💡 You can search from our list or type your own car model
                     </div>
                 </div>
 
@@ -706,8 +716,8 @@
                 <div class="pricing-info" id="pricingInfo">
                     <!-- Pricing will be populated here -->
                 </div>
-                <button class="close-btn" onclick="closeResponseModal()">
-                    Book This Service
+                <button class="close-btn" onclick="getQuoteForAnotherCar()">
+                    Get Price for Another Car
                 </button>
             </div>
         </div>
@@ -1176,17 +1186,16 @@
             const dropdownArrow = document.getElementById('dropdownArrow');
             const carSelection = document.getElementById('carSelection');
 
-            carDropdown.addEventListener('click', toggleCarDropdown);
-            carDropdown.addEventListener('input', handleCarSearch);
-            carDropdown.addEventListener('focus', () => {
-                carSelection.classList.add('focus');
-            });
-            carDropdown.addEventListener('blur', () => {
-                setTimeout(() => {
-                    carSelection.classList.remove('focus');
-                    closeCarDropdown();
-                }, 200);
-            });
+            // Event listeners
+            carDropdown.addEventListener('input', handleCarInput);
+            carDropdown.addEventListener('focus', handleCarFocus);
+            carDropdown.addEventListener('blur', handleCarBlur);
+            carDropdown.addEventListener('keydown', handleCarKeydown);
+
+            // Make dropdown arrow clickable
+            dropdownArrow.addEventListener('click', toggleCarDropdown);
+            dropdownArrow.style.pointerEvents = 'auto';
+            dropdownArrow.style.cursor = 'pointer';
 
             // Close dropdown when clicking outside
             document.addEventListener('click', (e) => {
@@ -1196,50 +1205,107 @@
             });
         }
 
-        function toggleCarDropdown() {
-            const carDropdown = document.getElementById('carDropdown');
-            const carOptions = document.getElementById('carOptions');
-            const dropdownArrow = document.getElementById('dropdownArrow');
-
-            if (isDropdownOpen) {
-                closeCarDropdown();
+        function handleCarInput(event) {
+            const searchTerm = event.target.value.trim();
+            selectedCar = searchTerm; // Always update selectedCar with current input
+            
+            if (searchTerm === '') {
+                filteredCars = carModelsList;
             } else {
-                carDropdown.removeAttribute('readonly');
-                carDropdown.focus();
-                carOptions.style.display = 'block';
-                dropdownArrow.classList.add('open');
-                isDropdownOpen = true;
-                
-                if (!filteredCars.length) {
-                    filteredCars = carModelsList;
-                }
+                filteredCars = carModelsList.filter(car => 
+                    car.toLowerCase().includes(searchTerm.toLowerCase())
+                );
+            }
+            
+            if (searchTerm.length > 0) {
+                openCarDropdown();
                 displayCarOptions(filteredCars);
+            } else {
+                openCarDropdown();
+                displayCarOptions(carModelsList);
             }
         }
 
+        function handleCarFocus(event) {
+            const carSelection = document.getElementById('carSelection');
+            carSelection.classList.add('focus');
+            
+            if (!isDropdownOpen) {
+                openCarDropdown();
+                if (event.target.value.trim() === '') {
+                    displayCarOptions(carModelsList);
+                }
+            }
+        }
+
+        function handleCarBlur(event) {
+            const carSelection = document.getElementById('carSelection');
+            
+            setTimeout(() => {
+                carSelection.classList.remove('focus');
+                closeCarDropdown();
+            }, 200);
+        }
+
+        function handleCarKeydown(event) {
+            const carOptions = document.getElementById('carOptions');
+            const options = carOptions.querySelectorAll('.car-option');
+            
+            if (!isDropdownOpen || options.length === 0) return;
+            
+            let highlighted = carOptions.querySelector('.car-option.highlighted');
+            let currentIndex = highlighted ? Array.from(options).indexOf(highlighted) : -1;
+            
+            if (event.key === 'ArrowDown') {
+                event.preventDefault();
+                if (highlighted) highlighted.classList.remove('highlighted');
+                currentIndex = (currentIndex + 1) % options.length;
+                options[currentIndex].classList.add('highlighted');
+                options[currentIndex].scrollIntoView({ block: 'nearest' });
+            } else if (event.key === 'ArrowUp') {
+                event.preventDefault();
+                if (highlighted) highlighted.classList.remove('highlighted');
+                currentIndex = currentIndex <= 0 ? options.length - 1 : currentIndex - 1;
+                options[currentIndex].classList.add('highlighted');
+                options[currentIndex].scrollIntoView({ block: 'nearest' });
+            } else if (event.key === 'Enter') {
+                event.preventDefault();
+                if (highlighted) {
+                    selectCar(highlighted.textContent);
+                }
+            } else if (event.key === 'Escape') {
+                closeCarDropdown();
+            }
+        }
+
+        function toggleCarDropdown() {
+            if (isDropdownOpen) {
+                closeCarDropdown();
+            } else {
+                document.getElementById('carDropdown').focus();
+            }
+        }
+
+        function openCarDropdown() {
+            const carOptions = document.getElementById('carOptions');
+            const dropdownArrow = document.getElementById('dropdownArrow');
+
+            carOptions.style.display = 'block';
+            dropdownArrow.classList.add('open');
+            isDropdownOpen = true;
+        }
+
         function closeCarDropdown() {
-            const carDropdown = document.getElementById('carDropdown');
             const carOptions = document.getElementById('carOptions');
             const dropdownArrow = document.getElementById('dropdownArrow');
 
             carOptions.style.display = 'none';
             dropdownArrow.classList.remove('open');
             isDropdownOpen = false;
-            carDropdown.setAttribute('readonly', 'true');
-        }
-
-        function handleCarSearch(event) {
-            const searchTerm = event.target.value.toLowerCase();
             
-            if (searchTerm === '') {
-                filteredCars = carModelsList;
-            } else {
-                filteredCars = carModelsList.filter(car => 
-                    car.toLowerCase().includes(searchTerm)
-                );
-            }
-            
-            displayCarOptions(filteredCars);
+            // Clear any highlighted options
+            const highlighted = carOptions.querySelector('.car-option.highlighted');
+            if (highlighted) highlighted.classList.remove('highlighted');
         }
 
         function displayCarOptions(cars) {
@@ -1251,10 +1317,23 @@
             }
             
             const optionsHTML = cars.map(car => 
-                `<div class="car-option" onclick="selectCar('${car}')">${car}</div>`
+                `<div class="car-option" onclick="selectCar('${car}')" 
+                      onmouseenter="highlightOption(this)"
+                      onmouseleave="unhighlightOption(this)">${car}</div>`
             ).join('');
             
             carOptions.innerHTML = optionsHTML;
+        }
+
+        function highlightOption(element) {
+            const carOptions = document.getElementById('carOptions');
+            const highlighted = carOptions.querySelector('.car-option.highlighted');
+            if (highlighted) highlighted.classList.remove('highlighted');
+            element.classList.add('highlighted');
+        }
+
+        function unhighlightOption(element) {
+            element.classList.remove('highlighted');
         }
 
         function selectCar(car) {
@@ -1663,14 +1742,20 @@
             modal.classList.add('show');
         }
 
-        // Close response modal
-        function closeResponseModal() {
+        // Function for "Get Price for Another Car" button
+        function getQuoteForAnotherCar() {
             const modal = document.getElementById('responseModal');
             modal.classList.remove('show');
             
-            // Redirect to WhatsApp after closing modal
-            const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}`;
-            window.location.href = whatsappUrl;
+            // Clear the car selection
+            const carDropdown = document.getElementById('carDropdown');
+            carDropdown.value = '';
+            selectedCar = '';
+            
+            // Focus on car dropdown
+            setTimeout(() => {
+                carDropdown.focus();
+            }, 300);
         }
 
         // Handle form submission
@@ -1682,8 +1767,8 @@
                 return;
             }
 
-            if (!selectedCar) {
-                alert('Please select your car model');
+            if (!selectedCar || selectedCar.trim() === '') {
+                alert('Please select or enter your car model');
                 return;
             }
 
@@ -1703,7 +1788,7 @@
                     pickup_url: coordsToGoogleMapsUrl(pickupLocation.lat, pickupLocation.lng),
                     drop_url: coordsToGoogleMapsUrl(dropLocation.lat, dropLocation.lng),
                     distance: distanceKm.toString(),
-                    car: selectedCar
+                    car: selectedCar.trim()
                 };
 
                 console.log('Submitting towing request:', submitData);
