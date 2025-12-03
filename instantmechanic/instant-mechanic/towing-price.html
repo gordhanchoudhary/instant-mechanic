@@ -1,0 +1,1852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instant Mechanic - Towing Service</title>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --success-color: #10b981;
+            --success-light: #d1fae5;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --border-light: #e2e8f0;
+            --shadow-soft: 0 4px 20px rgba(0,0,0,0.08);
+            --shadow-medium: 0 8px 30px rgba(0,0,0,0.12);
+            --shadow-strong: 0 12px 40px rgba(0,0,0,0.15);
+        }
+
+        body {
+            font-family: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-secondary);
+            min-height: 100vh;
+            color: var(--text-primary);
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            background: white;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        .header {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: var(--shadow-medium);
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .customer-info {
+            background: var(--bg-secondary);
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .customer-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 5px;
+        }
+
+        .customer-mobile {
+            color: var(--text-secondary);
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+            color: var(--text-secondary);
+        }
+
+        .main-content {
+            padding: 30px 20px 120px;
+            background: var(--bg-secondary);
+            min-height: calc(100vh - 200px);
+        }
+
+        /* Car Selection Section */
+        .car-selection {
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow-soft);
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .car-selection.focus {
+            border-color: #667eea;
+            box-shadow: 0 8px 30px rgba(102, 126, 234, 0.15);
+        }
+
+        .car-section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .car-dropdown-container {
+            position: relative;
+        }
+
+        .car-dropdown {
+            width: 100%;
+            padding: 18px 50px 18px 20px;
+            border: 2px solid var(--border-light);
+            border-radius: 16px;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s ease;
+            background: white;
+            box-shadow: var(--shadow-soft);
+            color: var(--text-primary);
+            cursor: pointer;
+        }
+
+        .car-dropdown:focus {
+            border-color: #667eea;
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.15);
+        }
+
+        .dropdown-arrow {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            font-size: 18px;
+            pointer-events: none;
+            transition: transform 0.3s ease;
+        }
+
+        .dropdown-arrow.open {
+            transform: translateY(-50%) rotate(180deg);
+        }
+
+        .car-options {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 2px solid var(--border-light);
+            border-top: none;
+            border-radius: 0 0 16px 16px;
+            max-height: 250px;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: var(--shadow-medium);
+            display: none;
+        }
+
+        .car-option {
+            padding: 15px 20px;
+            cursor: pointer;
+            border-bottom: 1px solid #f1f5f9;
+            transition: background-color 0.2s ease;
+            font-size: 15px;
+            color: var(--text-primary);
+        }
+
+        .car-option:hover {
+            background: var(--bg-secondary);
+        }
+
+        .car-option:last-child {
+            border-bottom: none;
+        }
+
+        .car-option.highlighted {
+            background: #eff6ff;
+            color: #2563eb;
+        }
+
+        .no-results {
+            padding: 20px;
+            text-align: center;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        .location-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .location-btn {
+            background: white;
+            border: none;
+            padding: 40px 20px;
+            border-radius: 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            font-weight: 600;
+            position: relative;
+            min-height: 140px;
+            font-size: 18px;
+            box-shadow: var(--shadow-soft);
+            border: 3px solid transparent;
+            color: var(--text-secondary);
+        }
+
+        .location-btn.active {
+            border-color: #3b82f6;
+            background: #3b82f6;
+            color: white;
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(59, 130, 246, 0.3);
+        }
+
+        .location-btn.completed {
+            border-color: var(--success-color);
+            background: white;
+            color: var(--success-color);
+        }
+
+        .location-btn.active.completed {
+            border-color: #3b82f6;
+            background: #3b82f6;
+            color: white;
+        }
+
+        .location-btn:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-strong);
+        }
+
+        .location-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .location-text {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .location-status {
+            font-size: 14px;
+            font-weight: 600;
+            padding: 6px 16px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .location-btn .location-status.pending {
+            background: #f1f5f9;
+            color: var(--text-secondary);
+        }
+
+        .location-btn.active .location-status.current {
+            background: rgba(255,255,255,0.2);
+            color: white;
+        }
+
+        .location-btn.completed .location-status.done {
+            background: var(--success-light);
+            color: #047857;
+        }
+
+        .search-container {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 18px 50px 18px 20px;
+            border: 2px solid var(--border-light);
+            border-radius: 16px;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s ease;
+            background: white;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .search-box:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.15);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            font-size: 18px;
+        }
+
+        .suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 2px solid var(--border-light);
+            border-top: none;
+            border-radius: 0 0 16px 16px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: var(--shadow-medium);
+        }
+
+        .suggestion-item {
+            padding: 15px 20px;
+            cursor: pointer;
+            border-bottom: 1px solid #f1f5f9;
+            transition: background-color 0.2s ease;
+            font-size: 15px;
+        }
+
+        .suggestion-item:hover {
+            background: var(--bg-secondary);
+        }
+
+        .current-location {
+            background: white;
+            padding: 20px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            border-left: 4px solid #3b82f6;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .current-location-label {
+            font-size: 12px;
+            color: #3b82f6;
+            font-weight: 700;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .current-location-address {
+            font-size: 15px;
+            color: var(--text-primary);
+            line-height: 1.4;
+        }
+
+        .edit-btn {
+            background: none;
+            border: none;
+            color: #3b82f6;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 8px;
+            margin-left: 8px;
+            transition: all 0.2s ease;
+            font-size: 16px;
+        }
+
+        .edit-btn:hover {
+            background: #eff6ff;
+        }
+
+        .map-container {
+            height: 350px;
+            border-radius: 20px;
+            overflow: hidden;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow-medium);
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+
+        .map-instructions {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 15px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .submit-btn {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: calc(100% - 40px);
+            max-width: 440px;
+            background: linear-gradient(135deg, var(--success-color), #059669);
+            color: white;
+            border: none;
+            padding: 20px;
+            border-radius: 16px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 30px rgba(16, 185, 129, 0.3);
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            transform: translateX(-50%) translateY(-3px);
+            box-shadow: 0 12px 40px rgba(16, 185, 129, 0.4);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: translateX(-50%);
+        }
+
+        /* Response Modal */
+        .response-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            padding: 20px;
+        }
+
+        .response-modal.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .response-content {
+            background: white;
+            border-radius: 24px;
+            padding: 30px;
+            max-width: 400px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-strong);
+            transform: scale(0.8);
+            transition: transform 0.3s ease;
+        }
+
+        .response-modal.show .response-content {
+            transform: scale(1);
+        }
+
+        .response-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .response-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--success-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 24px;
+        }
+
+        .response-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .response-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .pricing-info {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .service-option {
+            background: white;
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 12px;
+            border-left: 4px solid var(--success-color);
+            box-shadow: var(--shadow-soft);
+        }
+
+        .service-option:last-child {
+            margin-bottom: 0;
+        }
+
+        .service-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .service-price {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--success-color);
+            margin-bottom: 5px;
+        }
+
+        .service-breakdown {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        .close-btn {
+            width: 100%;
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .close-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-soft);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .distance-info {
+            display: none;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                max-width: 100%;
+            }
+            
+            .header {
+                padding: 15px;
+            }
+            
+            .main-content {
+                padding: 20px 15px 120px;
+            }
+            
+            .location-btn {
+                padding: 25px 15px;
+                min-height: 120px;
+            }
+            
+            .location-text {
+                font-size: 18px;
+            }
+            
+            .location-icon {
+                font-size: 28px;
+            }
+            
+            .search-box, .car-dropdown {
+                padding: 16px 45px 16px 18px;
+            }
+            
+            .map-container {
+                height: 300px;
+            }
+            
+            .submit-btn {
+                padding: 18px;
+                font-size: 16px;
+            }
+
+            .car-selection {
+                padding: 20px;
+            }
+
+            .response-content {
+                padding: 25px;
+                margin: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚗 Instant Mechanic</h1>
+            <p>Professional Towing Service</p>
+        </div>
+
+        <div id="customerInfo" class="customer-info hidden">
+            <div class="customer-name" id="customerName"></div>
+            <div class="customer-mobile">
+                <span>📞</span>
+                <span id="customerMobile"></span>
+            </div>
+        </div>
+
+        <div id="loadingDiv" class="loading">
+            <div>Loading customer data...</div>
+        </div>
+
+        <div id="mainContent" class="hidden">
+            <div class="main-content">
+                <!-- Car Selection Section -->
+                <div class="car-selection" id="carSelection">
+                    <div class="car-section-title">
+                        🚙 Select Your Car Model
+                    </div>
+                    <div class="car-dropdown-container">
+                        <input 
+                            type="text" 
+                            class="car-dropdown" 
+                            id="carDropdown" 
+                            placeholder="Search and select your car model..."
+                            autocomplete="off"
+                            readonly
+                        >
+                        <div class="dropdown-arrow" id="dropdownArrow">▼</div>
+                        <div class="car-options" id="carOptions">
+                            <div class="no-results">Start typing to search car models...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="location-buttons">
+                    <button class="location-btn" id="pickupBtn" onclick="selectMode('pickup')">
+                        <div class="location-icon">📍</div>
+                        <div class="location-text">Pickup</div>
+                        <div class="location-status pending" id="pickupStatus">Select</div>
+                    </button>
+                    <button class="location-btn" id="dropBtn" onclick="selectMode('drop')">
+                        <div class="location-icon">🎯</div>
+                        <div class="location-text">Drop</div>
+                        <div class="location-status pending" id="dropStatus">Select</div>
+                    </button>
+                </div>
+
+                <div id="currentLocationDiv" class="current-location hidden">
+                    <div class="current-location-label" id="currentLocationLabel">PICKUP LOCATION</div>
+                    <div class="current-location-address" id="currentLocationAddress">
+                        Current Location
+                        <button class="edit-btn" onclick="editCurrentLocation()">✏️</button>
+                    </div>
+                </div>
+
+                <div class="search-container">
+                    <input 
+                        type="text" 
+                        class="search-box" 
+                        id="searchInput" 
+                        placeholder="Search for pickup location..."
+                        oninput="handleSearchChange()"
+                        onfocus="showSuggestions = true"
+                    >
+                    <div class="search-icon">🔍</div>
+                    <div class="suggestions hidden" id="suggestions"></div>
+                </div>
+
+                <div class="map-instructions">
+                    Tap on the map to select location or search above
+                </div>
+
+                <div class="map-container">
+                    <div id="map"></div>
+                </div>
+
+                <!-- Distance info hidden from UI but used for API -->
+                <div id="distanceInfo" class="distance-info">
+                    <div class="distance-text" id="distanceText">0 km</div>
+                    <div class="distance-label">Estimated Distance</div>
+                </div>
+
+                <button class="submit-btn" id="submitBtn" onclick="handleSubmit()">
+                    Get Towing Quote
+                </button>
+            </div>
+        </div>
+
+        <!-- Response Modal -->
+        <div class="response-modal" id="responseModal">
+            <div class="response-content">
+                <div class="response-header">
+                    <div class="response-icon">✅</div>
+                    <div class="response-title">Towing Quote Ready!</div>
+                    <div class="response-subtitle">Here are your towing service options</div>
+                </div>
+                <div class="pricing-info" id="pricingInfo">
+                    <!-- Pricing will be populated here -->
+                </div>
+                <button class="close-btn" onclick="closeResponseModal()">
+                    Book This Service
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Car models list
+        const carModelsList = [
+            'Swift - Maruti Suzuki',
+            'WagonR - Maruti Suzuki',
+            'Swift Dzire - Maruti Suzuki',
+            'Baleno - Maruti Suzuki',
+            'Alto - Maruti Suzuki',
+            'Ritz - Maruti Suzuki',
+            'Celerio - Maruti Suzuki',
+            'Estilo - Maruti Suzuki',
+            'SX4 - Maruti Suzuki',
+            '800 - Maruti Suzuki',
+            'Zen - Maruti Suzuki',
+            'A-Star - Maruti Suzuki',
+            'Ignis - Maruti Suzuki',
+            'S-Cross - Maruti Suzuki',
+            'Eeco - Maruti Suzuki',
+            'Esteem - Maruti Suzuki',
+            'Omni - Maruti Suzuki',
+            'S-Presso - Maruti Suzuki',
+            'Grand Vitara - Maruti Suzuki',
+            'Gypsy - Maruti Suzuki',
+            'Kizashi - Maruti Suzuki',
+            'Versa - Maruti Suzuki',
+            'XL6 - Maruti Suzuki',
+            'New Grand Vitara - Maruti Suzuki',
+            'Invicto - Maruti Suzuki',
+            'Jimny - Maruti Suzuki',
+            'Fronx - Maruti Suzuki',
+            'i10 - Hyundai',
+            'i20 - Hyundai',
+            'Grand i10 - Hyundai',
+            'Santro Xing - Hyundai',
+            'Eon - Hyundai',
+            'Xcent - Hyundai',
+            'Elite i20 - Hyundai',
+            'Creta - Hyundai',
+            'Alcazar - Hyundai',
+            'Verna Fluidic - Hyundai',
+            'Verna - Hyundai',
+            'Accent - Hyundai',
+            'Santro - Hyundai',
+            'i20 Active - Hyundai',
+            'Elantra - Hyundai',
+            'Getz - Hyundai',
+            'Venue - Hyundai',
+            'Grand i10 Nios - Hyundai',
+            'Verna Transform - Hyundai',
+            'Getz Prime - Hyundai',
+            'Kona - Hyundai',
+            'Accent Viva - Hyundai',
+            'SantaFE - Hyundai',
+            'Tucson - Hyundai',
+            'Sonata - Hyundai',
+            'Sonata Embera - Hyundai',
+            'Aura - Hyundai',
+            'Sonata Transform - Hyundai',
+            'Venue N Line - Hyundai',
+            'i20 N Line - Hyundai',
+            'Exter - Hyundai',
+            'City IVTEC - Honda',
+            'Amaze - Honda',
+            'City - Honda',
+            'Brio - Honda',
+            'Jazz - Honda',
+            'Civic - Honda',
+            'Accord - Honda',
+            'City ZX - Honda',
+            'WRV - Honda',
+            'Mobilio - Honda',
+            'City IDTEC - Honda',
+            'CRV - Honda',
+            'BRV - Honda',
+            'Accord Hybrid - Honda',
+            'Elevate - Honda',
+            'Tiago - Tata',
+            'Tiago NRG - Tata',
+            'Nano - Tata',
+            'Zest - Tata',
+            'Nexon - Tata',
+            'Indica Vista - Tata',
+            'Tigor - Tata',
+            'Manza - Tata',
+            'Indica - Tata',
+            'Indigo - Tata',
+            'Safari - Tata',
+            'Indigo eCS - Tata',
+            'Indica V2 - Tata',
+            'Bolt - Tata',
+            'Indigo CS - Tata',
+            'Safari Storme - Tata',
+            'Nano Genx - Tata',
+            'Indica eV2 - Tata',
+            'Altroz - Tata',
+            'Aria - Tata',
+            'Harrier - Tata',
+            'Hexa - Tata',
+            'Sumo Grande - Tata',
+            'Indigo Marina - Tata',
+            'Sumo Gold - Tata',
+            'Sumo Grande MK II - Tata',
+            'Venture - Tata',
+            'Indigo XL - Tata',
+            'Sumo Spacio - Tata',
+            'Winger - Tata',
+            'Xenon - Tata',
+            'Sumo Victa - Tata',
+            'Curvv - Tata',
+            'Punch - Tata',
+            'Figo - Ford',
+            'Eco Sport - Ford',
+            'Figo Aspire - Ford',
+            'Fiesta - Ford',
+            'Fiesta Classic - Ford',
+            'Ikon - Ford',
+            'Endeavour - Ford',
+            'Freestyle - Ford',
+            'Fusion - Ford',
+            'Escort - Ford',
+            'Mondeo - Ford',
+            'Mustang - Ford',
+            'Polo - Volkswagen',
+            'Vento - Volkswagen',
+            'Ameo - Volkswagen',
+            'Cross Polo - Volkswagen',
+            'Jetta - Volkswagen',
+            'Passat - Volkswagen',
+            'Taigun - Volkswagen',
+            'T-Roc - Volkswagen',
+            'Beetle - Volkswagen',
+            'XUV 500 - Mahindra',
+            'Scorpio - Mahindra',
+            'KUV 100 - Mahindra',
+            'Xylo - Mahindra',
+            'TUV 300 - Mahindra',
+            'Bolero Neo - Mahindra',
+            'Quanto - Mahindra',
+            'Bolero - Mahindra',
+            'Imperio  - Mahindra',
+            'Logan - Mahindra',
+            'Verito - Mahindra',
+            'XUV 300 - Mahindra',
+            'Thar - Mahindra',
+            'Bolero Camper - Mahindra',
+            'NuvoSport - Mahindra',
+            'Marazzo - Mahindra',
+            'XUV 700 - Mahindra',
+            'Verito Vibe CS - Mahindra',
+            'Bolero Pickup - Mahindra',
+            'Scorpio Getaway - Mahindra',
+            'Alturas G4 - Mahindra',
+            'E20 Plus - Mahindra',
+            'TUV 300 Plus - Mahindra',
+            'Scorpio N - Mahindra',
+            'Reva - Mahindra',
+            'Thar Roxx - Mahindra',
+            'XEV 9e - Mahindra',
+            'BE 6  - Mahindra',
+            'XUV 3XO - Mahindra',
+            'Kwid - Renault',
+            'Duster - Renault',
+            'Scala - Renault',
+            'Pulse - Renault',
+            'Fluence - Renault',
+            'Triber - Renault',
+            'Lodgy - Renault',
+            'Captur - Renault',
+            'Koleos - Renault',
+            'Kiger - Renault',
+            'Beat - Chevrolet',
+            'Spark - Chevrolet',
+            'Cruze - Chevrolet',
+            'Aveo - Chevrolet',
+            'Sail - Chevrolet',
+            'Enjoy - Chevrolet',
+            'UVA - Chevrolet',
+            'Optra - Chevrolet',
+            'Sail Hatchback - Chevrolet',
+            'Optra Magnum - Chevrolet',
+            'Tavera - Chevrolet',
+            'Optra SRV - Chevrolet',
+            'Captiva - Chevrolet',
+            'Forester - Chevrolet',
+            'Trailblazer - Chevrolet',
+            'Sera - Toyota',
+            'Etios - Toyota',
+            'Innova - Toyota',
+            'Corolla Altis - Toyota',
+            'Etios Liva - Toyota',
+            'Fortuner - Toyota',
+            'Hilux - Toyota',
+            'Innova Crysta - Toyota',
+            'Corolla - Toyota',
+            'Qualis - Toyota',
+            'Etios Cross - Toyota',
+            'Yaris - Toyota',
+            'Camry - Toyota',
+            'Glanza - Toyota',
+            'Land Cruiser - Toyota',
+            'Land Cruiser Prado - Toyota',
+            'Urban Cruiser - Toyota',
+            'Alphard - Toyota',
+            'Vellfire - Toyota',
+            'Urban Cruiser Hyryder - Toyota',
+            'Innova Hycross - Toyota',
+            'Rapid - Skoda',
+            'Fabia - Skoda',
+            'Superb - Skoda',
+            'Laura - Skoda',
+            'Octavia - Skoda',
+            'Yeti - Skoda',
+            'Fabia Scout - Skoda',
+            'Kodiaq - Skoda',
+            'Kushaq - Skoda',
+            'Slavia - Skoda',
+            'Kylaq - Skoda',
+            'Micra - Nissan',
+            'Sunny - Nissan',
+            'Terrano - Nissan',
+            'Micra Active - Nissan',
+            'Teana - Nissan',
+            'Kicks - Nissan',
+            'Evalia - Nissan',
+            'X-Trail - Nissan',
+            'GTR - Nissan',
+            'Magnite - Nissan',
+            'Punto - Fiat',
+            'Linea - Fiat',
+            'Punto Evo - Fiat',
+            'Palio D - Fiat',
+            'Avventura - Fiat',
+            'Palio Stile - Fiat',
+            'Linea Classic - Fiat',
+            'Adventure - Fiat',
+            'Palio NV - Fiat',
+            'Abarth Punto - Fiat',
+            'Urban Cross - Fiat',
+            'Uno - Fiat',
+            'Petra - Fiat',
+            'Redi Go - Datsun',
+            'GO - Datsun',
+            'GO Plus - Datsun',
+            'X1 - BMW',
+            '3 Series - BMW',
+            '2 Series - BMW',
+            '5 Series - BMW',
+            '3 Series GT - BMW',
+            'X3 - BMW',
+            '7 Series - BMW',
+            '1 Series - BMW',
+            'Z4 - BMW',
+            '5 Series GT - BMW',
+            'X5 - BMW',
+            'X6 - BMW',
+            '6 Series - BMW',
+            'M5 - BMW',
+            'M3 - BMW',
+            'X4 - BMW',
+            '6 Series GT - BMW',
+            'X7 - BMW',
+            'i4 - BMW',
+            'iX - BMW',
+            'Carnival - Kia',
+            'Seltos - Kia',
+            'Carens - Kia',
+            'Sonet - Kia',
+            'EV6 - Kia',
+            'Syros - Kia',
+            'A4 - Audi',
+            'A6 - Audi',
+            'Q3 - Audi',
+            'Q2 - Audi',
+            'Q7 - Audi',
+            'A3 - Audi',
+            'Q5 - Audi',
+            'A8 L - Audi',
+            'S4 - Audi',
+            'A5 - Audi',
+            'A7 - Audi',
+            'A8 - Audi',
+            'TT - Audi',
+            'R8 - Audi',
+            'RS5 - Audi',
+            'RS3 - Audi',
+            'Q8 - Audi',
+            'e-tron - Audi',
+            'C-Class - Mercedes',
+            'E-Class - Mercedes',
+            'GLC - Mercedes',
+            'CLA Class - Mercedes',
+            'A-Class - Mercedes',
+            'S-Class - Mercedes',
+            'V-Class - Mercedes',
+            'ML Class - Mercedes',
+            'B-Class - Mercedes',
+            'GLA Class - Mercedes',
+            'GLE Class - Mercedes',
+            'SL 500 AMG - Mercedes',
+            'AMG GT - Mercedes',
+            'G63 AMGr - Mercedes',
+            'GL Class - Mercedes',
+            'SLK Class - Mercedes',
+            'CLS Class - Mercedes',
+            'GLS - Mercedes',
+            'R Class - Mercedes',
+            'GLE43 AMG - Mercedes',
+            'EQC - Mercedes',
+            'EQS - Mercedes',
+            'Compass - Jeep',
+            'Wrangler - Jeep',
+            'Pajero Sport - Mitsubishi',
+            'Outlander - Mitsubishi',
+            'Pajero - Mitsubishi',
+            'Lancer - Mitsubishi',
+            'Cedia - Mitsubishi',
+            'Montero - Mitsubishi',
+            'Gloster - MG',
+            'ZS EV - MG',
+            'Hector - MG',
+            'Astor - MG',
+            'Hector Plus - MG',
+            'Windsor - MG',
+            'Comet - MG',
+            'Discovery Sport - Land Rover',
+            'Range Rover Evoque - Land Rover',
+            'Freelander 2 - Land Rover',
+            'Range Rover Sport - Land Rover',
+            'Discovery 4 - Land Rover',
+            'Defender - Land Rover',
+            'Range Rover - Land Rover',
+            'Range Rover Vogue - Land Rover',
+            'Range Rover Velar - Land Rover',
+            'S60 - Volvo',
+            'V40 - Volvo',
+            'S80 - Volvo',
+            'XC60 - Volvo',
+            'XC90 - Volvo',
+            'S60 Cross Country - Volvo',
+            'V40 Cross Country - Volvo',
+            'S40 - Volvo',
+            'XC 40 - Volvo',
+            'V60 - Volvo',
+            'V90 - Volvo',
+            'S90 - Volvo',
+            'XF - Jaguar',
+            'XE - Jaguar',
+            'XJ - Jaguar',
+            'F Type - Jaguar',
+            'F Pace - Jaguar',
+            'XJR - Jaguar',
+            'XK R - Jaguar',
+            'I-Pace - Jaguar',
+            'Rexton - Ssangyong',
+            'MU7 - Isuzu',
+            'Dmax V Cross - Isuzu',
+            'MU-X - Isuzu',
+            'Cooper - Mini',
+            'Countryman - Mini',
+            'Clubman - Mini',
+            'Cooper SE - Mini',
+            'One - Force',
+            'Traveller 3350 - Force',
+            'Trax - Force',
+            'Gurkha - Force',
+            'Corsa - Opel',
+            'Astra - Opel',
+            '911 - Porsche',
+            'Cayenne - Porsche',
+            'Macan - Porsche',
+            'Cayman - Porsche',
+            'Panamera - Porsche',
+            'Boxter - Porsche',
+            'Taycan - Porsche',
+            'Taycan Turismo - Porsche',
+            'Matiz - Daewoo',
+            'Nexia - Daewoo',
+            'Cielo - Daewoo',
+            'Ambassador - Hindustan Motors',
+            'Vantage - Aston Martin',
+            'Rapide - Aston Martin',
+            'Vanquish - Aston Martin',
+            'DB9 - Aston Martin',
+            'C5 Aircross - Citroen',
+            'C3 - Citroen',
+            'ES - Lexus',
+            'NX - Lexus',
+            'LS - Lexus',
+            'RX - Lexus',
+            'LC - Lexus',
+            'LX - Lexus',
+            'Mulsanne - Bentley',
+            'Continental - Bentley',
+            'Flying Spur - Bentley',
+            'Avanti - DC',
+            '458 Speciale - Ferrari',
+            '458 Italia - Ferrari',
+            '488 - Ferrari',
+            'California - Ferrari',
+            'F12 Berlinetta - Ferrari',
+            'FF - Ferrari',
+            'Ghibli - Maserati',
+            'Quattroporte - Maserati',
+            'GranCabrio - Maserati',
+            'GranTurismo - Maserati',
+            'Huracan - Lamborghini',
+            'Aventador - Lamborghini',
+            'Gallardo - Lamborghini',
+            'Urus - Lamborghini',
+            'Phantom - Rolls Royce',
+            'Ghost - Rolls Royce',
+            'Wraith - Rolls Royce',
+            'VIW CS2 - Photon',
+            'Neo - Jayem',
+            'Rio - Premier',
+            'H2 - Hummer',
+            'H3 - Hummer',
+            'e6 - BYD'
+        ];
+
+        // Global variables
+        let customerData = null;
+        let map = null;
+        let pickupLocation = null;
+        let dropLocation = null;
+        let selectedMode = 'pickup';
+        let selectedCar = '';
+        let markers = { pickup: null, drop: null };
+        let autocompleteService = null;
+        let placesService = null;
+        let directionsService = null;
+        let directionsRenderer = null;
+        let showSuggestions = false;
+        let distanceKm = 0;
+        let filteredCars = [];
+        let isDropdownOpen = false;
+
+        const API_KEY = 'AIzaSyAhQ7pefYjHolK8tjYqgdSZ7XXZSUaglp4';
+        const WHATSAPP_NUMBER = '918130377099';
+
+        // Initialize the application
+        async function init() {
+            setupCarDropdown();
+            await fetchCustomerData();
+            initializeMap();
+        }
+
+        // Setup car dropdown functionality
+        function setupCarDropdown() {
+            const carDropdown = document.getElementById('carDropdown');
+            const carOptions = document.getElementById('carOptions');
+            const dropdownArrow = document.getElementById('dropdownArrow');
+            const carSelection = document.getElementById('carSelection');
+
+            carDropdown.addEventListener('click', toggleCarDropdown);
+            carDropdown.addEventListener('input', handleCarSearch);
+            carDropdown.addEventListener('focus', () => {
+                carSelection.classList.add('focus');
+            });
+            carDropdown.addEventListener('blur', () => {
+                setTimeout(() => {
+                    carSelection.classList.remove('focus');
+                    closeCarDropdown();
+                }, 200);
+            });
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!carSelection.contains(e.target)) {
+                    closeCarDropdown();
+                }
+            });
+        }
+
+        function toggleCarDropdown() {
+            const carDropdown = document.getElementById('carDropdown');
+            const carOptions = document.getElementById('carOptions');
+            const dropdownArrow = document.getElementById('dropdownArrow');
+
+            if (isDropdownOpen) {
+                closeCarDropdown();
+            } else {
+                carDropdown.removeAttribute('readonly');
+                carDropdown.focus();
+                carOptions.style.display = 'block';
+                dropdownArrow.classList.add('open');
+                isDropdownOpen = true;
+                
+                if (!filteredCars.length) {
+                    filteredCars = carModelsList;
+                }
+                displayCarOptions(filteredCars);
+            }
+        }
+
+        function closeCarDropdown() {
+            const carDropdown = document.getElementById('carDropdown');
+            const carOptions = document.getElementById('carOptions');
+            const dropdownArrow = document.getElementById('dropdownArrow');
+
+            carOptions.style.display = 'none';
+            dropdownArrow.classList.remove('open');
+            isDropdownOpen = false;
+            carDropdown.setAttribute('readonly', 'true');
+        }
+
+        function handleCarSearch(event) {
+            const searchTerm = event.target.value.toLowerCase();
+            
+            if (searchTerm === '') {
+                filteredCars = carModelsList;
+            } else {
+                filteredCars = carModelsList.filter(car => 
+                    car.toLowerCase().includes(searchTerm)
+                );
+            }
+            
+            displayCarOptions(filteredCars);
+        }
+
+        function displayCarOptions(cars) {
+            const carOptions = document.getElementById('carOptions');
+            
+            if (cars.length === 0) {
+                carOptions.innerHTML = '<div class="no-results">No cars found matching your search</div>';
+                return;
+            }
+            
+            const optionsHTML = cars.map(car => 
+                `<div class="car-option" onclick="selectCar('${car}')">${car}</div>`
+            ).join('');
+            
+            carOptions.innerHTML = optionsHTML;
+        }
+
+        function selectCar(car) {
+            const carDropdown = document.getElementById('carDropdown');
+            selectedCar = car;
+            carDropdown.value = car;
+            closeCarDropdown();
+        }
+
+        // Get mobile number from URL or use hardcoded value
+        function getMobileFromUrl() {
+            return '918393990942'; // Hardcoded as requested
+        }
+
+        // Fetch customer data from API
+        async function fetchCustomerData() {
+            try {
+                const mobile = getMobileFromUrl();
+                const response = await fetch(`https://ai.instantmechanic.online/bot/customer_chats/?mobile=${mobile}`);
+                const data = await response.json();
+                
+                if (data.status === 'success' && data.data.length > 0) {
+                    customerData = data.data[0];
+                    displayCustomerInfo();
+                    
+                    if (customerData.location) {
+                        const coords = extractCoordsFromUrl(customerData.location);
+                        if (coords) {
+                            pickupLocation = {
+                                lat: coords.lat,
+                                lng: coords.lng,
+                                address: 'Current Location',
+                                fromApi: true
+                            };
+                            updateLocationStatus();
+                            showCurrentLocation();
+                            selectMode('drop');
+                        }
+                    }
+                }
+                
+                if (!pickupLocation) {
+                    selectMode('pickup');
+                } else {
+                    selectMode('drop');
+                }
+                
+                document.getElementById('loadingDiv').classList.add('hidden');
+                document.getElementById('mainContent').classList.remove('hidden');
+            } catch (error) {
+                console.error('Error fetching customer data:', error);
+                selectMode('pickup');
+                document.getElementById('loadingDiv').classList.add('hidden');
+                document.getElementById('mainContent').classList.remove('hidden');
+            }
+        }
+
+        // Display customer information
+        function displayCustomerInfo() {
+            if (customerData) {
+                document.getElementById('customerName').textContent = customerData.name;
+                document.getElementById('customerMobile').textContent = customerData.mobile;
+                document.getElementById('customerInfo').classList.remove('hidden');
+            }
+        }
+
+        // Extract coordinates from Google Maps URL
+        function extractCoordsFromUrl(url) {
+            const match = url.match(/q=([0-9.-]+),([0-9.-]+)/);
+            if (match) {
+                return { lat: parseFloat(match[1]), lng: parseFloat(match[2]) };
+            }
+            return null;
+        }
+
+        // Convert coordinates to Google Maps URL format
+        function coordsToGoogleMapsUrl(lat, lng) {
+            return `https://maps.google.com/?q=${lat},${lng}`;
+        }
+
+        // Initialize Google Maps
+        function initializeMap() {
+            if (window.google) {
+                setupMap();
+            } else {
+                const script = document.createElement('script');
+                script.src = `https://maps.googleapis.com/maps/api/js?key=${API_KEY}&libraries=places&callback=setupMap`;
+                script.async = true;
+                document.head.appendChild(script);
+            }
+        }
+
+        // Setup the map
+        function setupMap() {
+            const mapElement = document.getElementById('map');
+            map = new google.maps.Map(mapElement, {
+                center: { lat: 28.6139, lng: 77.2090 },
+                zoom: 12,
+                styles: [
+                    {
+                        featureType: 'poi.business',
+                        stylers: [{ visibility: 'off' }]
+                    }
+                ]
+            });
+
+            autocompleteService = new google.maps.places.AutocompleteService();
+            placesService = new google.maps.places.PlacesService(map);
+            directionsService = new google.maps.DirectionsService();
+            directionsRenderer = new google.maps.DirectionsRenderer({
+                suppressMarkers: true,
+                polylineOptions: {
+                    strokeColor: '#667eea',
+                    strokeWeight: 4
+                }
+            });
+
+            map.addListener('click', (event) => {
+                handleMapClick(event.latLng);
+            });
+
+            if (pickupLocation) {
+                updateMarkers();
+            }
+        }
+
+        // Handle map click
+        function handleMapClick(latLng) {
+            const lat = latLng.lat();
+            const lng = latLng.lng();
+            
+            const geocoder = new google.maps.Geocoder();
+            geocoder.geocode({ location: { lat, lng } }, (results, status) => {
+                if (status === 'OK' && results[0]) {
+                    const location = {
+                        lat,
+                        lng,
+                        address: results[0].formatted_address,
+                        fromApi: false
+                    };
+
+                    if (selectedMode === 'pickup') {
+                        pickupLocation = location;
+                    } else {
+                        dropLocation = location;
+                    }
+                    
+                    updateLocationStatus();
+                    updateMarkers();
+                    clearSearch();
+                }
+            });
+        }
+
+        // Select mode (pickup or drop)
+        function selectMode(mode) {
+            selectedMode = mode;
+            
+            document.getElementById('pickupBtn').classList.remove('active');
+            document.getElementById('dropBtn').classList.remove('active');
+            document.getElementById(mode + 'Btn').classList.add('active');
+            
+            const searchInput = document.getElementById('searchInput');
+            searchInput.placeholder = `Search for ${mode} location...`;
+            
+            updateCurrentLocationDisplay();
+        }
+
+        // Handle search input change
+        function handleSearchChange() {
+            const query = document.getElementById('searchInput').value;
+            
+            if (query.length > 2 && autocompleteService) {
+                autocompleteService.getPlacePredictions(
+                    { 
+                        input: query, 
+                        componentRestrictions: { country: 'in' },
+                        types: ['establishment', 'geocode']
+                    },
+                    (predictions, status) => {
+                        if (status === google.maps.places.PlacesServiceStatus.OK) {
+                            displaySuggestions(predictions || []);
+                        }
+                    }
+                );
+            } else {
+                hideSuggestions();
+            }
+        }
+
+        // Display search suggestions
+        function displaySuggestions(predictions) {
+            const suggestionsDiv = document.getElementById('suggestions');
+            suggestionsDiv.innerHTML = '';
+            
+            if (predictions.length > 0) {
+                predictions.forEach(prediction => {
+                    const item = document.createElement('div');
+                    item.className = 'suggestion-item';
+                    item.textContent = prediction.description;
+                    item.onclick = () => selectSuggestion(prediction);
+                    suggestionsDiv.appendChild(item);
+                });
+                
+                suggestionsDiv.classList.remove('hidden');
+            } else {
+                hideSuggestions();
+            }
+        }
+
+        // Select a suggestion
+        function selectSuggestion(prediction) {
+            placesService.getDetails(
+                { placeId: prediction.place_id },
+                (place, status) => {
+                    if (status === google.maps.places.PlacesServiceStatus.OK) {
+                        const location = {
+                            lat: place.geometry.location.lat(),
+                            lng: place.geometry.location.lng(),
+                            address: place.formatted_address,
+                            fromApi: false
+                        };
+
+                        if (selectedMode === 'pickup') {
+                            pickupLocation = location;
+                        } else {
+                            dropLocation = location;
+                        }
+                        
+                        updateLocationStatus();
+                        updateMarkers();
+                        clearSearch();
+                    }
+                }
+            );
+        }
+
+        // Hide suggestions
+        function hideSuggestions() {
+            document.getElementById('suggestions').classList.add('hidden');
+        }
+
+        // Clear search input
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            hideSuggestions();
+        }
+
+        // Update location status indicators
+        function updateLocationStatus() {
+            const pickupBtn = document.getElementById('pickupBtn');
+            const dropBtn = document.getElementById('dropBtn');
+            const pickupStatus = document.getElementById('pickupStatus');
+            const dropStatus = document.getElementById('dropStatus');
+            
+            // Update pickup button
+            if (pickupLocation) {
+                pickupBtn.classList.add('completed');
+                pickupStatus.textContent = 'DONE';
+                pickupStatus.className = 'location-status done';
+            } else {
+                pickupBtn.classList.remove('completed');
+                if (selectedMode === 'pickup') {
+                    pickupStatus.textContent = 'CURRENT';
+                    pickupStatus.className = 'location-status current';
+                } else {
+                    pickupStatus.textContent = 'SELECT';
+                    pickupStatus.className = 'location-status pending';
+                }
+            }
+            
+            // Update drop button  
+            if (dropLocation) {
+                dropBtn.classList.add('completed');
+                dropStatus.textContent = 'DONE';
+                dropStatus.className = 'location-status done';
+            } else {
+                dropBtn.classList.remove('completed');
+                if (selectedMode === 'drop') {
+                    dropStatus.textContent = 'CURRENT';
+                    dropStatus.className = 'location-status current';
+                } else {
+                    dropStatus.textContent = 'SELECT';
+                    dropStatus.className = 'location-status pending';
+                }
+            }
+            
+            updateCurrentLocationDisplay();
+        }
+
+        // Show current location info
+        function showCurrentLocation() {
+            updateCurrentLocationDisplay();
+        }
+
+        // Update current location display
+        function updateCurrentLocationDisplay() {
+            const currentLocationDiv = document.getElementById('currentLocationDiv');
+            const label = document.getElementById('currentLocationLabel');
+            const address = document.getElementById('currentLocationAddress');
+            
+            const currentLocation = selectedMode === 'pickup' ? pickupLocation : dropLocation;
+            
+            if (currentLocation) {
+                label.textContent = selectedMode.toUpperCase() + ' LOCATION';
+                address.innerHTML = `${currentLocation.address} <button class="edit-btn" onclick="editCurrentLocation()">✏️</button>`;
+                currentLocationDiv.classList.remove('hidden');
+            } else {
+                currentLocationDiv.classList.add('hidden');
+            }
+        }
+
+        // Edit current location
+        function editCurrentLocation() {
+            if (selectedMode === 'pickup') {
+                pickupLocation = null;
+            } else {
+                dropLocation = null;
+            }
+            updateLocationStatus();
+            updateMarkers();
+        }
+
+        // Update map markers
+        function updateMarkers() {
+            Object.values(markers).forEach(marker => {
+                if (marker) marker.setMap(null);
+            });
+
+            markers = { pickup: null, drop: null };
+
+            if (pickupLocation) {
+                markers.pickup = new google.maps.Marker({
+                    position: { lat: pickupLocation.lat, lng: pickupLocation.lng },
+                    map: map,
+                    title: 'Pickup Location',
+                    icon: {
+                        url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+                            <svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="20" cy="20" r="18" fill="#22c55e" stroke="white" stroke-width="3"/>
+                                <text x="20" y="26" text-anchor="middle" fill="white" font-size="14" font-weight="bold">P</text>
+                            </svg>
+                        `),
+                        scaledSize: new google.maps.Size(40, 40)
+                    }
+                });
+            }
+
+            if (dropLocation) {
+                markers.drop = new google.maps.Marker({
+                    position: { lat: dropLocation.lat, lng: dropLocation.lng },
+                    map: map,
+                    title: 'Drop Location',
+                    icon: {
+                        url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+                            <svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="20" cy="20" r="18" fill="#ef4444" stroke="white" stroke-width="3"/>
+                                <text x="20" y="26" text-anchor="middle" fill="white" font-size="14" font-weight="bold">D</text>
+                            </svg>
+                        `),
+                        scaledSize: new google.maps.Size(40, 40)
+                    }
+                });
+            }
+
+            if (pickupLocation && dropLocation) {
+                const bounds = new google.maps.LatLngBounds();
+                bounds.extend({ lat: pickupLocation.lat, lng: pickupLocation.lng });
+                bounds.extend({ lat: dropLocation.lat, lng: dropLocation.lng });
+                map.fitBounds(bounds);
+                calculateDistance();
+            } else if (pickupLocation || dropLocation) {
+                const location = pickupLocation || dropLocation;
+                map.setCenter({ lat: location.lat, lng: location.lng });
+                map.setZoom(15);
+            }
+        }
+
+        // Calculate distance between pickup and drop
+        function calculateDistance() {
+            if (pickupLocation && dropLocation && directionsService) {
+                directionsService.route({
+                    origin: { lat: pickupLocation.lat, lng: pickupLocation.lng },
+                    destination: { lat: dropLocation.lat, lng: dropLocation.lng },
+                    travelMode: google.maps.TravelMode.DRIVING
+                }, (response, status) => {
+                    if (status === 'OK') {
+                        const route = response.routes[0];
+                        const distance = route.legs[0].distance;
+                        
+                        document.getElementById('distanceText').textContent = distance.text;
+                        const distanceMatch = distance.text.match(/([0-9.]+)/);
+                        distanceKm = distanceMatch ? parseFloat(distanceMatch[1]) : 0;
+                        
+                        directionsRenderer.setDirections(response);
+                        directionsRenderer.setMap(map);
+                    }
+                });
+            } else {
+                if (directionsRenderer) {
+                    directionsRenderer.setMap(null);
+                }
+                distanceKm = 0;
+            }
+        }
+
+        // Parse pricing information from API response
+        function parsePricingInfo(chatMessage) {
+            const lines = chatMessage.split('\n').filter(line => line.trim());
+            const services = [];
+            
+            lines.forEach(line => {
+                if (line.includes('Underlift:') || line.includes('Flatbed:')) {
+                    const parts = line.split(':');
+                    if (parts.length >= 2) {
+                        const serviceName = parts[0].trim();
+                        const priceInfo = parts[1].trim();
+                        
+                        // Extract price and breakdown
+                        const priceMatch = priceInfo.match(/Rs\.(\d+)/);
+                        const price = priceMatch ? priceMatch[1] : '';
+                        
+                        // Extract breakdown from parentheses
+                        const breakdownMatch = priceInfo.match(/\(([^)]+)\)/);
+                        const breakdown = breakdownMatch ? breakdownMatch[1] : '';
+                        
+                        services.push({
+                            name: serviceName,
+                            price: price,
+                            breakdown: breakdown
+                        });
+                    }
+                }
+            });
+            
+            return services;
+        }
+
+        // Display response modal with pricing
+        function showResponseModal(apiResponse) {
+            const modal = document.getElementById('responseModal');
+            const pricingInfo = document.getElementById('pricingInfo');
+            
+            const services = parsePricingInfo(apiResponse.data.chat_message);
+            
+            let servicesHTML = '';
+            services.forEach(service => {
+                servicesHTML += `
+                    <div class="service-option">
+                        <div class="service-name">${service.name}</div>
+                        <div class="service-price">₹${service.price}</div>
+                        <div class="service-breakdown">${service.breakdown}</div>
+                    </div>
+                `;
+            });
+            
+            pricingInfo.innerHTML = servicesHTML;
+            modal.classList.add('show');
+        }
+
+        // Close response modal
+        function closeResponseModal() {
+            const modal = document.getElementById('responseModal');
+            modal.classList.remove('show');
+            
+            // Redirect to WhatsApp after closing modal
+            const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}`;
+            window.location.href = whatsappUrl;
+        }
+
+        // Handle form submission
+        async function handleSubmit() {
+            console.log('handleSubmit called');
+            
+            if (!pickupLocation || !dropLocation) {
+                alert('Please select both pickup and drop locations');
+                return;
+            }
+
+            if (!selectedCar) {
+                alert('Please select your car model');
+                return;
+            }
+
+            const submitBtn = document.getElementById('submitBtn');
+            
+            // Simple loading state - just disable button
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.style.opacity = '0.6';
+                submitBtn.innerHTML = 'Getting Quote...';
+            }
+
+            try {
+                // Prepare data in the required format
+                const submitData = {
+                    mobile: getMobileFromUrl(),
+                    pickup_url: coordsToGoogleMapsUrl(pickupLocation.lat, pickupLocation.lng),
+                    drop_url: coordsToGoogleMapsUrl(dropLocation.lat, dropLocation.lng),
+                    distance: distanceKm.toString(),
+                    car: selectedCar
+                };
+
+                console.log('Submitting towing request:', submitData);
+
+                // Make API call
+                const response = await fetch('https://ai.instantmechanic.online/bot/save-locations/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': '*/*',
+                        'Accept-Language': 'en-US,en;q=0.9',
+                        'Connection': 'keep-alive',
+                        'Origin': 'https://instantmechanic.online',
+                        'Referer': 'https://instantmechanic.online/',
+                        'Sec-Fetch-Dest': 'empty',
+                        'Sec-Fetch-Mode': 'cors',
+                        'Sec-Fetch-Site': 'same-site',
+                        'User-Agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Mobile Safari/537.36',
+                        'sec-ch-ua': '"Chromium";v="142", "Google Chrome";v="142", "Not_A Brand";v="99"',
+                        'sec-ch-ua-mobile': '?1',
+                        'sec-ch-ua-platform': '"Android"'
+                    },
+                    body: JSON.stringify(submitData)
+                });
+
+                console.log('Response status:', response.status);
+                
+                const result = await response.json();
+                console.log('API Response:', result);
+
+                // Reset button first
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.style.opacity = '1';
+                    submitBtn.innerHTML = 'Get Towing Quote';
+                }
+
+                // Check if API call was successful
+                if (response.ok && result.data && result.data.chat_message) {
+                    console.log('Success - showing response modal');
+                    showResponseModal(result);
+                } else {
+                    // API returned error
+                    throw new Error(result.message || 'Failed to get towing quote');
+                }
+
+            } catch (error) {
+                console.error('Error submitting request:', error);
+                
+                // Reset button
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.style.opacity = '1';
+                    submitBtn.innerHTML = 'Get Towing Quote';
+                }
+                
+                alert('Failed to get towing quote. Please try again.');
+            }
+        }
+
+        // Close suggestions when clicking outside
+        document.addEventListener('click', (event) => {
+            if (!event.target.closest('.search-container')) {
+                hideSuggestions();
+            }
+        });
+
+        // Initialize app when page loads
+        window.addEventListener('load', init);
+        
+        // Make setupMap globally available for Google Maps callback
+        window.setupMap = setupMap;
+    </script>
+</body>
+</html>
