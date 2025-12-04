@@ -457,9 +457,9 @@
             background: white;
             border-radius: 24px;
             padding: 30px;
-            max-width: 400px;
+            max-width: 450px;
             width: 100%;
-            max-height: 80vh;
+            max-height: 85vh;
             overflow-y: auto;
             box-shadow: var(--shadow-strong);
             transform: scale(0.8);
@@ -500,43 +500,130 @@
         }
 
         .pricing-info {
-            background: var(--bg-secondary);
-            border-radius: 16px;
-            padding: 20px;
             margin-bottom: 25px;
         }
 
         .service-option {
             background: white;
-            border-radius: 12px;
-            padding: 18px;
-            margin-bottom: 12px;
-            border-left: 4px solid var(--success-color);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            border: 2px solid var(--border-light);
             box-shadow: var(--shadow-soft);
+            transition: all 0.3s ease;
+        }
+
+        .service-option:hover {
+            border-color: #667eea;
+            box-shadow: 0 8px 30px rgba(102, 126, 234, 0.15);
         }
 
         .service-option:last-child {
             margin-bottom: 0;
         }
 
+        .service-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
         .service-name {
             font-size: 18px;
             font-weight: 700;
             color: var(--text-primary);
-            margin-bottom: 8px;
+            flex: 1;
         }
 
         .service-price {
-            font-size: 24px;
+            font-size: 28px;
             font-weight: 800;
             color: var(--success-color);
-            margin-bottom: 5px;
+            margin-left: auto;
         }
 
-        .service-breakdown {
+        /* Pricing Breakdown */
+        .pricing-breakdown {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 15px;
+        }
+
+        .breakdown-title {
             font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .breakdown-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 14px;
+        }
+
+        .breakdown-item:last-child {
+            border-bottom: none;
+            margin-top: 8px;
+            padding-top: 12px;
+            border-top: 2px solid #e2e8f0;
+            font-weight: 600;
+        }
+
+        .breakdown-label {
             color: var(--text-secondary);
-            line-height: 1.4;
+        }
+
+        .breakdown-value {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        /* Overall Pricing Details */
+        .pricing-details {
+            background: #f8fafc;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid #667eea;
+        }
+
+        .details-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 0;
+            font-size: 14px;
+        }
+
+        .detail-label {
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .detail-value {
+            color: var(--text-primary);
+            font-weight: 600;
         }
 
         .close-btn {
@@ -563,6 +650,25 @@
 
         .distance-info {
             display: none;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-yes {
+            background: #d1fae5;
+            color: #047857;
+        }
+
+        .status-no {
+            background: #fee2e2;
+            color: #dc2626;
         }
 
         @media (max-width: 480px) {
@@ -713,9 +819,21 @@
                     <div class="response-title">Towing Quote Ready!</div>
                     <div class="response-subtitle">Here are your towing service options</div>
                 </div>
-                <div class="pricing-info" id="pricingInfo">
-                    <!-- Pricing will be populated here -->
+                
+                <!-- Pricing Details -->
+                <div class="pricing-details" id="pricingDetails">
+                    <div class="details-title">
+                        📊 Pricing Calculation Details
+                    </div>
+                    <div id="pricingDetailsContent">
+                        <!-- Will be populated dynamically -->
+                    </div>
                 </div>
+
+                <div class="pricing-info" id="pricingInfo">
+                    <!-- Service options will be populated here -->
+                </div>
+                
                 <button class="close-btn" onclick="getQuoteForAnotherCar()">
                     Get Price for Another Car
                 </button>
@@ -1692,7 +1810,9 @@
         function parsePricingInfo(chatMessage) {
             const lines = chatMessage.split('\n').filter(line => line.trim());
             const services = [];
+            const pricingDetails = {};
             
+            // Extract services
             lines.forEach(line => {
                 if (line.includes('Underlift:') || line.includes('Flatbed:')) {
                     const parts = line.split(':');
@@ -1700,40 +1820,149 @@
                         const serviceName = parts[0].trim();
                         const priceInfo = parts[1].trim();
                         
-                        // Extract price and breakdown
+                        // Extract price
                         const priceMatch = priceInfo.match(/Rs\.(\d+)/);
                         const price = priceMatch ? priceMatch[1] : '';
                         
-                        // Extract breakdown from parentheses
-                        const breakdownMatch = priceInfo.match(/\(([^)]+)\)/);
-                        const breakdown = breakdownMatch ? breakdownMatch[1] : '';
-                        
                         services.push({
                             name: serviceName,
-                            price: price,
-                            breakdown: breakdown
+                            price: price
                         });
                     }
                 }
             });
             
-            return services;
+            // Extract pricing summary details
+            const summaryStartIndex = lines.findIndex(line => line.includes('--- Pricing Summary ---'));
+            if (summaryStartIndex !== -1) {
+                for (let i = summaryStartIndex + 1; i < lines.length; i++) {
+                    const line = lines[i];
+                    if (line.includes('Base Underlift:')) {
+                        const match = line.match(/Rs\.(\d+)/);
+                        pricingDetails.baseUnderlift = match ? match[1] : '';
+                    } else if (line.includes('Base Flatbed:')) {
+                        const match = line.match(/Rs\.(\d+)/);
+                        pricingDetails.baseFlatbed = match ? match[1] : '';
+                    } else if (line.includes('Category:')) {
+                        pricingDetails.category = line.split(':')[1].trim();
+                    } else if (line.includes('Distance:')) {
+                        pricingDetails.distance = line.split(':')[1].trim();
+                    } else if (line.includes('Multiplier:')) {
+                        pricingDetails.multiplier = line.split(':')[1].trim();
+                    } else if (line.includes('Threshold Applied:')) {
+                        pricingDetails.thresholdApplied = line.split(':')[1].trim();
+                    } else if (line.includes('Toll/State Charge Applied:')) {
+                        pricingDetails.tollApplied = line.split(':')[1].trim();
+                    } else if (line.includes('Luxury Add-on:')) {
+                        pricingDetails.luxuryAddon = line.split(':')[1].trim();
+                    }
+                }
+            }
+            
+            return { services, pricingDetails };
         }
 
         // Display response modal with pricing
         function showResponseModal(apiResponse) {
             const modal = document.getElementById('responseModal');
             const pricingInfo = document.getElementById('pricingInfo');
+            const pricingDetailsContent = document.getElementById('pricingDetailsContent');
             
-            const services = parsePricingInfo(apiResponse.data.chat_message);
+            const { services, pricingDetails } = parsePricingInfo(apiResponse.data.chat_message);
             
+            // Display pricing details
+            let detailsHTML = '';
+            if (Object.keys(pricingDetails).length > 0) {
+                detailsHTML = `
+                    <div class="detail-row">
+                        <span class="detail-label">Car Category:</span>
+                        <span class="detail-value">${pricingDetails.category || 'N/A'}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Distance:</span>
+                        <span class="detail-value">${pricingDetails.distance || 'N/A'}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Distance Multiplier:</span>
+                        <span class="detail-value">${pricingDetails.multiplier || 'N/A'}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Threshold Applied:</span>
+                        <span class="detail-value">
+                            <span class="status-badge ${pricingDetails.thresholdApplied === 'Yes' ? 'status-yes' : 'status-no'}">
+                                ${pricingDetails.thresholdApplied || 'N/A'}
+                            </span>
+                        </span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Toll/State Charges:</span>
+                        <span class="detail-value">
+                            <span class="status-badge ${pricingDetails.tollApplied === 'Yes' ? 'status-yes' : 'status-no'}">
+                                ${pricingDetails.tollApplied || 'N/A'}
+                            </span>
+                        </span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Luxury Add-on:</span>
+                        <span class="detail-value">
+                            <span class="status-badge ${pricingDetails.luxuryAddon === 'Yes' ? 'status-yes' : 'status-no'}">
+                                ${pricingDetails.luxuryAddon || 'N/A'}
+                            </span>
+                        </span>
+                    </div>
+                `;
+            }
+            pricingDetailsContent.innerHTML = detailsHTML;
+            
+            // Display services with breakdown
             let servicesHTML = '';
             services.forEach(service => {
+                const isUnderlift = service.name.toLowerCase().includes('underlift');
+                const basePrice = isUnderlift ? pricingDetails.baseUnderlift : pricingDetails.baseFlatbed;
+                
                 servicesHTML += `
                     <div class="service-option">
-                        <div class="service-name">${service.name}</div>
-                        <div class="service-price">₹${service.price}</div>
-                        <div class="service-breakdown">${service.breakdown}</div>
+                        <div class="service-header">
+                            <div class="service-name">${service.name}</div>
+                            <div class="service-price">₹${service.price}</div>
+                        </div>
+                        ${basePrice ? `
+                            <div class="pricing-breakdown">
+                                <div class="breakdown-title">
+                                    🧮 Price Calculation
+                                </div>
+                                <div class="breakdown-item">
+                                    <span class="breakdown-label">Base ${service.name} Rate:</span>
+                                    <span class="breakdown-value">₹${basePrice}</span>
+                                </div>
+                                <div class="breakdown-item">
+                                    <span class="breakdown-label">Distance (${pricingDetails.distance}):</span>
+                                    <span class="breakdown-value">× ${pricingDetails.multiplier}</span>
+                                </div>
+                                ${pricingDetails.thresholdApplied === 'Yes' ? `
+                                    <div class="breakdown-item">
+                                        <span class="breakdown-label">Distance Threshold:</span>
+                                        <span class="breakdown-value">Applied</span>
+                                    </div>
+                                ` : ''}
+                                ${pricingDetails.tollApplied === 'Yes' ? `
+                                    <div class="breakdown-item">
+                                        <span class="breakdown-label">Toll/State Charges:</span>
+                                        <span class="breakdown-value">Added</span>
+                                    </div>
+                                ` : ''}
+                                ${pricingDetails.luxuryAddon === 'Yes' ? `
+                                    <div class="breakdown-item">
+                                        <span class="breakdown-label">Luxury Car Add-on:</span>
+                                        <span class="breakdown-value">Added</span>
+                                    </div>
+                                ` : ''}
+                                <div class="breakdown-item">
+                                    <span class="breakdown-label">Final Price:</span>
+                                    <span class="breakdown-value">₹${service.price}</span>
+                                </div>
+                            </div>
+                        ` : ''}
                     </div>
                 `;
             });
