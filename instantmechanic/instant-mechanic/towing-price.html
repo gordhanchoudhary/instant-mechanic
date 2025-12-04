@@ -339,6 +339,16 @@
             background: var(--bg-secondary);
         }
 
+        .coordinate-suggestion {
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            border-left: 3px solid #3b82f6;
+            font-weight: 500;
+        }
+
+        .coordinate-suggestion:hover {
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+        }
+
         .current-location {
             background: white;
             padding: 20px;
@@ -783,7 +793,7 @@
                         type="text" 
                         class="search-box" 
                         id="searchInput" 
-                        placeholder="Search for pickup location..."
+                        placeholder="Search location or paste coordinates (lat,lng)..."
                         oninput="handleSearchChange()"
                         onfocus="showSuggestions = true"
                     >
@@ -1543,6 +1553,10 @@
 
                     if (selectedMode === 'pickup') {
                         pickupLocation = location;
+                        // Auto-switch to drop location selection
+                        setTimeout(() => {
+                            selectMode('drop');
+                        }, 500);
                     } else {
                         dropLocation = location;
                     }
@@ -1563,14 +1577,21 @@
             document.getElementById(mode + 'Btn').classList.add('active');
             
             const searchInput = document.getElementById('searchInput');
-            searchInput.placeholder = `Search for ${mode} location...`;
+            searchInput.placeholder = `Search ${mode} location or paste coordinates (lat,lng)...`;
             
             updateCurrentLocationDisplay();
         }
 
         // Handle search input change
         function handleSearchChange() {
-            const query = document.getElementById('searchInput').value;
+            const query = document.getElementById('searchInput').value.trim();
+            
+            // Check if input looks like coordinates (lat,lng format)
+            const coordinatePattern = /^-?\d+\.?\d*\s*,\s*-?\d+\.?\d*$/;
+            if (coordinatePattern.test(query)) {
+                handleCoordinateInput(query);
+                return;
+            }
             
             if (query.length > 2 && autocompleteService) {
                 autocompleteService.getPlacePredictions(
@@ -1588,6 +1609,73 @@
             } else {
                 hideSuggestions();
             }
+        }
+
+        // Handle coordinate input (lat,lng)
+        function handleCoordinateInput(coordinateString) {
+            const parts = coordinateString.split(',');
+            if (parts.length === 2) {
+                const lat = parseFloat(parts[0].trim());
+                const lng = parseFloat(parts[1].trim());
+                
+                // Validate coordinates
+                if (!isNaN(lat) && !isNaN(lng) && 
+                    lat >= -90 && lat <= 90 && 
+                    lng >= -180 && lng <= 180) {
+                    
+                    // Show coordinate suggestion
+                    displayCoordinateSuggestion(lat, lng);
+                } else {
+                    hideSuggestions();
+                }
+            }
+        }
+
+        // Display coordinate suggestion
+        function displayCoordinateSuggestion(lat, lng) {
+            const suggestionsDiv = document.getElementById('suggestions');
+            suggestionsDiv.innerHTML = `
+                <div class="suggestion-item coordinate-suggestion" onclick="selectCoordinate(${lat}, ${lng})">
+                    📍 Use coordinates: ${lat}, ${lng}
+                    <div style="font-size: 12px; color: #64748b; margin-top: 4px;">
+                        Click to set this location
+                    </div>
+                </div>
+            `;
+            suggestionsDiv.classList.remove('hidden');
+        }
+
+        // Select coordinate location
+        function selectCoordinate(lat, lng) {
+            // Use reverse geocoding to get address
+            const geocoder = new google.maps.Geocoder();
+            geocoder.geocode({ location: { lat, lng } }, (results, status) => {
+                let address = `${lat}, ${lng}`;
+                if (status === 'OK' && results[0]) {
+                    address = results[0].formatted_address;
+                }
+                
+                const location = {
+                    lat,
+                    lng,
+                    address,
+                    fromApi: false
+                };
+
+                if (selectedMode === 'pickup') {
+                    pickupLocation = location;
+                    // Auto-switch to drop location selection
+                    setTimeout(() => {
+                        selectMode('drop');
+                    }, 500);
+                } else {
+                    dropLocation = location;
+                }
+                
+                updateLocationStatus();
+                updateMarkers();
+                clearSearch();
+            });
         }
 
         // Display search suggestions
@@ -1625,6 +1713,10 @@
 
                         if (selectedMode === 'pickup') {
                             pickupLocation = location;
+                            // Auto-switch to drop location selection
+                            setTimeout(() => {
+                                selectMode('drop');
+                            }, 500);
                         } else {
                             dropLocation = location;
                         }
@@ -1812,9 +1904,10 @@
             const services = [];
             const pricingDetails = {};
             
-            // Extract services
+            // Extract only final service prices (Underlift and Flatbed)
             lines.forEach(line => {
-                if (line.includes('Underlift:') || line.includes('Flatbed:')) {
+                if ((line.includes('Underlift:') || line.includes('Flatbed:')) && 
+                    !line.includes('Base Underlift:') && !line.includes('Base Flatbed:')) {
                     const parts = line.split(':');
                     if (parts.length >= 2) {
                         const serviceName = parts[0].trim();
