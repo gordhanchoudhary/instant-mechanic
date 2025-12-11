@@ -2639,5 +2639,113 @@
             }
         });
     </script>
+
+    <script>
+    // Add this to the existing global variables section
+    let skipMobileCollection = false;
+
+    // Modify the getURLParams function to include 'c' parameter
+    function getURLParams() {
+        const urlParams = new URLSearchParams(window.location.search);
+        return {
+            mobile: extractMobile(urlParams.get('mobile')),
+            brand_id: urlParams.get('brand_id'),
+            brand_name: urlParams.get('brand_name') || urlParams.get('brand'),
+            car_id: urlParams.get('car_id'),
+            car_name: urlParams.get('car_name') || urlParams.get('car'),
+            car_image: urlParams.get('car_image'),
+            c: urlParams.get('c') // Add this line
+        };
+    }
+
+    // Add this function to check for 'c' parameter
+    function checkCampaignParameter() {
+        const urlParams = getURLParams();
+        
+        if (urlParams.c) {
+            skipMobileCollection = true;
+            
+            // Hit Mixpanel event immediately
+            mixpanel.track('Campaign Page Visited', {
+                'Campaign Parameter': urlParams.c,
+                'Source': 'Direct Campaign Link',
+                'Skip Mobile': true,
+                'Timestamp': new Date().toISOString()
+            });
+            
+            // Hit service-query API
+            fetch('https://ai.instantmechanic.online/bot/service-query/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    mobile: urlParams.c, // Using 'c' parameter as mobile identifier
+                    message: "car service interested customer"
+                })
+            }).then(response => response.json())
+            .then(data => {
+                console.log('Campaign API call successful:', data);
+                
+                // Track API success
+                mixpanel.track('Campaign API Hit Success', {
+                    'Campaign Parameter': urlParams.c,
+                    'API Response': data.status || 'success',
+                    'Timestamp': new Date().toISOString()
+                });
+            }).catch(error => {
+                console.error('Campaign API call failed:', error);
+                
+                // Track API error
+                mixpanel.track('Campaign API Hit Error', {
+                    'Campaign Parameter': urlParams.c,
+                    'Error': error.message,
+                    'Timestamp': new Date().toISOString()
+                });
+            });
+        }
+    }
+
+    // Modify the selectCar function to skip mobile collection when 'c' parameter is present
+    function selectCar(car) {
+        selectedCar = car;
+
+        localStorage.setItem("selectedCarId", car.car_type_id);
+        localStorage.setItem("selectedCarName", car.name);
+        localStorage.setItem("carImage", car.image_path);
+        localStorage.setItem("brand", car.brand.name);
+        localStorage.setItem("carName", car.name);
+
+        mixpanel.track('Service Page - Car Selected', {
+            'Brand': car.brand.name,
+            'Car Model': car.name,
+            'Car ID': car.car_type_id,
+            'Mobile': userMobile,
+            'Skip Mobile Collection': skipMobileCollection,
+            'Timestamp': new Date().toISOString()
+        });
+
+        // Skip mobile collection if 'c' parameter is present
+        if (skipMobileCollection) {
+            skipToPricingPage();
+        } else {
+            skipToMobileCollection();
+        }
+    }
+
+    // Update the initialization to include campaign parameter check
+    document.addEventListener('DOMContentLoaded', function() {
+        checkCampaignParameter(); // Add this line
+        initializeTracking();
+        
+        Promise.all([loadBrandData(), loadCarData()]).then(() => {
+            if (!checkDirectAccess()) {
+                displayBrands();
+            }
+        }).catch(error => {
+            displayBrands();
+        });
+    });
+</script>
 </body>
 </html>
