@@ -207,15 +207,21 @@
         const res = await fetch(API_URL);
         const agents = await res.json();
         
+        // Exclude deleted agents from the UI list
+        const visibleAgents = agents.filter(a => !a.is_deleted);
+        
         if (shouldSort) {
           // Only sort on initial load/reload
-          currentAgents = sortAgents(agents);
+          currentAgents = sortAgents(visibleAgents);
         } else {
-          // Update existing agents without changing order
+          // Update existing agents without changing order.
+          // For existing agents, prefer the updated version from the API (if not deleted).
           currentAgents = currentAgents.map(existingAgent => {
             const updatedAgent = agents.find(a => a.id === existingAgent.id);
-            return updatedAgent || existingAgent;
-          });
+            // keep existingAgent if no updated version found,
+            // but if updated version is deleted, remove it by returning null
+            return updatedAgent ? (updatedAgent.is_deleted ? null : updatedAgent) : existingAgent;
+          }).filter(a => a !== null && !a.is_deleted);
         }
         
         displayAgents(currentAgents);
@@ -391,7 +397,7 @@
           return { ...agent, ...updates };
         }
         return agent;
-      });
+      }).filter(a => !a.is_deleted); // ensure deleted agents are removed if they appear
       displayAgents(currentAgents);
     }
     
@@ -409,4 +415,3 @@
   </script>
 </body>
 </html>
-
