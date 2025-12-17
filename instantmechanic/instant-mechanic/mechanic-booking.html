@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>इंस्टेंट मैकेनिक - नया जॉब रिक्वेस्ट</title>
+    <title>इंस्टेंट मैकेनिक -  नई बुकिंग</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         * {
@@ -735,7 +735,7 @@
                 <div class="service-icon">
                     <span class="icon-tools"></span>
                 </div>
-                <h2 class="header-title">नया जॉब रिक्वेस्ट</h2>
+                <h2 class="header-title"> नई बुकिंग</h2>
             </div>
             <div class="timer" id="timer">00:45</div>
         </div>
@@ -808,7 +808,7 @@
                         </span>
                         <button class="call-agent-btn" onclick="callAgent()" id="callAgentBtn" style="display: none;">
                             <span class="icon-call"></span>
-                            कॉल
+                            कंपनी को कॉल करें
                         </button>
                     </div>
                 </div>
@@ -925,7 +925,7 @@
 
             // Service title and vehicle info
             document.getElementById('problemText').textContent = data.problem || 'समस्या का विवरण उपलब्ध नहीं';
-            document.getElementById('vehicleInfo').textContent = `गाड़ी: ${data.car || 'निर्दिष्ट नहीं'}`;
+            document.getElementById('vehicleInfo').textContent = `कार: ${data.car || 'निर्दिष्ट नहीं'}`;
 
             // Store full phone number
             fullPhoneNumber = data.customer_mobile || '';
@@ -957,7 +957,7 @@
             // Location
             if (data.location) {
                 document.getElementById('locationInfo').innerHTML = 
-                    `स्थान देखें<br>(<a href="${data.location}" class="map-link" target="_blank">मैप प्रीव्यू</a>)`;
+                    `स्थान देखें<br>(<a href="${data.location}" class="map-link" target="_blank">मेप पर देखें </a>)`;
             } else {
                 document.getElementById('locationInfo').textContent = 'स्थान उपलब्ध नहीं';
             }
