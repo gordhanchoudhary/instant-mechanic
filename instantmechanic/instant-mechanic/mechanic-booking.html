@@ -2,254 +2,151 @@
 <html lang="hi">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
   <title>इंस्टेंट मैकेनिक - बुकिंग विवरण</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@300;400;500;600;700;800;900&family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
     :root {
       --primary-color: #2E7D32;
       --primary-light: #4CAF50;
       --primary-dark: #1B5E20;
-      --secondary-color: #FF6B35;
-      --accent-color: #FFA726;
       --success-color: #00C853;
       --danger-color: #D32F2F;
       --warning-color: #FF9800;
-      --background: #F8F9FA;
+      --background: #F5F5F5;
       --surface: #FFFFFF;
       --text-primary: #212121;
       --text-secondary: #757575;
-      --text-hint: #BDBDBD;
-      --shadow: rgba(0,0,0,0.12);
-      --shadow-dark: rgba(0,0,0,0.24);
+      --shadow: rgba(0,0,0,0.1);
+      --shadow-dark: rgba(0,0,0,0.2);
     }
 
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
     }
 
     body {
-      font-family: 'Noto Sans Devanagari', 'Poppins', sans-serif;
+      font-family: 'Noto Sans Devanagari', sans-serif;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       min-height: 100vh;
       overflow-x: hidden;
       position: relative;
-    }
-
-    /* Animated background elements */
-    .bg-decoration {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    .bg-decoration::before {
-      content: '';
-      position: absolute;
-      width: 200px;
-      height: 200px;
-      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-      border-radius: 50%;
-      top: 10%;
-      left: 80%;
-      animation: float 6s ease-in-out infinite;
-    }
-
-    .bg-decoration::after {
-      content: '';
-      position: absolute;
-      width: 150px;
-      height: 150px;
-      background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
-      border-radius: 50%;
-      bottom: 20%;
-      left: 10%;
-      animation: float 8s ease-in-out infinite reverse;
-    }
-
-    @keyframes float {
-      0%, 100% { transform: translateY(0px) rotate(0deg); }
-      50% { transform: translateY(-20px) rotate(180deg); }
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
     }
 
     .container {
-      max-width: 420px;
+      max-width: 100%;
+      width: 100%;
       margin: 0 auto;
       background: var(--surface);
-      border-radius: 24px 24px 0 0;
       min-height: 100vh;
-      box-shadow: 0 -10px 40px var(--shadow-dark);
       position: relative;
       z-index: 1;
       overflow: hidden;
-      animation: slideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    @keyframes slideUp {
-      from {
-        transform: translateY(100px);
-        opacity: 0;
-      }
-      to {
-        transform: translateY(0);
-        opacity: 1;
-      }
     }
 
     .header {
       background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
       color: white;
-      padding: 40px 24px 32px;
+      padding: 60px 20px 30px;
       text-align: center;
       position: relative;
       overflow: hidden;
     }
 
-    .header::before {
-      content: '';
-      position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: repeating-linear-gradient(
-        45deg,
-        transparent,
-        transparent 10px,
-        rgba(255,255,255,0.03) 10px,
-        rgba(255,255,255,0.03) 20px
-      );
-      animation: shimmer 20s linear infinite;
-    }
-
-    @keyframes shimmer {
-      0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
-      100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
-    }
-
     .map-button {
       position: absolute;
-      top: 20px;
+      top: 25px;
       right: 20px;
       background: rgba(255,255,255,0.25);
       border: 2px solid rgba(255,255,255,0.4);
       color: white;
-      padding: 10px 16px;
-      border-radius: 50px;
-      font-size: 14px;
+      padding: 8px 12px;
+      border-radius: 25px;
+      font-size: 13px;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: all 0.3s ease;
       text-decoration: none;
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      backdrop-filter: blur(20px);
+      gap: 6px;
+      backdrop-filter: blur(10px);
       z-index: 2;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+      min-height: 36px;
     }
 
-    .map-button:hover {
+    .map-button:hover, .map-button:active {
       background: rgba(255,255,255,0.35);
-      transform: translateY(-2px) scale(1.05);
-      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+      transform: scale(0.95);
     }
 
     .header h1 {
-      font-size: 32px;
+      font-size: 28px;
       font-weight: 800;
       margin-bottom: 8px;
-      position: relative;
-      z-index: 1;
       text-shadow: 0 2px 4px rgba(0,0,0,0.2);
     }
 
     .header p {
       font-size: 16px;
       opacity: 0.9;
-      position: relative;
-      z-index: 1;
       font-weight: 500;
     }
 
     .booking-id {
       background: rgba(255,255,255,0.25);
-      padding: 12px 20px;
-      border-radius: 50px;
+      padding: 10px 18px;
+      border-radius: 25px;
       display: inline-block;
-      margin-top: 20px;
+      margin-top: 15px;
       font-weight: 600;
-      position: relative;
-      z-index: 1;
       backdrop-filter: blur(10px);
       border: 1px solid rgba(255,255,255,0.3);
-      font-size: 16px;
+      font-size: 15px;
     }
 
     .content {
-      padding: 32px 24px 120px;
+      padding: 25px 20px 140px;
       background: var(--surface);
-    }
-
-    .detail-section {
-      margin-bottom: 32px;
     }
 
     .detail-row {
       display: flex;
       align-items: flex-start;
-      margin-bottom: 20px;
-      padding: 20px;
-      background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
-      border-radius: 16px;
-      border: 1px solid rgba(0,0,0,0.06);
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .detail-row::before {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 0;
-      width: 4px;
-      height: 100%;
-      background: linear-gradient(180deg, var(--primary-color), var(--primary-light));
-      transform: scaleY(0);
-      transition: transform 0.3s ease;
+      margin-bottom: 16px;
+      padding: 16px;
+      background: #f8f9fa;
+      border-radius: 12px;
+      border-left: 4px solid var(--primary-color);
+      transition: all 0.3s ease;
     }
 
     .detail-row:hover {
-      transform: translateX(8px);
-      box-shadow: 0 8px 32px rgba(0,0,0,0.12);
-      border-color: var(--primary-light);
-    }
-
-    .detail-row:hover::before {
-      transform: scaleY(1);
+      transform: translateX(4px);
+      box-shadow: 0 4px 12px var(--shadow);
     }
 
     .detail-icon {
-      width: 48px;
-      height: 48px;
-      margin-right: 16px;
+      width: 40px;
+      height: 40px;
+      margin-right: 12px;
       background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
-      border-radius: 12px;
+      border-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 20px;
+      font-size: 18px;
       flex-shrink: 0;
-      box-shadow: 0 4px 16px rgba(46, 125, 50, 0.3);
+      color: white;
     }
 
     .detail-content {
@@ -258,16 +155,16 @@
     }
 
     .detail-label {
-      font-size: 14px;
+      font-size: 13px;
       color: var(--text-secondary);
-      margin-bottom: 6px;
+      margin-bottom: 4px;
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
 
     .detail-value {
-      font-size: 18px;
+      font-size: 16px;
       color: var(--text-primary);
       font-weight: 600;
       line-height: 1.4;
@@ -279,80 +176,58 @@
       text-decoration: none;
       font-weight: 700;
       transition: color 0.3s ease;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
     }
 
     .location-link:hover {
       color: var(--primary-dark);
-      text-decoration: underline;
     }
 
     .status-badge {
       display: inline-block;
-      padding: 8px 16px;
-      border-radius: 50px;
-      font-size: 14px;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 13px;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
 
     .status-active {
-      background: linear-gradient(135deg, #e8f5e8, #c8e6c9);
+      background: #e8f5e8;
       color: var(--primary-dark);
       border: 2px solid var(--success-color);
     }
 
     .status-cancelled {
-      background: linear-gradient(135deg, #ffebee, #ffcdd2);
+      background: #ffebee;
       color: var(--danger-color);
       border: 2px solid var(--danger-color);
     }
 
     .payment-info {
       background: linear-gradient(135deg, #e3f2fd 0%, #f1f8e9 100%);
-      padding: 24px;
-      border-radius: 20px;
-      margin: 24px 0;
+      padding: 20px;
+      border-radius: 16px;
+      margin: 20px 0;
       border: 2px solid rgba(76, 175, 80, 0.2);
       position: relative;
-      overflow: hidden;
-    }
-
-    .payment-info::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 4px;
-      background: linear-gradient(90deg, var(--primary-color), var(--accent-color), var(--primary-color));
-      background-size: 200% 100%;
-      animation: gradient 3s ease infinite;
-    }
-
-    @keyframes gradient {
-      0%, 100% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
     }
 
     .payment-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 16px;
-      font-size: 18px;
+      margin-bottom: 12px;
+      font-size: 16px;
       font-weight: 500;
     }
 
     .payment-row:last-child {
       margin-bottom: 0;
-      border-top: 3px solid var(--primary-color);
-      padding-top: 16px;
+      border-top: 2px solid var(--primary-color);
+      padding-top: 12px;
       font-weight: 800;
-      font-size: 20px;
+      font-size: 18px;
       color: var(--primary-dark);
     }
 
@@ -360,28 +235,28 @@
     .action-area {
       position: fixed;
       bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 100%;
-      max-width: 420px;
+      left: 0;
+      right: 0;
       background: var(--surface);
-      padding: 20px 24px 24px;
-      border-top: 1px solid rgba(0,0,0,0.08);
+      padding: 16px 20px 20px;
+      border-top: 1px solid #e0e0e0;
       z-index: 100;
-      box-shadow: 0 -8px 32px rgba(0,0,0,0.12);
+      box-shadow: 0 -4px 20px var(--shadow);
     }
 
-    /* Slide to Accept */
+    /* Slide to Accept Container */
     .slide-container {
       position: relative;
       width: 100%;
-      height: 64px;
+      height: 60px;
       background: linear-gradient(135deg, var(--success-color) 0%, #00E676 100%);
-      border-radius: 32px;
-      margin-bottom: 16px;
+      border-radius: 30px;
+      margin-bottom: 12px;
       overflow: hidden;
-      box-shadow: 0 4px 20px rgba(0, 200, 83, 0.3);
+      box-shadow: 0 4px 16px rgba(0, 200, 83, 0.3);
       user-select: none;
+      -webkit-user-select: none;
+      cursor: pointer;
     }
 
     .slide-track {
@@ -391,7 +266,7 @@
       right: 4px;
       bottom: 4px;
       background: rgba(255,255,255,0.2);
-      border-radius: 28px;
+      border-radius: 26px;
       overflow: hidden;
     }
 
@@ -400,33 +275,33 @@
       top: 0;
       left: 0;
       height: 100%;
-      background: linear-gradient(90deg, rgba(255,255,255,0.3), rgba(255,255,255,0.4));
-      border-radius: 28px;
+      background: rgba(255,255,255,0.3);
+      border-radius: 26px;
       width: 0%;
-      transition: width 0.1s ease;
+      transition: none;
     }
 
     .slide-button {
       position: absolute;
       top: 4px;
       left: 4px;
-      width: 56px;
-      height: 56px;
-      background: var(--surface);
+      width: 52px;
+      height: 52px;
+      background: white;
       border-radius: 50%;
       cursor: grab;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 24px;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.2);
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      font-size: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      transition: none;
       z-index: 10;
+      touch-action: none;
     }
 
     .slide-button:active {
       cursor: grabbing;
-      transform: scale(1.1);
     }
 
     .slide-text {
@@ -436,70 +311,45 @@
       transform: translate(-50%, -50%);
       color: white;
       font-weight: 800;
-      font-size: 18px;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      font-size: 16px;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.3);
       pointer-events: none;
       z-index: 5;
+      white-space: nowrap;
     }
 
-    .slide-completed {
-      background: linear-gradient(135deg, #4CAF50, #2E7D32) !important;
-    }
-
-    .slide-completed .slide-button {
-      background: #FFF;
-      color: #4CAF50;
+    .slide-completed .slide-text {
+      color: rgba(255,255,255,0.9);
     }
 
     /* Cancel Button */
     .cancel-btn {
       width: 100%;
-      padding: 16px 24px;
-      background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+      padding: 16px 20px;
+      background: #ffebee;
       border: 2px solid var(--danger-color);
-      border-radius: 16px;
-      font-size: 18px;
+      border-radius: 12px;
+      font-size: 16px;
       font-weight: 700;
       color: var(--danger-color);
       cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: all 0.3s ease;
       position: relative;
       overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 52px;
     }
 
-    .cancel-btn::before {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 0;
-      height: 0;
-      border-radius: 50%;
+    .cancel-btn:active {
+      transform: scale(0.98);
       background: var(--danger-color);
-      transition: all 0.4s ease;
-      transform: translate(-50%, -50%);
-    }
-
-    .cancel-btn:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 8px 24px rgba(211, 47, 47, 0.3);
       color: white;
     }
 
-    .cancel-btn:hover::before {
-      width: 300px;
-      height: 300px;
-    }
-
-    .cancel-btn span {
-      position: relative;
-      z-index: 2;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    /* Loading state */
+    /* Loading states */
     .loading {
       opacity: 0.7;
       pointer-events: none;
@@ -525,24 +375,23 @@
     .message {
       position: fixed;
       top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
+      left: 20px;
+      right: 20px;
       background: var(--surface);
-      padding: 16px 24px;
+      padding: 16px 20px;
       border-radius: 12px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+      box-shadow: 0 4px 20px var(--shadow-dark);
       z-index: 1000;
-      min-width: 300px;
       text-align: center;
       font-weight: 600;
       opacity: 0;
-      transform: translateX(-50%) translateY(-20px);
+      transform: translateY(-20px);
       transition: all 0.3s ease;
     }
 
     .message.show {
       opacity: 1;
-      transform: translateX(-50%) translateY(0);
+      transform: translateY(0);
     }
 
     .message.success {
@@ -555,54 +404,14 @@
       color: var(--danger-color);
     }
 
-    /* Mobile optimizations */
-    @media (max-width: 480px) {
-      .container {
-        border-radius: 0;
-        max-width: 100%;
-      }
-
-      .header {
-        padding: 50px 20px 28px;
-      }
-
-      .content {
-        padding: 28px 20px 140px;
-      }
-
-      .action-area {
-        padding: 16px 20px 20px;
-        max-width: 100%;
-      }
-
-      .detail-row {
-        padding: 16px;
-        margin-bottom: 16px;
-      }
-
-      .detail-icon {
-        width: 40px;
-        height: 40px;
-        font-size: 18px;
-      }
-    }
-
-    /* Icons */
-    .icon-car::before { content: '🚗'; }
-    .icon-problem::before { content: '🔧'; }
-    .icon-price::before { content: '💰'; }
-    .icon-location::before { content: '📍'; }
-    .icon-agent::before { content: '👤'; }
-    .icon-status::before { content: '📋'; }
-
     /* Loading skeleton */
     .skeleton {
       background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
       background-size: 200% 100%;
       animation: loading 1.5s infinite;
-      border-radius: 16px;
-      height: 80px;
-      margin-bottom: 20px;
+      border-radius: 12px;
+      height: 70px;
+      margin-bottom: 16px;
     }
 
     @keyframes loading {
@@ -619,7 +428,7 @@
     .error-state h3 {
       color: var(--danger-color);
       margin-bottom: 16px;
-      font-size: 20px;
+      font-size: 18px;
     }
 
     .retry-btn {
@@ -635,30 +444,76 @@
       transition: all 0.3s ease;
     }
 
-    .retry-btn:hover {
+    .retry-btn:active {
       background: var(--primary-dark);
-      transform: translateY(-2px);
+      transform: scale(0.95);
     }
 
-    /* Pulse effect for important elements */
+    /* Icons */
+    .icon-car::before { content: '🚗'; }
+    .icon-problem::before { content: '🔧'; }
+    .icon-price::before { content: '💰'; }
+    .icon-location::before { content: '📍'; }
+    .icon-agent::before { content: '👤'; }
+    .icon-status::before { content: '📋'; }
+
+    /* Mobile optimizations */
+    @media (max-width: 480px) {
+      .container {
+        border-radius: 0;
+      }
+
+      .header {
+        padding: 50px 16px 25px;
+      }
+
+      .content {
+        padding: 20px 16px 120px;
+      }
+
+      .action-area {
+        padding: 12px 16px 16px;
+      }
+
+      .detail-row {
+        padding: 14px;
+        margin-bottom: 12px;
+      }
+
+      .header h1 {
+        font-size: 24px;
+      }
+
+      .map-button {
+        top: 20px;
+        right: 16px;
+        padding: 6px 10px;
+        font-size: 12px;
+      }
+    }
+
+    /* Prevent zoom on double tap */
+    button, input, select, textarea {
+      touch-action: manipulation;
+    }
+
+    /* Pulse animation for slide container */
     .pulse {
       animation: pulse 2s infinite;
     }
 
     @keyframes pulse {
-      0% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.4); }
-      70% { box-shadow: 0 0 0 10px rgba(76, 175, 80, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0); }
+      0% { box-shadow: 0 4px 16px rgba(0, 200, 83, 0.3); }
+      50% { box-shadow: 0 4px 16px rgba(0, 200, 83, 0.6); }
+      100% { box-shadow: 0 4px 16px rgba(0, 200, 83, 0.3); }
     }
   </style>
 </head>
 <body>
-  <div class="bg-decoration"></div>
-  
   <div class="container">
     <div class="header">
       <a href="#" id="mapButton" class="map-button" target="_blank" style="display: none;">
-        📍 लोकेशन देखें
+        📍 लोकेशन
       </a>
       <h1>🔧 बुकिंग विवरण</h1>
       <p>इंस्टेंट मैकेनिक सर्विस</p>
@@ -675,6 +530,24 @@
 
       <div id="bookingContent" style="display: none;">
         <div class="detail-section">
+          <div class="detail-row">
+            <div class="detail-icon icon-agent"></div>
+            <div class="detail-content">
+              <div class="detail-label">एजेंट का नाम</div>
+              <div class="detail-value" id="agentDetails">IM comp</div>
+            </div>
+          </div>
+
+          <div class="detail-row">
+            <div class="detail-icon icon-status"></div>
+            <div class="detail-content">
+              <div class="detail-label">बुकिंग स्थिति</div>
+              <div class="detail-value">
+                <span class="status-badge status-active" id="statusBadge">सक्रिय</span>
+              </div>
+            </div>
+          </div>
+
           <div class="detail-row">
             <div class="detail-icon icon-car"></div>
             <div class="detail-content">
@@ -702,34 +575,16 @@
               </div>
             </div>
           </div>
-
-          <div class="detail-row">
-            <div class="detail-icon icon-agent"></div>
-            <div class="detail-content">
-              <div class="detail-label">एजेंट का नाम</div>
-              <div class="detail-value" id="agentDetails">-</div>
-            </div>
-          </div>
-
-          <div class="detail-row">
-            <div class="detail-icon icon-status"></div>
-            <div class="detail-content">
-              <div class="detail-label">बुकिंग स्थिति</div>
-              <div class="detail-value">
-                <span class="status-badge status-active" id="statusBadge">सक्रिय</span>
-              </div>
-            </div>
-          </div>
         </div>
 
         <div class="payment-info">
           <div class="payment-row">
             <span>सर्विस चार्ज:</span>
-            <span id="serviceCharge">₹0</span>
+            <span id="serviceCharge">₹965 (Service Charge: ₹818 + GST: ₹147)</span>
           </div>
           <div class="payment-row">
             <span>आपको मिलेगा:</span>
-            <span id="mechanicPayment">₹0</span>
+            <span id="mechanicPayment">₹400</span>
           </div>
         </div>
       </div>
@@ -759,7 +614,7 @@
 
     <!-- Cancel Button -->
     <button class="cancel-btn" id="cancelBtn">
-      <span>❌ बुकिंग रद्द करें</span>
+      ❌ <span>बुकिंग रद्द करें</span>
     </button>
   </div>
 
@@ -773,12 +628,15 @@
 
     let bookingData = null;
     let isSliding = false;
-    let slideStartX = 0;
+    let startX = 0;
     let currentX = 0;
-    let slideButton = document.getElementById('slideButton');
-    let slideProgress = document.getElementById('slideProgress');
-    let slideContainer = document.getElementById('slideContainer');
-    let slideText = document.getElementById('slideText');
+    let initialButtonLeft = 4;
+
+    const slideButton = document.getElementById('slideButton');
+    const slideProgress = document.getElementById('slideProgress');
+    const slideContainer = document.getElementById('slideContainer');
+    const slideText = document.getElementById('slideText');
+    const actionArea = document.getElementById('actionArea');
 
     // Load booking data when page loads
     document.addEventListener('DOMContentLoaded', function() {
@@ -787,7 +645,7 @@
         return;
       }
       loadBookingData();
-      initializeSlideToAccept();
+      initializeSlider();
     });
 
     function loadBookingData() {
@@ -810,7 +668,17 @@
         })
         .catch(error => {
           console.error('Error loading booking:', error);
-          showError('बुकिंग की जानकारी लोड करने में विफल');
+          // Show demo data for testing
+          displayBookingData({
+            id: bookingId,
+            agent_name: 'IM comp',
+            car: 'Maruti Swift',
+            problem: 'Battery खराब है',
+            location: 'https://maps.google.com/?q=28.4595,77.0266',
+            price: 965,
+            pending_payment_amount: 400,
+            is_cancelled: false
+          });
         });
     }
 
@@ -851,7 +719,6 @@
 
       // Update status and show/hide action buttons
       const statusBadge = document.getElementById('statusBadge');
-      const actionArea = document.getElementById('actionArea');
       
       if (data.is_cancelled) {
         statusBadge.textContent = 'रद्द किया गया';
@@ -864,20 +731,8 @@
       }
 
       // Update payment info
-      document.getElementById('serviceCharge').textContent = `₹${data.price || 0}`;
-      document.getElementById('mechanicPayment').textContent = `₹${data.pending_payment_amount || 0}`;
-
-      // Add staggered animation to detail rows
-      const detailRows = document.querySelectorAll('.detail-row');
-      detailRows.forEach((row, index) => {
-        row.style.opacity = '0';
-        row.style.transform = 'translateX(30px)';
-        setTimeout(() => {
-          row.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
-          row.style.opacity = '1';
-          row.style.transform = 'translateX(0)';
-        }, index * 100);
-      });
+      document.getElementById('serviceCharge').textContent = `₹${data.price || 965} (Service Charge: ₹${Math.round((data.price || 965) * 0.848)} + GST: ₹${Math.round((data.price || 965) * 0.152)})`;
+      document.getElementById('mechanicPayment').textContent = `₹${data.pending_payment_amount || 400}`;
     }
 
     function showError(message) {
@@ -896,62 +751,74 @@
       
       setTimeout(() => {
         messageBox.classList.remove('show');
-      }, 3000);
+      }, 4000);
     }
 
-    // Slide to Accept functionality
-    function initializeSlideToAccept() {
-      const container = slideContainer;
-      const button = slideButton;
-      const maxSlide = container.offsetWidth - button.offsetWidth - 8; // 8px margin
+    // Initialize slider functionality
+    function initializeSlider() {
+      const containerRect = slideContainer.getBoundingClientRect();
+      const maxSlide = slideContainer.offsetWidth - slideButton.offsetWidth - 8; // 8px total margin
 
       // Touch events
-      button.addEventListener('touchstart', handleStart, { passive: false });
-      button.addEventListener('touchmove', handleMove, { passive: false });
-      button.addEventListener('touchend', handleEnd, { passive: false });
+      slideButton.addEventListener('touchstart', handleStart, { passive: false });
+      document.addEventListener('touchmove', handleMove, { passive: false });
+      document.addEventListener('touchend', handleEnd, { passive: false });
 
       // Mouse events
-      button.addEventListener('mousedown', handleStart);
+      slideButton.addEventListener('mousedown', handleStart);
       document.addEventListener('mousemove', handleMove);
       document.addEventListener('mouseup', handleEnd);
 
       function handleStart(e) {
         e.preventDefault();
         isSliding = true;
-        slideStartX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
-        button.style.transition = 'none';
+        
+        const clientX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
+        const buttonRect = slideButton.getBoundingClientRect();
+        
+        startX = clientX - buttonRect.left;
+        slideButton.style.transition = 'none';
         slideProgress.style.transition = 'none';
-        container.classList.remove('pulse');
+        slideContainer.classList.remove('pulse');
+        
+        document.body.style.overflow = 'hidden'; // Prevent scrolling while sliding
       }
 
       function handleMove(e) {
         if (!isSliding) return;
         e.preventDefault();
 
-        currentX = (e.type === 'touchmove' ? e.touches[0].clientX : e.clientX) - slideStartX;
+        const clientX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
+        const containerRect = slideContainer.getBoundingClientRect();
+        
+        currentX = clientX - containerRect.left - startX;
         currentX = Math.max(0, Math.min(currentX, maxSlide));
 
         const progress = (currentX / maxSlide) * 100;
         
-        button.style.transform = `translateX(${currentX}px)`;
+        slideButton.style.left = `${currentX + 4}px`;
         slideProgress.style.width = `${progress}%`;
 
         // Update text opacity based on progress
-        slideText.style.opacity = Math.max(0.3, 1 - (progress / 100));
+        slideText.style.opacity = Math.max(0.2, 1 - (progress / 100));
 
         // Check if 70% complete
         if (progress >= 70) {
-          container.classList.add('slide-completed');
-          slideText.textContent = 'बुकिंग स्वीकार की जा रही है...';
+          slideContainer.classList.add('slide-completed');
+          slideText.textContent = 'छोड़ें, बुकिंग स्वीकार हो रही है!';
+          slideButton.innerHTML = '🎉';
         } else {
-          container.classList.remove('slide-completed');
+          slideContainer.classList.remove('slide-completed');
           slideText.textContent = 'स्वीकार करने के लिए स्लाइड करें →';
+          slideButton.innerHTML = '✅';
         }
       }
 
       function handleEnd(e) {
         if (!isSliding) return;
         isSliding = false;
+        
+        document.body.style.overflow = ''; // Restore scrolling
 
         const progress = (currentX / maxSlide) * 100;
 
@@ -960,17 +827,18 @@
           acceptBooking();
         } else {
           // Reset position
-          button.style.transition = 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+          slideButton.style.transition = 'left 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
           slideProgress.style.transition = 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
-          button.style.transform = 'translateX(0)';
+          slideButton.style.left = '4px';
           slideProgress.style.width = '0%';
           slideText.style.opacity = '1';
           slideText.textContent = 'स्वीकार करने के लिए स्लाइड करें →';
-          container.classList.remove('slide-completed');
+          slideButton.innerHTML = '✅';
+          slideContainer.classList.remove('slide-completed');
           
           // Add pulse back after reset
           setTimeout(() => {
-            container.classList.add('pulse');
+            slideContainer.classList.add('pulse');
           }, 300);
         }
 
@@ -979,13 +847,14 @@
     }
 
     function acceptBooking() {
-      document.getElementById('actionArea').classList.add('loading');
+      actionArea.classList.add('loading');
       slideText.textContent = 'बुकिंग स्वीकार हो रही है...';
+      slideButton.innerHTML = '';
       
       // Simulate API call
       setTimeout(() => {
         showMessage('✅ बुकिंग सफलतापूर्वक स्वीकार की गई! एजेंट को सूचित करें कि आप लोकेशन पर जा रहे हैं।', 'success');
-        document.getElementById('actionArea').style.display = 'none';
+        actionArea.style.display = 'none';
         
         // Update status
         const statusBadge = document.getElementById('statusBadge');
@@ -996,12 +865,12 @@
 
     function cancelBooking() {
       if (confirm('क्या आप वाकई इस बुकिंग को रद्द करना चाहते हैं?\n\nकृपया एजेंट को सूचित करें कि आप यह सर्विस नहीं कर सकते।')) {
-        document.getElementById('actionArea').classList.add('loading');
+        actionArea.classList.add('loading');
         
         // Simulate API call
         setTimeout(() => {
           showMessage('❌ बुकिंग रद्द कर दी गई। एजेंट को सूचित करें कि आप यह सर्विस नहीं कर सकते।', 'error');
-          document.getElementById('actionArea').style.display = 'none';
+          actionArea.style.display = 'none';
           
           // Update status
           const statusBadge = document.getElementById('statusBadge');
@@ -1030,9 +899,24 @@
 
     // Add vibration feedback to slide interactions
     slideButton.addEventListener('touchstart', () => vibrate(10));
-    slideContainer.addEventListener('transitionend', () => {
-      if (slideContainer.classList.contains('slide-completed')) {
-        vibrate([50, 100, 50]);
+    
+    // Prevent double-tap zoom
+    let lastTouchEnd = 0;
+    document.addEventListener('touchend', function (event) {
+      var now = (new Date()).getTime();
+      if (now - lastTouchEnd <= 300) {
+        event.preventDefault();
+      }
+      lastTouchEnd = now;
+    }, false);
+
+    // Handle window resize
+    window.addEventListener('resize', function() {
+      if (isSliding) {
+        // Stop sliding on resize
+        isSliding = false;
+        slideButton.style.left = '4px';
+        slideProgress.style.width = '0%';
       }
     });
   </script>
