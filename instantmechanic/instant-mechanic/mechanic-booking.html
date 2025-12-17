@@ -1,924 +1,910 @@
 <!DOCTYPE html>
 <html lang="hi">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
-  <title>इंस्टेंट मैकेनिक - बुकिंग विवरण</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --primary-color: #2E7D32;
-      --primary-light: #4CAF50;
-      --primary-dark: #1B5E20;
-      --success-color: #00C853;
-      --danger-color: #D32F2F;
-      --warning-color: #FF9800;
-      --background: #F5F5F5;
-      --surface: #FFFFFF;
-      --text-primary: #212121;
-      --text-secondary: #757575;
-      --shadow: rgba(0,0,0,0.1);
-      --shadow-dark: rgba(0,0,0,0.2);
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>इंस्टेंट मैकेनिक - नया जॉब रिक्वेस्ट</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
+        body {
+            font-family: 'Noto Sans Devanagari', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+            position: relative;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
 
-    body {
-      font-family: 'Noto Sans Devanagari', sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      min-height: 100vh;
-      overflow-x: hidden;
-      position: relative;
-      -webkit-user-select: none;
-      -moz-user-select: none;
-      -ms-user-select: none;
-      user-select: none;
-    }
+        /* Map Background */
+        .map-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            z-index: 1;
+        }
 
-    .container {
-      max-width: 100%;
-      width: 100%;
-      margin: 0 auto;
-      background: var(--surface);
-      min-height: 100vh;
-      position: relative;
-      z-index: 1;
-      overflow: hidden;
-    }
+        .map-background::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 25% 25%, rgba(0,150,136,0.1) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(76,175,80,0.1) 0%, transparent 50%),
+                linear-gradient(45deg, transparent 48%, rgba(158,158,158,0.05) 49%, rgba(158,158,158,0.05) 51%, transparent 52%);
+        }
 
-    .header {
-      background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
-      color: white;
-      padding: 60px 20px 30px;
-      text-align: center;
-      position: relative;
-      overflow: hidden;
-    }
+        /* Road lines */
+        .map-lines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.3;
+        }
 
-    .map-button {
-      position: absolute;
-      top: 25px;
-      right: 20px;
-      background: rgba(255,255,255,0.25);
-      border: 2px solid rgba(255,255,255,0.4);
-      color: white;
-      padding: 8px 12px;
-      border-radius: 25px;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      backdrop-filter: blur(10px);
-      z-index: 2;
-      min-height: 36px;
-    }
+        .road-line {
+            position: absolute;
+            background: #9e9e9e;
+            border-radius: 1px;
+        }
 
-    .map-button:hover, .map-button:active {
-      background: rgba(255,255,255,0.35);
-      transform: scale(0.95);
-    }
+        .road-line.horizontal {
+            height: 2px;
+            width: 100%;
+        }
 
-    .header h1 {
-      font-size: 28px;
-      font-weight: 800;
-      margin-bottom: 8px;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.2);
-    }
+        .road-line.vertical {
+            width: 2px;
+            height: 100%;
+        }
 
-    .header p {
-      font-size: 16px;
-      opacity: 0.9;
-      font-weight: 500;
-    }
+        .road-line:nth-child(1) { top: 20%; }
+        .road-line:nth-child(2) { top: 45%; }
+        .road-line:nth-child(3) { top: 70%; }
+        .road-line:nth-child(4) { left: 30%; }
+        .road-line:nth-child(5) { left: 65%; }
 
-    .booking-id {
-      background: rgba(255,255,255,0.25);
-      padding: 10px 18px;
-      border-radius: 25px;
-      display: inline-block;
-      margin-top: 15px;
-      font-weight: 600;
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255,255,255,0.3);
-      font-size: 15px;
-    }
+        /* Popup Card */
+        .booking-popup {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15), 0 2px 8px rgba(0, 0, 0, 0.08);
+            padding: 24px;
+            z-index: 10;
+            animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            max-height: calc(100vh - 40px);
+            overflow-y: auto;
+        }
 
-    .content {
-      padding: 25px 20px 140px;
-      background: var(--surface);
-    }
+        @keyframes slideUp {
+            from {
+                transform: translateY(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
 
-    .detail-row {
-      display: flex;
-      align-items: flex-start;
-      margin-bottom: 16px;
-      padding: 16px;
-      background: #f8f9fa;
-      border-radius: 12px;
-      border-left: 4px solid var(--primary-color);
-      transition: all 0.3s ease;
-    }
+        /* Header */
+        .popup-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
 
-    .detail-row:hover {
-      transform: translateX(4px);
-      box-shadow: 0 4px 12px var(--shadow);
-    }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
 
-    .detail-icon {
-      width: 40px;
-      height: 40px;
-      margin-right: 12px;
-      background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 18px;
-      flex-shrink: 0;
-      color: white;
-    }
+        .service-icon {
+            width: 40px;
+            height: 40px;
+            background: #f5f5f5;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
 
-    .detail-content {
-      flex: 1;
-      min-width: 0;
-    }
+        .header-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1f2937;
+            margin: 0;
+        }
 
-    .detail-label {
-      font-size: 13px;
-      color: var(--text-secondary);
-      margin-bottom: 4px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
+        .timer {
+            background: #fff3cd;
+            color: #856404;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            border: 1px solid #ffeaa7;
+        }
 
-    .detail-value {
-      font-size: 16px;
-      color: var(--text-primary);
-      font-weight: 600;
-      line-height: 1.4;
-      word-wrap: break-word;
-    }
+        /* Service Details with Car Image */
+        .service-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            gap: 16px;
+        }
 
-    .location-link {
-      color: var(--primary-color);
-      text-decoration: none;
-      font-weight: 700;
-      transition: color 0.3s ease;
-    }
+        .service-info {
+            flex: 1;
+        }
 
-    .location-link:hover {
-      color: var(--primary-dark);
-    }
+        .service-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 4px;
+            line-height: 1.2;
+        }
 
-    .status-badge {
-      display: inline-block;
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-size: 13px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
+        .vehicle-info {
+            font-size: 14px;
+            color: #6b7280;
+            margin-bottom: 0;
+        }
 
-    .status-active {
-      background: #e8f5e8;
-      color: var(--primary-dark);
-      border: 2px solid var(--success-color);
-    }
+        .car-image-container {
+            flex-shrink: 0;
+            width: 80px;
+            height: 60px;
+            background: #f8fafc;
+            border-radius: 12px;
+            border: 2px solid #e2e8f0;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
 
-    .status-cancelled {
-      background: #ffebee;
-      color: var(--danger-color);
-      border: 2px solid var(--danger-color);
-    }
+        .car-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 10px;
+        }
 
-    .payment-info {
-      background: linear-gradient(135deg, #e3f2fd 0%, #f1f8e9 100%);
-      padding: 20px;
-      border-radius: 16px;
-      margin: 20px 0;
-      border: 2px solid rgba(76, 175, 80, 0.2);
-      position: relative;
-    }
+        /* Info Rows */
+        .info-section {
+            margin-bottom: 24px;
+        }
 
-    .payment-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
-      font-size: 16px;
-      font-weight: 500;
-    }
+        .info-row {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 16px;
+            gap: 12px;
+        }
 
-    .payment-row:last-child {
-      margin-bottom: 0;
-      border-top: 2px solid var(--primary-color);
-      padding-top: 12px;
-      font-weight: 800;
-      font-size: 18px;
-      color: var(--primary-dark);
-    }
+        .info-row:last-child {
+            margin-bottom: 0;
+        }
 
-    /* Fixed bottom action area */
-    .action-area {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: var(--surface);
-      padding: 16px 20px 20px;
-      border-top: 1px solid #e0e0e0;
-      z-index: 100;
-      box-shadow: 0 -4px 20px var(--shadow);
-    }
+        .info-icon {
+            width: 20px;
+            height: 20px;
+            color: #6b7280;
+            margin-top: 2px;
+            flex-shrink: 0;
+        }
 
-    /* Slide to Accept Container */
-    .slide-container {
-      position: relative;
-      width: 100%;
-      height: 60px;
-      background: linear-gradient(135deg, var(--success-color) 0%, #00E676 100%);
-      border-radius: 30px;
-      margin-bottom: 12px;
-      overflow: hidden;
-      box-shadow: 0 4px 16px rgba(0, 200, 83, 0.3);
-      user-select: none;
-      -webkit-user-select: none;
-      cursor: pointer;
-    }
+        .info-content {
+            flex: 1;
+        }
 
-    .slide-track {
-      position: absolute;
-      top: 4px;
-      left: 4px;
-      right: 4px;
-      bottom: 4px;
-      background: rgba(255,255,255,0.2);
-      border-radius: 26px;
-      overflow: hidden;
-    }
+        .info-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #1f2937;
+            margin-bottom: 2px;
+        }
 
-    .slide-progress {
-      position: absolute;
-      top: 0;
-      left: 0;
-      height: 100%;
-      background: rgba(255,255,255,0.3);
-      border-radius: 26px;
-      width: 0%;
-      transition: none;
-    }
+        .info-value {
+            font-size: 14px;
+            color: #6b7280;
+            line-height: 1.4;
+        }
 
-    .slide-button {
-      position: absolute;
-      top: 4px;
-      left: 4px;
-      width: 52px;
-      height: 52px;
-      background: white;
-      border-radius: 50%;
-      cursor: grab;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 20px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-      transition: none;
-      z-index: 10;
-      touch-action: none;
-    }
+        .map-link {
+            color: #3b82f6;
+            text-decoration: none;
+            font-weight: 500;
+        }
 
-    .slide-button:active {
-      cursor: grabbing;
-    }
+        .map-link:hover {
+            text-decoration: underline;
+        }
 
-    .slide-text {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      color: white;
-      font-weight: 800;
-      font-size: 16px;
-      text-shadow: 0 1px 2px rgba(0,0,0,0.3);
-      pointer-events: none;
-      z-index: 5;
-      white-space: nowrap;
-    }
+        .phone-number {
+            color: #1f2937;
+            font-weight: 500;
+        }
 
-    .slide-completed .slide-text {
-      color: rgba(255,255,255,0.9);
-    }
+        /* Price Section */
+        .price-section {
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 24px;
+        }
 
-    /* Cancel Button */
-    .cancel-btn {
-      width: 100%;
-      padding: 16px 20px;
-      background: #ffebee;
-      border: 2px solid var(--danger-color);
-      border-radius: 12px;
-      font-size: 16px;
-      font-weight: 700;
-      color: var(--danger-color);
-      cursor: pointer;
-      transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      min-height: 52px;
-    }
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+            font-size: 14px;
+        }
 
-    .cancel-btn:active {
-      transform: scale(0.98);
-      background: var(--danger-color);
-      color: white;
-    }
+        .price-row:last-child {
+            margin-bottom: 0;
+        }
 
-    /* Loading states */
-    .loading {
-      opacity: 0.7;
-      pointer-events: none;
-    }
+        .price-label {
+            color: #1f2937;
+            font-weight: 500;
+        }
 
-    .loading .slide-button::after {
-      content: '';
-      position: absolute;
-      width: 20px;
-      height: 20px;
-      border: 2px solid var(--primary-color);
-      border-top: 2px solid transparent;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
+        .price-value {
+            color: #1f2937;
+            font-weight: 600;
+        }
 
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
+        .total-price {
+            font-size: 16px !important;
+            font-weight: 700 !important;
+            border-top: 1px solid #fde68a;
+            padding-top: 8px;
+            margin-top: 8px;
+        }
 
-    /* Success/Error Messages */
-    .message {
-      position: fixed;
-      top: 20px;
-      left: 20px;
-      right: 20px;
-      background: var(--surface);
-      padding: 16px 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 20px var(--shadow-dark);
-      z-index: 1000;
-      text-align: center;
-      font-weight: 600;
-      opacity: 0;
-      transform: translateY(-20px);
-      transition: all 0.3s ease;
-    }
+        .payout-highlight {
+            background: #fef3c7;
+            padding: 4px 0;
+            border-radius: 4px;
+        }
 
-    .message.show {
-      opacity: 1;
-      transform: translateY(0);
-    }
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
 
-    .message.success {
-      border-left: 4px solid var(--success-color);
-      color: var(--success-color);
-    }
+        /* Swipe to Accept */
+        .swipe-container {
+            position: relative;
+            height: 56px;
+            background: #10b981;
+            border-radius: 28px;
+            overflow: hidden;
+            cursor: pointer;
+            user-select: none;
+            touch-action: none;
+            box-shadow: 0 3px 12px rgba(16, 185, 129, 0.3);
+        }
 
-    .message.error {
-      border-left: 4px solid var(--danger-color);
-      color: var(--danger-color);
-    }
+        .swipe-track {
+            height: 100%;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-    /* Loading skeleton */
-    .skeleton {
-      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-      background-size: 200% 100%;
-      animation: loading 1.5s infinite;
-      border-radius: 12px;
-      height: 70px;
-      margin-bottom: 16px;
-    }
+        .swipe-text {
+            color: white;
+            font-weight: 600;
+            font-size: 17px;
+            position: absolute;
+            transition: opacity 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            letter-spacing: 0.3px;
+        }
 
-    @keyframes loading {
-      0% { background-position: 200% 0; }
-      100% { background-position: -200% 0; }
-    }
+        .swipe-handle {
+            position: absolute;
+            left: 4px;
+            top: 4px;
+            width: 48px;
+            height: 48px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: none;
+            cursor: grab;
+            z-index: 2;
+            touch-action: none;
+        }
 
-    .error-state {
-      text-align: center;
-      padding: 40px 20px;
-      color: var(--text-secondary);
-    }
+        .swipe-handle:active {
+            cursor: grabbing;
+        }
 
-    .error-state h3 {
-      color: var(--danger-color);
-      margin-bottom: 16px;
-      font-size: 18px;
-    }
+        .swipe-progress {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            width: 0%;
+            transition: none;
+            border-radius: 28px;
+        }
 
-    .retry-btn {
-      background: var(--primary-color);
-      color: white;
-      border: none;
-      padding: 12px 24px;
-      border-radius: 8px;
-      cursor: pointer;
-      margin-top: 16px;
-      font-size: 16px;
-      font-weight: 600;
-      transition: all 0.3s ease;
-    }
+        /* Decline Button */
+        .decline-button {
+            height: 48px;
+            background: transparent;
+            border: 1.5px solid #e5e7eb;
+            color: #6b7280;
+            border-radius: 24px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
 
-    .retry-btn:active {
-      background: var(--primary-dark);
-      transform: scale(0.95);
-    }
+        .decline-button:hover {
+            border-color: #ef4444;
+            color: #ef4444;
+            background: #fef2f2;
+        }
 
-    /* Icons */
-    .icon-car::before { content: '🚗'; }
-    .icon-problem::before { content: '🔧'; }
-    .icon-price::before { content: '💰'; }
-    .icon-location::before { content: '📍'; }
-    .icon-agent::before { content: '👤'; }
-    .icon-status::before { content: '📋'; }
+        .decline-button:active {
+            transform: scale(0.98);
+        }
 
-    /* Mobile optimizations */
-    @media (max-width: 480px) {
-      .container {
-        border-radius: 0;
-      }
+        /* Success State */
+        .swipe-container.accepted {
+            background: #059669;
+        }
 
-      .header {
-        padding: 50px 16px 25px;
-      }
+        .swipe-container.accepted .swipe-text {
+            opacity: 1 !important;
+        }
 
-      .content {
-        padding: 20px 16px 120px;
-      }
+        /* Icons */
+        .icon-location::before { content: "📍"; }
+        .icon-phone::before { content: "📞"; }
+        .icon-tag::before { content: "🏷️"; }
+        .icon-tools::before { content: "🔧"; }
+        .icon-agent::before { content: "👤"; }
+        .icon-call::before { content: "📞"; }
+        .icon-arrow::before { content: "→"; }
+        .icon-x::before { content: "✕"; }
 
-      .action-area {
-        padding: 12px 16px 16px;
-      }
+        /* Agent Info Styles */
+        .agent-info {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
 
-      .detail-row {
-        padding: 14px;
-        margin-bottom: 12px;
-      }
+        .agent-name {
+            color: #1f2937;
+            font-weight: 600;
+            font-size: 15px;
+            flex: 1;
+        }
 
-      .header h1 {
-        font-size: 24px;
-      }
+        .call-agent-btn {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+            min-width: 70px;
+            justify-content: center;
+        }
 
-      .map-button {
-        top: 20px;
-        right: 16px;
-        padding: 6px 10px;
-        font-size: 12px;
-      }
-    }
+        .call-agent-btn:hover {
+            background: #059669;
+            transform: translateY(-1px);
+            box-shadow: 0 3px 8px rgba(16, 185, 129, 0.3);
+        }
 
-    /* Prevent zoom on double tap */
-    button, input, select, textarea {
-      touch-action: manipulation;
-    }
+        .call-agent-btn:active {
+            transform: translateY(0);
+        }
 
-    /* Pulse animation for slide container */
-    .pulse {
-      animation: pulse 2s infinite;
-    }
+        /* Loading skeleton */
+        .loading-skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            border-radius: 8px;
+            height: 20px;
+            margin-bottom: 8px;
+        }
 
-    @keyframes pulse {
-      0% { box-shadow: 0 4px 16px rgba(0, 200, 83, 0.3); }
-      50% { box-shadow: 0 4px 16px rgba(0, 200, 83, 0.6); }
-      100% { box-shadow: 0 4px 16px rgba(0, 200, 83, 0.3); }
-    }
-  </style>
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        .loading .service-title,
+        .loading .vehicle-info,
+        .loading .info-value,
+        .loading .price-value {
+            display: none;
+        }
+
+        .loading .service-title::after,
+        .loading .vehicle-info::after,
+        .loading .info-value::after,
+        .loading .price-value::after {
+            content: '';
+            display: block;
+            width: 100%;
+            height: 16px;
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            border-radius: 4px;
+        }
+
+        /* Responsive */
+        @media (max-width: 375px) {
+            .booking-popup {
+                left: 16px;
+                right: 16px;
+                bottom: 16px;
+                padding: 20px;
+            }
+
+            .service-header {
+                gap: 12px;
+            }
+
+            .service-title {
+                font-size: 20px;
+            }
+
+            .car-image-container {
+                width: 70px;
+                height: 52px;
+            }
+
+            .timer {
+                font-size: 12px;
+                padding: 4px 8px;
+            }
+        }
+
+        /* Hide elements during loading */
+        .loading .action-buttons {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <div class="header">
-      <a href="#" id="mapButton" class="map-button" target="_blank" style="display: none;">
-        📍 लोकेशन
-      </a>
-      <h1>🔧 बुकिंग विवरण</h1>
-      <p>इंस्टेंट मैकेनिक सर्विस</p>
-      <div class="booking-id" id="bookingIdDisplay">लोड हो रहा है...</div>
+    <!-- Map Background -->
+    <div class="map-background">
+        <div class="map-lines">
+            <div class="road-line horizontal"></div>
+            <div class="road-line horizontal"></div>
+            <div class="road-line horizontal"></div>
+            <div class="road-line vertical"></div>
+            <div class="road-line vertical"></div>
+        </div>
     </div>
 
-    <div class="content">
-      <div id="loadingContent">
-        <div class="skeleton"></div>
-        <div class="skeleton"></div>
-        <div class="skeleton"></div>
-        <div class="skeleton"></div>
-      </div>
-
-      <div id="bookingContent" style="display: none;">
-        <div class="detail-section">
-          <div class="detail-row">
-            <div class="detail-icon icon-agent"></div>
-            <div class="detail-content">
-              <div class="detail-label">एजेंट का नाम</div>
-              <div class="detail-value" id="agentDetails">IM comp</div>
+    <!-- Booking Popup -->
+    <div class="booking-popup loading" id="bookingPopup">
+        <!-- Header -->
+        <div class="popup-header">
+            <div class="header-left">
+                <div class="service-icon">
+                    <span class="icon-tools"></span>
+                </div>
+                <h2 class="header-title">नया जॉब रिक्वेस्ट</h2>
             </div>
-          </div>
-
-          <div class="detail-row">
-            <div class="detail-icon icon-status"></div>
-            <div class="detail-content">
-              <div class="detail-label">बुकिंग स्थिति</div>
-              <div class="detail-value">
-                <span class="status-badge status-active" id="statusBadge">सक्रिय</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="detail-row">
-            <div class="detail-icon icon-car"></div>
-            <div class="detail-content">
-              <div class="detail-label">गाड़ी की जानकारी</div>
-              <div class="detail-value" id="carDetails">-</div>
-            </div>
-          </div>
-
-          <div class="detail-row">
-            <div class="detail-icon icon-problem"></div>
-            <div class="detail-content">
-              <div class="detail-label">समस्या का विवरण</div>
-              <div class="detail-value" id="problemDetails">-</div>
-            </div>
-          </div>
-
-          <div class="detail-row">
-            <div class="detail-icon icon-location"></div>
-            <div class="detail-content">
-              <div class="detail-label">सर्विस लोकेशन</div>
-              <div class="detail-value">
-                <a href="#" id="locationLink" class="location-link" target="_blank">
-                  📍 मैप पर देखें
-                </a>
-              </div>
-            </div>
-          </div>
+            <div class="timer" id="timer">00:45</div>
         </div>
 
-        <div class="payment-info">
-          <div class="payment-row">
-            <span>सर्विस चार्ज:</span>
-            <span id="serviceCharge">₹965 (Service Charge: ₹818 + GST: ₹147)</span>
-          </div>
-          <div class="payment-row">
-            <span>आपको मिलेगा:</span>
-            <span id="mechanicPayment">₹400</span>
-          </div>
+        <!-- Service Details with Car Image -->
+        <div class="service-header">
+            <div class="service-info">
+                <div class="service-title" id="problemText">
+                    <div class="loading-skeleton"></div>
+                </div>
+                <div class="vehicle-info" id="vehicleInfo">
+                    <div class="loading-skeleton"></div>
+                </div>
+            </div>
+            <div class="car-image-container">
+                <img src="" alt="" class="car-image" id="carImage" style="display: none;">
+                <div class="loading-skeleton" id="imageSkeleton" style="width: 100%; height: 100%;"></div>
+            </div>
         </div>
-      </div>
 
-      <div id="errorContent" class="error-state" style="display: none;">
-        <h3>⚠️ बुकिंग लोड करने में त्रुटि</h3>
-        <p>बुकिंग की जानकारी लोड नहीं हो सकी। कृपया अपना कनेक्शन चेक करें और दोबारा कोशिश करें।</p>
-        <button class="retry-btn" onclick="loadBookingData()">🔄 दोबारा कोशिश करें</button>
-      </div>
+        <!-- Info Section -->
+        <div class="info-section">
+            <div class="info-row">
+                <span class="info-icon icon-location"></span>
+                <div class="info-content">
+                    <div class="info-label">स्थान:</div>
+                    <div class="info-value" id="locationInfo">
+                        <div class="loading-skeleton"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-row">
+                <span class="info-icon icon-phone"></span>
+                <div class="info-content">
+                    <div class="info-value" id="phoneInfo">
+                        <div class="loading-skeleton"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-row">
+                <span class="info-icon icon-tag"></span>
+                <div class="info-content">
+                    <div class="info-label">कुल राशि:</div>
+                    <div class="info-value" id="totalPrice">
+                        <div class="loading-skeleton"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-row agent-row">
+                <span class="info-icon icon-agent"></span>
+                <div class="info-content">
+                    <div class="info-label">असाइन्ड एजेंट:</div>
+                    <div class="agent-info">
+                        <span class="agent-name" id="agentName">
+                            <div class="loading-skeleton"></div>
+                        </span>
+                        <button class="call-agent-btn" onclick="callAgent()" id="callBtn" style="display: none;">
+                            <span class="icon-call"></span>
+                            कॉल करें
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Price Breakdown -->
+        <div class="price-section">
+            <div class="price-row payout-highlight">
+                <span class="price-label">आपको मिलेगा:</span>
+                <span class="price-value" id="payoutAmount">
+                    <div class="loading-skeleton"></div>
+                </span>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <div class="swipe-container" id="swipeContainer">
+                <div class="swipe-progress" id="swipeProgress"></div>
+                <div class="swipe-track">
+                    <div class="swipe-text" id="swipeText">
+                        स्वीकार करने के लिए स्लाइड करें
+                        <span style="margin-left: 4px;">→</span>
+                    </div>
+                    <div class="swipe-handle" id="swipeHandle">
+                        <span style="color: #10b981; font-size: 18px; font-weight: bold;">→</span>
+                    </div>
+                </div>
+            </div>
+
+            <button class="decline-button" onclick="declineBooking()">
+                <span class="icon-x"></span>
+                रिजेक्ट करें
+            </button>
+        </div>
     </div>
-  </div>
 
-  <!-- Fixed bottom action area -->
-  <div class="action-area" id="actionArea" style="display: none;">
-    <!-- Slide to Accept -->
-    <div class="slide-container pulse" id="slideContainer">
-      <div class="slide-track">
-        <div class="slide-progress" id="slideProgress"></div>
-      </div>
-      <div class="slide-button" id="slideButton">
-        ✅
-      </div>
-      <div class="slide-text" id="slideText">
-        स्वीकार करने के लिए स्लाइड करें →
-      </div>
-    </div>
+    <script>
+        // Get booking ID from URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const bookingId = urlParams.get('id') || '8978';
 
-    <!-- Cancel Button -->
-    <button class="cancel-btn" id="cancelBtn">
-      ❌ <span>बुकिंग रद्द करें</span>
-    </button>
-  </div>
+        let bookingData = null;
+        let timeLeft = 45;
+        let isAccepted = false;
+        let isDragging = false;
+        let startX = 0;
+        let currentX = 0;
 
-  <!-- Success/Error Message -->
-  <div class="message" id="messageBox"></div>
-
-  <script>
-    // Get booking ID from URL parameters
-    const urlParams = new URLSearchParams(window.location.search);
-    const bookingId = urlParams.get('id');
-
-    let bookingData = null;
-    let isSliding = false;
-    let startX = 0;
-    let currentX = 0;
-    let initialButtonLeft = 4;
-
-    const slideButton = document.getElementById('slideButton');
-    const slideProgress = document.getElementById('slideProgress');
-    const slideContainer = document.getElementById('slideContainer');
-    const slideText = document.getElementById('slideText');
-    const actionArea = document.getElementById('actionArea');
-
-    // Load booking data when page loads
-    document.addEventListener('DOMContentLoaded', function() {
-      if (!bookingId) {
-        showError('URL में बुकिंग ID नहीं मिली');
-        return;
-      }
-      loadBookingData();
-      initializeSlider();
-    });
-
-    function loadBookingData() {
-      document.getElementById('loadingContent').style.display = 'block';
-      document.getElementById('bookingContent').style.display = 'none';
-      document.getElementById('errorContent').style.display = 'none';
-      document.getElementById('actionArea').style.display = 'none';
-
-      // Simulate API call - replace with actual API endpoint
-      fetch(`https://ai.instantmechanic.online/bot/api/bookings/${bookingId}/`)
-        .then(response => {
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
-          return response.json();
-        })
-        .then(data => {
-          bookingData = data;
-          displayBookingData(data);
-        })
-        .catch(error => {
-          console.error('Error loading booking:', error);
-          // Show demo data for testing
-          displayBookingData({
-            id: bookingId,
-            agent_name: 'IM comp',
-            car: 'Maruti Swift',
-            problem: 'Battery खराब है',
-            location: 'https://maps.google.com/?q=28.4595,77.0266',
-            price: 965,
-            pending_payment_amount: 400,
-            is_cancelled: false
-          });
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadBookingData();
+            initTimer();
+            initSwipeToAccept();
         });
-    }
 
-    function displayBookingData(data) {
-      // Hide loading and show content
-      document.getElementById('loadingContent').style.display = 'none';
-      document.getElementById('errorContent').style.display = 'none';
-      document.getElementById('bookingContent').style.display = 'block';
-
-      // Update booking ID
-      document.getElementById('bookingIdDisplay').textContent = `बुकिंग #${data.id || bookingId}`;
-
-      // Update car details
-      document.getElementById('carDetails').textContent = data.car || 'निर्दिष्ट नहीं';
-
-      // Update problem details
-      document.getElementById('problemDetails').textContent = data.problem || 'निर्दिष्ट नहीं';
-
-      // Update location
-      const locationLink = document.getElementById('locationLink');
-      const mapButton = document.getElementById('mapButton');
-      
-      if (data.location) {
-        locationLink.href = data.location;
-        locationLink.innerHTML = '📍 सर्विस लोकेशन देखें';
-        
-        // Show and set map button in header
-        mapButton.href = data.location;
-        mapButton.style.display = 'inline-flex';
-      } else {
-        locationLink.href = '#';
-        locationLink.innerHTML = '📍 लोकेशन उपलब्ध नहीं';
-        mapButton.style.display = 'none';
-      }
-
-      // Update agent details
-      document.getElementById('agentDetails').textContent = data.agent_name || 'अभी तक असाइन नहीं';
-
-      // Update status and show/hide action buttons
-      const statusBadge = document.getElementById('statusBadge');
-      
-      if (data.is_cancelled) {
-        statusBadge.textContent = 'रद्द किया गया';
-        statusBadge.className = 'status-badge status-cancelled';
-        actionArea.style.display = 'none';
-      } else {
-        statusBadge.textContent = 'सक्रिय';
-        statusBadge.className = 'status-badge status-active';
-        actionArea.style.display = 'block';
-      }
-
-      // Update payment info
-      document.getElementById('serviceCharge').textContent = `₹${data.price || 965} (Service Charge: ₹${Math.round((data.price || 965) * 0.848)} + GST: ₹${Math.round((data.price || 965) * 0.152)})`;
-      document.getElementById('mechanicPayment').textContent = `₹${data.pending_payment_amount || 400}`;
-    }
-
-    function showError(message) {
-      document.getElementById('loadingContent').style.display = 'none';
-      document.getElementById('bookingContent').style.display = 'none';
-      document.getElementById('actionArea').style.display = 'none';
-      document.getElementById('errorContent').style.display = 'block';
-      document.querySelector('#errorContent p').textContent = message;
-    }
-
-    function showMessage(text, type = 'success') {
-      const messageBox = document.getElementById('messageBox');
-      messageBox.textContent = text;
-      messageBox.className = `message ${type}`;
-      messageBox.classList.add('show');
-      
-      setTimeout(() => {
-        messageBox.classList.remove('show');
-      }, 4000);
-    }
-
-    // Initialize slider functionality
-    function initializeSlider() {
-      const containerRect = slideContainer.getBoundingClientRect();
-      const maxSlide = slideContainer.offsetWidth - slideButton.offsetWidth - 8; // 8px total margin
-
-      // Touch events
-      slideButton.addEventListener('touchstart', handleStart, { passive: false });
-      document.addEventListener('touchmove', handleMove, { passive: false });
-      document.addEventListener('touchend', handleEnd, { passive: false });
-
-      // Mouse events
-      slideButton.addEventListener('mousedown', handleStart);
-      document.addEventListener('mousemove', handleMove);
-      document.addEventListener('mouseup', handleEnd);
-
-      function handleStart(e) {
-        e.preventDefault();
-        isSliding = true;
-        
-        const clientX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
-        const buttonRect = slideButton.getBoundingClientRect();
-        
-        startX = clientX - buttonRect.left;
-        slideButton.style.transition = 'none';
-        slideProgress.style.transition = 'none';
-        slideContainer.classList.remove('pulse');
-        
-        document.body.style.overflow = 'hidden'; // Prevent scrolling while sliding
-      }
-
-      function handleMove(e) {
-        if (!isSliding) return;
-        e.preventDefault();
-
-        const clientX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
-        const containerRect = slideContainer.getBoundingClientRect();
-        
-        currentX = clientX - containerRect.left - startX;
-        currentX = Math.max(0, Math.min(currentX, maxSlide));
-
-        const progress = (currentX / maxSlide) * 100;
-        
-        slideButton.style.left = `${currentX + 4}px`;
-        slideProgress.style.width = `${progress}%`;
-
-        // Update text opacity based on progress
-        slideText.style.opacity = Math.max(0.2, 1 - (progress / 100));
-
-        // Check if 70% complete
-        if (progress >= 70) {
-          slideContainer.classList.add('slide-completed');
-          slideText.textContent = 'छोड़ें, बुकिंग स्वीकार हो रही है!';
-          slideButton.innerHTML = '🎉';
-        } else {
-          slideContainer.classList.remove('slide-completed');
-          slideText.textContent = 'स्वीकार करने के लिए स्लाइड करें →';
-          slideButton.innerHTML = '✅';
-        }
-      }
-
-      function handleEnd(e) {
-        if (!isSliding) return;
-        isSliding = false;
-        
-        document.body.style.overflow = ''; // Restore scrolling
-
-        const progress = (currentX / maxSlide) * 100;
-
-        if (progress >= 70) {
-          // Accept booking
-          acceptBooking();
-        } else {
-          // Reset position
-          slideButton.style.transition = 'left 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
-          slideProgress.style.transition = 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
-          slideButton.style.left = '4px';
-          slideProgress.style.width = '0%';
-          slideText.style.opacity = '1';
-          slideText.textContent = 'स्वीकार करने के लिए स्लाइड करें →';
-          slideButton.innerHTML = '✅';
-          slideContainer.classList.remove('slide-completed');
-          
-          // Add pulse back after reset
-          setTimeout(() => {
-            slideContainer.classList.add('pulse');
-          }, 300);
+        // Load booking data
+        function loadBookingData() {
+            // Simulate API call - replace with actual API endpoint
+            fetch(`https://ai.instantmechanic.online/bot/api/bookings/${bookingId}/`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    bookingData = data;
+                    displayBookingData(data);
+                })
+                .catch(error => {
+                    console.error('Error loading booking:', error);
+                    // Show demo data for testing
+                    const demoData = {
+                        "id": 8978,
+                        "agent_name": "IM comp",
+                        "customer_mobile": "14166067178",
+                        "mechanic_name": "Lal Babu Delhi",
+                        "car": "Range Rover Discovery Sports",
+                        "problem": "Battery dead, needs jump start",
+                        "price": "965 (Service Charge: ₹818 + GST: ₹147)",
+                        "location": "https://www.google.com/maps?q=28.566780090332,77.121612548828",
+                        "pending_payment_amount": "409",
+                        "car_image": "https://gomechprod.blob.core.windows.net/gm-retail-app/cars/land-rover-range-rover-sport-petrol-tilted.jpg",
+                        "is_cancelled": false
+                    };
+                    displayBookingData(demoData);
+                });
         }
 
-        currentX = 0;
-      }
-    }
+        // Display booking data
+        function displayBookingData(data) {
+            document.getElementById('bookingPopup').classList.remove('loading');
 
-    function acceptBooking() {
-      actionArea.classList.add('loading');
-      slideText.textContent = 'बुकिंग स्वीकार हो रही है...';
-      slideButton.innerHTML = '';
-      
-      // Simulate API call
-      setTimeout(() => {
-        showMessage('✅ बुकिंग सफलतापूर्वक स्वीकार की गई! एजेंट को सूचित करें कि आप लोकेशन पर जा रहे हैं।', 'success');
-        actionArea.style.display = 'none';
+            // Service title and vehicle info
+            document.getElementById('problemText').textContent = data.problem || 'समस्या का विवरण उपलब्ध नहीं';
+            document.getElementById('vehicleInfo').textContent = `गाड़ी: ${data.car || 'निर्दिष्ट नहीं'}`;
+
+            // Car image
+            const carImage = document.getElementById('carImage');
+            const imageSkeleton = document.getElementById('imageSkeleton');
+            if (data.car_image) {
+                carImage.src = data.car_image;
+                carImage.alt = data.car;
+                carImage.onerror = function() {
+                    this.src = `data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="150" height="100" viewBox="0 0 150 100"><rect width="150" height="100" fill="%23f3f4f6"/><text x="75" y="50" text-anchor="middle" dy=".3em" font-family="Inter, sans-serif" font-size="14" fill="%236b7280">🚗 ${data.car || 'Car'}</text></svg>`;
+                };
+                carImage.onload = function() {
+                    carImage.style.display = 'block';
+                    imageSkeleton.style.display = 'none';
+                };
+            } else {
+                carImage.style.display = 'block';
+                imageSkeleton.style.display = 'none';
+                carImage.src = `data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="150" height="100" viewBox="0 0 150 100"><rect width="150" height="100" fill="%23f3f4f6"/><text x="75" y="50" text-anchor="middle" dy=".3em" font-family="Inter, sans-serif" font-size="14" fill="%236b7280">🚗 ${data.car || 'Car'}</text></svg>`;
+            }
+
+            // Location
+            if (data.location) {
+                document.getElementById('locationInfo').innerHTML = 
+                    `स्थान देखें<br>(<a href="${data.location}" class="map-link" target="_blank">मैप प्रीव्यू</a>)`;
+            } else {
+                document.getElementById('locationInfo').textContent = 'स्थान उपलब्ध नहीं';
+            }
+
+            // Phone number
+            document.getElementById('phoneInfo').innerHTML = 
+                `<span class="phone-number">${data.customer_mobile || 'फोन नंबर उपलब्ध नहीं'}</span>`;
+
+            // Total price
+            const priceText = data.price || '₹0';
+            document.getElementById('totalPrice').textContent = `${priceText} (GST सहित)`;
+
+            // Agent info
+            const agentName = data.agent_name || 'असाइन नहीं किया गया';
+            document.getElementById('agentName').textContent = agentName;
+            document.getElementById('callBtn').style.display = data.agent_name ? 'flex' : 'none';
+
+            // Payout amount
+            const payoutAmount = data.pending_payment_amount || '0';
+            document.getElementById('payoutAmount').textContent = `₹${payoutAmount}`;
+        }
+
+        // Timer functionality
+        function initTimer() {
+            const timerElement = document.getElementById('timer');
+            
+            function updateTimer() {
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                
+                if (timeLeft > 0) {
+                    timeLeft--;
+                } else {
+                    alert('बुकिंग टाइम समाप्त हो गया');
+                    declineBooking();
+                }
+            }
+            
+            setInterval(updateTimer, 1000);
+        }
+
+        // Swipe to Accept functionality
+        function initSwipeToAccept() {
+            const swipeContainer = document.getElementById('swipeContainer');
+            const swipeHandle = document.getElementById('swipeHandle');
+            const swipeProgress = document.getElementById('swipeProgress');
+            const swipeText = document.getElementById('swipeText');
+            
+            let maxSwipeDistance;
+
+            function updateMaxSwipeDistance() {
+                maxSwipeDistance = swipeContainer.offsetWidth - swipeHandle.offsetWidth - 8; // 8px total margin
+            }
+
+            updateMaxSwipeDistance();
+            window.addEventListener('resize', updateMaxSwipeDistance);
+            
+            // Touch events
+            swipeHandle.addEventListener('touchstart', handleStart, { passive: false });
+            document.addEventListener('touchmove', handleMove, { passive: false });
+            document.addEventListener('touchend', handleEnd, { passive: false });
+            
+            // Mouse events for desktop testing
+            swipeHandle.addEventListener('mousedown', handleStart);
+            document.addEventListener('mousemove', handleMove);
+            document.addEventListener('mouseup', handleEnd);
+            
+            function handleStart(e) {
+                if (isAccepted) return;
+                
+                isDragging = true;
+                const clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+                const handleRect = swipeHandle.getBoundingClientRect();
+                startX = clientX - handleRect.left;
+                swipeHandle.style.transition = 'none';
+                swipeProgress.style.transition = 'none';
+                
+                e.preventDefault();
+            }
+            
+            function handleMove(e) {
+                if (!isDragging || isAccepted) return;
+                
+                const clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+                const containerRect = swipeContainer.getBoundingClientRect();
+                
+                currentX = clientX - containerRect.left - startX;
+                currentX = Math.max(0, Math.min(currentX, maxSwipeDistance));
+                
+                const progress = (currentX / maxSwipeDistance) * 100;
+                
+                swipeHandle.style.transform = `translateX(${currentX}px)`;
+                swipeProgress.style.width = `${progress}%`;
+                
+                // Update text opacity based on progress
+                swipeText.style.opacity = 1 - (progress / 100);
+                
+                e.preventDefault();
+            }
+            
+            function handleEnd(e) {
+                if (!isDragging || isAccepted) return;
+                
+                isDragging = false;
+                
+                const progress = (currentX / maxSwipeDistance) * 100;
+                
+                if (progress >= 75) { // 75% completion for acceptance
+                    acceptBooking();
+                } else {
+                    resetSwipe();
+                }
+            }
+            
+            function resetSwipe() {
+                swipeHandle.style.transition = 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+                swipeProgress.style.transition = 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+                swipeHandle.style.transform = 'translateX(0px)';
+                swipeProgress.style.width = '0%';
+                swipeText.style.opacity = '1';
+                currentX = 0;
+            }
+        }
         
-        // Update status
-        const statusBadge = document.getElementById('statusBadge');
-        statusBadge.textContent = 'स्वीकार की गई';
-        statusBadge.className = 'status-badge status-active';
-      }, 2000);
-    }
-
-    function cancelBooking() {
-      if (confirm('क्या आप वाकई इस बुकिंग को रद्द करना चाहते हैं?\n\nकृपया एजेंट को सूचित करें कि आप यह सर्विस नहीं कर सकते।')) {
-        actionArea.classList.add('loading');
+        function acceptBooking() {
+            isAccepted = true;
+            const swipeContainer = document.getElementById('swipeContainer');
+            const swipeText = document.getElementById('swipeText');
+            
+            swipeContainer.classList.add('accepted');
+            swipeText.textContent = 'बुकिंग स्वीकार की गई!';
+            swipeText.style.opacity = '1';
+            
+            setTimeout(() => {
+                alert('बुकिंग स्वीकार की गई! कस्टमर के स्थान पर नेवीगेशन शुरू होगी।');
+                // Here you can redirect to navigation or next step
+            }, 500);
+        }
         
-        // Simulate API call
-        setTimeout(() => {
-          showMessage('❌ बुकिंग रद्द कर दी गई। एजेंट को सूचित करें कि आप यह सर्विस नहीं कर सकते।', 'error');
-          actionArea.style.display = 'none';
-          
-          // Update status
-          const statusBadge = document.getElementById('statusBadge');
-          statusBadge.textContent = 'रद्द किया गया';
-          statusBadge.className = 'status-badge status-cancelled';
-        }, 1500);
-      }
-    }
+        function declineBooking() {
+            if (confirm('क्या आप वाकई इस बुकिंग को रिजेक्ट करना चाहते हैं?')) {
+                alert('बुकिंग रिजेक्ट की गई। अगली उपलब्ध जॉब खोजी जा रही है...');
+                // Here you can redirect to next booking or job search
+            }
+        }
 
-    // Cancel button event
-    document.getElementById('cancelBtn').addEventListener('click', cancelBooking);
+        function callAgent() {
+            if (bookingData && bookingData.agent_name) {
+                if (confirm(`${bookingData.agent_name} को कॉल करें?`)) {
+                    // In real implementation, this would get agent's phone number from API
+                    window.location.href = 'tel:+919876543210';
+                }
+            }
+        }
+        
+        // Prevent scrolling when swiping
+        document.getElementById('swipeContainer').addEventListener('touchmove', function(e) {
+            if (isDragging) {
+                e.preventDefault();
+            }
+        }, { passive: false });
 
-    // Prevent context menu on long press
-    document.addEventListener('contextmenu', function(e) {
-      if (e.target.closest('.slide-button') || e.target.closest('.action-area')) {
-        e.preventDefault();
-      }
-    });
+        // Add haptic feedback for mobile
+        function vibrate(pattern = 50) {
+            if ('vibrate' in navigator) {
+                navigator.vibrate(pattern);
+            }
+        }
 
-    // Add haptic feedback for touch devices
-    function vibrate(pattern = 50) {
-      if ('vibrate' in navigator) {
-        navigator.vibrate(pattern);
-      }
-    }
-
-    // Add vibration feedback to slide interactions
-    slideButton.addEventListener('touchstart', () => vibrate(10));
-    
-    // Prevent double-tap zoom
-    let lastTouchEnd = 0;
-    document.addEventListener('touchend', function (event) {
-      var now = (new Date()).getTime();
-      if (now - lastTouchEnd <= 300) {
-        event.preventDefault();
-      }
-      lastTouchEnd = now;
-    }, false);
-
-    // Handle window resize
-    window.addEventListener('resize', function() {
-      if (isSliding) {
-        // Stop sliding on resize
-        isSliding = false;
-        slideButton.style.left = '4px';
-        slideProgress.style.width = '0%';
-      }
-    });
-  </script>
+        document.getElementById('swipeHandle').addEventListener('touchstart', () => vibrate(10));
+    </script>
 </body>
 </html>
