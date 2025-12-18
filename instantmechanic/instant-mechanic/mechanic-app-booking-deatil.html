@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <title>My Booking – Instant Mechanic</title>
+
+  <!--
+    DESIGN GOALS
+    - Read‑only (NO actions)
+    - Mobile‑first & Android WebView safe
+    - Survives very large system font sizes
+    - High contrast, clean cards
+  -->
+
+  <style>
+    :root {
+      --bg: #f4f6f8;
+      --card: #ffffff;
+      --primary: #2563eb;
+      --text: #0f172a;
+      --muted: #64748b;
+      --success: #16a34a;
+      --danger: #dc2626;
+      --radius: 14px;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-text-size-adjust: 100%; /* prevent font zoom break */
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu;
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    .page {
+      max-width: 720px;
+      margin: auto;
+      padding: 16px;
+    }
+
+    /* ---------- HEADER ---------- */
+    .header {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .car-img {
+      width: 84px;
+      height: 84px;
+      border-radius: 12px;
+      object-fit: contain;
+      background: #f1f5f9;
+      flex-shrink: 0;
+    }
+
+    .header-info h1 {
+      font-size: 1.25rem;
+      margin: 0;
+      word-break: break-word;
+    }
+
+    .header-info p {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    /* ---------- CARD ---------- */
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 16px;
+      margin-bottom: 14px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+    }
+
+    .card h2 {
+      font-size: 1.05rem;
+      margin: 0 0 12px;
+    }
+
+    /* ---------- INFO ROWS ---------- */
+    .row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+      align-items: flex-start;
+    }
+
+    .label {
+      min-width: 110px;
+      font-size: 0.9rem;
+      color: var(--muted);
+      flex-shrink: 0;
+    }
+
+    .value {
+      font-size: 1rem;
+      word-break: break-word;
+    }
+
+    /* ---------- ACTION BUTTONS ---------- */
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 10px;
+    }
+
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 14px 10px;
+      border-radius: 12px;
+      text-decoration: none;
+      font-size: 1rem;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .btn-call {
+      background: var(--success);
+      color: white;
+    }
+
+    .btn-map {
+      background: var(--primary);
+      color: white;
+    }
+
+    /* ---------- STATUS ---------- */
+    .status {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .status-cancelled {
+      background: #fee2e2;
+      color: var(--danger);
+    }
+
+    .status-active {
+      background: #dcfce7;
+      color: var(--success);
+    }
+
+    /* ---------- RESPONSIVE ---------- */
+    @media (max-width: 420px) {
+      .actions {
+        grid-template-columns: 1fr;
+      }
+
+      .label {
+        min-width: 90px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <img id="carImage" class="car-img" src="" alt="Car" />
+    <div class="header-info">
+      <h1 id="carName">—</h1>
+      <p id="problem">—</p>
+    </div>
+  </div>
+
+  <!-- CUSTOMER CARD -->
+  <div class="card">
+    <h2>Customer</h2>
+    <div class="row">
+      <div class="label">Name</div>
+      <div class="value" id="customerName">—</div>
+    </div>
+    <div class="row">
+      <div class="label">Mobile</div>
+      <div class="value" id="customerMobile">—</div>
+    </div>
+
+    <div class="actions">
+      <a id="callBtn" class="btn btn-call" href="#">📞 Call</a>
+      <a id="mapBtn" class="btn btn-map" href="#" target="_blank">📍 Navigate</a>
+    </div>
+
+    <div class="actions" style="margin-top:12px">
+      <button id="copyBtn" class="btn" style="background:#0f172a;color:#fff">📋 Copy Details</button>
+      <a id="whatsappBtn" class="btn" style="background:#25D366;color:#fff" target="_blank">🟢 WhatsApp</a>
+    </div>
+  </div>
+
+  <!-- BOOKING CARD -->
+  <div class="card">
+    <h2>Booking Details</h2>
+
+    <div class="row">
+      <div class="label">Booking ID</div>
+      <div class="value" id="bookingId">—</div>
+    </div>
+
+    <div class="row">
+      <div class="label">Price</div>
+      <div class="value" id="price">—</div>
+    </div>
+
+    <div class="row">
+      <div class="label">Status</div>
+      <div class="value"><span id="status" class="status">—</span></div>
+    </div>
+
+    <div class="row">
+      <div class="label">Address</div>
+      <div class="value" id="address">—</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const bookingId = new URLSearchParams(window.location.search).get('id');
+  let whatsappText = '';
+
+  fetch(`https://ai.instantmechanic.online/bot/api/bookings/${bookingId}/`)
+    .then(r => r.json())
+    .then(data => {
+      document.getElementById('carName').textContent = data.car || '-';
+      document.getElementById('problem').textContent = data.problem || '-';
+
+      document.getElementById('customerName').textContent = data.customer_name || '-';
+      document.getElementById('customerMobile').textContent = data.customer_mobile || '-';
+
+      document.getElementById('bookingId').textContent = data.id;
+      document.getElementById('price').textContent = '₹' + (data.price || 0);
+      document.getElementById('address').textContent = data.address || '-';
+
+      const statusEl = document.getElementById('status');
+      if (data.is_cancelled) {
+        statusEl.textContent = 'Cancelled';
+        statusEl.classList.add('status-cancelled');
+      } else {
+        statusEl.textContent = 'Active';
+        statusEl.classList.add('status-active');
+      }
+
+      if (data.car_image) {
+        document.getElementById('carImage').src = data.car_image;
+      }
+
+      if (data.customer_mobile) {
+        document.getElementById('callBtn').href = `tel:${data.customer_mobile}`;
+      }
+
+      if (data.location) {
+        document.getElementById('mapBtn').href = data.location;
+      }
+
+      whatsappText = `*New Booking Details*\n` +
+        `📞 *Customer Mobile*: ${data.customer_mobile || '-'}\n` +
+        `🚗 *Car Model*: ${data.car || '-'}\n` +
+        `🧑‍🔧 *Service Requested*: ${data.problem || '-'}\n` +
+        `💰 *Price*: ₹${data.price || 0}\n` +
+        `📍 *Location*: ${data.location || 'Call Customer for location'}\n` +
+        `🧑‍🔧 *Mechanic Info*: https://instantmechanic.online/booking.html?id=${data.id}\n` +
+        `📞 *Mechanic Payout*: ₹${data.mechanic_payout || '-'}\n\n` +
+        `Please communicate with service provider about this booking.\n\nThank you`;
+
+      document.getElementById('whatsappBtn').href = `https://wa.me/?text=${encodeURIComponent(whatsappText)}`;
+    })
+    .catch(() => alert('Failed to load booking'));
+
+  document.getElementById('copyBtn').addEventListener('click', () => {
+    navigator.clipboard.writeText(whatsappText).then(() => {
+      alert('Booking details copied');
+    });
+  });
+</script>
+
+</body>
+</html>
