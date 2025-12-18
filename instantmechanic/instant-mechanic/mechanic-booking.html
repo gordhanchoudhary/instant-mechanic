@@ -2,65 +2,41 @@
 <html lang="hi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, shrink-to-fit=no, viewport-fit=cover">
-    <meta name="format-detection" content="telephone=no">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>इंस्टेंट मैकेनिक - नई बुकिंग</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        /* AGGRESSIVE ANDROID FONT SCALING PREVENTION */
+        /* FINAL SOLUTION: Lock everything to rem with fixed root */
         html {
             font-size: 16px !important;
-            -webkit-text-size-adjust: none !important;
-            -moz-text-size-adjust: none !important;
-            -ms-text-size-adjust: none !important;
-            text-size-adjust: none !important;
-            zoom: 1 !important;
-            
-            /* Force fixed dimensions */
-            width: 100vw !important;
-            height: 100vh !important;
-            overflow: hidden !important;
+            /* This is the key - prevents system font scaling */
+            -webkit-text-size-adjust: 100% !important;
+            -moz-text-size-adjust: 100% !important;
+            -ms-text-size-adjust: 100% !important;
+            text-size-adjust: 100% !important;
         }
-        
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: 'Noto Sans Devanagari', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
-            font-size: 16px !important;
-            line-height: 1.4 !important;
-            margin: 0 !important;
-            padding: 0 !important;
-            width: 100vw !important;
-            height: 100vh !important;
-            overflow: hidden !important;
+            font-family: 'Noto Sans Devanagari', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background: #f5f5f5;
-            
-            /* Prevent any scaling */
-            -webkit-text-size-adjust: none !important;
-            -moz-text-size-adjust: none !important;
-            -ms-text-size-adjust: none !important;
-            text-size-adjust: none !important;
-            zoom: 1 !important;
-            transform: scale(1) !important;
-            transform-origin: 0 0 !important;
-            
-            /* Additional overrides */
+            min-height: 100vh;
+            position: relative;
             -webkit-user-select: none;
             -moz-user-select: none;
             -ms-user-select: none;
             user-select: none;
             -webkit-tap-highlight-color: transparent;
-        }
-        
-        /* Force all elements to use exact pixel sizes */
-        * {
-            box-sizing: border-box !important;
-            -webkit-text-size-adjust: none !important;
-            -moz-text-size-adjust: none !important;
-            -ms-text-size-adjust: none !important;
-            text-size-adjust: none !important;
-            zoom: 1 !important;
+            overflow: hidden;
+            
+            /* Lock body font size */
+            font-size: 1rem;
+            line-height: 1.4;
         }
 
         /* Map Background */
@@ -68,8 +44,8 @@
             position: fixed;
             top: 0;
             left: 0;
-            width: 100vw;
-            height: 100vh;
+            width: 100%;
+            height: 100%;
             background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
             z-index: 1;
         }
@@ -119,29 +95,17 @@
         .road-line:nth-child(4) { left: 30%; }
         .road-line:nth-child(5) { left: 65%; }
 
-        /* Main Container with Fixed Dimensions */
-        .container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            transform: scale(1) !important;
-            transform-origin: 0 0 !important;
-            z-index: 5;
-        }
-
         /* Popup Card */
         .booking-popup {
-            position: absolute;
-            bottom: 8px;
-            left: 8px;
-            right: 8px;
-            top: 8px;
+            position: fixed;
+            bottom: 0.5rem;
+            left: 0.5rem;
+            right: 0.5rem;
+            top: 0.5rem;
             background: white;
-            border-radius: 20px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15), 0 2px 8px rgba(0, 0, 0, 0.08);
-            padding: 14px;
+            border-radius: 1.25rem;
+            box-shadow: 0 0.625rem 2.5rem rgba(0, 0, 0, 0.15), 0 0.125rem 0.5rem rgba(0, 0, 0, 0.08);
+            padding: 0.875rem;
             z-index: 10;
             animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             display: flex;
@@ -160,158 +124,51 @@
             }
         }
 
-        /* Typography - FIXED PIXEL SIZES */
-        .header-title {
-            font-size: 15px !important;
-            font-weight: 600 !important;
-            color: #1f2937;
-            margin: 0;
-            line-height: 18px !important;
-        }
-
-        .service-title {
-            font-size: 20px !important;
-            font-weight: 700 !important;
-            color: #1f2937;
-            margin-bottom: 2px;
-            line-height: 22px !important;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .vehicle-info {
-            font-size: 13px !important;
-            color: #6b7280;
-            margin-bottom: 0;
-            line-height: 16px !important;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .timer {
-            background: #fff3cd;
-            color: #856404;
-            padding: 4px 10px;
-            border-radius: 15px;
-            font-size: 13px !important;
-            font-weight: 600 !important;
-            border: 1px solid #ffeaa7;
-            min-width: 50px;
-            text-align: center;
-            line-height: 14px !important;
-        }
-
-        .info-label {
-            font-size: 13px !important;
-            font-weight: 500 !important;
-            color: #1f2937;
-            margin-bottom: 1px;
-            line-height: 16px !important;
-        }
-
-        .info-value {
-            font-size: 13px !important;
-            color: #6b7280;
-            line-height: 17px !important;
-        }
-
-        .phone-number {
-            color: #1f2937;
-            font-weight: 500 !important;
-            font-size: 15px !important;
-            letter-spacing: 0.5px;
-            line-height: 18px !important;
-        }
-
-        .agent-name {
-            color: #1f2937;
-            font-weight: 600 !important;
-            font-size: 14px !important;
-            flex: 1;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            line-height: 17px !important;
-        }
-
-        .price-label {
-            color: #1f2937;
-            font-weight: 500 !important;
-            font-size: 13px !important;
-        }
-
-        .price-value {
-            color: #1f2937;
-            font-weight: 600 !important;
-            font-size: 13px !important;
-        }
-
-        .payout-highlight .price-label {
-            font-size: 18px !important;
-            line-height: 20px !important;
-        }
-
-        .payout-highlight .price-value {
-            font-size: 18px !important;
-            line-height: 20px !important;
-        }
-
-        .swipe-text {
-            color: white;
-            font-weight: 600 !important;
-            font-size: 15px !important;
-            line-height: 17px !important;
-            position: absolute;
-            transition: opacity 0.2s ease;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            letter-spacing: 0.2px;
-        }
-
-        .decline-button {
-            height: 40px;
-            background: transparent;
-            border: 1.5px solid #e5e7eb;
-            color: #6b7280;
-            border-radius: 20px;
-            font-weight: 600 !important;
-            font-size: 14px !important;
-            line-height: 16px !important;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-        }
-
-        /* Layout Components */
+        /* Header */
         .popup-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 14px;
+            margin-bottom: 0.875rem;
             flex-shrink: 0;
         }
 
         .header-left {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 0.625rem;
         }
 
         .service-icon {
-            width: 34px;
-            height: 34px;
+            width: 2.125rem;
+            height: 2.125rem;
             background: #f5f5f5;
-            border-radius: 10px;
+            border-radius: 0.625rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 16px !important;
+            font-size: 1rem;
+        }
+
+        .header-title {
+            font-size: 0.9375rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin: 0;
+            line-height: 1.2;
+        }
+
+        .timer {
+            background: #fff3cd;
+            color: #856404;
+            padding: 0.25rem 0.625rem;
+            border-radius: 0.9375rem;
+            font-size: 0.8125rem;
+            font-weight: 600;
+            border: 1px solid #ffeaa7;
+            min-width: 3.125rem;
+            text-align: center;
+            line-height: 1.1;
         }
 
         .timer.warning {
@@ -325,12 +182,13 @@
             50% { transform: scale(1.05); }
         }
 
+        /* Service Details */
         .service-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 14px;
-            gap: 12px;
+            margin-bottom: 0.875rem;
+            gap: 0.75rem;
             flex-shrink: 0;
         }
 
@@ -339,18 +197,39 @@
             min-width: 0;
         }
 
+        .service-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 0.125rem;
+            line-height: 1.1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .vehicle-info {
+            font-size: 0.8125rem;
+            color: #6b7280;
+            margin-bottom: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            line-height: 1.2;
+        }
+
         .car-image-container {
             flex-shrink: 0;
-            width: 85px;
-            height: 60px;
+            width: 5.3125rem;
+            height: 3.75rem;
             background: #f8fafc;
-            border-radius: 12px;
+            border-radius: 0.75rem;
             border: 2px solid #e2e8f0;
             overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.05);
             position: relative;
         }
 
@@ -358,7 +237,7 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            border-radius: 10px;
+            border-radius: 0.625rem;
             transition: opacity 0.3s ease;
         }
 
@@ -369,14 +248,15 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 22px !important;
+            font-size: 1.375rem;
             background: #f3f4f6;
             color: #6b7280;
-            border-radius: 10px;
+            border-radius: 0.625rem;
         }
 
+        /* Info Rows */
         .info-section {
-            margin-bottom: 12px;
+            margin-bottom: 0.75rem;
             flex: 1;
             min-height: 0;
         }
@@ -384,8 +264,8 @@
         .info-row {
             display: flex;
             align-items: flex-start;
-            margin-bottom: 10px;
-            gap: 10px;
+            margin-bottom: 0.625rem;
+            gap: 0.625rem;
         }
 
         .info-row:last-child {
@@ -393,12 +273,12 @@
         }
 
         .info-icon {
-            width: 18px;
-            height: 18px;
+            width: 1.125rem;
+            height: 1.125rem;
             color: #6b7280;
-            margin-top: 1px;
+            margin-top: 0.0625rem;
             flex-shrink: 0;
-            font-size: 16px !important;
+            font-size: 1rem;
         }
 
         .info-content {
@@ -406,61 +286,96 @@
             min-width: 0;
         }
 
+        .info-label {
+            font-size: 0.8125rem;
+            font-weight: 500;
+            color: #1f2937;
+            margin-bottom: 0.0625rem;
+            line-height: 1.2;
+        }
+
+        .info-value {
+            font-size: 0.8125rem;
+            color: #6b7280;
+            line-height: 1.3;
+        }
+
         .map-link {
             color: #3b82f6;
             text-decoration: none;
-            font-weight: 500 !important;
-            font-size: 13px !important;
+            font-weight: 500;
+            font-size: 0.8125rem;
         }
 
         .map-link:hover {
             text-decoration: underline;
         }
 
-        .phone-masked {
-            color: #6b7280;
-            font-weight: 400 !important;
+        .phone-number {
+            color: #1f2937;
+            font-weight: 500;
+            font-size: 0.9375rem;
+            letter-spacing: 0.03125rem;
+            line-height: 1.2;
         }
 
+        .phone-masked {
+            color: #6b7280;
+            font-weight: 400;
+        }
+
+        /* Agent Info */
         .agent-info {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 8px;
+            gap: 0.5rem;
+        }
+
+        .agent-name {
+            color: #1f2937;
+            font-weight: 600;
+            font-size: 0.875rem;
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            line-height: 1.2;
         }
 
         .call-agent-btn {
             background: #10b981;
             color: white;
             border: none;
-            padding: 5px 10px;
-            border-radius: 12px;
-            font-size: 11px !important;
-            font-weight: 600 !important;
-            line-height: 13px !important;
+            padding: 0.3125rem 0.625rem;
+            border-radius: 0.75rem;
+            font-size: 0.6875rem;
+            font-weight: 600;
             cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 0.25rem;
             transition: all 0.2s ease;
-            min-width: 55px;
+            min-width: 3.4375rem;
             justify-content: center;
+            line-height: 1.1;
         }
 
         .call-agent-btn:hover {
             background: #059669;
             transform: translateY(-1px);
-            box-shadow: 0 2px 6px rgba(16, 185, 129, 0.3);
+            box-shadow: 0 0.125rem 0.375rem rgba(16, 185, 129, 0.3);
         }
 
         .call-agent-btn:active {
             transform: translateY(0);
         }
 
+        /* Customer Contact */
         .customer-contact {
             display: flex;
-            gap: 8px;
-            margin-top: 6px;
+            gap: 0.5rem;
+            margin-top: 0.375rem;
         }
 
         .contact-btn {
@@ -468,17 +383,17 @@
             background: #f3f4f6;
             color: #9ca3af;
             border: 1px solid #e5e7eb;
-            padding: 6px 8px;
-            border-radius: 10px;
-            font-size: 11px !important;
-            font-weight: 600 !important;
-            line-height: 13px !important;
+            padding: 0.375rem 0.5rem;
+            border-radius: 0.625rem;
+            font-size: 0.6875rem;
+            font-weight: 600;
             cursor: not-allowed;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 4px;
+            gap: 0.25rem;
             transition: all 0.3s ease;
+            line-height: 1.1;
         }
 
         .contact-btn.enabled {
@@ -502,45 +417,68 @@
             background: #128c7e;
         }
 
+        /* Price Section */
         .price-section {
             background: #fffbeb;
             border: 1px solid #fde68a;
-            border-radius: 10px;
-            padding: 10px;
-            margin-bottom: 12px;
+            border-radius: 0.625rem;
+            padding: 0.625rem;
+            margin-bottom: 0.75rem;
             flex-shrink: 0;
         }
 
         .price-row {
             display: flex;
             justify-content: space-between;
-            font-size: 13px !important;
-            line-height: 16px !important;
+            font-size: 0.8125rem;
+            line-height: 1.2;
+        }
+
+        .price-label {
+            color: #1f2937;
+            font-weight: 500;
+            font-size: 0.8125rem;
+        }
+
+        .price-value {
+            color: #1f2937;
+            font-weight: 600;
+            font-size: 0.8125rem;
         }
 
         .payout-highlight {
             background: #fef3c7;
-            padding: 2px 0;
-            border-radius: 4px;
+            padding: 0.125rem 0;
+            border-radius: 0.25rem;
         }
 
+        .payout-highlight .price-label {
+            font-size: 1.125rem;
+        }
+
+        .payout-highlight .price-value {
+            font-size: 1.125rem;
+        }
+
+        /* Action Buttons */
         .action-buttons {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 0.5rem;
             flex-shrink: 0;
         }
 
+        /* Swipe Container */
         .swipe-container {
             position: relative;
-            height: 50px;
+            height: 3.125rem;
             background: #10b981;
-            border-radius: 25px;
+            border-radius: 1.5625rem;
             overflow: hidden;
             cursor: pointer;
             user-select: none;
             touch-action: none;
-            box-shadow: 0 3px 12px rgba(16, 185, 129, 0.3);
+            box-shadow: 0 0.1875rem 0.75rem rgba(16, 185, 129, 0.3);
         }
 
         .swipe-track {
@@ -551,18 +489,31 @@
             justify-content: center;
         }
 
+        .swipe-text {
+            color: white;
+            font-weight: 600;
+            font-size: 0.9375rem;
+            position: absolute;
+            transition: opacity 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+            letter-spacing: 0.0125rem;
+            line-height: 1.1;
+        }
+
         .swipe-handle {
             position: absolute;
-            left: 3px;
-            top: 3px;
-            width: 44px;
-            height: 44px;
+            left: 0.1875rem;
+            top: 0.1875rem;
+            width: 2.75rem;
+            height: 2.75rem;
             background: white;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.1);
             transition: none;
             cursor: grab;
             z-index: 2;
@@ -581,7 +532,25 @@
             background: rgba(255, 255, 255, 0.1);
             width: 0%;
             transition: none;
-            border-radius: 25px;
+            border-radius: 1.5625rem;
+        }
+
+        /* Decline Button */
+        .decline-button {
+            height: 2.5rem;
+            background: transparent;
+            border: 1.5px solid #e5e7eb;
+            color: #6b7280;
+            border-radius: 1.25rem;
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.375rem;
+            line-height: 1.1;
         }
 
         .decline-button:hover {
@@ -594,6 +563,7 @@
             transform: scale(0.98);
         }
 
+        /* Success State */
         .swipe-container.accepted {
             background: #059669;
         }
@@ -618,9 +588,9 @@
             background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
             background-size: 200% 100%;
             animation: loading 1.5s infinite;
-            border-radius: 6px;
-            height: 14px;
-            margin-bottom: 4px;
+            border-radius: 0.375rem;
+            height: 0.875rem;
+            margin-bottom: 0.25rem;
         }
 
         @keyframes loading {
@@ -642,11 +612,11 @@
             content: '';
             display: block;
             width: 100%;
-            height: 12px;
+            height: 0.75rem;
             background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
             background-size: 200% 100%;
             animation: loading 1.5s infinite;
-            border-radius: 4px;
+            border-radius: 0.25rem;
         }
 
         .loading .action-buttons {
@@ -654,16 +624,16 @@
             pointer-events: none;
         }
 
-        /* Timer extension popup */
+        /* Timer popup */
         .timer-popup {
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
             background: white;
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            padding: 1.25rem;
+            border-radius: 0.9375rem;
+            box-shadow: 0 0.625rem 1.875rem rgba(0, 0, 0, 0.3);
             z-index: 1000;
             text-align: center;
             display: none;
@@ -680,34 +650,34 @@
         }
 
         .timer-popup h3 {
-            margin-bottom: 10px;
+            margin-bottom: 0.625rem;
             color: #1f2937;
-            font-size: 18px !important;
-            line-height: 20px !important;
+            font-size: 1.125rem;
+            line-height: 1.2;
         }
 
         .timer-popup p {
-            margin-bottom: 20px;
+            margin-bottom: 1.25rem;
             color: #6b7280;
-            font-size: 14px !important;
-            line-height: 17px !important;
+            font-size: 0.875rem;
+            line-height: 1.3;
         }
 
         .timer-popup-buttons {
             display: flex;
-            gap: 10px;
+            gap: 0.625rem;
         }
 
         .timer-popup-btn {
             flex: 1;
-            padding: 10px 20px;
+            padding: 0.625rem 1.25rem;
             border: none;
-            border-radius: 8px;
-            font-weight: 600 !important;
+            border-radius: 0.5rem;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.2s ease;
-            font-size: 14px !important;
-            line-height: 16px !important;
+            font-size: 0.875rem;
+            line-height: 1.1;
         }
 
         .timer-popup-btn.extend {
@@ -724,275 +694,210 @@
             transform: scale(0.95);
         }
 
-        /* Responsive adjustments */
+        /* Responsive */
         @media (max-height: 700px) {
             .booking-popup {
-                padding: 12px;
+                padding: 0.75rem;
             }
             
             .popup-header {
-                margin-bottom: 12px;
+                margin-bottom: 0.75rem;
             }
             
             .service-header {
-                margin-bottom: 12px;
+                margin-bottom: 0.75rem;
             }
             
             .info-section {
-                margin-bottom: 10px;
+                margin-bottom: 0.625rem;
             }
             
             .price-section {
-                margin-bottom: 10px;
-                padding: 8px;
+                margin-bottom: 0.625rem;
+                padding: 0.5rem;
             }
             
             .info-row {
-                margin-bottom: 8px;
+                margin-bottom: 0.5rem;
             }
             
             .service-title {
-                font-size: 18px !important;
+                font-size: 1.125rem;
             }
         }
 
         @media (max-width: 375px) {
             .booking-popup {
-                left: 6px;
-                right: 6px;
-                bottom: 6px;
-                top: 6px;
-                padding: 12px;
+                left: 0.375rem;
+                right: 0.375rem;
+                bottom: 0.375rem;
+                top: 0.375rem;
+                padding: 0.75rem;
             }
 
             .service-header {
-                gap: 8px;
+                gap: 0.5rem;
             }
 
             .service-title {
-                font-size: 18px !important;
+                font-size: 1.125rem;
             }
 
             .car-image-container {
-                width: 75px;
-                height: 55px;
+                width: 4.6875rem;
+                height: 3.4375rem;
             }
 
             .timer {
-                font-size: 12px !important;
-                padding: 3px 8px;
+                font-size: 0.75rem;
+                padding: 0.1875rem 0.5rem;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Fixed Container -->
-    <div class="container">
-        <!-- Map Background -->
-        <div class="map-background">
-            <div class="map-lines">
-                <div class="road-line horizontal"></div>
-                <div class="road-line horizontal"></div>
-                <div class="road-line horizontal"></div>
-                <div class="road-line vertical"></div>
-                <div class="road-line vertical"></div>
+    <!-- Map Background -->
+    <div class="map-background">
+        <div class="map-lines">
+            <div class="road-line horizontal"></div>
+            <div class="road-line horizontal"></div>
+            <div class="road-line horizontal"></div>
+            <div class="road-line vertical"></div>
+            <div class="road-line vertical"></div>
+        </div>
+    </div>
+
+    <!-- Booking Popup -->
+    <div class="booking-popup loading" id="bookingPopup">
+        <!-- Header -->
+        <div class="popup-header">
+            <div class="header-left">
+                <div class="service-icon">
+                    <span class="icon-tools"></span>
+                </div>
+                <h2 class="header-title"> नई बुकिंग</h2>
+            </div>
+            <div class="timer" id="timer">00:45</div>
+        </div>
+
+        <!-- Service Details with Car Image -->
+        <div class="service-header">
+            <div class="service-info">
+                <div class="service-title" id="problemText">
+                    <div class="loading-skeleton"></div>
+                </div>
+                <div class="vehicle-info" id="vehicleInfo">
+                    <div class="loading-skeleton"></div>
+                </div>
+            </div>
+            <div class="car-image-container">
+                <div class="car-placeholder" id="carPlaceholder">🚗</div>
+                <img src="" alt="" class="car-image" id="carImage" style="display: none;">
             </div>
         </div>
 
-        <!-- Booking Popup -->
-        <div class="booking-popup loading" id="bookingPopup">
-            <!-- Header -->
-            <div class="popup-header">
-                <div class="header-left">
-                    <div class="service-icon">
-                        <span class="icon-tools"></span>
-                    </div>
-                    <h2 class="header-title"> नई बुकिंग</h2>
-                </div>
-                <div class="timer" id="timer">00:45</div>
-            </div>
-
-            <!-- Service Details with Car Image -->
-            <div class="service-header">
-                <div class="service-info">
-                    <div class="service-title" id="problemText">
-                        <div class="loading-skeleton"></div>
-                    </div>
-                    <div class="vehicle-info" id="vehicleInfo">
+        <!-- Info Section -->
+        <div class="info-section">
+            <div class="info-row">
+                <span class="info-icon icon-location"></span>
+                <div class="info-content">
+                    <div class="info-label">स्थान:</div>
+                    <div class="info-value" id="locationInfo">
                         <div class="loading-skeleton"></div>
                     </div>
                 </div>
-                <div class="car-image-container">
-                    <div class="car-placeholder" id="carPlaceholder">🚗</div>
-                    <img src="" alt="" class="car-image" id="carImage" style="display: none;">
-                </div>
             </div>
 
-            <!-- Info Section -->
-            <div class="info-section">
-                <div class="info-row">
-                    <span class="info-icon icon-location"></span>
-                    <div class="info-content">
-                        <div class="info-label">स्थान:</div>
-                        <div class="info-value" id="locationInfo">
-                            <div class="loading-skeleton"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="info-row">
-                    <span class="info-icon icon-phone"></span>
-                    <div class="info-content">
-                        <div class="info-value" id="phoneInfo">
-                            <div class="loading-skeleton"></div>
-                        </div>
-                        <!-- Customer contact options (initially disabled) -->
-                        <div class="customer-contact" id="customerContact" style="display: none;">
-                            <button class="contact-btn whatsapp" id="whatsappBtn" onclick="contactCustomer('whatsapp')">
-                                <span class="icon-whatsapp"></span>
-                                WhatsApp
-                            </button>
-                            <button class="contact-btn" id="callBtn" onclick="contactCustomer('call')">
-                                <span class="icon-call"></span>
-                                कॉल करें
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="info-row">
-                    <span class="info-icon icon-tag"></span>
-                    <div class="info-content">
-                        <div class="info-label">कुल राशि:</div>
-                        <div class="info-value" id="totalPrice">
-                            <div class="loading-skeleton"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="info-row agent-row">
-                    <span class="info-icon icon-agent"></span>
-                    <div class="info-content">
-                        <div class="info-label">असाइन्ड एजेंट:</div>
-                        <div class="agent-info">
-                            <span class="agent-name" id="agentName">
-                                <div class="loading-skeleton"></div>
-                            </span>
-                            <button class="call-agent-btn" onclick="callAgent()" id="callAgentBtn" style="display: none;">
-                                <span class="icon-call"></span>
-                                कंपनी को कॉल करें
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Price Breakdown -->
-            <div class="price-section">
-                <div class="price-row payout-highlight">
-                    <span class="price-label">आपको मिलेगा:</span>
-                    <span class="price-value" id="payoutAmount">
+            <div class="info-row">
+                <span class="info-icon icon-phone"></span>
+                <div class="info-content">
+                    <div class="info-value" id="phoneInfo">
                         <div class="loading-skeleton"></div>
-                    </span>
+                    </div>
+                    <!-- Customer contact options (initially disabled) -->
+                    <div class="customer-contact" id="customerContact" style="display: none;">
+                        <button class="contact-btn whatsapp" id="whatsappBtn" onclick="contactCustomer('whatsapp')">
+                            <span class="icon-whatsapp"></span>
+                            WhatsApp
+                        </button>
+                        <button class="contact-btn" id="callBtn" onclick="contactCustomer('call')">
+                            <span class="icon-call"></span>
+                            कॉल करें
+                        </button>
+                    </div>
                 </div>
             </div>
 
-            <!-- Action Buttons -->
-            <div class="action-buttons">
-                <div class="swipe-container" id="swipeContainer">
-                    <div class="swipe-progress" id="swipeProgress"></div>
-                    <div class="swipe-track">
-                        <div class="swipe-text" id="swipeText">
-                            स्वीकार करने के लिए स्लाइड करें
-                            <span style="margin-left: 4px;">→</span>
-                        </div>
-                        <div class="swipe-handle" id="swipeHandle">
-                            <span style="color: #10b981; font-size: 16px; font-weight: bold;">→</span>
-                        </div>
+            <div class="info-row">
+                <span class="info-icon icon-tag"></span>
+                <div class="info-content">
+                    <div class="info-label">कुल राशि:</div>
+                    <div class="info-value" id="totalPrice">
+                        <div class="loading-skeleton"></div>
                     </div>
                 </div>
+            </div>
 
-                <button class="decline-button" onclick="declineBooking()">
-                    <span class="icon-x"></span>
-                    रिजेक्ट करें
-                </button>
+            <div class="info-row agent-row">
+                <span class="info-icon icon-agent"></span>
+                <div class="info-content">
+                    <div class="info-label">असाइन्ड एजेंट:</div>
+                    <div class="agent-info">
+                        <span class="agent-name" id="agentName">
+                            <div class="loading-skeleton"></div>
+                        </span>
+                        <button class="call-agent-btn" onclick="callAgent()" id="callAgentBtn" style="display: none;">
+                            <span class="icon-call"></span>
+                            कंपनी को कॉल करें
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- Timer Extension Popup -->
-        <div class="timer-popup" id="timerPopup">
-            <h3>समय समाप्त!</h3>
-            <p>क्या आप 45 सेकंड और चाहते हैं?</p>
-            <div class="timer-popup-buttons">
-                <button class="timer-popup-btn extend" onclick="extendTimer()">45 सेकंड और दें</button>
-                <button class="timer-popup-btn cancel" onclick="declineBooking()">रिजेक्ट करें</button>
+        <!-- Price Breakdown -->
+        <div class="price-section">
+            <div class="price-row payout-highlight">
+                <span class="price-label">आपको मिलेगा:</span>
+                <span class="price-value" id="payoutAmount">
+                    <div class="loading-skeleton"></div>
+                </span>
             </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <div class="swipe-container" id="swipeContainer">
+                <div class="swipe-progress" id="swipeProgress"></div>
+                <div class="swipe-track">
+                    <div class="swipe-text" id="swipeText">
+                        स्वीकार करने के लिए स्लाइड करें
+                        <span style="margin-left: 0.25rem;">→</span>
+                    </div>
+                    <div class="swipe-handle" id="swipeHandle">
+                        <span style="color: #10b981; font-size: 1rem; font-weight: bold;">→</span>
+                    </div>
+                </div>
+            </div>
+
+            <button class="decline-button" onclick="declineBooking()">
+                <span class="icon-x"></span>
+                रिजेक्ट करें
+            </button>
+        </div>
+    </div>
+
+    <!-- Timer Extension Popup -->
+    <div class="timer-popup" id="timerPopup">
+        <h3>समय समाप्त!</h3>
+        <p>क्या आप 45 सेकंड और चाहते हैं?</p>
+        <div class="timer-popup-buttons">
+            <button class="timer-popup-btn extend" onclick="extendTimer()">45 सेकंड और दें</button>
+            <button class="timer-popup-btn cancel" onclick="declineBooking()">रिजेक्ट करें</button>
         </div>
     </div>
 
     <script>
-        // ULTIMATE Android font scaling prevention
-        function preventFontScaling() {
-            // Force viewport reset
-            const viewport = document.querySelector('meta[name="viewport"]');
-            if (viewport) {
-                viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, shrink-to-fit=no, viewport-fit=cover');
-            }
-
-            // Force body and html styles programmatically
-            document.documentElement.style.setProperty('font-size', '16px', 'important');
-            document.documentElement.style.setProperty('-webkit-text-size-adjust', 'none', 'important');
-            document.documentElement.style.setProperty('text-size-adjust', 'none', 'important');
-            document.documentElement.style.setProperty('zoom', '1', 'important');
-
-            document.body.style.setProperty('font-size', '16px', 'important');
-            document.body.style.setProperty('-webkit-text-size-adjust', 'none', 'important');
-            document.body.style.setProperty('text-size-adjust', 'none', 'important');
-            document.body.style.setProperty('zoom', '1', 'important');
-            document.body.style.setProperty('transform', 'scale(1)', 'important');
-
-            // Apply specific font sizes to all text elements
-            const fontSizes = {
-                '.header-title': '15px',
-                '.service-title': '20px',
-                '.vehicle-info': '13px',
-                '.timer': '13px',
-                '.info-label': '13px',
-                '.info-value': '13px',
-                '.phone-number': '15px',
-                '.agent-name': '14px',
-                '.call-agent-btn': '11px',
-                '.contact-btn': '11px',
-                '.price-label': '13px',
-                '.price-value': '13px',
-                '.payout-highlight .price-label': '18px',
-                '.payout-highlight .price-value': '18px',
-                '.swipe-text': '15px',
-                '.decline-button': '14px',
-                '.timer-popup h3': '18px',
-                '.timer-popup p': '14px',
-                '.timer-popup-btn': '14px'
-            };
-
-            Object.entries(fontSizes).forEach(([selector, size]) => {
-                const elements = document.querySelectorAll(selector);
-                elements.forEach(el => {
-                    el.style.setProperty('font-size', size, 'important');
-                    el.style.setProperty('line-height', parseFloat(size) + 2 + 'px', 'important');
-                    el.style.setProperty('-webkit-text-size-adjust', 'none', 'important');
-                    el.style.setProperty('text-size-adjust', 'none', 'important');
-                });
-            });
-
-            // Force all elements to prevent scaling
-            const allElements = document.querySelectorAll('*');
-            allElements.forEach(el => {
-                el.style.setProperty('-webkit-text-size-adjust', 'none', 'important');
-                el.style.setProperty('text-size-adjust', 'none', 'important');
-                el.style.setProperty('zoom', '1', 'important');
-            });
-        }
-
         // Get booking ID from URL parameters
         const urlParams = new URLSearchParams(window.location.search);
         const bookingId = urlParams.get('id') || '8978';
@@ -1009,18 +914,10 @@
 
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
-            // Prevent font scaling immediately and continuously
-            preventFontScaling();
-            setInterval(preventFontScaling, 500); // Every 500ms
-            
             loadBookingData();
             initTimer();
             initSwipeToAccept();
         });
-
-        // Also prevent scaling on window resize
-        window.addEventListener('resize', preventFontScaling);
-        window.addEventListener('orientationchange', preventFontScaling);
 
         // Mask phone number (hide last 4 digits)
         function maskPhoneNumber(phone) {
@@ -1065,9 +962,6 @@
         // Display booking data
         function displayBookingData(data) {
             document.getElementById('bookingPopup').classList.remove('loading');
-
-            // Apply font scaling prevention after data load
-            setTimeout(preventFontScaling, 100);
 
             // Service title and vehicle info
             document.getElementById('problemText').textContent = data.problem || 'समस्या का विवरण उपलब्ध नहीं';
@@ -1130,9 +1024,6 @@
             // Payout amount
             const payoutAmount = data.pending_payment_amount || '0';
             document.getElementById('payoutAmount').textContent = `₹${payoutAmount}`;
-
-            // Re-apply font scaling prevention after DOM updates
-            setTimeout(preventFontScaling, 200);
         }
 
         // Timer functionality with extension option
@@ -1166,7 +1057,6 @@
         function showTimerExtensionPopup() {
             if (!hasExtended && !isAccepted) {
                 document.getElementById('timerPopup').classList.add('show');
-                preventFontScaling(); // Ensure fonts stay fixed in popup
             } else {
                 // Auto decline if already extended once or accepted
                 declineBooking();
@@ -1194,9 +1084,6 @@
             
             whatsappBtn.classList.add('enabled');
             callBtn.classList.add('enabled');
-
-            // Re-apply font scaling prevention
-            preventFontScaling();
         }
 
         // Handle customer contact
