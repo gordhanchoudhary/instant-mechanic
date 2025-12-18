@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, target-densitydpi=device-dpi">
     <title>इंस्टेंट मैकेनिक - नई बुकिंग</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔧</text></svg>">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         /* NUCLEAR OPTION: Override everything with CSS zoom and transforms */
@@ -715,6 +716,7 @@
                     </div>
                 </div>
 
+                <!-- Phone info row - COMMENTED OUT -->
                 <!-- <div class="info-row">
                     <span class="info-icon icon-phone"></span>
                     <div class="info-content">
@@ -744,6 +746,7 @@
                     </div>
                 </div>
 
+                <!-- Agent info row - COMMENTED OUT -->
                 <!-- <div class="info-row agent-row">
                     <span class="info-icon icon-agent"></span>
                     <div class="info-content">
@@ -807,35 +810,44 @@
     <script>
         // Force fixed scaling on page load and continuously
         function forceFixedScaling() {
-            // Force HTML and body properties
-            document.documentElement.style.setProperty('zoom', '1', 'important');
-            document.documentElement.style.setProperty('transform', 'scale(1)', 'important');
-            document.documentElement.style.setProperty('font-size', '16px', 'important');
-            document.documentElement.style.setProperty('-webkit-text-size-adjust', 'none', 'important');
-            document.documentElement.style.setProperty('text-size-adjust', 'none', 'important');
+            try {
+                // Force HTML and body properties
+                document.documentElement.style.setProperty('zoom', '1', 'important');
+                document.documentElement.style.setProperty('transform', 'scale(1)', 'important');
+                document.documentElement.style.setProperty('font-size', '16px', 'important');
+                document.documentElement.style.setProperty('-webkit-text-size-adjust', 'none', 'important');
+                document.documentElement.style.setProperty('text-size-adjust', 'none', 'important');
 
-            document.body.style.setProperty('zoom', '1', 'important');
-            document.body.style.setProperty('transform', 'scale(1)', 'important');
-            document.body.style.setProperty('font-size', '16px', 'important');
-            document.body.style.setProperty('-webkit-text-size-adjust', 'none', 'important');
-            document.body.style.setProperty('text-size-adjust', 'none', 'important');
+                document.body.style.setProperty('zoom', '1', 'important');
+                document.body.style.setProperty('transform', 'scale(1)', 'important');
+                document.body.style.setProperty('font-size', '16px', 'important');
+                document.body.style.setProperty('-webkit-text-size-adjust', 'none', 'important');
+                document.body.style.setProperty('text-size-adjust', 'none', 'important');
 
-            // Force app container scaling
-            const container = document.querySelector('.app-container');
-            if (container) {
-                container.style.setProperty('transform', 'scale(1)', 'important');
-                container.style.setProperty('zoom', '1', 'important');
+                // Force app container scaling
+                const container = document.querySelector('.app-container');
+                if (container) {
+                    container.style.setProperty('transform', 'scale(1)', 'important');
+                    container.style.setProperty('zoom', '1', 'important');
+                }
+
+                // Apply fixed font sizes to all text elements
+                const textElements = document.querySelectorAll('.fixed-text-15, .fixed-text-20, .fixed-text-13, .fixed-text-14, .fixed-text-11, .fixed-text-18');
+                textElements.forEach(el => {
+                    if (el && el.className) {
+                        const match = el.className.match(/fixed-text-(\d+)/);
+                        if (match) {
+                            const size = match[1];
+                            el.style.setProperty('font-size', size + 'px', 'important');
+                            el.style.setProperty('line-height', (parseInt(size) + 2) + 'px', 'important');
+                            el.style.setProperty('-webkit-text-size-adjust', 'none', 'important');
+                            el.style.setProperty('text-size-adjust', 'none', 'important');
+                        }
+                    }
+                });
+            } catch (error) {
+                console.warn('Error in forceFixedScaling:', error);
             }
-
-            // Apply fixed font sizes to all text elements
-            const textElements = document.querySelectorAll('.fixed-text-15, .fixed-text-20, .fixed-text-13, .fixed-text-14, .fixed-text-11, .fixed-text-18');
-            textElements.forEach(el => {
-                const size = el.className.match(/fixed-text-(\d+)/)[1];
-                el.style.setProperty('font-size', size + 'px', 'important');
-                el.style.setProperty('line-height', (parseInt(size) + 2) + 'px', 'important');
-                el.style.setProperty('-webkit-text-size-adjust', 'none', 'important');
-                el.style.setProperty('text-size-adjust', 'none', 'important');
-            });
         }
 
         // Get booking ID from URL parameters
@@ -854,13 +866,17 @@
 
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
-            forceFixedScaling();
-            // Run scaling fix repeatedly to override any system changes
-            setInterval(forceFixedScaling, 100);
-            
-            loadBookingData();
-            initTimer();
-            initSwipeToAccept();
+            try {
+                forceFixedScaling();
+                // Run scaling fix repeatedly to override any system changes
+                setInterval(forceFixedScaling, 100);
+                
+                loadBookingData();
+                initTimer();
+                initSwipeToAccept();
+            } catch (error) {
+                console.error('Error in DOMContentLoaded:', error);
+            }
         });
 
         // Also apply on resize and orientation change
@@ -871,8 +887,13 @@
 
         // Mask phone number (hide last 4 digits)
         function maskPhoneNumber(phone) {
-            if (!phone || phone.length < 4) return phone;
-            return phone.substring(0, phone.length - 4) + '****';
+            try {
+                if (!phone || phone.length < 4) return phone;
+                return phone.substring(0, phone.length - 4) + '****';
+            } catch (error) {
+                console.warn('Error in maskPhoneNumber:', error);
+                return phone;
+            }
         }
 
         // Load booking data
@@ -902,7 +923,7 @@
                         "price": "599 (Service Charge: ₹508, GST: ₹91)",
                         "location": "https://www.google.com/maps?q=28.566780090332,77.121612548828",
                         "pending_payment_amount": "254",
-                        "car_image": "https://gomechprod.blob.core.windows.net/gm-retail-app/cars/maruti-suzuki-ciaz-petrol.jpg",
+                        "car_image": null, // Set to null to avoid 404 error
                         "is_cancelled": false
                     };
                     displayBookingData(demoData);
@@ -911,287 +932,387 @@
 
         // Display booking data
         function displayBookingData(data) {
-            document.getElementById('bookingPopup').classList.remove('loading');
-            forceFixedScaling(); // Apply scaling after DOM changes
+            try {
+                const bookingPopup = document.getElementById('bookingPopup');
+                if (bookingPopup) {
+                    bookingPopup.classList.remove('loading');
+                }
+                forceFixedScaling(); // Apply scaling after DOM changes
 
-            // Service title and vehicle info
-            document.getElementById('problemText').textContent = data.problem || 'समस्या का विवरण उपलब्ध नहीं';
-            document.getElementById('vehicleInfo').textContent = `कार: ${data.car || 'निर्दिष्ट नहीं'}`;
-
-            // Store full phone number
-            fullPhoneNumber = data.customer_mobile || '';
-
-            // Car image handling
-            const carImage = document.getElementById('carImage');
-            const carPlaceholder = document.getElementById('carPlaceholder');
-            
-            if (data.car_image) {
-                carImage.src = data.car_image;
-                carImage.alt = data.car || 'Car';
+                // Service title and vehicle info
+                const problemText = document.getElementById('problemText');
+                const vehicleInfo = document.getElementById('vehicleInfo');
                 
-                carImage.onload = function() {
-                    carImage.style.display = 'block';
-                    carPlaceholder.style.display = 'none';
-                };
+                if (problemText) {
+                    problemText.textContent = data.problem || 'समस्या का विवरण उपलब्ध नहीं';
+                }
+                if (vehicleInfo) {
+                    vehicleInfo.textContent = `कार: ${data.car || 'निर्दिष्ट नहीं'}`;
+                }
+
+                // Store full phone number
+                fullPhoneNumber = data.customer_mobile || '';
+
+                // Car image handling
+                const carImage = document.getElementById('carImage');
+                const carPlaceholder = document.getElementById('carPlaceholder');
                 
-                carImage.onerror = function() {
-                    carImage.style.display = 'none';
+                if (data.car_image && carImage && carPlaceholder) {
+                    carImage.src = data.car_image;
+                    carImage.alt = data.car || 'Car';
+                    
+                    carImage.onload = function() {
+                        carImage.style.display = 'block';
+                        carPlaceholder.style.display = 'none';
+                    };
+                    
+                    carImage.onerror = function() {
+                        carImage.style.display = 'none';
+                        carPlaceholder.style.display = 'flex';
+                        carPlaceholder.textContent = '🚗';
+                    };
+                } else if (carPlaceholder) {
                     carPlaceholder.style.display = 'flex';
                     carPlaceholder.textContent = '🚗';
-                };
-            } else {
-                carImage.style.display = 'none';
-                carPlaceholder.style.display = 'flex';
-                carPlaceholder.textContent = '🚗';
+                }
+
+                // Location
+                const locationInfo = document.getElementById('locationInfo');
+                if (locationInfo) {
+                    if (data.location) {
+                        locationInfo.innerHTML = 
+                            `स्थान देखें<br>(<a href="${data.location}" class="map-link" target="_blank">मेप पर देखें</a>)`;
+                    } else {
+                        locationInfo.textContent = 'स्थान उपलब्ध नहीं';
+                    }
+                }
+
+                // Total price
+                const totalPrice = document.getElementById('totalPrice');
+                if (totalPrice) {
+                    const priceText = data.price || '₹0';
+                    totalPrice.textContent = `${priceText} (GST सहित)`;
+                }
+
+                // Payout amount
+                const payoutAmount = document.getElementById('payoutAmount');
+                if (payoutAmount) {
+                    const payoutAmountValue = data.pending_payment_amount || '0';
+                    payoutAmount.textContent = `₹${payoutAmountValue}`;
+                }
+
+                forceFixedScaling(); // Final scaling enforcement
+            } catch (error) {
+                console.error('Error in displayBookingData:', error);
             }
-
-            // Location
-            if (data.location) {
-                document.getElementById('locationInfo').innerHTML = 
-                    `स्थान देखें<br>(<a href="${data.location}" class="map-link" target="_blank">मेप पर देखें</a>)`;
-            } else {
-                document.getElementById('locationInfo').textContent = 'स्थान उपलब्ध नहीं';
-            }
-
-            // Phone number (masked initially)
-            const maskedPhone = maskPhoneNumber(fullPhoneNumber);
-            document.getElementById('phoneInfo').innerHTML = 
-                `<span class="phone-number phone-masked">${maskedPhone || 'फोन नंबर उपलब्ध नहीं'}</span>`;
-
-            // Show customer contact buttons (initially disabled)
-            if (fullPhoneNumber) {
-                document.getElementById('customerContact').style.display = 'flex';
-            }
-
-            // Total price
-            const priceText = data.price || '₹0';
-            document.getElementById('totalPrice').textContent = `${priceText} (GST सहित)`;
-
-            // Agent info
-            const agentName = data.agent_name || 'असाइन नहीं किया गया';
-            document.getElementById('agentName').textContent = agentName;
-            document.getElementById('callAgentBtn').style.display = data.agent_name ? 'flex' : 'none';
-
-            // Payout amount
-            const payoutAmount = data.pending_payment_amount || '0';
-            document.getElementById('payoutAmount').textContent = `₹${payoutAmount}`;
-
-            forceFixedScaling(); // Final scaling enforcement
         }
 
         // Timer functionality
         function initTimer() {
-            const timerElement = document.getElementById('timer');
-            
-            function updateTimer() {
-                const minutes = Math.floor(timeLeft / 60);
-                const seconds = timeLeft % 60;
-                timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            try {
+                const timerElement = document.getElementById('timer');
                 
-                if (timeLeft <= 15) {
-                    timerElement.classList.add('warning');
-                } else {
-                    timerElement.classList.remove('warning');
+                function updateTimer() {
+                    try {
+                        if (!timerElement) return;
+                        
+                        const minutes = Math.floor(timeLeft / 60);
+                        const seconds = timeLeft % 60;
+                        timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                        
+                        if (timeLeft <= 15) {
+                            timerElement.classList.add('warning');
+                        } else {
+                            timerElement.classList.remove('warning');
+                        }
+                        
+                        if (timeLeft > 0) {
+                            timeLeft--;
+                        } else {
+                            clearInterval(timerInterval);
+                            showTimerExtensionPopup();
+                        }
+                    } catch (error) {
+                        console.warn('Error in updateTimer:', error);
+                    }
                 }
                 
-                if (timeLeft > 0) {
-                    timeLeft--;
-                } else {
-                    clearInterval(timerInterval);
-                    showTimerExtensionPopup();
-                }
+                timerInterval = setInterval(updateTimer, 1000);
+            } catch (error) {
+                console.error('Error in initTimer:', error);
             }
-            
-            timerInterval = setInterval(updateTimer, 1000);
         }
 
         function showTimerExtensionPopup() {
-            if (!hasExtended && !isAccepted) {
-                document.getElementById('timerPopup').classList.add('show');
-            } else {
-                declineBooking();
+            try {
+                if (!hasExtended && !isAccepted) {
+                    const timerPopup = document.getElementById('timerPopup');
+                    if (timerPopup) {
+                        timerPopup.classList.add('show');
+                    }
+                } else {
+                    declineBooking();
+                }
+            } catch (error) {
+                console.warn('Error in showTimerExtensionPopup:', error);
             }
         }
 
         function extendTimer() {
-            if (!hasExtended) {
-                hasExtended = true;
-                timeLeft = 45;
-                document.getElementById('timerPopup').classList.remove('show');
-                initTimer();
+            try {
+                if (!hasExtended) {
+                    hasExtended = true;
+                    timeLeft = 45;
+                    const timerPopup = document.getElementById('timerPopup');
+                    if (timerPopup) {
+                        timerPopup.classList.remove('show');
+                    }
+                    initTimer();
+                }
+            } catch (error) {
+                console.warn('Error in extendTimer:', error);
             }
         }
 
-        // Enable customer contact after acceptance
+        // Enable customer contact after acceptance (not used with commented sections)
         function enableCustomerContact() {
-            document.getElementById('phoneInfo').innerHTML = 
-                `<span class="phone-number">${fullPhoneNumber}</span>`;
-
-            const whatsappBtn = document.getElementById('whatsappBtn');
-            const callBtn = document.getElementById('callBtn');
-            
-            whatsappBtn.classList.add('enabled');
-            callBtn.classList.add('enabled');
+            try {
+                // This function is kept for compatibility but won't be used
+                // since customer contact sections are commented out
+                console.log('Customer contact would be enabled here');
+            } catch (error) {
+                console.warn('Error in enableCustomerContact:', error);
+            }
         }
 
-        // Handle customer contact
+        // Handle customer contact (not used with commented sections)
         function contactCustomer(type) {
-            if (!isAccepted || !fullPhoneNumber) {
-                alert('पहले बुकिंग स्वीकार करें');
-                return;
-            }
+            try {
+                if (!isAccepted || !fullPhoneNumber) {
+                    alert('पहले बुकिंग स्वीकार करें');
+                    return;
+                }
 
-            if (type === 'whatsapp') {
-                const message = encodeURIComponent('मैं आपका मैकेनिक हूं। मैं आपकी लोकेशन पर आ रहा हूं।');
-                window.open(`https://wa.me/${fullPhoneNumber}?text=${message}`, '_blank');
-            } else if (type === 'call') {
-                window.location.href = `tel:${fullPhoneNumber}`;
+                if (type === 'whatsapp') {
+                    const message = encodeURIComponent('मैं आपका मैकेनिक हूं। मैं आपकी लोकेशन पर आ रहा हूं।');
+                    window.open(`https://wa.me/${fullPhoneNumber}?text=${message}`, '_blank');
+                } else if (type === 'call') {
+                    window.location.href = `tel:${fullPhoneNumber}`;
+                }
+            } catch (error) {
+                console.warn('Error in contactCustomer:', error);
             }
         }
 
         // Swipe to Accept functionality
         function initSwipeToAccept() {
-            const swipeContainer = document.getElementById('swipeContainer');
-            const swipeHandle = document.getElementById('swipeHandle');
-            const swipeProgress = document.getElementById('swipeProgress');
-            const swipeText = document.getElementById('swipeText');
-            
-            let maxSwipeDistance;
-
-            function updateMaxSwipeDistance() {
-                maxSwipeDistance = swipeContainer.offsetWidth - swipeHandle.offsetWidth - 6;
-            }
-
-            updateMaxSwipeDistance();
-            window.addEventListener('resize', updateMaxSwipeDistance);
-            
-            // Touch events
-            swipeHandle.addEventListener('touchstart', handleStart, { passive: false });
-            document.addEventListener('touchmove', handleMove, { passive: false });
-            document.addEventListener('touchend', handleEnd, { passive: false });
-            
-            // Mouse events
-            swipeHandle.addEventListener('mousedown', handleStart);
-            document.addEventListener('mousemove', handleMove);
-            document.addEventListener('mouseup', handleEnd);
-            
-            function handleStart(e) {
-                if (isAccepted) return;
+            try {
+                const swipeContainer = document.getElementById('swipeContainer');
+                const swipeHandle = document.getElementById('swipeHandle');
+                const swipeProgress = document.getElementById('swipeProgress');
+                const swipeText = document.getElementById('swipeText');
                 
-                isDragging = true;
-                const clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
-                const handleRect = swipeHandle.getBoundingClientRect();
-                startX = clientX - handleRect.left;
-                swipeHandle.style.transition = 'none';
-                swipeProgress.style.transition = 'none';
-                
-                e.preventDefault();
-            }
-            
-            function handleMove(e) {
-                if (!isDragging || isAccepted) return;
-                
-                const clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
-                const containerRect = swipeContainer.getBoundingClientRect();
-                
-                currentX = clientX - containerRect.left - startX;
-                currentX = Math.max(0, Math.min(currentX, maxSwipeDistance));
-                
-                const progress = (currentX / maxSwipeDistance) * 100;
-                
-                swipeHandle.style.transform = `translateX(${currentX}px)`;
-                swipeProgress.style.width = `${progress}%`;
-                swipeText.style.opacity = 1 - (progress / 100);
-                
-                e.preventDefault();
-            }
-            
-            function handleEnd(e) {
-                if (!isDragging || isAccepted) return;
-                
-                isDragging = false;
-                const progress = (currentX / maxSwipeDistance) * 100;
-                
-                if (progress >= 75) {
-                    acceptBooking();
-                } else {
-                    resetSwipe();
+                if (!swipeContainer || !swipeHandle || !swipeProgress || !swipeText) {
+                    console.warn('Swipe elements not found');
+                    return;
                 }
-            }
-            
-            function resetSwipe() {
-                swipeHandle.style.transition = 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
-                swipeProgress.style.transition = 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
-                swipeHandle.style.transform = 'translateX(0px)';
-                swipeProgress.style.width = '0%';
-                swipeText.style.opacity = '1';
-                currentX = 0;
+                
+                let maxSwipeDistance;
+
+                function updateMaxSwipeDistance() {
+                    try {
+                        maxSwipeDistance = swipeContainer.offsetWidth - swipeHandle.offsetWidth - 6;
+                    } catch (error) {
+                        console.warn('Error updating maxSwipeDistance:', error);
+                        maxSwipeDistance = 200; // fallback value
+                    }
+                }
+
+                updateMaxSwipeDistance();
+                window.addEventListener('resize', updateMaxSwipeDistance);
+                
+                // Touch events
+                swipeHandle.addEventListener('touchstart', handleStart, { passive: false });
+                document.addEventListener('touchmove', handleMove, { passive: false });
+                document.addEventListener('touchend', handleEnd, { passive: false });
+                
+                // Mouse events
+                swipeHandle.addEventListener('mousedown', handleStart);
+                document.addEventListener('mousemove', handleMove);
+                document.addEventListener('mouseup', handleEnd);
+                
+                function handleStart(e) {
+                    try {
+                        if (isAccepted) return;
+                        
+                        isDragging = true;
+                        const clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+                        const handleRect = swipeHandle.getBoundingClientRect();
+                        startX = clientX - handleRect.left;
+                        swipeHandle.style.transition = 'none';
+                        swipeProgress.style.transition = 'none';
+                        
+                        e.preventDefault();
+                    } catch (error) {
+                        console.warn('Error in handleStart:', error);
+                    }
+                }
+                
+                function handleMove(e) {
+                    try {
+                        if (!isDragging || isAccepted) return;
+                        
+                        const clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+                        const containerRect = swipeContainer.getBoundingClientRect();
+                        
+                        currentX = clientX - containerRect.left - startX;
+                        currentX = Math.max(0, Math.min(currentX, maxSwipeDistance));
+                        
+                        const progress = (currentX / maxSwipeDistance) * 100;
+                        
+                        swipeHandle.style.transform = `translateX(${currentX}px)`;
+                        swipeProgress.style.width = `${progress}%`;
+                        swipeText.style.opacity = 1 - (progress / 100);
+                        
+                        e.preventDefault();
+                    } catch (error) {
+                        console.warn('Error in handleMove:', error);
+                    }
+                }
+                
+                function handleEnd(e) {
+                    try {
+                        if (!isDragging || isAccepted) return;
+                        
+                        isDragging = false;
+                        const progress = (currentX / maxSwipeDistance) * 100;
+                        
+                        if (progress >= 75) {
+                            acceptBooking();
+                        } else {
+                            resetSwipe();
+                        }
+                    } catch (error) {
+                        console.warn('Error in handleEnd:', error);
+                    }
+                }
+                
+                function resetSwipe() {
+                    try {
+                        swipeHandle.style.transition = 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+                        swipeProgress.style.transition = 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+                        swipeHandle.style.transform = 'translateX(0px)';
+                        swipeProgress.style.width = '0%';
+                        swipeText.style.opacity = '1';
+                        currentX = 0;
+                    } catch (error) {
+                        console.warn('Error in resetSwipe:', error);
+                    }
+                }
+            } catch (error) {
+                console.error('Error in initSwipeToAccept:', error);
             }
         }
         
         function acceptBooking() {
-            isAccepted = true;
-            clearInterval(timerInterval);
-            
-            const swipeContainer = document.getElementById('swipeContainer');
-            const swipeText = document.getElementById('swipeText');
-            
-            swipeContainer.classList.add('accepted');
-            swipeText.textContent = 'बुकिंग स्वीकार की गई!';
-            swipeText.style.opacity = '1';
-            
-            document.getElementById('timerPopup').classList.remove('show');
-            enableCustomerContact();
-            
-            setTimeout(() => {
-                alert('बुकिंग स्वीकार की गई! अब आप कस्टमर से संपर्क कर सकते हैं।');
-            }, 500);
+            try {
+                isAccepted = true;
+                clearInterval(timerInterval);
+                
+                const swipeContainer = document.getElementById('swipeContainer');
+                const swipeText = document.getElementById('swipeText');
+                
+                if (swipeContainer) {
+                    swipeContainer.classList.add('accepted');
+                }
+                if (swipeText) {
+                    swipeText.textContent = 'बुकिंग स्वीकार की गई!';
+                    swipeText.style.opacity = '1';
+                }
+                
+                const timerPopup = document.getElementById('timerPopup');
+                if (timerPopup) {
+                    timerPopup.classList.remove('show');
+                }
+                
+                enableCustomerContact();
+                
+                setTimeout(() => {
+                    alert('बुकिंग स्वीकार की गई! अब आप कस्टमर से संपर्क कर सकते हैं।');
+                }, 500);
+            } catch (error) {
+                console.error('Error in acceptBooking:', error);
+            }
         }
         
         function declineBooking() {
-            clearInterval(timerInterval);
-            document.getElementById('timerPopup').classList.remove('show');
-            
-            if (confirm('क्या आप वाकई इस बुकिंग को रिजेक्ट करना चाहते हैं?')) {
-                alert('बुकिंग रिजेक्ट की गई। अगली उपलब्ध जॉब खोजी जा रही है...');
-            } else {
-                if (!hasExtended && timeLeft <= 0) {
-                    timeLeft = 45;
-                    initTimer();
+            try {
+                clearInterval(timerInterval);
+                const timerPopup = document.getElementById('timerPopup');
+                if (timerPopup) {
+                    timerPopup.classList.remove('show');
                 }
+                
+                if (confirm('क्या आप वाकई इस बुकिंग को रिजेक्ट करना चाहते हैं?')) {
+                    alert('बुकिंग रिजेक्ट की गई। अगली उपलब्ध जॉब खोजी जा रही है...');
+                } else {
+                    if (!hasExtended && timeLeft <= 0) {
+                        timeLeft = 45;
+                        initTimer();
+                    }
+                }
+            } catch (error) {
+                console.warn('Error in declineBooking:', error);
             }
         }
 
         function callAgent() {
-            if (bookingData && bookingData.agent_name) {
-                if (confirm(`${bookingData.agent_name} को कॉल करें?`)) {
-                    window.location.href = 'tel:+919876543210';
+            try {
+                if (bookingData && bookingData.agent_name) {
+                    if (confirm(`${bookingData.agent_name} को कॉल करें?`)) {
+                        window.location.href = 'tel:+919876543210';
+                    }
                 }
+            } catch (error) {
+                console.warn('Error in callAgent:', error);
             }
         }
         
         // Prevent scrolling when swiping
-        document.getElementById('swipeContainer').addEventListener('touchmove', function(e) {
-            if (isDragging) {
-                e.preventDefault();
-            }
-        }, { passive: false });
+        const swipeContainer = document.getElementById('swipeContainer');
+        if (swipeContainer) {
+            swipeContainer.addEventListener('touchmove', function(e) {
+                if (isDragging) {
+                    e.preventDefault();
+                }
+            }, { passive: false });
+        }
 
         // Haptic feedback
         function vibrate(pattern = 50) {
-            if ('vibrate' in navigator) {
-                navigator.vibrate(pattern);
+            try {
+                if ('vibrate' in navigator) {
+                    navigator.vibrate(pattern);
+                }
+            } catch (error) {
+                console.warn('Vibrate not supported:', error);
             }
         }
 
-        document.getElementById('swipeHandle').addEventListener('touchstart', () => vibrate(10));
+        const swipeHandle = document.getElementById('swipeHandle');
+        if (swipeHandle) {
+            swipeHandle.addEventListener('touchstart', () => vibrate(10));
+        }
 
         // Close timer popup when clicking outside
-        document.getElementById('timerPopup').addEventListener('click', function(e) {
-            if (e.target === this) {
-                this.classList.remove('show');
-            }
-        });
+        const timerPopup = document.getElementById('timerPopup');
+        if (timerPopup) {
+            timerPopup.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.classList.remove('show');
+                }
+            });
+        }
     </script>
 </body>
 </html>
