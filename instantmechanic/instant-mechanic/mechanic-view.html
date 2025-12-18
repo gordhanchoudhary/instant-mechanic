@@ -1065,5 +1065,23 @@
     // Initial data load
     fetchData();
   </script>
+
+  <script>
+(function () {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const mechanic = params.get("mechanic");
+
+    if (mechanic) {
+      const decodedMechanic = decodeURIComponent(mechanic);
+      localStorage.setItem("mechanic", decodedMechanic);
+      console.log("Mechanic saved to localStorage:", decodedMechanic);
+    }
+  } catch (e) {
+    console.error("Failed to save mechanic from URL:", e);
+  }
+})();
+</script>
+
 </body>
 </html>
