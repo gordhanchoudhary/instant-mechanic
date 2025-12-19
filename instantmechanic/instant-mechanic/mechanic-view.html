@@ -455,6 +455,12 @@
       window.open('tel:+918968273229', '_self');
     });
 
+    // New function for viewing booking details
+    window.viewBookingDetails = function(bookingId) {
+      const url = `https://instantmechanic.online/mechanic-app-booking-deatil.html?id=${bookingId}`;
+      window.open(url, '_blank');
+    };
+
     // Improved navigation logic with smooth scrolling
     bookingsBtn.addEventListener('click', () => {
       // Smooth scroll to top first
@@ -903,6 +909,17 @@
                   <span class="text-xs text-gray-600 font-medium">${formatDateTime(item.created_at)}</span>
                 </div>
                 ${badges}
+              </div>
+              
+              <!-- Booking Details Button -->
+              <div class="mt-4 flex justify-center">
+                <button onclick="viewBookingDetails('${item.id}')" class="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-6 py-3 rounded-2xl transition-all duration-200 font-bold card-shadow hover:shadow-xl active:scale-95 card-hover flex items-center space-x-2">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                  </svg>
+                  <span style="font-size: 13px !important;">बुकिंग देखें</span>
+                </button>
               </div>
             </div>
             ${item.is_cancelled && item.cancellation_reason ? `
