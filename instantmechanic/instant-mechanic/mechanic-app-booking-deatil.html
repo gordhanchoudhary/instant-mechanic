@@ -148,6 +148,11 @@
       box-shadow: var(--card-shadow);
       text-align: center;
       border-left: 4px solid var(--primary-color);
+      position: relative;
+    }
+
+    .collect-amount.completed {
+      border-left: 4px solid var(--secondary-color);
     }
 
     .collect-amount h3 {
@@ -162,6 +167,29 @@
       font-weight: 700;
       font-family: 'JetBrains Mono', monospace;
       color: var(--primary-color);
+    }
+
+    .collected-stamp {
+      position: absolute;
+      top: 50%;
+      right: 20px;
+      transform: translateY(-50%);
+      background: var(--success-color);
+      color: white;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: clamp(0.7rem, 2vw, 0.85rem);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      box-shadow: 0 2px 8px rgba(19, 115, 51, 0.3);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .collected-stamp i {
+      font-size: clamp(0.8rem, 2.2vw, 1rem);
     }
 
     .main-card {
@@ -559,9 +587,13 @@
       </div>
 
       <!-- Total Collection Amount -->
-      <div class="collect-amount">
-        <h3> कस्टमर से आपको टोटल पैसे लेने है</h3>
+      <div class="collect-amount" id="collectAmountSection">
+        <h3 id="collectTitle"> कस्टमर से आपको टोटल पैसे लेने है</h3>
         <div class="collect-display" id="totalCollect">₹0</div>
+        <div class="collected-stamp" id="collectedStamp" style="display: none;">
+          <i class="fas fa-check-circle"></i>
+          COLLECTED
+        </div>
       </div>
 
       <!-- Car Information Card -->
@@ -736,6 +768,15 @@
       // Replace slider with completed message
       document.getElementById('sliderContainer').style.display = 'none';
       document.getElementById('completedMessage').style.display = 'block';
+      
+      // Update collection amount section for completed bookings
+      const collectTitle = document.getElementById('collectTitle');
+      const collectSection = document.getElementById('collectAmountSection');
+      const collectedStamp = document.getElementById('collectedStamp');
+      
+      collectTitle.textContent = ' कस्टमर से आपने पेमेंट कलेक्ट कर ली है';
+      collectSection.classList.add('completed');
+      collectedStamp.style.display = 'flex';
       
       // Gray out and disable customer contact
       const customerItem = document.getElementById('customerInfoItem');
