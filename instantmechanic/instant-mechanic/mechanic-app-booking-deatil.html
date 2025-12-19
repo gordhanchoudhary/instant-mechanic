@@ -457,7 +457,7 @@
     }
 
     .cancelled-overlay::after {
-      content: 'रद्द किया गया';
+      content: 'कैंसिल किया गया';
       position: absolute;
       top: 50%;
       left: 50%;
@@ -893,7 +893,7 @@
       
       if (data.is_cancelled) {
         statusBadge.className = 'status-badge status-pending';
-        statusBadge.innerHTML = '<i class="fas fa-times-circle"></i> रद्द';
+        statusBadge.innerHTML = '<i class="fas fa-times-circle"></i> कैंसिल';
       } else {
         statusBadge.className = 'status-badge status-completed';
         statusBadge.innerHTML = '<i class="fas fa-check-circle"></i> सक्रिय';
