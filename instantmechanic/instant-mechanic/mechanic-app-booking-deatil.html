@@ -218,6 +218,11 @@
       border-left: 4px solid var(--primary-color);
     }
 
+    .info-item.completed {
+      opacity: 0.6;
+      pointer-events: none;
+    }
+
     .info-label {
       font-size: clamp(0.75rem, 2vw, 0.9rem);
       font-weight: 500;
@@ -327,6 +332,22 @@
       color: var(--text-primary);
       margin-bottom: 20px;
       text-align: center;
+    }
+
+    .completed-message {
+      background: var(--success-color);
+      color: white;
+      padding: 20px;
+      border-radius: 12px;
+      text-align: center;
+      font-size: clamp(1rem, 3vw, 1.2rem);
+      font-weight: 600;
+    }
+
+    .completed-message i {
+      font-size: clamp(1.5rem, 4vw, 2rem);
+      margin-bottom: 10px;
+      display: block;
     }
 
     .slider-container {
@@ -459,6 +480,11 @@
       color: var(--secondary-color);
     }
 
+    .status-call-done {
+      background: rgba(107, 114, 128, 0.1);
+      color: var(--text-secondary);
+    }
+
     .error-state {
       background: var(--surface);
       border-radius: var(--border-radius);
@@ -550,13 +576,13 @@
 
         <div class="info-grid">
           <!-- Customer Information -->
-          <div class="info-item">
+          <div class="info-item" id="customerInfoItem">
             <div class="info-label">
               <i class="fas fa-user"></i>
                कस्टमर का मोबाइल
             </div>
             <div class="info-value" id="customerMobile">लोड हो रहा है...</div>
-            <div class="contact-buttons">
+            <div class="contact-buttons" id="customerContactButtons">
               <a href="tel:" id="callButton" class="contact-btn call">
                 <i class="fas fa-phone"></i>
                 कॉल करें
@@ -569,7 +595,7 @@
           </div>
 
           <!-- Location -->
-          <div class="info-item">
+          <div class="info-item" id="locationInfoItem">
             <div class="info-label">
               <i class="fas fa-map-marker-alt"></i>
               सर्विस लोकेशन
@@ -614,6 +640,11 @@
       <!-- Completion Section -->
       <div class="completion-section">
         <h3>बुकिंग की स्थिति</h3>
+        
+        <div id="completedMessage" style="display: none;" class="completed-message">
+          <i class="fas fa-check-circle"></i>
+          ये बुकिंग आपने complete कर दी
+        </div>
         
         <div class="slider-container" id="sliderContainer">
           <div class="slider-track">
@@ -698,6 +729,23 @@
         clearInterval(timerInterval);
         document.getElementById('timerCard').style.display = 'none';
       }
+    }
+
+    // Function to handle completed bookings
+    function handleCompletedBooking() {
+      // Replace slider with completed message
+      document.getElementById('sliderContainer').style.display = 'none';
+      document.getElementById('completedMessage').style.display = 'block';
+      
+      // Gray out and disable customer contact
+      const customerItem = document.getElementById('customerInfoItem');
+      const contactButtons = document.getElementById('customerContactButtons');
+      customerItem.classList.add('completed');
+      contactButtons.style.display = 'none';
+      
+      // Gray out location
+      const locationItem = document.getElementById('locationInfoItem');
+      locationItem.classList.add('completed');
     }
 
     // API Functions
@@ -809,8 +857,11 @@
       document.getElementById('loadingState').style.display = 'none';
       document.getElementById('mainContent').style.display = 'block';
 
-      // Start timer
-      if (data.created_at) {
+      // Check booking status
+      const isCompleted = data.booking_status === 'complete';
+
+      // Start timer only if not completed
+      if (data.created_at && !isCompleted) {
         startTimer(data.created_at);
       }
 
@@ -859,7 +910,21 @@
       // Basic information
       document.getElementById('carName').textContent = data.car || 'अज्ञात वाहन';
       document.getElementById('problemDescription').textContent = data.problem || 'सर्विस आवश्यक';
-      document.getElementById('customerMobile').textContent = formatMobile(data.customer_mobile);
+      
+      // Customer mobile - mask if completed
+      let customerMobileDisplay;
+      if (isCompleted) {
+        const formattedMobile = formatMobile(data.customer_mobile);
+        if (formattedMobile && formattedMobile !== 'उपलब्ध नहीं') {
+          customerMobileDisplay = formattedMobile.replace(/\d{4}$/, '****');
+        } else {
+          customerMobileDisplay = formattedMobile;
+        }
+      } else {
+        customerMobileDisplay = formatMobile(data.customer_mobile);
+      }
+      document.getElementById('customerMobile').textContent = customerMobileDisplay;
+      
       document.getElementById('servicePrice').textContent = data.price || 'कीमत निर्दिष्ट नहीं';
       document.getElementById('mechanicPayment').textContent = `₹${mechanicPayment}`;
 
@@ -887,6 +952,11 @@
         document.getElementById('carCard').classList.add('cancelled-overlay');
         document.querySelector('.completion-section').classList.add('disabled');
       }
+
+      // Handle completed bookings
+      if (isCompleted) {
+        handleCompletedBooking();
+      }
     }
 
     function formatMobile(mobile) {
@@ -906,6 +976,9 @@
       if (data.is_cancelled) {
         statusBadge.className = 'status-badge status-pending';
         statusBadge.innerHTML = '<i class="fas fa-times-circle"></i> कैंसिल';
+      } else if (data.booking_status === 'complete') {
+        statusBadge.className = 'status-badge status-call-done';
+        statusBadge.innerHTML = '<i class="fas fa-check-double"></i> Call Done';
       } else {
         statusBadge.className = 'status-badge status-completed';
         statusBadge.innerHTML = '<i class="fas fa-check-circle"></i> सक्रिय';
@@ -913,6 +986,11 @@
     }
 
     function setupActionButtons(data) {
+      // Skip if booking is completed
+      if (data.booking_status === 'complete') {
+        return;
+      }
+      
       const mobile = data.customer_mobile;
       
       if (mobile) {
