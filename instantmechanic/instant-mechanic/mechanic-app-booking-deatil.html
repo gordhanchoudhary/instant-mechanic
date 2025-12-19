@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, maximum-scale=3.0">
-  <title>बुकिंग विवरण - मैकेनिक व्यू</title>
+  <title>बुकिंग विवरण </title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
   <style>
@@ -474,7 +474,7 @@
     }
 
     .cancelled-overlay::after {
-      content: 'रद्द किया गया';
+      content: 'कैंसिल किया गया';
       position: absolute;
       top: 50%;
       left: 50%;
@@ -518,10 +518,7 @@
 
     <!-- Main Content -->
     <div id="mainContent" style="display: none;">
-      <!-- Header -->
-      <div class="header">
-        <h1>सर्विस विवरण</h1>
-      </div>
+
 
       <!-- Timer Card -->
       <div class="timer-card" id="timerCard" style="display: none;">
@@ -531,13 +528,13 @@
 
       <!-- Advance Payment Status -->
       <div class="advance-status" id="advanceStatus">
-        <h3 id="advanceTitle">ग्राहक का अग्रिम भुगतान</h3>
+        <h3 id="advanceTitle"> कस्टमर का  एडवांस</h3>
         <div class="advance-amount" id="advanceAmount">लोड हो रहा है...</div>
       </div>
 
       <!-- Total Collection Amount -->
       <div class="collect-amount">
-        <h3>ग्राहक से कुल वसूलना है</h3>
+        <h3> कस्टमर से आपको टोटल पैसे लेने है</h3>
         <div class="collect-display" id="totalCollect">₹0</div>
       </div>
 
@@ -556,7 +553,7 @@
           <div class="info-item">
             <div class="info-label">
               <i class="fas fa-user"></i>
-              ग्राहक का मोबाइल
+               कस्टमर का मोबाइल
             </div>
             <div class="info-value" id="customerMobile">लोड हो रहा है...</div>
             <div class="contact-buttons">
@@ -631,7 +628,7 @@
         <div class="action-buttons">
           <button class="btn btn-danger" onclick="customerDenied()">
             <i class="fas fa-times"></i>
-            ग्राहक ने मना कर दिया
+             कस्टमर ने मना कर दिया
           </button>
           
           <button class="btn btn-warning" onclick="callCompany()">
@@ -767,7 +764,7 @@
     }
 
     async function customerDenied() {
-      if (confirm('क्या आप वाकई में ग्राहक द्वारा मना करने की जानकारी भेजना चाहते हैं?')) {
+      if (confirm('क्या आप वाकई में  कस्टमर द्वारा मना करने की जानकारी भेजना चाहते हैं?')) {
         const success = await makeBookingAction('customer-denied');
         if (success) {
           alert('जानकारी सफलतापूर्वक भेजी गई!');
@@ -838,12 +835,12 @@
       const advanceAmountEl = document.getElementById('advanceAmount');
       
       if (paymentStatus === 'partially-paid' && advancePayment > 0) {
-        advanceTitle.textContent = 'ग्राहक का अग्रिम';
+        advanceTitle.textContent = ' कस्टमर का एडवांस';
         advanceAmountEl.innerHTML = `<strong>₹${advancePayment}</strong> आ गया है`;
         advanceAmountEl.style.color = 'var(--secondary-color)';
       } else {
-        advanceTitle.textContent = 'ग्राहक का अग्रिम';
-        advanceAmountEl.innerHTML = 'कोई अग्रिम नहीं आया है';
+        advanceTitle.textContent = ' कस्टमर का एडवांस';
+        advanceAmountEl.innerHTML = 'कोई एडवांस नहीं आया है';
         advanceAmountEl.style.color = 'var(--danger-color)';
       }
 
@@ -918,7 +915,7 @@
       
       if (data.is_cancelled) {
         statusBadge.className = 'status-badge status-pending';
-        statusBadge.innerHTML = '<i class="fas fa-times-circle"></i> रद्द';
+        statusBadge.innerHTML = '<i class="fas fa-times-circle"></i> कैंसिल';
       } else {
         statusBadge.className = 'status-badge status-completed';
         statusBadge.innerHTML = '<i class="fas fa-check-circle"></i> सक्रिय';
