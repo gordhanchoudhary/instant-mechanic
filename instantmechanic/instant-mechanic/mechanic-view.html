@@ -911,7 +911,8 @@
                 ${badges}
               </div>
               
-              <!-- Booking Details Button -->
+              <!-- Booking Details Button - Only show for non-cancelled calls -->
+              ${!item.is_cancelled ? `
               <div class="mt-4 flex justify-center">
                 <button onclick="viewBookingDetails('${item.id}')" class="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-6 py-3 rounded-2xl transition-all duration-200 font-bold card-shadow hover:shadow-xl active:scale-95 card-hover flex items-center space-x-2">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -921,6 +922,7 @@
                   <span style="font-size: 13px !important;">बुकिंग देखें</span>
                 </button>
               </div>
+              ` : ''}
             </div>
             ${item.is_cancelled && item.cancellation_reason ? `
               <div class="mt-4 p-3 bg-red-100 rounded-xl border-2 border-red-200">
