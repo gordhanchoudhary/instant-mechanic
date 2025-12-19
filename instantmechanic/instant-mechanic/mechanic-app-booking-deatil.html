@@ -514,7 +514,7 @@
 
       <!-- Advance Payment Status -->
       <div class="advance-status" id="advanceStatus">
-        <h3 id="advanceTitle">ग्राहक का अग्रिम भुगतान</h3>
+        <h3 id="advanceTitle">कस्टमर का एडवांस  भुगतान</h3>
         <div class="advance-amount" id="advanceAmount">लोड हो रहा है...</div>
       </div>
 
@@ -813,12 +813,12 @@
       const advanceAmountEl = document.getElementById('advanceAmount');
       
       if (paymentStatus === 'partially-paid' && advancePayment > 0) {
-        advanceTitle.textContent = 'ग्राहक का अग्रिम';
+        advanceTitle.textContent = 'कस्टमर का एडवांस ';
         advanceAmountEl.innerHTML = `<strong>₹${advancePayment}</strong> आ गया है`;
         advanceAmountEl.style.color = 'var(--secondary-color)';
       } else {
-        advanceTitle.textContent = 'ग्राहक का अग्रिम';
-        advanceAmountEl.innerHTML = 'कोई अग्रिम नहीं आया है';
+        advanceTitle.textContent = 'कस्टमर का एडवांस ';
+        advanceAmountEl.innerHTML = 'कोई एडवांस नहीं आया है';
         advanceAmountEl.style.color = 'var(--danger-color)';
       }
 
