@@ -95,6 +95,75 @@
       margin-bottom: 8px;
     }
 
+    .timer-card {
+      background: var(--warning-color);
+      color: white;
+      padding: 16px;
+      border-radius: var(--border-radius);
+      margin-bottom: 16px;
+      box-shadow: var(--card-shadow);
+      text-align: center;
+    }
+
+    .timer-card h3 {
+      font-size: clamp(1rem, 3vw, 1.2rem);
+      margin-bottom: 8px;
+    }
+
+    .timer-display {
+      font-size: clamp(1.8rem, 5vw, 2.4rem);
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .advance-status {
+      background: var(--surface);
+      border-radius: var(--border-radius);
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow: var(--card-shadow);
+      text-align: center;
+      border-left: 4px solid var(--secondary-color);
+    }
+
+    .advance-status h3 {
+      font-size: clamp(1rem, 3vw, 1.2rem);
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+
+    .advance-amount {
+      font-size: clamp(1.4rem, 4vw, 1.8rem);
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--secondary-color);
+    }
+
+    .collect-amount {
+      background: var(--surface);
+      border-radius: var(--border-radius);
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow: var(--card-shadow);
+      text-align: center;
+      border-left: 4px solid var(--primary-color);
+    }
+
+    .collect-amount h3 {
+      font-size: clamp(1rem, 3vw, 1.2rem);
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+
+    .collect-display {
+      font-size: clamp(1.6rem, 5vw, 2.2rem);
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--primary-color);
+    }
+
     .main-card {
       background: var(--surface);
       border-radius: var(--border-radius);
@@ -165,6 +234,41 @@
       color: var(--text-primary);
     }
 
+    .contact-buttons {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .contact-btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 8px;
+      font-size: clamp(0.8rem, 2vw, 0.9rem);
+      font-weight: 500;
+      color: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      flex: 1;
+      justify-content: center;
+    }
+
+    .contact-btn.call {
+      background: var(--secondary-color);
+    }
+
+    .contact-btn.whatsapp {
+      background: #25d366;
+    }
+
+    .contact-btn:active {
+      transform: scale(0.95);
+    }
+
     .highlight-card {
       background: linear-gradient(135deg, var(--secondary-color), #28a745);
       color: white;
@@ -187,53 +291,96 @@
       font-family: 'JetBrains Mono', monospace;
     }
 
-    .payment-breakdown {
+    .agent-info {
+      background: var(--surface);
+      border-radius: var(--border-radius);
+      padding: 16px;
+      margin: 16px 0;
+      box-shadow: var(--card-shadow);
+      border-left: 4px solid var(--warning-color);
+    }
+
+    .agent-info h3 {
+      font-size: clamp(1rem, 3vw, 1.2rem);
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+
+    .agent-info p {
+      font-size: clamp(0.9rem, 2.5vw, 1rem);
+      color: var(--text-secondary);
+      margin: 4px 0;
+    }
+
+    .completion-section {
       background: var(--surface);
       border-radius: var(--border-radius);
       padding: 20px;
-      margin: 16px 0;
+      margin: 20px 0;
       box-shadow: var(--card-shadow);
-      display: none;
     }
 
-    .payment-breakdown.show {
-      display: block;
-    }
-
-    .payment-breakdown h3 {
-      font-size: clamp(1rem, 3vw, 1.3rem);
+    .completion-section h3 {
+      font-size: clamp(1.1rem, 3vw, 1.3rem);
       font-weight: 600;
       color: var(--text-primary);
-      margin-bottom: 16px;
+      margin-bottom: 20px;
       text-align: center;
-      padding-bottom: 8px;
-      border-bottom: 2px solid var(--primary-color);
     }
 
-    .breakdown-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 8px 0;
-      border-bottom: 1px solid #e5e7eb;
-      font-size: clamp(0.9rem, 2.5vw, 1rem);
+    .slider-container {
+      position: relative;
+      background: #e5e7eb;
+      border-radius: 50px;
+      padding: 4px;
+      margin: 20px 0;
     }
 
-    .breakdown-item:last-child {
-      border-bottom: none;
+    .slider-track {
+      width: 100%;
+      height: 50px;
+      border-radius: 50px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .slider-button {
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 120px;
+      height: 46px;
+      background: var(--secondary-color);
+      border-radius: 50px;
+      border: none;
+      color: white;
       font-weight: 600;
-      background: rgba(52, 168, 83, 0.1);
-      padding: 12px;
-      border-radius: 8px;
-      margin-top: 8px;
-      color: var(--secondary-color);
+      font-size: clamp(0.9rem, 2.5vw, 1rem);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .slider-text {
+      position: absolute;
+      top: 50%;
+      right: 20px;
+      transform: translateY(-50%);
+      color: var(--text-secondary);
+      font-size: clamp(0.8rem, 2vw, 0.9rem);
+      font-weight: 500;
+      pointer-events: none;
     }
 
     .action-buttons {
       display: flex;
       flex-direction: column;
       gap: 12px;
-      padding: 20px;
+      margin-top: 20px;
     }
 
     .btn {
@@ -258,10 +405,16 @@
       box-shadow: 0 4px 16px rgba(26, 115, 232, 0.3);
     }
 
-    .btn-success {
-      background: linear-gradient(135deg, var(--secondary-color), #28a745);
+    .btn-danger {
+      background: linear-gradient(135deg, var(--danger-color), #c53030);
       color: white;
-      box-shadow: 0 4px 16px rgba(52, 168, 83, 0.3);
+      box-shadow: 0 4px 16px rgba(234, 67, 53, 0.3);
+    }
+
+    .btn-warning {
+      background: linear-gradient(135deg, var(--warning-color), #d69e2e);
+      color: white;
+      box-shadow: 0 4px 16px rgba(249, 171, 0, 0.3);
     }
 
     .btn:active {
@@ -319,30 +472,9 @@
       z-index: 10;
     }
 
-    .agent-info {
-      background: var(--surface);
-      border-radius: var(--border-radius);
-      padding: 16px;
-      margin: 16px 0;
-      box-shadow: var(--card-shadow);
-      border-left: 4px solid var(--warning-color);
-    }
-
-    .agent-info h3 {
-      font-size: clamp(1rem, 3vw, 1.2rem);
-      font-weight: 600;
-      color: var(--text-primary);
-      margin-bottom: 8px;
-    }
-
-    .agent-info p {
-      font-size: clamp(0.9rem, 2.5vw, 1rem);
-      color: var(--text-secondary);
-      margin: 4px 0;
-    }
-
-    .hide-on-pending {
-      display: none;
+    .disabled {
+      opacity: 0.6;
+      pointer-events: none;
     }
   </style>
 </head>
@@ -374,11 +506,22 @@
         <h1>सर्विस विवरण</h1>
       </div>
 
-      <!-- Agent Information -->
-      <div class="agent-info">
-        <h3><i class="fas fa-headset"></i> एजेंट जानकारी</h3>
-        <p><strong>नाम:</strong> <span id="agentName">लोड हो रहा है...</span></p>
-        <p><strong>मोबाइल:</strong> <span id="agentMobile">लोड हो रहा है...</span></p>
+      <!-- Timer Card -->
+      <div class="timer-card" id="timerCard" style="display: none;">
+        <h3><i class="fas fa-clock"></i> बुकिंग समय</h3>
+        <div class="timer-display" id="timerDisplay">00:00</div>
+      </div>
+
+      <!-- Advance Payment Status -->
+      <div class="advance-status" id="advanceStatus">
+        <h3 id="advanceTitle">ग्राहक का अग्रिम भुगतान</h3>
+        <div class="advance-amount" id="advanceAmount">लोड हो रहा है...</div>
+      </div>
+
+      <!-- Total Collection Amount -->
+      <div class="collect-amount">
+        <h3>ग्राहक से कुल वसूलना है</h3>
+        <div class="collect-display" id="totalCollect">₹0</div>
       </div>
 
       <!-- Car Information Card -->
@@ -399,6 +542,16 @@
               ग्राहक का मोबाइल
             </div>
             <div class="info-value" id="customerMobile">लोड हो रहा है...</div>
+            <div class="contact-buttons">
+              <a href="tel:" id="callButton" class="contact-btn call">
+                <i class="fas fa-phone"></i>
+                कॉल करें
+              </a>
+              <a href="#" id="whatsappButton" target="_blank" class="contact-btn whatsapp">
+                <i class="fab fa-whatsapp"></i>
+                WhatsApp
+              </a>
+            </div>
           </div>
 
           <!-- Location -->
@@ -408,7 +561,7 @@
               सर्विस लोकेशन
             </div>
             <div class="info-value">
-              <button id="locationButton" onclick="openLocation()" style="background: var(--primary-color); color: white; border: none; padding: 8px 16px; border-radius: 8px; font-size: 0.9rem;">
+              <button id="locationButton" onclick="openLocation()" style="background: var(--primary-color); color: white; border: none; padding: 8px 16px; border-radius: 8px; font-size: 0.9rem; width: 100%;">
                 <i class="fas fa-external-link-alt"></i>
                 मैप पर देखें
               </button>
@@ -444,47 +597,44 @@
         <p style="margin-top: 6px; opacity: 0.9;">इस सर्विस के लिए आपको मिलने वाली राशि</p>
       </div>
 
-      <!-- Payment Breakdown (Only show if payment status is not pending) -->
-      <div class="payment-breakdown" id="paymentBreakdown">
-        <h3>पेमेंट का विवरण</h3>
-        <div class="breakdown-item">
-          <span>कुल सर्विस राशि:</span>
-          <span id="totalAmount">₹0</span>
+      <!-- Completion Section -->
+      <div class="completion-section">
+        <h3>बुकिंग की स्थिति</h3>
+        
+        <div class="slider-container">
+          <div class="slider-track">
+            <button class="slider-button" id="completeSlider" onclick="completeBooking()">
+              <i class="fas fa-check"></i>
+              पूर्ण किया
+            </button>
+            <div class="slider-text">स्लाइड करके पूर्ण करें</div>
+          </div>
         </div>
-        <div class="breakdown-item">
-          <span>कंपनी का हिस्सा:</span>
-          <span id="companyShare">₹0</span>
-        </div>
-        <div class="breakdown-item">
-          <span>आपका हिस्सा:</span>
-          <span id="mechanicShare">₹0</span>
-        </div>
-        <div class="breakdown-item" id="advanceRow" style="display: none;">
-          <span>ग्राहक द्वारा दी गई अग्रिम राशि:</span>
-          <span id="advancePaid">₹0</span>
-        </div>
-        <div class="breakdown-item">
-          <span><strong>ग्राहक से लेनी है:</strong></span>
-          <span id="collectAmount"><strong>₹0</strong></span>
+
+        <div class="action-buttons">
+          <button class="btn btn-danger" onclick="customerDenied()">
+            <i class="fas fa-times"></i>
+            ग्राहक ने मना कर दिया
+          </button>
+          
+          <button class="btn btn-warning" onclick="callCompany()">
+            <i class="fas fa-phone-alt"></i>
+            कंपनी में कॉल करें
+          </button>
         </div>
       </div>
 
-      <!-- Action Buttons -->
-      <div class="action-buttons">
-        <a id="callButton" href="tel:" class="btn btn-success">
-          <i class="fas fa-phone"></i>
-          ग्राहक को कॉल करें
-        </a>
-        
-        <a id="whatsappButton" href="#" target="_blank" class="btn btn-primary">
-          <i class="fab fa-whatsapp"></i>
-          व्हाट्सऐप मैसेज करें
-        </a>
-        
-        <button id="directionsButton" onclick="openLocation()" class="btn btn-primary">
-          <i class="fas fa-route"></i>
-          दिशा-निर्देश लें
-        </button>
+      <!-- Agent Information (at bottom) -->
+      <div class="agent-info">
+        <h3><i class="fas fa-headset"></i> एजेंट जानकारी</h3>
+        <p><strong>नाम:</strong> <span id="agentName">लोड हो रहा है...</span></p>
+        <p><strong>मोबाइल:</strong> <span id="agentMobile">लोड हो रहा है...</span></p>
+        <div class="contact-buttons" id="agentCallButton" style="display: none; margin-top: 12px;">
+          <a href="tel:" class="contact-btn call" style="width: auto;">
+            <i class="fas fa-phone"></i>
+            एजेंट को कॉल करें
+          </a>
+        </div>
       </div>
     </div>
   </div>
@@ -494,6 +644,8 @@
     const urlParams = new URLSearchParams(window.location.search);
     const bookingId = urlParams.get('id');
     let bookingLocation = '';
+    let timerInterval;
+    let bookingCreatedAt;
 
     // Check if coming from mechanic-booking.html and prevent back navigation
     const referrer = document.referrer;
@@ -512,6 +664,104 @@
       } else {
         alert('लोकेशन उपलब्ध नहीं है');
       }
+    }
+
+    // Timer functions
+    function startTimer(createdAt) {
+      bookingCreatedAt = new Date(createdAt);
+      const now = new Date();
+      const elapsedMinutes = Math.floor((now - bookingCreatedAt) / (1000 * 60));
+      
+      // Show timer only if booking is less than 30 minutes old
+      if (elapsedMinutes < 30) {
+        document.getElementById('timerCard').style.display = 'block';
+        updateTimer();
+        timerInterval = setInterval(updateTimer, 1000);
+      }
+    }
+
+    function updateTimer() {
+      const now = new Date();
+      const elapsedMs = now - bookingCreatedAt;
+      const elapsedMinutes = Math.floor(elapsedMs / (1000 * 60));
+      const remainingMinutes = Math.max(0, 30 - elapsedMinutes);
+      const remainingSeconds = Math.max(0, 60 - Math.floor((elapsedMs % (1000 * 60)) / 1000));
+      
+      const display = `${remainingMinutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+      document.getElementById('timerDisplay').textContent = display;
+      
+      if (remainingMinutes === 0 && remainingSeconds === 0) {
+        clearInterval(timerInterval);
+        document.getElementById('timerCard').style.display = 'none';
+      }
+    }
+
+    // API Functions
+    async function makeBookingAction(action) {
+      const mechanicName = localStorage.getItem('mechanic');
+      if (!mechanicName) {
+        alert('मैकेनिक का नाम localStorage में नहीं मिला');
+        return false;
+      }
+
+      try {
+        const response = await fetch('https://ai.instantmechanic.online/bot/api/mechanic-booking-action', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            mechanic: mechanicName,
+            booking: parseInt(bookingId),
+            action: action
+          })
+        });
+
+        const result = await response.json();
+        
+        if (response.ok) {
+          return true;
+        } else {
+          throw new Error(result.message || 'API error');
+        }
+      } catch (error) {
+        console.error('API Error:', error);
+        alert('एक्शन भेजने में समस्या हुई: ' + error.message);
+        return false;
+      }
+    }
+
+    async function completeBooking() {
+      const button = document.getElementById('completeSlider');
+      button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> भेजा जा रहा है...';
+      button.disabled = true;
+      
+      const success = await makeBookingAction('complete');
+      
+      if (success) {
+        button.innerHTML = '<i class="fas fa-check"></i> पूर्ण हो गया';
+        button.style.background = 'var(--success-color)';
+        document.querySelector('.completion-section').classList.add('disabled');
+        alert('बुकिंग सफलतापूर्वक पूर्ण की गई!');
+      } else {
+        button.innerHTML = '<i class="fas fa-check"></i> पूर्ण किया';
+        button.disabled = false;
+      }
+    }
+
+    async function customerDenied() {
+      if (confirm('क्या आप वाकई में ग्राहक द्वारा मना करने की जानकारी भेजना चाहते हैं?')) {
+        const success = await makeBookingAction('customer-denied');
+        if (success) {
+          alert('जानकारी सफलतापूर्वक भेजी गई!');
+          document.querySelector('.completion-section').classList.add('disabled');
+        }
+      }
+    }
+
+    function callCompany() {
+      // You can add company phone number here
+      window.open('tel:+911234567890', '_self');
     }
 
     // Load booking data
@@ -547,15 +797,63 @@
       document.getElementById('loadingState').style.display = 'none';
       document.getElementById('mainContent').style.display = 'block';
 
+      // Start timer
+      if (data.created_at) {
+        startTimer(data.created_at);
+      }
+
+      // Payment calculations
+      const companyProfit = parseFloat(data.company_profit) || 0;
+      const mechanicPayment = parseFloat(data.pending_payment_amount) || 0;
+      const advancePayment = parseFloat(data.advance_payment_amount) || 0;
+      const paymentStatus = data.payment_status;
+
+      // Update advance payment status
+      const advanceTitle = document.getElementById('advanceTitle');
+      const advanceAmountEl = document.getElementById('advanceAmount');
+      
+      if (advancePayment > 0 && paymentStatus === 'partially-paid') {
+        advanceTitle.textContent = 'ग्राहक का अग्रिम';
+        advanceAmountEl.innerHTML = `<strong>₹${advancePayment}</strong> पार्शियली पेड`;
+        advanceAmountEl.style.color = 'var(--warning-color)';
+      } else if (advancePayment > 0) {
+        advanceTitle.textContent = 'ग्राहक का अग्रिम';
+        advanceAmountEl.innerHTML = `<strong>₹${advancePayment}</strong> आ गया है`;
+        advanceAmountEl.style.color = 'var(--secondary-color)';
+      } else {
+        advanceTitle.textContent = 'ग्राहक का अग्रिम';
+        advanceAmountEl.innerHTML = 'कोई अग्रिम नहीं आया है';
+        advanceAmountEl.style.color = 'var(--danger-color)';
+      }
+
+      // Calculate total collection amount
+      let totalCollectAmount = companyProfit + mechanicPayment;
+      if (paymentStatus === 'partially-paid') {
+        totalCollectAmount = Math.max(0, totalCollectAmount - advancePayment);
+      }
+      document.getElementById('totalCollect').textContent = `₹${totalCollectAmount}`;
+
       // Agent information
       document.getElementById('agentName').textContent = data.agent_name || 'उपलब्ध नहीं';
-      document.getElementById('agentMobile').textContent = formatMobile(data.agent_mobile) || 'उपलब्ध नहीं';
+      const agentMobileFormatted = formatMobile(data.agent_mobile);
+      document.getElementById('agentMobile').textContent = agentMobileFormatted || 'उपलब्ध नहीं';
+      
+      // Show agent call button if mobile available
+      if (data.agent_mobile) {
+        const agentCallButton = document.getElementById('agentCallButton');
+        const callLink = agentCallButton.querySelector('a');
+        const cleanMobile = data.agent_mobile.replace(/\D/g, '');
+        const formattedMobile = cleanMobile.startsWith('91') ? cleanMobile : '91' + cleanMobile.slice(-10);
+        callLink.href = `tel:+${formattedMobile}`;
+        agentCallButton.style.display = 'block';
+      }
 
       // Basic information
       document.getElementById('carName').textContent = data.car || 'अज्ञात वाहन';
       document.getElementById('problemDescription').textContent = data.problem || 'सर्विस आवश्यक';
       document.getElementById('customerMobile').textContent = formatMobile(data.customer_mobile);
       document.getElementById('servicePrice').textContent = data.price || 'कीमत निर्दिष्ट नहीं';
+      document.getElementById('mechanicPayment').textContent = `₹${mechanicPayment}`;
 
       // Store location for buttons
       bookingLocation = data.location;
@@ -573,15 +871,13 @@
       // Booking status
       updateBookingStatus(data);
 
-      // Payment calculations
-      calculatePayments(data);
-
       // Set up action buttons
       setupActionButtons(data);
 
       // Handle cancelled bookings
       if (data.is_cancelled) {
         document.getElementById('carCard').classList.add('cancelled-overlay');
+        document.querySelector('.completion-section').classList.add('disabled');
       }
     }
 
@@ -608,42 +904,6 @@
       }
     }
 
-    function calculatePayments(data) {
-      const companyProfit = parseFloat(data.company_profit) || 0;
-      const mechanicPayment = parseFloat(data.pending_payment_amount) || 0;
-      const advancePayment = parseFloat(data.advance_payment_amount) || 0;
-      const paymentStatus = data.payment_status;
-
-      // Update mechanic payment highlight
-      document.getElementById('mechanicPayment').textContent = `₹${mechanicPayment}`;
-
-      // Show payment breakdown only if status is not pending
-      if (paymentStatus !== 'pending') {
-        const paymentBreakdown = document.getElementById('paymentBreakdown');
-        paymentBreakdown.classList.add('show');
-
-        // Calculate total amount to collect from customer
-        let totalCollectAmount = companyProfit + mechanicPayment;
-        
-        // If partially paid, subtract advance payment
-        if (paymentStatus === 'partially-paid') {
-          totalCollectAmount = Math.max(0, totalCollectAmount - advancePayment);
-        }
-
-        // Update UI
-        document.getElementById('totalAmount').textContent = `₹${companyProfit + mechanicPayment}`;
-        document.getElementById('companyShare').textContent = `₹${companyProfit}`;
-        document.getElementById('mechanicShare').textContent = `₹${mechanicPayment}`;
-        document.getElementById('collectAmount').textContent = `₹${totalCollectAmount}`;
-
-        // Show advance payment row if applicable
-        if (advancePayment > 0) {
-          document.getElementById('advanceRow').style.display = 'flex';
-          document.getElementById('advancePaid').textContent = `₹${advancePayment}`;
-        }
-      }
-    }
-
     function setupActionButtons(data) {
       const mobile = data.customer_mobile;
       
@@ -660,18 +920,17 @@
         document.getElementById('whatsappButton').href = `https://wa.me/${formattedMobile}?text=${message}`;
       } else {
         // Disable buttons if no mobile
-        document.getElementById('callButton').style.opacity = '0.5';
-        document.getElementById('whatsappButton').style.opacity = '0.5';
-        document.getElementById('callButton').onclick = (e) => {
-          e.preventDefault();
-          alert('ग्राहक का मोबाइल नंबर उपलब्ध नहीं');
-        };
-        document.getElementById('whatsappButton').onclick = (e) => {
-          e.preventDefault();
-          alert('ग्राहक का मोबाइल नंबर उपलब्ध नहीं');
-        };
+        document.getElementById('callButton').classList.add('disabled');
+        document.getElementById('whatsappButton').classList.add('disabled');
       }
     }
+
+    // Cleanup timer on page unload
+    window.addEventListener('beforeunload', function() {
+      if (timerInterval) {
+        clearInterval(timerInterval);
+      }
+    });
 
     // Load data when page loads
     window.addEventListener('load', loadBookingData);
