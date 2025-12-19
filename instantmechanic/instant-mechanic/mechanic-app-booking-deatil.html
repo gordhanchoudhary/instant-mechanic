@@ -520,7 +520,7 @@
 
       <!-- Total Collection Amount -->
       <div class="collect-amount">
-        <h3>ग्राहक से कुल वसूलना है</h3>
+        <h3>कस्टमर से कुल वसूलना है</h3>
         <div class="collect-display" id="totalCollect">₹0</div>
       </div>
 
@@ -539,7 +539,7 @@
           <div class="info-item">
             <div class="info-label">
               <i class="fas fa-user"></i>
-              ग्राहक का मोबाइल
+              कस्टमर का मोबाइल
             </div>
             <div class="info-value" id="customerMobile">लोड हो रहा है...</div>
             <div class="contact-buttons">
@@ -614,7 +614,7 @@
         <div class="action-buttons">
           <button class="btn btn-danger" onclick="customerDenied()">
             <i class="fas fa-times"></i>
-            ग्राहक ने मना कर दिया
+            कस्टमर ने मना कर दिया
           </button>
           
           <button class="btn btn-warning" onclick="callCompany()">
@@ -750,7 +750,7 @@
     }
 
     async function customerDenied() {
-      if (confirm('क्या आप वाकई में ग्राहक द्वारा मना करने की जानकारी भेजना चाहते हैं?')) {
+      if (confirm('क्या आप वाकई में कस्टमर द्वारा मना करने की जानकारी भेजना चाहते हैं?')) {
         const success = await makeBookingAction('customer-denied');
         if (success) {
           alert('जानकारी सफलतापूर्वक भेजी गई!');
