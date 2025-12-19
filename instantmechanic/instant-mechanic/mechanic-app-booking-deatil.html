@@ -335,6 +335,7 @@
       border-radius: 50px;
       padding: 4px;
       margin: 20px 0;
+      user-select: none;
     }
 
     .slider-track {
@@ -343,6 +344,7 @@
       border-radius: 50px;
       position: relative;
       overflow: hidden;
+      cursor: pointer;
     }
 
     .slider-button {
@@ -357,12 +359,22 @@
       color: white;
       font-weight: 600;
       font-size: clamp(0.9rem, 2.5vw, 1rem);
-      cursor: pointer;
-      transition: all 0.3s ease;
+      cursor: grab;
+      transition: box-shadow 0.2s ease;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
+      touch-action: none;
+    }
+
+    .slider-button:active {
+      cursor: grabbing;
+      box-shadow: 0 4px 12px rgba(52, 168, 83, 0.4);
+    }
+
+    .slider-button.sliding {
+      transition: none;
     }
 
     .slider-text {
@@ -374,6 +386,11 @@
       font-size: clamp(0.8rem, 2vw, 0.9rem);
       font-weight: 500;
       pointer-events: none;
+    }
+
+    .slider-completed {
+      background: var(--success-color) !important;
+      left: calc(100% - 122px) !important;
     }
 
     .action-buttons {
@@ -457,7 +474,7 @@
     }
 
     .cancelled-overlay::after {
-      content: 'कैंसिल किया गया';
+      content: 'रद्द किया गया';
       position: absolute;
       top: 50%;
       left: 50%;
@@ -501,7 +518,10 @@
 
     <!-- Main Content -->
     <div id="mainContent" style="display: none;">
-
+      <!-- Header -->
+      <div class="header">
+        <h1>सर्विस विवरण</h1>
+      </div>
 
       <!-- Timer Card -->
       <div class="timer-card" id="timerCard" style="display: none;">
@@ -511,13 +531,13 @@
 
       <!-- Advance Payment Status -->
       <div class="advance-status" id="advanceStatus">
-        <h3 id="advanceTitle">कस्टमर का एडवांस  भुगतान</h3>
+        <h3 id="advanceTitle">ग्राहक का अग्रिम भुगतान</h3>
         <div class="advance-amount" id="advanceAmount">लोड हो रहा है...</div>
       </div>
 
       <!-- Total Collection Amount -->
       <div class="collect-amount">
-        <h3> कस्टमर से आपको टोटल पैसे लेने है</h3>
+        <h3>ग्राहक से कुल वसूलना है</h3>
         <div class="collect-display" id="totalCollect">₹0</div>
       </div>
 
@@ -536,7 +556,7 @@
           <div class="info-item">
             <div class="info-label">
               <i class="fas fa-user"></i>
-              कस्टमर का मोबाइल
+              ग्राहक का मोबाइल
             </div>
             <div class="info-value" id="customerMobile">लोड हो रहा है...</div>
             <div class="contact-buttons">
@@ -598,20 +618,20 @@
       <div class="completion-section">
         <h3>बुकिंग की स्थिति</h3>
         
-        <div class="slider-container">
+        <div class="slider-container" id="sliderContainer">
           <div class="slider-track">
-            <button class="slider-button" id="completeSlider" onclick="completeBooking()">
+            <button class="slider-button" id="completeSlider">
               <i class="fas fa-check"></i>
               पूर्ण किया
             </button>
-            <div class="slider-text">स्लाइड करके पूर्ण करें</div>
+            <div class="slider-text" id="sliderText">स्लाइड करके पूर्ण करें</div>
           </div>
         </div>
 
         <div class="action-buttons">
           <button class="btn btn-danger" onclick="customerDenied()">
             <i class="fas fa-times"></i>
-            कस्टमर ने मना कर दिया
+            ग्राहक ने मना कर दिया
           </button>
           
           <button class="btn btn-warning" onclick="callCompany()">
@@ -747,11 +767,19 @@
     }
 
     async function customerDenied() {
-      if (confirm('क्या आप वाकई में कस्टमर द्वारा मना करने की जानकारी भेजना चाहते हैं?')) {
+      if (confirm('क्या आप वाकई में ग्राहक द्वारा मना करने की जानकारी भेजना चाहते हैं?')) {
         const success = await makeBookingAction('customer-denied');
         if (success) {
           alert('जानकारी सफलतापूर्वक भेजी गई!');
           document.querySelector('.completion-section').classList.add('disabled');
+          
+          // Redirect after 2 seconds
+          setTimeout(() => {
+            const mechanicName = localStorage.getItem('mechanic');
+            if (mechanicName) {
+              window.location.href = `https://instantmechanic.online/mechanic-view.html?mechanic=${encodeURIComponent(mechanicName)}`;
+            }
+          }, 2000);
         }
       }
     }
@@ -810,12 +838,12 @@
       const advanceAmountEl = document.getElementById('advanceAmount');
       
       if (paymentStatus === 'partially-paid' && advancePayment > 0) {
-        advanceTitle.textContent = 'कस्टमर का एडवांस ';
+        advanceTitle.textContent = 'ग्राहक का अग्रिम';
         advanceAmountEl.innerHTML = `<strong>₹${advancePayment}</strong> आ गया है`;
         advanceAmountEl.style.color = 'var(--secondary-color)';
       } else {
-        advanceTitle.textContent = 'कस्टमर का एडवांस ';
-        advanceAmountEl.innerHTML = 'कोई एडवांस नहीं आया है';
+        advanceTitle.textContent = 'ग्राहक का अग्रिम';
+        advanceAmountEl.innerHTML = 'कोई अग्रिम नहीं आया है';
         advanceAmountEl.style.color = 'var(--danger-color)';
       }
 
@@ -890,7 +918,7 @@
       
       if (data.is_cancelled) {
         statusBadge.className = 'status-badge status-pending';
-        statusBadge.innerHTML = '<i class="fas fa-times-circle"></i> कैंसिल';
+        statusBadge.innerHTML = '<i class="fas fa-times-circle"></i> रद्द';
       } else {
         statusBadge.className = 'status-badge status-completed';
         statusBadge.innerHTML = '<i class="fas fa-check-circle"></i> सक्रिय';
@@ -926,13 +954,139 @@
     });
 
     // Load data when page loads
-    window.addEventListener('load', loadBookingData);
+    window.addEventListener('load', function() {
+      loadBookingData();
+      initSlider();  // Initialize slider functionality
+    });
 
     // Add retry functionality for failed requests
     function retryLoad() {
       document.getElementById('errorState').style.display = 'none';
       document.getElementById('loadingState').style.display = 'flex';
       setTimeout(loadBookingData, 500);
+    }
+
+    // Slider functionality
+    let isSliding = false;
+    let startX = 0;
+    let currentX = 0;
+    let sliderStartLeft = 2;
+
+    function initSlider() {
+      const slider = document.getElementById('completeSlider');
+      const container = document.getElementById('sliderContainer');
+      
+      if (!slider || !container) return;
+      
+      // Mouse events
+      slider.addEventListener('mousedown', startSlide);
+      document.addEventListener('mousemove', slide);
+      document.addEventListener('mouseup', endSlide);
+      
+      // Touch events
+      slider.addEventListener('touchstart', startSlide, { passive: false });
+      document.addEventListener('touchmove', slide, { passive: false });
+      document.addEventListener('touchend', endSlide);
+    }
+
+    function startSlide(e) {
+      if (document.querySelector('.completion-section').classList.contains('disabled')) return;
+      
+      e.preventDefault();
+      isSliding = true;
+      const slider = document.getElementById('completeSlider');
+      slider.classList.add('sliding');
+      
+      startX = e.type === 'mousedown' ? e.clientX : e.touches[0].clientX;
+      currentX = startX;
+      
+      const rect = slider.getBoundingClientRect();
+      sliderStartLeft = rect.left - slider.parentElement.getBoundingClientRect().left;
+    }
+
+    function slide(e) {
+      if (!isSliding) return;
+      
+      e.preventDefault();
+      currentX = e.type === 'mousemove' ? e.clientX : e.touches[0].clientX;
+      const diffX = currentX - startX;
+      
+      const slider = document.getElementById('completeSlider');
+      const container = document.getElementById('sliderContainer');
+      const maxLeft = container.offsetWidth - slider.offsetWidth - 4;
+      
+      let newLeft = Math.max(2, Math.min(maxLeft, sliderStartLeft + diffX));
+      slider.style.left = newLeft + 'px';
+      
+      // Change color as it slides
+      const progress = (newLeft - 2) / (maxLeft - 2);
+      if (progress > 0.8) {
+        slider.style.background = 'var(--success-color)';
+        document.getElementById('sliderText').style.opacity = '0.5';
+      } else {
+        slider.style.background = 'var(--secondary-color)';
+        document.getElementById('sliderText').style.opacity = '1';
+      }
+    }
+
+    function endSlide() {
+      if (!isSliding) return;
+      
+      isSliding = false;
+      const slider = document.getElementById('completeSlider');
+      slider.classList.remove('sliding');
+      
+      const container = document.getElementById('sliderContainer');
+      const maxLeft = container.offsetWidth - slider.offsetWidth - 4;
+      const currentLeft = parseInt(slider.style.left || '2px');
+      const progress = (currentLeft - 2) / (maxLeft - 2);
+      
+      if (progress > 0.8) {
+        // Complete the booking
+        slider.style.left = maxLeft + 'px';
+        slider.style.background = 'var(--success-color)';
+        slider.classList.add('slider-completed');
+        completeBookingSlider();
+      } else {
+        // Snap back to start
+        slider.style.left = '2px';
+        slider.style.background = 'var(--secondary-color)';
+        document.getElementById('sliderText').style.opacity = '1';
+      }
+    }
+
+    async function completeBookingSlider() {
+      const slider = document.getElementById('completeSlider');
+      const sliderText = document.getElementById('sliderText');
+      
+      slider.innerHTML = '<i class="fas fa-spinner fa-spin"></i> भेजा जा रहा है...';
+      sliderText.textContent = 'कृपया प्रतीक्षा करें...';
+      
+      const success = await makeBookingAction('complete');
+      
+      if (success) {
+        slider.innerHTML = '<i class="fas fa-check"></i> पूर्ण हो गया';
+        sliderText.textContent = 'बुकिंग पूर्ण!';
+        document.querySelector('.completion-section').classList.add('disabled');
+        
+        // Show success message
+        alert('बुकिंग सफलतापूर्वक पूर्ण की गई!');
+        
+        // Redirect after 2 seconds
+        setTimeout(() => {
+          const mechanicName = localStorage.getItem('mechanic');
+          if (mechanicName) {
+            window.location.href = `https://instantmechanic.online/mechanic-view.html?mechanic=${encodeURIComponent(mechanicName)}`;
+          }
+        }, 2000);
+      } else {
+        slider.innerHTML = '<i class="fas fa-check"></i> पूर्ण किया';
+        slider.style.left = '2px';
+        slider.style.background = 'var(--secondary-color)';
+        sliderText.textContent = 'स्लाइड करके पूर्ण करें';
+        sliderText.style.opacity = '1';
+        slider.classList.remove('slider-completed');
+      }
     }
 
     // Add to window for inline onclick handlers
