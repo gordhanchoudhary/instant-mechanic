@@ -812,11 +812,7 @@
       const advanceTitle = document.getElementById('advanceTitle');
       const advanceAmountEl = document.getElementById('advanceAmount');
       
-      if (advancePayment > 0 && paymentStatus === 'partially-paid') {
-        advanceTitle.textContent = 'ग्राहक का अग्रिम';
-        advanceAmountEl.innerHTML = `<strong>₹${advancePayment}</strong> पार्शियली पेड`;
-        advanceAmountEl.style.color = 'var(--warning-color)';
-      } else if (advancePayment > 0) {
+      if (paymentStatus === 'partially-paid' && advancePayment > 0) {
         advanceTitle.textContent = 'ग्राहक का अग्रिम';
         advanceAmountEl.innerHTML = `<strong>₹${advancePayment}</strong> आ गया है`;
         advanceAmountEl.style.color = 'var(--secondary-color)';
