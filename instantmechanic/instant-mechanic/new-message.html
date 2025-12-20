@@ -368,6 +368,29 @@
       const problem = booking.problem || 'Not specified';
       const price = booking.price || 'Not specified';
       
+      // Function to format phone number for WhatsApp and call links
+      function formatPhoneNumber(phoneNumber) {
+        if (!phoneNumber || phoneNumber === 'Not available') return '';
+        
+        // Remove all non-numeric characters
+        const cleanNumber = phoneNumber.replace(/[^0-9]/g, '');
+        
+        // If number already starts with 91, use as is
+        // If number starts with just 9 (10 digit Indian number), add 91
+        if (cleanNumber.startsWith('91')) {
+          return cleanNumber;
+        } else if (cleanNumber.length === 10 && cleanNumber.startsWith('9')) {
+          return '91' + cleanNumber;
+        } else if (cleanNumber.length === 12 && cleanNumber.startsWith('91')) {
+          return cleanNumber;
+        } else {
+          // For any other format, assume it needs 91 prefix if not already there
+          return cleanNumber.startsWith('91') ? cleanNumber : '91' + cleanNumber;
+        }
+      }
+      
+      const formattedNumber = formatPhoneNumber(customerMobile);
+      
       const customerInfoHtml = `
         <div class="customer-name">
           ${customerName}
@@ -393,12 +416,12 @@
         </div>
 
         <div class="contact-buttons">
-          <a href="https://wa.me/91${customerMobile.replace(/[^0-9]/g, '')}" 
+          <a href="https://wa.me/${formattedNumber}" 
              class="contact-btn whatsapp-btn" 
              target="_blank">
             📱 WhatsApp
           </a>
-          <a href="tel:+91${customerMobile.replace(/[^0-9]/g, '')}" 
+          <a href="tel:+${formattedNumber}" 
              class="contact-btn call-btn">
             📞 Call
           </a>
