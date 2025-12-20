@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mechanic - Customer Chat View</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body { 
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 15px;
+    }
+
+    .container { 
+      max-width: 480px; 
+      margin: 0 auto; 
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+      overflow: hidden;
+      backdrop-filter: blur(10px);
+    }
+
+    .header {
+      background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+      color: white;
+      padding: 25px 20px;
+      text-align: center;
+      position: relative;
+    }
+
+    .header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="80" cy="40" r="1.5" fill="rgba(255,255,255,0.1)"/><circle cx="40" cy="80" r="1" fill="rgba(255,255,255,0.1)"/></svg>');
+      pointer-events: none;
+    }
+
+    .header h1 {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .header .subtitle {
+      font-size: 14px;
+      opacity: 0.9;
+      position: relative;
+      z-index: 1;
+    }
+
+    .customer-info {
+      background: white;
+      padding: 20px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .customer-name {
+      font-size: 20px;
+      font-weight: 700;
+      color: #2c3e50;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .customer-name::before {
+      content: '👤';
+      font-size: 18px;
+    }
+
+    .booking-details {
+      display: grid;
+      gap: 8px;
+      margin-bottom: 15px;
+    }
+
+    .detail-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      color: #555;
+    }
+
+    .detail-icon {
+      font-size: 16px;
+      width: 20px;
+      text-align: center;
+    }
+
+    .detail-value {
+      font-weight: 500;
+      color: #2c3e50;
+    }
+
+    .contact-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 15px;
+    }
+
+    .contact-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 16px;
+      border: none;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .whatsapp-btn {
+      background: linear-gradient(135deg, #25D366 0%, #20b954 100%);
+      color: white;
+    }
+
+    .whatsapp-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(37, 211, 102, 0.3);
+    }
+
+    .call-btn {
+      background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+      color: white;
+    }
+
+    .call-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0, 123, 255, 0.3);
+    }
+
+    .chat-section {
+      background: #f8f9fa;
+      max-height: 60vh;
+      overflow-y: auto;
+      padding: 0;
+    }
+
+    .chat-header {
+      background: linear-gradient(90deg, #6c757d 0%, #5a6268 100%);
+      color: white;
+      padding: 15px 20px;
+      text-align: center;
+      font-weight: 600;
+      font-size: 16px;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+    }
+
+    .chat-messages {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .chat-message {
+      max-width: 85%;
+      padding: 12px 16px;
+      border-radius: 18px;
+      font-size: 14px;
+      line-height: 1.4;
+      word-wrap: break-word;
+      position: relative;
+    }
+
+    .customer-message {
+      background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+      color: #1565c0;
+      align-self: flex-start;
+      border-bottom-left-radius: 6px;
+      border: 1px solid #90caf9;
+    }
+
+    .customer-message::before {
+      content: '👤';
+      position: absolute;
+      left: -25px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 16px;
+    }
+
+    .agent-message {
+      background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%);
+      color: #2e7d32;
+      align-self: flex-end;
+      border-bottom-right-radius: 6px;
+      border: 1px solid #a5d6a7;
+    }
+
+    .agent-message::before {
+      content: '🔧';
+      position: absolute;
+      right: -25px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 16px;
+    }
+
+    .message-time {
+      font-size: 11px;
+      opacity: 0.7;
+      margin-top: 6px;
+      text-align: right;
+    }
+
+    .no-messages {
+      text-align: center;
+      padding: 40px 20px;
+      color: #666;
+      font-style: italic;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px 20px;
+      color: #666;
+    }
+
+    .loading::after {
+      content: '';
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 2px solid #ddd;
+      border-top: 2px solid #4CAF50;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-left: 10px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .error-message {
+      background: #ffebee;
+      color: #c62828;
+      padding: 15px 20px;
+      text-align: center;
+      border-left: 4px solid #f44336;
+      margin: 20px;
+      border-radius: 8px;
+    }
+
+    /* Custom scrollbar */
+    .chat-section::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .chat-section::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+
+    .chat-section::-webkit-scrollbar-thumb {
+      background: #c1c1c1;
+      border-radius: 3px;
+    }
+
+    .chat-section::-webkit-scrollbar-thumb:hover {
+      background: #a8a8a8;
+    }
+
+    /* Responsive design */
+    @media (max-width: 480px) {
+      .container {
+        margin: 0;
+        border-radius: 0;
+        height: 100vh;
+      }
+      
+      body {
+        padding: 0;
+      }
+
+      .customer-info {
+        padding: 15px;
+      }
+
+      .chat-messages {
+        padding: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Customer Chat</h1>
+      <div class="subtitle">Communication History</div>
+    </div>
+
+    <div class="customer-info" id="customerInfo">
+      <div class="loading">Loading customer information...</div>
+    </div>
+
+    <div class="chat-section">
+      <div class="chat-header">
+        💬 Chat Messages
+      </div>
+      <div class="chat-messages" id="chatMessages">
+        <div class="loading">Loading chat history...</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Get booking ID from URL parameters
+    const bookingId = new URLSearchParams(window.location.search).get("id");
+    
+    if (!bookingId) {
+      document.getElementById("customerInfo").innerHTML = 
+        '<div class="error-message">❌ No booking ID provided in URL</div>';
+      document.getElementById("chatMessages").innerHTML = 
+        '<div class="error-message">❌ Cannot load chat without booking ID</div>';
+    } else {
+      // Load booking data and chat history
+      loadBookingInfo();
+    }
+
+    async function loadBookingInfo() {
+      try {
+        // Fetch booking details
+        const bookingResponse = await fetch(`https://ai.instantmechanic.online/bot/api/bookings/${bookingId}/`);
+        const bookingData = await bookingResponse.json();
+        
+        // Display customer info
+        displayCustomerInfo(bookingData);
+        
+        // Fetch and display chat messages
+        await loadChatMessages();
+        
+      } catch (error) {
+        console.error('Error loading booking info:', error);
+        document.getElementById("customerInfo").innerHTML = 
+          '<div class="error-message">❌ Error loading booking information</div>';
+      }
+    }
+
+    function displayCustomerInfo(booking) {
+      const customerMobile = booking.customer_mobile || booking.mobile || 'Not available';
+      const customerName = booking.customer_name || 'Customer';
+      const car = booking.car || 'Not specified';
+      const problem = booking.problem || 'Not specified';
+      const price = booking.price || 'Not specified';
+      
+      const customerInfoHtml = `
+        <div class="customer-name">
+          ${customerName}
+        </div>
+        
+        <div class="booking-details">
+          <div class="detail-item">
+            <span class="detail-icon">📱</span>
+            <span class="detail-value">${customerMobile}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-icon">🚗</span>
+            <span class="detail-value">${car}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-icon">🔧</span>
+            <span class="detail-value">${problem}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-icon">💰</span>
+            <span class="detail-value">₹${price}</span>
+          </div>
+        </div>
+
+        <div class="contact-buttons">
+          <a href="https://wa.me/91${customerMobile.replace(/[^0-9]/g, '')}" 
+             class="contact-btn whatsapp-btn" 
+             target="_blank">
+            📱 WhatsApp
+          </a>
+          <a href="tel:+91${customerMobile.replace(/[^0-9]/g, '')}" 
+             class="contact-btn call-btn">
+            📞 Call
+          </a>
+        </div>
+      `;
+      
+      document.getElementById("customerInfo").innerHTML = customerInfoHtml;
+    }
+
+    async function loadChatMessages() {
+      try {
+        const chatResponse = await fetch(`https://ai.instantmechanic.online/bot/customer_chats/?booking=${bookingId}`);
+        const chatData = await chatResponse.json();
+        
+        if (chatData.status === "success" && chatData.data && chatData.data.length > 0) {
+          const messages = chatData.data[0]?.chats || [];
+          const filteredMessages = filterMessagesAfterLastBookingDetails(messages);
+          displayChatMessages(filteredMessages);
+        } else {
+          document.getElementById("chatMessages").innerHTML = 
+            '<div class="no-messages">📝 No chat messages available</div>';
+        }
+      } catch (error) {
+        console.error('Error loading chat messages:', error);
+        document.getElementById("chatMessages").innerHTML = 
+          '<div class="error-message">❌ Error loading chat messages</div>';
+      }
+    }
+
+    function filterMessagesAfterLastBookingDetails(messages) {
+      // Find the last occurrence of "View Booking Details" in the messages
+      let lastBookingDetailsIndex = -1;
+      
+      for (let i = messages.length - 1; i >= 0; i--) {
+        const message = messages[i];
+        if (message.message && message.message.includes("View Booking Details")) {
+          lastBookingDetailsIndex = i;
+          break;
+        }
+      }
+      
+      // If no "View Booking Details" found, return all customer messages (excluding support messages)
+      if (lastBookingDetailsIndex === -1) {
+        return messages.filter(msg => msg.is_from_customer);
+      }
+      
+      // Return messages after the last "View Booking Details", excluding support messages
+      return messages
+        .slice(lastBookingDetailsIndex + 1)
+        .filter(msg => msg.is_from_customer || (!msg.is_from_customer && isFromMechanic(msg)));
+    }
+
+    function isFromMechanic(message) {
+      // Logic to determine if message is from mechanic (not customer support)
+      // You can customize this based on how you identify mechanic messages
+      // For now, we'll assume non-customer messages after booking details are from mechanic
+      return !message.is_from_customer;
+    }
+
+    function displayChatMessages(messages) {
+      if (messages.length === 0) {
+        document.getElementById("chatMessages").innerHTML = 
+          '<div class="no-messages">💬 No new messages since booking confirmation</div>';
+        return;
+      }
+
+      const chatHtml = messages.map(message => {
+        const messageClass = message.is_from_customer ? 'customer-message' : 'agent-message';
+        const messageTime = new Date(message.timestamp).toLocaleString('en-IN', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: true
+        });
+        
+        return `
+          <div class="chat-message ${messageClass}">
+            <div class="message-content">${escapeHtml(message.message)}</div>
+            <div class="message-time">${messageTime}</div>
+          </div>
+        `;
+      }).join('');
+
+      document.getElementById("chatMessages").innerHTML = chatHtml;
+      
+      // Auto-scroll to bottom
+      const chatSection = document.querySelector('.chat-section');
+      chatSection.scrollTop = chatSection.scrollHeight;
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // Auto-refresh chat messages every 30 seconds
+    setInterval(() => {
+      if (bookingId) {
+        loadChatMessages();
+      }
+    }, 30000);
+  </script>
+</body>
+</html>
