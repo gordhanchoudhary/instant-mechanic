@@ -573,7 +573,6 @@
     <!-- Main Content -->
     <div id="mainContent" style="display: none;">
 
-
       <!-- Timer Card -->
       <div class="timer-card" id="timerCard" style="display: none;">
         <h3><i class="fas fa-clock"></i> बुकिंग समय</h3>
@@ -687,7 +686,6 @@
             <div class="slider-text" id="sliderText">स्लाइड करके पूर्ण करें</div>
           </div>
         </div>
-
 
       </div>
 
@@ -911,25 +909,50 @@
       const mechanicPayment = parseFloat(data.pending_payment_amount) || 0;
       const advancePayment = parseFloat(data.advance_payment_amount) || 0;
       const paymentStatus = data.payment_status;
+      const isGoMechanicCall = data.is_gomechanic_call;
+      const needToCollectPayment = data.need_to_collect_payment_on_gomech;
+      const amountToCollectOnGomech = parseFloat(data.amount_to_collect_on_gomech) || 0;
 
       // Update advance payment status
       const advanceTitle = document.getElementById('advanceTitle');
       const advanceAmountEl = document.getElementById('advanceAmount');
       
-      if (paymentStatus === 'partially-paid' && advancePayment > 0) {
+      if (isGoMechanicCall && !needToCollectPayment) {
+        // GoMechanic call with no payment collection needed
+        advanceTitle.textContent = ' कस्टमर का एडवांस';
+        advanceAmountEl.innerHTML = 'कस्टमर का पूरा एडवांस आ गया है';
+        advanceAmountEl.style.color = 'var(--secondary-color)';
+      } else if (isGoMechanicCall && needToCollectPayment) {
+        // GoMechanic call with payment collection needed
+        advanceTitle.textContent = ' कस्टमर का एडवांस';
+        advanceAmountEl.innerHTML = 'कोई एडवांस नहीं आया है';
+        advanceAmountEl.style.color = 'var(--danger-color)';
+      } else if (paymentStatus === 'partially-paid' && advancePayment > 0) {
+        // Regular call with partial payment
         advanceTitle.textContent = ' कस्टमर का एडवांस';
         advanceAmountEl.innerHTML = `<strong>₹${advancePayment}</strong> आ गया है`;
         advanceAmountEl.style.color = 'var(--secondary-color)';
       } else {
+        // Regular call with no advance
         advanceTitle.textContent = ' कस्टमर का एडवांस';
         advanceAmountEl.innerHTML = 'कोई एडवांस नहीं आया है';
         advanceAmountEl.style.color = 'var(--danger-color)';
       }
 
       // Calculate total collection amount
-      let totalCollectAmount = companyProfit + mechanicPayment;
-      if (paymentStatus === 'partially-paid') {
-        totalCollectAmount = Math.max(0, totalCollectAmount - advancePayment);
+      let totalCollectAmount;
+      if (isGoMechanicCall && needToCollectPayment) {
+        // GoMechanic call - show amount to collect on gomech
+        totalCollectAmount = amountToCollectOnGomech;
+      } else if (isGoMechanicCall && !needToCollectPayment) {
+        // GoMechanic call - no payment needed
+        totalCollectAmount = 0;
+      } else {
+        // Regular call logic
+        totalCollectAmount = companyProfit + mechanicPayment;
+        if (paymentStatus === 'partially-paid') {
+          totalCollectAmount = Math.max(0, totalCollectAmount - advancePayment);
+        }
       }
       document.getElementById('totalCollect').textContent = `₹${totalCollectAmount}`;
 
