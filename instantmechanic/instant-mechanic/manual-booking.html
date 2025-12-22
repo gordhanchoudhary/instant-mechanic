@@ -795,6 +795,16 @@
                     </div>
                 </div>
 
+                <!-- NEW: Payment Collection Toggle (hidden by default) -->
+                <div class="form-group hidden" id="paymentCollectionGroup">
+                    <div class="toggle-group">
+                        <span class="toggle-label">Payment need to collect?</span>
+                        <div class="toggle-switch" id="paymentCollectionToggle">
+                            <div class="toggle-slider"></div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="form-group">
                     <label for="mobile">Mobile Number *</label>
                     <div class="phone-input-wrapper">
@@ -1302,6 +1312,7 @@
             'e6 - BYD'
         ];
 
+
         // Mixpanel tracking function
         function trackMixpanelEvent(eventName, properties = {}) {
             try {
@@ -1702,6 +1713,19 @@
             }
         }
 
+        // Function to toggle payment collection visibility
+        function togglePaymentCollectionVisibility(isGoMechanic) {
+            const paymentCollectionGroup = document.getElementById('paymentCollectionGroup');
+            
+            if (isGoMechanic) {
+                paymentCollectionGroup.classList.remove('hidden');
+            } else {
+                paymentCollectionGroup.classList.add('hidden');
+                // Reset toggle to false when hidden
+                document.getElementById('paymentCollectionToggle').classList.remove('active');
+            }
+        }
+
         // Get URL parameters
         function getUrlParameter(name) {
             name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
@@ -1792,12 +1816,19 @@
                 document.getElementById('securityAmount').value = calculatedSecurity || '428';
             }
 
-            // Toggle functionality with visibility control
+            // Toggle functionality for GoMechanic with visibility control
             const goMechanicToggle = document.getElementById('goMechanicToggle');
             goMechanicToggle.addEventListener('click', function() {
                 this.classList.toggle('active');
                 const isGoMechanic = this.classList.contains('active');
                 togglePriceAndSecurityVisibility(isGoMechanic);
+                togglePaymentCollectionVisibility(isGoMechanic);
+            });
+
+            // Toggle functionality for Payment Collection
+            const paymentCollectionToggle = document.getElementById('paymentCollectionToggle');
+            paymentCollectionToggle.addEventListener('click', function() {
+                this.classList.toggle('active');
             });
 
             // Form validation for mobile number
@@ -1885,6 +1916,9 @@
 
                 // Check if GoMechanic toggle is active
                 const isGoMechanic = document.getElementById('goMechanicToggle').classList.contains('active');
+                
+                // Check if Payment Collection toggle is active (only relevant when GoMechanic is true)
+                const needToCollectPayment = document.getElementById('paymentCollectionToggle').classList.contains('active');
 
                 // Get form values
                 const mobile = document.getElementById('mobile').value;
@@ -1903,9 +1937,12 @@
                     location: location,
                     securityAmount: mechanicPayout || null,
                     isGoMechanicCall: isGoMechanic,
+                    need_to_collect_payment_on_gomech: isGoMechanic ? needToCollectPayment : false, // NEW FIELD
                     timestamp: new Date().toISOString(),
                     agent: localStorage.getItem("agent_name_im") || "Harshit"
                 };
+
+                console.log('Form data being sent:', formData); // Debug log
 
                 try {
                     await processBooking(formData);
@@ -1921,14 +1958,18 @@
                         "company_profit": price - mechanicPayout,
                         "security_asked": 199, // Fixed as per your requirement
                         "mechanic_payout": mechanicPayout,
-                        "total_price": price
+                        "total_price": price,
+                        "is_gomechanic_call": isGoMechanic,
+                        "need_to_collect_payment_on_gomech": isGoMechanic ? needToCollectPayment : false
                     });
 
                     successMessage.style.display = 'block';
                     document.getElementById('bookingForm').reset();
                     // Reset toggles to default state and restore default values
                     document.getElementById('goMechanicToggle').classList.remove('active');
+                    document.getElementById('paymentCollectionToggle').classList.remove('active');
                     togglePriceAndSecurityVisibility(false); // Show price and security fields
+                    togglePaymentCollectionVisibility(false); // Hide payment collection toggle
                     document.getElementById('price').value = '742';
                     const calculatedSecurity = calculateSecurityAmount('742');
                     document.getElementById('securityAmount').value = calculatedSecurity;
@@ -1953,12 +1994,16 @@
                             "company_profit": price - mechanicPayout,
                             "security_asked": 199,
                             "mechanic_payout": mechanicPayout,
-                            "total_price": price
+                            "total_price": price,
+                            "is_gomechanic_call": isGoMechanic,
+                            "need_to_collect_payment_on_gomech": isGoMechanic ? needToCollectPayment : false
                         });
                         
                         document.getElementById('bookingForm').reset();
                         document.getElementById('goMechanicToggle').classList.remove('active');
+                        document.getElementById('paymentCollectionToggle').classList.remove('active');
                         togglePriceAndSecurityVisibility(false); // Show price and security fields
+                        togglePaymentCollectionVisibility(false); // Hide payment collection toggle
                         document.getElementById('price').value = '742';
                         const calculatedSecurity = calculateSecurityAmount('742');
                         document.getElementById('securityAmount').value = calculatedSecurity;
@@ -2004,6 +2049,9 @@
                 }
                 // If existing booking found, popup will be shown and user can choose to continue or cancel
             });
+
+            // Make submitBookingForm available globally for existing booking popup
+            window.submitBookingForm = submitBookingForm;
         });
     </script>
 
