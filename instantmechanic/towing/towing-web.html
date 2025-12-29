@@ -28,6 +28,26 @@
   gtag('config', 'AW-17767202307');
 </script>
 
+	<!-- Event snippet for Click to call (3) conversion page
+In your html page, add the snippet and call gtag_report_conversion when someone clicks on the chosen link or button. -->
+<script>
+function gtag_report_conversion(url) {
+  var callback = function () {
+    if (typeof(url) != 'undefined') {
+      window.location = url;
+    }
+  };
+  gtag('event', 'conversion', {
+      'send_to': 'AW-17767202307/XEaLCOuqgdkbEIP8h5hC',
+      'value': 1.0,
+      'currency': 'INR',
+      'event_callback': callback
+  });
+  return false;
+}
+</script>
+
+
 
 
     <meta charset="UTF-8">
@@ -742,10 +762,7 @@
     </style>
 </head>
 <body>
-	<!-- Google Tag Manager (noscript) -->
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MHK2PHN6"
-height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-<!-- End Google Tag Manager (noscript) -->
+
     <!-- Header -->
     <header>
         <div class="container">
@@ -754,9 +771,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     <span class="logo-primary">Instant </span><span class="logo-sec">Tow</span>
                 </div>
                 <div class="header-buttons">
-                    <a href="tel:+918130377099" class="btn btn-primary">
-                        📞 Call Now
-                    </a>
+                    <a href="tel:+918130377099"
+   class="btn btn-primary"
+   onclick="return gtag_report_conversion('tel:+918130377099');">
+  📞 Call Now
+</a>
+
                     
                 </div>
             </div>
@@ -781,9 +801,13 @@ Fast response, friendly support, affordable pricing — available 24x7.</p>
                     <div class="hero-feature">✓ Flatbed Tow Service for Luxury Cars</div>
                 </div>
                 <div style="justify-content: center; margin-top: 2rem;" class="header-buttons2">
-                    <a href="tel:+918130377099" class="btn btn-primary" style="font-size: 1.1rem; padding: 1rem 2rem;">
-                        📞 +91 81303 77099
-                    </a>
+                    <a href="tel:+918130377099"
+   class="btn btn-primary"
+   style="font-size: 1.1rem; padding: 1rem 2rem;"
+   onclick="return gtag_report_conversion('tel:+918130377099');">
+  📞 +91 81303 77099
+</a>
+
                     
                 </div>
             </div>
