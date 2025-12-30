@@ -547,6 +547,92 @@
       opacity: 0.6;
       pointer-events: none;
     }
+
+    /* Sub-mechanic assignment styles */
+    .sub-mechanic-card {
+      background: var(--surface);
+      border-radius: var(--border-radius);
+      padding: 20px;
+      margin: 16px 0;
+      box-shadow: var(--card-shadow);
+      border-left: 4px solid var(--primary-color);
+    }
+
+    .sub-mechanic-card h3 {
+      font-size: clamp(1rem, 3vw, 1.2rem);
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .mechanic-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .mechanic-item {
+      background: var(--surface-variant);
+      border-radius: 10px;
+      padding: 12px 16px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 2px solid transparent;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .mechanic-item:hover {
+      background: #e5f3ff;
+      border-color: var(--primary-color);
+    }
+
+    .mechanic-item:active {
+      transform: scale(0.98);
+    }
+
+    .mechanic-name {
+      font-size: clamp(0.9rem, 2.5vw, 1rem);
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .mechanic-select-icon {
+      color: var(--primary-color);
+      font-size: clamp(0.8rem, 2vw, 0.9rem);
+    }
+
+    .assigned-mechanic-card {
+      background: linear-gradient(135deg, var(--success-color), #28a745);
+      color: white;
+      border-left: 4px solid #1e7e34;
+    }
+
+    .assigned-mechanic-card h3 {
+      color: white;
+    }
+
+    .assigned-mechanic-info {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .assigned-mechanic-name {
+      font-size: clamp(1.1rem, 3.5vw, 1.4rem);
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .assigned-mechanic-status {
+      font-size: clamp(0.9rem, 2.5vw, 1rem);
+      opacity: 0.9;
+    }
   </style>
 </head>
 <body>
@@ -689,6 +775,17 @@
 
       </div>
 
+      <!-- Sub-Mechanic Assignment Card -->
+      <div class="sub-mechanic-card" id="subMechanicCard" style="display: none;">
+        <h3 id="subMechanicTitle">
+          <i class="fas fa-users"></i>
+          आपने किसी मैकेनिक को भेजे
+        </h3>
+        <div id="subMechanicContent">
+          <!-- Content will be populated by JavaScript -->
+        </div>
+      </div>
+
       <!-- Agent Information (at bottom) -->
       <div class="agent-info">
         <h3><i class="fas fa-headset"></i> एजेंट जानकारी</h3>
@@ -711,6 +808,8 @@
     let bookingLocation = '';
     let timerInterval;
     let bookingCreatedAt;
+    let subMechanics = [];
+    let assignedMechanic = null;
 
     // Check if coming from mechanic-booking.html and prevent back navigation
     const referrer = document.referrer;
@@ -785,6 +884,142 @@
       // Gray out location
       const locationItem = document.getElementById('locationInfoItem');
       locationItem.classList.add('completed');
+    }
+
+    // Sub-Mechanic Functions
+    async function loadSubMechanics() {
+      const mechanicName = localStorage.getItem('mechanic');
+      if (!mechanicName) {
+        console.log('No mechanic name in localStorage');
+        return;
+      }
+
+      try {
+        const response = await fetch(`https://ai.instantmechanic.online/bot/get-mechanics?parent_mechanic=${encodeURIComponent(mechanicName)}`);
+        const data = await response.json();
+        
+        if (response.ok && data.sub_mechanics && data.sub_mechanics.length > 0) {
+          subMechanics = data.sub_mechanics;
+          checkAssignedMechanic();
+          displaySubMechanicCard();
+        } else {
+          console.log('No sub-mechanics found or error:', data.error || 'Unknown error');
+        }
+      } catch (error) {
+        console.error('Error loading sub-mechanics:', error);
+      }
+    }
+
+    function checkAssignedMechanic() {
+      const storageKey = `assigned_mechanic_${bookingId}`;
+      const stored = localStorage.getItem(storageKey);
+      if (stored) {
+        assignedMechanic = JSON.parse(stored);
+      }
+    }
+
+    function displaySubMechanicCard() {
+      const card = document.getElementById('subMechanicCard');
+      const content = document.getElementById('subMechanicContent');
+      
+      if (assignedMechanic) {
+        // Show assigned mechanic
+        displayAssignedMechanic();
+      } else {
+        // Show mechanic selection list
+        displayMechanicList();
+      }
+      
+      card.style.display = 'block';
+    }
+
+    function displayAssignedMechanic() {
+      const card = document.getElementById('subMechanicCard');
+      const title = document.getElementById('subMechanicTitle');
+      const content = document.getElementById('subMechanicContent');
+      
+      // Update card style for assigned state
+      card.classList.add('assigned-mechanic-card');
+      title.innerHTML = `<i class="fas fa-check-circle"></i> आपने इस बुकिंग पर "${assignedMechanic.name}" को भेजा है`;
+      
+      content.innerHTML = `
+        <div class="assigned-mechanic-info">
+          <div class="assigned-mechanic-name">${assignedMechanic.name}</div>
+          <div class="assigned-mechanic-status">इस बुकिंग को असाइन किया गया</div>
+        </div>
+      `;
+    }
+
+    function displayMechanicList() {
+      const content = document.getElementById('subMechanicContent');
+      
+      const mechanicListHTML = subMechanics.map(mechanic => `
+        <div class="mechanic-item" onclick="assignMechanic(${mechanic.id}, '${mechanic.name}')">
+          <div class="mechanic-name">${mechanic.name}</div>
+          <div class="mechanic-select-icon">
+            <i class="fas fa-arrow-right"></i>
+          </div>
+        </div>
+      `).join('');
+      
+      content.innerHTML = `
+        <div class="mechanic-list">
+          ${mechanicListHTML}
+        </div>
+      `;
+    }
+
+    async function assignMechanic(mechanicId, mechanicName) {
+      if (assignedMechanic) return; // Already assigned
+      
+      // Show loading state
+      const clickedItem = event.currentTarget;
+      clickedItem.innerHTML = `
+        <div class="mechanic-name">
+          <i class="fas fa-spinner fa-spin"></i> ${mechanicName} को असाइन कर रहे हैं...
+        </div>
+      `;
+      clickedItem.style.pointerEvents = 'none';
+      
+      try {
+        const response = await fetch('https://ai.instantmechanic.online/bot/assign-sub-mechanic', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            booking: bookingId,
+            sub_mechanic_id: mechanicId.toString()
+          })
+        });
+
+        if (response.ok) {
+          // Save to localStorage
+          assignedMechanic = { id: mechanicId, name: mechanicName };
+          const storageKey = `assigned_mechanic_${bookingId}`;
+          localStorage.setItem(storageKey, JSON.stringify(assignedMechanic));
+          
+          // Update display
+          displayAssignedMechanic();
+          
+          // Show success message
+          alert(`${mechanicName} को सफलतापूर्वक इस बुकिंग पर असाइन किया गया!`);
+        } else {
+          throw new Error('Assignment failed');
+        }
+      } catch (error) {
+        console.error('Error assigning mechanic:', error);
+        alert('मैकेनिक असाइन करने में समस्या हुई। कृपया दोबारा कोशिश करें।');
+        
+        // Reset the item
+        clickedItem.innerHTML = `
+          <div class="mechanic-name">${mechanicName}</div>
+          <div class="mechanic-select-icon">
+            <i class="fas fa-arrow-right"></i>
+          </div>
+        `;
+        clickedItem.style.pointerEvents = 'auto';
+      }
     }
 
     // API Functions
@@ -879,6 +1114,9 @@
         
         const data = await response.json();
         displayBookingData(data);
+        
+        // Load sub-mechanics after booking data is loaded
+        await loadSubMechanics();
       } catch (error) {
         console.error('Error loading booking:', error);
         showError('बुकिंग डेटा लोड करने में असमर्थ। कृपया अपना इंटरनेट कनेक्शन चेक करें।');
@@ -1220,6 +1458,7 @@
 
     // Add to window for inline onclick handlers
     window.retryLoad = retryLoad;
+    window.assignMechanic = assignMechanic;
   </script>
 </body>
 </html>
