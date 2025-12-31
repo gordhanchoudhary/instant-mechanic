@@ -865,6 +865,78 @@
         let actionTaken = false; // New flag to track if action was taken
         let fullPhoneNumber = '';
 
+        // Check if booking is already accepted
+        function checkAcceptedBooking() {
+            const acceptedBooking = localStorage.getItem('acceptedBooking');
+            if (acceptedBooking) {
+                try {
+                    const acceptedData = JSON.parse(acceptedBooking);
+                    if (acceptedData.bookingId === bookingId) {
+                        // This booking is already accepted
+                        showAcceptedBookingDialog();
+                        return true;
+                    }
+                } catch (error) {
+                    console.warn('Error parsing accepted booking:', error);
+                }
+            }
+            return false;
+        }
+
+        // Show dialog for already accepted booking
+        function showAcceptedBookingDialog() {
+            const overlay = document.getElementById('popupOverlay');
+            const popup = document.getElementById('successPopup');
+            
+            if (popup && overlay) {
+                popup.innerHTML = `
+                    <h3>यह बुकिंग पहले से स्वीकार है!</h3>
+                    <p>आपने इस बुकिंग को पहले ही स्वीकार कर लिया है। आप क्या करना चाहते हैं?</p>
+                    <div class="popup-buttons">
+                        <button class="popup-btn cancel" onclick="goToHomePage()">होम पेज जाएं</button>
+                        <button class="popup-btn accept" onclick="goToBookingDetails()">बुकिंग डिटेल्स देखें</button>
+                    </div>
+                `;
+                
+                overlay.classList.add('show');
+                popup.classList.add('show');
+            }
+        }
+
+        // Navigate to home page
+        function goToHomePage() {
+            window.location.href = `https://instantmechanic.online/mechanic-view.html?mechanic=${encodeURIComponent(mechanicName)}`;
+        }
+
+        // Navigate to booking details
+        function goToBookingDetails() {
+            window.location.href = `https://instantmechanic.online/mechanic-app-booking-deatil.html?id=${bookingId}`;
+        }
+
+        // Store accepted booking in localStorage
+        function storeAcceptedBooking() {
+            const acceptedBookingData = {
+                bookingId: bookingId,
+                mechanicName: mechanicName,
+                acceptedAt: new Date().toISOString(),
+                timestamp: Date.now()
+            };
+            localStorage.setItem('acceptedBooking', JSON.stringify(acceptedBookingData));
+        }
+
+        // Clear accepted booking from localStorage (for testing or when job is complete)
+        function clearAcceptedBooking() {
+            localStorage.removeItem('acceptedBooking');
+        }
+
+        // Check if there's an accepted booking when going back
+        window.addEventListener('pageshow', function(event) {
+            // This fires when user navigates back to this page
+            if (event.persisted) {
+                checkAcceptedBooking();
+            }
+        });
+
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             try {
@@ -872,9 +944,12 @@
                 // Run scaling fix repeatedly to override any system changes
                 setInterval(forceFixedScaling, 100);
                 
-                loadBookingData();
-                initTimer();
-                initSwipeToAccept();
+                // Check if booking is already accepted before loading
+                if (!checkAcceptedBooking()) {
+                    loadBookingData();
+                    initTimer();
+                    initSwipeToAccept();
+                }
             } catch (error) {
                 console.error('Error in DOMContentLoaded:', error);
             }
@@ -1286,6 +1361,9 @@
                     swipeText.textContent = 'बुकिंग स्वीकार की गई!';
                     swipeText.style.opacity = '1';
                 }
+                
+                // Store accepted booking in localStorage
+                storeAcceptedBooking();
                 
                 // Call API
                 const apiResponse = await callMechanicBookingAPI('accept');
