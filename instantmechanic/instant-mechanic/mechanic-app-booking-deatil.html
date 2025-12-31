@@ -893,7 +893,7 @@
     }
 
     // Sub-Mechanic Functions
-    async function loadSubMechanics() {
+    async function loadSubMechanics(isCompleted = false) {
       const mechanicName = localStorage.getItem('mechanic');
       if (!mechanicName) {
         console.log('No mechanic name in localStorage');
@@ -907,7 +907,7 @@
         if (response.ok && data.sub_mechanics && data.sub_mechanics.length > 0) {
           subMechanics = data.sub_mechanics;
           checkAssignedMechanic();
-          displaySubMechanicCard();
+          displaySubMechanicCard(isCompleted);
         } else {
           console.log('No sub-mechanics found or error:', data.error || 'Unknown error');
         }
@@ -924,22 +924,29 @@
       }
     }
 
-    function displaySubMechanicCard() {
+    function displaySubMechanicCard(isCompleted = false) {
       const card = document.getElementById('subMechanicCard');
       const content = document.getElementById('subMechanicContent');
       
       if (assignedMechanic) {
         // Show assigned mechanic
-        displayAssignedMechanic();
+        displayAssignedMechanic(isCompleted);
       } else {
         // Show mechanic selection list
-        displayMechanicList();
+        displayMechanicList(isCompleted);
+      }
+      
+      // Gray out card if booking is completed
+      if (isCompleted) {
+        card.classList.add('disabled');
+        card.style.opacity = '0.6';
+        card.style.pointerEvents = 'none';
       }
       
       card.style.display = 'block';
     }
 
-    function displayAssignedMechanic() {
+    function displayAssignedMechanic(isCompleted = false) {
       const card = document.getElementById('subMechanicCard');
       const title = document.getElementById('subMechanicTitle');
       const content = document.getElementById('subMechanicContent');
@@ -948,20 +955,39 @@
       card.classList.add('assigned-mechanic-card');
       title.innerHTML = `<i class="fas fa-check-circle"></i> आपने इस बुकिंग पर "${assignedMechanic.name}" को भेजा है`;
       
-      content.innerHTML = `
-        <div class="assigned-mechanic-info">
-          <div class="assigned-mechanic-name">${assignedMechanic.name}</div>
-          <div class="assigned-mechanic-status">इस बुकिंग को असाइन किया गया</div>
-          <button class="btn btn-warning" onclick="showReassignOptions()" style="margin-top: 12px; font-size: 0.9rem; padding: 8px 16px;">
-            <i class="fas fa-exchange-alt"></i>
-            दूसरे मैकेनिक को असाइन करें
-          </button>
-        </div>
-      `;
+      // Show different content based on completion status
+      if (isCompleted) {
+        content.innerHTML = `
+          <div class="assigned-mechanic-info">
+            <div class="assigned-mechanic-name">${assignedMechanic.name}</div>
+            <div class="assigned-mechanic-status">इस बुकिंग को असाइन किया गया था (बुकिंग पूर्ण हो गई)</div>
+          </div>
+        `;
+      } else {
+        content.innerHTML = `
+          <div class="assigned-mechanic-info">
+            <div class="assigned-mechanic-name">${assignedMechanic.name}</div>
+            <div class="assigned-mechanic-status">इस बुकिंग को असाइन किया गया</div>
+            <button class="btn btn-warning" onclick="showReassignOptions()" style="margin-top: 12px; font-size: 0.9rem; padding: 8px 16px;">
+              <i class="fas fa-exchange-alt"></i>
+              दूसरे मैकेनिक को असाइन करें
+            </button>
+          </div>
+        `;
+      }
     }
 
-    function displayMechanicList() {
+    function displayMechanicList(isCompleted = false) {
       const content = document.getElementById('subMechanicContent');
+      
+      if (isCompleted) {
+        content.innerHTML = `
+          <div class="current-assignment" style="background: rgba(255,255,255,0.1); padding: 12px; border-radius: 8px; text-align: center; color: var(--text-secondary);">
+            <i class="fas fa-info-circle"></i> बुकिंग पूर्ण हो गई - असाइनमेंट अब उपलब्ध नहीं है
+          </div>
+        `;
+        return;
+      }
       
       const mechanicListHTML = subMechanics.map(mechanic => `
         <div class="mechanic-item" onclick="assignMechanic(${mechanic.id}, '${mechanic.name}')">
@@ -1220,8 +1246,11 @@
         const data = await response.json();
         displayBookingData(data);
         
+        // Check if booking is completed
+        const isCompleted = data.booking_status === 'complete';
+        
         // Load sub-mechanics after booking data is loaded
-        await loadSubMechanics();
+        await loadSubMechanics(isCompleted);
       } catch (error) {
         console.error('Error loading booking:', error);
         showError('बुकिंग डेटा लोड करने में असमर्थ। कृपया अपना इंटरनेट कनेक्शन चेक करें।');
