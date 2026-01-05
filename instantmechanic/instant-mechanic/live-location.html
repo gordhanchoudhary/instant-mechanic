@@ -507,6 +507,292 @@
             background: #fef3c7;
             color: #d97706;
         }
+
+        /* Custom Map UI Styles */
+        .map-overlay {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            z-index: 10;
+        }
+
+        .route-info-overlay {
+            top: 20px;
+            left: 20px;
+            padding: 1rem 1.5rem;
+            max-width: 300px;
+        }
+
+        .eta-display {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .eta-time {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #10b981;
+        }
+
+        .eta-label {
+            font-size: 0.875rem;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .route-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+            margin-top: 0.75rem;
+        }
+
+        .route-stat {
+            text-align: center;
+        }
+
+        .route-stat-value {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .route-stat-label {
+            font-size: 0.75rem;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 0.25rem;
+        }
+
+        .mechanic-status-overlay {
+            top: 20px;
+            right: 20px;
+            padding: 1rem;
+            min-width: 200px;
+        }
+
+        .mechanic-status-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .status-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #10b981, #059669);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .status-info h4 {
+            margin: 0;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .status-info p {
+            margin: 0;
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+
+        .live-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.75rem;
+            color: #10b981;
+            font-weight: 500;
+        }
+
+        .live-dot {
+            width: 6px;
+            height: 6px;
+            background: #10b981;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .progress-overlay {
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 0.75rem 1.5rem;
+        }
+
+        .progress-content {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .progress-bar {
+            width: 200px;
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981, #059669);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .progress-text {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #1e293b;
+            white-space: nowrap;
+        }
+
+        /* Custom Marker Styles */
+        .custom-marker {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .marker-pin {
+            width: 40px;
+            height: 40px;
+            border-radius: 50% 50% 50% 0;
+            transform: rotate(-45deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 600;
+            position: relative;
+        }
+
+        .mechanic-pin {
+            background: linear-gradient(135deg, #10b981, #059669);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+        }
+
+        .customer-pin {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+        }
+
+        .marker-label {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin-top: 0.5rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            white-space: nowrap;
+        }
+
+        /* Route Animation */
+        @keyframes route-dash {
+            0% {
+                stroke-dashoffset: 0;
+            }
+            100% {
+                stroke-dashoffset: -40;
+            }
+        }
+
+        /* Info Window Styles */
+        .custom-info-window {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            border: none;
+            padding: 0;
+            overflow: hidden;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .info-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 0.75rem 1rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .info-content {
+            padding: 1rem;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .info-label {
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .info-value {
+            color: #1e293b;
+            font-weight: 600;
+        }
+
+        .geofence-label {
+            position: absolute;
+            background: rgba(239, 68, 68, 0.9);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        @media (max-width: 768px) {
+            .route-info-overlay {
+                left: 10px;
+                right: 10px;
+                max-width: none;
+            }
+
+            .mechanic-status-overlay {
+                right: 10px;
+                left: 10px;
+                top: auto;
+                bottom: 180px;
+            }
+
+            .progress-overlay {
+                left: 10px;
+                right: 10px;
+                transform: none;
+                bottom: 120px;
+            }
+
+            .progress-bar {
+                width: 150px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -533,6 +819,49 @@
     <div class="main-container">
         <div class="map-container">
             <div id="map"></div>
+            
+            <!-- Route Information Overlay -->
+            <div class="map-overlay route-info-overlay" id="routeInfoOverlay">
+                <div class="eta-display">
+                    <div class="eta-time" id="mapEta">--</div>
+                    <div class="eta-label">Minutes Away</div>
+                </div>
+                <div class="route-stats">
+                    <div class="route-stat">
+                        <div class="route-stat-value" id="mapDistance">--</div>
+                        <div class="route-stat-label">Distance</div>
+                    </div>
+                    <div class="route-stat">
+                        <div class="route-stat-value" id="mapSpeed">--</div>
+                        <div class="route-stat-label">Speed</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mechanic Status Overlay -->
+            <div class="map-overlay mechanic-status-overlay" id="mechanicStatusOverlay">
+                <div class="mechanic-status-header">
+                    <div class="status-avatar" id="statusAvatar">M</div>
+                    <div class="status-info">
+                        <h4 id="statusMechanicName">Loading...</h4>
+                        <p id="statusPhone">--</p>
+                    </div>
+                </div>
+                <div class="live-status">
+                    <div class="live-dot"></div>
+                    <span id="liveStatusText">Connecting...</span>
+                </div>
+            </div>
+
+            <!-- Progress Overlay -->
+            <div class="map-overlay progress-overlay" id="progressOverlay">
+                <div class="progress-content">
+                    <div class="progress-text" id="progressText">Calculating route...</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                </div>
+            </div>
         </div>
         
         <div class="info-panel">
@@ -635,6 +964,10 @@
         let mechanicData = {};
         let isTracking = true;
         let traccarSessionEstablished = false;
+        let routeData = null;
+        let geofenceLabel = null;
+        let mechanicInfoWindow = null;
+        let customerInfoWindow = null;
         
         // URL parameters
         const urlParams = new URLSearchParams(window.location.search);
@@ -656,20 +989,56 @@
                         "featureType": "transit",
                         "elementType": "labels",
                         "stylers": [{"visibility": "off"}]
+                    },
+                    {
+                        "featureType": "road",
+                        "elementType": "geometry",
+                        "stylers": [{"color": "#f5f5f5"}]
+                    },
+                    {
+                        "featureType": "road.highway",
+                        "elementType": "geometry",
+                        "stylers": [{"color": "#ffffff"}]
+                    },
+                    {
+                        "featureType": "water",
+                        "elementType": "geometry",
+                        "stylers": [{"color": "#c9c9c9"}]
+                    },
+                    {
+                        "featureType": "landscape",
+                        "elementType": "geometry",
+                        "stylers": [{"color": "#f0f0f0"}]
                     }
                 ],
                 mapTypeControl: false,
                 streetViewControl: false,
-                fullscreenControl: false
+                fullscreenControl: false,
+                zoomControl: true,
+                zoomControlOptions: {
+                    position: google.maps.ControlPosition.RIGHT_BOTTOM
+                }
             });
 
             directionsService = new google.maps.DirectionsService();
             directionsRenderer = new google.maps.DirectionsRenderer({
                 suppressMarkers: true,
+                preserveViewport: false,
                 polylineOptions: {
                     strokeColor: '#667eea',
-                    strokeWeight: 4,
-                    strokeOpacity: 0.8
+                    strokeWeight: 6,
+                    strokeOpacity: 0.8,
+                    icons: [{
+                        icon: {
+                            path: 'M 0,-1 0,1',
+                            strokeOpacity: 1,
+                            strokeWeight: 2,
+                            strokeColor: '#ffffff',
+                            scale: 2
+                        },
+                        offset: '0',
+                        repeat: '20px'
+                    }]
                 }
             });
             directionsRenderer.setMap(map);
@@ -831,37 +1200,93 @@
                     
                     const customerLocation = { lat: customerLat, lng: customerLng };
                     
-                    // Create customer marker
+                    // Create enhanced customer marker
                     customerMarker = new google.maps.Marker({
                         position: customerLocation,
                         map: map,
                         title: 'Customer Location',
                         icon: {
-                            path: google.maps.SymbolPath.CIRCLE,
+                            path: "m12,0c-4.4,0-8,3.6-8,8 0,5.4 7.9,16 7.9,16 0.1,0.1 0.1,0.1 0.2,0 0,0 7.9-10.6 7.9-16 0-4.4-3.6-8-8-8z",
                             fillColor: '#ef4444',
                             fillOpacity: 1,
                             strokeColor: '#ffffff',
                             strokeWeight: 3,
-                            scale: 12
+                            scale: 2,
+                            anchor: new google.maps.Point(12, 32)
                         }
                     });
 
-                    // Create geofence circle (300m radius)
+                    // Create enhanced geofence circle (300m radius)
                     geofenceCircle = new google.maps.Circle({
                         strokeColor: '#ef4444',
-                        strokeOpacity: 0.6,
-                        strokeWeight: 2,
+                        strokeOpacity: 0.8,
+                        strokeWeight: 3,
                         fillColor: '#ef4444',
-                        fillOpacity: 0.1,
+                        fillOpacity: 0.15,
                         map: map,
                         center: customerLocation,
                         radius: 300
+                    });
+
+                    // Add geofence label
+                    geofenceLabel = new google.maps.InfoWindow({
+                        content: '<div style="background: rgba(239, 68, 68, 0.9); color: white; padding: 0.5rem 0.75rem; border-radius: 20px; font-size: 0.75rem; font-weight: 500; text-align: center; font-family: Inter, sans-serif;">300m Service Zone</div>',
+                        position: {
+                            lat: customerLat + 0.002,
+                            lng: customerLng
+                        },
+                        disableAutoPan: true
+                    });
+                    geofenceLabel.open(map);
+
+                    // Create custom info window for customer
+                    customerInfoWindow = new google.maps.InfoWindow({
+                        content: createCustomerInfoContent(),
+                        disableAutoPan: false
+                    });
+
+                    customerMarker.addListener('click', () => {
+                        if (mechanicInfoWindow) mechanicInfoWindow.close();
+                        customerInfoWindow.open(map, customerMarker);
                     });
 
                     // Center map on customer location initially
                     map.setCenter(customerLocation);
                 }
             }
+        }
+
+        // Create custom info window content for customer
+        function createCustomerInfoContent() {
+            return `
+                <div class="custom-info-window">
+                    <div class="info-header">
+                        <i class="fas fa-map-marker-alt"></i> Customer Location
+                    </div>
+                    <div class="info-content">
+                        <div class="info-row">
+                            <span class="info-label">Car:</span>
+                            <span class="info-value">${bookingData.car || 'N/A'}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Problem:</span>
+                            <span class="info-value">${bookingData.problem || 'N/A'}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Price:</span>
+                            <span class="info-value">${bookingData.price || 'N/A'}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Phone:</span>
+                            <span class="info-value">
+                                <a href="tel:${bookingData.customer_mobile}" style="color: #667eea; text-decoration: none;">
+                                    ${bookingData.customer_mobile || 'N/A'}
+                                </a>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            `;
         }
 
         // Update mechanic marker
@@ -877,53 +1302,210 @@
                     map: map,
                     title: 'Mechanic Location',
                     icon: {
-                        path: "M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z",
+                        path: "m12,0c-4.4,0-8,3.6-8,8 0,5.4 7.9,16 7.9,16 0.1,0.1 0.1,0.1 0.2,0 0,0 7.9-10.6 7.9-16 0-4.4-3.6-8-8-8z m0,12c-2.2,0-4-1.8-4-4s1.8-4 4-4 4,1.8 4,4-1.8,4-4,4z",
                         fillColor: '#10b981',
                         fillOpacity: 1,
                         strokeColor: '#ffffff',
-                        strokeWeight: 2,
+                        strokeWeight: 3,
                         scale: 2,
-                        anchor: new google.maps.Point(12, 24)
-                    }
+                        anchor: new google.maps.Point(12, 32)
+                    },
+                    animation: google.maps.Animation.DROP
                 });
 
-                // Add info window
-                const infoWindow = new google.maps.InfoWindow({
-                    content: `
-                        <div style="padding: 10px; font-family: 'Inter', sans-serif;">
-                            <h4 style="margin: 0 0 8px 0; color: #1e293b;">${bookingData.mechanic_name || 'Mechanic'}</h4>
-                            <p style="margin: 0; color: #64748b; font-size: 0.875rem;">Last updated: ${new Date(mechanicData.serverTime).toLocaleTimeString()}</p>
-                        </div>
-                    `
+                // Create enhanced info window for mechanic
+                mechanicInfoWindow = new google.maps.InfoWindow({
+                    content: createMechanicInfoContent(),
+                    disableAutoPan: false
                 });
 
                 mechanicMarker.addListener('click', () => {
-                    infoWindow.open(map, mechanicMarker);
+                    if (customerInfoWindow) customerInfoWindow.close();
+                    mechanicInfoWindow.setContent(createMechanicInfoContent());
+                    mechanicInfoWindow.open(map, mechanicMarker);
                 });
             } else {
                 mechanicMarker.setPosition(mechanicLocation);
+                // Update info window content if it's open
+                if (mechanicInfoWindow.getMap()) {
+                    mechanicInfoWindow.setContent(createMechanicInfoContent());
+                }
             }
+
+            // Update map overlays
+            updateMapOverlays();
+        }
+
+        // Create custom info window content for mechanic
+        function createMechanicInfoContent() {
+            const lastUpdate = new Date(mechanicData.serverTime).toLocaleTimeString();
+            const isMoving = mechanicData.attributes.motion;
+            const currentSpeed = Math.round(mechanicData.speed || 0);
+            
+            return `
+                <div class="custom-info-window">
+                    <div class="info-header">
+                        <i class="fas fa-wrench"></i> ${bookingData.mechanic_name || 'Mechanic'}
+                    </div>
+                    <div class="info-content">
+                        <div class="info-row">
+                            <span class="info-label">Status:</span>
+                            <span class="info-value" style="color: ${isMoving ? '#10b981' : '#f59e0b'}">
+                                ${isMoving ? 'Moving' : 'Stopped'}
+                            </span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Speed:</span>
+                            <span class="info-value">${currentSpeed} km/h</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Phone:</span>
+                            <span class="info-value">
+                                <a href="tel:${bookingData.agent_mobile}" style="color: #667eea; text-decoration: none;">
+                                    ${bookingData.agent_mobile || 'N/A'}
+                                </a>
+                            </span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Updated:</span>
+                            <span class="info-value">${lastUpdate}</span>
+                        </div>
+                        <div style="margin-top: 0.75rem; text-align: center;">
+                            <button onclick="callMechanic('${bookingData.agent_mobile}')" 
+                                    style="background: #10b981; color: white; border: none; padding: 0.5rem 1rem; 
+                                           border-radius: 6px; cursor: pointer; font-size: 0.875rem;">
+                                <i class="fas fa-phone"></i> Call Now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Update map overlays with real-time information
+        function updateMapOverlays() {
+            if (!mechanicData || !bookingData) return;
+
+            // Update mechanic status overlay
+            const statusAvatar = document.getElementById('statusAvatar');
+            const statusMechanicName = document.getElementById('statusMechanicName');
+            const statusPhone = document.getElementById('statusPhone');
+            const liveStatusText = document.getElementById('liveStatusText');
+
+            if (bookingData.mechanic_name) {
+                statusAvatar.textContent = bookingData.mechanic_name.charAt(0).toUpperCase();
+                statusMechanicName.textContent = bookingData.mechanic_name;
+            }
+            statusPhone.textContent = bookingData.agent_mobile || '--';
+
+            const isMoving = mechanicData.attributes.motion;
+            liveStatusText.textContent = isMoving ? 'En Route' : 'Stopped';
+            liveStatusText.style.color = isMoving ? '#10b981' : '#f59e0b';
+
+            // Update speed display
+            const currentSpeed = Math.round(mechanicData.speed || 0);
+            document.getElementById('mapSpeed').textContent = `${currentSpeed} km/h`;
         }
 
         // Calculate and display route
         function calculateRoute() {
             if (mechanicMarker && customerMarker) {
+                const mechanicPos = mechanicMarker.getPosition();
+                const customerPos = customerMarker.getPosition();
+
                 directionsService.route({
-                    origin: mechanicMarker.getPosition(),
-                    destination: customerMarker.getPosition(),
+                    origin: mechanicPos,
+                    destination: customerPos,
                     travelMode: google.maps.TravelMode.DRIVING,
-                    avoidTolls: true
+                    avoidTolls: true,
+                    drivingOptions: {
+                        departureTime: new Date(),
+                        trafficModel: google.maps.TrafficModel.BEST_GUESS
+                    }
                 }, (result, status) => {
                     if (status === 'OK') {
                         directionsRenderer.setDirections(result);
+                        routeData = result;
+
+                        // Extract route information
+                        const route = result.routes[0];
+                        const leg = route.legs[0];
                         
-                        // Fit bounds to show both markers
+                        // Update map overlays with route data
+                        updateRouteOverlays(leg);
+                        
+                        // Fit bounds to show both markers with padding
                         const bounds = new google.maps.LatLngBounds();
-                        bounds.extend(mechanicMarker.getPosition());
-                        bounds.extend(customerMarker.getPosition());
-                        map.fitBounds(bounds, { padding: 50 });
+                        bounds.extend(mechanicPos);
+                        bounds.extend(customerPos);
+                        map.fitBounds(bounds, { 
+                            padding: { top: 200, right: 100, bottom: 300, left: 100 }
+                        });
+                    } else {
+                        console.error('Directions service failed:', status);
+                        // Fallback to simple distance calculation
+                        updateFallbackStats();
                     }
                 });
+            }
+        }
+
+        // Update route overlays with calculated route data
+        function updateRouteOverlays(leg) {
+            // Update ETA and distance
+            const etaMinutes = Math.round(leg.duration_in_traffic ? 
+                leg.duration_in_traffic.value / 60 : leg.duration.value / 60);
+            const distanceText = leg.distance.text;
+
+            document.getElementById('mapEta').textContent = etaMinutes;
+            document.getElementById('mapDistance').textContent = distanceText;
+
+            // Calculate progress (simplified - based on distance from destination)
+            if (mechanicMarker && customerMarker) {
+                const mechanicPos = mechanicMarker.getPosition();
+                const customerPos = customerMarker.getPosition();
+                const currentDistance = google.maps.geometry.spherical.computeDistanceBetween(
+                    mechanicPos, customerPos
+                );
+                
+                // Determine if mechanic has arrived (within 300m geofence)
+                const hasArrived = currentDistance <= 300;
+                let progress = 0;
+                
+                if (hasArrived) {
+                    progress = 100;
+                    document.getElementById('progressText').textContent = 'Mechanic Arrived!';
+                    document.getElementById('progressText').style.color = '#10b981';
+                } else {
+                    // Simple progress calculation (this could be enhanced with route tracking)
+                    const totalDistance = leg.distance.value; // in meters
+                    progress = Math.max(0, Math.min(95, ((totalDistance - currentDistance) / totalDistance) * 100));
+                    document.getElementById('progressText').textContent = `${etaMinutes} min away`;
+                    document.getElementById('progressText').style.color = '#1e293b';
+                }
+                
+                document.getElementById('progressFill').style.width = `${progress}%`;
+            }
+        }
+
+        // Fallback stats when directions service fails
+        function updateFallbackStats() {
+            if (mechanicMarker && customerMarker) {
+                const distance = google.maps.geometry.spherical.computeDistanceBetween(
+                    mechanicMarker.getPosition(),
+                    customerMarker.getPosition()
+                );
+                
+                const distanceKm = (distance / 1000).toFixed(1);
+                const etaMinutes = Math.round((distanceKm / 30) * 60); // Assume 30 km/h avg speed
+                
+                document.getElementById('mapEta').textContent = etaMinutes;
+                document.getElementById('mapDistance').textContent = `${distanceKm} km`;
+                
+                const progress = distance <= 300 ? 100 : 0;
+                document.getElementById('progressFill').style.width = `${progress}%`;
+                document.getElementById('progressText').textContent = 
+                    distance <= 300 ? 'Arrived!' : `${etaMinutes} min away`;
             }
         }
 
@@ -976,7 +1558,7 @@
             `;
         }
 
-        // Update stats
+        // Update stats (both panel and map overlays)
         function updateStats() {
             if (mechanicMarker && customerMarker) {
                 // Calculate distance
@@ -986,10 +1568,12 @@
                 );
                 
                 const distanceKm = (distance / 1000).toFixed(1);
+                
+                // Update bottom panel stats
                 document.getElementById('distance').textContent = `${distanceKm} km`;
 
-                // Calculate ETA (assuming 30 km/h average speed in traffic)
-                const avgSpeed = 30; // km/h
+                // Calculate ETA (enhanced with traffic consideration)
+                const avgSpeed = mechanicData.speed > 0 ? Math.max(mechanicData.speed, 20) : 30; // km/h
                 const etaMinutes = Math.round((distanceKm / avgSpeed) * 60);
                 document.getElementById('eta').textContent = `${etaMinutes} min`;
 
@@ -999,12 +1583,30 @@
 
                 // Status based on motion and geofence
                 let status = 'En Route';
+                let statusColor = '#667eea';
+                
                 if (distance <= 300) {
                     status = 'Arrived';
+                    statusColor = '#10b981';
                 } else if (!mechanicData.attributes.motion) {
                     status = 'Stopped';
+                    statusColor = '#f59e0b';
                 }
-                document.getElementById('status').textContent = status;
+                
+                const statusElement = document.getElementById('status');
+                statusElement.textContent = status;
+                statusElement.style.color = statusColor;
+
+                // Update map overlays if they exist (fallback for when directions service fails)
+                if (!routeData) {
+                    document.getElementById('mapEta').textContent = etaMinutes;
+                    document.getElementById('mapDistance').textContent = `${distanceKm} km`;
+                    
+                    const progress = distance <= 300 ? 100 : 0;
+                    document.getElementById('progressFill').style.width = `${progress}%`;
+                    document.getElementById('progressText').textContent = 
+                        distance <= 300 ? 'Arrived!' : `${etaMinutes} min away`;
+                }
             }
         }
 
@@ -1116,6 +1718,68 @@
         window.addEventListener('blur', () => {
             isTracking = false;
         });
+
+        // Map overlay interactions
+        document.addEventListener('DOMContentLoaded', function() {
+            // Make route info overlay clickable to center on route
+            const routeInfoOverlay = document.getElementById('routeInfoOverlay');
+            if (routeInfoOverlay) {
+                routeInfoOverlay.addEventListener('click', () => {
+                    if (mechanicMarker && customerMarker) {
+                        const bounds = new google.maps.LatLngBounds();
+                        bounds.extend(mechanicMarker.getPosition());
+                        bounds.extend(customerMarker.getPosition());
+                        map.fitBounds(bounds, { 
+                            padding: { top: 200, right: 100, bottom: 300, left: 100 }
+                        });
+                    }
+                });
+                routeInfoOverlay.style.cursor = 'pointer';
+                routeInfoOverlay.title = 'Click to center map on route';
+            }
+
+            // Make mechanic status overlay clickable to call
+            const mechanicStatusOverlay = document.getElementById('mechanicStatusOverlay');
+            if (mechanicStatusOverlay) {
+                mechanicStatusOverlay.addEventListener('click', () => {
+                    if (bookingData.agent_mobile) {
+                        callMechanic(bookingData.agent_mobile);
+                    }
+                });
+                mechanicStatusOverlay.style.cursor = 'pointer';
+                mechanicStatusOverlay.title = 'Click to call mechanic';
+            }
+
+            // Progress overlay click to show mechanic marker info
+            const progressOverlay = document.getElementById('progressOverlay');
+            if (progressOverlay) {
+                progressOverlay.addEventListener('click', () => {
+                    if (mechanicMarker && mechanicInfoWindow) {
+                        mechanicInfoWindow.setContent(createMechanicInfoContent());
+                        mechanicInfoWindow.open(map, mechanicMarker);
+                        map.panTo(mechanicMarker.getPosition());
+                    }
+                });
+                progressOverlay.style.cursor = 'pointer';
+                progressOverlay.title = 'Click to view mechanic details';
+            }
+        });
+
+        // Mobile touch handling for better UX
+        let touchStartY = 0;
+        document.addEventListener('touchstart', function(e) {
+            touchStartY = e.touches[0].clientY;
+        });
+
+        document.addEventListener('touchmove', function(e) {
+            const touchY = e.touches[0].clientY;
+            const touchDiff = touchStartY - touchY;
+            
+            // Prevent pull-to-refresh on map container
+            if (e.target.closest('.map-container') && touchDiff < 0) {
+                e.preventDefault();
+            }
+        }, { passive: false });
     </script>
 </body>
 </html>
