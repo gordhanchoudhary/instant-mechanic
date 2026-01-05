@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live Tracking - Instant Mechanic</title>
+    <title>Track Your Mechanic - Instant Mechanic</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -17,90 +17,69 @@
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background: #f8fafc;
             min-height: 100vh;
-            overflow-x: hidden;
+            overflow: hidden;
         }
 
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        /* Header */
         .header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             padding: 1rem 1.5rem;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
-            opacity: 0.3;
-        }
-
-        .header-content {
-            position: relative;
-            z-index: 1;
-        }
-
-        .brand {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
-            margin-bottom: 0.5rem;
+            gap: 1rem;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+            z-index: 100;
         }
 
-        .brand-logo {
+        .header-icon {
             width: 40px;
             height: 40px;
             background: rgba(255,255,255,0.2);
-            border-radius: 10px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 1.2rem;
         }
 
-        .brand-text {
-            font-size: 1.5rem;
+        .header-content h1 {
+            font-size: 1.3rem;
             font-weight: 700;
-            letter-spacing: -0.5px;
+            margin-bottom: 0.25rem;
         }
 
-        .tracking-info {
+        .header-content p {
+            font-size: 0.85rem;
+            opacity: 0.9;
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            font-size: 0.9rem;
-            opacity: 0.9;
         }
 
-        .status-indicator {
-            width: 8px;
-            height: 8px;
+        .live-dot {
+            width: 6px;
+            height: 6px;
             background: #10b981;
             border-radius: 50%;
             animation: pulse 2s infinite;
         }
 
         @keyframes pulse {
-            0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.2); opacity: 0.7; }
-            100% { transform: scale(1); opacity: 1; }
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.1); }
         }
 
-        .main-container {
-            display: flex;
-            flex-direction: column;
-            height: calc(100vh - 80px);
-        }
-
-        .map-container {
+        /* Map Container */
+        .map-section {
             flex: 1;
             position: relative;
-            overflow: hidden;
         }
 
         #map {
@@ -108,42 +87,71 @@
             height: 100%;
         }
 
+        /* ETA Overlay - Simple and Clean */
+        .eta-overlay {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 1rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .eta-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .eta-main {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .eta-time {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #10b981;
+        }
+
+        .eta-label {
+            font-size: 0.9rem;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .eta-distance {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        /* Bottom Info Panel */
         .info-panel {
             background: white;
-            border-top: 1px solid #e2e8f0;
+            border-radius: 24px 24px 0 0;
             padding: 1.5rem;
-            box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+            z-index: 50;
         }
 
-        .booking-card {
-            background: linear-gradient(135deg, #f8faff 0%, #f1f5f9 100%);
-            border: 1px solid #e2e8f0;
-            border-radius: 16px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .booking-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, #667eea, #764ba2);
-        }
-
+        /* Booking Header */
         .booking-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e2e8f0;
         }
 
         .booking-id {
-            font-size: 0.875rem;
+            font-size: 0.9rem;
             color: #64748b;
             font-weight: 500;
         }
@@ -151,19 +159,22 @@
         .booking-status {
             background: #fef3c7;
             color: #d97706;
-            padding: 0.25rem 0.75rem;
+            padding: 0.4rem 1rem;
             border-radius: 20px;
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
         }
 
-        .customer-info {
+        /* Service Details */
+        .service-details {
             display: grid;
             grid-template-columns: auto 1fr;
             gap: 1rem;
-            align-items: start;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid #e2e8f0;
         }
 
         .car-image {
@@ -174,56 +185,58 @@
             border: 2px solid #e2e8f0;
         }
 
-        .customer-details h3 {
-            font-size: 1.1rem;
-            font-weight: 600;
+        .service-info h3 {
+            font-size: 1.2rem;
+            font-weight: 700;
             color: #1e293b;
             margin-bottom: 0.5rem;
         }
 
-        .detail-row {
+        .service-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .meta-item {
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            margin-bottom: 0.25rem;
-            font-size: 0.875rem;
+            font-size: 0.9rem;
             color: #64748b;
         }
 
-        .detail-row i {
+        .meta-item i {
             width: 16px;
             color: #667eea;
         }
 
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 1rem;
+        .price-highlight {
+            color: #10b981;
+            font-weight: 600;
+        }
+
+        /* Stats Grid */
+        .stats-section {
             margin-bottom: 1.5rem;
         }
 
-        .stat-card {
-            background: white;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 1rem;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
         }
 
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, #10b981, #059669);
+        .stat-card {
+            text-align: center;
+            padding: 1rem;
+            background: #f8fafc;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
         }
 
         .stat-value {
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             font-weight: 700;
             color: #1e293b;
             margin-bottom: 0.25rem;
@@ -233,27 +246,16 @@
             font-size: 0.75rem;
             color: #64748b;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
             font-weight: 500;
+            letter-spacing: 0.5px;
         }
 
-        .mechanic-card {
-            background: white;
-            border: 1px solid #e2e8f0;
+        /* Mechanic Card */
+        .mechanic-section {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
             border-radius: 16px;
             padding: 1.5rem;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .mechanic-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, #10b981, #059669);
+            border: 1px solid #bae6fd;
         }
 
         .mechanic-header {
@@ -277,35 +279,61 @@
         }
 
         .mechanic-info h4 {
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             font-weight: 600;
             color: #1e293b;
             margin-bottom: 0.25rem;
         }
 
         .mechanic-phone {
-            font-size: 0.875rem;
+            font-size: 0.9rem;
             color: #64748b;
             display: flex;
             align-items: center;
             gap: 0.5rem;
         }
 
+        .mechanic-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-top: 0.5rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+        }
+
+        .status-moving {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-stopped {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .status-arrived {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
         .call-button {
+            width: 100%;
             background: linear-gradient(135deg, #10b981, #059669);
             color: white;
             border: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: 12px;
-            font-size: 0.9rem;
+            padding: 1rem;
+            border-radius: 16px;
+            font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            width: 100%;
             justify-content: center;
+            gap: 0.75rem;
             margin-top: 1rem;
         }
 
@@ -314,13 +342,18 @@
             box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
         }
 
+        .call-button:active {
+            transform: translateY(0);
+        }
+
+        /* Loading State */
         .loading {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(255,255,255,0.95);
+            background: rgba(255, 255, 255, 0.95);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -329,8 +362,8 @@
         }
 
         .loading-spinner {
-            width: 60px;
-            height: 60px;
+            width: 50px;
+            height: 50px;
             border: 4px solid #e2e8f0;
             border-top: 4px solid #667eea;
             border-radius: 50%;
@@ -344,12 +377,13 @@
         }
 
         .loading-text {
-            font-size: 1.1rem;
-            font-weight: 500;
+            font-size: 1rem;
             color: #64748b;
+            font-weight: 500;
         }
 
-        .error {
+        /* Error States */
+        .error-message {
             background: #fef2f2;
             border: 1px solid #fecaca;
             color: #dc2626;
@@ -357,23 +391,45 @@
             border-radius: 12px;
             margin: 1rem;
             text-align: center;
+            font-size: 0.9rem;
         }
 
+        /* Refresh Button */
+        .refresh-btn {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 1.1rem;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+            transition: all 0.3s ease;
+            z-index: 60;
+        }
+
+        .refresh-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .refresh-btn.spinning {
+            animation: spin 1s linear infinite;
+        }
+
+        /* Mobile Optimizations */
         @media (max-width: 768px) {
-            .header {
-                padding: 1rem;
+            .eta-overlay {
+                left: 15px;
+                right: 15px;
+                top: 15px;
             }
 
-            .brand-text {
-                font-size: 1.25rem;
-            }
-
-            .info-panel {
-                padding: 1rem;
-            }
-
-            .booking-card {
-                padding: 1rem;
+            .eta-time {
+                font-size: 1.6rem;
             }
 
             .stats-grid {
@@ -385,412 +441,24 @@
                 padding: 0.75rem;
             }
 
-            .stat-value {
-                font-size: 1.25rem;
-            }
-
-            .customer-info {
+            .service-details {
                 grid-template-columns: 1fr;
-                gap: 0.75rem;
                 text-align: center;
+                gap: 0.75rem;
             }
 
             .car-image {
                 justify-self: center;
-            }
-        }
-
-        .refresh-button {
-            position: fixed;
-            bottom: 100px;
-            right: 20px;
-            width: 56px;
-            height: 56px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            font-size: 1.2rem;
-            cursor: pointer;
-            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
-            transition: all 0.3s ease;
-            z-index: 100;
-        }
-
-        .refresh-button:hover {
-            transform: scale(1.1);
-        }
-
-        .refresh-button.spinning {
-            animation: spin 1s linear infinite;
-        }
-
-        .debug-panel {
-            position: fixed;
-            top: 80px;
-            right: -300px;
-            width: 300px;
-            height: calc(100vh - 80px);
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-left: 1px solid #e2e8f0;
-            padding: 1rem;
-            transition: right 0.3s ease;
-            z-index: 200;
-            overflow-y: auto;
-        }
-
-        .debug-panel.open {
-            right: 0;
-        }
-
-        .debug-toggle {
-            position: fixed;
-            top: 100px;
-            right: 20px;
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, #f59e0b, #d97706);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            font-size: 0.9rem;
-            cursor: pointer;
-            z-index: 201;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .debug-section {
-            margin-bottom: 1rem;
-        }
-
-        .debug-title {
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: #1e293b;
-            margin-bottom: 0.5rem;
-        }
-
-        .debug-content {
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 6px;
-            padding: 0.5rem;
-            font-size: 0.75rem;
-            font-family: monospace;
-            color: #64748b;
-            max-height: 100px;
-            overflow-y: auto;
-        }
-
-        .debug-status {
-            display: inline-block;
-            padding: 0.125rem 0.5rem;
-            border-radius: 12px;
-            font-size: 0.75rem;
-            font-weight: 500;
-        }
-
-        .debug-status.success {
-            background: #dcfce7;
-            color: #166534;
-        }
-
-        .debug-status.error {
-            background: #fef2f2;
-            color: #dc2626;
-        }
-
-        .debug-status.warning {
-            background: #fef3c7;
-            color: #d97706;
-        }
-
-        /* Custom Map UI Styles */
-        .map-overlay {
-            position: absolute;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 12px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            z-index: 10;
-        }
-
-        .route-info-overlay {
-            top: 20px;
-            left: 20px;
-            padding: 1rem 1.5rem;
-            max-width: 300px;
-        }
-
-        .eta-display {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 0.75rem;
-        }
-
-        .eta-time {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #10b981;
-        }
-
-        .eta-label {
-            font-size: 0.875rem;
-            color: #64748b;
-            font-weight: 500;
-        }
-
-        .route-stats {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 0.75rem;
-            margin-top: 0.75rem;
-        }
-
-        .route-stat {
-            text-align: center;
-        }
-
-        .route-stat-value {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #1e293b;
-        }
-
-        .route-stat-label {
-            font-size: 0.75rem;
-            color: #64748b;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-top: 0.25rem;
-        }
-
-        .mechanic-status-overlay {
-            top: 20px;
-            right: 20px;
-            padding: 1rem;
-            min-width: 200px;
-        }
-
-        .mechanic-status-header {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            margin-bottom: 0.75rem;
-        }
-
-        .status-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #10b981, #059669);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 600;
-            font-size: 1.1rem;
-        }
-
-        .status-info h4 {
-            margin: 0;
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: #1e293b;
-        }
-
-        .status-info p {
-            margin: 0;
-            font-size: 0.75rem;
-            color: #64748b;
-        }
-
-        .live-status {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 0.75rem;
-            color: #10b981;
-            font-weight: 500;
-        }
-
-        .live-dot {
-            width: 6px;
-            height: 6px;
-            background: #10b981;
-            border-radius: 50%;
-            animation: pulse 2s infinite;
-        }
-
-        .progress-overlay {
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 0.75rem 1.5rem;
-        }
-
-        .progress-content {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .progress-bar {
-            width: 200px;
-            height: 6px;
-            background: #e2e8f0;
-            border-radius: 3px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #10b981, #059669);
-            border-radius: 3px;
-            transition: width 0.3s ease;
-            width: 0%;
-        }
-
-        .progress-text {
-            font-size: 0.875rem;
-            font-weight: 500;
-            color: #1e293b;
-            white-space: nowrap;
-        }
-
-        /* Custom Marker Styles */
-        .custom-marker {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            font-family: 'Inter', sans-serif;
-        }
-
-        .marker-pin {
-            width: 40px;
-            height: 40px;
-            border-radius: 50% 50% 50% 0;
-            transform: rotate(-45deg);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1.2rem;
-            font-weight: 600;
-            position: relative;
-        }
-
-        .mechanic-pin {
-            background: linear-gradient(135deg, #10b981, #059669);
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
-        }
-
-        .customer-pin {
-            background: linear-gradient(135deg, #ef4444, #dc2626);
-            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
-        }
-
-        .marker-label {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 0.25rem 0.75rem;
-            border-radius: 12px;
-            font-size: 0.75rem;
-            font-weight: 500;
-            margin-top: 0.5rem;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            white-space: nowrap;
-        }
-
-        /* Route Animation */
-        @keyframes route-dash {
-            0% {
-                stroke-dashoffset: 0;
-            }
-            100% {
-                stroke-dashoffset: -40;
-            }
-        }
-
-        /* Info Window Styles */
-        .custom-info-window {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
-            border: none;
-            padding: 0;
-            overflow: hidden;
-            font-family: 'Inter', sans-serif;
-        }
-
-        .info-header {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            padding: 0.75rem 1rem;
-            font-weight: 600;
-            font-size: 0.9rem;
-        }
-
-        .info-content {
-            padding: 1rem;
-        }
-
-        .info-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 0.5rem;
-            font-size: 0.875rem;
-        }
-
-        .info-label {
-            color: #64748b;
-            font-weight: 500;
-        }
-
-        .info-value {
-            color: #1e293b;
-            font-weight: 600;
-        }
-
-        .geofence-label {
-            position: absolute;
-            background: rgba(239, 68, 68, 0.9);
-            color: white;
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 500;
-            pointer-events: none;
-            z-index: 1000;
-        }
-
-        @media (max-width: 768px) {
-            .route-info-overlay {
-                left: 10px;
-                right: 10px;
-                max-width: none;
+                width: 100px;
+                height: 75px;
             }
 
-            .mechanic-status-overlay {
-                right: 10px;
-                left: 10px;
-                top: auto;
-                bottom: 180px;
+            .header {
+                padding: 1rem;
             }
 
-            .progress-overlay {
-                left: 10px;
-                right: 10px;
-                transform: none;
-                bottom: 120px;
-            }
-
-            .progress-bar {
-                width: 150px;
+            .info-panel {
+                padding: 1rem;
             }
         }
     </style>
@@ -798,139 +466,84 @@
 <body>
     <div class="loading" id="loading">
         <div class="loading-spinner"></div>
-        <div class="loading-text">Loading live tracking...</div>
+        <div class="loading-text">Loading your mechanic's location...</div>
     </div>
 
-    <header class="header">
-        <div class="header-content">
-            <div class="brand">
-                <div class="brand-logo">
-                    <i class="fas fa-wrench"></i>
-                </div>
-                <div class="brand-text">Instant Mechanic</div>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-icon">
+                <i class="fas fa-wrench"></i>
             </div>
-            <div class="tracking-info">
-                <div class="status-indicator"></div>
-                <span>Live Tracking Active</span>
+            <div class="header-content">
+                <h1>Your Mechanic is On the Way</h1>
+                <p>
+                    <span class="live-dot"></span>
+                    Live tracking active
+                </p>
             </div>
-        </div>
-    </header>
+        </header>
 
-    <div class="main-container">
-        <div class="map-container">
+        <!-- Map Section -->
+        <div class="map-section">
             <div id="map"></div>
             
-            <!-- Route Information Overlay -->
-            <div class="map-overlay route-info-overlay" id="routeInfoOverlay">
-                <div class="eta-display">
-                    <div class="eta-time" id="mapEta">--</div>
-                    <div class="eta-label">Minutes Away</div>
-                </div>
-                <div class="route-stats">
-                    <div class="route-stat">
-                        <div class="route-stat-value" id="mapDistance">--</div>
-                        <div class="route-stat-label">Distance</div>
+            <!-- ETA Overlay -->
+            <div class="eta-overlay" id="etaOverlay">
+                <div class="eta-content">
+                    <div class="eta-main">
+                        <div class="eta-time" id="etaTime">--</div>
+                        <div class="eta-label">min away</div>
                     </div>
-                    <div class="route-stat">
-                        <div class="route-stat-value" id="mapSpeed">--</div>
-                        <div class="route-stat-label">Speed</div>
-                    </div>
+                    <div class="eta-distance" id="etaDistance">-- km</div>
                 </div>
             </div>
 
-            <!-- Mechanic Status Overlay -->
-            <div class="map-overlay mechanic-status-overlay" id="mechanicStatusOverlay">
-                <div class="mechanic-status-header">
-                    <div class="status-avatar" id="statusAvatar">M</div>
-                    <div class="status-info">
-                        <h4 id="statusMechanicName">Loading...</h4>
-                        <p id="statusPhone">--</p>
-                    </div>
-                </div>
-                <div class="live-status">
-                    <div class="live-dot"></div>
-                    <span id="liveStatusText">Connecting...</span>
-                </div>
-            </div>
-
-            <!-- Progress Overlay -->
-            <div class="map-overlay progress-overlay" id="progressOverlay">
-                <div class="progress-content">
-                    <div class="progress-text" id="progressText">Calculating route...</div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="progressFill"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="info-panel">
-            <div class="booking-card" id="booking-card">
-                <!-- Booking info will be populated here -->
-            </div>
-
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-value" id="distance">--</div>
-                    <div class="stat-label">Distance</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="eta">--</div>
-                    <div class="stat-label">ETA</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="speed">--</div>
-                    <div class="stat-label">Speed</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="status">--</div>
-                    <div class="stat-label">Status</div>
-                </div>
-            </div>
-
-            <div class="mechanic-card" id="mechanic-card">
-                <!-- Mechanic info will be populated here -->
-            </div>
-        </div>
-    </div>
-
-    <button class="refresh-button" id="refreshBtn" onclick="refreshData()">
-        <i class="fas fa-sync"></i>
-    </button>
-
-    <button class="debug-toggle" id="debugToggle" onclick="toggleDebug()">
-        <i class="fas fa-bug"></i>
-    </button>
-
-    <div class="debug-panel" id="debugPanel">
-        <div class="debug-section">
-            <div class="debug-title">Authentication Status</div>
-            <div id="authStatus" class="debug-status warning">Not Connected</div>
-        </div>
-        
-        <div class="debug-section">
-            <div class="debug-title">API Configuration</div>
-            <div class="debug-content">
-                <div>Traccar: <span id="traccarUrl">${CONFIG.traccar.baseUrl}</span></div>
-                <div>Booking: <span id="bookingUrl">${CONFIG.booking.baseUrl}</span></div>
-                <div>Device ID: <span id="debugDeviceId">${deviceId}</span></div>
-            </div>
-        </div>
-
-        <div class="debug-section">
-            <div class="debug-title">Last API Response</div>
-            <div class="debug-content" id="lastResponse">No data yet</div>
-        </div>
-
-        <div class="debug-section">
-            <div class="debug-title">Connection Log</div>
-            <div class="debug-content" id="connectionLog">Initializing...</div>
-        </div>
-
-        <div class="debug-section">
-            <button onclick="testConnection()" style="width: 100%; padding: 0.5rem; background: #667eea; color: white; border: none; border-radius: 6px; font-size: 0.875rem; cursor: pointer;">
-                Test Connection
+            <!-- Refresh Button -->
+            <button class="refresh-btn" id="refreshBtn" onclick="refreshData()">
+                <i class="fas fa-sync"></i>
             </button>
+        </div>
+
+        <!-- Bottom Info Panel -->
+        <div class="info-panel">
+            <!-- Booking Header -->
+            <div class="booking-header">
+                <div class="booking-id" id="bookingId">Loading...</div>
+                <div class="booking-status" id="bookingStatus">--</div>
+            </div>
+
+            <!-- Service Details -->
+            <div class="service-details" id="serviceDetails">
+                <!-- Content will be populated by JavaScript -->
+            </div>
+
+            <!-- Stats -->
+            <div class="stats-section">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="statDistance">--</div>
+                        <div class="stat-label">Distance</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statSpeed">--</div>
+                        <div class="stat-label">Speed</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statEta">--</div>
+                        <div class="stat-label">ETA</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statStatus">--</div>
+                        <div class="stat-label">Status</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mechanic Details -->
+            <div class="mechanic-section" id="mechanicSection">
+                <!-- Content will be populated by JavaScript -->
+            </div>
         </div>
     </div>
 
@@ -938,7 +551,7 @@
 
     <script>
         // ===========================================
-        // CONFIGURATION - Update credentials here
+        // CONFIGURATION
         // ===========================================
         const CONFIG = {
             traccar: {
@@ -948,12 +561,12 @@
             },
             booking: {
                 baseUrl: 'https://ai.instantmechanic.online'
-            },
-            googleMaps: {
-                apiKey: 'AIzaSyAhQ7pefYjHolK8tjYqgdSZ7XXZSUaglp4'
             }
         };
 
+        // ===========================================
+        // GLOBAL VARIABLES
+        // ===========================================
         let map;
         let mechanicMarker;
         let customerMarker;
@@ -965,58 +578,52 @@
         let isTracking = true;
         let traccarSessionEstablished = false;
         let routeData = null;
-        let geofenceLabel = null;
-        let mechanicInfoWindow = null;
-        let customerInfoWindow = null;
         
         // URL parameters
         const urlParams = new URLSearchParams(window.location.search);
         const bookingId = urlParams.get('booking') || '18332';
         const deviceId = urlParams.get('device') || '1';
-        
-        // Initialize map
+
+        // ===========================================
+        // MAP INITIALIZATION
+        // ===========================================
         function initMap() {
             map = new google.maps.Map(document.getElementById('map'), {
                 zoom: 13,
                 center: { lat: 28.4354417, lng: 77.0349183 },
                 styles: [
                     {
-                        "featureType": "poi",
-                        "elementType": "labels",
+                        "featureType": "poi.business",
                         "stylers": [{"visibility": "off"}]
                     },
                     {
-                        "featureType": "transit",
-                        "elementType": "labels",
+                        "featureType": "poi.park",
+                        "elementType": "labels.text",
                         "stylers": [{"visibility": "off"}]
                     },
                     {
                         "featureType": "road",
                         "elementType": "geometry",
-                        "stylers": [{"color": "#f5f5f5"}]
+                        "stylers": [{"color": "#ffffff"}]
                     },
                     {
                         "featureType": "road.highway",
                         "elementType": "geometry",
-                        "stylers": [{"color": "#ffffff"}]
+                        "stylers": [{"color": "#dadada"}]
                     },
                     {
                         "featureType": "water",
-                        "elementType": "geometry",
-                        "stylers": [{"color": "#c9c9c9"}]
+                        "stylers": [{"color": "#46bcec"}]
                     },
                     {
-                        "featureType": "landscape",
-                        "elementType": "geometry",
-                        "stylers": [{"color": "#f0f0f0"}]
+                        "featureType": "transit",
+                        "stylers": [{"visibility": "off"}]
                     }
                 ],
-                mapTypeControl: false,
-                streetViewControl: false,
-                fullscreenControl: false,
+                disableDefaultUI: true,
                 zoomControl: true,
                 zoomControlOptions: {
-                    position: google.maps.ControlPosition.RIGHT_BOTTOM
+                    position: google.maps.ControlPosition.LEFT_BOTTOM
                 }
             });
 
@@ -1026,42 +633,58 @@
                 preserveViewport: false,
                 polylineOptions: {
                     strokeColor: '#667eea',
-                    strokeWeight: 6,
-                    strokeOpacity: 0.8,
-                    icons: [{
-                        icon: {
-                            path: 'M 0,-1 0,1',
-                            strokeOpacity: 1,
-                            strokeWeight: 2,
-                            strokeColor: '#ffffff',
-                            scale: 2
-                        },
-                        offset: '0',
-                        repeat: '20px'
-                    }]
+                    strokeWeight: 5,
+                    strokeOpacity: 0.8
                 }
             });
             directionsRenderer.setMap(map);
 
-            // Load initial data
+            // Load data
             loadBookingData();
             loadMechanicLocation();
-            
-            // Initialize debug panel
-            document.getElementById('traccarUrl').textContent = CONFIG.traccar.baseUrl;
-            document.getElementById('bookingUrl').textContent = CONFIG.booking.baseUrl;
-            document.getElementById('debugDeviceId').textContent = deviceId;
-            logConnection('System initialized');
             
             // Set up periodic updates
             setInterval(() => {
                 if (isTracking) {
                     loadMechanicLocation();
                 }
-            }, 10000); // Update every 10 seconds
+            }, 10000);
         }
 
-        // Load booking data
+        // ===========================================
+        // AUTHENTICATION
+        // ===========================================
+        async function authenticateTraccar() {
+            try {
+                const response = await fetch(`${CONFIG.traccar.baseUrl}/api/session`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'Accept': 'application/json'
+                    },
+                    credentials: 'include',
+                    body: new URLSearchParams({
+                        'email': CONFIG.traccar.email,
+                        'password': CONFIG.traccar.password
+                    })
+                });
+
+                if (response.ok) {
+                    traccarSessionEstablished = true;
+                    return true;
+                } else {
+                    showError('Authentication failed. Please check credentials.');
+                    return false;
+                }
+            } catch (error) {
+                showError('Unable to connect to tracking server');
+                return false;
+            }
+        }
+
+        // ===========================================
+        // DATA LOADING
+        // ===========================================
         async function loadBookingData() {
             try {
                 const response = await fetch(`${CONFIG.booking.baseUrl}/bot/api/bookings/${bookingId}/`, {
@@ -1081,68 +704,20 @@
                     throw new Error(`Failed to load booking data: ${response.status}`);
                 }
             } catch (error) {
-                console.error('Error loading booking:', error);
                 showError('Failed to load booking information');
             }
         }
 
-        // Authenticate with Traccar
-        async function authenticateTraccar() {
-            try {
-                logConnection('Attempting authentication...');
-                updateDebugStatus('Connecting...', 'warning');
-                
-                const response = await fetch(`${CONFIG.traccar.baseUrl}/api/session`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                        'Accept': 'application/json'
-                    },
-                    credentials: 'include', // Important for session cookies
-                    body: new URLSearchParams({
-                        'email': CONFIG.traccar.email,
-                        'password': CONFIG.traccar.password
-                    })
-                });
-
-                if (response.ok) {
-                    traccarSessionEstablished = true;
-                    updateDebugStatus('Authenticated', 'success');
-                    logConnection('✅ Session established successfully');
-                    console.log('Traccar session authenticated successfully');
-                    return true;
-                } else {
-                    const errorText = await response.text();
-                    updateDebugStatus('Auth Failed', 'error');
-                    logConnection(`❌ Auth failed: ${response.status} - ${errorText}`);
-                    console.error('Traccar authentication failed:', response.status, errorText);
-                    showError('Authentication failed. Please check credentials.');
-                    return false;
-                }
-            } catch (error) {
-                updateDebugStatus('Connection Error', 'error');
-                logConnection(`❌ Connection error: ${error.message}`);
-                console.error('Error authenticating with Traccar:', error);
-                showError('Unable to connect to tracking server');
-                return false;
-            }
-        }
-
-        // Load mechanic location
         async function loadMechanicLocation() {
             try {
-                // Ensure we have an authenticated session
                 if (!traccarSessionEstablished) {
                     const authSuccess = await authenticateTraccar();
-                    if (!authSuccess) {
-                        throw new Error('Failed to authenticate with Traccar');
-                    }
+                    if (!authSuccess) return;
                 }
 
-                logConnection('Fetching mechanic location...');
                 const response = await fetch(`${CONFIG.traccar.baseUrl}/api/positions?deviceId=${deviceId}`, {
                     method: 'GET',
-                    credentials: 'include', // Include session cookies
+                    credentials: 'include',
                     headers: {
                         'Accept': 'application/json',
                         'Content-Type': 'application/json'
@@ -1151,60 +726,96 @@
                 
                 if (response.ok) {
                     const positions = await response.json();
-                    updateLastResponse(positions);
-                    
                     if (positions.length > 0) {
                         mechanicData = positions[0];
                         updateMechanicMarker();
                         updateStats();
                         calculateRoute();
-                        logConnection(`✅ Location updated: ${mechanicData.latitude.toFixed(6)}, ${mechanicData.longitude.toFixed(6)}`);
-                    } else {
-                        logConnection('⚠️ No position data available');
                     }
                 } else if (response.status === 401) {
-                    // Session expired, re-authenticate
                     traccarSessionEstablished = false;
-                    logConnection('🔄 Session expired, re-authenticating...');
-                    updateDebugStatus('Re-authenticating...', 'warning');
-                    console.log('Session expired, re-authenticating...');
                     const authSuccess = await authenticateTraccar();
                     if (authSuccess) {
-                        // Retry the request
                         return loadMechanicLocation();
-                    } else {
-                        throw new Error('Failed to re-authenticate with Traccar');
                     }
-                } else {
-                    const errorText = await response.text();
-                    logConnection(`❌ API Error: ${response.status} - ${errorText}`);
-                    throw new Error(`Failed to load mechanic location: ${response.status}`);
                 }
             } catch (error) {
                 console.error('Error loading mechanic location:', error);
-                logConnection(`❌ Error: ${error.message}`);
-                showError('Failed to load mechanic location. Please check your connection.');
+                showError('Failed to load mechanic location');
             } finally {
                 document.getElementById('loading').style.display = 'none';
             }
         }
 
-        // Setup customer location
+        // ===========================================
+        // UI UPDATES
+        // ===========================================
+        function updateBookingUI() {
+            // Update booking header
+            document.getElementById('bookingId').textContent = `Booking #${bookingData.id}`;
+            document.getElementById('bookingStatus').textContent = bookingData.booking_status || 'PENDING';
+
+            // Update service details
+            const serviceDetails = document.getElementById('serviceDetails');
+            serviceDetails.innerHTML = `
+                <img src="${bookingData.car_image}" alt="Car" class="car-image">
+                <div class="service-info">
+                    <h3>${bookingData.car}</h3>
+                    <div class="service-meta">
+                        <div class="meta-item">
+                            <i class="fas fa-tools"></i>
+                            <span>${bookingData.problem}</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-rupee-sign"></i>
+                            <span class="price-highlight">${bookingData.price}</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-phone"></i>
+                            <span>${bookingData.customer_mobile}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Update mechanic section
+            const mechanicSection = document.getElementById('mechanicSection');
+            mechanicSection.innerHTML = `
+                <div class="mechanic-header">
+                    <div class="mechanic-avatar">
+                        ${bookingData.mechanic_name ? bookingData.mechanic_name.charAt(0).toUpperCase() : 'M'}
+                    </div>
+                    <div class="mechanic-info">
+                        <h4>${bookingData.mechanic_name || 'Mechanic'}</h4>
+                        <div class="mechanic-phone">
+                            <i class="fas fa-phone"></i>
+                            <span>${bookingData.agent_mobile}</span>
+                        </div>
+                        <div class="mechanic-status status-moving" id="mechanicStatus">
+                            <i class="fas fa-circle"></i>
+                            <span>Connecting...</span>
+                        </div>
+                    </div>
+                </div>
+                <button class="call-button" onclick="callMechanic('${bookingData.agent_mobile}')">
+                    <i class="fas fa-phone"></i>
+                    Call ${bookingData.mechanic_name || 'Mechanic'}
+                </button>
+            `;
+        }
+
         function setupCustomerLocation() {
             if (bookingData.location) {
-                // Parse Google Maps URL to get coordinates
                 const urlMatch = bookingData.location.match(/q=(-?\d+\.?\d*),(-?\d+\.?\d*)/);
                 if (urlMatch) {
                     const customerLat = parseFloat(urlMatch[1]);
                     const customerLng = parseFloat(urlMatch[2]);
-                    
                     const customerLocation = { lat: customerLat, lng: customerLng };
                     
-                    // Create enhanced customer marker
                     customerMarker = new google.maps.Marker({
                         position: customerLocation,
                         map: map,
-                        title: 'Customer Location',
+                        title: 'Your Location',
                         icon: {
                             path: "m12,0c-4.4,0-8,3.6-8,8 0,5.4 7.9,16 7.9,16 0.1,0.1 0.1,0.1 0.2,0 0,0 7.9-10.6 7.9-16 0-4.4-3.6-8-8-8z",
                             fillColor: '#ef4444',
@@ -1216,80 +827,22 @@
                         }
                     });
 
-                    // Create enhanced geofence circle (300m radius)
                     geofenceCircle = new google.maps.Circle({
                         strokeColor: '#ef4444',
                         strokeOpacity: 0.8,
-                        strokeWeight: 3,
+                        strokeWeight: 2,
                         fillColor: '#ef4444',
-                        fillOpacity: 0.15,
+                        fillOpacity: 0.1,
                         map: map,
                         center: customerLocation,
                         radius: 300
                     });
 
-                    // Add geofence label
-                    geofenceLabel = new google.maps.InfoWindow({
-                        content: '<div style="background: rgba(239, 68, 68, 0.9); color: white; padding: 0.5rem 0.75rem; border-radius: 20px; font-size: 0.75rem; font-weight: 500; text-align: center; font-family: Inter, sans-serif;">300m Service Zone</div>',
-                        position: {
-                            lat: customerLat + 0.002,
-                            lng: customerLng
-                        },
-                        disableAutoPan: true
-                    });
-                    geofenceLabel.open(map);
-
-                    // Create custom info window for customer
-                    customerInfoWindow = new google.maps.InfoWindow({
-                        content: createCustomerInfoContent(),
-                        disableAutoPan: false
-                    });
-
-                    customerMarker.addListener('click', () => {
-                        if (mechanicInfoWindow) mechanicInfoWindow.close();
-                        customerInfoWindow.open(map, customerMarker);
-                    });
-
-                    // Center map on customer location initially
                     map.setCenter(customerLocation);
                 }
             }
         }
 
-        // Create custom info window content for customer
-        function createCustomerInfoContent() {
-            return `
-                <div class="custom-info-window">
-                    <div class="info-header">
-                        <i class="fas fa-map-marker-alt"></i> Customer Location
-                    </div>
-                    <div class="info-content">
-                        <div class="info-row">
-                            <span class="info-label">Car:</span>
-                            <span class="info-value">${bookingData.car || 'N/A'}</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Problem:</span>
-                            <span class="info-value">${bookingData.problem || 'N/A'}</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Price:</span>
-                            <span class="info-value">${bookingData.price || 'N/A'}</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Phone:</span>
-                            <span class="info-value">
-                                <a href="tel:${bookingData.customer_mobile}" style="color: #667eea; text-decoration: none;">
-                                    ${bookingData.customer_mobile || 'N/A'}
-                                </a>
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        // Update mechanic marker
         function updateMechanicMarker() {
             const mechanicLocation = {
                 lat: mechanicData.latitude,
@@ -1309,105 +862,42 @@
                         strokeWeight: 3,
                         scale: 2,
                         anchor: new google.maps.Point(12, 32)
-                    },
-                    animation: google.maps.Animation.DROP
-                });
-
-                // Create enhanced info window for mechanic
-                mechanicInfoWindow = new google.maps.InfoWindow({
-                    content: createMechanicInfoContent(),
-                    disableAutoPan: false
-                });
-
-                mechanicMarker.addListener('click', () => {
-                    if (customerInfoWindow) customerInfoWindow.close();
-                    mechanicInfoWindow.setContent(createMechanicInfoContent());
-                    mechanicInfoWindow.open(map, mechanicMarker);
+                    }
                 });
             } else {
                 mechanicMarker.setPosition(mechanicLocation);
-                // Update info window content if it's open
-                if (mechanicInfoWindow.getMap()) {
-                    mechanicInfoWindow.setContent(createMechanicInfoContent());
-                }
             }
 
-            // Update map overlays
-            updateMapOverlays();
+            // Update status
+            updateMechanicStatus();
         }
 
-        // Create custom info window content for mechanic
-        function createMechanicInfoContent() {
-            const lastUpdate = new Date(mechanicData.serverTime).toLocaleTimeString();
+        function updateMechanicStatus() {
+            const statusElement = document.getElementById('mechanicStatus');
+            if (!statusElement) return;
+
             const isMoving = mechanicData.attributes.motion;
             const currentSpeed = Math.round(mechanicData.speed || 0);
             
-            return `
-                <div class="custom-info-window">
-                    <div class="info-header">
-                        <i class="fas fa-wrench"></i> ${bookingData.mechanic_name || 'Mechanic'}
-                    </div>
-                    <div class="info-content">
-                        <div class="info-row">
-                            <span class="info-label">Status:</span>
-                            <span class="info-value" style="color: ${isMoving ? '#10b981' : '#f59e0b'}">
-                                ${isMoving ? 'Moving' : 'Stopped'}
-                            </span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Speed:</span>
-                            <span class="info-value">${currentSpeed} km/h</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Phone:</span>
-                            <span class="info-value">
-                                <a href="tel:${bookingData.agent_mobile}" style="color: #667eea; text-decoration: none;">
-                                    ${bookingData.agent_mobile || 'N/A'}
-                                </a>
-                            </span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Updated:</span>
-                            <span class="info-value">${lastUpdate}</span>
-                        </div>
-                        <div style="margin-top: 0.75rem; text-align: center;">
-                            <button onclick="callMechanic('${bookingData.agent_mobile}')" 
-                                    style="background: #10b981; color: white; border: none; padding: 0.5rem 1rem; 
-                                           border-radius: 6px; cursor: pointer; font-size: 0.875rem;">
-                                <i class="fas fa-phone"></i> Call Now
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        // Update map overlays with real-time information
-        function updateMapOverlays() {
-            if (!mechanicData || !bookingData) return;
-
-            // Update mechanic status overlay
-            const statusAvatar = document.getElementById('statusAvatar');
-            const statusMechanicName = document.getElementById('statusMechanicName');
-            const statusPhone = document.getElementById('statusPhone');
-            const liveStatusText = document.getElementById('liveStatusText');
-
-            if (bookingData.mechanic_name) {
-                statusAvatar.textContent = bookingData.mechanic_name.charAt(0).toUpperCase();
-                statusMechanicName.textContent = bookingData.mechanic_name;
+            if (mechanicMarker && customerMarker) {
+                const distance = google.maps.geometry.spherical.computeDistanceBetween(
+                    mechanicMarker.getPosition(),
+                    customerMarker.getPosition()
+                );
+                
+                if (distance <= 300) {
+                    statusElement.className = 'mechanic-status status-arrived';
+                    statusElement.innerHTML = '<i class="fas fa-check-circle"></i><span>Arrived!</span>';
+                } else if (isMoving) {
+                    statusElement.className = 'mechanic-status status-moving';
+                    statusElement.innerHTML = '<i class="fas fa-route"></i><span>On the way</span>';
+                } else {
+                    statusElement.className = 'mechanic-status status-stopped';
+                    statusElement.innerHTML = '<i class="fas fa-pause-circle"></i><span>Stopped</span>';
+                }
             }
-            statusPhone.textContent = bookingData.agent_mobile || '--';
-
-            const isMoving = mechanicData.attributes.motion;
-            liveStatusText.textContent = isMoving ? 'En Route' : 'Stopped';
-            liveStatusText.style.color = isMoving ? '#10b981' : '#f59e0b';
-
-            // Update speed display
-            const currentSpeed = Math.round(mechanicData.speed || 0);
-            document.getElementById('mapSpeed').textContent = `${currentSpeed} km/h`;
         }
 
-        // Calculate and display route
         function calculateRoute() {
             if (mechanicMarker && customerMarker) {
                 const mechanicPos = mechanicMarker.getPosition();
@@ -1427,68 +917,58 @@
                         directionsRenderer.setDirections(result);
                         routeData = result;
 
-                        // Extract route information
                         const route = result.routes[0];
                         const leg = route.legs[0];
+                        updateETA(leg);
                         
-                        // Update map overlays with route data
-                        updateRouteOverlays(leg);
-                        
-                        // Fit bounds to show both markers with padding
+                        // Fit bounds with padding
                         const bounds = new google.maps.LatLngBounds();
                         bounds.extend(mechanicPos);
                         bounds.extend(customerPos);
                         map.fitBounds(bounds, { 
-                            padding: { top: 200, right: 100, bottom: 300, left: 100 }
+                            padding: { top: 120, right: 50, bottom: 400, left: 50 }
                         });
                     } else {
-                        console.error('Directions service failed:', status);
-                        // Fallback to simple distance calculation
                         updateFallbackStats();
                     }
                 });
             }
         }
 
-        // Update route overlays with calculated route data
-        function updateRouteOverlays(leg) {
-            // Update ETA and distance
+        function updateETA(leg) {
             const etaMinutes = Math.round(leg.duration_in_traffic ? 
                 leg.duration_in_traffic.value / 60 : leg.duration.value / 60);
             const distanceText = leg.distance.text;
 
-            document.getElementById('mapEta').textContent = etaMinutes;
-            document.getElementById('mapDistance').textContent = distanceText;
+            document.getElementById('etaTime').textContent = etaMinutes;
+            document.getElementById('etaDistance').textContent = distanceText;
+        }
 
-            // Calculate progress (simplified - based on distance from destination)
+        function updateStats() {
             if (mechanicMarker && customerMarker) {
-                const mechanicPos = mechanicMarker.getPosition();
-                const customerPos = customerMarker.getPosition();
-                const currentDistance = google.maps.geometry.spherical.computeDistanceBetween(
-                    mechanicPos, customerPos
+                const distance = google.maps.geometry.spherical.computeDistanceBetween(
+                    mechanicMarker.getPosition(),
+                    customerMarker.getPosition()
                 );
                 
-                // Determine if mechanic has arrived (within 300m geofence)
-                const hasArrived = currentDistance <= 300;
-                let progress = 0;
+                const distanceKm = (distance / 1000).toFixed(1);
+                const currentSpeed = Math.round(mechanicData.speed || 0);
+                const etaMinutes = Math.round((distanceKm / Math.max(currentSpeed, 20)) * 60);
                 
-                if (hasArrived) {
-                    progress = 100;
-                    document.getElementById('progressText').textContent = 'Mechanic Arrived!';
-                    document.getElementById('progressText').style.color = '#10b981';
-                } else {
-                    // Simple progress calculation (this could be enhanced with route tracking)
-                    const totalDistance = leg.distance.value; // in meters
-                    progress = Math.max(0, Math.min(95, ((totalDistance - currentDistance) / totalDistance) * 100));
-                    document.getElementById('progressText').textContent = `${etaMinutes} min away`;
-                    document.getElementById('progressText').style.color = '#1e293b';
+                document.getElementById('statDistance').textContent = `${distanceKm} km`;
+                document.getElementById('statSpeed').textContent = `${currentSpeed} km/h`;
+                document.getElementById('statEta').textContent = `${etaMinutes} min`;
+
+                let status = 'En Route';
+                if (distance <= 300) {
+                    status = 'Arrived';
+                } else if (!mechanicData.attributes.motion) {
+                    status = 'Stopped';
                 }
-                
-                document.getElementById('progressFill').style.width = `${progress}%`;
+                document.getElementById('statStatus').textContent = status;
             }
         }
 
-        // Fallback stats when directions service fails
         function updateFallbackStats() {
             if (mechanicMarker && customerMarker) {
                 const distance = google.maps.geometry.spherical.computeDistanceBetween(
@@ -1497,179 +977,16 @@
                 );
                 
                 const distanceKm = (distance / 1000).toFixed(1);
-                const etaMinutes = Math.round((distanceKm / 30) * 60); // Assume 30 km/h avg speed
+                const etaMinutes = Math.round((distanceKm / 30) * 60);
                 
-                document.getElementById('mapEta').textContent = etaMinutes;
-                document.getElementById('mapDistance').textContent = `${distanceKm} km`;
-                
-                const progress = distance <= 300 ? 100 : 0;
-                document.getElementById('progressFill').style.width = `${progress}%`;
-                document.getElementById('progressText').textContent = 
-                    distance <= 300 ? 'Arrived!' : `${etaMinutes} min away`;
+                document.getElementById('etaTime').textContent = etaMinutes;
+                document.getElementById('etaDistance').textContent = `${distanceKm} km`;
             }
         }
 
-        // Update booking UI
-        function updateBookingUI() {
-            const bookingCard = document.getElementById('booking-card');
-            bookingCard.innerHTML = `
-                <div class="booking-header">
-                    <div class="booking-id">Booking #${bookingData.id}</div>
-                    <div class="booking-status">${bookingData.booking_status}</div>
-                </div>
-                <div class="customer-info">
-                    <img src="${bookingData.car_image}" alt="Car" class="car-image">
-                    <div class="customer-details">
-                        <h3>${bookingData.car}</h3>
-                        <div class="detail-row">
-                            <i class="fas fa-tools"></i>
-                            <span>${bookingData.problem}</span>
-                        </div>
-                        <div class="detail-row">
-                            <i class="fas fa-rupee-sign"></i>
-                            <span>${bookingData.price}</span>
-                        </div>
-                        <div class="detail-row">
-                            <i class="fas fa-phone"></i>
-                            <span>${bookingData.customer_mobile}</span>
-                        </div>
-                    </div>
-                </div>
-            `;
-
-            const mechanicCard = document.getElementById('mechanic-card');
-            mechanicCard.innerHTML = `
-                <div class="mechanic-header">
-                    <div class="mechanic-avatar">
-                        ${bookingData.mechanic_name ? bookingData.mechanic_name.charAt(0).toUpperCase() : 'M'}
-                    </div>
-                    <div class="mechanic-info">
-                        <h4>${bookingData.mechanic_name || 'Mechanic'}</h4>
-                        <div class="mechanic-phone">
-                            <i class="fas fa-phone"></i>
-                            <span>${bookingData.agent_mobile}</span>
-                        </div>
-                    </div>
-                </div>
-                <button class="call-button" onclick="callMechanic('${bookingData.agent_mobile}')">
-                    <i class="fas fa-phone"></i>
-                    Call Mechanic
-                </button>
-            `;
-        }
-
-        // Update stats (both panel and map overlays)
-        function updateStats() {
-            if (mechanicMarker && customerMarker) {
-                // Calculate distance
-                const distance = google.maps.geometry.spherical.computeDistanceBetween(
-                    mechanicMarker.getPosition(),
-                    customerMarker.getPosition()
-                );
-                
-                const distanceKm = (distance / 1000).toFixed(1);
-                
-                // Update bottom panel stats
-                document.getElementById('distance').textContent = `${distanceKm} km`;
-
-                // Calculate ETA (enhanced with traffic consideration)
-                const avgSpeed = mechanicData.speed > 0 ? Math.max(mechanicData.speed, 20) : 30; // km/h
-                const etaMinutes = Math.round((distanceKm / avgSpeed) * 60);
-                document.getElementById('eta').textContent = `${etaMinutes} min`;
-
-                // Current speed
-                const currentSpeed = Math.round(mechanicData.speed || 0);
-                document.getElementById('speed').textContent = `${currentSpeed} km/h`;
-
-                // Status based on motion and geofence
-                let status = 'En Route';
-                let statusColor = '#667eea';
-                
-                if (distance <= 300) {
-                    status = 'Arrived';
-                    statusColor = '#10b981';
-                } else if (!mechanicData.attributes.motion) {
-                    status = 'Stopped';
-                    statusColor = '#f59e0b';
-                }
-                
-                const statusElement = document.getElementById('status');
-                statusElement.textContent = status;
-                statusElement.style.color = statusColor;
-
-                // Update map overlays if they exist (fallback for when directions service fails)
-                if (!routeData) {
-                    document.getElementById('mapEta').textContent = etaMinutes;
-                    document.getElementById('mapDistance').textContent = `${distanceKm} km`;
-                    
-                    const progress = distance <= 300 ? 100 : 0;
-                    document.getElementById('progressFill').style.width = `${progress}%`;
-                    document.getElementById('progressText').textContent = 
-                        distance <= 300 ? 'Arrived!' : `${etaMinutes} min away`;
-                }
-            }
-        }
-
-        // Debug functions
-        function toggleDebug() {
-            const panel = document.getElementById('debugPanel');
-            panel.classList.toggle('open');
-        }
-
-        function updateDebugStatus(status, type = 'warning') {
-            const authStatus = document.getElementById('authStatus');
-            authStatus.textContent = status;
-            authStatus.className = `debug-status ${type}`;
-        }
-
-        function logConnection(message) {
-            const log = document.getElementById('connectionLog');
-            const timestamp = new Date().toLocaleTimeString();
-            log.innerHTML = `[${timestamp}] ${message}<br>` + log.innerHTML;
-            if (log.innerHTML.split('<br>').length > 10) {
-                log.innerHTML = log.innerHTML.split('<br>').slice(0, 10).join('<br>');
-            }
-        }
-
-        function updateLastResponse(data) {
-            const responseElement = document.getElementById('lastResponse');
-            responseElement.textContent = JSON.stringify(data, null, 2);
-        }
-
-        async function testConnection() {
-            logConnection('Testing connection...');
-            updateDebugStatus('Testing...', 'warning');
-            
-            try {
-                const authSuccess = await authenticateTraccar();
-                if (authSuccess) {
-                    updateDebugStatus('Connected', 'success');
-                    logConnection('✅ Authentication successful');
-                    
-                    // Test position fetch
-                    const positionTest = await fetch(`${CONFIG.traccar.baseUrl}/api/positions?deviceId=${deviceId}`, {
-                        credentials: 'include',
-                        headers: { 'Accept': 'application/json' }
-                    });
-                    
-                    if (positionTest.ok) {
-                        const positions = await positionTest.json();
-                        updateLastResponse(positions);
-                        logConnection(`✅ Position data received: ${positions.length} devices`);
-                    } else {
-                        logConnection(`❌ Position fetch failed: ${positionTest.status}`);
-                    }
-                } else {
-                    updateDebugStatus('Failed', 'error');
-                    logConnection('❌ Authentication failed');
-                }
-            } catch (error) {
-                updateDebugStatus('Error', 'error');
-                logConnection(`❌ Connection error: ${error.message}`);
-            }
-        }
-
-        // Utility functions
+        // ===========================================
+        // UTILITY FUNCTIONS
+        // ===========================================
         function callMechanic(phoneNumber) {
             window.location.href = `tel:${phoneNumber}`;
         }
@@ -1690,7 +1007,7 @@
 
         function showError(message) {
             const errorDiv = document.createElement('div');
-            errorDiv.className = 'error';
+            errorDiv.className = 'error-message';
             errorDiv.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${message}`;
             document.querySelector('.info-panel').prepend(errorDiv);
             
@@ -1699,17 +1016,14 @@
             }, 5000);
         }
 
-        // Handle page visibility change
+        // ===========================================
+        // EVENT HANDLERS
+        // ===========================================
         document.addEventListener('visibilitychange', () => {
-            if (document.hidden) {
-                isTracking = false;
-            } else {
-                isTracking = true;
-                loadMechanicLocation();
-            }
+            isTracking = !document.hidden;
+            if (isTracking) loadMechanicLocation();
         });
 
-        // Handle window focus
         window.addEventListener('focus', () => {
             isTracking = true;
             loadMechanicLocation();
@@ -1718,68 +1032,6 @@
         window.addEventListener('blur', () => {
             isTracking = false;
         });
-
-        // Map overlay interactions
-        document.addEventListener('DOMContentLoaded', function() {
-            // Make route info overlay clickable to center on route
-            const routeInfoOverlay = document.getElementById('routeInfoOverlay');
-            if (routeInfoOverlay) {
-                routeInfoOverlay.addEventListener('click', () => {
-                    if (mechanicMarker && customerMarker) {
-                        const bounds = new google.maps.LatLngBounds();
-                        bounds.extend(mechanicMarker.getPosition());
-                        bounds.extend(customerMarker.getPosition());
-                        map.fitBounds(bounds, { 
-                            padding: { top: 200, right: 100, bottom: 300, left: 100 }
-                        });
-                    }
-                });
-                routeInfoOverlay.style.cursor = 'pointer';
-                routeInfoOverlay.title = 'Click to center map on route';
-            }
-
-            // Make mechanic status overlay clickable to call
-            const mechanicStatusOverlay = document.getElementById('mechanicStatusOverlay');
-            if (mechanicStatusOverlay) {
-                mechanicStatusOverlay.addEventListener('click', () => {
-                    if (bookingData.agent_mobile) {
-                        callMechanic(bookingData.agent_mobile);
-                    }
-                });
-                mechanicStatusOverlay.style.cursor = 'pointer';
-                mechanicStatusOverlay.title = 'Click to call mechanic';
-            }
-
-            // Progress overlay click to show mechanic marker info
-            const progressOverlay = document.getElementById('progressOverlay');
-            if (progressOverlay) {
-                progressOverlay.addEventListener('click', () => {
-                    if (mechanicMarker && mechanicInfoWindow) {
-                        mechanicInfoWindow.setContent(createMechanicInfoContent());
-                        mechanicInfoWindow.open(map, mechanicMarker);
-                        map.panTo(mechanicMarker.getPosition());
-                    }
-                });
-                progressOverlay.style.cursor = 'pointer';
-                progressOverlay.title = 'Click to view mechanic details';
-            }
-        });
-
-        // Mobile touch handling for better UX
-        let touchStartY = 0;
-        document.addEventListener('touchstart', function(e) {
-            touchStartY = e.touches[0].clientY;
-        });
-
-        document.addEventListener('touchmove', function(e) {
-            const touchY = e.touches[0].clientY;
-            const touchDiff = touchStartY - touchY;
-            
-            // Prevent pull-to-refresh on map container
-            if (e.target.closest('.map-container') && touchDiff < 0) {
-                e.preventDefault();
-            }
-        }, { passive: false });
     </script>
 </body>
 </html>
