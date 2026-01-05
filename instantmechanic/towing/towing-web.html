@@ -59,6 +59,61 @@ function gtag_report_conversion(url) {
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     
     <style>
+
+        /* Sticky Call CTA */
+.sticky-call-cta {
+    position: fixed;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #f97316, #ea580c);
+    color: #ffffff;
+    font-size: 1.25rem;
+    font-weight: 800;
+    padding: 1rem 2rem;
+    border-radius: 9999px;
+    box-shadow: 0 10px 30px rgba(249, 115, 22, 0.5);
+    text-decoration: none;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    animation: pulseCTA 2s infinite;
+}
+
+/* Pulse animation */
+@keyframes pulseCTA {
+    0% {
+        transform: translateX(-50%) scale(1);
+        box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.6);
+    }
+    70% {
+        transform: translateX(-50%) scale(1.05);
+        box-shadow: 0 0 0 18px rgba(249, 115, 22, 0);
+    }
+    100% {
+        transform: translateX(-50%) scale(1);
+        box-shadow: 0 0 0 0 rgba(249, 115, 22, 0);
+    }
+}
+
+/* Mobile Optimization */
+@media (max-width: 768px) {
+    .sticky-call-cta {
+        width: calc(100% - 24px);
+        bottom: 12px;
+        font-size: 1.2rem;
+        padding: 1rem;
+        border-radius: 16px;
+    }
+
+    /* Prevent content hiding behind CTA */
+    body {
+        padding-bottom: 90px;
+    }
+}
+
         * {
             margin: 0;
             padding: 0;
@@ -762,6 +817,14 @@ function gtag_report_conversion(url) {
     </style>
 </head>
 <body>
+
+    <!-- Sticky Call CTA -->
+<a href="tel:+918130377099"
+   class="sticky-call-cta"
+   onclick="return gtag_report_conversion('tel:+918130377099');">
+    📞 Call for Immediate Towing
+</a>
+
 
     <!-- Header -->
     <header>
