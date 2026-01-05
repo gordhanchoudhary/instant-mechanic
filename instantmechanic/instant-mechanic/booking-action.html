@@ -20,14 +20,14 @@
         }
 
         .dashboard-container {
-            max-width: 1400px;
+            max-width: 1600px;
             margin: 0 auto;
             padding: 20px;
         }
 
         .header {
             background: white;
-            padding: 25px;
+            padding: 30px;
             border-radius: 15px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
             margin-bottom: 25px;
@@ -40,11 +40,37 @@
 
         .header h1 {
             color: #2c3e50;
-            font-size: 2.2rem;
+            font-size: 2.4rem;
             font-weight: 700;
             display: flex;
             align-items: center;
             gap: 15px;
+        }
+
+        .header-stats {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .quick-stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #667eea;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 4px;
         }
 
         .date-controls {
@@ -67,6 +93,7 @@
             border-radius: 8px;
             font-size: 16px;
             transition: all 0.3s ease;
+            min-width: 150px;
         }
 
         .date-controls input:focus {
@@ -95,84 +122,14 @@
             box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
         }
 
-        .kpi-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .kpi-card {
-            background: white;
-            padding: 25px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            transition: transform 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .kpi-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .kpi-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-
-        .kpi-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .kpi-title {
-            color: #6c757d;
-            font-size: 14px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .kpi-icon {
-            width: 45px;
-            height: 45px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            color: white;
-        }
-
-        .kpi-value {
-            font-size: 2.5rem;
-            font-weight: 800;
-            color: #2c3e50;
-            margin-bottom: 10px;
-        }
-
-        .kpi-subtitle {
-            color: #6c757d;
-            font-size: 13px;
-            line-height: 1.4;
-        }
-
         .main-content {
             display: grid;
-            grid-template-columns: 2fr 1fr;
+            grid-template-columns: 3fr 2fr;
             gap: 25px;
             margin-bottom: 30px;
         }
 
-        .bookings-section, .performance-section {
+        .actions-section, .mechanics-section {
             background: white;
             border-radius: 15px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
@@ -180,13 +137,18 @@
         }
 
         .section-header {
-            padding: 25px;
+            padding: 25px 30px;
             background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
             border-bottom: 1px solid #dee2e6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
         }
 
         .section-title {
-            font-size: 1.4rem;
+            font-size: 1.5rem;
             font-weight: 700;
             color: #2c3e50;
             display: flex;
@@ -194,11 +156,26 @@
             gap: 12px;
         }
 
-        .filters {
-            padding: 20px 25px;
-            background: #f8f9fa;
+        .section-stats {
             display: flex;
-            gap: 15px;
+            gap: 20px;
+            font-size: 14px;
+            color: #6c757d;
+        }
+
+        .section-stats span {
+            background: white;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-weight: 600;
+        }
+
+        .filters-panel {
+            padding: 20px 30px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            gap: 20px;
             flex-wrap: wrap;
             align-items: center;
         }
@@ -209,289 +186,205 @@
             gap: 8px;
         }
 
-        .filter-select {
+        .filter-group label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 14px;
+        }
+
+        .filter-select, .search-input {
             padding: 8px 12px;
             border: 1px solid #dee2e6;
             border-radius: 6px;
             background: white;
             font-size: 14px;
+            min-width: 150px;
         }
 
-        .bookings-table {
-            overflow-x: auto;
+        .search-input {
+            background: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='%236c757d' viewBox='0 0 16 16'%3e%3cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z'/%3e%3c/svg%3e") no-repeat right 12px center;
+            background-size: 16px;
+            padding-right: 35px;
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
+        .content-area {
+            max-height: 800px;
+            overflow-y: auto;
         }
 
-        th {
-            background: #2c3e50;
-            color: white;
-            padding: 15px 12px;
-            text-align: left;
-            font-weight: 600;
-            font-size: 13px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+        .actions-list {
+            padding: 0;
         }
 
-        td {
-            padding: 15px 12px;
-            border-bottom: 1px solid #dee2e6;
-            vertical-align: top;
+        .action-item {
+            border-bottom: 1px solid #f1f3f4;
+            padding: 25px 30px;
+            transition: all 0.3s ease;
+            position: relative;
         }
 
-        tr:hover {
+        .action-item:hover {
             background: #f8f9fa;
+            transform: translateX(5px);
+        }
+
+        .action-item:last-child {
+            border-bottom: none;
+        }
+
+        .action-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .booking-info {
+            flex: 1;
+            min-width: 300px;
         }
 
         .booking-id {
-            font-weight: 700;
+            font-size: 1.1rem;
+            font-weight: 800;
             color: #667eea;
+            margin-bottom: 8px;
+            cursor: pointer;
         }
 
-        .car-info {
-            font-weight: 600;
+        .booking-id:hover {
+            text-decoration: underline;
+        }
+
+        .car-details {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 8px;
+        }
+
+        .car-name {
+            font-weight: 700;
             color: #2c3e50;
-            margin-bottom: 5px;
+            font-size: 16px;
         }
 
-        .problem-text {
+        .problem-badge {
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .customer-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
             color: #6c757d;
-            font-size: 13px;
+            font-size: 14px;
         }
 
         .customer-mobile {
             font-family: 'Courier New', monospace;
             background: #f8f9fa;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 13px;
-        }
-
-        .actions-list {
-            max-height: 150px;
-            overflow-y: auto;
-        }
-
-        .action-item {
-            background: #f8f9fa;
-            margin-bottom: 8px;
-            padding: 10px;
-            border-radius: 8px;
-            border-left: 4px solid #dee2e6;
-            font-size: 13px;
-        }
-
-        .action-item:last-child {
-            margin-bottom: 0;
-        }
-
-        .action-mechanic {
+            padding: 4px 10px;
+            border-radius: 6px;
             font-weight: 600;
-            color: #2c3e50;
-            margin-bottom: 4px;
         }
 
-        .action-type {
-            display: inline-block;
-            padding: 3px 8px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: 600;
-            text-transform: uppercase;
-            margin-bottom: 4px;
-        }
-
-        .action-accept {
-            background: #d4edda;
-            color: #155724;
-            border-left-color: #28a745;
-        }
-
-        .action-complete {
-            background: #d1ecf1;
-            color: #0c5460;
-            border-left-color: #17a2b8;
-        }
-
-        .action-noaction {
-            background: #fff3cd;
-            color: #856404;
-            border-left-color: #ffc107;
-        }
-
-        .action-customer-denied, .action-cancel {
-            background: #f8d7da;
-            color: #721c24;
-            border-left-color: #dc3545;
-        }
-
-        .action-sub-mechanic-assign {
-            background: #e2e3e5;
-            color: #383d41;
-            border-left-color: #6c757d;
-        }
-
-        .action-time {
+        .booking-time {
             color: #6c757d;
-            font-size: 11px;
-            margin-top: 4px;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
 
-        .action-remarks {
-            color: #495057;
-            font-style: italic;
-            margin-top: 4px;
-            font-size: 12px;
+        .action-timeline {
+            margin-top: 20px;
+            padding-left: 20px;
+            border-left: 3px solid #e9ecef;
+            position: relative;
         }
 
-        .mechanic-performance {
-            padding: 25px;
+        .timeline-item {
+            position: relative;
+            padding: 15px 0;
+            padding-left: 25px;
+            border-bottom: 1px solid #f1f3f4;
         }
 
-        .mechanic-list {
-            max-height: 600px;
-            overflow-y: auto;
+        .timeline-item:last-child {
+            border-bottom: none;
         }
 
-        .mechanic-item {
-            background: #f8f9fa;
-            margin-bottom: 15px;
-            padding: 20px;
-            border-radius: 10px;
-            border-left: 4px solid #dee2e6;
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -8px;
+            top: 20px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #dee2e6;
+        }
+
+        .timeline-item.action-accept::before {
+            background: #28a745;
+        }
+
+        .timeline-item.action-complete::before {
+            background: #17a2b8;
+        }
+
+        .timeline-item.action-noaction::before {
+            background: #ffc107;
+        }
+
+        .timeline-item.action-cancel,
+        .timeline-item.action-customer-denied::before {
+            background: #dc3545;
+        }
+
+        .timeline-item.action-sub-mechanic-assign::before {
+            background: #6c757d;
+        }
+
+        .action-details {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .action-main {
+            flex: 1;
         }
 
         .mechanic-name {
             font-weight: 700;
             color: #2c3e50;
-            font-size: 16px;
-            margin-bottom: 10px;
-        }
-
-        .mechanic-stats {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
-
-        .stat-item {
-            font-size: 13px;
-        }
-
-        .stat-label {
-            color: #6c757d;
-            margin-right: 8px;
-        }
-
-        .stat-value {
-            font-weight: 600;
-            color: #2c3e50;
-        }
-
-        .performance-score {
-            background: white;
-            padding: 10px;
-            border-radius: 8px;
-            text-align: center;
-            margin-top: 10px;
-        }
-
-        .score-label {
-            font-size: 12px;
-            color: #6c757d;
-            margin-bottom: 5px;
-        }
-
-        .score-value {
-            font-size: 24px;
-            font-weight: 800;
-        }
-
-        .score-excellent {
-            color: #28a745;
-        }
-
-        .score-good {
-            color: #17a2b8;
-        }
-
-        .score-average {
-            color: #ffc107;
-        }
-
-        .score-poor {
-            color: #dc3545;
-        }
-
-        .loading {
+            font-size: 15px;
+            margin-bottom: 6px;
             display: flex;
-            justify-content: center;
             align-items: center;
-            padding: 60px;
-            color: #6c757d;
+            gap: 8px;
         }
 
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #667eea;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-right: 15px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .error-message {
-            background: #f8d7da;
-            color: #721c24;
-            padding: 20px;
-            border-radius: 8px;
-            text-align: center;
-            margin: 20px 0;
-        }
-
-        .no-data {
-            text-align: center;
-            padding: 60px;
-            color: #6c757d;
-        }
-
-        .no-data i {
-            font-size: 4rem;
-            margin-bottom: 20px;
-        }
-
-        @media (max-width: 768px) {
-            .header {
-                flex-direction: column;
-                text-align: center;
-            }
-
-            .header h1 {
-                font-size: 1.8rem;
-            }
-
-            .main-content {
-                grid-template-columns: 1fr;
-            }
-
-            .date-controls {
-                flex-direction: column;
-            }
-
-            .kpi-grid {
-                grid-template-columns: 1fr;
-            }
+        .action-type {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
         }
 
         .action-type.accept {
@@ -519,87 +412,397 @@
             background: #e2e3e5;
             color: #383d41;
         }
+
+        .action-remarks {
+            background: #f8f9fa;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-style: italic;
+            color: #495057;
+            margin-top: 8px;
+            border-left: 3px solid #17a2b8;
+            font-size: 13px;
+        }
+
+        .action-time {
+            color: #6c757d;
+            font-size: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            white-space: nowrap;
+        }
+
+        .mechanics-list {
+            padding: 0;
+        }
+
+        .mechanic-card {
+            border-bottom: 1px solid #f1f3f4;
+            padding: 25px 30px;
+            transition: all 0.3s ease;
+        }
+
+        .mechanic-card:hover {
+            background: #f8f9fa;
+        }
+
+        .mechanic-card:last-child {
+            border-bottom: none;
+        }
+
+        .mechanic-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .mechanic-name-section {
+            flex: 1;
+        }
+
+        .mechanic-name {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 6px;
+        }
+
+        .mechanic-status {
+            font-size: 12px;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-inactive {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .mechanic-score {
+            text-align: center;
+            min-width: 80px;
+        }
+
+        .score-circle {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 800;
+            margin: 0 auto 8px;
+            color: white;
+        }
+
+        .score-excellent {
+            background: linear-gradient(135deg, #28a745, #20c997);
+        }
+
+        .score-good {
+            background: linear-gradient(135deg, #17a2b8, #20c997);
+        }
+
+        .score-average {
+            background: linear-gradient(135deg, #ffc107, #fd7e14);
+        }
+
+        .score-poor {
+            background: linear-gradient(135deg, #dc3545, #e74c3c);
+        }
+
+        .score-label {
+            font-size: 11px;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .mechanic-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-box {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            border-left: 4px solid #dee2e6;
+        }
+
+        .stat-box.accepts {
+            border-left-color: #28a745;
+        }
+
+        .stat-box.completes {
+            border-left-color: #17a2b8;
+        }
+
+        .stat-box.noactions {
+            border-left-color: #ffc107;
+        }
+
+        .stat-box.cancels {
+            border-left-color: #dc3545;
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #2c3e50;
+            display: block;
+        }
+
+        .stat-text {
+            font-size: 11px;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 4px;
+        }
+
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 80px;
+            color: #6c757d;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 30px;
+            border-radius: 8px;
+            text-align: center;
+            margin: 30px;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 80px;
+            color: #6c757d;
+        }
+
+        .no-data i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            color: #dee2e6;
+        }
+
+        .export-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .export-btn:hover {
+            background: #218838;
+            transform: translateY(-1px);
+        }
+
+        @media (max-width: 1200px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-container {
+                padding: 15px;
+            }
+
+            .header {
+                flex-direction: column;
+                text-align: center;
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .header-stats {
+                justify-content: center;
+            }
+
+            .date-controls {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .section-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .filters-panel {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .filter-group {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 5px;
+            }
+
+            .filter-select, .search-input {
+                width: 100%;
+            }
+
+            .action-item {
+                padding: 20px 15px;
+            }
+
+            .action-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .car-details {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+
+            .mechanic-stats {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .view-toggle {
+            display: flex;
+            background: #e9ecef;
+            border-radius: 8px;
+            padding: 3px;
+        }
+
+        .view-toggle button {
+            background: none;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .view-toggle button.active {
+            background: white;
+            color: #667eea;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
     </style>
 </head>
 <body>
     <div class="dashboard-container">
         <!-- Header -->
         <div class="header">
-            <h1>
-                <i class="fas fa-wrench"></i>
-                Mechanic Actions Dashboard
-            </h1>
+            <div>
+                <h1>
+                    <i class="fas fa-tasks"></i>
+                    Mechanic Actions Dashboard
+                </h1>
+            </div>
+            
+            <div class="header-stats">
+                <div class="quick-stat">
+                    <span class="stat-value" id="totalBookings">-</span>
+                    <div class="stat-label">Bookings</div>
+                </div>
+                <div class="quick-stat">
+                    <span class="stat-value" id="totalActions">-</span>
+                    <div class="stat-label">Actions</div>
+                </div>
+                <div class="quick-stat">
+                    <span class="stat-value" id="activeMechanics">-</span>
+                    <div class="stat-label">Mechanics</div>
+                </div>
+                <div class="quick-stat">
+                    <span class="stat-value" id="completionRate">-%</span>
+                    <div class="stat-label">Completed</div>
+                </div>
+            </div>
+
             <div class="date-controls">
                 <label for="dateInput">Select Date:</label>
                 <input type="date" id="dateInput">
                 <button class="refresh-btn" onclick="loadData()">
                     <i class="fas fa-sync-alt"></i>
-                    Refresh Data
+                    Refresh
                 </button>
-            </div>
-        </div>
-
-        <!-- KPI Cards -->
-        <div class="kpi-grid">
-            <div class="kpi-card">
-                <div class="kpi-header">
-                    <span class="kpi-title">Total Bookings</span>
-                    <div class="kpi-icon" style="background: linear-gradient(135deg, #667eea, #764ba2);">
-                        <i class="fas fa-clipboard-list"></i>
-                    </div>
-                </div>
-                <div class="kpi-value" id="totalBookings">-</div>
-                <div class="kpi-subtitle">Bookings received today</div>
-            </div>
-
-            <div class="kpi-card">
-                <div class="kpi-header">
-                    <span class="kpi-title">Total Actions</span>
-                    <div class="kpi-icon" style="background: linear-gradient(135deg, #28a745, #20c997);">
-                        <i class="fas fa-tasks"></i>
-                    </div>
-                </div>
-                <div class="kpi-value" id="totalActions">-</div>
-                <div class="kpi-subtitle">Actions taken by mechanics</div>
-            </div>
-
-            <div class="kpi-card">
-                <div class="kpi-header">
-                    <span class="kpi-title">Active Mechanics</span>
-                    <div class="kpi-icon" style="background: linear-gradient(135deg, #17a2b8, #20c997);">
-                        <i class="fas fa-user-cog"></i>
-                    </div>
-                </div>
-                <div class="kpi-value" id="activeMechanics">-</div>
-                <div class="kpi-subtitle">Mechanics who took actions</div>
-            </div>
-
-            <div class="kpi-card">
-                <div class="kpi-header">
-                    <span class="kpi-title">Completion Rate</span>
-                    <div class="kpi-icon" style="background: linear-gradient(135deg, #ffc107, #fd7e14);">
-                        <i class="fas fa-percentage"></i>
-                    </div>
-                </div>
-                <div class="kpi-value" id="completionRate">-%</div>
-                <div class="kpi-subtitle">Bookings marked as complete</div>
             </div>
         </div>
 
         <!-- Main Content -->
         <div class="main-content">
-            <!-- Bookings Section -->
-            <div class="bookings-section">
+            <!-- Actions Section -->
+            <div class="actions-section">
                 <div class="section-header">
                     <h2 class="section-title">
-                        <i class="fas fa-list-alt"></i>
-                        Booking Actions
+                        <i class="fas fa-clipboard-list"></i>
+                        Booking Actions Timeline
                     </h2>
+                    <div class="section-stats">
+                        <span>Total: <strong id="filteredCount">0</strong></span>
+                        <button class="export-btn" onclick="exportData()">
+                            <i class="fas fa-download"></i>
+                            Export
+                        </button>
+                    </div>
                 </div>
                 
-                <div class="filters">
+                <div class="filters-panel">
                     <div class="filter-group">
-                        <label>Filter by Action:</label>
+                        <label>Search Booking:</label>
+                        <input type="text" class="search-input" id="searchInput" placeholder="Search by ID, car, or mobile..." onkeyup="applyFilters()">
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label>Action Type:</label>
                         <select class="filter-select" id="actionFilter" onchange="applyFilters()">
                             <option value="">All Actions</option>
                             <option value="accept">Accept</option>
@@ -612,28 +815,42 @@
                     </div>
                     
                     <div class="filter-group">
-                        <label>Filter by Mechanic:</label>
+                        <label>Mechanic:</label>
                         <select class="filter-select" id="mechanicFilter" onchange="applyFilters()">
                             <option value="">All Mechanics</option>
                         </select>
                     </div>
+
+                    <div class="filter-group">
+                        <label>Status:</label>
+                        <select class="filter-select" id="statusFilter" onchange="applyFilters()">
+                            <option value="">All Status</option>
+                            <option value="completed">Completed</option>
+                            <option value="pending">Pending</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                    </div>
                 </div>
 
-                <div class="bookings-table" id="bookingsTable">
-                    <!-- Table content will be loaded here -->
+                <div class="content-area" id="actionsContent">
+                    <!-- Actions content will be loaded here -->
                 </div>
             </div>
 
-            <!-- Performance Section -->
-            <div class="performance-section">
+            <!-- Mechanics Section -->
+            <div class="mechanics-section">
                 <div class="section-header">
                     <h2 class="section-title">
-                        <i class="fas fa-chart-bar"></i>
+                        <i class="fas fa-users-cog"></i>
                         Mechanic Performance
                     </h2>
+                    <div class="section-stats">
+                        <span>Active: <strong id="activeMechanicsCount">0</strong></span>
+                    </div>
                 </div>
-                <div class="mechanic-performance" id="mechanicPerformance">
-                    <!-- Performance content will be loaded here -->
+                
+                <div class="content-area" id="mechanicsContent">
+                    <!-- Mechanics content will be loaded here -->
                 </div>
             </div>
         </div>
@@ -643,6 +860,7 @@
         // Global variables
         let allBookingsData = [];
         let filteredData = [];
+        let allActions = [];
         const API_BASE = 'https://ai.instantmechanic.online/bot';
 
         // Initialize dashboard
@@ -672,11 +890,12 @@
                 }
 
                 allBookingsData = await response.json();
+                processData();
                 filteredData = [...allBookingsData];
                 
-                updateKPIs();
-                renderBookingsTable();
-                renderMechanicPerformance();
+                updateStats();
+                renderActions();
+                renderMechanics();
                 populateFilters();
 
             } catch (error) {
@@ -685,26 +904,43 @@
             }
         }
 
+        // Process data to create flat actions array
+        function processData() {
+            allActions = [];
+            allBookingsData.forEach(booking => {
+                booking.booking_actions.forEach(action => {
+                    allActions.push({
+                        ...action,
+                        booking_id: booking.booking_id,
+                        car: booking.car,
+                        problem: booking.problem,
+                        customer_mobile: booking.customer_mobile,
+                        created_at: booking.created_at
+                    });
+                });
+            });
+        }
+
         // Show loading state
         function showLoading() {
-            const bookingsTable = document.getElementById('bookingsTable');
-            const mechanicPerformance = document.getElementById('mechanicPerformance');
+            const actionsContent = document.getElementById('actionsContent');
+            const mechanicsContent = document.getElementById('mechanicsContent');
             
             const loadingHTML = `
                 <div class="loading">
                     <div class="spinner"></div>
-                    <span>Loading data...</span>
+                    <span>Loading comprehensive action data...</span>
                 </div>
             `;
             
-            bookingsTable.innerHTML = loadingHTML;
-            mechanicPerformance.innerHTML = loadingHTML;
+            actionsContent.innerHTML = loadingHTML;
+            mechanicsContent.innerHTML = loadingHTML;
         }
 
         // Show error message
         function showError(message) {
-            const bookingsTable = document.getElementById('bookingsTable');
-            const mechanicPerformance = document.getElementById('mechanicPerformance');
+            const actionsContent = document.getElementById('actionsContent');
+            const mechanicsContent = document.getElementById('mechanicsContent');
             
             const errorHTML = `
                 <div class="error-message">
@@ -712,21 +948,19 @@
                 </div>
             `;
             
-            bookingsTable.innerHTML = errorHTML;
-            mechanicPerformance.innerHTML = errorHTML;
+            actionsContent.innerHTML = errorHTML;
+            mechanicsContent.innerHTML = errorHTML;
         }
 
-        // Update KPI cards
-        function updateKPIs() {
+        // Update header stats
+        function updateStats() {
             const totalBookings = allBookingsData.length;
-            const totalActions = allBookingsData.reduce((sum, booking) => sum + booking.booking_actions.length, 0);
+            const totalActions = allActions.length;
             
             // Get unique mechanics who took actions
             const activeMechanics = new Set();
-            allBookingsData.forEach(booking => {
-                booking.booking_actions.forEach(action => {
-                    activeMechanics.add(action.mechanic_name);
-                });
+            allActions.forEach(action => {
+                activeMechanics.add(action.mechanic_name);
             });
 
             // Calculate completion rate
@@ -739,16 +973,17 @@
             document.getElementById('totalActions').textContent = totalActions;
             document.getElementById('activeMechanics').textContent = activeMechanics.size;
             document.getElementById('completionRate').textContent = `${completionRate}%`;
+            document.getElementById('activeMechanicsCount').textContent = activeMechanics.size;
         }
 
-        // Render bookings table
-        function renderBookingsTable() {
-            const container = document.getElementById('bookingsTable');
+        // Render actions list
+        function renderActions() {
+            const container = document.getElementById('actionsContent');
             
             if (filteredData.length === 0) {
                 container.innerHTML = `
                     <div class="no-data">
-                        <i class="fas fa-inbox"></i>
+                        <i class="fas fa-search"></i>
                         <h3>No booking actions found</h3>
                         <p>Try adjusting your filters or select a different date</p>
                     </div>
@@ -756,106 +991,150 @@
                 return;
             }
 
-            let tableHTML = `
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Booking ID</th>
-                            <th>Car & Problem</th>
-                            <th>Customer</th>
-                            <th>Created At</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-            `;
+            // Update filtered count
+            const totalFilteredActions = filteredData.reduce((sum, booking) => sum + booking.booking_actions.length, 0);
+            document.getElementById('filteredCount').textContent = totalFilteredActions;
 
-            filteredData.forEach(booking => {
-                const createdAt = new Date(booking.created_at).toLocaleString();
-                
-                let actionsHTML = '<div class="actions-list">';
-                booking.booking_actions.forEach(action => {
-                    const actionTime = new Date(action.action_time).toLocaleString();
-                    actionsHTML += `
-                        <div class="action-item action-${action.action}">
-                            <div class="action-mechanic">${action.mechanic_name}</div>
-                            <span class="action-type ${action.action}">${action.action}</span>
-                            <div class="action-time">${actionTime}</div>
-                            ${action.remarks ? `<div class="action-remarks">${action.remarks}</div>` : ''}
+            let actionsHTML = '<div class="actions-list">';
+            
+            // Sort bookings by most recent first
+            const sortedData = [...filteredData].sort((a, b) => 
+                new Date(b.created_at) - new Date(a.created_at)
+            );
+
+            sortedData.forEach(booking => {
+                const createdAt = new Date(booking.created_at);
+                const formattedDate = createdAt.toLocaleDateString('en-US', {
+                    weekday: 'short',
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                });
+                const formattedTime = createdAt.toLocaleTimeString('en-US', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+
+                // Sort actions by time
+                const sortedActions = [...booking.booking_actions].sort((a, b) => 
+                    new Date(a.action_time) - new Date(b.action_time)
+                );
+
+                let timelineHTML = '<div class="action-timeline">';
+                sortedActions.forEach(action => {
+                    const actionTime = new Date(action.action_time);
+                    const actionDate = actionTime.toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric'
+                    });
+                    const actionTimeStr = actionTime.toLocaleTimeString('en-US', {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+
+                    timelineHTML += `
+                        <div class="timeline-item action-${action.action}">
+                            <div class="action-details">
+                                <div class="action-main">
+                                    <div class="mechanic-name">
+                                        <i class="fas fa-user-cog"></i>
+                                        ${action.mechanic_name}
+                                    </div>
+                                    <span class="action-type ${action.action}">${formatActionType(action.action)}</span>
+                                    ${action.remarks ? `<div class="action-remarks">
+                                        <i class="fas fa-quote-left"></i> ${action.remarks}
+                                    </div>` : ''}
+                                </div>
+                                <div class="action-time">
+                                    <i class="fas fa-clock"></i>
+                                    ${actionDate} • ${actionTimeStr}
+                                </div>
+                            </div>
                         </div>
                     `;
                 });
-                actionsHTML += '</div>';
+                timelineHTML += '</div>';
 
-                tableHTML += `
-                    <tr>
-                        <td><span class="booking-id">#${booking.booking_id}</span></td>
-                        <td>
-                            <div class="car-info">${booking.car}</div>
-                            <div class="problem-text">${booking.problem}</div>
-                        </td>
-                        <td><span class="customer-mobile">${booking.customer_mobile}</span></td>
-                        <td>${createdAt}</td>
-                        <td>${actionsHTML}</td>
-                    </tr>
+                actionsHTML += `
+                    <div class="action-item">
+                        <div class="action-header">
+                            <div class="booking-info">
+                                <div class="booking-id" onclick="viewBookingDetails(${booking.booking_id})">
+                                    #${booking.booking_id}
+                                </div>
+                                <div class="car-details">
+                                    <span class="car-name">${booking.car}</span>
+                                    <span class="problem-badge">${booking.problem}</span>
+                                </div>
+                                <div class="customer-info">
+                                    <i class="fas fa-phone"></i>
+                                    <span class="customer-mobile">${booking.customer_mobile}</span>
+                                    <i class="fas fa-calendar-alt"></i>
+                                    <span>Created: ${formattedDate} • ${formattedTime}</span>
+                                </div>
+                            </div>
+                        </div>
+                        ${timelineHTML}
+                    </div>
                 `;
             });
-
-            tableHTML += `
-                    </tbody>
-                </table>
-            `;
-
-            container.innerHTML = tableHTML;
+            
+            actionsHTML += '</div>';
+            container.innerHTML = actionsHTML;
         }
 
-        // Render mechanic performance
-        function renderMechanicPerformance() {
-            const container = document.getElementById('mechanicPerformance');
+        // Render mechanics performance
+        function renderMechanics() {
+            const container = document.getElementById('mechanicsContent');
             
             // Calculate mechanic statistics
             const mechanicStats = {};
             
-            allBookingsData.forEach(booking => {
-                booking.booking_actions.forEach(action => {
-                    const mechanic = action.mechanic_name;
-                    if (!mechanicStats[mechanic]) {
-                        mechanicStats[mechanic] = {
-                            totalActions: 0,
-                            accepts: 0,
-                            completes: 0,
-                            noActions: 0,
-                            cancels: 0,
-                            assigns: 0
-                        };
-                    }
-                    
-                    mechanicStats[mechanic].totalActions++;
-                    
-                    switch(action.action) {
-                        case 'accept':
-                            mechanicStats[mechanic].accepts++;
-                            break;
-                        case 'complete':
-                            mechanicStats[mechanic].completes++;
-                            break;
-                        case 'noaction':
-                            mechanicStats[mechanic].noActions++;
-                            break;
-                        case 'cancel':
-                        case 'customer-denied':
-                            mechanicStats[mechanic].cancels++;
-                            break;
-                        case 'sub-mechanic-assign':
-                            mechanicStats[mechanic].assigns++;
-                            break;
-                    }
-                });
+            allActions.forEach(action => {
+                const mechanic = action.mechanic_name;
+                if (!mechanicStats[mechanic]) {
+                    mechanicStats[mechanic] = {
+                        totalActions: 0,
+                        accepts: 0,
+                        completes: 0,
+                        noActions: 0,
+                        cancels: 0,
+                        assigns: 0,
+                        lastAction: null
+                    };
+                }
+                
+                mechanicStats[mechanic].totalActions++;
+                mechanicStats[mechanic].lastAction = action.action_time;
+                
+                switch(action.action) {
+                    case 'accept':
+                        mechanicStats[mechanic].accepts++;
+                        break;
+                    case 'complete':
+                        mechanicStats[mechanic].completes++;
+                        break;
+                    case 'noaction':
+                        mechanicStats[mechanic].noActions++;
+                        break;
+                    case 'cancel':
+                    case 'customer-denied':
+                        mechanicStats[mechanic].cancels++;
+                        break;
+                    case 'sub-mechanic-assign':
+                        mechanicStats[mechanic].assigns++;
+                        break;
+                }
             });
 
-            // Sort mechanics by total actions
+            // Sort mechanics by performance score
             const sortedMechanics = Object.entries(mechanicStats)
-                .sort(([,a], [,b]) => b.totalActions - a.totalActions);
+                .map(([name, stats]) => ({
+                    name,
+                    ...stats,
+                    score: calculatePerformanceScore(stats)
+                }))
+                .sort((a, b) => b.score - a.score);
 
             if (sortedMechanics.length === 0) {
                 container.innerHTML = `
@@ -868,44 +1147,68 @@
                 return;
             }
 
-            let performanceHTML = '<div class="mechanic-list">';
+            let mechanicsHTML = '<div class="mechanics-list">';
             
-            sortedMechanics.forEach(([mechanicName, stats]) => {
-                // Calculate performance score
-                const score = calculatePerformanceScore(stats);
-                const scoreClass = getScoreClass(score);
-                
-                performanceHTML += `
-                    <div class="mechanic-item">
-                        <div class="mechanic-name">${mechanicName}</div>
-                        <div class="mechanic-stats">
-                            <div class="stat-item">
-                                <span class="stat-label">Total Actions:</span>
-                                <span class="stat-value">${stats.totalActions}</span>
+            sortedMechanics.forEach(mechanic => {
+                const scoreClass = getScoreClass(mechanic.score);
+                const statusClass = mechanic.totalActions > 0 ? 'active' : 'inactive';
+                const lastAction = mechanic.lastAction ? 
+                    new Date(mechanic.lastAction).toLocaleString() : 'No recent action';
+
+                mechanicsHTML += `
+                    <div class="mechanic-card">
+                        <div class="mechanic-header">
+                            <div class="mechanic-name-section">
+                                <div class="mechanic-name">${mechanic.name}</div>
+                                <span class="mechanic-status status-${statusClass}">
+                                    ${statusClass === 'active' ? 'Active Today' : 'No Activity'}
+                                </span>
                             </div>
-                            <div class="stat-item">
-                                <span class="stat-label">Accepts:</span>
-                                <span class="stat-value">${stats.accepts}</span>
-                            </div>
-                            <div class="stat-item">
-                                <span class="stat-label">Completes:</span>
-                                <span class="stat-value">${stats.completes}</span>
-                            </div>
-                            <div class="stat-item">
-                                <span class="stat-label">No Actions:</span>
-                                <span class="stat-value">${stats.noActions}</span>
+                            <div class="mechanic-score">
+                                <div class="score-circle ${scoreClass}">
+                                    ${mechanic.score}
+                                </div>
+                                <div class="score-label">Score</div>
                             </div>
                         </div>
-                        <div class="performance-score">
-                            <div class="score-label">Performance Score</div>
-                            <div class="score-value ${scoreClass}">${score}/100</div>
+                        
+                        <div class="mechanic-stats">
+                            <div class="stat-box accepts">
+                                <span class="stat-number">${mechanic.accepts}</span>
+                                <div class="stat-text">Accepts</div>
+                            </div>
+                            <div class="stat-box completes">
+                                <span class="stat-number">${mechanic.completes}</span>
+                                <div class="stat-text">Completes</div>
+                            </div>
+                            <div class="stat-box noactions">
+                                <span class="stat-number">${mechanic.noActions}</span>
+                                <div class="stat-text">No Actions</div>
+                            </div>
+                            <div class="stat-box cancels">
+                                <span class="stat-number">${mechanic.cancels}</span>
+                                <div class="stat-text">Cancels</div>
+                            </div>
                         </div>
                     </div>
                 `;
             });
             
-            performanceHTML += '</div>';
-            container.innerHTML = performanceHTML;
+            mechanicsHTML += '</div>';
+            container.innerHTML = mechanicsHTML;
+        }
+
+        // Format action type for display
+        function formatActionType(action) {
+            const actionMap = {
+                'accept': 'Accepted',
+                'complete': 'Completed',
+                'noaction': 'No Action',
+                'customer-denied': 'Customer Denied',
+                'cancel': 'Cancelled',
+                'sub-mechanic-assign': 'Assigned to Sub-mechanic'
+            };
+            return actionMap[action] || action;
         }
 
         // Calculate performance score
@@ -939,10 +1242,8 @@
             
             // Get unique mechanics
             const mechanics = new Set();
-            allBookingsData.forEach(booking => {
-                booking.booking_actions.forEach(action => {
-                    mechanics.add(action.mechanic_name);
-                });
+            allActions.forEach(action => {
+                mechanics.add(action.mechanic_name);
             });
 
             // Clear existing options (except "All Mechanics")
@@ -959,11 +1260,23 @@
 
         // Apply filters
         function applyFilters() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
             const actionFilter = document.getElementById('actionFilter').value;
             const mechanicFilter = document.getElementById('mechanicFilter').value;
+            const statusFilter = document.getElementById('statusFilter').value;
 
             filteredData = allBookingsData.filter(booking => {
-                // Filter by action type
+                // Search filter
+                if (searchTerm) {
+                    const searchMatch = 
+                        booking.booking_id.toString().includes(searchTerm) ||
+                        booking.car.toLowerCase().includes(searchTerm) ||
+                        booking.problem.toLowerCase().includes(searchTerm) ||
+                        booking.customer_mobile.includes(searchTerm);
+                    if (!searchMatch) return false;
+                }
+
+                // Action filter
                 if (actionFilter) {
                     const hasAction = booking.booking_actions.some(action => 
                         action.action === actionFilter
@@ -971,7 +1284,7 @@
                     if (!hasAction) return false;
                 }
 
-                // Filter by mechanic
+                // Mechanic filter
                 if (mechanicFilter) {
                     const hasMechanic = booking.booking_actions.some(action => 
                         action.mechanic_name === mechanicFilter
@@ -979,10 +1292,68 @@
                     if (!hasMechanic) return false;
                 }
 
+                // Status filter
+                if (statusFilter) {
+                    const hasCompleteAction = booking.booking_actions.some(action => action.action === 'complete');
+                    const hasCancelAction = booking.booking_actions.some(action => 
+                        action.action === 'cancel' || action.action === 'customer-denied'
+                    );
+                    
+                    if (statusFilter === 'completed' && !hasCompleteAction) return false;
+                    if (statusFilter === 'cancelled' && !hasCancelAction) return false;
+                    if (statusFilter === 'pending' && (hasCompleteAction || hasCancelAction)) return false;
+                }
+
                 return true;
             });
 
-            renderBookingsTable();
+            renderActions();
+        }
+
+        // View booking details
+        function viewBookingDetails(bookingId) {
+            window.open(`https://instantmechanic.online/booking.html?id=${bookingId}`, '_blank');
+        }
+
+        // Export data
+        function exportData() {
+            const dataToExport = filteredData.map(booking => {
+                return booking.booking_actions.map(action => ({
+                    'Booking ID': booking.booking_id,
+                    'Car': booking.car,
+                    'Problem': booking.problem,
+                    'Customer Mobile': booking.customer_mobile,
+                    'Booking Created': booking.created_at,
+                    'Mechanic Name': action.mechanic_name,
+                    'Action': action.action,
+                    'Action Time': action.action_time,
+                    'Remarks': action.remarks || ''
+                }));
+            }).flat();
+
+            const csv = convertToCSV(dataToExport);
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `mechanic-actions-${document.getElementById('dateInput').value}.csv`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+
+        // Convert data to CSV
+        function convertToCSV(data) {
+            if (data.length === 0) return '';
+            
+            const headers = Object.keys(data[0]);
+            const csvData = [
+                headers.join(','),
+                ...data.map(row => headers.map(header => 
+                    `"${(row[header] || '').toString().replace(/"/g, '""')}"`
+                ).join(','))
+            ];
+            
+            return csvData.join('\n');
         }
     </script>
 </body>
