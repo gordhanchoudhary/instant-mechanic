@@ -113,7 +113,7 @@
       }
 
       .cs_circle_btn {
-        background-color: #ffba05;
+        background-color: #007bff;
         border: none;
         border-radius: 3%;
         padding: 15px;
@@ -123,6 +123,19 @@
         display: flex;
         align-items: center;
         justify-content: center;
+      }
+
+      /* Blue Button Styles */
+      .cs_btn.cs_style_1 {
+        background-color: #007bff !important;
+        background: #007bff !important;
+        border-color: #007bff !important;
+      }
+
+      .cs_btn.cs_style_1:hover {
+        background-color: #0056b3 !important;
+        background: #0056b3 !important;
+        border-color: #0056b3 !important;
       }
 
       @keyframes vibrate {
@@ -138,7 +151,7 @@
       }
 
       .battery-hero {
-        background: linear-gradient(135deg, #ffba05 0%, #ff8c00 100%);
+        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
         position: relative;
         overflow: hidden;
       }
@@ -179,7 +192,7 @@
       }
 
       .location-badge {
-        background: #ffba05;
+        background: #007bff;
         color: white;
         padding: 5px 15px;
         border-radius: 20px;
@@ -190,7 +203,7 @@
 
       .feature-highlight {
         background: linear-gradient(45deg, #f8f9fa, #ffffff);
-        border-left: 5px solid #ffba05;
+        border-left: 5px solid #007bff;
         padding: 30px;
         margin: 20px 0;
         border-radius: 10px;
@@ -212,7 +225,7 @@
       }
 
       .stats-counter {
-        background: #ffba05;
+        background: #007bff;
         color: white;
         padding: 20px;
         border-radius: 10px;
@@ -226,7 +239,7 @@
       }
 
       .breadcrumb-item + .breadcrumb-item::before {
-        color: #ffba05;
+        color: #007bff;
       }
 
       .process-step {
@@ -237,7 +250,7 @@
       .process-number {
         width: 60px;
         height: 60px;
-        background: #ffba05;
+        background: #007bff;
         color: white;
         border-radius: 50%;
         display: flex;
@@ -253,12 +266,31 @@
         padding: 30px;
         border-radius: 15px;
         margin: 20px 0;
-        border-left: 5px solid #ffba05;
+        border-left: 5px solid #007bff;
       }
 
       .rating {
-        color: #ffba05;
+        color: #007bff;
         font-size: 20px;
+      }
+
+      .cs_accent_color {
+        color: #007bff !important;
+      }
+
+      .brand-loading {
+        text-align: center;
+        padding: 50px;
+        color: #007bff;
+      }
+
+      .brand-error {
+        text-align: center;
+        padding: 20px;
+        color: #dc3545;
+        background: #f8f9fa;
+        border-radius: 10px;
+        margin: 20px 0;
       }
     </style>
 
@@ -279,6 +311,58 @@
     src="https://www.facebook.com/tr?id=479182611911558&ev=PageView&noscript=1"
     /></noscript>
     <!-- End Meta Pixel Code -->
+
+    <!-- Car Brand Data -->
+    <script>
+    window.carBrands = [
+      {"name":"Maruti Suzuki","is_luxury":false,"is_popular":true,"id":9,"brand_logo":"https://gomechprod.blob.core.windows.net/carimagepath/general/logo/maruti%20suzuki.png"},
+      {"name":"Hyundai","is_luxury":false,"is_popular":true,"id":7,"brand_logo":"https://gomechprod.blob.core.windows.net/carimagepath/general/logo/hyundai.png"},
+      {"name":"Tata","is_luxury":false,"is_popular":true,"id":14,"brand_logo":"https://gomechprod.blob.core.windows.net/carimagepath/general/logo/tata.png"},
+      {"name":"Mahindra","is_luxury":false,"is_popular":true,"id":8,"brand_logo":"https://gomechprod.blob.core.windows.net/carimagepath/general/logo/mahindra.png"},
+      {"name":"Kia","is_luxury":false,"is_popular":true,"id":38,"brand_logo":"https://gomechprod.blob.core.windows.net/carimagepath/general/logo/kia.png"},
+      {"name":"Toyota","is_luxury":false,"is_popular":true,"id":15,"brand_logo":"https://gomechprod.blob.core.windows.net/carimagepath/general/logo/toyota.png"},
+      {"name":"Honda","is_luxury":false,"is_popular":true,"id":6,"brand_logo":"https://gomechprod.blob.core.windows.net/carimagepath/general/logo/honda.png"},
+      {"name":"Renault","is_luxury":false,"is_popular":false,"id":12,"brand_logo":"https://gomechprod.blob.core.windows.net/carimagepath/general/logo/renault.png"},
+      {"name":"Volkswagen","is_luxury":false,"is_popular":false,"id":16,"brand_logo":"https://gomechprod.blob.core.windows.net/carimagepath/general/logo/volkswagen.png"},
+      {"name":"Skoda","is_luxury":false,"is_popular":false,"id":13,"brand_logo":"https://gomechprod.blob.core.windows.net/carimagepath/general/logo/skoda.png"},
+      {"name":"Nissan","is_luxury":false,"is_popular":false,"id":11,"brand_logo":"https://gomechprod.blob.core.windows.net/carimagepath/general/logo/nissan.png"},
+      {"name":"MG","is_luxury":false,"is_popular":false,"id":37,"brand_logo":"https://gomechprod.blob.core.windows.net/carimagepath/general/logo/MG.png"},
+      {"name":"Ford","is_luxury":false,"is_popular":false,"id":5,"brand_logo":"https://gomechprod.blob.core.windows.net/carimagepath/general/logo/ford.png"},
+      {"name":"Mercedes","is_luxury":true,"is_popular":false,"id":26,"brand_logo":"https://gomechprod.blob.core.windows.net/carimagepath/general/logo/mercedes.png"},
+      {"name":"BMW","is_luxury":true,"is_popular":false,"id":20,"brand_logo":"https://gomechprod.blob.core.windows.net/carimagepath/general/logo/bmw.png"},
+      {"name":"Audi","is_luxury":true,"is_popular":false,"id":18,"brand_logo":"https://gomechprod.blob.core.windows.net/carimagepath/general/logo/audi.png"},
+      {"name":"Jaguar","is_luxury":true,"is_popular":false,"id":22,"brand_logo":"https://gomechprod.blob.core.windows.net/carimagepath/general/logo/Jaguar.png"},
+      {"name":"Land Rover","is_luxury":true,"is_popular":false,"id":24,"brand_logo":"https://gomechprod.blob.core.windows.net/carimagepath/general/logo/land%20rover.png"},
+      {"name":"Volvo","is_luxury":true,"is_popular":false,"id":30,"brand_logo":"https://gomechprod.blob.core.windows.net/carimagepath/general/logo/volvo.png"},
+      {"name":"Lexus","is_luxury":true,"is_popular":false,"id":42,"brand_logo":"https://gomechprod.blob.core.windows.net/gm-retail-app/thumbnails/brand-42.jpeg"},
+      {"name":"Porsche","is_luxury":true,"is_popular":false,"id":28,"brand_logo":"https://gomechprod.blob.core.windows.net/carimagepath/general/logo/porshe.png"},
+      {"name":"Mini","is_luxury":true,"is_popular":false,"id":27,"brand_logo":"https://gomechprod.blob.core.windows.net/carimagepath/general/logo/mini%20coper.png"},
+      {"name":"Maserati","is_luxury":true,"is_popular":false,"id":25,"brand_logo":"https://gomechprod.blob.core.windows.net/carimagepath/general/logo/maserati.png"},
+      {"name":"Ferrari","is_luxury":true,"is_popular":false,"id":21,"brand_logo":"https://gomechprod.blob.core.windows.net/carimagepath/general/logo/ferrari.png"},
+      {"name":"Lamborghini","is_luxury":true,"is_popular":false,"id":23,"brand_logo":"https://gomechprod.blob.core.windows.net/carimagepath/general/logo/lamborgini.png"},
+      {"name":"Rolls Royce","is_luxury":true,"is_popular":false,"id":29,"brand_logo":"https://gomechprod.blob.core.windows.net/carimagepath/general/logo/rolls%20royse.png"},
+      {"name":"Bentley","is_luxury":true,"is_popular":false,"id":19,"brand_logo":"https://gomechprod.blob.core.windows.net/carimagepath/general/logo/bentlry.png"},
+      {"name":"Aston Martin","is_luxury":true,"is_popular":false,"id":17,"brand_logo":"https://gomechprod.blob.core.windows.net/carimagepath/general/logo/astin%20martin.png"},
+      {"name":"Hummer","is_luxury":true,"is_popular":false,"id":45,"brand_logo":"https://gomechprod.blob.core.windows.net/gm-retail-app/thumbnails/brand-45.jpeg"},
+      {"name":"Jeep","is_luxury":false,"is_popular":false,"id":34,"brand_logo":"https://gomechprod.blob.core.windows.net/carimagepath/general/logo/jeep.png"},
+      {"name":"Fiat","is_luxury":false,"is_popular":false,"id":4,"brand_logo":"https://gomechprod.blob.core.windows.net/carimagepath/general/logo/fiat.png"},
+      {"name":"Mitsubishi","is_luxury":false,"is_popular":false,"id":10,"brand_logo":"https://gomechprod.blob.core.windows.net/carimagepath/general/logo/mistubushi.png"},
+      {"name":"Chevrolet","is_luxury":false,"is_popular":false,"id":1,"brand_logo":"https://gomechprod.blob.core.windows.net/carimagepath/general/logo/chevrolte.png"},
+      {"name":"Datsun","is_luxury":false,"is_popular":false,"id":3,"brand_logo":"https://gomechprod.blob.core.windows.net/carimagepath/general/logo/datsun.png"},
+      {"name":"Daewoo","is_luxury":false,"is_popular":false,"id":2,"brand_logo":"https://gomechprod.blob.core.windows.net/carimagepath/general/logo/daewoo.png"},
+      {"name":"Opel","is_luxury":false,"is_popular":false,"id":35,"brand_logo":"https://gomechprod.blob.core.windows.net/carimagepath/general/logo/opel.png"},
+      {"name":"Premier","is_luxury":false,"is_popular":false,"id":44,"brand_logo":"https://gomechprod.blob.core.windows.net/gm-retail-app/thumbnails/brand-44.jpeg"},
+      {"name":"Hindustan Motors","is_luxury":false,"is_popular":false,"id":33,"brand_logo":"https://gomechprod.blob.core.windows.net/carimagepath/general/logo/Hindustan_motors.png"},
+      {"name":"Force","is_luxury":false,"is_popular":false,"id":31,"brand_logo":"https://gomechprod.blob.core.windows.net/carimagepath/general/logo/forse.png"},
+      {"name":"Isuzu","is_luxury":false,"is_popular":false,"id":32,"brand_logo":"https://gomechprod.blob.core.windows.net/carimagepath/general/logo/isuzu.png"},
+      {"name":"Ssangyong","is_luxury":false,"is_popular":false,"id":36,"brand_logo":"https://gomechprod.blob.core.windows.net/carimagepath/general/logo/Ssangyong%20Logo_Transparent.png"},
+      {"name":"Photon","is_luxury":false,"is_popular":false,"id":39,"brand_logo":"https://gomechprod.blob.core.windows.net/gm-retail-app/thumbnails/brand-39.jpeg"},
+      {"name":"Jayem","is_luxury":false,"is_popular":false,"id":40,"brand_logo":"https://gomechprod.blob.core.windows.net/carimagepath/general/logo/chevrolte.png"},
+      {"name":"DC","is_luxury":false,"is_popular":false,"id":41,"brand_logo":"https://gomechprod.blob.core.windows.net/carimagepath/general/logo/DC%20Logo%20(1).jpg"},
+      {"name":"BYD","is_luxury":false,"is_popular":false,"id":46,"brand_logo":"https://gomechprod.blob.core.windows.net/gm-retail-app/thumbnails/brand-46.jpeg"},
+      {"name":"Citroen","is_luxury":false,"is_popular":false,"id":43,"brand_logo":"https://gomechprod.blob.core.windows.net/gm-retail-app/thumbnails/brand-43.jpeg"}
+    ];
+    </script>
 </head>
 
 <body>
@@ -382,8 +466,6 @@
     </header>
     <!-- End Header Section -->
 
-
-
     <!-- Hero Section -->
     <section class="battery-hero position-relative">
         <div class="cs_height_120 cs_height_lg_80"></div>
@@ -425,15 +507,7 @@
                         </span>
                     </div>
                 </div>
-                <div class="col-lg-4">
-                    <div class="text-center wow fadeInRight">
-                        <!-- Dummy image placeholder - Size: 400x300px -->
-                        <img src="https://via.placeholder.com/400x300/ffba05/ffffff?text=Car+Battery+Replacement" 
-                             alt="Car Battery Replacement Service Delhi NCR" 
-                             class="img-fluid rounded shadow-lg"
-                             style="max-width: 100%; height: auto;">
-                    </div>
-                </div>
+
             </div>
         </div>
         <div class="cs_height_120 cs_height_lg_80"></div>
@@ -486,83 +560,28 @@
                 <p class="mt-3">We provide genuine car batteries for all popular car brands in India</p>
             </div>
             
-            <div class="row justify-content-center">
-                <div class="col-lg-2 col-md-3 col-4 mb-4 text-center">
-                    <!-- Dummy image placeholder - Size: 120x80px -->
-                    <img src="https://via.placeholder.com/120x80/cccccc/666666?text=Maruti" 
-                         alt="Maruti Suzuki Battery Replacement" class="brand-logo mb-2">
-                    <p><strong>Maruti Suzuki</strong></p>
+            <!-- Loading State -->
+            <div id="brands-loading" class="brand-loading">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
                 </div>
-                <div class="col-lg-2 col-md-3 col-4 mb-4 text-center">
-                    <!-- Dummy image placeholder - Size: 120x80px -->
-                    <img src="https://via.placeholder.com/120x80/cccccc/666666?text=Hyundai" 
-                         alt="Hyundai Battery Replacement" class="brand-logo mb-2">
-                    <p><strong>Hyundai</strong></p>
-                </div>
-                <div class="col-lg-2 col-md-3 col-4 mb-4 text-center">
-                    <!-- Dummy image placeholder - Size: 120x80px -->
-                    <img src="https://via.placeholder.com/120x80/cccccc/666666?text=Tata" 
-                         alt="Tata Battery Replacement" class="brand-logo mb-2">
-                    <p><strong>Tata Motors</strong></p>
-                </div>
-                <div class="col-lg-2 col-md-3 col-4 mb-4 text-center">
-                    <!-- Dummy image placeholder - Size: 120x80px -->
-                    <img src="https://via.placeholder.com/120x80/cccccc/666666?text=Honda" 
-                         alt="Honda Battery Replacement" class="brand-logo mb-2">
-                    <p><strong>Honda</strong></p>
-                </div>
-                <div class="col-lg-2 col-md-3 col-4 mb-4 text-center">
-                    <!-- Dummy image placeholder - Size: 120x80px -->
-                    <img src="https://via.placeholder.com/120x80/cccccc/666666?text=Toyota" 
-                         alt="Toyota Battery Replacement" class="brand-logo mb-2">
-                    <p><strong>Toyota</strong></p>
-                </div>
-                <div class="col-lg-2 col-md-3 col-4 mb-4 text-center">
-                    <!-- Dummy image placeholder - Size: 120x80px -->
-                    <img src="https://via.placeholder.com/120x80/cccccc/666666?text=Mahindra" 
-                         alt="Mahindra Battery Replacement" class="brand-logo mb-2">
-                    <p><strong>Mahindra</strong></p>
-                </div>
-                <div class="col-lg-2 col-md-3 col-4 mb-4 text-center">
-                    <!-- Dummy image placeholder - Size: 120x80px -->
-                    <img src="https://via.placeholder.com/120x80/cccccc/666666?text=Ford" 
-                         alt="Ford Battery Replacement" class="brand-logo mb-2">
-                    <p><strong>Ford</strong></p>
-                </div>
-                <div class="col-lg-2 col-md-3 col-4 mb-4 text-center">
-                    <!-- Dummy image placeholder - Size: 120x80px -->
-                    <img src="https://via.placeholder.com/120x80/cccccc/666666?text=Nissan" 
-                         alt="Nissan Battery Replacement" class="brand-logo mb-2">
-                    <p><strong>Nissan</strong></p>
-                </div>
-                <div class="col-lg-2 col-md-3 col-4 mb-4 text-center">
-                    <!-- Dummy image placeholder - Size: 120x80px -->
-                    <img src="https://via.placeholder.com/120x80/cccccc/666666?text=Renault" 
-                         alt="Renault Battery Replacement" class="brand-logo mb-2">
-                    <p><strong>Renault</strong></p>
-                </div>
-                <div class="col-lg-2 col-md-3 col-4 mb-4 text-center">
-                    <!-- Dummy image placeholder - Size: 120x80px -->
-                    <img src="https://via.placeholder.com/120x80/cccccc/666666?text=Kia" 
-                         alt="Kia Battery Replacement" class="brand-logo mb-2">
-                    <p><strong>Kia</strong></p>
-                </div>
-                <div class="col-lg-2 col-md-3 col-4 mb-4 text-center">
-                    <!-- Dummy image placeholder - Size: 120x80px -->
-                    <img src="https://via.placeholder.com/120x80/cccccc/666666?text=Volkswagen" 
-                         alt="Volkswagen Battery Replacement" class="brand-logo mb-2">
-                    <p><strong>Volkswagen</strong></p>
-                </div>
-                <div class="col-lg-2 col-md-3 col-4 mb-4 text-center">
-                    <!-- Dummy image placeholder - Size: 120x80px -->
-                    <img src="https://via.placeholder.com/120x80/cccccc/666666?text=Skoda" 
-                         alt="Skoda Battery Replacement" class="brand-logo mb-2">
-                    <p><strong>Skoda</strong></p>
-                </div>
+                <p class="mt-3">Loading car brands...</p>
+            </div>
+            
+            <!-- Error State -->
+            <div id="brands-error" class="brand-error" style="display: none;">
+                <i class="fa-solid fa-exclamation-triangle mb-3" style="font-size: 2rem;"></i>
+                <p><strong>Unable to load car brands at the moment.</strong></p>
+                <p>Please contact us directly for your car battery replacement needs.</p>
+            </div>
+            
+            <!-- Brands Container -->
+            <div id="brands-container" class="row justify-content-center" style="display: none;">
+                <!-- Brands will be loaded here -->
             </div>
             
             <div class="text-center mt-4">
-                <p class="cs_fs_16"><strong>And many more brands...</strong> including BMW, Mercedes, Audi, Jaguar, Land Rover, and all luxury car brands</p>
+                <p class="cs_fs_16"><strong>Professional service for all vehicle types</strong> - from economy cars to luxury vehicles, we have the right battery for your car</p>
             </div>
         </div>
     </section>
@@ -988,6 +1007,61 @@
     <script src="assets/js/ripples.min.js"></script>
     <script src="assets/js/odometer.js"></script>
     <script src="assets/js/main.js"></script>
+
+    <!-- Brand Loading Script -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const loadingDiv = document.getElementById('brands-loading');
+        const errorDiv = document.getElementById('brands-error');
+        const containerDiv = document.getElementById('brands-container');
+        
+        function loadBrands() {
+            try {
+                const brands = window.carBrands || [];
+                
+                if (brands.length === 0) {
+                    throw new Error('No brands data available');
+                }
+                
+                // Sort brands: popular first, then alphabetically
+                const popularBrands = brands.filter(brand => brand.is_popular).sort((a, b) => a.name.localeCompare(b.name));
+                const luxuryBrands = brands.filter(brand => brand.is_luxury && !brand.is_popular).sort((a, b) => a.name.localeCompare(b.name));
+                const otherBrands = brands.filter(brand => !brand.is_popular && !brand.is_luxury).sort((a, b) => a.name.localeCompare(b.name));
+                
+                const sortedBrands = [...popularBrands, ...luxuryBrands, ...otherBrands];
+                
+                let brandsHtml = '';
+                
+                sortedBrands.forEach((brand, index) => {
+                    const brandClass = brand.is_luxury ? 'luxury-brand' : (brand.is_popular ? 'popular-brand' : '');
+                    brandsHtml += `
+                        <div class="col-lg-2 col-md-3 col-4 mb-4 text-center ${brandClass}">
+                            <img src="${brand.brand_logo}" 
+                                 alt="${brand.name} Battery Replacement" 
+                                 class="brand-logo mb-2"
+                                 onerror="this.src='https://via.placeholder.com/120x80/cccccc/666666?text=${encodeURIComponent(brand.name)}'">
+                            <p><strong>${brand.name}</strong></p>
+                        </div>
+                    `;
+                });
+                
+                containerDiv.innerHTML = brandsHtml;
+                
+                // Hide loading and show brands
+                loadingDiv.style.display = 'none';
+                containerDiv.style.display = 'flex';
+                
+            } catch (error) {
+                console.error('Error loading brands:', error);
+                loadingDiv.style.display = 'none';
+                errorDiv.style.display = 'block';
+            }
+        }
+        
+        // Load brands with a small delay to show loading state
+        setTimeout(loadBrands, 1000);
+    });
+    </script>
 
     <script defer>
     (function() {
