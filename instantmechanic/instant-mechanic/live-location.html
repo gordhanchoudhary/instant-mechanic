@@ -424,6 +424,89 @@
         .refresh-button.spinning {
             animation: spin 1s linear infinite;
         }
+
+        .debug-panel {
+            position: fixed;
+            top: 80px;
+            right: -300px;
+            width: 300px;
+            height: calc(100vh - 80px);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-left: 1px solid #e2e8f0;
+            padding: 1rem;
+            transition: right 0.3s ease;
+            z-index: 200;
+            overflow-y: auto;
+        }
+
+        .debug-panel.open {
+            right: 0;
+        }
+
+        .debug-toggle {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 0.9rem;
+            cursor: pointer;
+            z-index: 201;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .debug-section {
+            margin-bottom: 1rem;
+        }
+
+        .debug-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+        }
+
+        .debug-content {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 0.5rem;
+            font-size: 0.75rem;
+            font-family: monospace;
+            color: #64748b;
+            max-height: 100px;
+            overflow-y: auto;
+        }
+
+        .debug-status {
+            display: inline-block;
+            padding: 0.125rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .debug-status.success {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .debug-status.error {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+
+        .debug-status.warning {
+            background: #fef3c7;
+            color: #d97706;
+        }
     </style>
 </head>
 <body>
@@ -486,9 +569,62 @@
         <i class="fas fa-sync"></i>
     </button>
 
+    <button class="debug-toggle" id="debugToggle" onclick="toggleDebug()">
+        <i class="fas fa-bug"></i>
+    </button>
+
+    <div class="debug-panel" id="debugPanel">
+        <div class="debug-section">
+            <div class="debug-title">Authentication Status</div>
+            <div id="authStatus" class="debug-status warning">Not Connected</div>
+        </div>
+        
+        <div class="debug-section">
+            <div class="debug-title">API Configuration</div>
+            <div class="debug-content">
+                <div>Traccar: <span id="traccarUrl">${CONFIG.traccar.baseUrl}</span></div>
+                <div>Booking: <span id="bookingUrl">${CONFIG.booking.baseUrl}</span></div>
+                <div>Device ID: <span id="debugDeviceId">${deviceId}</span></div>
+            </div>
+        </div>
+
+        <div class="debug-section">
+            <div class="debug-title">Last API Response</div>
+            <div class="debug-content" id="lastResponse">No data yet</div>
+        </div>
+
+        <div class="debug-section">
+            <div class="debug-title">Connection Log</div>
+            <div class="debug-content" id="connectionLog">Initializing...</div>
+        </div>
+
+        <div class="debug-section">
+            <button onclick="testConnection()" style="width: 100%; padding: 0.5rem; background: #667eea; color: white; border: none; border-radius: 6px; font-size: 0.875rem; cursor: pointer;">
+                Test Connection
+            </button>
+        </div>
+    </div>
+
     <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAhQ7pefYjHolK8tjYqgdSZ7XXZSUaglp4&callback=initMap&libraries=geometry"></script>
 
     <script>
+        // ===========================================
+        // CONFIGURATION - Update credentials here
+        // ===========================================
+        const CONFIG = {
+            traccar: {
+                baseUrl: 'https://traccar.instantmechanic.online',
+                email: 'gdmirdha@gmail.com',
+                password: '12341234'
+            },
+            booking: {
+                baseUrl: 'https://ai.instantmechanic.online'
+            },
+            googleMaps: {
+                apiKey: 'AIzaSyAhQ7pefYjHolK8tjYqgdSZ7XXZSUaglp4'
+            }
+        };
+
         let map;
         let mechanicMarker;
         let customerMarker;
@@ -498,14 +634,12 @@
         let bookingData = {};
         let mechanicData = {};
         let isTracking = true;
+        let traccarSessionEstablished = false;
         
         // URL parameters
         const urlParams = new URLSearchParams(window.location.search);
         const bookingId = urlParams.get('booking') || '18332';
         const deviceId = urlParams.get('device') || '1';
-
-        // API configurations
-        const traccarAuth = btoa('gdmirdhafgmail.com:12341234'); // Base64 encoded credentials
         
         // Initialize map
         function initMap() {
@@ -544,6 +678,12 @@
             loadBookingData();
             loadMechanicLocation();
             
+            // Initialize debug panel
+            document.getElementById('traccarUrl').textContent = CONFIG.traccar.baseUrl;
+            document.getElementById('bookingUrl').textContent = CONFIG.booking.baseUrl;
+            document.getElementById('debugDeviceId').textContent = deviceId;
+            logConnection('System initialized');
+            
             // Set up periodic updates
             setInterval(() => {
                 if (isTracking) {
@@ -555,7 +695,7 @@
         // Load booking data
         async function loadBookingData() {
             try {
-                const response = await fetch(`https://ai.instantmechanic.online/bot/api/bookings/${bookingId}/`, {
+                const response = await fetch(`${CONFIG.booking.baseUrl}/bot/api/bookings/${bookingId}/`, {
                     method: 'GET',
                     headers: {
                         'Accept': '*/*',
@@ -569,7 +709,7 @@
                     updateBookingUI();
                     setupCustomerLocation();
                 } else {
-                    throw new Error('Failed to load booking data');
+                    throw new Error(`Failed to load booking data: ${response.status}`);
                 }
             } catch (error) {
                 console.error('Error loading booking:', error);
@@ -577,29 +717,104 @@
             }
         }
 
+        // Authenticate with Traccar
+        async function authenticateTraccar() {
+            try {
+                logConnection('Attempting authentication...');
+                updateDebugStatus('Connecting...', 'warning');
+                
+                const response = await fetch(`${CONFIG.traccar.baseUrl}/api/session`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'Accept': 'application/json'
+                    },
+                    credentials: 'include', // Important for session cookies
+                    body: new URLSearchParams({
+                        'email': CONFIG.traccar.email,
+                        'password': CONFIG.traccar.password
+                    })
+                });
+
+                if (response.ok) {
+                    traccarSessionEstablished = true;
+                    updateDebugStatus('Authenticated', 'success');
+                    logConnection('✅ Session established successfully');
+                    console.log('Traccar session authenticated successfully');
+                    return true;
+                } else {
+                    const errorText = await response.text();
+                    updateDebugStatus('Auth Failed', 'error');
+                    logConnection(`❌ Auth failed: ${response.status} - ${errorText}`);
+                    console.error('Traccar authentication failed:', response.status, errorText);
+                    showError('Authentication failed. Please check credentials.');
+                    return false;
+                }
+            } catch (error) {
+                updateDebugStatus('Connection Error', 'error');
+                logConnection(`❌ Connection error: ${error.message}`);
+                console.error('Error authenticating with Traccar:', error);
+                showError('Unable to connect to tracking server');
+                return false;
+            }
+        }
+
         // Load mechanic location
         async function loadMechanicLocation() {
             try {
-                const response = await fetch(`https://traccar.instantmechanic.online/api/positions?deviceId=${deviceId}`, {
+                // Ensure we have an authenticated session
+                if (!traccarSessionEstablished) {
+                    const authSuccess = await authenticateTraccar();
+                    if (!authSuccess) {
+                        throw new Error('Failed to authenticate with Traccar');
+                    }
+                }
+
+                logConnection('Fetching mechanic location...');
+                const response = await fetch(`${CONFIG.traccar.baseUrl}/api/positions?deviceId=${deviceId}`, {
+                    method: 'GET',
+                    credentials: 'include', // Include session cookies
                     headers: {
-                        'Authorization': `Basic ${traccarAuth}`
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
                     }
                 });
                 
                 if (response.ok) {
                     const positions = await response.json();
+                    updateLastResponse(positions);
+                    
                     if (positions.length > 0) {
                         mechanicData = positions[0];
                         updateMechanicMarker();
                         updateStats();
                         calculateRoute();
+                        logConnection(`✅ Location updated: ${mechanicData.latitude.toFixed(6)}, ${mechanicData.longitude.toFixed(6)}`);
+                    } else {
+                        logConnection('⚠️ No position data available');
+                    }
+                } else if (response.status === 401) {
+                    // Session expired, re-authenticate
+                    traccarSessionEstablished = false;
+                    logConnection('🔄 Session expired, re-authenticating...');
+                    updateDebugStatus('Re-authenticating...', 'warning');
+                    console.log('Session expired, re-authenticating...');
+                    const authSuccess = await authenticateTraccar();
+                    if (authSuccess) {
+                        // Retry the request
+                        return loadMechanicLocation();
+                    } else {
+                        throw new Error('Failed to re-authenticate with Traccar');
                     }
                 } else {
-                    throw new Error('Failed to load mechanic location');
+                    const errorText = await response.text();
+                    logConnection(`❌ API Error: ${response.status} - ${errorText}`);
+                    throw new Error(`Failed to load mechanic location: ${response.status}`);
                 }
             } catch (error) {
                 console.error('Error loading mechanic location:', error);
-                showError('Failed to load mechanic location');
+                logConnection(`❌ Error: ${error.message}`);
+                showError('Failed to load mechanic location. Please check your connection.');
             } finally {
                 document.getElementById('loading').style.display = 'none';
             }
@@ -790,6 +1005,65 @@
                     status = 'Stopped';
                 }
                 document.getElementById('status').textContent = status;
+            }
+        }
+
+        // Debug functions
+        function toggleDebug() {
+            const panel = document.getElementById('debugPanel');
+            panel.classList.toggle('open');
+        }
+
+        function updateDebugStatus(status, type = 'warning') {
+            const authStatus = document.getElementById('authStatus');
+            authStatus.textContent = status;
+            authStatus.className = `debug-status ${type}`;
+        }
+
+        function logConnection(message) {
+            const log = document.getElementById('connectionLog');
+            const timestamp = new Date().toLocaleTimeString();
+            log.innerHTML = `[${timestamp}] ${message}<br>` + log.innerHTML;
+            if (log.innerHTML.split('<br>').length > 10) {
+                log.innerHTML = log.innerHTML.split('<br>').slice(0, 10).join('<br>');
+            }
+        }
+
+        function updateLastResponse(data) {
+            const responseElement = document.getElementById('lastResponse');
+            responseElement.textContent = JSON.stringify(data, null, 2);
+        }
+
+        async function testConnection() {
+            logConnection('Testing connection...');
+            updateDebugStatus('Testing...', 'warning');
+            
+            try {
+                const authSuccess = await authenticateTraccar();
+                if (authSuccess) {
+                    updateDebugStatus('Connected', 'success');
+                    logConnection('✅ Authentication successful');
+                    
+                    // Test position fetch
+                    const positionTest = await fetch(`${CONFIG.traccar.baseUrl}/api/positions?deviceId=${deviceId}`, {
+                        credentials: 'include',
+                        headers: { 'Accept': 'application/json' }
+                    });
+                    
+                    if (positionTest.ok) {
+                        const positions = await positionTest.json();
+                        updateLastResponse(positions);
+                        logConnection(`✅ Position data received: ${positions.length} devices`);
+                    } else {
+                        logConnection(`❌ Position fetch failed: ${positionTest.status}`);
+                    }
+                } else {
+                    updateDebugStatus('Failed', 'error');
+                    logConnection('❌ Authentication failed');
+                }
+            } catch (error) {
+                updateDebugStatus('Error', 'error');
+                logConnection(`❌ Connection error: ${error.message}`);
             }
         }
 
