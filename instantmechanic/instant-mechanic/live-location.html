@@ -464,6 +464,99 @@
         }
 
         /* Mobile Optimizations */
+        /* Arrival Notification */
+        .arrival-notification {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            z-index: 2000;
+            max-width: 350px;
+            width: 90%;
+            animation: slideInUp 0.5s ease-out;
+        }
+
+        .arrival-notification.fade-out {
+            animation: fadeOut 0.5s ease-in;
+            opacity: 0;
+        }
+
+        .arrival-content {
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .arrival-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem auto;
+            color: white;
+            font-size: 2.5rem;
+        }
+
+        .arrival-text h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+        }
+
+        .arrival-text p {
+            font-size: 1rem;
+            color: #64748b;
+            margin-bottom: 1.5rem;
+        }
+
+        .arrival-call-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+        }
+
+        .arrival-call-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+        }
+
+        @keyframes slideInUp {
+            from {
+                transform: translate(-50%, 100%);
+                opacity: 0;
+            }
+            to {
+                transform: translate(-50%, -50%);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+            }
+            to {
+                opacity: 0;
+            }
+        }
+
         @media (max-width: 768px) {
             .header {
                 padding: 0.5rem 1rem;
@@ -695,7 +788,7 @@
         const CONFIG = {
             traccar: {
                 baseUrl: 'https://traccar.instantmechanic.online',
-                email: 'gdmirdha@gmail.com',
+                email: 'test@gmail.com',
                 password: '12341234'
             },
             booking: {
@@ -717,6 +810,10 @@
         let isTracking = true;
         let traccarSessionEstablished = false;
         let routeData = null;
+        let hasArrivedNotified = false;
+        let lastUpdateTime = null;
+        let connectionStatus = 'connecting';
+        let updateInterval = null;
         
         // URL parameters
         const urlParams = new URLSearchParams(window.location.search);
@@ -782,12 +879,15 @@
             loadBookingData();
             loadMechanicLocation();
             
-            // Set up periodic updates
-            setInterval(() => {
-                if (isTracking) {
+            // Start smart refresh system (4th Feature)
+            startSmartRefresh();
+            
+            // Also update on page focus/visibility
+            document.addEventListener('visibilitychange', () => {
+                if (!document.hidden && isTracking) {
                     loadMechanicLocation();
                 }
-            }, 10000);
+            });
         }
 
         // ===========================================
@@ -795,6 +895,8 @@
         // ===========================================
         async function authenticateTraccar() {
             try {
+                updateConnectionStatus('connecting');
+                
                 const response = await fetch(`${CONFIG.traccar.baseUrl}/api/session`, {
                     method: 'POST',
                     headers: {
@@ -810,12 +912,15 @@
 
                 if (response.ok) {
                     traccarSessionEstablished = true;
+                    updateConnectionStatus('connected');
                     return true;
                 } else {
+                    updateConnectionStatus('error');
                     showError('Authentication failed. Please check credentials.');
                     return false;
                 }
             } catch (error) {
+                updateConnectionStatus('error');
                 showError('Unable to connect to tracking server');
                 return false;
             }
@@ -866,23 +971,60 @@
                 if (response.ok) {
                     const positions = await response.json();
                     if (positions.length > 0) {
-                        mechanicData = positions[0];
+                        const newMechanicData = positions[0];
+                        
+                        // Check if location actually changed
+                        const locationChanged = !mechanicData.latitude || 
+                            Math.abs(newMechanicData.latitude - mechanicData.latitude) > 0.00001 ||
+                            Math.abs(newMechanicData.longitude - mechanicData.longitude) > 0.00001;
+                        
+                        mechanicData = newMechanicData;
                         updateMechanicMarker();
                         updateStats();
                         calculateRoute();
+                        
+                        // Update connection status and last successful fetch time
+                        updateConnectionStatus('connected');
+                        lastUpdateTime = new Date();
+                        
+                        // Log background location update
+                        if (!document.hidden) {
+                            console.log(`Location updated: ${mechanicData.latitude}, ${mechanicData.longitude} at ${lastUpdateTime.toLocaleTimeString()}`);
+                        }
+                        
+                        // Update ETA display immediately
+                        if (locationChanged && mechanicMarker && customerMarker) {
+                            const distance = google.maps.geometry.spherical.computeDistanceBetween(
+                                mechanicMarker.getPosition(),
+                                customerMarker.getPosition()
+                            );
+                            const etaMinutes = Math.round((distance / 1000) / 30 * 60); // Assuming 30km/h speed
+                            document.getElementById('etaTime').textContent = etaMinutes;
+                        }
                     }
                 } else if (response.status === 401) {
                     traccarSessionEstablished = false;
+                    updateConnectionStatus('connecting');
                     const authSuccess = await authenticateTraccar();
                     if (authSuccess) {
                         return loadMechanicLocation();
                     }
+                } else {
+                    updateConnectionStatus('error');
                 }
             } catch (error) {
                 console.error('Error loading mechanic location:', error);
-                showError('Failed to load mechanic location');
+                updateConnectionStatus('error');
+                
+                // Only show error to user if it's been more than 30 seconds since last update
+                if (lastUpdateTime && (new Date() - lastUpdateTime) > 30000) {
+                    showError('Connection lost. Retrying...');
+                }
             } finally {
-                document.getElementById('loading').style.display = 'none';
+                // Always hide loading on first load
+                if (!lastUpdateTime) {
+                    document.getElementById('loading').style.display = 'none';
+                }
             }
         }
 
@@ -994,21 +1136,179 @@
                     map: map,
                     title: 'Mechanic Location',
                     icon: {
-                        path: "m12,0c-4.4,0-8,3.6-8,8 0,5.4 7.9,16 7.9,16 0.1,0.1 0.1,0.1 0.2,0 0,0 7.9-10.6 7.9-16 0-4.4-3.6-8-8-8z m0,12c-2.2,0-4-1.8-4-4s1.8-4 4-4 4,1.8 4,4-1.8,4-4,4z",
+                        path: "M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.22.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z",
                         fillColor: '#10b981',
                         fillOpacity: 1,
                         strokeColor: '#ffffff',
-                        strokeWeight: 3,
-                        scale: 2,
-                        anchor: new google.maps.Point(12, 32)
-                    }
+                        strokeWeight: 2,
+                        scale: 1.5,
+                        anchor: new google.maps.Point(12, 12),
+                        rotation: 0
+                    },
+                    optimized: false
                 });
             } else {
                 mechanicMarker.setPosition(mechanicLocation);
+                
+                // Update car rotation based on movement direction
+                if (mechanicData.course) {
+                    const icon = mechanicMarker.getIcon();
+                    icon.rotation = mechanicData.course;
+                    mechanicMarker.setIcon(icon);
+                }
             }
 
-            // Update status
+            // Update status and check geofence
             updateMechanicStatus();
+            checkGeofenceEntry();
+        }
+
+        // Check if mechanic has entered customer geofence
+        function checkGeofenceEntry() {
+            if (mechanicMarker && customerMarker && !hasArrivedNotified) {
+                const distance = google.maps.geometry.spherical.computeDistanceBetween(
+                    mechanicMarker.getPosition(),
+                    customerMarker.getPosition()
+                );
+                
+                if (distance <= 300) {
+                    hasArrivedNotified = true;
+                    showArrivalNotification();
+                    updateHeaderForArrival();
+                    
+                    // Visual feedback - pulse the geofence circle
+                    if (geofenceCircle) {
+                        geofenceCircle.setOptions({
+                            fillColor: '#10b981',
+                            fillOpacity: 0.3,
+                            strokeColor: '#10b981',
+                            strokeWeight: 3
+                        });
+                    }
+                }
+            }
+        }
+
+        // Show arrival notification
+        function showArrivalNotification() {
+            // Create arrival notification overlay
+            const notification = document.createElement('div');
+            notification.className = 'arrival-notification';
+            notification.innerHTML = `
+                <div class="arrival-content">
+                    <div class="arrival-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="arrival-text">
+                        <h3>Mechanic Has Arrived!</h3>
+                        <p>${bookingData.mechanic_name || 'Your mechanic'} is now at your location</p>
+                    </div>
+                    <button class="arrival-call-btn" onclick="callMechanic('${bookingData.agent_mobile}')">
+                        <i class="fas fa-phone"></i> Call Now
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                notification.classList.add('fade-out');
+                setTimeout(() => {
+                    notification.remove();
+                }, 500);
+            }, 5000);
+            
+            // Play notification sound (if supported)
+            try {
+                const audio = new Audio();
+                audio.volume = 0.3;
+                audio.play();
+            } catch (error) {
+                console.log('Audio notification not supported');
+            }
+        }
+
+        // Update header when mechanic arrives
+        function updateHeaderForArrival() {
+            const headerContent = document.querySelector('.header-content h1');
+            if (headerContent) {
+                headerContent.textContent = 'Your Mechanic Has Arrived!';
+            }
+            
+            const liveText = document.querySelector('.header-content p');
+            if (liveText) {
+                liveText.innerHTML = '<span class="live-dot"></span>Mechanic at your location';
+            }
+        }
+
+        // Connection Status Management (4th Feature)
+        function updateConnectionStatus(status) {
+            connectionStatus = status;
+            const liveText = document.querySelector('.header-content p');
+            const liveDot = document.querySelector('.live-dot');
+            
+            if (!liveText || hasArrivedNotified) return;
+            
+            switch (status) {
+                case 'connected':
+                    liveText.innerHTML = '<span class="live-dot"></span>Live tracking active';
+                    if (liveDot) {
+                        liveDot.style.background = '#10b981';
+                        liveDot.style.animation = 'pulse 2s infinite';
+                    }
+                    break;
+                case 'connecting':
+                    liveText.innerHTML = '<span class="live-dot"></span>Connecting...';
+                    if (liveDot) {
+                        liveDot.style.background = '#f59e0b';
+                        liveDot.style.animation = 'pulse 1s infinite';
+                    }
+                    break;
+                case 'error':
+                    liveText.innerHTML = '<span class="live-dot"></span>Connection issues';
+                    if (liveDot) {
+                        liveDot.style.background = '#ef4444';
+                        liveDot.style.animation = 'pulse 0.5s infinite';
+                    }
+                    break;
+            }
+        }
+
+        // Smart refresh system with connection monitoring
+        function startSmartRefresh() {
+            if (updateInterval) clearInterval(updateInterval);
+            
+            updateInterval = setInterval(() => {
+                if (isTracking) {
+                    // Check if we haven't updated in more than 20 seconds
+                    if (lastUpdateTime && (new Date() - lastUpdateTime) > 20000) {
+                        updateConnectionStatus('connecting');
+                    }
+                    
+                    loadMechanicLocation();
+                }
+            }, 10000);
+        }
+
+        // Enhanced refresh with visual feedback
+        function refreshData() {
+            const btn = document.getElementById('refreshBtn');
+            btn.classList.add('spinning');
+            updateConnectionStatus('connecting');
+            
+            Promise.all([
+                loadBookingData(),
+                loadMechanicLocation()
+            ]).then(() => {
+                updateConnectionStatus('connected');
+            }).catch(() => {
+                updateConnectionStatus('error');
+            }).finally(() => {
+                setTimeout(() => {
+                    btn.classList.remove('spinning');
+                }, 1000);
+            });
         }
 
         function updateMechanicStatus() {
@@ -1130,20 +1430,6 @@
             window.location.href = `tel:${phoneNumber}`;
         }
 
-        function refreshData() {
-            const btn = document.getElementById('refreshBtn');
-            btn.classList.add('spinning');
-            
-            Promise.all([
-                loadBookingData(),
-                loadMechanicLocation()
-            ]).finally(() => {
-                setTimeout(() => {
-                    btn.classList.remove('spinning');
-                }, 1000);
-            });
-        }
-
         function showError(message) {
             const errorDiv = document.createElement('div');
             errorDiv.className = 'error-message';
@@ -1160,16 +1446,33 @@
         // ===========================================
         document.addEventListener('visibilitychange', () => {
             isTracking = !document.hidden;
-            if (isTracking) loadMechanicLocation();
+            if (isTracking) {
+                loadMechanicLocation();
+                startSmartRefresh();
+            } else {
+                if (updateInterval) clearInterval(updateInterval);
+            }
         });
 
         window.addEventListener('focus', () => {
             isTracking = true;
             loadMechanicLocation();
+            startSmartRefresh();
         });
 
         window.addEventListener('blur', () => {
             isTracking = false;
+            if (updateInterval) clearInterval(updateInterval);
+        });
+
+        // Handle network connectivity
+        window.addEventListener('online', () => {
+            updateConnectionStatus('connecting');
+            loadMechanicLocation();
+        });
+
+        window.addEventListener('offline', () => {
+            updateConnectionStatus('error');
         });
     </script>
 </body>
