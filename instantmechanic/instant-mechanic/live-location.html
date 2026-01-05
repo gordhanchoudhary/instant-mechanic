@@ -782,6 +782,14 @@
     <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAhQ7pefYjHolK8tjYqgdSZ7XXZSUaglp4&callback=initMap&libraries=geometry"></script>
 
     <script>
+        // Hide loading screen immediately when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                const loading = document.getElementById('loading');
+                if (loading) loading.style.display = 'none';
+            }, 2000);
+        });
+
         // ===========================================
         // CONFIGURATION
         // ===========================================
@@ -875,7 +883,12 @@
             });
             directionsRenderer.setMap(map);
 
-            // Load data
+            // Hide loading immediately when map initializes
+            setTimeout(() => {
+                document.getElementById('loading').style.display = 'none';
+            }, 1000);
+
+            // Load data in background
             loadBookingData();
             loadMechanicLocation();
             
@@ -948,6 +961,21 @@
                     throw new Error(`Failed to load booking data: ${response.status}`);
                 }
             } catch (error) {
+                console.error('Error loading booking:', error);
+                // Set fallback booking data to prevent UI breaks
+                bookingData = {
+                    id: bookingId,
+                    booking_status: 'PENDING',
+                    car: 'Vehicle',
+                    problem: 'Service Request',
+                    price: 'Rs 788',
+                    customer_mobile: '9180057356',
+                    mechanic_name: 'Mechanic',
+                    agent_mobile: '9554889260',
+                    car_image: 'https://via.placeholder.com/80x60?text=Car',
+                    location: null
+                };
+                updateBookingUI();
                 showError('Failed to load booking information');
             }
         }
@@ -1020,11 +1048,6 @@
                 if (lastUpdateTime && (new Date() - lastUpdateTime) > 30000) {
                     showError('Connection lost. Retrying...');
                 }
-            } finally {
-                // Always hide loading on first load
-                if (!lastUpdateTime) {
-                    document.getElementById('loading').style.display = 'none';
-                }
             }
         }
 
@@ -1033,94 +1056,109 @@
         // ===========================================
         function updateBookingUI() {
             // Update booking header
-            document.getElementById('bookingId').textContent = `Booking #${bookingData.id}`;
+            document.getElementById('bookingId').textContent = `Booking #${bookingData.id || bookingId}`;
             document.getElementById('bookingStatus').textContent = bookingData.booking_status || 'PENDING';
 
             // Update service details
             const serviceDetails = document.getElementById('serviceDetails');
-            serviceDetails.innerHTML = `
-                <img src="${bookingData.car_image}" alt="Car" class="car-image">
-                <div class="service-info">
-                    <h3>${bookingData.car}</h3>
-                    <div class="service-meta">
-                        <div class="meta-item">
-                            <i class="fas fa-tools"></i>
-                            <span>${bookingData.problem}</span>
-                        </div>
-                        <div class="meta-item">
-                            <i class="fas fa-rupee-sign"></i>
-                            <span class="price-highlight">${bookingData.price}</span>
-                        </div>
-                        <div class="meta-item">
-                            <i class="fas fa-phone"></i>
-                            <span>${bookingData.customer_mobile}</span>
+            if (serviceDetails) {
+                serviceDetails.innerHTML = `
+                    <img src="${bookingData.car_image || 'https://via.placeholder.com/80x60?text=Car'}" alt="Car" class="car-image" onerror="this.src='https://via.placeholder.com/80x60?text=Car'">
+                    <div class="service-info">
+                        <h3>${bookingData.car || 'Vehicle'}</h3>
+                        <div class="service-meta">
+                            <div class="meta-item">
+                                <i class="fas fa-tools"></i>
+                                <span>${bookingData.problem || 'Service Request'}</span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-rupee-sign"></i>
+                                <span class="price-highlight">${bookingData.price || '--'}</span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-phone"></i>
+                                <span>${bookingData.customer_mobile || '--'}</span>
+                            </div>
                         </div>
                     </div>
-                </div>
-            `;
+                `;
+            }
 
             // Update mechanic section
             const mechanicSection = document.getElementById('mechanicSection');
-            mechanicSection.innerHTML = `
-                <div class="mechanic-header">
-                    <div class="mechanic-avatar">
-                        ${bookingData.mechanic_name ? bookingData.mechanic_name.charAt(0).toUpperCase() : 'M'}
-                    </div>
-                    <div class="mechanic-info">
-                        <h4>${bookingData.mechanic_name || 'Mechanic'}</h4>
-                        <div class="mechanic-phone">
-                            <i class="fas fa-phone"></i>
-                            <span>${bookingData.agent_mobile}</span>
+            if (mechanicSection) {
+                const mechanicName = bookingData.mechanic_name || 'Mechanic';
+                const mechanicPhone = bookingData.agent_mobile || '--';
+                
+                mechanicSection.innerHTML = `
+                    <div class="mechanic-header">
+                        <div class="mechanic-avatar">
+                            ${mechanicName.charAt(0).toUpperCase()}
                         </div>
-                        <div class="mechanic-status status-moving" id="mechanicStatus">
-                            <i class="fas fa-circle"></i>
-                            <span>Connecting...</span>
+                        <div class="mechanic-info">
+                            <h4>${mechanicName}</h4>
+                            <div class="mechanic-phone">
+                                <i class="fas fa-phone"></i>
+                                <span>${mechanicPhone}</span>
+                            </div>
+                            <div class="mechanic-status status-moving" id="mechanicStatus">
+                                <i class="fas fa-circle"></i>
+                                <span>Connecting...</span>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <button class="call-button" onclick="callMechanic('${bookingData.agent_mobile}')">
-                    <i class="fas fa-phone"></i>
-                    Call ${bookingData.mechanic_name || 'Mechanic'}
-                </button>
-            `;
+                    <button class="call-button" onclick="callMechanic('${mechanicPhone}')">
+                        <i class="fas fa-phone"></i>
+                        Call ${mechanicName}
+                    </button>
+                `;
+            }
         }
 
         function setupCustomerLocation() {
-            if (bookingData.location) {
+            if (bookingData && bookingData.location) {
                 const urlMatch = bookingData.location.match(/q=(-?\d+\.?\d*),(-?\d+\.?\d*)/);
                 if (urlMatch) {
                     const customerLat = parseFloat(urlMatch[1]);
                     const customerLng = parseFloat(urlMatch[2]);
-                    const customerLocation = { lat: customerLat, lng: customerLng };
                     
-                    customerMarker = new google.maps.Marker({
-                        position: customerLocation,
-                        map: map,
-                        title: 'Your Location',
-                        icon: {
-                            path: "m12,0c-4.4,0-8,3.6-8,8 0,5.4 7.9,16 7.9,16 0.1,0.1 0.1,0.1 0.2,0 0,0 7.9-10.6 7.9-16 0-4.4-3.6-8-8-8z",
+                    // Validate coordinates
+                    if (!isNaN(customerLat) && !isNaN(customerLng)) {
+                        const customerLocation = { lat: customerLat, lng: customerLng };
+                        
+                        customerMarker = new google.maps.Marker({
+                            position: customerLocation,
+                            map: map,
+                            title: 'Your Location',
+                            icon: {
+                                path: "m12,0c-4.4,0-8,3.6-8,8 0,5.4 7.9,16 7.9,16 0.1,0.1 0.1,0.1 0.2,0 0,0 7.9-10.6 7.9-16 0-4.4-3.6-8-8-8z",
+                                fillColor: '#ef4444',
+                                fillOpacity: 1,
+                                strokeColor: '#ffffff',
+                                strokeWeight: 3,
+                                scale: 2,
+                                anchor: new google.maps.Point(12, 32)
+                            }
+                        });
+
+                        geofenceCircle = new google.maps.Circle({
+                            strokeColor: '#ef4444',
+                            strokeOpacity: 0.8,
+                            strokeWeight: 2,
                             fillColor: '#ef4444',
-                            fillOpacity: 1,
-                            strokeColor: '#ffffff',
-                            strokeWeight: 3,
-                            scale: 2,
-                            anchor: new google.maps.Point(12, 32)
-                        }
-                    });
+                            fillOpacity: 0.1,
+                            map: map,
+                            center: customerLocation,
+                            radius: 300
+                        });
 
-                    geofenceCircle = new google.maps.Circle({
-                        strokeColor: '#ef4444',
-                        strokeOpacity: 0.8,
-                        strokeWeight: 2,
-                        fillColor: '#ef4444',
-                        fillOpacity: 0.1,
-                        map: map,
-                        center: customerLocation,
-                        radius: 300
-                    });
-
-                    map.setCenter(customerLocation);
+                        map.setCenter(customerLocation);
+                    }
                 }
+            } else {
+                // Set default location if no customer location provided
+                const defaultLocation = { lat: 28.4354417, lng: 77.0349183 };
+                map.setCenter(defaultLocation);
             }
         }
 
