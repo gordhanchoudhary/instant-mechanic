@@ -26,37 +26,38 @@
             height: 100vh;
         }
 
-        /* Header */
+        /* Header - Compact */
         .header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 1rem 1.5rem;
+            padding: 0.75rem 1.5rem;
             display: flex;
             align-items: center;
             gap: 1rem;
             box-shadow: 0 2px 20px rgba(0,0,0,0.1);
             z-index: 100;
+            flex-shrink: 0;
         }
 
         .header-icon {
-            width: 40px;
-            height: 40px;
+            width: 32px;
+            height: 32px;
             background: rgba(255,255,255,0.2);
-            border-radius: 12px;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.2rem;
+            font-size: 1rem;
         }
 
         .header-content h1 {
-            font-size: 1.3rem;
+            font-size: 1.1rem;
             font-weight: 700;
-            margin-bottom: 0.25rem;
+            margin-bottom: 0.125rem;
         }
 
         .header-content p {
-            font-size: 0.85rem;
+            font-size: 0.75rem;
             opacity: 0.9;
             display: flex;
             align-items: center;
@@ -76,10 +77,11 @@
             50% { opacity: 0.7; transform: scale(1.1); }
         }
 
-        /* Map Container */
+        /* Map Container - 60% of screen */
         .map-section {
-            flex: 1;
+            height: 60vh;
             position: relative;
+            flex-shrink: 0;
         }
 
         #map {
@@ -87,17 +89,17 @@
             height: 100%;
         }
 
-        /* ETA Overlay - Simple and Clean */
+        /* ETA Overlay - Smaller and positioned better */
         .eta-overlay {
             position: absolute;
-            top: 20px;
-            left: 20px;
-            right: 20px;
+            top: 15px;
+            left: 15px;
+            right: 15px;
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
-            border-radius: 16px;
-            padding: 1rem;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            padding: 0.75rem 1rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
@@ -110,48 +112,86 @@
         .eta-main {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
+            gap: 0.5rem;
         }
 
         .eta-time {
-            font-size: 2rem;
+            font-size: 1.5rem;
             font-weight: 700;
             color: #10b981;
         }
 
         .eta-label {
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             color: #64748b;
             font-weight: 500;
         }
 
         .eta-distance {
-            font-size: 1.1rem;
+            font-size: 1rem;
             font-weight: 600;
             color: #1e293b;
         }
 
-        /* Bottom Info Panel */
+        /* Bottom Info Panel - 40% of screen, scrollable */
         .info-panel {
+            height: 40vh;
             background: white;
-            border-radius: 24px 24px 0 0;
-            padding: 1.5rem;
+            border-radius: 20px 20px 0 0;
             box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
             z-index: 50;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
         }
 
-        /* Booking Header */
+        /* Scroll indicator for info panel */
+        .info-panel::-webkit-scrollbar {
+            width: 3px;
+        }
+
+        .info-panel::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 10px;
+        }
+
+        .info-panel::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+
+        .info-panel::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* Pull indicator at top of info panel */
+        .info-panel::before {
+            content: '';
+            width: 40px;
+            height: 4px;
+            background: #e2e8f0;
+            border-radius: 2px;
+            margin: 0 auto 0.75rem auto;
+            flex-shrink: 0;
+        }
+
+        /* Booking Header - More compact */
         .booking-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
             border-bottom: 1px solid #e2e8f0;
+            flex-shrink: 0;
         }
 
         .booking-id {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             color: #64748b;
             font-weight: 500;
         }
@@ -159,56 +199,57 @@
         .booking-status {
             background: #fef3c7;
             color: #d97706;
-            padding: 0.4rem 1rem;
-            border-radius: 20px;
-            font-size: 0.8rem;
+            padding: 0.3rem 0.8rem;
+            border-radius: 16px;
+            font-size: 0.75rem;
             font-weight: 600;
             text-transform: uppercase;
         }
 
-        /* Service Details */
+        /* Service Details - More compact */
         .service-details {
             display: grid;
             grid-template-columns: auto 1fr;
-            gap: 1rem;
+            gap: 0.75rem;
             align-items: center;
-            margin-bottom: 1.5rem;
-            padding-bottom: 1.5rem;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
             border-bottom: 1px solid #e2e8f0;
         }
 
         .car-image {
-            width: 80px;
-            height: 60px;
+            width: 70px;
+            height: 50px;
             object-fit: cover;
-            border-radius: 12px;
+            border-radius: 10px;
             border: 2px solid #e2e8f0;
         }
 
         .service-info h3 {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: 700;
             color: #1e293b;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.4rem;
         }
 
         .service-meta {
             display: flex;
             flex-direction: column;
-            gap: 0.25rem;
+            gap: 0.2rem;
         }
 
         .meta-item {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            font-size: 0.9rem;
+            gap: 0.4rem;
+            font-size: 0.8rem;
             color: #64748b;
         }
 
         .meta-item i {
-            width: 16px;
+            width: 14px;
             color: #667eea;
+            font-size: 0.75rem;
         }
 
         .price-highlight {
@@ -216,92 +257,94 @@
             font-weight: 600;
         }
 
-        /* Stats Grid */
+        /* Stats Grid - More compact */
         .stats-section {
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
+            flex-shrink: 0;
         }
 
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 1rem;
+            gap: 0.75rem;
         }
 
         .stat-card {
             text-align: center;
-            padding: 1rem;
+            padding: 0.75rem 0.5rem;
             background: #f8fafc;
-            border-radius: 16px;
+            border-radius: 12px;
             border: 1px solid #e2e8f0;
         }
 
         .stat-value {
-            font-size: 1.4rem;
+            font-size: 1.2rem;
             font-weight: 700;
             color: #1e293b;
-            margin-bottom: 0.25rem;
+            margin-bottom: 0.2rem;
         }
 
         .stat-label {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             color: #64748b;
             text-transform: uppercase;
             font-weight: 500;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.3px;
         }
 
-        /* Mechanic Card */
+        /* Mechanic Card - More compact */
         .mechanic-section {
             background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
             border-radius: 16px;
-            padding: 1.5rem;
+            padding: 1rem;
             border: 1px solid #bae6fd;
+            flex-shrink: 0;
         }
 
         .mechanic-header {
             display: flex;
             align-items: center;
-            gap: 1rem;
-            margin-bottom: 1rem;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
         }
 
         .mechanic-avatar {
-            width: 60px;
-            height: 60px;
+            width: 50px;
+            height: 50px;
             background: linear-gradient(135deg, #10b981, #059669);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             font-weight: 700;
         }
 
         .mechanic-info h4 {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: 600;
             color: #1e293b;
-            margin-bottom: 0.25rem;
+            margin-bottom: 0.2rem;
         }
 
         .mechanic-phone {
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             color: #64748b;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.4rem;
         }
 
         .mechanic-status {
             display: inline-flex;
             align-items: center;
-            gap: 0.5rem;
-            font-size: 0.85rem;
+            gap: 0.4rem;
+            font-size: 0.75rem;
             font-weight: 500;
-            margin-top: 0.5rem;
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
+            margin-top: 0.4rem;
+            padding: 0.2rem 0.6rem;
+            border-radius: 16px;
         }
 
         .status-moving {
@@ -324,17 +367,17 @@
             background: linear-gradient(135deg, #10b981, #059669);
             color: white;
             border: none;
-            padding: 1rem;
-            border-radius: 16px;
-            font-size: 1rem;
+            padding: 0.8rem;
+            border-radius: 12px;
+            font-size: 0.9rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 0.75rem;
-            margin-top: 1rem;
+            gap: 0.6rem;
+            margin-top: 0.75rem;
         }
 
         .call-button:hover {
@@ -394,20 +437,20 @@
             font-size: 0.9rem;
         }
 
-        /* Refresh Button */
+        /* Refresh Button - positioned in map area */
         .refresh-btn {
             position: absolute;
-            bottom: 20px;
-            right: 20px;
-            width: 48px;
-            height: 48px;
+            bottom: 15px;
+            right: 15px;
+            width: 44px;
+            height: 44px;
             background: linear-gradient(135deg, #667eea, #764ba2);
             color: white;
             border: none;
             border-radius: 50%;
-            font-size: 1.1rem;
+            font-size: 1rem;
             cursor: pointer;
-            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
             transition: all 0.3s ease;
             z-index: 60;
         }
@@ -422,43 +465,139 @@
 
         /* Mobile Optimizations */
         @media (max-width: 768px) {
+            .header {
+                padding: 0.5rem 1rem;
+            }
+
+            .header-content h1 {
+                font-size: 1rem;
+            }
+
+            .header-content p {
+                font-size: 0.7rem;
+            }
+
             .eta-overlay {
-                left: 15px;
-                right: 15px;
-                top: 15px;
+                left: 10px;
+                right: 10px;
+                top: 10px;
+                padding: 0.6rem 0.8rem;
             }
 
             .eta-time {
-                font-size: 1.6rem;
+                font-size: 1.3rem;
+            }
+
+            .eta-label {
+                font-size: 0.75rem;
+            }
+
+            .eta-distance {
+                font-size: 0.9rem;
+            }
+
+            .info-panel {
+                padding: 0.75rem;
             }
 
             .stats-grid {
                 grid-template-columns: repeat(2, 1fr);
-                gap: 0.75rem;
+                gap: 0.6rem;
             }
 
             .stat-card {
-                padding: 0.75rem;
+                padding: 0.6rem 0.4rem;
+            }
+
+            .stat-value {
+                font-size: 1.1rem;
+            }
+
+            .stat-label {
+                font-size: 0.65rem;
             }
 
             .service-details {
                 grid-template-columns: 1fr;
                 text-align: center;
-                gap: 0.75rem;
+                gap: 0.6rem;
             }
 
             .car-image {
                 justify-self: center;
-                width: 100px;
-                height: 75px;
+                width: 80px;
+                height: 60px;
             }
 
-            .header {
-                padding: 1rem;
+            .service-info h3 {
+                font-size: 1rem;
+            }
+
+            .meta-item {
+                font-size: 0.75rem;
+                justify-content: center;
+            }
+
+            .mechanic-section {
+                padding: 0.8rem;
+            }
+
+            .mechanic-avatar {
+                width: 45px;
+                height: 45px;
+                font-size: 1.2rem;
+            }
+
+            .mechanic-info h4 {
+                font-size: 1rem;
+            }
+
+            .mechanic-phone {
+                font-size: 0.75rem;
+            }
+
+            .call-button {
+                padding: 0.7rem;
+                font-size: 0.85rem;
+            }
+
+            .refresh-btn {
+                width: 40px;
+                height: 40px;
+                bottom: 12px;
+                right: 12px;
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Extra small screens */
+        @media (max-width: 480px) {
+            .map-section {
+                height: 58vh;
             }
 
             .info-panel {
-                padding: 1rem;
+                height: 42vh;
+            }
+
+            .eta-main {
+                gap: 0.4rem;
+            }
+
+            .eta-time {
+                font-size: 1.2rem;
+            }
+
+            .stats-grid {
+                gap: 0.5rem;
+            }
+
+            .stat-card {
+                padding: 0.5rem 0.3rem;
+            }
+
+            .stat-value {
+                font-size: 1rem;
             }
         }
     </style>
@@ -921,12 +1060,12 @@
                         const leg = route.legs[0];
                         updateETA(leg);
                         
-                        // Fit bounds with padding
+                        // Fit bounds with proper padding for 60% map area
                         const bounds = new google.maps.LatLngBounds();
                         bounds.extend(mechanicPos);
                         bounds.extend(customerPos);
                         map.fitBounds(bounds, { 
-                            padding: { top: 120, right: 50, bottom: 400, left: 50 }
+                            padding: { top: 80, right: 30, bottom: 80, left: 30 }
                         });
                     } else {
                         updateFallbackStats();
