@@ -381,8 +381,8 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>📱 Camera Test & Upload</h1>
-            <p>Test photo capture with JavaScript Bridge & AWS S3 Upload</p>
+            <h1>📱 Camera Upload Ready</h1>
+            <p>Photo capture with JavaScript Bridge & AWS S3 Upload - Ready to Go!</p>
         </div>
 
         <div class="content">
@@ -421,11 +421,11 @@
                 <div class="api-info">
                     <h4>Upload Endpoint:</h4>
                     <div style="font-family: 'Courier New', monospace; background: #e9ecef; padding: 8px; border-radius: 4px;">
-                        <span id="uploadUrl">[Please provide your upload API URL]</span>
+                        <span id="uploadUrl">https://ai.instantmechanic.online/bot/upload-car-image/</span>
                         <button class="copy-btn" onclick="copyToClipboard('uploadUrl')">Copy</button>
                     </div>
-                    <p style="margin-top: 10px; font-size: 12px; color: #6c757d;">
-                        Update the UPLOAD_API_URL variable in the JavaScript code with your actual endpoint
+                    <p style="margin-top: 10px; font-size: 12px; color: #28a745;">
+                        ✅ API endpoint configured and ready for uploads
                     </p>
                 </div>
             </div>
@@ -464,7 +464,7 @@
 
     <script>
         // Configuration
-        const UPLOAD_API_URL = 'YOUR_UPLOAD_API_ENDPOINT_HERE'; // Replace with your actual API URL
+        const UPLOAD_API_URL = 'https://ai.instantmechanic.online/bot/upload-car-image/';
         
         let capturedPhotos = [];
         let photoCount = 0;
@@ -480,13 +480,8 @@
 
         function updateUploadUrlDisplay() {
             const urlElement = document.getElementById('uploadUrl');
-            if (UPLOAD_API_URL === 'YOUR_UPLOAD_API_ENDPOINT_HERE') {
-                urlElement.textContent = 'Please configure your upload API URL';
-                urlElement.style.color = '#dc3545';
-            } else {
-                urlElement.textContent = UPLOAD_API_URL;
-                urlElement.style.color = '#28a745';
-            }
+            urlElement.textContent = UPLOAD_API_URL;
+            urlElement.style.color = '#28a745';
         }
 
         // JavaScript Bridge Methods
@@ -636,11 +631,6 @@
         }
 
         async function uploadToAWS(photoData, fileName, photoId) {
-            if (UPLOAD_API_URL === 'YOUR_UPLOAD_API_ENDPOINT_HERE') {
-                updateUploadStatus(photoId, 'error', 'Upload API URL not configured');
-                return;
-            }
-
             try {
                 // Convert base64 to blob if needed
                 let blob;
