@@ -7,6 +7,33 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
+
+        /* Agent shift dropdown */
+.shift-row {
+    background: #f8fafc;
+}
+
+.shift-details {
+    padding: 1rem 1.5rem;
+    font-size: 0.85rem;
+    color: #374151;
+}
+
+.shift-details span {
+    display: inline-block;
+    margin-right: 1.5rem;
+    font-weight: 500;
+}
+
+.agent-clickable {
+    cursor: pointer;
+    color: #2563eb;
+}
+
+.agent-clickable:hover {
+    text-decoration: underline;
+}
+
         :root {
             --primary-color: #3b82f6;
             --primary-dark: #2563eb;
@@ -871,20 +898,23 @@
                     </div>
                     <div style="overflow-x: auto;">
                         <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Agent</th>
-                                    <th>Type</th>
-                                    <th>Working Hours</th>
-                                    <th>Chats</th>
-                                    <th>Bookings</th>
-                                    <th>Cancelled</th>
-                                    <th>Conversion Rate</th>
-                                    <th>Cancellation Rate</th>
-                                    <th>Revenue</th>
-                                    <th>Efficiency</th>
-                                </tr>
-                            </thead>
+                         <thead>
+<tr>
+    <th>Agent</th>
+    <th>Total Chats</th>
+    <th>Total Bookings</th>
+    <th>Total Cancelled</th>
+    <th>Net Bookings</th>
+    <th>Overall Conversion %</th>
+    <th>Net Conversion %</th>
+    <th>Cancellation %</th>
+    <th>Revenue</th>
+    <th>Efficacy (₹/hr)</th>
+</tr>
+</thead>
+
+
+
                             <tbody id="performanceTableBody">
                                 <!-- Table rows will be populated by JavaScript -->
                             </tbody>
@@ -1940,7 +1970,11 @@
                     
                     row.innerHTML = `
                         <td>${new Date(date).toLocaleDateString()}</td>
-                        <td class="agent-name">${agentName}</td>
+                       <td class="agent-name agent-clickable" 
+    onclick="toggleShiftDetails('${date}','${agentName}', this)">
+    ${agentName}
+</td>
+
                         <td>
                             <span class="status-badge ${data.isLive ? 'live' : 'offline'}">
                                 ${data.isLive ? 'Live' : 'Offline'}
@@ -1960,95 +1994,152 @@
         }
 
         // Update performance table
-        function updatePerformanceTable() {
-            const tbody = document.getElementById('performanceTableBody');
-            tbody.innerHTML = '';
+       function updatePerformanceTable() {
+    const tbody = document.getElementById('performanceTableBody');
+    tbody.innerHTML = '';
 
-            // Calculate agent working hours
-            const agentHours = {};
-            activityData.forEach(activity => {
-                if (activity.activity_type !== 'Regular') return;
-                
-                if (!agentHours[activity.agent_name]) {
-                    agentHours[activity.agent_name] = 0;
-                }
-                
-                let hours;
-                if (activity.end_time) {
-                    const start = new Date(activity.start_time);
-                    const end = new Date(activity.end_time);
-                    hours = (end - start) / (1000 * 60 * 60);
-                } else {
-                    const start = new Date(activity.start_time);
-                    const now = new Date();
-                    hours = (now - start) / (1000 * 60 * 60);
-                }
-                
-                agentHours[activity.agent_name] += hours;
-            });
+    /* -------- Working hours per agent -------- */
+    const agentHours = {};
+    activityData.forEach(a => {
+        if (a.activity_type !== 'Regular') return;
 
-            // Calculate agent totals
-            const agentTotals = {};
-            performanceData.forEach(agent => {
-                if (!agentTotals[agent.agent]) {
-                    agentTotals[agent.agent] = {
-                        type: agent.agent_type,
-                        chats: 0,
-                        bookings: 0,
-                        cancelled: 0,
-                        revenue: 0
-                    };
-                }
-                agentTotals[agent.agent].chats += agent.chats_handled || 0;
-                agentTotals[agent.agent].bookings += agent.total_bookings || 0;
-                agentTotals[agent.agent].cancelled += agent.cancelled_bookings || 0;
-                agentTotals[agent.agent].revenue += agent.total_revenue || 0;
-            });
+        if (!agentHours[a.agent_name]) agentHours[a.agent_name] = 0;
 
-            // Sort by revenue descending
-            const sortedAgents = Object.keys(agentTotals).sort((a, b) => 
-                agentTotals[b].revenue - agentTotals[a].revenue
-            );
+        const start = new Date(a.start_time);
+        const end = a.end_time ? new Date(a.end_time) : new Date();
+        agentHours[a.agent_name] += (end - start) / (1000 * 60 * 60);
+    });
 
-            sortedAgents.forEach(agentName => {
-                const agent = agentTotals[agentName];
-                const workingHours = agentHours[agentName] || 0;
-                
-                const conversionRate = agent.chats > 0 ? 
-                    ((agent.bookings / agent.chats) * 100) : 0;
-                const cancellationRate = agent.bookings > 0 ? 
-                    ((agent.cancelled / agent.bookings) * 100) : 0;
-                
-                // Calculate efficiency (revenue per hour)
-                const efficiency = workingHours > 0 ? 
-                    Math.round(agent.revenue / workingHours) : 0;
-                
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td class="agent-name">${agentName}</td>
-                    <td>
-                        <span class="agent-type-badge ${agent.type === 'primary' || agent.type === 'both' ? 'primary' : 'secondary'}">
-                            ${agent.type === 'both' ? 'Primary' : agent.type}
-                        </span>
-                    </td>
-                    <td class="metric-value ${workingHours < 6 ? 'metric-negative' : 'metric-neutral'}">
-                        ${workingHours.toFixed(1)}h
-                    </td>
-                    <td class="metric-value">${agent.chats.toLocaleString()}</td>
-                    <td class="metric-value">${agent.bookings.toLocaleString()}</td>
-                    <td class="metric-value metric-negative">${agent.cancelled.toLocaleString()}</td>
-                    <td class="metric-value ${conversionRate < 45 ? 'conversion-problem' : conversionRate >= 60 ? 'metric-positive' : 'metric-neutral'}">
-                        ${conversionRate.toFixed(1)}%
-                    </td>
-                    <td class="metric-value ${cancellationRate > 30 ? 'cancellation-problem' : cancellationRate > 20 ? 'metric-warning' : 'metric-positive'}">
-                        ${cancellationRate.toFixed(1)}%
-                    </td>
-                    <td class="metric-value metric-positive">₹${agent.revenue.toLocaleString()}</td>
-                    <td class="metric-value metric-primary">₹${efficiency}/hr</td>
-                `;
-                tbody.appendChild(row);
-            });
+    /* -------- Aggregate performance -------- */
+    const agentTotals = {};
+    performanceData.forEach(a => {
+        if (!agentTotals[a.agent]) {
+            agentTotals[a.agent] = {
+                chats: 0,
+                bookings: 0,
+                cancelled: 0,
+                revenue: 0
+            };
         }
+
+        agentTotals[a.agent].chats += a.chats_handled || 0;
+        agentTotals[a.agent].bookings += a.total_bookings || 0;
+        agentTotals[a.agent].cancelled += a.cancelled_bookings || 0;
+        agentTotals[a.agent].revenue += a.total_revenue || 0;
+    });
+
+    /* -------- Render rows -------- */
+    Object.keys(agentTotals).forEach(agent => {
+        const d = agentTotals[agent];
+        const hours = agentHours[agent] || 0;
+
+        const netBookings = d.bookings - d.cancelled;
+
+        const overallConversion =
+            d.chats > 0 ? (d.bookings / d.chats) * 100 : 0;
+
+        const netConversion =
+            d.chats > 0 ? (netBookings / d.chats) * 100 : 0;
+
+        const cancellationRate =
+            d.bookings > 0 ? (d.cancelled / d.bookings) * 100 : 0;
+
+        const efficacy =
+            hours > 0 ? Math.round(d.revenue / hours) : 0;
+
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td class="agent-name">${agent}</td>
+
+            <td class="metric-value">${d.chats}</td>
+
+            <td class="metric-value">${d.bookings}</td>
+
+            <td class="metric-value metric-negative">${d.cancelled}</td>
+
+            <td class="metric-value metric-primary">${netBookings}</td>
+
+            <td class="metric-value ${
+                overallConversion < 45 ? 'conversion-problem' : 'metric-positive'
+            }">
+                ${overallConversion.toFixed(1)}%
+            </td>
+
+            <td class="metric-value ${
+                netConversion < 45 ? 'conversion-problem' : 'metric-positive'
+            }">
+                ${netConversion.toFixed(1)}%
+            </td>
+
+            <td class="metric-value ${
+                cancellationRate > 30 ? 'cancellation-problem' :
+                cancellationRate > 20 ? 'metric-warning' :
+                'metric-positive'
+            }">
+                ${cancellationRate.toFixed(1)}%
+            </td>
+
+            <td class="metric-value metric-positive">
+                ₹${d.revenue.toLocaleString()}
+            </td>
+
+            <td class="metric-value metric-primary">
+                ₹${efficacy}/hr
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+
+
+
+
+        
+
+        function toggleShiftDetails(date, agentName, el) {
+    // Remove existing open dropdown (if any)
+    const existing = el.closest('tr').nextSibling;
+    if (existing && existing.classList?.contains('shift-row')) {
+        existing.remove();
+        return;
+    }
+
+    // Collect shift sessions
+    const shifts = activityData.filter(a =>
+        a.activity_type === 'Regular' &&
+        a.agent_name === agentName &&
+        a.start_time.startsWith(date)
+    );
+
+    if (!shifts.length) return;
+
+    let html = shifts.map((s, i) => {
+        const start = new Date(s.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const end = s.end_time
+            ? new Date(s.end_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            : 'Live';
+
+        return `
+            <div>
+                <span>Session ${i + 1}</span>
+                <span>ON: ${start}</span>
+                <span>OFF: ${end}</span>
+            </div>
+        `;
+    }).join('');
+
+    const row = document.createElement('tr');
+    row.className = 'shift-row';
+    row.innerHTML = `
+        <td colspan="6">
+            <div class="shift-details">
+                ${html}
+            </div>
+        </td>
+    `;
+
+    el.closest('tr').after(row);
+}
 
         // Show/hide loading
         function showLoading() {
