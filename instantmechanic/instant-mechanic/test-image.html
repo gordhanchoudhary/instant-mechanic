@@ -391,11 +391,14 @@
                 <h2><span class="section-icon">🌉</span> Photo Capture & Upload</h2>
                 <p style="margin-bottom: 20px; color: #6c757d;">Use Android Bridge to capture/select photos and upload to AWS S3</p>
                 
+                <!-- Hidden file input for WebView file chooser -->
+                <input type="file" id="fileInput" accept="image/*" capture="environment" style="display: none;" onchange="handleFileSelect(this)">
+                
                 <div class="button-group">
-                    <button class="btn btn-primary" onclick="openCamera()" id="cameraBtn">
+                    <button class="btn btn-primary" onclick="triggerFileInput('camera')" id="cameraBtn">
                         <span>📸</span> <span>Open Camera</span>
                     </button>
-                    <button class="btn btn-secondary" onclick="openGallery()" id="galleryBtn">
+                    <button class="btn btn-secondary" onclick="triggerFileInput('gallery')" id="galleryBtn">
                         <span>🖼️</span> <span>Open Gallery</span>
                     </button>
                     <button class="btn btn-success" onclick="testBridge()" id="testBtn">
@@ -470,6 +473,7 @@
         let photoCount = 0;
         let uploadedCount = 0;
         let failedCount = 0;
+        let currentMode = 'gallery'; // track current capture mode
 
         // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
@@ -484,59 +488,115 @@
             urlElement.style.color = '#28a745';
         }
 
-        // JavaScript Bridge Methods
-        function openCamera() {
-            console.log('Attempting to open camera via bridge...');
-            const btn = document.getElementById('cameraBtn');
+        // NEW: Trigger file input with proper attributes for camera/gallery
+        function triggerFileInput(mode) {
+            console.log(`Triggering file input in ${mode} mode`);
+            currentMode = mode;
+            
+            const fileInput = document.getElementById('fileInput');
+            const btn = mode === 'camera' ? document.getElementById('cameraBtn') : document.getElementById('galleryBtn');
             
             try {
                 btn.disabled = true;
-                btn.innerHTML = '<div class="loading"></div> <span>Opening Camera...</span>';
+                btn.innerHTML = mode === 'camera' ? 
+                    '<div class="loading"></div> <span>Opening Camera...</span>' : 
+                    '<div class="loading"></div> <span>Opening Gallery...</span>';
                 
-                if (typeof AndroidBridge !== 'undefined' && AndroidBridge.openCamera) {
-                    AndroidBridge.openCamera();
-                    updateStatusMessage('Camera opened via Android Bridge - waiting for photo...', 'info');
-                    console.log('Camera opened successfully');
+                // Set capture attribute for camera mode
+                if (mode === 'camera') {
+                    fileInput.setAttribute('capture', 'environment');
+                    fileInput.setAttribute('accept', 'image/*');
                 } else {
-                    throw new Error('AndroidBridge.openCamera() not available');
+                    fileInput.removeAttribute('capture');
+                    fileInput.setAttribute('accept', 'image/*');
                 }
+                
+                // Trigger the file input
+                fileInput.click();
+                
+                updateStatusMessage(`${mode === 'camera' ? 'Camera' : 'Gallery'} opened - waiting for selection...`, 'info');
+                console.log(`${mode} file input triggered successfully`);
+                
             } catch (error) {
-                console.error('Error opening camera:', error);
-                updateStatusMessage(`Camera Error: ${error.message}`, 'warning');
-                btn.innerHTML = '<span>📸</span> <span>Open Camera</span>';
+                console.error(`Error triggering ${mode}:`, error);
+                updateStatusMessage(`${mode} Error: ${error.message}`, 'warning');
+                btn.innerHTML = mode === 'camera' ? 
+                    '<span>📸</span> <span>Open Camera</span>' : 
+                    '<span>🖼️</span> <span>Open Gallery</span>';
             } finally {
                 setTimeout(() => {
                     btn.disabled = false;
-                    btn.innerHTML = '<span>📸</span> <span>Open Camera</span>';
+                    btn.innerHTML = mode === 'camera' ? 
+                        '<span>📸</span> <span>Open Camera</span>' : 
+                        '<span>🖼️</span> <span>Open Gallery</span>';
                 }, 2000);
             }
         }
 
-        function openGallery() {
-            console.log('Attempting to open gallery via bridge...');
-            const btn = document.getElementById('galleryBtn');
+        // NEW: Handle file selection from WebView's file chooser
+        function handleFileSelect(input) {
+            console.log('File selected:', input.files);
             
-            try {
-                btn.disabled = true;
-                btn.innerHTML = '<div class="loading"></div> <span>Opening Gallery...</span>';
+            if (input.files && input.files.length > 0) {
+                const file = input.files[0];
+                console.log('Selected file:', file.name, file.type, file.size);
                 
-                if (typeof AndroidBridge !== 'undefined' && AndroidBridge.openGallery) {
-                    AndroidBridge.openGallery();
-                    updateStatusMessage('Gallery opened via Android Bridge - waiting for selection...', 'info');
-                    console.log('Gallery opened successfully');
-                } else {
-                    throw new Error('AndroidBridge.openGallery() not available');
-                }
-            } catch (error) {
-                console.error('Error opening gallery:', error);
-                updateStatusMessage(`Gallery Error: ${error.message}`, 'warning');
-                btn.innerHTML = '<span>🖼️</span> <span>Open Gallery</span>';
-            } finally {
-                setTimeout(() => {
-                    btn.disabled = false;
-                    btn.innerHTML = '<span>🖼️</span> <span>Open Gallery</span>';
-                }, 2000);
+                // Create preview and upload
+                const photoId = Date.now() + Math.random();
+                createPhotoPreviewFromFile(file, photoId);
+                
+                // Update counters
+                photoCount++;
+                updateStats();
+                
+                // Start upload
+                uploadToAWS(file, file.name, photoId);
+                
+                updateStatusMessage(`Photo selected! Starting upload...`, 'success');
+                
+                // Clear the input for next use
+                input.value = '';
+            } else {
+                updateStatusMessage('No file selected', 'warning');
             }
+        }
+
+        // NEW: Create preview from File object
+        function createPhotoPreviewFromFile(file, photoId) {
+            const previewContainer = document.getElementById('previewContainer');
+            const previewItem = document.createElement('div');
+            previewItem.className = 'preview-item';
+            previewItem.id = `photo-${photoId}`;
+            
+            // Create object URL for preview
+            const imageUrl = URL.createObjectURL(file);
+            
+            previewItem.innerHTML = `
+                <img src="${imageUrl}" alt="Selected Photo" onload="URL.revokeObjectURL(this.src)">
+                <div class="preview-info">
+                    <strong>${file.name}</strong><br>
+                    Size: ${(file.size / 1024 / 1024).toFixed(2)} MB<br>
+                    Type: ${file.type}<br>
+                    Selected: ${new Date().toLocaleTimeString()}
+                </div>
+                <div class="upload-status uploading" id="status-${photoId}">
+                    <div class="loading-text"></div> Uploading...
+                </div>
+                <button class="remove-btn" onclick="removePhoto('${photoId}')">&times;</button>
+            `;
+            
+            previewContainer.appendChild(previewItem);
+        }
+
+        // LEGACY: Bridge methods (keeping for compatibility)
+        function openCamera() {
+            console.log('Legacy openCamera called - using triggerFileInput instead');
+            triggerFileInput('camera');
+        }
+
+        function openGallery() {
+            console.log('Legacy openGallery called - using triggerFileInput instead');
+            triggerFileInput('gallery');
         }
 
         function testBridge() {
@@ -569,7 +629,8 @@
                     updateStatusMessage(`Bridge test successful! Results: ${testResults.join(', ')}`, 'success');
                     console.log('Bridge test results:', testResults);
                 } else {
-                    throw new Error('AndroidBridge not available');
+                    updateStatusMessage('AndroidBridge not available - using WebView file input instead', 'info');
+                    console.log('AndroidBridge not available, but WebView file chooser is working');
                 }
             } catch (error) {
                 console.error('Bridge test failed:', error);
@@ -582,79 +643,14 @@
             }
         }
 
-        // This function should be called by the Android app when a photo is captured/selected
-        function onPhotoReceived(photoData, fileName = null) {
-            console.log('Photo received from Android Bridge');
-            
-            // photoData could be base64 string or blob
-            const actualFileName = fileName || `photo_${Date.now()}.jpg`;
-            
-            // Create preview immediately
-            const photoId = Date.now() + Math.random();
-            createPhotoPreview(photoData, actualFileName, photoId);
-            
-            // Update counters
-            photoCount++;
-            updateStats();
-            
-            // Start upload
-            uploadToAWS(photoData, actualFileName, photoId);
-            
-            updateStatusMessage('Photo received! Starting upload...', 'success');
-        }
-
-        function createPhotoPreview(photoData, fileName, photoId) {
-            const previewContainer = document.getElementById('previewContainer');
-            const previewItem = document.createElement('div');
-            previewItem.className = 'preview-item';
-            previewItem.id = `photo-${photoId}`;
-            
-            // Handle different data formats
-            let imageSrc = photoData;
-            if (!photoData.startsWith('data:')) {
-                imageSrc = `data:image/jpeg;base64,${photoData}`;
-            }
-            
-            previewItem.innerHTML = `
-                <img src="${imageSrc}" alt="Captured Photo">
-                <div class="preview-info">
-                    <strong>${fileName}</strong><br>
-                    Captured: ${new Date().toLocaleTimeString()}
-                </div>
-                <div class="upload-status uploading" id="status-${photoId}">
-                    <div class="loading-text"></div> Uploading...
-                </div>
-                <button class="remove-btn" onclick="removePhoto('${photoId}')">&times;</button>
-            `;
-            
-            previewContainer.appendChild(previewItem);
-        }
-
-        async function uploadToAWS(photoData, fileName, photoId) {
+        // Upload function - now works with File objects
+        async function uploadToAWS(file, fileName, photoId) {
             try {
-                // Convert base64 to blob if needed
-                let blob;
-                if (typeof photoData === 'string') {
-                    // Remove data URL prefix if present
-                    const base64Data = photoData.replace(/^data:image\/[a-z]+;base64,/, '');
-                    const byteCharacters = atob(base64Data);
-                    const byteNumbers = new Array(byteCharacters.length);
-                    
-                    for (let i = 0; i < byteCharacters.length; i++) {
-                        byteNumbers[i] = byteCharacters.charCodeAt(i);
-                    }
-                    
-                    const byteArray = new Uint8Array(byteNumbers);
-                    blob = new Blob([byteArray], { type: 'image/jpeg' });
-                } else {
-                    blob = photoData;
-                }
-
-                // Create form data
-                const formData = new FormData();
-                formData.append('image', blob, fileName);
-
                 console.log(`Uploading ${fileName} to ${UPLOAD_API_URL}`);
+
+                // Create form data with the file
+                const formData = new FormData();
+                formData.append('image', file, fileName);
 
                 // Upload to your API
                 const response = await fetch(UPLOAD_API_URL, {
@@ -761,7 +757,7 @@
                     
                     deviceInfo += `Available Methods: ${methods.join(', ')}<br>`;
                 } else {
-                    deviceInfo += `<br><strong>Android Bridge:</strong> Not Available<br>`;
+                    deviceInfo += `<br><strong>Android Bridge:</strong> Not Available (using WebView file chooser)<br>`;
                 }
 
                 // Check file upload support
