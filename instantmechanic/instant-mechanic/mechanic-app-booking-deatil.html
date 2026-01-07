@@ -346,7 +346,7 @@
       margin: 4px 0;
     }
 
-    /* Image Upload Styles - Replacing Slider */
+    /* Image Upload Styles - Fixed */
     .completion-section {
       background: var(--surface);
       border-radius: var(--border-radius);
@@ -371,6 +371,11 @@
       cursor: pointer;
       transition: all 0.3s ease;
       margin-bottom: 20px;
+      min-height: 200px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
     }
 
     .image-upload-container:hover {
@@ -381,6 +386,7 @@
     .image-upload-container.has-image {
       border-color: var(--success-color);
       background: #f0f9f0;
+      padding: 10px;
     }
 
     .upload-icon {
@@ -407,10 +413,70 @@
 
     .image-preview {
       max-width: 100%;
-      max-height: 200px;
+      max-height: 300px;
       border-radius: 8px;
-      margin: 15px 0;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      object-fit: cover;
+    }
+
+    /* Uploaded Image Display */
+    .uploaded-image-display {
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .uploaded-image-title {
+      font-size: clamp(0.9rem, 2.5vw, 1rem);
+      color: var(--success-color);
+      font-weight: 600;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .uploaded-image-container {
+      background: var(--surface-variant);
+      border-radius: 12px;
+      padding: 15px;
+      border: 2px solid var(--success-color);
+    }
+
+    .uploaded-image {
+      max-width: 100%;
+      max-height: 250px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      object-fit: cover;
+      margin-bottom: 10px;
+    }
+
+    .uploaded-image-url {
+      font-size: clamp(0.7rem, 2vw, 0.8rem);
+      color: var(--text-secondary);
+      word-break: break-all;
+      background: rgba(255, 255, 255, 0.8);
+      padding: 8px;
+      border-radius: 6px;
+      margin-top: 8px;
+    }
+
+    .change-image-btn {
+      background: var(--warning-color);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: all 0.3s ease;
+    }
+
+    .change-image-btn:hover {
+      background: #d69e2e;
+      transform: translateY(-1px);
     }
 
     .upload-actions {
@@ -789,13 +855,28 @@
         <p style="margin-top: 6px; opacity: 0.9;">इस सर्विस के लिए आपको मिलने वाली राशि</p>
       </div>
 
-      <!-- Image Upload Section - Replacing Slider -->
+      <!-- Image Upload Section - Fixed -->
       <div class="completion-section">
         <h3>📷 गाड़ी की फोटो अपलोड करके बुकिंग पूरी करें</h3>
         
         <div id="completedMessage" style="display: none;" class="completed-message">
           <i class="fas fa-check-circle"></i>
           ये बुकिंग आपने complete कर दी
+        </div>
+        
+        <!-- Show previously uploaded image if exists -->
+        <div id="previousUploadedImage" style="display: none;" class="uploaded-image-display">
+          <div class="uploaded-image-title">
+            <i class="fas fa-check-circle"></i>
+            पहले से अपलोड की गई फोटो
+          </div>
+          <div class="uploaded-image-container">
+            <img id="previousImagePreview" class="uploaded-image" alt="Previously uploaded image">
+            <div class="uploaded-image-url" id="previousImageUrl"></div>
+            <button class="change-image-btn" onclick="changeUploadedImage()">
+              <i class="fas fa-edit"></i> फोटो बदलें
+            </button>
+          </div>
         </div>
         
         <div id="imageUploadContainer">
@@ -814,11 +895,11 @@
 
           <!-- Upload Actions -->
           <div class="upload-actions">
-            <button class="upload-btn btn-camera" onclick="openCamera()">
+            <button class="upload-btn btn-camera" onclick="openCamera()" id="cameraBtn">
               <i class="fas fa-camera"></i>
               कैमरा खोलें
             </button>
-            <button class="upload-btn btn-gallery" onclick="openGallery()">
+            <button class="upload-btn btn-gallery" onclick="openGallery()" id="galleryBtn">
               <i class="fas fa-images"></i>
               गैलरी से चुनें
             </button>
@@ -877,6 +958,9 @@
     let selectedFiles = [];
     let jsBridgeUris = [];
 
+    // localStorage keys for image persistence
+    const imageStorageKey = `booking_image_${bookingId}`;
+
     // Check if coming from mechanic-booking.html and prevent back navigation
     const referrer = document.referrer;
     if (referrer.includes('mechanic-booking.html')) {
@@ -885,6 +969,89 @@
         history.pushState(null, null, location.href);
       });
       history.pushState(null, null, location.href);
+    }
+
+    // Function to save uploaded image to localStorage
+    function saveImageToStorage(imageUrl) {
+      if (bookingId && imageUrl) {
+        localStorage.setItem(imageStorageKey, JSON.stringify({
+          url: imageUrl,
+          timestamp: new Date().toISOString()
+        }));
+        console.log('Image saved to localStorage:', imageUrl);
+      }
+    }
+
+    // Function to load previously uploaded image from localStorage
+    function loadSavedImage() {
+      if (bookingId) {
+        const saved = localStorage.getItem(imageStorageKey);
+        if (saved) {
+          try {
+            const imageData = JSON.parse(saved);
+            if (imageData.url) {
+              displayPreviousUploadedImage(imageData.url);
+              uploadedImageUrl = imageData.url;
+              return true;
+            }
+          } catch (e) {
+            console.error('Error loading saved image:', e);
+          }
+        }
+      }
+      return false;
+    }
+
+    // Function to display previously uploaded image
+    function displayPreviousUploadedImage(imageUrl) {
+      const previousImageDiv = document.getElementById('previousUploadedImage');
+      const previousImagePreview = document.getElementById('previousImagePreview');
+      const previousImageUrlDiv = document.getElementById('previousImageUrl');
+      const uploadContainer = document.getElementById('imageUploadContainer');
+      
+      previousImagePreview.src = imageUrl;
+      previousImageUrlDiv.textContent = imageUrl;
+      previousImageDiv.style.display = 'block';
+      
+      // Hide upload container initially if image exists
+      uploadContainer.style.display = 'none';
+      
+      // Enable complete button since image is already uploaded
+      enableCompleteButton();
+    }
+
+    // Function to change uploaded image
+    function changeUploadedImage() {
+      const previousImageDiv = document.getElementById('previousUploadedImage');
+      const uploadContainer = document.getElementById('imageUploadContainer');
+      
+      previousImageDiv.style.display = 'none';
+      uploadContainer.style.display = 'block';
+      
+      // Reset upload state
+      resetUploadState();
+      disableCompleteButton();
+    }
+
+    // Function to reset upload state
+    function resetUploadState() {
+      const uploadArea = document.getElementById('uploadArea');
+      const uploadIcon = document.getElementById('uploadIcon');
+      const uploadText = document.getElementById('uploadText');
+      const uploadSubtext = document.getElementById('uploadSubtext');
+      const imagePreview = document.getElementById('imagePreview');
+      const uploadStatus = document.getElementById('uploadStatus');
+      
+      uploadArea.classList.remove('has-image');
+      uploadIcon.innerHTML = '<i class="fas fa-camera"></i>';
+      uploadText.textContent = 'गाड़ी की फोटो अपलोड करें';
+      uploadSubtext.textContent = 'सर्विस की गई गाड़ी की तस्वीर लेकर अपलोड करें';
+      imagePreview.style.display = 'none';
+      uploadStatus.style.display = 'none';
+      
+      selectedImageFile = null;
+      selectedFiles = [];
+      jsBridgeUris = [];
     }
 
     // Function to open location
@@ -930,6 +1097,7 @@
     function handleCompletedBooking() {
       // Replace upload section with completed message
       document.getElementById('imageUploadContainer').style.display = 'none';
+      document.getElementById('previousUploadedImage').style.display = 'none';
       document.getElementById('completedMessage').style.display = 'block';
       
       // Update collection amount section for completed bookings
@@ -952,7 +1120,7 @@
       locationItem.classList.add('completed');
     }
 
-    // Image Upload Functions
+    // Image Upload Functions - Fixed
     function triggerImageSelect() {
       if (document.querySelector('.completion-section').classList.contains('disabled')) return;
       document.getElementById('carImageInput').click();
@@ -960,60 +1128,112 @@
 
     function openCamera() {
       console.log('Opening camera via JSBridge...');
+      
+      // Clear any existing status messages
+      const uploadStatus = document.getElementById('uploadStatus');
+      uploadStatus.style.display = 'none';
+      
+      // Disable button temporarily
+      const cameraBtn = document.getElementById('cameraBtn');
+      cameraBtn.disabled = true;
+      cameraBtn.innerHTML = '<div class="loading-inline"></div> कैमरा खोली जा रही है...';
+      
       if (typeof AndroidBridge !== 'undefined' && AndroidBridge.openCamera) {
         AndroidBridge.openCamera();
-        showUploadStatus('कैमरा खोला जा रहा है...', 'uploading');
+        
+        // Reset button after a delay
+        setTimeout(() => {
+          cameraBtn.disabled = false;
+          cameraBtn.innerHTML = '<i class="fas fa-camera"></i> कैमरा खोलें';
+        }, 2000);
       } else {
         // Fallback to file input
+        cameraBtn.disabled = false;
+        cameraBtn.innerHTML = '<i class="fas fa-camera"></i> कैमरा खोलें';
         triggerImageSelect();
       }
     }
 
     function openGallery() {
       console.log('Opening gallery via JSBridge...');
+      
+      // Clear any existing status messages
+      const uploadStatus = document.getElementById('uploadStatus');
+      uploadStatus.style.display = 'none';
+      
+      // Disable button temporarily
+      const galleryBtn = document.getElementById('galleryBtn');
+      galleryBtn.disabled = true;
+      galleryBtn.innerHTML = '<div class="loading-inline"></div> गैलरी खोली जा रही है...';
+      
       if (typeof AndroidBridge !== 'undefined' && AndroidBridge.openGallery) {
         AndroidBridge.openGallery();
-        showUploadStatus('गैलरी खोली जा रही है...', 'uploading');
+        
+        // Reset button after a delay
+        setTimeout(() => {
+          galleryBtn.disabled = false;
+          galleryBtn.innerHTML = '<i class="fas fa-images"></i> गैलरी से चुनें';
+        }, 2000);
       } else {
         // Fallback to file input
+        galleryBtn.disabled = false;
+        galleryBtn.innerHTML = '<i class="fas fa-images"></i> गैलरी से चुनें';
         triggerImageSelect();
       }
     }
 
-    // Global function to handle JSBridge file results
+    // Global function to handle JSBridge file results - Fixed
     window.handleJSBridgeFileResult = function(uriArray) {
       console.log('JSBridge file result received:', uriArray);
+      
+      // Reset button states
+      resetButtonStates();
       
       if (uriArray && uriArray.length > 0) {
         const uri = uriArray[0]; // Take first image
         jsBridgeUris = [uri];
+        selectedFiles = []; // Clear HTML file selections
+        selectedImageFile = null;
+        
+        console.log('Processing JSBridge URI:', uri);
         
         // Try to convert URI to base64 for preview
         if (typeof AndroidBridge !== 'undefined' && AndroidBridge.convertUriToBase64) {
           try {
             const base64Data = AndroidBridge.convertUriToBase64(uri);
+            console.log('Base64 conversion result:', base64Data ? 'Success' : 'Failed');
+            
             if (base64Data) {
-              displayImagePreview(base64Data, 'JSBridge Image');
-              showUploadStatus('फोटो सेलेक्ट हो गई! अब बुकिंग पूरी करें', 'success');
-              enableCompleteButton();
+              displayImagePreview(base64Data, 'JSBridge Camera Image');
             } else {
-              displayPlaceholderPreview();
-              showUploadStatus('फोटो सेलेक्ट हो गई! अब बुकिंग पूरी करें', 'success');
-              enableCompleteButton();
+              displayPlaceholderPreview('JSBridge Camera Image');
             }
           } catch (e) {
             console.warn('Could not convert URI to base64:', e);
-            displayPlaceholderPreview();
-            showUploadStatus('फोटो सेलेक्ट हो गई! अब बुकिंग पूरी करें', 'success');
-            enableCompleteButton();
+            displayPlaceholderPreview('JSBridge Camera Image');
           }
         } else {
-          displayPlaceholderPreview();
-          showUploadStatus('फोटो सेलेक्ट हो गई! अब बुकिंग पूरी करें', 'success');
-          enableCompleteButton();
+          displayPlaceholderPreview('JSBridge Camera Image');
         }
+        
+        showUploadStatus('📷 फोटो सेलेक्ट हो गई! अब बुकिंग पूरी करें', 'success');
+        enableCompleteButton();
+      } else {
+        showUploadStatus('❌ कोई फोटो सेलेक्ट नहीं हुई', 'error');
       }
     };
+
+    // Function to reset button states
+    function resetButtonStates() {
+      const cameraBtn = document.getElementById('cameraBtn');
+      const galleryBtn = document.getElementById('galleryBtn');
+      
+      cameraBtn.disabled = false;
+      cameraBtn.innerHTML = '<i class="fas fa-camera"></i> कैमरा खोलें';
+      
+      galleryBtn.disabled = false;
+      galleryBtn.innerHTML = '<i class="fas fa-images"></i> गैलरी से चुनें';
+    }
 
     // HTML File Input Handler
     document.getElementById('carImageInput').addEventListener('change', function(event) {
@@ -1024,11 +1244,13 @@
         selectedFiles = [file];
         jsBridgeUris = []; // Clear JSBridge URIs
         
+        console.log('File selected via HTML input:', file.name);
+        
         // Display preview
         const reader = new FileReader();
         reader.onload = function(e) {
           displayImagePreview(e.target.result, file.name);
-          showUploadStatus('फोटो सेलेक्ट हो गई! अब बुकिंग पूरी करें', 'success');
+          showUploadStatus('📷 फोटो सेलेक्ट हो गई! अब बुकिंग पूरी करें', 'success');
           enableCompleteButton();
         };
         reader.readAsDataURL(file);
@@ -1046,23 +1268,27 @@
       preview.style.display = 'block';
       uploadArea.classList.add('has-image');
       uploadIcon.innerHTML = '<i class="fas fa-check-circle"></i>';
-      uploadText.textContent = 'फोटो सेलेक्ट हो गई';
-      uploadSubtext.textContent = name;
+      uploadText.textContent = '✅ फोटो सेलेक्ट हो गई';
+      uploadSubtext.textContent = name || 'Selected Image';
+      
+      console.log('Image preview displayed for:', name);
     }
 
-    function displayPlaceholderPreview() {
+    function displayPlaceholderPreview(name = 'JSBridge Image') {
       const preview = document.getElementById('imagePreview');
       const uploadArea = document.getElementById('uploadArea');
       const uploadIcon = document.getElementById('uploadIcon');
       const uploadText = document.getElementById('uploadText');
       const uploadSubtext = document.getElementById('uploadSubtext');
       
-      // Create a placeholder for JSBridge images
+      // Hide actual image preview and show success state
       preview.style.display = 'none';
       uploadArea.classList.add('has-image');
       uploadIcon.innerHTML = '<i class="fas fa-check-circle"></i>';
-      uploadText.textContent = 'JSBridge फोटो सेलेक्ट हो गई';
-      uploadSubtext.textContent = 'कैमरा/गैलरी से फोटो ली गई';
+      uploadText.textContent = '✅ JSBridge फोटो सेलेक्ट हो गई';
+      uploadSubtext.textContent = name;
+      
+      console.log('Placeholder preview displayed for:', name);
     }
 
     function showUploadStatus(message, type) {
@@ -1070,6 +1296,8 @@
       statusDiv.textContent = message;
       statusDiv.className = `upload-status ${type}`;
       statusDiv.style.display = 'block';
+      
+      console.log('Upload status:', message, type);
     }
 
     function enableCompleteButton() {
@@ -1084,39 +1312,54 @@
       completeBtn.style.opacity = '0.6';
     }
 
-    // Complete Booking with Image Upload
+    // Complete Booking with Image Upload - Fixed
     async function completeBookingWithImage() {
       const completeBtn = document.getElementById('completeBookingBtn');
       
-      // Check if image is selected
-      if (!selectedImageFile && jsBridgeUris.length === 0) {
+      // Check if image is selected or already uploaded
+      if (!selectedImageFile && jsBridgeUris.length === 0 && !uploadedImageUrl) {
         alert('कृपया पहले गाड़ी की फोटो सेलेक्ट करें');
+        return;
+      }
+
+      // If image is already uploaded, just complete booking
+      if (uploadedImageUrl && !selectedImageFile && jsBridgeUris.length === 0) {
+        await completeBookingOnly();
         return;
       }
 
       // Disable button and show loading
       completeBtn.disabled = true;
       completeBtn.innerHTML = '<div class="loading-inline"></div> अपलोड हो रहा है...';
-      showUploadStatus('फोटो अपलोड हो रही है...', 'uploading');
+      showUploadStatus('📤 फोटो अपलोड हो रही है...', 'uploading');
 
       try {
         // Step 1: Upload Image
         let imageUploadSuccess = false;
+        let newImageUrl = null;
         
         if (jsBridgeUris.length > 0) {
           // Upload via JSBridge
-          imageUploadSuccess = await uploadViaJSBridge();
+          const result = await uploadViaJSBridge();
+          imageUploadSuccess = result.success;
+          newImageUrl = result.url;
         } else if (selectedImageFile) {
           // Upload via HTML file input
-          imageUploadSuccess = await uploadViaFileInput();
+          const result = await uploadViaFileInput();
+          imageUploadSuccess = result.success;
+          newImageUrl = result.url;
         }
 
-        if (!imageUploadSuccess) {
+        if (!imageUploadSuccess || !newImageUrl) {
           throw new Error('Image upload failed');
         }
 
+        // Save uploaded image URL
+        uploadedImageUrl = newImageUrl;
+        saveImageToStorage(newImageUrl);
+
         // Step 2: Complete Booking
-        showUploadStatus('फोटो अपलोड हो गई! बुकिंग कम्प्लीट हो रही है...', 'uploading');
+        showUploadStatus('✅ फोटो अपलोड हो गई! बुकिंग कम्प्लीट हो रही है...', 'success');
         completeBtn.innerHTML = '<div class="loading-inline"></div> बुकिंग पूरी हो रही है...';
         
         const bookingSuccess = await makeBookingAction('complete');
@@ -1125,7 +1368,7 @@
           // Success!
           completeBtn.innerHTML = '<i class="fas fa-check-circle"></i> पूरी हो गई';
           completeBtn.style.background = 'var(--success-color)';
-          showUploadStatus(`✅ बुकिंग सफलतापूर्वक पूरी हो गई! फोटो: ${uploadedImageUrl}`, 'success');
+          showUploadStatus(`✅ बुकिंग सफलतापूर्वक पूरी हो गई!`, 'success');
           
           // Disable the entire section
           document.querySelector('.completion-section').classList.add('disabled');
@@ -1155,6 +1398,45 @@
       }
     }
 
+    // Function to complete booking when image is already uploaded
+    async function completeBookingOnly() {
+      const completeBtn = document.getElementById('completeBookingBtn');
+      
+      completeBtn.disabled = true;
+      completeBtn.innerHTML = '<div class="loading-inline"></div> बुकिंग पूरी हो रही है...';
+      showUploadStatus('🔄 बुकिंग कम्प्लीट हो रही है...', 'uploading');
+
+      try {
+        const bookingSuccess = await makeBookingAction('complete');
+        
+        if (bookingSuccess) {
+          completeBtn.innerHTML = '<i class="fas fa-check-circle"></i> पूरी हो गई';
+          completeBtn.style.background = 'var(--success-color)';
+          showUploadStatus(`✅ बुकिंग सफलतापूर्वक पूरी हो गई!`, 'success');
+          
+          document.querySelector('.completion-section').classList.add('disabled');
+          alert('बुकिंग सफलतापूर्वक पूरी हो गई!');
+          
+          setTimeout(() => {
+            const mechanicName = localStorage.getItem('mechanic');
+            if (mechanicName) {
+              window.location.href = `https://instantmechanic.online/mechanic-view.html?mechanic=${encodeURIComponent(mechanicName)}`;
+            }
+          }, 3000);
+        } else {
+          throw new Error('Booking completion failed');
+        }
+      } catch (error) {
+        console.error('Error completing booking:', error);
+        
+        completeBtn.disabled = false;
+        completeBtn.innerHTML = '<i class="fas fa-check-circle"></i> बुकिंग पूरी करें';
+        showUploadStatus('❌ Error: ' + error.message, 'error');
+        
+        alert('बुकिंग पूरी करने में समस्या हुई: ' + error.message);
+      }
+    }
+
     async function uploadViaJSBridge() {
       return new Promise((resolve) => {
         if (typeof AndroidBridge !== 'undefined' && AndroidBridge.uploadImageFromUri) {
@@ -1162,11 +1444,11 @@
           
           // Set up callback for JSBridge upload result
           window.tempUploadCallback = function(result) {
+            console.log('JSBridge upload result:', result);
             if (result && result.success) {
-              uploadedImageUrl = result.imageUrl;
-              resolve(true);
+              resolve({ success: true, url: result.imageUrl });
             } else {
-              resolve(false);
+              resolve({ success: false, url: null });
             }
             // Cleanup
             delete window.tempUploadCallback;
@@ -1174,7 +1456,7 @@
           
           AndroidBridge.uploadImageFromUri(uri, 'tempUploadCallback');
         } else {
-          resolve(false);
+          resolve({ success: false, url: null });
         }
       });
     }
@@ -1194,12 +1476,12 @@
         }
 
         const result = await response.json();
-        uploadedImageUrl = result.image_url;
-        return true;
+        console.log('File input upload result:', result);
+        return { success: true, url: result.image_url };
 
       } catch (error) {
         console.error('File input upload failed:', error);
-        return false;
+        return { success: false, url: null };
       }
     }
 
@@ -1483,7 +1765,7 @@
       window.open('tel:+911234567890', '_self');
     }
 
-    // Load booking data (keeping existing functionality)
+    // Load booking data
     async function loadBookingData() {
       if (!bookingId) {
         showError('URL में बुकिंग ID नहीं मिली');
@@ -1502,6 +1784,11 @@
         
         const isCompleted = data.booking_status === 'complete';
         await loadSubMechanics(isCompleted);
+        
+        // Load saved image after booking data is loaded
+        if (!isCompleted) {
+          loadSavedImage();
+        }
       } catch (error) {
         console.error('Error loading booking:', error);
         showError('बुकिंग डेटा लोड करने में असमर्थ। कृपया अपना इंटरनेट कनेक्शन चेक करें।');
@@ -1702,6 +1989,7 @@
     window.openCamera = openCamera;
     window.openGallery = openGallery;
     window.completeBookingWithImage = completeBookingWithImage;
+    window.changeUploadedImage = changeUploadedImage;
   </script>
 </body>
 </html>
