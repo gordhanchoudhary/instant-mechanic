@@ -473,6 +473,17 @@
         let totalSize = 0;
         let testsPassed = 0;
 
+        // Global function to handle JSBridge file results
+        window.handleJSBridgeFileResult = function(uriArray) {
+            console.log('JSBridge file result received:', uriArray);
+            updateStatusMessage(`JSBridge returned ${uriArray.length} file(s)`, 'success');
+            
+            // You can process these URIs as needed
+            // For now, just update the UI to show success
+            updateTestStatus('bridgeTest', 'pass');
+            updateTestStatus('cameraTest', 'pass');
+        };
+
         // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
             console.log('Page loaded, initializing tests...');
@@ -570,9 +581,8 @@
             try {
                 if (typeof AndroidBridge !== 'undefined' && AndroidBridge.openCamera) {
                     AndroidBridge.openCamera();
-                    updateTestStatus('cameraTest', 'pass');
-                    updateStatusMessage('Camera opened via Android Bridge', 'success');
-                    console.log('Camera opened successfully');
+                    updateStatusMessage('Camera request sent to Android Bridge', 'info');
+                    console.log('Camera request sent successfully');
                 } else {
                     console.log('AndroidBridge not available or method not found');
                     updateStatusMessage('AndroidBridge.openCamera() not available', 'warning');
@@ -590,8 +600,8 @@
             try {
                 if (typeof AndroidBridge !== 'undefined' && AndroidBridge.openGallery) {
                     AndroidBridge.openGallery();
-                    updateStatusMessage('Gallery opened via Android Bridge', 'success');
-                    console.log('Gallery opened successfully');
+                    updateStatusMessage('Gallery request sent to Android Bridge', 'info');
+                    console.log('Gallery request sent successfully');
                 } else {
                     console.log('AndroidBridge not available or method not found');
                     updateStatusMessage('AndroidBridge.openGallery() not available', 'warning');
@@ -609,10 +619,11 @@
                     // Test basic bridge functionality
                     const deviceInfo = AndroidBridge.getDeviceInfo();
                     const customResult = AndroidBridge.customFunction('Test from web');
+                    const debugInfo = AndroidBridge.debugInfo ? AndroidBridge.debugInfo() : 'Debug method not available';
                     
                     updateTestStatus('bridgeTest', 'pass');
                     updateStatusMessage(`Bridge test successful! Device: ${deviceInfo}`, 'success');
-                    console.log('Bridge test results:', { deviceInfo, customResult });
+                    console.log('Bridge test results:', { deviceInfo, customResult, debugInfo });
                     
                     // Show toast if available
                     if (AndroidBridge.showToast) {
@@ -644,9 +655,21 @@
                 `;
 
                 // Try to get Android Bridge info
-                if (typeof AndroidBridge !== 'undefined' && AndroidBridge.getDeviceInfo) {
-                    const androidInfo = AndroidBridge.getDeviceInfo();
-                    deviceInfo += `<strong>Android Bridge:</strong> ${androidInfo}<br>`;
+                if (typeof AndroidBridge !== 'undefined') {
+                    if (AndroidBridge.getDeviceInfo) {
+                        const androidInfo = AndroidBridge.getDeviceInfo();
+                        deviceInfo += `<strong>Android Bridge:</strong> ${androidInfo}<br>`;
+                    }
+                    
+                    if (AndroidBridge.checkPermissions) {
+                        const permissions = AndroidBridge.checkPermissions();
+                        deviceInfo += `<strong>Permissions:</strong> ${permissions}<br>`;
+                    }
+                    
+                    if (AndroidBridge.debugInfo) {
+                        const debug = AndroidBridge.debugInfo();
+                        deviceInfo += `<strong>Debug Info:</strong><br><pre style="font-size: 12px; white-space: pre-wrap;">${debug}</pre>`;
+                    }
                 }
 
                 // Check media devices support
