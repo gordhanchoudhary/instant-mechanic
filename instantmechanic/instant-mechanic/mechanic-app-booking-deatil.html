@@ -346,7 +346,7 @@
       margin: 4px 0;
     }
 
-    /* Image Upload Styles - Fixed */
+    /* Image Upload Styles - Gallery Only */
     .completion-section {
       background: var(--surface);
       border-radius: var(--border-radius);
@@ -419,7 +419,7 @@
       object-fit: cover;
     }
 
-    /* Uploaded Image Display */
+    /* Uploaded Image Display - Fixed for S3 */
     .uploaded-image-display {
       margin-bottom: 20px;
       text-align: center;
@@ -483,11 +483,11 @@
       display: flex;
       gap: 12px;
       margin-top: 20px;
+      justify-content: center;
     }
 
     .upload-btn {
-      flex: 1;
-      padding: 14px 20px;
+      padding: 14px 24px;
       border: none;
       border-radius: 12px;
       font-size: clamp(0.95rem, 2.8vw, 1.1rem);
@@ -498,12 +498,7 @@
       align-items: center;
       justify-content: center;
       gap: 8px;
-    }
-
-    .btn-camera {
-      background: linear-gradient(135deg, var(--primary-color), #1557b0);
-      color: white;
-      box-shadow: 0 4px 16px rgba(26, 115, 232, 0.3);
+      min-width: 200px;
     }
 
     .btn-gallery {
@@ -725,6 +720,16 @@
       opacity: 0.9;
     }
 
+    /* Image loading error handling */
+    .image-error {
+      background: var(--surface-variant);
+      color: var(--text-secondary);
+      padding: 20px;
+      border-radius: 8px;
+      text-align: center;
+      font-size: 0.9rem;
+    }
+
     @media (max-width: 768px) {
       .upload-actions {
         flex-direction: column;
@@ -855,7 +860,7 @@
         <p style="margin-top: 6px; opacity: 0.9;">इस सर्विस के लिए आपको मिलने वाली राशि</p>
       </div>
 
-      <!-- Image Upload Section - Fixed -->
+      <!-- Image Upload Section - Gallery Only -->
       <div class="completion-section">
         <h3>📷 गाड़ी की फोटो अपलोड करके बुकिंग पूरी करें</h3>
         
@@ -871,7 +876,7 @@
             पहले से अपलोड की गई फोटो
           </div>
           <div class="uploaded-image-container">
-            <img id="previousImagePreview" class="uploaded-image" alt="Previously uploaded image">
+            <img id="previousImagePreview" class="uploaded-image" alt="Previously uploaded image" onerror="handleImageError(this)">
             <div class="uploaded-image-url" id="previousImageUrl"></div>
             <button class="change-image-btn" onclick="changeUploadedImage()">
               <i class="fas fa-edit"></i> फोटो बदलें
@@ -881,27 +886,23 @@
         
         <div id="imageUploadContainer">
           <!-- File Input (Hidden) -->
-          <input type="file" id="carImageInput" class="hidden-file-input" accept="image/*" capture="environment">
+          <input type="file" id="carImageInput" class="hidden-file-input" accept="image/*" multiple>
           
           <!-- Upload Area -->
           <div class="image-upload-container" id="uploadArea" onclick="triggerImageSelect()">
             <div class="upload-icon" id="uploadIcon">
-              <i class="fas fa-camera"></i>
+              <i class="fas fa-images"></i>
             </div>
-            <div class="upload-text" id="uploadText">गाड़ी की फोटो अपलोड करें</div>
-            <div class="upload-subtext" id="uploadSubtext">सर्विस की गई गाड़ी की तस्वीर लेकर अपलोड करें</div>
+            <div class="upload-text" id="uploadText">गैलरी से फोटो चुनें</div>
+            <div class="upload-subtext" id="uploadSubtext">सर्विस की गई गाड़ी की तस्वीर गैलरी से चुनकर अपलोड करें</div>
             <img id="imagePreview" class="image-preview" style="display: none;" alt="Selected Image">
           </div>
 
-          <!-- Upload Actions -->
+          <!-- Upload Actions - Gallery Only -->
           <div class="upload-actions">
-            <button class="upload-btn btn-camera" onclick="openCamera()" id="cameraBtn">
-              <i class="fas fa-camera"></i>
-              कैमरा खोलें
-            </button>
             <button class="upload-btn btn-gallery" onclick="openGallery()" id="galleryBtn">
               <i class="fas fa-images"></i>
-              गैलरी से चुनें
+              गैलरी खोलें
             </button>
           </div>
 
@@ -971,6 +972,22 @@
       history.pushState(null, null, location.href);
     }
 
+    // Function to handle image loading errors
+    function handleImageError(img) {
+      console.error('Failed to load image:', img.src);
+      const container = img.closest('.uploaded-image-container');
+      if (container) {
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'image-error';
+        errorDiv.innerHTML = `
+          <i class="fas fa-exclamation-triangle"></i><br>
+          फोटो लोड नहीं हो सकी<br>
+          <small>S3 URL से इमेज लोड करने में समस्या</small>
+        `;
+        img.replaceWith(errorDiv);
+      }
+    }
+
     // Function to save uploaded image to localStorage
     function saveImageToStorage(imageUrl) {
       if (bookingId && imageUrl) {
@@ -982,7 +999,7 @@
       }
     }
 
-    // Function to load previously uploaded image from localStorage
+    // Function to load previously uploaded image from localStorage - Fixed
     function loadSavedImage() {
       if (bookingId) {
         const saved = localStorage.getItem(imageStorageKey);
@@ -990,34 +1007,56 @@
           try {
             const imageData = JSON.parse(saved);
             if (imageData.url) {
+              console.log('Loading saved image from localStorage:', imageData.url);
               displayPreviousUploadedImage(imageData.url);
               uploadedImageUrl = imageData.url;
               return true;
             }
           } catch (e) {
             console.error('Error loading saved image:', e);
+            // Clear corrupted data
+            localStorage.removeItem(imageStorageKey);
           }
         }
       }
       return false;
     }
 
-    // Function to display previously uploaded image
+    // Function to display previously uploaded image - Fixed for S3
     function displayPreviousUploadedImage(imageUrl) {
       const previousImageDiv = document.getElementById('previousUploadedImage');
       const previousImagePreview = document.getElementById('previousImagePreview');
       const previousImageUrlDiv = document.getElementById('previousImageUrl');
       const uploadContainer = document.getElementById('imageUploadContainer');
       
-      previousImagePreview.src = imageUrl;
-      previousImageUrlDiv.textContent = imageUrl;
-      previousImageDiv.style.display = 'block';
+      console.log('Displaying previous image:', imageUrl);
       
-      // Hide upload container initially if image exists
-      uploadContainer.style.display = 'none';
+      // Create a test image to verify URL is accessible
+      const testImg = new Image();
+      testImg.onload = function() {
+        console.log('S3 image loaded successfully');
+        previousImagePreview.src = imageUrl;
+        previousImageUrlDiv.textContent = imageUrl;
+        previousImageDiv.style.display = 'block';
+        uploadContainer.style.display = 'none';
+        enableCompleteButton();
+      };
       
-      // Enable complete button since image is already uploaded
-      enableCompleteButton();
+      testImg.onerror = function() {
+        console.error('Failed to load S3 image, showing upload interface');
+        // If S3 image fails to load, remove from storage and show upload interface
+        localStorage.removeItem(imageStorageKey);
+        uploadedImageUrl = null;
+        uploadContainer.style.display = 'block';
+        previousImageDiv.style.display = 'none';
+        disableCompleteButton();
+        
+        showUploadStatus('⚠️ पुरानी फोटो लोड नहीं हो सकी, नई फोटो अपलोड करें', 'error');
+      };
+      
+      // Set crossOrigin to anonymous to handle CORS issues
+      testImg.crossOrigin = 'anonymous';
+      testImg.src = imageUrl;
     }
 
     // Function to change uploaded image
@@ -1043,9 +1082,9 @@
       const uploadStatus = document.getElementById('uploadStatus');
       
       uploadArea.classList.remove('has-image');
-      uploadIcon.innerHTML = '<i class="fas fa-camera"></i>';
-      uploadText.textContent = 'गाड़ी की फोटो अपलोड करें';
-      uploadSubtext.textContent = 'सर्विस की गई गाड़ी की तस्वीर लेकर अपलोड करें';
+      uploadIcon.innerHTML = '<i class="fas fa-images"></i>';
+      uploadText.textContent = 'गैलरी से फोटो चुनें';
+      uploadSubtext.textContent = 'सर्विस की गई गाड़ी की तस्वीर गैलरी से चुनकर अपलोड करें';
       imagePreview.style.display = 'none';
       uploadStatus.style.display = 'none';
       
@@ -1120,38 +1159,10 @@
       locationItem.classList.add('completed');
     }
 
-    // Image Upload Functions - Fixed
+    // Image Upload Functions - Gallery Only
     function triggerImageSelect() {
       if (document.querySelector('.completion-section').classList.contains('disabled')) return;
       document.getElementById('carImageInput').click();
-    }
-
-    function openCamera() {
-      console.log('Opening camera via JSBridge...');
-      
-      // Clear any existing status messages
-      const uploadStatus = document.getElementById('uploadStatus');
-      uploadStatus.style.display = 'none';
-      
-      // Disable button temporarily
-      const cameraBtn = document.getElementById('cameraBtn');
-      cameraBtn.disabled = true;
-      cameraBtn.innerHTML = '<div class="loading-inline"></div> कैमरा खोली जा रही है...';
-      
-      if (typeof AndroidBridge !== 'undefined' && AndroidBridge.openCamera) {
-        AndroidBridge.openCamera();
-        
-        // Reset button after a delay
-        setTimeout(() => {
-          cameraBtn.disabled = false;
-          cameraBtn.innerHTML = '<i class="fas fa-camera"></i> कैमरा खोलें';
-        }, 2000);
-      } else {
-        // Fallback to file input
-        cameraBtn.disabled = false;
-        cameraBtn.innerHTML = '<i class="fas fa-camera"></i> कैमरा खोलें';
-        triggerImageSelect();
-      }
     }
 
     function openGallery() {
@@ -1172,17 +1183,17 @@
         // Reset button after a delay
         setTimeout(() => {
           galleryBtn.disabled = false;
-          galleryBtn.innerHTML = '<i class="fas fa-images"></i> गैलरी से चुनें';
+          galleryBtn.innerHTML = '<i class="fas fa-images"></i> गैलरी खोलें';
         }, 2000);
       } else {
         // Fallback to file input
         galleryBtn.disabled = false;
-        galleryBtn.innerHTML = '<i class="fas fa-images"></i> गैलरी से चुनें';
+        galleryBtn.innerHTML = '<i class="fas fa-images"></i> गैलरी खोलें';
         triggerImageSelect();
       }
     }
 
-    // Global function to handle JSBridge file results - Fixed
+    // Global function to handle JSBridge file results - Gallery Only
     window.handleJSBridgeFileResult = function(uriArray) {
       console.log('JSBridge file result received:', uriArray);
       
@@ -1204,16 +1215,16 @@
             console.log('Base64 conversion result:', base64Data ? 'Success' : 'Failed');
             
             if (base64Data) {
-              displayImagePreview(base64Data, 'JSBridge Camera Image');
+              displayImagePreview(base64Data, 'JSBridge Gallery Image');
             } else {
-              displayPlaceholderPreview('JSBridge Camera Image');
+              displayPlaceholderPreview('JSBridge Gallery Image');
             }
           } catch (e) {
             console.warn('Could not convert URI to base64:', e);
-            displayPlaceholderPreview('JSBridge Camera Image');
+            displayPlaceholderPreview('JSBridge Gallery Image');
           }
         } else {
-          displayPlaceholderPreview('JSBridge Camera Image');
+          displayPlaceholderPreview('JSBridge Gallery Image');
         }
         
         showUploadStatus('📷 फोटो सेलेक्ट हो गई! अब बुकिंग पूरी करें', 'success');
@@ -1225,14 +1236,10 @@
 
     // Function to reset button states
     function resetButtonStates() {
-      const cameraBtn = document.getElementById('cameraBtn');
       const galleryBtn = document.getElementById('galleryBtn');
       
-      cameraBtn.disabled = false;
-      cameraBtn.innerHTML = '<i class="fas fa-camera"></i> कैमरा खोलें';
-      
       galleryBtn.disabled = false;
-      galleryBtn.innerHTML = '<i class="fas fa-images"></i> गैलरी से चुनें';
+      galleryBtn.innerHTML = '<i class="fas fa-images"></i> गैलरी खोलें';
     }
 
     // HTML File Input Handler
@@ -1986,10 +1993,10 @@
     window.cancelReassign = cancelReassign;
     window.reassignMechanic = reassignMechanic;
     window.triggerImageSelect = triggerImageSelect;
-    window.openCamera = openCamera;
     window.openGallery = openGallery;
     window.completeBookingWithImage = completeBookingWithImage;
     window.changeUploadedImage = changeUploadedImage;
+    window.handleImageError = handleImageError;
   </script>
 </body>
 </html>
