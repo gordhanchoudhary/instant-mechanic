@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Instant Mechanic - Photo Capture & Upload Test</title>
+    <title>Instant Mechanic - Complete Photo Test</title>
     <style>
         * {
             margin: 0;
@@ -466,15 +466,15 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>📱 Camera & Gallery Test</h1>
-            <p>Test photo capture, upload functionality for Instant Mechanic App</p>
+            <h1>🚗 Instant Mechanic Photo System</h1>
+            <p>Complete camera, gallery, and upload test for car service images</p>
         </div>
 
         <div class="content">
             <!-- Method 1: HTML File Input -->
             <div class="section">
                 <h2><span class="section-icon">📁</span> Method 1: HTML File Input</h2>
-                <p style="margin-bottom: 20px; color: #6c757d;">This method uses native HTML file input with camera/gallery access</p>
+                <p style="margin-bottom: 20px; color: #6c757d;">Native HTML file input with camera/gallery access</p>
                 
                 <input type="file" id="fileInput" class="file-input" accept="image/*" capture="environment" multiple>
                 <label for="fileInput" class="file-input-label">
@@ -497,8 +497,8 @@
 
             <!-- Method 2: JavaScript Bridge -->
             <div class="section">
-                <h2><span class="section-icon">🌉</span> Method 2: JavaScript Bridge</h2>
-                <p style="margin-bottom: 20px; color: #6c757d;">Direct access using Android Bridge methods</p>
+                <h2><span class="section-icon">🌉</span> Method 2: Android JSBridge</h2>
+                <p style="margin-bottom: 20px; color: #6c757d;">Direct native Android camera/gallery access with server upload</p>
                 
                 <div class="button-group">
                     <button class="btn btn-primary" onclick="openCamera()">
@@ -509,6 +509,9 @@
                     </button>
                     <button class="btn btn-success" onclick="testBridge()">
                         <span>🔧</span> Test Bridge
+                    </button>
+                    <button class="btn btn-warning" onclick="uploadJSBridgeImages()" id="uploadJSBridgeBtn">
+                        <span>☁️</span> Upload JSBridge Images
                     </button>
                 </div>
             </div>
@@ -549,7 +552,7 @@
                 <div class="console-container" id="consoleContainer">
                     <div class="console-log info">
                         <span class="console-timestamp">[Ready]</span>
-                        Console initialized - All logs will appear here
+                        Instant Mechanic Photo System initialized
                     </div>
                 </div>
             </div>
@@ -567,7 +570,7 @@
 
             <!-- Statistics -->
             <div class="section">
-                <h2><span class="section-icon">📈</span> Test Statistics</h2>
+                <h2><span class="section-icon">📈</span> Statistics</h2>
                 <div class="stats">
                     <div class="stat-card">
                         <div class="stat-number" id="photoCount">0</div>
@@ -612,6 +615,10 @@
                         <span>Server Upload</span>
                         <span class="test-status test-pending" id="uploadTest">Pending</span>
                     </div>
+                    <div class="test-item">
+                        <span>JSBridge Upload</span>
+                        <span class="test-status test-pending" id="jsBridgeUploadTest">Pending</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -619,6 +626,7 @@
 
     <script>
         let selectedFiles = [];
+        let jsBridgeUris = [];
         let uploadedImages = [];
         let photoCount = 0;
         let uploadCount = 0;
@@ -658,7 +666,30 @@
             addConsoleLog(args.join(' '), 'error');
         };
 
-        // Upload function
+        // JSBridge upload callback function
+        window.handleJSBridgeUploadResult = function(result) {
+            console.log('JSBridge upload result:', result);
+            
+            if (result.success) {
+                uploadedImages.push({
+                    fileName: `JSBridge Image ${Date.now()}`,
+                    url: result.imageUrl,
+                    timestamp: new Date().toISOString(),
+                    source: 'JSBridge'
+                });
+                
+                uploadCount++;
+                updateStats();
+                updateUploadResults();
+                updateTestStatus('jsBridgeUploadTest', 'pass');
+                updateStatusMessage(`JSBridge upload successful: ${result.imageUrl}`, 'success');
+            } else {
+                console.error('JSBridge upload failed:', result.error);
+                updateStatusMessage(`JSBridge upload failed: ${result.error}`, 'error');
+            }
+        };
+
+        // Upload function for HTML file inputs
         async function uploadImageToServer(file, previewItem) {
             const formData = new FormData();
             formData.append('image', file);
@@ -698,7 +729,8 @@
                 uploadedImages.push({
                     fileName: file.name,
                     url: result.image_url,
-                    timestamp: new Date().toISOString()
+                    timestamp: new Date().toISOString(),
+                    source: 'HTML File Input'
                 });
 
                 // Update upload results
@@ -739,7 +771,8 @@
             
             uploadedUrls.innerHTML = uploadedImages.map((img, index) => `
                 <div style="margin: 10px 0; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #00d2d3;">
-                    <strong>📷 Image ${index + 1}:</strong> ${img.fileName}<br>
+                    <strong>🚗 Image ${index + 1}:</strong> ${img.fileName}<br>
+                    <strong>📦 Source:</strong> ${img.source}<br>
                     <strong>🔗 URL:</strong> <a href="${img.url}" target="_blank" style="color: #3742fa; word-break: break-all; font-size: 13px;">${img.url}</a><br>
                     <strong>📅 Uploaded:</strong> ${new Date(img.timestamp).toLocaleString()}
                 </div>
@@ -793,6 +826,47 @@
             updateStatusMessage(message, successCount > 0 ? 'success' : 'error');
         }
 
+        function uploadJSBridgeImages() {
+            if (jsBridgeUris.length === 0) {
+                updateStatusMessage('No JSBridge images to upload', 'warning');
+                return;
+            }
+
+            console.log(`Uploading ${jsBridgeUris.length} JSBridge images...`);
+            
+            if (typeof AndroidBridge !== 'undefined' && AndroidBridge.uploadMultipleImages) {
+                const uriJson = jsBridgeUris.join(',');
+                AndroidBridge.uploadMultipleImages(uriJson, 'handleJSBridgeBatchUploadResult');
+                updateStatusMessage(`Uploading ${jsBridgeUris.length} JSBridge images...`, 'info');
+            } else {
+                updateStatusMessage('AndroidBridge upload method not available', 'error');
+            }
+        }
+
+        // Batch upload callback for JSBridge
+        window.handleJSBridgeBatchUploadResult = function(result) {
+            console.log('JSBridge batch upload result:', result);
+            
+            if (result.success && result.results) {
+                result.results.forEach((uploadResult, index) => {
+                    uploadedImages.push({
+                        fileName: `JSBridge Image ${index + 1}`,
+                        url: uploadResult.imageUrl,
+                        timestamp: new Date().toISOString(),
+                        source: 'JSBridge'
+                    });
+                });
+                
+                uploadCount += result.totalUploaded;
+                updateStats();
+                updateUploadResults();
+                updateTestStatus('jsBridgeUploadTest', 'pass');
+                updateStatusMessage(`JSBridge batch upload: ${result.totalUploaded}/${result.totalAttempted} successful`, 'success');
+            } else {
+                updateStatusMessage('JSBridge batch upload failed', 'error');
+            }
+        };
+
         async function uploadSingleImage(fileName, button) {
             const file = selectedFiles.find(f => f.name === fileName);
             const previewItem = button.closest('.preview-item');
@@ -809,10 +883,33 @@
             }
         }
 
+        function uploadSingleJSBridgeImage(uri, button) {
+            console.log('Uploading single JSBridge image:', uri);
+            
+            if (typeof AndroidBridge !== 'undefined' && AndroidBridge.uploadImageFromUri) {
+                AndroidBridge.uploadImageFromUri(uri, 'handleJSBridgeUploadResult');
+                
+                const previewItem = button.closest('.preview-item');
+                let uploadStatus = previewItem.querySelector('.upload-status');
+                if (!uploadStatus) {
+                    uploadStatus = document.createElement('div');
+                    uploadStatus.className = 'upload-status uploading';
+                    previewItem.querySelector('.preview-info').appendChild(uploadStatus);
+                }
+                uploadStatus.innerHTML = '<span class="loading"></span> Uploading via JSBridge...';
+                button.disabled = true;
+            } else {
+                updateStatusMessage('AndroidBridge upload method not available', 'error');
+            }
+        }
+
         // Global function to handle JSBridge file results
         window.handleJSBridgeFileResult = function(uriArray) {
             console.log('JSBridge file result received:', uriArray);
             updateStatusMessage(`JSBridge returned ${uriArray.length} file(s)`, 'success');
+            
+            // Store URIs for upload
+            jsBridgeUris.push(...uriArray);
             
             // Process each URI - create preview from content:// URI
             uriArray.forEach((uri, index) => {
@@ -833,54 +930,54 @@
             const previewContainer = document.getElementById('previewContainer');
             const previewItem = document.createElement('div');
             previewItem.className = 'preview-item jsbridge-preview';
+            previewItem.setAttribute('data-uri', uri);
             
-            // For Android content:// URIs, we'll show a placeholder with URI info
-            previewItem.innerHTML = `
+            // Try to get base64 version from JSBridge if available
+            let imageContent = `
                 <div style="height: 200px; background: linear-gradient(45deg, #00d2d3, #54a0ff); display: flex; align-items: center; justify-content: center; color: white; font-size: 3rem;">
                     📷
                 </div>
+            `;
+
+            // Try to convert URI to base64 for display
+            if (typeof AndroidBridge !== 'undefined' && AndroidBridge.convertUriToBase64) {
+                try {
+                    const base64Data = AndroidBridge.convertUriToBase64(uri);
+                    if (base64Data) {
+                        imageContent = `<img src="${base64Data}" style="width: 100%; height: 200px; object-fit: cover;" alt="JSBridge Image">`;
+                    }
+                } catch (e) {
+                    console.warn('Could not convert URI to base64:', e);
+                }
+            }
+            
+            previewItem.innerHTML = `
+                ${imageContent}
                 <div class="preview-info jsbridge-info">
-                    <strong>JSBridge Image ${index + 1}</strong><br>
-                    URI: ${uri.substring(0, 50)}...<br>
-                    Source: Android Bridge<br>
-                    Status: ✅ Successfully captured<br>
-                    <small><em>Note: JSBridge images need special handling for upload</em></small>
+                    <strong>🚗 JSBridge Car Image ${index + 1}</strong><br>
+                    📍 URI: ${uri.substring(0, 50)}...<br>
+                    📦 Source: Android Bridge<br>
+                    ✅ Status: Successfully captured<br>
+                    <em>Ready for native upload</em>
                 </div>
                 <div class="preview-actions">
-                    <button class="upload-single-btn" onclick="alertJSBridgeUpload()">☁️ Upload</button>
+                    <button class="upload-single-btn" onclick="uploadSingleJSBridgeImage('${uri}', this)">☁️ Upload</button>
                     <button class="remove-single-btn" onclick="removeJSBridgePreview(this, '${uri}')">🗑️ Remove</button>
                 </div>
             `;
             
             previewContainer.appendChild(previewItem);
-            
-            // Try to load the actual image if possible
-            tryLoadActualImage(uri, previewItem);
-        }
-
-        function alertJSBridgeUpload() {
-            alert('JSBridge images use content:// URIs which require special Android handling for upload. This would need to be implemented in the Android JSBridge to convert the URI to uploadable data.');
-            console.warn('JSBridge upload not implemented - requires Android-side URI to data conversion');
-        }
-
-        function tryLoadActualImage(uri, previewItem) {
-            const img = new Image();
-            img.onload = function() {
-                const imgContainer = previewItem.querySelector('div[style*="height: 200px"]');
-                if (imgContainer) {
-                    imgContainer.innerHTML = `<img src="${uri}" style="width: 100%; height: 200px; object-fit: cover;" alt="JSBridge Image">`;
-                }
-                console.log('Successfully loaded image from URI:', uri);
-            };
-            img.onerror = function() {
-                console.log('Could not load image directly from URI (expected for content:// URIs):', uri);
-            };
-            img.src = uri;
         }
 
         function removeJSBridgePreview(button, uri) {
             const previewItem = button.closest('.preview-item');
             previewItem.remove();
+            
+            // Remove from URI array
+            const index = jsBridgeUris.indexOf(uri);
+            if (index > -1) {
+                jsBridgeUris.splice(index, 1);
+            }
             
             photoCount = Math.max(0, photoCount - 1);
             updateStats();
@@ -892,7 +989,7 @@
 
         // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('Page loaded, initializing tests...');
+            console.log('Instant Mechanic Photo System initialized');
             runInitialTests();
             refreshDeviceInfo();
         });
@@ -913,7 +1010,7 @@
         }
 
         function handleFiles(files) {
-            console.log(`Selected ${files.length} files via file input`);
+            console.log(`Selected ${files.length} car images via file input`);
             
             files.forEach(file => {
                 if (file.type.startsWith('image/')) {
@@ -922,9 +1019,9 @@
                 }
             });
 
-            photoCount = selectedFiles.length;
+            photoCount = selectedFiles.length + jsBridgeUris.length;
             updateStats();
-            updateStatusMessage(`${files.length} photos selected successfully!`, 'success');
+            updateStatusMessage(`${files.length} car images selected successfully!`, 'success');
             
             if (selectedFiles.length > 0) {
                 updateTestStatus('previewTest', 'pass');
@@ -939,11 +1036,12 @@
                 previewItem.className = 'preview-item';
                 
                 previewItem.innerHTML = `
-                    <img src="${e.target.result}" alt="Preview">
+                    <img src="${e.target.result}" alt="Car Image Preview">
                     <div class="preview-info">
-                        <strong>📷 ${file.name}</strong><br>
+                        <strong>🚗 ${file.name}</strong><br>
                         📊 Size: ${Math.round(file.size / 1024)} KB<br>
-                        📄 Type: ${file.type}
+                        📄 Type: ${file.type}<br>
+                        📦 Source: HTML File Input
                     </div>
                     <div class="preview-actions">
                         <button class="upload-single-btn" onclick="uploadSingleImage('${file.name}', this)">☁️ Upload</button>
@@ -963,10 +1061,10 @@
             // Remove from selectedFiles array
             selectedFiles = selectedFiles.filter(file => file.name !== fileName);
             
-            photoCount = selectedFiles.length;
+            photoCount = selectedFiles.length + jsBridgeUris.length;
             updateStats();
             
-            if (selectedFiles.length === 0) {
+            if (photoCount === 0) {
                 updateStatusMessage('All photos removed', 'info');
             }
         }
@@ -974,6 +1072,7 @@
         function clearPreviews() {
             document.getElementById('previewContainer').innerHTML = '';
             selectedFiles = [];
+            jsBridgeUris = [];
             uploadedImages = [];
             photoCount = 0;
             uploadCount = 0;
@@ -985,7 +1084,7 @@
 
         // Method 2: JavaScript Bridge Methods
         function openCamera() {
-            console.log('Attempting to open camera via bridge...');
+            console.log('Attempting to open camera via JSBridge...');
             try {
                 if (typeof AndroidBridge !== 'undefined' && AndroidBridge.openCamera) {
                     AndroidBridge.openCamera();
@@ -1004,7 +1103,7 @@
         }
 
         function openGallery() {
-            console.log('Attempting to open gallery via bridge...');
+            console.log('Attempting to open gallery via JSBridge...');
             try {
                 if (typeof AndroidBridge !== 'undefined' && AndroidBridge.openGallery) {
                     AndroidBridge.openGallery();
@@ -1025,7 +1124,7 @@
             try {
                 if (typeof AndroidBridge !== 'undefined') {
                     const deviceInfo = AndroidBridge.getDeviceInfo();
-                    const customResult = AndroidBridge.customFunction('Test from web');
+                    const customResult = AndroidBridge.customFunction('Test from Instant Mechanic');
                     const debugInfo = AndroidBridge.debugInfo ? AndroidBridge.debugInfo() : 'Debug method not available';
                     
                     updateTestStatus('bridgeTest', 'pass');
@@ -1033,7 +1132,7 @@
                     console.log('Bridge test results:', { deviceInfo, customResult, debugInfo });
                     
                     if (AndroidBridge.showToast) {
-                        AndroidBridge.showToast('Bridge test successful!');
+                        AndroidBridge.showToast('Instant Mechanic Bridge test successful!');
                     }
                 } else {
                     updateTestStatus('bridgeTest', 'fail');
@@ -1053,10 +1152,10 @@
         }
 
         function testConsole() {
-            console.log('This is a test log message');
-            console.warn('This is a test warning message');
-            console.error('This is a test error message');
-            addConsoleLog('Console test completed', 'success');
+            console.log('Testing Instant Mechanic console logging system');
+            console.warn('Warning: This is a test warning message');
+            console.error('Error: This is a test error message');
+            addConsoleLog('Console test completed for Instant Mechanic app', 'success');
         }
 
         // Device Information
@@ -1065,7 +1164,7 @@
             
             try {
                 let deviceInfo = `
-                    <strong>Browser Info:</strong><br>
+                    <strong>📱 Browser Info:</strong><br>
                     User Agent: ${navigator.userAgent}<br>
                     Platform: ${navigator.platform}<br>
                     Screen: ${screen.width}x${screen.height}<br>
@@ -1076,29 +1175,29 @@
                 if (typeof AndroidBridge !== 'undefined') {
                     if (AndroidBridge.getDeviceInfo) {
                         const androidInfo = AndroidBridge.getDeviceInfo();
-                        deviceInfo += `<strong>Android Bridge:</strong> ${androidInfo}<br>`;
+                        deviceInfo += `<strong>🤖 Android Bridge:</strong> ${androidInfo}<br>`;
                     }
                     
                     if (AndroidBridge.checkPermissions) {
                         const permissions = AndroidBridge.checkPermissions();
-                        deviceInfo += `<strong>Permissions:</strong> ${permissions}<br>`;
+                        deviceInfo += `<strong>🔐 Permissions:</strong> ${permissions}<br>`;
                     }
                     
                     if (AndroidBridge.debugInfo) {
                         const debug = AndroidBridge.debugInfo();
-                        deviceInfo += `<strong>Debug Info:</strong><br><pre style="font-size: 12px; white-space: pre-wrap;">${debug}</pre>`;
+                        deviceInfo += `<strong>🔧 Debug Info:</strong><br><pre style="font-size: 12px; white-space: pre-wrap;">${debug}</pre>`;
                     }
                 }
 
                 if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                    deviceInfo += `<strong>Camera API:</strong> Supported<br>`;
+                    deviceInfo += `<strong>📷 Camera API:</strong> Supported<br>`;
                 } else {
-                    deviceInfo += `<strong>Camera API:</strong> Not supported<br>`;
+                    deviceInfo += `<strong>📷 Camera API:</strong> Not supported<br>`;
                 }
 
                 deviceInfoDiv.innerHTML = deviceInfo;
             } catch (error) {
-                deviceInfoDiv.innerHTML = `<strong>Error loading device info:</strong> ${error.message}`;
+                deviceInfoDiv.innerHTML = `<strong>❌ Error loading device info:</strong> ${error.message}`;
             }
         }
 
@@ -1149,7 +1248,7 @@
         });
 
         // Add initial log
-        addConsoleLog('Application initialized successfully', 'success');
+        addConsoleLog('Instant Mechanic Photo System ready for car image capture and upload', 'success');
     </script>
 </body>
 </html>
