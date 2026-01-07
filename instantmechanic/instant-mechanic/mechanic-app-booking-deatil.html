@@ -419,7 +419,7 @@
       object-fit: cover;
     }
 
-    /* Uploaded Image Display - Fixed for S3 */
+    /* Uploaded Image Display - Enhanced */
     .uploaded-image-display {
       margin-bottom: 20px;
       text-align: center;
@@ -634,92 +634,6 @@
       animation: spin 1s ease-in-out infinite;
     }
 
-    /* Sub-mechanic assignment styles */
-    .sub-mechanic-card {
-      background: var(--surface);
-      border-radius: var(--border-radius);
-      padding: 20px;
-      margin: 16px 0;
-      box-shadow: var(--card-shadow);
-      border-left: 4px solid var(--primary-color);
-    }
-
-    .sub-mechanic-card h3 {
-      font-size: clamp(1rem, 3vw, 1.2rem);
-      font-weight: 600;
-      color: var(--text-primary);
-      margin-bottom: 16px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .mechanic-list {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .mechanic-item {
-      background: var(--surface-variant);
-      border-radius: 10px;
-      padding: 12px 16px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      border: 2px solid transparent;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .mechanic-item:hover {
-      background: #e5f3ff;
-      border-color: var(--primary-color);
-    }
-
-    .mechanic-item:active {
-      transform: scale(0.98);
-    }
-
-    .mechanic-name {
-      font-size: clamp(0.9rem, 2.5vw, 1rem);
-      font-weight: 500;
-      color: var(--text-primary);
-    }
-
-    .mechanic-select-icon {
-      color: var(--primary-color);
-      font-size: clamp(0.8rem, 2vw, 0.9rem);
-    }
-
-    .assigned-mechanic-card {
-      background: linear-gradient(135deg, var(--success-color), #28a745);
-      color: white;
-      border-left: 4px solid #1e7e34;
-    }
-
-    .assigned-mechanic-card h3 {
-      color: white;
-    }
-
-    .assigned-mechanic-info {
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 10px;
-      padding: 16px;
-      text-align: center;
-    }
-
-    .assigned-mechanic-name {
-      font-size: clamp(1.1rem, 3.5vw, 1.4rem);
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
-
-    .assigned-mechanic-status {
-      font-size: clamp(0.9rem, 2.5vw, 1rem);
-      opacity: 0.9;
-    }
-
     /* Image loading error handling */
     .image-error {
       background: var(--surface-variant);
@@ -860,7 +774,7 @@
         <p style="margin-top: 6px; opacity: 0.9;">इस सर्विस के लिए आपको मिलने वाली राशि</p>
       </div>
 
-      <!-- Image Upload Section - Gallery Only -->
+      <!-- Image Upload Section - Enhanced with better persistence -->
       <div class="completion-section">
         <h3>📷 गाड़ी की फोटो अपलोड करके बुकिंग पूरी करें</h3>
         
@@ -876,7 +790,7 @@
             पहले से अपलोड की गई फोटो
           </div>
           <div class="uploaded-image-container">
-            <img id="previousImagePreview" class="uploaded-image" alt="Previously uploaded image" onerror="handleImageError(this)">
+            <img id="previousImagePreview" class="uploaded-image" alt="Previously uploaded image" crossorigin="anonymous">
             <div class="uploaded-image-url" id="previousImageUrl"></div>
             <button class="change-image-btn" onclick="changeUploadedImage()">
               <i class="fas fa-edit"></i> फोटो बदलें
@@ -917,17 +831,6 @@
         </div>
       </div>
 
-      <!-- Sub-Mechanic Assignment Card -->
-      <div class="sub-mechanic-card" id="subMechanicCard" style="display: none;">
-        <h3 id="subMechanicTitle">
-          <i class="fas fa-users"></i>
-          आपने किसी मैकेनिक को भेजे
-        </h3>
-        <div id="subMechanicContent">
-          <!-- Content will be populated by JavaScript -->
-        </div>
-      </div>
-
       <!-- Agent Information (at bottom) -->
       <div class="agent-info">
         <h3><i class="fas fa-headset"></i> एजेंट जानकारी</h3>
@@ -950,8 +853,6 @@
     let bookingLocation = '';
     let timerInterval;
     let bookingCreatedAt;
-    let subMechanics = [];
-    let assignedMechanic = null;
     let selectedImageFile = null;
     let uploadedImageUrl = null;
 
@@ -959,94 +860,115 @@
     let selectedFiles = [];
     let jsBridgeUris = [];
 
-    // localStorage keys for image persistence
+    // localStorage key for image persistence - FIXED
     const imageStorageKey = `booking_image_${bookingId}`;
 
-    // Check if coming from mechanic-booking.html and prevent back navigation
-    const referrer = document.referrer;
-    if (referrer.includes('mechanic-booking.html')) {
-      history.replaceState(null, null, location.href);
-      window.addEventListener('popstate', function(event) {
-        history.pushState(null, null, location.href);
-      });
-      history.pushState(null, null, location.href);
-    }
+    console.log('Booking page loaded for ID:', bookingId);
+    console.log('Image storage key:', imageStorageKey);
 
-    // Function to handle image loading errors
-    function handleImageError(img) {
-      console.error('Failed to load image:', img.src);
-      const container = img.closest('.uploaded-image-container');
-      if (container) {
-        const errorDiv = document.createElement('div');
-        errorDiv.className = 'image-error';
-        errorDiv.innerHTML = `
-          <i class="fas fa-exclamation-triangle"></i><br>
-          फोटो लोड नहीं हो सकी<br>
-          <small>S3 URL से इमेज लोड करने में समस्या</small>
-        `;
-        img.replaceWith(errorDiv);
-      }
-    }
-
-    // Function to save uploaded image to localStorage
+    // Enhanced function to save uploaded image to localStorage
     function saveImageToStorage(imageUrl) {
       if (bookingId && imageUrl) {
-        localStorage.setItem(imageStorageKey, JSON.stringify({
-          url: imageUrl,
-          timestamp: new Date().toISOString()
-        }));
-        console.log('Image saved to localStorage:', imageUrl);
-      }
-    }
-
-    // Function to load previously uploaded image from localStorage - Fixed
-    function loadSavedImage() {
-      if (bookingId) {
-        const saved = localStorage.getItem(imageStorageKey);
-        if (saved) {
-          try {
-            const imageData = JSON.parse(saved);
-            if (imageData.url) {
-              console.log('Loading saved image from localStorage:', imageData.url);
-              displayPreviousUploadedImage(imageData.url);
-              uploadedImageUrl = imageData.url;
-              return true;
-            }
-          } catch (e) {
-            console.error('Error loading saved image:', e);
-            // Clear corrupted data
-            localStorage.removeItem(imageStorageKey);
-          }
+        try {
+          const imageData = {
+            url: imageUrl,
+            timestamp: new Date().toISOString(),
+            bookingId: bookingId
+          };
+          
+          localStorage.setItem(imageStorageKey, JSON.stringify(imageData));
+          console.log('✅ Image saved to localStorage:', {
+            key: imageStorageKey,
+            url: imageUrl,
+            timestamp: imageData.timestamp
+          });
+          
+          // Verify it was saved
+          const verification = localStorage.getItem(imageStorageKey);
+          console.log('✅ Verification - saved data:', verification);
+          
+        } catch (error) {
+          console.error('❌ Error saving image to localStorage:', error);
         }
+      } else {
+        console.warn('⚠️ Cannot save image: missing bookingId or imageUrl', {bookingId, imageUrl});
       }
-      return false;
     }
 
-    // Function to display previously uploaded image - Fixed for S3
+    // Enhanced function to load previously uploaded image from localStorage
+    function loadSavedImage() {
+      if (!bookingId) {
+        console.warn('⚠️ No booking ID available for loading saved image');
+        return false;
+      }
+
+      try {
+        console.log('🔍 Looking for saved image with key:', imageStorageKey);
+        const saved = localStorage.getItem(imageStorageKey);
+        
+        if (!saved) {
+          console.log('ℹ️ No saved image found in localStorage');
+          return false;
+        }
+
+        console.log('📦 Found saved data:', saved);
+        const imageData = JSON.parse(saved);
+        
+        if (imageData && imageData.url) {
+          console.log('✅ Loading saved image:', imageData.url);
+          displayPreviousUploadedImage(imageData.url);
+          uploadedImageUrl = imageData.url;
+          return true;
+        } else {
+          console.warn('⚠️ Invalid image data structure:', imageData);
+          localStorage.removeItem(imageStorageKey);
+          return false;
+        }
+        
+      } catch (error) {
+        console.error('❌ Error loading saved image:', error);
+        // Clear corrupted data
+        try {
+          localStorage.removeItem(imageStorageKey);
+        } catch (e) {
+          console.error('❌ Error clearing corrupted data:', e);
+        }
+        return false;
+      }
+    }
+
+    // Enhanced function to display previously uploaded image
     function displayPreviousUploadedImage(imageUrl) {
       const previousImageDiv = document.getElementById('previousUploadedImage');
       const previousImagePreview = document.getElementById('previousImagePreview');
       const previousImageUrlDiv = document.getElementById('previousImageUrl');
       const uploadContainer = document.getElementById('imageUploadContainer');
       
-      console.log('Displaying previous image:', imageUrl);
+      console.log('🖼️ Attempting to display previous image:', imageUrl);
       
       // Create a test image to verify URL is accessible
       const testImg = new Image();
+      
       testImg.onload = function() {
-        console.log('S3 image loaded successfully');
+        console.log('✅ S3 image loaded successfully, displaying preview');
         previousImagePreview.src = imageUrl;
         previousImageUrlDiv.textContent = imageUrl;
         previousImageDiv.style.display = 'block';
         uploadContainer.style.display = 'none';
         enableCompleteButton();
+        showUploadStatus('✅ पुरानी फोटो लोड हो गई', 'success');
       };
       
       testImg.onerror = function() {
-        console.error('Failed to load S3 image, showing upload interface');
+        console.error('❌ Failed to load S3 image, clearing storage and showing upload interface');
         // If S3 image fails to load, remove from storage and show upload interface
-        localStorage.removeItem(imageStorageKey);
-        uploadedImageUrl = null;
+        try {
+          localStorage.removeItem(imageStorageKey);
+          uploadedImageUrl = null;
+        } catch (e) {
+          console.error('Error clearing storage:', e);
+        }
+        
         uploadContainer.style.display = 'block';
         previousImageDiv.style.display = 'none';
         disableCompleteButton();
@@ -1054,13 +976,14 @@
         showUploadStatus('⚠️ पुरानी फोटो लोड नहीं हो सकी, नई फोटो अपलोड करें', 'error');
       };
       
-      // Set crossOrigin to anonymous to handle CORS issues
+      // Set crossOrigin to handle CORS issues with S3
       testImg.crossOrigin = 'anonymous';
       testImg.src = imageUrl;
     }
 
     // Function to change uploaded image
     function changeUploadedImage() {
+      console.log('🔄 User requested to change uploaded image');
       const previousImageDiv = document.getElementById('previousUploadedImage');
       const uploadContainer = document.getElementById('imageUploadContainer');
       
@@ -1091,6 +1014,8 @@
       selectedImageFile = null;
       selectedFiles = [];
       jsBridgeUris = [];
+      
+      console.log('🔄 Upload state reset');
     }
 
     // Function to open location
@@ -1166,7 +1091,7 @@
     }
 
     function openGallery() {
-      console.log('Opening gallery via JSBridge...');
+      console.log('📱 Opening gallery via JSBridge...');
       
       // Clear any existing status messages
       const uploadStatus = document.getElementById('uploadStatus');
@@ -1195,7 +1120,7 @@
 
     // Global function to handle JSBridge file results - Gallery Only
     window.handleJSBridgeFileResult = function(uriArray) {
-      console.log('JSBridge file result received:', uriArray);
+      console.log('📨 JSBridge file result received:', uriArray);
       
       // Reset button states
       resetButtonStates();
@@ -1206,13 +1131,13 @@
         selectedFiles = []; // Clear HTML file selections
         selectedImageFile = null;
         
-        console.log('Processing JSBridge URI:', uri);
+        console.log('🔄 Processing JSBridge URI:', uri);
         
         // Try to convert URI to base64 for preview
         if (typeof AndroidBridge !== 'undefined' && AndroidBridge.convertUriToBase64) {
           try {
             const base64Data = AndroidBridge.convertUriToBase64(uri);
-            console.log('Base64 conversion result:', base64Data ? 'Success' : 'Failed');
+            console.log('🔄 Base64 conversion result:', base64Data ? 'Success' : 'Failed');
             
             if (base64Data) {
               displayImagePreview(base64Data, 'JSBridge Gallery Image');
@@ -1220,7 +1145,7 @@
               displayPlaceholderPreview('JSBridge Gallery Image');
             }
           } catch (e) {
-            console.warn('Could not convert URI to base64:', e);
+            console.warn('⚠️ Could not convert URI to base64:', e);
             displayPlaceholderPreview('JSBridge Gallery Image');
           }
         } else {
@@ -1251,7 +1176,7 @@
         selectedFiles = [file];
         jsBridgeUris = []; // Clear JSBridge URIs
         
-        console.log('File selected via HTML input:', file.name);
+        console.log('📁 File selected via HTML input:', file.name);
         
         // Display preview
         const reader = new FileReader();
@@ -1278,7 +1203,7 @@
       uploadText.textContent = '✅ फोटो सेलेक्ट हो गई';
       uploadSubtext.textContent = name || 'Selected Image';
       
-      console.log('Image preview displayed for:', name);
+      console.log('🖼️ Image preview displayed for:', name);
     }
 
     function displayPlaceholderPreview(name = 'JSBridge Image') {
@@ -1295,7 +1220,7 @@
       uploadText.textContent = '✅ JSBridge फोटो सेलेक्ट हो गई';
       uploadSubtext.textContent = name;
       
-      console.log('Placeholder preview displayed for:', name);
+      console.log('📦 Placeholder preview displayed for:', name);
     }
 
     function showUploadStatus(message, type) {
@@ -1304,7 +1229,7 @@
       statusDiv.className = `upload-status ${type}`;
       statusDiv.style.display = 'block';
       
-      console.log('Upload status:', message, type);
+      console.log('📊 Upload status:', message, type);
     }
 
     function enableCompleteButton() {
@@ -1319,7 +1244,7 @@
       completeBtn.style.opacity = '0.6';
     }
 
-    // Complete Booking with Image Upload - Fixed
+    // Complete Booking with Image Upload - Enhanced with better persistence
     async function completeBookingWithImage() {
       const completeBtn = document.getElementById('completeBookingBtn');
       
@@ -1331,6 +1256,7 @@
 
       // If image is already uploaded, just complete booking
       if (uploadedImageUrl && !selectedImageFile && jsBridgeUris.length === 0) {
+        console.log('📤 Using existing uploaded image:', uploadedImageUrl);
         await completeBookingOnly();
         return;
       }
@@ -1341,17 +1267,19 @@
       showUploadStatus('📤 फोटो अपलोड हो रही है...', 'uploading');
 
       try {
+        console.log('🚀 Starting upload process...');
+        
         // Step 1: Upload Image
         let imageUploadSuccess = false;
         let newImageUrl = null;
         
         if (jsBridgeUris.length > 0) {
-          // Upload via JSBridge
+          console.log('📱 Uploading via JSBridge...');
           const result = await uploadViaJSBridge();
           imageUploadSuccess = result.success;
           newImageUrl = result.url;
         } else if (selectedImageFile) {
-          // Upload via HTML file input
+          console.log('📁 Uploading via HTML file input...');
           const result = await uploadViaFileInput();
           imageUploadSuccess = result.success;
           newImageUrl = result.url;
@@ -1361,11 +1289,13 @@
           throw new Error('Image upload failed');
         }
 
-        // Save uploaded image URL
+        console.log('✅ Image upload successful:', newImageUrl);
+
+        // Step 2: Save uploaded image URL to localStorage
         uploadedImageUrl = newImageUrl;
         saveImageToStorage(newImageUrl);
 
-        // Step 2: Complete Booking
+        // Step 3: Complete Booking
         showUploadStatus('✅ फोटो अपलोड हो गई! बुकिंग कम्प्लीट हो रही है...', 'success');
         completeBtn.innerHTML = '<div class="loading-inline"></div> बुकिंग पूरी हो रही है...';
         
@@ -1373,6 +1303,7 @@
         
         if (bookingSuccess) {
           // Success!
+          console.log('✅ Booking completed successfully');
           completeBtn.innerHTML = '<i class="fas fa-check-circle"></i> पूरी हो गई';
           completeBtn.style.background = 'var(--success-color)';
           showUploadStatus(`✅ बुकिंग सफलतापूर्वक पूरी हो गई!`, 'success');
@@ -1394,7 +1325,7 @@
         }
 
       } catch (error) {
-        console.error('Error in complete booking process:', error);
+        console.error('❌ Error in complete booking process:', error);
         
         // Reset button
         completeBtn.disabled = false;
@@ -1434,7 +1365,7 @@
           throw new Error('Booking completion failed');
         }
       } catch (error) {
-        console.error('Error completing booking:', error);
+        console.error('❌ Error completing booking:', error);
         
         completeBtn.disabled = false;
         completeBtn.innerHTML = '<i class="fas fa-check-circle"></i> बुकिंग पूरी करें';
@@ -1451,7 +1382,7 @@
           
           // Set up callback for JSBridge upload result
           window.tempUploadCallback = function(result) {
-            console.log('JSBridge upload result:', result);
+            console.log('📨 JSBridge upload result:', result);
             if (result && result.success) {
               resolve({ success: true, url: result.imageUrl });
             } else {
@@ -1472,7 +1403,6 @@
       try {
         const formData = new FormData();
         formData.append('image', selectedImageFile);
-        formData.append('booking_id', bookingId);
 
         const response = await fetch('https://ai.instantmechanic.online/bot/upload-car-image/', {
           method: 'POST',
@@ -1484,253 +1414,12 @@
         }
 
         const result = await response.json();
-        console.log('File input upload result:', result);
+        console.log('📁 File input upload result:', result);
         return { success: true, url: result.image_url };
 
       } catch (error) {
-        console.error('File input upload failed:', error);
+        console.error('❌ File input upload failed:', error);
         return { success: false, url: null };
-      }
-    }
-
-    // Sub-Mechanic Functions (keeping existing functionality)
-    async function loadSubMechanics(isCompleted = false) {
-      const mechanicName = localStorage.getItem('mechanic');
-      if (!mechanicName) {
-        console.log('No mechanic name in localStorage');
-        return;
-      }
-
-      try {
-        const response = await fetch(`https://ai.instantmechanic.online/bot/get-mechanics?parent_mechanic=${encodeURIComponent(mechanicName)}`);
-        const data = await response.json();
-        
-        if (response.ok && data.sub_mechanics && data.sub_mechanics.length > 0) {
-          subMechanics = data.sub_mechanics;
-          checkAssignedMechanic();
-          displaySubMechanicCard(isCompleted);
-        } else {
-          console.log('No sub-mechanics found or error:', data.error || 'Unknown error');
-        }
-      } catch (error) {
-        console.error('Error loading sub-mechanics:', error);
-      }
-    }
-
-    function checkAssignedMechanic() {
-      const storageKey = `assigned_mechanic_${bookingId}`;
-      const stored = localStorage.getItem(storageKey);
-      if (stored) {
-        assignedMechanic = JSON.parse(stored);
-      }
-    }
-
-    function displaySubMechanicCard(isCompleted = false) {
-      const card = document.getElementById('subMechanicCard');
-      const content = document.getElementById('subMechanicContent');
-      
-      if (assignedMechanic) {
-        displayAssignedMechanic(isCompleted);
-      } else {
-        displayMechanicList(isCompleted);
-      }
-      
-      if (isCompleted) {
-        card.classList.add('disabled');
-        card.style.opacity = '0.6';
-        card.style.pointerEvents = 'none';
-      }
-      
-      card.style.display = 'block';
-    }
-
-    function displayAssignedMechanic(isCompleted = false) {
-      const card = document.getElementById('subMechanicCard');
-      const title = document.getElementById('subMechanicTitle');
-      const content = document.getElementById('subMechanicContent');
-      
-      card.classList.add('assigned-mechanic-card');
-      title.innerHTML = `<i class="fas fa-check-circle"></i> आपने इस बुकिंग पर "${assignedMechanic.name}" को भेजा है`;
-      
-      if (isCompleted) {
-        content.innerHTML = `
-          <div class="assigned-mechanic-info">
-            <div class="assigned-mechanic-name">${assignedMechanic.name}</div>
-            <div class="assigned-mechanic-status">इस बुकिंग को असाइन किया गया था (बुकिंग पूर्ण हो गई)</div>
-          </div>
-        `;
-      } else {
-        content.innerHTML = `
-          <div class="assigned-mechanic-info">
-            <div class="assigned-mechanic-name">${assignedMechanic.name}</div>
-            <div class="assigned-mechanic-status">इस बुकिंग को असाइन किया गया</div>
-            <button class="btn btn-warning" onclick="showReassignOptions()" style="margin-top: 12px; font-size: 0.9rem; padding: 8px 16px;">
-              <i class="fas fa-exchange-alt"></i>
-              दूसरे मैकेनिक को असाइन करें
-            </button>
-          </div>
-        `;
-      }
-    }
-
-    function displayMechanicList(isCompleted = false) {
-      const content = document.getElementById('subMechanicContent');
-      
-      if (isCompleted) {
-        content.innerHTML = `
-          <div class="current-assignment" style="background: rgba(255,255,255,0.1); padding: 12px; border-radius: 8px; text-align: center; color: var(--text-secondary);">
-            <i class="fas fa-info-circle"></i> बुकिंग पूर्ण हो गई - असाइनमेंट अब उपलब्ध नहीं है
-          </div>
-        `;
-        return;
-      }
-      
-      const mechanicListHTML = subMechanics.map(mechanic => `
-        <div class="mechanic-item" onclick="assignMechanic(${mechanic.id}, '${mechanic.name}')">
-          <div class="mechanic-name">${mechanic.name}</div>
-          <div class="mechanic-select-icon">
-            <i class="fas fa-arrow-right"></i>
-          </div>
-        </div>
-      `).join('');
-      
-      content.innerHTML = `
-        <div class="mechanic-list">
-          ${mechanicListHTML}
-        </div>
-      `;
-    }
-
-    function showReassignOptions() {
-      const card = document.getElementById('subMechanicCard');
-      const title = document.getElementById('subMechanicTitle');
-      const content = document.getElementById('subMechanicContent');
-      
-      card.classList.remove('assigned-mechanic-card');
-      title.innerHTML = `<i class="fas fa-exchange-alt"></i> दूसरा मैकेनिक चुनें`;
-      
-      const availableMechanics = subMechanics.filter(mechanic => mechanic.id !== assignedMechanic.id);
-      
-      const mechanicListHTML = availableMechanics.map(mechanic => `
-        <div class="mechanic-item" onclick="reassignMechanic(${mechanic.id}, '${mechanic.name}')">
-          <div class="mechanic-name">${mechanic.name}</div>
-          <div class="mechanic-select-icon">
-            <i class="fas fa-arrow-right"></i>
-          </div>
-        </div>
-      `).join('');
-      
-      content.innerHTML = `
-        <div class="current-assignment" style="background: rgba(255,255,255,0.1); padding: 12px; border-radius: 8px; margin-bottom: 12px; text-align: center; color: var(--text-secondary);">
-          <i class="fas fa-info-circle"></i> वर्तमान में असाइन: <strong>${assignedMechanic.name}</strong>
-        </div>
-        <div class="mechanic-list">
-          ${mechanicListHTML}
-        </div>
-        <button class="btn btn-secondary" onclick="cancelReassign()" style="margin-top: 12px; background: var(--text-secondary);">
-          <i class="fas fa-times"></i>
-          कैंसिल करें
-        </button>
-      `;
-    }
-
-    function cancelReassign() {
-      displayAssignedMechanic();
-    }
-
-    async function reassignMechanic(mechanicId, mechanicName) {
-      if (!confirm(`क्या आप वाकई में ${assignedMechanic.name} की जगह ${mechanicName} को असाइन करना चाहते हैं?`)) {
-        return;
-      }
-      
-      const clickedItem = event.currentTarget;
-      clickedItem.innerHTML = `
-        <div class="mechanic-name">
-          <i class="fas fa-spinner fa-spin"></i> ${mechanicName} को असाइन कर रहे हैं...
-        </div>
-      `;
-      clickedItem.style.pointerEvents = 'none';
-      
-      try {
-        const response = await fetch('https://ai.instantmechanic.online/bot/assign-sub-mechanic', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            booking: bookingId,
-            sub_mechanic_id: mechanicId.toString()
-          })
-        });
-
-        if (response.ok) {
-          assignedMechanic = { id: mechanicId, name: mechanicName };
-          const storageKey = `assigned_mechanic_${bookingId}`;
-          localStorage.setItem(storageKey, JSON.stringify(assignedMechanic));
-          
-          displayAssignedMechanic();
-          alert(`${mechanicName} को सफलतापूर्वक री-असाइन किया गया!`);
-        } else {
-          throw new Error('Reassignment failed');
-        }
-      } catch (error) {
-        console.error('Error reassigning mechanic:', error);
-        alert('मैकेनिक री-असाइन करने में समस्या हुई। कृपया दोबारा कोशिश करें।');
-        
-        clickedItem.innerHTML = `
-          <div class="mechanic-name">${mechanicName}</div>
-          <div class="mechanic-select-icon">
-            <i class="fas fa-arrow-right"></i>
-          </div>
-        `;
-        clickedItem.style.pointerEvents = 'auto';
-      }
-    }
-
-    async function assignMechanic(mechanicId, mechanicName) {
-      if (assignedMechanic) return;
-      
-      const clickedItem = event.currentTarget;
-      clickedItem.innerHTML = `
-        <div class="mechanic-name">
-          <i class="fas fa-spinner fa-spin"></i> ${mechanicName} को असाइन कर रहे हैं...
-        </div>
-      `;
-      clickedItem.style.pointerEvents = 'none';
-      
-      try {
-        const response = await fetch('https://ai.instantmechanic.online/bot/assign-sub-mechanic', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            booking: bookingId,
-            sub_mechanic_id: mechanicId.toString()
-          })
-        });
-
-        if (response.ok) {
-          assignedMechanic = { id: mechanicId, name: mechanicName };
-          const storageKey = `assigned_mechanic_${bookingId}`;
-          localStorage.setItem(storageKey, JSON.stringify(assignedMechanic));
-          
-          displayAssignedMechanic();
-          alert(`${mechanicName} को सफलतापूर्वक इस बुकिंग पर असाइन किया गया!`);
-        } else {
-          throw new Error('Assignment failed');
-        }
-      } catch (error) {
-        console.error('Error assigning mechanic:', error);
-        alert('मैकेनिक असाइन करने में समस्या हुई। कृपया दोबारा कोशिश करें।');
-        
-        clickedItem.innerHTML = `
-          <div class="mechanic-name">${mechanicName}</div>
-          <div class="mechanic-select-icon">
-            <i class="fas fa-arrow-right"></i>
-          </div>
-        `;
-        clickedItem.style.pointerEvents = 'auto';
       }
     }
 
@@ -1763,14 +1452,10 @@
           throw new Error(result.message || 'API error');
         }
       } catch (error) {
-        console.error('API Error:', error);
+        console.error('❌ API Error:', error);
         alert('एक्शन भेजने में समस्या हुई: ' + error.message);
         return false;
       }
-    }
-
-    function callCompany() {
-      window.open('tel:+911234567890', '_self');
     }
 
     // Load booking data
@@ -1791,14 +1476,22 @@
         displayBookingData(data);
         
         const isCompleted = data.booking_status === 'complete';
-        await loadSubMechanics(isCompleted);
         
-        // Load saved image after booking data is loaded
+        // Load saved image after booking data is loaded - ENHANCED
         if (!isCompleted) {
-          loadSavedImage();
+          console.log('💾 Attempting to load saved image for active booking...');
+          const imageLoaded = loadSavedImage();
+          if (imageLoaded) {
+            console.log('✅ Saved image loaded successfully');
+          } else {
+            console.log('ℹ️ No saved image found, showing upload interface');
+          }
+        } else {
+          console.log('ℹ️ Booking completed, skipping image loading');
         }
+        
       } catch (error) {
-        console.error('Error loading booking:', error);
+        console.error('❌ Error loading booking:', error);
         showError('बुकिंग डेटा लोड करने में असमर्थ। कृपया अपना इंटरनेट कनेक्शन चेक करें।');
       }
     }
@@ -1976,28 +1669,18 @@
       }
     });
 
-    // Load data when page loads
+    // Enhanced page load handling with better logging
     window.addEventListener('load', function() {
+      console.log('🚀 Page loaded, initializing booking system...');
       loadBookingData();
     });
 
-    function retryLoad() {
-      document.getElementById('errorState').style.display = 'none';
-      document.getElementById('loadingState').style.display = 'flex';
-      setTimeout(loadBookingData, 500);
-    }
-
     // Add to window for inline onclick handlers
-    window.retryLoad = retryLoad;
-    window.assignMechanic = assignMechanic;
-    window.showReassignOptions = showReassignOptions;
-    window.cancelReassign = cancelReassign;
-    window.reassignMechanic = reassignMechanic;
+    window.openLocation = openLocation;
     window.triggerImageSelect = triggerImageSelect;
     window.openGallery = openGallery;
     window.completeBookingWithImage = completeBookingWithImage;
     window.changeUploadedImage = changeUploadedImage;
-    window.handleImageError = handleImageError;
   </script>
 </body>
 </html>
