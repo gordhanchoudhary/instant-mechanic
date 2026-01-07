@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Instant Mechanic - Photo Capture & Upload</title>
+    <title>Instant Mechanic - Photo Capture Test</title>
     <style>
         * {
             margin: 0;
@@ -94,13 +94,6 @@
             gap: 8px;
             min-width: 160px;
             justify-content: center;
-            position: relative;
-        }
-
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none !important;
         }
 
         .btn-primary {
@@ -108,7 +101,7 @@
             color: white;
         }
 
-        .btn-primary:hover:not(:disabled) {
+        .btn-primary:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 25px rgba(55, 66, 250, 0.3);
         }
@@ -118,7 +111,7 @@
             color: white;
         }
 
-        .btn-secondary:hover:not(:disabled) {
+        .btn-secondary:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 25px rgba(238, 90, 36, 0.3);
         }
@@ -128,14 +121,40 @@
             color: white;
         }
 
-        .btn-success:hover:not(:disabled) {
+        .btn-success:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 25px rgba(0, 210, 211, 0.3);
         }
 
+        .file-input {
+            display: none;
+        }
+
+        .file-input-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 20px;
+            border: 3px dashed #a4b0be;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            font-weight: 600;
+            color: #747d8c;
+            margin-bottom: 20px;
+        }
+
+        .file-input-label:hover {
+            border-color: #3742fa;
+            color: #3742fa;
+            background: #f8f9ff;
+        }
+
         .preview-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 20px;
             margin-top: 25px;
         }
@@ -146,7 +165,6 @@
             overflow: hidden;
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
             transition: all 0.3s ease;
-            background: white;
         }
 
         .preview-item:hover {
@@ -165,48 +183,6 @@
             background: #f8f9fa;
             font-size: 14px;
             color: #495057;
-        }
-
-        .upload-status {
-            padding: 10px;
-            background: #fff;
-            border-top: 1px solid #dee2e6;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .upload-status.uploading {
-            color: #856404;
-            background: #fff3cd;
-        }
-
-        .upload-status.success {
-            color: #155724;
-            background: #d4edda;
-        }
-
-        .upload-status.error {
-            color: #721c24;
-            background: #f8d7da;
-        }
-
-        .url-display {
-            font-family: 'Courier New', monospace;
-            font-size: 11px;
-            word-break: break-all;
-            margin-top: 5px;
-            padding: 5px;
-            background: #e9ecef;
-            border-radius: 3px;
-        }
-
-        .url-display a {
-            color: #007bff;
-            text-decoration: none;
-        }
-
-        .url-display a:hover {
-            text-decoration: underline;
         }
 
         .remove-btn {
@@ -289,32 +265,47 @@
             border-radius: 8px;
             margin: 20px 0;
             border-left: 4px solid #3742fa;
-            font-size: 14px;
-            line-height: 1.5;
         }
 
-        .loading {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            border: 2px solid rgba(255,255,255,.3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 1s ease-in-out infinite;
+        .test-results {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f1f3f4;
+            border-radius: 8px;
         }
 
-        .loading-text {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            border: 2px solid rgba(0,0,0,.3);
-            border-radius: 50%;
-            border-top-color: #007bff;
-            animation: spin 1s ease-in-out infinite;
+        .test-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #dee2e6;
         }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        .test-item:last-child {
+            border-bottom: none;
+        }
+
+        .test-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .test-pass {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .test-fail {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .test-pending {
+            background: #fff3cd;
+            color: #856404;
         }
 
         @media (max-width: 768px) {
@@ -342,64 +333,66 @@
             .btn {
                 width: 100%;
             }
-            
-            .preview-container {
-                grid-template-columns: 1fr;
-            }
         }
 
-        .api-info {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 15px 0;
-            font-size: 14px;
-            border-left: 4px solid #28a745;
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
         }
 
-        .api-info h4 {
-            margin-bottom: 10px;
-            color: #155724;
-        }
-
-        .copy-btn {
-            background: #6c757d;
-            color: white;
-            border: none;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 10px;
-            cursor: pointer;
-            margin-left: 5px;
-        }
-
-        .copy-btn:hover {
-            background: #5a6268;
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>📱 Camera Upload Ready</h1>
-            <p>Photo capture with WebView File Chooser & AWS S3 Upload</p>
+            <h1>📱 Camera & Gallery Test</h1>
+            <p>Test photo capture functionality for Instant Mechanic App</p>
         </div>
 
         <div class="content">
-            <!-- WebView File Chooser Photo Capture -->
+            <!-- Method 1: HTML File Input -->
             <div class="section">
-                <h2><span class="section-icon">📸</span> Photo Capture & Upload</h2>
-                <p style="margin-bottom: 20px; color: #6c757d;">Click to capture/select photos and upload to AWS S3</p>
+                <h2><span class="section-icon">📁</span> Method 1: HTML File Input</h2>
+                <p style="margin-bottom: 20px; color: #6c757d;">This method uses native HTML file input with camera/gallery access</p>
                 
-                <!-- THIS IS THE KEY: Standard file input that WebView will intercept -->
-                <input type="file" id="fileInput" accept="image/*" multiple style="display: none;" onchange="handleFileSelect(this)">
+                <input type="file" id="fileInput" class="file-input" accept="image/*" capture="environment" multiple>
+                <label for="fileInput" class="file-input-label">
+                    <span style="font-size: 2rem;">📷</span>
+                    <span>Tap to select photos or take new ones</span>
+                </label>
+
+                <div class="button-group">
+                    <button class="btn btn-success" onclick="triggerFileInput()">
+                        <span>📷</span> Open Camera/Gallery
+                    </button>
+                    <button class="btn btn-primary" onclick="clearPreviews()">
+                        <span>🗑️</span> Clear All
+                    </button>
+                </div>
+            </div>
+
+            <!-- Method 2: JavaScript Bridge -->
+            <div class="section">
+                <h2><span class="section-icon">🌉</span> Method 2: JavaScript Bridge</h2>
+                <p style="margin-bottom: 20px; color: #6c757d;">Direct access using Android Bridge methods</p>
                 
                 <div class="button-group">
-                    <button class="btn btn-primary" onclick="openFileChooser()" id="photoBtn">
-                        <span>📸</span> <span>Capture/Select Photo</span>
+                    <button class="btn btn-primary" onclick="openCamera()">
+                        <span>📸</span> Open Camera
                     </button>
-                    <button class="btn btn-success" onclick="testBridge()" id="testBtn">
-                        <span>🔧</span> <span>Test Bridge</span>
+                    <button class="btn btn-secondary" onclick="openGallery()">
+                        <span>🖼️</span> Open Gallery
+                    </button>
+                    <button class="btn btn-success" onclick="testBridge()">
+                        <span>🔧</span> Test Bridge
                     </button>
                 </div>
             </div>
@@ -415,26 +408,11 @@
                 </button>
             </div>
 
-            <!-- Upload API Information -->
+            <!-- Photo Previews -->
             <div class="section">
-                <h2><span class="section-icon">☁️</span> Upload API Configuration</h2>
-                <div class="api-info">
-                    <h4>Upload Endpoint:</h4>
-                    <div style="font-family: 'Courier New', monospace; background: #e9ecef; padding: 8px; border-radius: 4px;">
-                        <span id="uploadUrl">https://ai.instantmechanic.online/bot/upload-car-image/</span>
-                        <button class="copy-btn" onclick="copyToClipboard('uploadUrl')">Copy</button>
-                    </div>
-                    <p style="margin-top: 10px; font-size: 12px; color: #28a745;">
-                        ✅ API endpoint configured and ready for uploads
-                    </p>
-                </div>
-            </div>
-
-            <!-- Photo Previews & Upload Results -->
-            <div class="section">
-                <h2><span class="section-icon">🖼️</span> Photos & Upload Status</h2>
+                <h2><span class="section-icon">🖼️</span> Photo Previews</h2>
                 <div id="statusMessage" class="status info">
-                    Click "Capture/Select Photo" button above to choose photos
+                    Select photos using the methods above to see them here
                 </div>
                 <div class="preview-container" id="previewContainer">
                     <!-- Previews will be added here dynamically -->
@@ -443,19 +421,46 @@
 
             <!-- Statistics -->
             <div class="section">
-                <h2><span class="section-icon">📈</span> Statistics</h2>
+                <h2><span class="section-icon">📈</span> Test Statistics</h2>
                 <div class="stats">
                     <div class="stat-card">
                         <div class="stat-number" id="photoCount">0</div>
                         <div class="stat-label">Photos Selected</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-number" id="uploadedCount">0</div>
-                        <div class="stat-label">Successfully Uploaded</div>
+                        <div class="stat-number" id="totalSize">0</div>
+                        <div class="stat-label">Total Size (KB)</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-number" id="failedCount">0</div>
-                        <div class="stat-label">Failed Uploads</div>
+                        <div class="stat-number" id="testsPassed">0</div>
+                        <div class="stat-label">Tests Passed</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Test Results -->
+            <div class="section">
+                <h2><span class="section-icon">✅</span> Feature Tests</h2>
+                <div class="test-results">
+                    <div class="test-item">
+                        <span>File Input Support</span>
+                        <span class="test-status test-pending" id="fileInputTest">Pending</span>
+                    </div>
+                    <div class="test-item">
+                        <span>Multiple File Selection</span>
+                        <span class="test-status test-pending" id="multipleFileTest">Pending</span>
+                    </div>
+                    <div class="test-item">
+                        <span>Image Preview</span>
+                        <span class="test-status test-pending" id="previewTest">Pending</span>
+                    </div>
+                    <div class="test-item">
+                        <span>JavaScript Bridge</span>
+                        <span class="test-status test-pending" id="bridgeTest">Pending</span>
+                    </div>
+                    <div class="test-item">
+                        <span>Camera Access</span>
+                        <span class="test-status test-pending" id="cameraTest">Pending</span>
                     </div>
                 </div>
             </div>
@@ -463,227 +468,164 @@
     </div>
 
     <script>
-        // Configuration
-        const UPLOAD_API_URL = 'https://ai.instantmechanic.online/bot/upload-car-image/';
-        
-        let capturedPhotos = [];
+        let selectedFiles = [];
         let photoCount = 0;
-        let uploadedCount = 0;
-        let failedCount = 0;
+        let totalSize = 0;
+        let testsPassed = 0;
 
         // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('Page loaded, initializing...');
+            console.log('Page loaded, initializing tests...');
+            runInitialTests();
             refreshDeviceInfo();
-            updateUploadUrlDisplay();
         });
 
-        function updateUploadUrlDisplay() {
-            const urlElement = document.getElementById('uploadUrl');
-            urlElement.textContent = UPLOAD_API_URL;
-            urlElement.style.color = '#28a745';
+        // Method 1: HTML File Input Handler
+        document.getElementById('fileInput').addEventListener('change', function(event) {
+            const files = Array.from(event.target.files);
+            handleFiles(files);
+            updateTestStatus('fileInputTest', 'pass');
+            
+            if (files.length > 1) {
+                updateTestStatus('multipleFileTest', 'pass');
+            }
+        });
+
+        function triggerFileInput() {
+            document.getElementById('fileInput').click();
         }
 
-        // FIXED: Simple file chooser trigger - WebView will handle camera/gallery choice
-        function openFileChooser() {
-            console.log('Opening file chooser...');
-            const fileInput = document.getElementById('fileInput');
-            const btn = document.getElementById('photoBtn');
+        function handleFiles(files) {
+            console.log(`Selected ${files.length} files`);
             
-            try {
-                btn.disabled = true;
-                btn.innerHTML = '<div class="loading"></div> <span>Opening...</span>';
-                
-                // Simply trigger the file input - WebView will show camera/gallery options
-                fileInput.click();
-                
-                updateStatusMessage('Opening camera/gallery chooser...', 'info');
-                console.log('File input triggered - waiting for selection');
-                
-            } catch (error) {
-                console.error('Error opening file chooser:', error);
-                updateStatusMessage(`Error: ${error.message}`, 'warning');
-            } finally {
-                // Re-enable button after a short delay
-                setTimeout(() => {
-                    btn.disabled = false;
-                    btn.innerHTML = '<span>📸</span> <span>Capture/Select Photo</span>';
-                }, 1000);
-            }
-        }
-
-        // FIXED: Handle file selection from WebView's file chooser
-        function handleFileSelect(input) {
-            console.log('Files selected:', input.files);
-            
-            if (!input.files || input.files.length === 0) {
-                updateStatusMessage('No files selected', 'warning');
-                return;
-            }
-
-            updateStatusMessage(`Processing ${input.files.length} file(s)...`, 'info');
-
-            // Process each selected file
-            Array.from(input.files).forEach((file, index) => {
-                console.log(`Processing file ${index + 1}:`, file.name, file.type, file.size);
-                
-                // Create preview and upload
-                const photoId = Date.now() + Math.random() + index;
-                createPhotoPreviewFromFile(file, photoId);
-                
-                // Update counters
-                photoCount++;
-                updateStats();
-                
-                // Start upload
-                uploadToAWS(file, file.name, photoId);
+            files.forEach(file => {
+                if (file.type.startsWith('image/')) {
+                    selectedFiles.push(file);
+                    createPreview(file);
+                    totalSize += Math.round(file.size / 1024); // Convert to KB
+                }
             });
+
+            photoCount = selectedFiles.length;
+            updateStats();
+            updateStatusMessage(`${files.length} photos selected successfully!`, 'success');
             
-            // Clear the input for next use
-            input.value = '';
+            if (selectedFiles.length > 0) {
+                updateTestStatus('previewTest', 'pass');
+            }
         }
 
-        // Create preview from File object
-        function createPhotoPreviewFromFile(file, photoId) {
-            const previewContainer = document.getElementById('previewContainer');
-            const previewItem = document.createElement('div');
-            previewItem.className = 'preview-item';
-            previewItem.id = `photo-${photoId}`;
+        function createPreview(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const previewContainer = document.getElementById('previewContainer');
+                const previewItem = document.createElement('div');
+                previewItem.className = 'preview-item';
+                
+                previewItem.innerHTML = `
+                    <img src="${e.target.result}" alt="Preview">
+                    <div class="preview-info">
+                        <strong>${file.name}</strong><br>
+                        Size: ${Math.round(file.size / 1024)} KB<br>
+                        Type: ${file.type}
+                    </div>
+                    <button class="remove-btn" onclick="removePreview(this, '${file.name}')">&times;</button>
+                `;
+                
+                previewContainer.appendChild(previewItem);
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function removePreview(button, fileName) {
+            const previewItem = button.parentElement;
+            previewItem.remove();
             
-            // Create object URL for preview
-            const imageUrl = URL.createObjectURL(file);
+            // Remove from selectedFiles array
+            selectedFiles = selectedFiles.filter(file => file.name !== fileName);
             
-            previewItem.innerHTML = `
-                <img src="${imageUrl}" alt="Selected Photo" onload="URL.revokeObjectURL(this.src)">
-                <div class="preview-info">
-                    <strong>${file.name}</strong><br>
-                    Size: ${(file.size / 1024 / 1024).toFixed(2)} MB<br>
-                    Type: ${file.type}<br>
-                    Selected: ${new Date().toLocaleTimeString()}
-                </div>
-                <div class="upload-status uploading" id="status-${photoId}">
-                    <div class="loading-text"></div> Uploading...
-                </div>
-                <button class="remove-btn" onclick="removePhoto('${photoId}')">&times;</button>
-            `;
+            // Recalculate stats
+            totalSize = selectedFiles.reduce((sum, file) => sum + Math.round(file.size / 1024), 0);
+            photoCount = selectedFiles.length;
+            updateStats();
             
-            previewContainer.appendChild(previewItem);
+            if (selectedFiles.length === 0) {
+                updateStatusMessage('All photos removed', 'info');
+            }
+        }
+
+        function clearPreviews() {
+            document.getElementById('previewContainer').innerHTML = '';
+            selectedFiles = [];
+            photoCount = 0;
+            totalSize = 0;
+            updateStats();
+            updateStatusMessage('All photos cleared', 'info');
+            document.getElementById('fileInput').value = '';
+        }
+
+        // Method 2: JavaScript Bridge Methods
+        function openCamera() {
+            console.log('Attempting to open camera via bridge...');
+            try {
+                if (typeof AndroidBridge !== 'undefined' && AndroidBridge.openCamera) {
+                    AndroidBridge.openCamera();
+                    updateTestStatus('cameraTest', 'pass');
+                    updateStatusMessage('Camera opened via Android Bridge', 'success');
+                    console.log('Camera opened successfully');
+                } else {
+                    console.log('AndroidBridge not available or method not found');
+                    updateStatusMessage('AndroidBridge.openCamera() not available', 'warning');
+                    updateTestStatus('cameraTest', 'fail');
+                }
+            } catch (error) {
+                console.error('Error opening camera:', error);
+                updateStatusMessage(`Error: ${error.message}`, 'warning');
+                updateTestStatus('cameraTest', 'fail');
+            }
+        }
+
+        function openGallery() {
+            console.log('Attempting to open gallery via bridge...');
+            try {
+                if (typeof AndroidBridge !== 'undefined' && AndroidBridge.openGallery) {
+                    AndroidBridge.openGallery();
+                    updateStatusMessage('Gallery opened via Android Bridge', 'success');
+                    console.log('Gallery opened successfully');
+                } else {
+                    console.log('AndroidBridge not available or method not found');
+                    updateStatusMessage('AndroidBridge.openGallery() not available', 'warning');
+                }
+            } catch (error) {
+                console.error('Error opening gallery:', error);
+                updateStatusMessage(`Error: ${error.message}`, 'warning');
+            }
         }
 
         function testBridge() {
             console.log('Testing JavaScript Bridge...');
-            const btn = document.getElementById('testBtn');
-            
             try {
-                btn.disabled = true;
-                btn.innerHTML = '<div class="loading"></div> <span>Testing...</span>';
-                
                 if (typeof AndroidBridge !== 'undefined') {
-                    let testResults = [];
+                    // Test basic bridge functionality
+                    const deviceInfo = AndroidBridge.getDeviceInfo();
+                    const customResult = AndroidBridge.customFunction('Test from web');
                     
-                    if (AndroidBridge.getDeviceInfo) {
-                        const deviceInfo = AndroidBridge.getDeviceInfo();
-                        testResults.push(`Device Info: ${deviceInfo}`);
-                    }
+                    updateTestStatus('bridgeTest', 'pass');
+                    updateStatusMessage(`Bridge test successful! Device: ${deviceInfo}`, 'success');
+                    console.log('Bridge test results:', { deviceInfo, customResult });
                     
-                    if (AndroidBridge.customFunction) {
-                        const customResult = AndroidBridge.customFunction('Bridge test');
-                        testResults.push(`Custom Function: ${customResult}`);
-                    }
-                    
+                    // Show toast if available
                     if (AndroidBridge.showToast) {
                         AndroidBridge.showToast('Bridge test successful!');
-                        testResults.push('Toast: Success');
                     }
-                    
-                    updateStatusMessage(`Bridge test successful! Results: ${testResults.join(', ')}`, 'success');
-                    console.log('Bridge test results:', testResults);
                 } else {
-                    updateStatusMessage('AndroidBridge not available - WebView file chooser is working', 'info');
-                    console.log('AndroidBridge not available, but WebView file chooser works');
+                    updateTestStatus('bridgeTest', 'fail');
+                    updateStatusMessage('AndroidBridge not available', 'warning');
                 }
             } catch (error) {
                 console.error('Bridge test failed:', error);
+                updateTestStatus('bridgeTest', 'fail');
                 updateStatusMessage(`Bridge test failed: ${error.message}`, 'warning');
-            } finally {
-                setTimeout(() => {
-                    btn.disabled = false;
-                    btn.innerHTML = '<span>🔧</span> <span>Test Bridge</span>';
-                }, 2000);
-            }
-        }
-
-        // Upload function
-        async function uploadToAWS(file, fileName, photoId) {
-            try {
-                console.log(`Uploading ${fileName} to ${UPLOAD_API_URL}`);
-
-                const formData = new FormData();
-                formData.append('image', file, fileName);
-
-                const response = await fetch(UPLOAD_API_URL, {
-                    method: 'POST',
-                    body: formData,
-                });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                }
-
-                const result = await response.json();
-                console.log('Upload response:', result);
-
-                if (result.image_url) {
-                    updateUploadStatus(photoId, 'success', 'Upload successful!', result.image_url);
-                    uploadedCount++;
-                    updateStats();
-                    
-                    if (typeof AndroidBridge !== 'undefined' && AndroidBridge.showToast) {
-                        AndroidBridge.showToast('Photo uploaded successfully!');
-                    }
-                    
-                    updateStatusMessage(`Photo uploaded! URL: ${result.image_url}`, 'success');
-                } else {
-                    throw new Error('No image URL in response');
-                }
-
-            } catch (error) {
-                console.error('Upload failed:', error);
-                updateUploadStatus(photoId, 'error', `Upload failed: ${error.message}`);
-                failedCount++;
-                updateStats();
-                
-                updateStatusMessage(`Upload failed: ${error.message}`, 'warning');
-            }
-        }
-
-        function updateUploadStatus(photoId, status, message, url = null) {
-            const statusElement = document.getElementById(`status-${photoId}`);
-            if (statusElement) {
-                statusElement.className = `upload-status ${status}`;
-                statusElement.innerHTML = message;
-                
-                if (url) {
-                    statusElement.innerHTML += `
-                        <div class="url-display">
-                            <a href="${url}" target="_blank">${url}</a>
-                            <button class="copy-btn" onclick="copyUrl('${url}')">Copy</button>
-                        </div>
-                    `;
-                }
-            }
-        }
-
-        function removePhoto(photoId) {
-            const photoElement = document.getElementById(`photo-${photoId}`);
-            if (photoElement) {
-                photoElement.remove();
-                photoCount--;
-                updateStats();
-                
-                if (photoCount === 0) {
-                    updateStatusMessage('All photos removed', 'info');
-                }
             }
         }
 
@@ -693,79 +635,86 @@
             
             try {
                 let deviceInfo = `
-                    <strong>Browser Information:</strong><br>
+                    <strong>Browser Info:</strong><br>
                     User Agent: ${navigator.userAgent}<br>
                     Platform: ${navigator.platform}<br>
                     Screen: ${screen.width}x${screen.height}<br>
                     Viewport: ${window.innerWidth}x${window.innerHeight}<br>
                     Touch Support: ${('ontouchstart' in window) ? 'Yes' : 'No'}<br>
-                    Online: ${navigator.onLine ? 'Yes' : 'No'}<br>
                 `;
 
-                if (typeof AndroidBridge !== 'undefined') {
-                    deviceInfo += `<br><strong>Android Bridge:</strong> Available<br>`;
-                    
-                    if (AndroidBridge.getDeviceInfo) {
-                        const androidInfo = AndroidBridge.getDeviceInfo();
-                        deviceInfo += `Device Info: ${androidInfo}<br>`;
-                    }
-                } else {
-                    deviceInfo += `<br><strong>Android Bridge:</strong> Not Available<br>`;
+                // Try to get Android Bridge info
+                if (typeof AndroidBridge !== 'undefined' && AndroidBridge.getDeviceInfo) {
+                    const androidInfo = AndroidBridge.getDeviceInfo();
+                    deviceInfo += `<strong>Android Bridge:</strong> ${androidInfo}<br>`;
                 }
 
-                const supportsFileAPI = !!(window.File && window.FileReader && window.FileList && window.Blob);
-                deviceInfo += `File API Support: ${supportsFileAPI ? 'Yes ✅' : 'No ❌'}<br>`;
+                // Check media devices support
+                if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                    deviceInfo += `<strong>Camera API:</strong> Supported<br>`;
+                } else {
+                    deviceInfo += `<strong>Camera API:</strong> Not supported<br>`;
+                }
 
                 deviceInfoDiv.innerHTML = deviceInfo;
             } catch (error) {
-                deviceInfoDiv.innerHTML = `<strong>Error:</strong> ${error.message}`;
+                deviceInfoDiv.innerHTML = `<strong>Error loading device info:</strong> ${error.message}`;
             }
         }
 
-        // Utility Functions
+        // Test Management
+        function runInitialTests() {
+            // Test file input support
+            const fileInput = document.getElementById('fileInput');
+            if (fileInput && fileInput.accept) {
+                updateTestStatus('fileInputTest', 'pass');
+                testsPassed++;
+            }
+
+            updateStats();
+        }
+
+        function updateTestStatus(testId, status) {
+            const testElement = document.getElementById(testId);
+            if (testElement) {
+                testElement.className = `test-status test-${status}`;
+                testElement.textContent = status === 'pass' ? 'Passed' : 
+                                        status === 'fail' ? 'Failed' : 'Pending';
+                
+                if (status === 'pass') {
+                    testsPassed++;
+                    updateStats();
+                }
+            }
+        }
+
+        // UI Updates
         function updateStatusMessage(message, type) {
             const statusDiv = document.getElementById('statusMessage');
             statusDiv.textContent = message;
             statusDiv.className = `status ${type}`;
+            
             console.log(`Status: ${message}`);
         }
 
         function updateStats() {
             document.getElementById('photoCount').textContent = photoCount;
-            document.getElementById('uploadedCount').textContent = uploadedCount;
-            document.getElementById('failedCount').textContent = failedCount;
+            document.getElementById('totalSize').textContent = totalSize;
+            document.getElementById('testsPassed').textContent = testsPassed;
         }
 
-        function copyToClipboard(elementId) {
-            const text = document.getElementById(elementId).textContent;
-            copyUrl(text);
-        }
-
-        function copyUrl(text) {
-            navigator.clipboard.writeText(text).then(() => {
-                if (typeof AndroidBridge !== 'undefined' && AndroidBridge.showToast) {
-                    AndroidBridge.showToast('Copied!');
-                }
-                console.log('Copied:', text);
-            }).catch(err => {
-                console.error('Copy failed:', err);
-            });
-        }
-
-        // Error handler
+        // Global error handler
         window.addEventListener('error', function(event) {
             console.error('JavaScript error:', event.error);
-            updateStatusMessage(`Error: ${event.error.message}`, 'warning');
+            updateStatusMessage(`JavaScript error: ${event.error.message}`, 'warning');
         });
 
-        // Connection status
-        window.addEventListener('online', () => {
-            updateStatusMessage('Connection restored', 'success');
-        });
-
-        window.addEventListener('offline', () => {
-            updateStatusMessage('Connection lost', 'warning');
-        });
+        // Log all console messages for debugging
+        const originalLog = console.log;
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            // You could also send logs to your Android app here if needed
+        };
     </script>
 </body>
 </html>
