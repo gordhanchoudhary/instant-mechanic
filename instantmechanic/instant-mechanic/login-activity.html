@@ -2028,67 +2028,79 @@
         agentTotals[a.agent].revenue += a.total_revenue || 0;
     });
 
-    /* -------- Render rows -------- */
-    Object.keys(agentTotals).forEach(agent => {
+    /* -------- Sort agents by NET conversion % (DESC) -------- */
+const sortedAgents = Object.keys(agentTotals)
+    .map(agent => {
         const d = agentTotals[agent];
-        const hours = agentHours[agent] || 0;
-
         const netBookings = d.bookings - d.cancelled;
-
-        const overallConversion =
-            d.chats > 0 ? (d.bookings / d.chats) * 100 : 0;
-
         const netConversion =
             d.chats > 0 ? (netBookings / d.chats) * 100 : 0;
 
-        const cancellationRate =
-            d.bookings > 0 ? (d.cancelled / d.bookings) * 100 : 0;
+        return { agent, netConversion };
+    })
+    .sort((a, b) => b.netConversion - a.netConversion);
 
-        const efficacy =
-            hours > 0 ? Math.round(d.revenue / hours) : 0;
+/* -------- Render rows (sorted) -------- */
+sortedAgents.forEach(({ agent }) => {
+    const d = agentTotals[agent];
+    const hours = agentHours[agent] || 0;
 
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td class="agent-name">${agent}</td>
+    const netBookings = d.bookings - d.cancelled;
 
-            <td class="metric-value">${d.chats}</td>
+    const overallConversion =
+        d.chats > 0 ? (d.bookings / d.chats) * 100 : 0;
 
-            <td class="metric-value">${d.bookings}</td>
+    const netConversion =
+        d.chats > 0 ? (netBookings / d.chats) * 100 : 0;
 
-            <td class="metric-value metric-negative">${d.cancelled}</td>
+    const cancellationRate =
+        d.bookings > 0 ? (d.cancelled / d.bookings) * 100 : 0;
 
-            <td class="metric-value metric-primary">${netBookings}</td>
+    const efficacy =
+        hours > 0 ? Math.round(d.revenue / hours) : 0;
 
-            <td class="metric-value ${
-                overallConversion < 45 ? 'conversion-problem' : 'metric-positive'
-            }">
-                ${overallConversion.toFixed(1)}%
-            </td>
+    const row = document.createElement('tr');
+    row.innerHTML = `
+        <td class="agent-name">${agent}</td>
 
-            <td class="metric-value ${
-                netConversion < 45 ? 'conversion-problem' : 'metric-positive'
-            }">
-                ${netConversion.toFixed(1)}%
-            </td>
+        <td class="metric-value">${d.chats}</td>
 
-            <td class="metric-value ${
-                cancellationRate > 30 ? 'cancellation-problem' :
-                cancellationRate > 20 ? 'metric-warning' :
-                'metric-positive'
-            }">
-                ${cancellationRate.toFixed(1)}%
-            </td>
+        <td class="metric-value">${d.bookings}</td>
 
-            <td class="metric-value metric-positive">
-                ₹${d.revenue.toLocaleString()}
-            </td>
+        <td class="metric-value metric-negative">${d.cancelled}</td>
 
-            <td class="metric-value metric-primary">
-                ₹${efficacy}/hr
-            </td>
-        `;
-        tbody.appendChild(row);
-    });
+        <td class="metric-value metric-primary">${netBookings}</td>
+
+        <td class="metric-value ${
+            overallConversion < 45 ? 'conversion-problem' : 'metric-positive'
+        }">
+            ${overallConversion.toFixed(1)}%
+        </td>
+
+        <td class="metric-value ${
+            netConversion < 45 ? 'conversion-problem' : 'metric-positive'
+        }">
+            ${netConversion.toFixed(1)}%
+        </td>
+
+        <td class="metric-value ${
+            cancellationRate > 30 ? 'cancellation-problem' :
+            cancellationRate > 20 ? 'metric-warning' :
+            'metric-positive'
+        }">
+            ${cancellationRate.toFixed(1)}%
+        </td>
+
+        <td class="metric-value metric-positive">
+            ₹${d.revenue.toLocaleString()}
+        </td>
+
+        <td class="metric-value metric-primary">
+            ₹${efficacy}/hr
+        </td>
+    `;
+    tbody.appendChild(row);
+});
 }
 
 
