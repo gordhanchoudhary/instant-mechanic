@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Booking List</title>
+  <style>
+    table { width:100%; border-collapse: collapse; }
+    th, td { border:1px solid #ccc; padding:8px; }
+    th { background:#f5f5f5; }
+    .tag { padding:4px 8px; border-radius:4px; font-size:12px; }
+    .company { background:#d1e7ff; }
+    .mechanic { background:#ffe0b2; }
+  </style>
+</head>
+<body>
+
+<h3>Booking List</h3>
+
+<label>
+  <input type="radio" name="mode" value="single" checked> Single Date
+</label>
+<label>
+  <input type="radio" name="mode" value="range"> Date Range
+</label>
+
+<br><br>
+
+<input type="date" id="singleDate">
+<input type="date" id="startDate" style="display:none">
+<input type="date" id="endDate" style="display:none">
+
+<button onclick="loadBookings()">Fetch</button>
+
+<br><br>
+
+<table>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Created At</th>
+      <th>Customer</th>
+      <th>Car</th>
+      <th>Problem</th>
+      <th>Company Profit</th>
+      <th>Payment Status</th>
+      <th>Payment ID</th>
+    </tr>
+  </thead>
+  <tbody id="rows"></tbody>
+</table>
+
+<script>
+document.querySelectorAll("input[name='mode']").forEach(r => {
+  r.addEventListener("change", e => {
+    if (e.target.value === "single") {
+      singleDate.style.display = "inline";
+      startDate.style.display = "none";
+      endDate.style.display = "none";
+    } else {
+      singleDate.style.display = "none";
+      startDate.style.display = "inline";
+      endDate.style.display = "inline";
+    }
+  });
+});
+
+function getPaymentLabel(item) {
+  if (item.payment_status === "partially-paid") return "Paid Online to Company";
+  if (item.payment_status === "pending") return "Paid to Mechanic";
+  return item.payment_status;
+}
+
+function getPaymentId(item) {
+  return item.payment_status === "partially-paid" ? item.payment_id : "-";
+}
+
+async function loadBookings() {
+  let url = "https://ai.instantmechanic.online/bot/api/booking/by-date/";
+
+  if (document.querySelector("input[name='mode']:checked").value === "single") {
+    url += `?date=${singleDate.value}`;
+  } else {
+    url += `?start_date=${startDate.value}&end_date=${endDate.value}`;
+  }
+
+  const res = await fetch(url);
+  const data = await res.json();
+
+  let html = "";
+  data.forEach(b => {
+    html += `
+      <tr>
+        <td>${b.id}</td>
+        <td>${new Date(b.created_at).toLocaleString("en-IN")}</td>
+        <td>${b.customer_mobile}</td>
+        <td>${b.car}</td>
+        <td>${b.problem}</td>
+        <td>₹${b.company_profit}</td>
+        <td>
+          <span class="tag ${b.payment_status === 'partially-paid' ? 'company' : 'mechanic'}">
+            ${getPaymentLabel(b)}
+          </span>
+        </td>
+        <td>${getPaymentId(b)}</td>
+      </tr>
+    `;
+  });
+
+  document.getElementById("rows").innerHTML = html;
+}
+</script>
+
+</body>
+</html>
