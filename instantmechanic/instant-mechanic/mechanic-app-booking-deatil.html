@@ -1475,7 +1475,7 @@
         formData.append('booking', bookingId);
 
 
-        const response = await fetch('https://ai.instantmechanic.online/bot/upload-car-image/', {
+        const response = await fetch('https://ai.instantmechanic.online/bot/upload-car-image/?booking=${bookingId}', {
           method: 'POST',
           body: formData
         });
