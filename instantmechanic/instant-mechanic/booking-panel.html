@@ -38,6 +38,22 @@
       background:#16a34a; color:white; border:none;
       padding:8px 14px; border-radius:6px; cursor:pointer;
     }
+
+    /* Loader */
+    #loader { display:none; text-align:center; margin:40px 0; }
+    .spinner {
+      width:40px; height:40px;
+      border:4px solid #e5e7eb;
+      border-top:4px solid #2563eb;
+      border-radius:50%;
+      animation:spin 1s linear infinite;
+      margin:0 auto;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
   </style>
 </head>
 <body>
@@ -53,6 +69,13 @@
   <input type="date" id="endDate" style="display:none">
 
   <button class="export-btn" onclick="exportCSV()">⬇ Export CSV</button>
+</div>
+
+<div id="loader">
+  <div class="spinner"></div>
+  <p id="slowText" style="display:none; margin-top:10px; color:#1d4ed8; font-weight:600;">
+    You requested data for multiple dates, please wait for a few seconds...
+  </p>
 </div>
 
 <table>
@@ -73,6 +96,7 @@
 
 <script>
 let currentData = [];
+let loaderTimer;
 
 function toggleMode() {
   const mode = document.querySelector('input[name="mode"]:checked').value;
@@ -99,6 +123,21 @@ function getPaymentLabel(b) {
   return b.payment_status;
 }
 
+function showLoader() {
+  loader.style.display = "block";
+  slowText.style.display = "none";
+
+  loaderTimer = setTimeout(() => {
+    slowText.style.display = "block";
+  }, 7000);
+}
+
+function hideLoader() {
+  clearTimeout(loaderTimer);
+  loader.style.display = "none";
+  slowText.style.display = "none";
+}
+
 function loadBookings() {
   let url = "https://ai.instantmechanic.online/bot/api/booking/by-date/";
   const mode = document.querySelector('input[name="mode"]:checked').value;
@@ -111,9 +150,12 @@ function loadBookings() {
     url += `?start_date=${startDate.value}&end_date=${endDate.value}`;
   }
 
+  showLoader();
+
   fetch(url)
     .then(r => r.json())
     .then(data => {
+      hideLoader();
       currentData = data.filter(b => b.is_cancelled === false);
 
       let html = "";
@@ -136,6 +178,10 @@ function loadBookings() {
         `;
       });
       rows.innerHTML = html;
+    })
+    .catch(() => {
+      hideLoader();
+      alert("Failed to load bookings. Please try again.");
     });
 }
 
