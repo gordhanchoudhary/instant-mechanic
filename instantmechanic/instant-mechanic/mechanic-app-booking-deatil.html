@@ -1784,9 +1784,7 @@
         await loadSubMechanics(isCompleted);
         
         // Load saved image after booking data is loaded
-        if (!isCompleted) {
-          loadSavedImage();
-        }
+        loadSavedImage(data.user_car_image || null);
       } catch (error) {
         console.error('Error loading booking:', error);
         showError('बुकिंग डेटा लोड करने में असमर्थ। कृपया अपना इंटरनेट कनेक्शन चेक करें।');
