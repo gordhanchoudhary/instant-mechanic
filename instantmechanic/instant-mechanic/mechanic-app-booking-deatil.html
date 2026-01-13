@@ -998,8 +998,19 @@
       }
     }
 
-    // Function to load previously uploaded image from localStorage - Fixed
-    function loadSavedImage() {
+    // Function to load previously uploaded image from localStorage or API - Fixed
+    function loadSavedImage(apiImageUrl = null) {
+      // First priority: API image (user_car_image)
+      if (apiImageUrl) {
+        console.log('Loading image from API (user_car_image):', apiImageUrl);
+        displayPreviousUploadedImage(apiImageUrl);
+        uploadedImageUrl = apiImageUrl;
+        // Also save to localStorage for consistency
+        saveImageToStorage(apiImageUrl);
+        return true;
+      }
+      
+      // Second priority: localStorage
       if (bookingId) {
         const saved = localStorage.getItem(imageStorageKey);
         if (saved) {
