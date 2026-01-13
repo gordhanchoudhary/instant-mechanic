@@ -886,7 +886,6 @@
         
         <div id="imageUploadContainer">
           <!-- File Input (Hidden) -->
-          <input type="file" id="carImageInput" class="hidden-file-input" accept="image/*" multiple>
           
           <!-- Upload Area -->
           <div class="image-upload-container" id="uploadArea" onclick="triggerImageSelect()">
@@ -1162,7 +1161,7 @@
     // Image Upload Functions - Gallery Only
     function triggerImageSelect() {
       if (document.querySelector('.completion-section').classList.contains('disabled')) return;
-      document.getElementById('carImageInput').click();
+      openGallery();
     }
 
     function openGallery() {
@@ -1242,27 +1241,7 @@
       galleryBtn.innerHTML = '<i class="fas fa-images"></i> गैलरी खोलें';
     }
 
-    // HTML File Input Handler
-    document.getElementById('carImageInput').addEventListener('change', function(event) {
-      const files = Array.from(event.target.files);
-      if (files.length > 0) {
-        const file = files[0];
-        selectedImageFile = file;
-        selectedFiles = [file];
-        jsBridgeUris = []; // Clear JSBridge URIs
-        
-        console.log('File selected via HTML input:', file.name);
-        
-        // Display preview
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          displayImagePreview(e.target.result, file.name);
-          showUploadStatus('📷 फोटो सेलेक्ट हो गई! अब बुकिंग पूरी करें', 'success');
-          enableCompleteButton();
-        };
-        reader.readAsDataURL(file);
-      }
-    });
+
 
     function displayImagePreview(src, name) {
       const preview = document.getElementById('imagePreview');
