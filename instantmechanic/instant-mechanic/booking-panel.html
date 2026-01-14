@@ -156,7 +156,7 @@ function loadBookings() {
     .then(r => r.json())
     .then(data => {
       hideLoader();
-      currentData = data.filter(b => b.is_cancelled === false);
+      currentData = data.filter(b => b.is_cancelled === false && b.is_gomechanic_call === false);
 
       let html = "";
       currentData.forEach(b => {
