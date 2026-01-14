@@ -95,6 +95,7 @@
 </table>
 
 <script>
+const SAHID_CUTOFF = new Date("2025-11-06"); 
 let currentData = [];
 let loaderTimer;
 
@@ -156,7 +157,23 @@ function loadBookings() {
     .then(r => r.json())
     .then(data => {
       hideLoader();
-      currentData = data.filter(b => b.is_cancelled === false && b.is_gomechanic_call === false);
+     currentData = data.filter(b => {
+  if (b.is_cancelled) return false;
+  if (b.is_gomechanic_call) return false;
+
+  const bookingDate = new Date(b.created_at);
+  bookingDate.setHours(0,0,0,0);
+
+  // Before cutoff → allow Sahid
+  if (bookingDate < SAHID_CUTOFF) {
+    return true;
+  }
+
+  // On or after cutoff → exclude Sahid Gurugram
+  return b.mechanic_name !== "Sahid Gurugram";
+});
+
+      
 
       let html = "";
       currentData.forEach(b => {
