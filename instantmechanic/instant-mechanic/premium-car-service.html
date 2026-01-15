@@ -2069,13 +2069,12 @@
                     const services = data.data[0].services;
                     
                     // Filter to only show "Standard Service"
-                    // const standardService = services.find(service => 
-                    //     service.name && service.name.toLowerCase().includes('standard')
-                    // );
+                    const standardService = services.find(service => 
+                        service.name && !service.name.toLowerCase().includes('standard')
+                    );
 
-                    // const standardService = services
                     
-                    if (services) {
+                    if (standardService) {
                         const extractedServices = [{
                             name: standardService.name || "N/A",
                             service_tag: standardService.service_tag || "Every 3 Month",
