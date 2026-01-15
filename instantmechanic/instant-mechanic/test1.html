@@ -3,1050 +3,3349 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Techzinia - AI-Powered WhatsApp Automation | Automate Customer Support & Sales</title>
-    <meta name="description" content="Automate WhatsApp with AI for customer support, sales & bookings. 24/7 engagement, smart dashboard, boost conversions. Get 2 months FREE CRM access!">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --primary-color: #25D366;
-            --secondary-color: #128C7E;
-            --accent-color: #34B7F1;
-            --dark-color: #075E54;
-            --text-dark: #2c3e50;
-            --text-light: #7f8c8d;
-            --bg-light: #f8f9fa;
-            --white: #ffffff;
-            --gradient-1: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
-            --gradient-2: linear-gradient(135deg, #34B7F1 0%, #25D366 100%);
-            --shadow-light: 0 5px 15px rgba(0,0,0,0.1);
-            --shadow-medium: 0 10px 30px rgba(0,0,0,0.15);
-            --shadow-heavy: 0 20px 60px rgba(0,0,0,0.2);
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            line-height: 1.6;
-            color: var(--text-dark);
-            overflow-x: hidden;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        /* Animations */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes floatAnimation {
-            0%, 100% {
-                transform: translateY(0px);
-            }
-            50% {
-                transform: translateY(-10px);
-            }
-        }
-
-        @keyframes pulseGlow {
-            0%, 100% {
-                box-shadow: 0 0 20px rgba(37, 211, 102, 0.3);
-            }
-            50% {
-                box-shadow: 0 0 30px rgba(37, 211, 102, 0.6);
-            }
-        }
-
-        @keyframes slideInRight {
-            from {
-                opacity: 0;
-                transform: translateX(50px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        .animate-on-scroll {
-            opacity: 0;
-            transition: all 0.6s ease;
-        }
-
-        .animate-on-scroll.animate {
-            opacity: 1;
-            animation: fadeInUp 0.8s ease forwards;
-        }
-
-        /* Header */
-        header {
-            background: var(--gradient-1);
-            padding: 1rem 0;
-            position: fixed;
-            width: 100%;
-            top: 0;
-            z-index: 1000;
-            backdrop-filter: blur(10px);
-            box-shadow: var(--shadow-light);
-        }
-
-        nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: var(--white);
-            text-decoration: none;
-        }
-
-        .cta-header {
-            background: var(--white);
-            color: var(--primary-color);
-            padding: 0.7rem 1.5rem;
-            border-radius: 50px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            animation: pulseGlow 2s infinite;
-        }
-
-        .cta-header:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-medium);
-        }
-
-        /* Hero Section */
-        .hero {
-            background: var(--gradient-1);
-            padding: 120px 0 80px;
-            color: var(--white);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .hero::before {
-            content: '';
-            position: absolute;
-            width: 200%;
-            height: 200%;
-            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Ccircle cx='9' cy='9' r='9'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;
-            animation: floatAnimation 20s ease-in-out infinite;
-            opacity: 0.1;
-        }
-
-        .hero-content {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 3rem;
-            align-items: center;
-            position: relative;
-            z-index: 2;
-        }
-
-        .hero-text h1 {
-            font-size: 3.5rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            line-height: 1.2;
-        }
-
-        .hero-text .subtitle {
-            font-size: 1.3rem;
-            margin-bottom: 2rem;
-            opacity: 0.9;
-        }
-
-        .hero-text p {
-            font-size: 1.1rem;
-            margin-bottom: 2rem;
-            opacity: 0.8;
-        }
-
-        .hero-visual {
-            position: relative;
-            animation: floatAnimation 6s ease-in-out infinite;
-        }
-
-        .phone-mockup {
-            background: var(--white);
-            border-radius: 30px;
-            padding: 20px;
-            box-shadow: var(--shadow-heavy);
-            max-width: 300px;
-            margin: 0 auto;
-        }
-
-        .whatsapp-ui {
-            background: #e5ddd5;
-            border-radius: 20px;
-            padding: 15px;
-            height: 400px;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .chat-header {
-            background: var(--dark-color);
-            color: white;
-            padding: 15px;
-            border-radius: 10px 10px 0 0;
-            margin: -15px -15px 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .chat-bubble {
-            background: var(--primary-color);
-            color: white;
-            padding: 10px 15px;
-            border-radius: 15px 15px 5px 15px;
-            margin: 10px 0;
-            max-width: 80%;
-            margin-left: auto;
-            animation: slideInRight 1s ease;
-        }
-
-        .chat-bubble.user {
-            background: white;
-            color: var(--text-dark);
-            border-radius: 15px 15px 15px 5px;
-            margin-left: 0;
-            margin-right: auto;
-        }
-
-        /* CTA Buttons */
-        .cta-buttons {
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
-
-        .btn-primary {
-            background: var(--white);
-            color: var(--primary-color);
-            padding: 1rem 2rem;
-            border: none;
-            border-radius: 50px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: var(--shadow-medium);
-        }
-
-        .btn-secondary {
-            background: transparent;
-            color: var(--white);
-            border: 2px solid var(--white);
-            padding: 1rem 2rem;
-            border-radius: 50px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-
-        .btn-secondary:hover {
-            background: var(--white);
-            color: var(--primary-color);
-            transform: translateY(-3px);
-        }
-
-        /* Features Section */
-        .features {
-            padding: 80px 0;
-            background: var(--bg-light);
-        }
-
-        .section-header {
-            text-align: center;
-            margin-bottom: 4rem;
-        }
-
-        .section-header h2 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: var(--text-dark);
-            margin-bottom: 1rem;
-        }
-
-        .section-header p {
-            font-size: 1.2rem;
-            color: var(--text-light);
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-        }
-
-        .feature-card {
-            background: var(--white);
-            padding: 2rem;
-            border-radius: 20px;
-            box-shadow: var(--shadow-light);
-            transition: all 0.3s ease;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .feature-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(37, 211, 102, 0.1), transparent);
-            transition: all 0.5s ease;
-        }
-
-        .feature-card:hover::before {
-            left: 100%;
-        }
-
-        .feature-card:hover {
-            transform: translateY(-10px);
-            box-shadow: var(--shadow-medium);
-        }
-
-        .feature-icon {
-            width: 80px;
-            height: 80px;
-            background: var(--gradient-2);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 1.5rem;
-            font-size: 2rem;
-        }
-
-        .feature-card h3 {
-            font-size: 1.3rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            color: var(--text-dark);
-        }
-
-        .feature-card p {
-            color: var(--text-light);
-            line-height: 1.6;
-        }
-
-        /* Dashboard Preview */
-        .dashboard-preview {
-            padding: 80px 0;
-            background: var(--white);
-        }
-
-        .dashboard-mockup {
-            background: var(--bg-light);
-            border-radius: 20px;
-            padding: 2rem;
-            box-shadow: var(--shadow-medium);
-            margin-top: 3rem;
-        }
-
-        .dashboard-header {
-            background: var(--gradient-1);
-            color: white;
-            padding: 1rem 2rem;
-            border-radius: 10px;
-            margin-bottom: 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .dashboard-stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-
-        .stat-card {
-            background: var(--white);
-            padding: 1.5rem;
-            border-radius: 15px;
-            text-align: center;
-            box-shadow: var(--shadow-light);
-        }
-
-        .stat-number {
-            font-size: 2rem;
-            font-weight: bold;
-            color: var(--primary-color);
-        }
-
-        .stat-label {
-            color: var(--text-light);
-            margin-top: 0.5rem;
-        }
-
-        /* Industries Section */
-        .industries {
-            padding: 80px 0;
-            background: var(--bg-light);
-        }
-
-        .industries-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            margin-top: 3rem;
-        }
-
-        .industry-card {
-            background: var(--white);
-            padding: 1.5rem;
-            border-radius: 15px;
-            box-shadow: var(--shadow-light);
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .industry-card:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--shadow-medium);
-        }
-
-        .industry-icon {
-            width: 60px;
-            height: 60px;
-            background: var(--gradient-2);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-        }
-
-        /* Offer Section */
-        .offer {
-            background: var(--gradient-2);
-            color: var(--white);
-            padding: 60px 0;
-            text-align: center;
-            position: relative;
-        }
-
-        .offer-content {
-            background: rgba(255,255,255,0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 3rem;
-            border: 1px solid rgba(255,255,255,0.2);
-        }
-
-        .offer h2 {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-        }
-
-        .offer-badge {
-            background: #ff4757;
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 25px;
-            font-weight: 600;
-            display: inline-block;
-            margin-bottom: 1rem;
-            animation: pulseGlow 2s infinite;
-        }
-
-        /* Contact Section */
-        .contact {
-            padding: 80px 0;
-            background: var(--white);
-            text-align: center;
-        }
-
-        .whatsapp-button {
-            background: var(--gradient-1);
-            color: white;
-            padding: 1.5rem 3rem;
-            border-radius: 50px;
-            text-decoration: none;
-            font-size: 1.2rem;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            gap: 1rem;
-            margin: 2rem 0;
-            transition: all 0.3s ease;
-            box-shadow: var(--shadow-medium);
-        }
-
-        .whatsapp-button:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--shadow-heavy);
-        }
-
-        /* Footer */
-        footer {
-            background: var(--text-dark);
-            color: white;
-            padding: 2rem 0;
-            text-align: center;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .hero-content {
-                grid-template-columns: 1fr;
-                text-align: center;
-            }
-
-            .hero-text h1 {
-                font-size: 2.5rem;
-            }
-
-            .hero-text .subtitle {
-                font-size: 1.1rem;
-            }
-
-            .cta-buttons {
-                justify-content: center;
-            }
-
-            .features-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .dashboard-stats {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .industries-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .offer-content {
-                padding: 2rem 1rem;
-            }
-
-            .offer h2 {
-                font-size: 2rem;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .container {
-                padding: 0 15px;
-            }
-
-            .hero {
-                padding: 100px 0 60px;
-            }
-
-            .hero-text h1 {
-                font-size: 2rem;
-            }
-
-            .btn-primary,
-            .btn-secondary {
-                padding: 0.8rem 1.5rem;
-                font-size: 1rem;
-            }
-
-            .dashboard-stats {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        /* Loading Animation */
-        .loading-dots {
-            display: inline-flex;
-            gap: 3px;
-        }
-
-        .loading-dots span {
-            width: 6px;
-            height: 6px;
-            background: var(--text-light);
-            border-radius: 50%;
-            animation: loadingPulse 1.5s ease-in-out infinite;
-        }
-
-        .loading-dots span:nth-child(2) {
-            animation-delay: 0.2s;
-        }
-
-        .loading-dots span:nth-child(3) {
-            animation-delay: 0.4s;
-        }
-
-        @keyframes loadingPulse {
-            0%, 80%, 100% {
-                transform: scale(1);
-                opacity: 0.5;
-            }
-            40% {
-                transform: scale(1.2);
-                opacity: 1;
-            }
-        }
-    </style>
+    <title>Instant Mechanic - Premium Car Service</title>
+    <link rel="icon" href="assets/img/favicon.png">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <!-- External CSS -->
+<style>
+    :root {
+    --primary-color: #2563eb;
+    --secondary-color: #f59e0b;
+    --accent-color: #10b981;
+    --dark-color: #0f172a;
+    --light-color: #f8fafc;
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-400: #9ca3af;
+    --gray-500: #6b7280;
+    --gray-600: #4b5563;
+    --gray-700: #374151;
+    --gray-800: #1f2937;
+    --gray-900: #111827;
+    --white: #ffffff;
+    --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    --gradient-accent: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    --gradient-success: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'Inter', sans-serif;
+    line-height: 1.6;
+    color: var(--gray-800);
+    background: var(--gray-50);
+    overflow-x: hidden;
+}
+
+/* Header */
+.header {
+    background: var(--white);
+    box-shadow: var(--shadow-md);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    backdrop-filter: blur(10px);
+}
+
+.header-top {
+    background: var(--dark-color);
+    color: var(--white);
+    padding: 8px 0;
+    font-size: 14px;
+}
+
+.header-top .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.header-info { display: flex; gap: 20px; }
+.header-info span { display: flex; align-items: center; gap: 8px; }
+.header-social { display: flex; gap: 15px; }
+.header-social a { color: var(--white); transition: color 0.3s ease; }
+.header-social a:hover { color: var(--secondary-color); }
+
+.header-main { padding: 12px 0; }
+.header-main .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--primary-color);
+    text-decoration: none;
+    font-family: 'Poppins', sans-serif;
+}
+
+.nav { display: flex; gap: 25px; list-style: none; }
+.nav a {
+    color: var(--gray-700);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+    position: relative;
+}
+.nav a:hover { color: var(--primary-color); }
+.nav a::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: -5px;
+    left: 0;
+    background: var(--primary-color);
+    transition: width 0.3s ease;
+}
+.nav a:hover::after { width: 100%; }
+
+.cta-button {
+    background: var(--gradient-primary);
+    color: var(--white);
+    padding: 10px 20px;
+    border-radius: 25px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-md);
+    font-size: 14px;
+}
+.cta-button:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+/* Main Content */
+.main-content {
+    margin-top: 110px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 15px;
+}
+
+.progress-bar { width: 100%; max-width: 500px; margin-bottom: 30px; }
+.progress-steps {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+}
+.progress-steps::before {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--gray-200);
+    z-index: 1;
+}
+.progress-line {
+    position: absolute;
+    top: 20px;
+    left: 0;
+    height: 2px;
+    background: var(--gradient-primary);
+    transition: width 0.5s ease;
+    z-index: 2;
+}
+.step {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    background: var(--white);
+    border: 2px solid var(--gray-200);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    color: var(--gray-400);
+    position: relative;
+    z-index: 3;
+    transition: all 0.3s ease;
+    font-size: 14px;
+}
+.step.active {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: var(--white);
+    transform: scale(1.1);
+}
+.step.completed {
+    background: var(--accent-color);
+    border-color: var(--accent-color);
+    color: var(--white);
+}
+
+.section-title { text-align: center; margin-bottom: 30px; }
+.section-title h1 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--gray-900);
+    margin-bottom: 8px;
+    font-family: 'Poppins', sans-serif;
+}
+.section-title p {
+    font-size: 0.95rem;
+    color: var(--gray-600);
+    max-width: 500px;
+    margin: 0 auto;
+    line-height: 1.5;
+}
+
+.content-container { width: 100%; max-width: 1000px; margin: 0 auto; }
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 20px;
+}
+
+/* Cards */
+.brand-card {
+    background: var(--white);
+    border-radius: 15px;
+    padding: 20px 12px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-sm);
+    border: 2px solid transparent;
+    position: relative;
+    overflow: hidden;
+}
+.brand-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: var(--gradient-accent);
+    opacity: 0.1;
+    transition: left 0.5s ease;
+}
+.brand-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--primary-color);
+}
+.brand-card:hover::before { left: 0; }
+.brand-card img {
+    width: 50px;
+    height: 50px;
+    object-fit: contain;
+    margin-bottom: 10px;
+    transition: transform 0.3s ease;
+}
+.brand-card:hover img { transform: scale(1.05); }
+.brand-card h3 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--gray-800);
+    margin-bottom: 5px;
+}
+
+.car-card {
+    background: var(--white);
+    border-radius: 15px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-sm);
+    border: 2px solid transparent;
+}
+.car-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--primary-color);
+}
+.car-card img { width: 100%; height: 120px; object-fit: cover; }
+.car-card-content { padding: 15px 10px; text-align: center; }
+.car-card h3 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--gray-800);
+    line-height: 1.3;
+}
+
+.selected-car {
+    background: var(--white);
+    border-radius: 20px;
+    padding: 25px;
+    text-align: center;
+    margin-bottom: 30px;
+    box-shadow: var(--shadow-lg);
+    border: 2px solid var(--primary-color);
+}
+.selected-car img {
+    width: 100%;
+    max-width: 280px;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 12px;
+    margin-bottom: 15px;
+}
+.selected-car h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 10px;
+}
+
+.back-btn {
+    background: transparent;
+    color: var(--primary-color);
+    border: 2px solid var(--primary-color);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+}
+.back-btn:hover {
+    background: var(--primary-color);
+    color: var(--white);
+    transform: translateY(-1px);
+}
+
+/* Mobile Section */
+.mobile-section {
+    background: var(--white);
+    border-radius: 20px;
+    padding: 30px;
+    text-align: center;
+    margin-bottom: 30px;
+    box-shadow: var(--shadow-lg);
+    border: 2px solid var(--accent-color);
+    max-width: 500px;
+    margin: 0 auto 30px;
+}
+.mobile-section .icon {
+    width: 60px;
+    height: 60px;
+    background: var(--gradient-accent);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    color: var(--white);
+    font-size: 1.5rem;
+}
+.mobile-section h3 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--gray-900);
+    margin-bottom: 10px;
+    font-family: 'Poppins', sans-serif;
+}
+.mobile-section p {
+    color: var(--gray-600);
+    margin-bottom: 25px;
+    font-size: 0.95rem;
+}
+.mobile-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    align-items: center;
+}
+.mobile-input-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    max-width: 350px;
+}
+.country-code {
+    background: var(--gray-100);
+    padding: 12px 15px;
+    border-radius: 12px;
+    font-weight: 600;
+    color: var(--gray-700);
+    border: 2px solid var(--gray-200);
+}
+.mobile-input {
+    flex: 1;
+    padding: 12px 16px;
+    border: 2px solid var(--gray-200);
+    border-radius: 12px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: var(--gray-50);
+}
+.mobile-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    background: var(--white);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+.mobile-input.error { border-color: #ef4444; background: #fef2f2; }
+.mobile-submit-btn {
+    background: var(--gradient-primary);
+    color: var(--white);
+    border: none;
+    padding: 12px 30px;
+    border-radius: 25px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-md);
+    min-width: 180px;
+}
+.mobile-submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+.mobile-submit-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+.mobile-error {
+    color: #ef4444;
+    font-size: 0.85rem;
+    margin-top: 5px;
+    text-align: center;
+}
+
+/* Service Cards */
+.service-card {
+    background: var(--white);
+    border-radius: 18px;
+    overflow: hidden;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow-md);
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+.service-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-xl);
+    border-color: var(--primary-color);
+}
+.service-header {
+    background: var(--gradient-primary);
+    color: var(--white);
+    padding: 18px;
+    position: relative;
+}
+.service-tag {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: var(--secondary-color);
+    color: var(--white);
+    padding: 4px 10px;
+    border-radius: 15px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+.service-header h3 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+.service-content { padding: 20px; }
+.service-image {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    border-radius: 12px;
+    margin-bottom: 15px;
+}
+
+/* Pricing */
+.gst-notice {
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--gray-500);
+    margin-bottom: 8px;
+    font-style: italic;
+}
+.price-details-box {
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    border: 2px solid #bae6fd;
+    border-radius: 12px;
+    padding: 12px 15px;
+    margin-bottom: 15px;
+}
+.price-row-detail {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+}
+.price-row-detail:last-child {
+    margin-bottom: 0;
+    padding-top: 8px;
+    border-top: 2px dashed #38bdf8;
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--primary-color);
+}
+.price-row-detail .label { color: var(--gray-700); }
+.price-row-detail .value { font-weight: 600; color: var(--gray-900); }
+.gst-info-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.75rem;
+    color: var(--primary-color);
+    background: rgba(37, 99, 235, 0.1);
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin-left: 8px;
+}
+
+.price-section {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+}
+.original-price {
+    font-size: 1rem;
+    text-decoration: line-through;
+    color: var(--gray-400);
+}
+.discounted-price {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--accent-color);
+}
+.discount-badge {
+    background: var(--accent-color);
+    color: var(--white);
+    padding: 3px 8px;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+/* Coupon Section - New Professional Design */
+.coupon-section {
+    background: linear-gradient(135deg, #fff5e6 0%, #ffe9cc 100%);
+    border: 2px solid #ff9800;
+    border-radius: 16px;
+    padding: 20px;
+    margin: 20px 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.coupon-section::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 152, 0, 0.1) 0%, transparent 70%);
+    animation: pulse 3s ease-in-out infinite;
+}
+
+.coupon-promo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    position: relative;
+    z-index: 1;
+}
+
+.coupon-promo-content {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex: 1;
+}
+
+.coupon-icon {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #ff6a00, #ff9800);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.5rem;
+    animation: bounce 2s ease-in-out infinite;
+    box-shadow: 0 4px 15px rgba(255, 106, 0, 0.3);
+}
+
+.coupon-promo-text h4 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #ff6a00;
+    margin: 0 0 4px 0;
+    font-family: 'Poppins', sans-serif;
+}
+
+.coupon-promo-text p {
+    font-size: 0.9rem;
+    color: var(--gray-700);
+    margin: 0;
+}
+
+.coupon-promo-text .highlight {
+    font-weight: 700;
+    color: #ff6a00;
+    font-size: 1.1rem;
+}
+
+.apply-coupon-direct-btn {
+    background: linear-gradient(135deg, #ff6a00, #ff9800);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 25px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(255, 106, 0, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+}
+
+.apply-coupon-direct-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 106, 0, 0.4);
+}
+
+.apply-coupon-direct-btn:active {
+    transform: translateY(0);
+}
+
+.coupon-applied-badge {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+    padding: 15px 20px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    font-size: 1rem;
+    animation: slideInScale 0.5s ease-out;
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+}
+
+.coupon-applied-badge i {
+    font-size: 1.3rem;
+}
+
+.manual-coupon-btn {
+    background: transparent;
+    border: none;
+    color: var(--primary-color);
+    font-size: 0.85rem;
+    cursor: pointer;
+    padding: 8px 0;
+    text-decoration: underline;
+    transition: color 0.3s ease;
+    margin-top: 10px;
+    display: block;
+    width: 100%;
+    text-align: center;
+}
+
+.manual-coupon-btn:hover {
+    color: #1d4ed8;
+}
+
+.coupon-input-section {
+    margin-top: 15px;
+    animation: slideDown 0.3s ease;
+}
+
+.coupon-input-group { 
+    display: flex; 
+    gap: 8px; 
+    margin-bottom: 12px; 
+}
+
+.coupon-input {
+    flex: 1;
+    padding: 10px 12px;
+    border: 2px solid var(--gray-200);
+    border-radius: 8px;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.coupon-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.coupon-input.success { 
+    border-color: var(--accent-color); 
+    background: #f0fdf4; 
+}
+
+.coupon-input.error { 
+    border-color: #ef4444; 
+    background: #fef2f2; 
+}
+
+.apply-coupon-btn {
+    background: var(--primary-color);
+    color: var(--white);
+    border: none;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+    min-width: 60px;
+}
+
+.apply-coupon-btn:hover { 
+    background: #1d4ed8; 
+}
+
+.apply-coupon-btn:disabled { 
+    opacity: 0.6; 
+    cursor: not-allowed; 
+}
+
+.coupon-message {
+    font-size: 0.85rem;
+    padding: 8px 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.coupon-message.success { 
+    color: var(--accent-color); 
+}
+
+.coupon-message.error { 
+    color: #ef4444; 
+}
+
+/* Mobile Collection Modal */
+.mobile-collection-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    backdrop-filter: blur(5px);
+}
+
+.mobile-collection-modal.show {
+    opacity: 1;
+}
+
+.mobile-collection-content {
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    padding: 35px 30px;
+    width: 90%;
+    max-width: 450px;
+    border-radius: 24px;
+    position: relative;
+    animation: modalSlideUp 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.mobile-collection-header {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.coupon-badge-modal {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, #ff6a00, #ff9800);
+    color: white;
+    padding: 8px 20px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin-bottom: 15px;
+    box-shadow: 0 4px 15px rgba(255, 106, 0, 0.3);
+    animation: badgePulse 2s ease-in-out infinite;
+}
+
+.coupon-badge-modal i {
+    font-size: 1.2rem;
+}
+
+.mobile-collection-header h3 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--gray-900);
+    margin-bottom: 8px;
+    font-family: 'Poppins', sans-serif;
+}
+
+.mobile-collection-header p {
+    color: var(--gray-600);
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.mobile-collection-form {
+    margin-bottom: 20px;
+}
+
+.mobile-input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.country-code-modal {
+    background: var(--gray-100);
+    padding: 14px 16px;
+    border-radius: 12px;
+    font-weight: 600;
+    color: var(--gray-700);
+    border: 2px solid var(--gray-200);
+    font-size: 1rem;
+}
+
+.mobile-input-modal {
+    flex: 1;
+    padding: 14px 16px;
+    border: 2px solid var(--gray-200);
+    border-radius: 12px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: var(--gray-50);
+}
+
+.mobile-input-modal:focus {
+    outline: none;
+    border-color: #ff6a00;
+    background: var(--white);
+    box-shadow: 0 0 0 3px rgba(255, 106, 0, 0.1);
+}
+
+.mobile-input-modal.error {
+    border-color: #ef4444;
+    background: #fef2f2;
+    animation: shake 0.5s ease;
+}
+
+.mobile-error-modal {
+    color: #ef4444;
+    font-size: 0.85rem;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.mobile-error-modal::before {
+    content: '⚠️';
+}
+
+.apply-with-mobile-btn {
+    width: 100%;
+    background: linear-gradient(135deg, #ff6a00, #ff9800);
+    color: white;
+    border: none;
+    padding: 14px 24px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(255, 106, 0, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.apply-with-mobile-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 106, 0, 0.4);
+}
+
+.apply-with-mobile-btn:active {
+    transform: translateY(0);
+}
+
+.apply-with-mobile-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.mobile-collection-benefits {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    padding: 15px;
+    background: var(--gray-50);
+    border-radius: 12px;
+}
+
+.benefit-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.75rem;
+    color: var(--gray-600);
+}
+
+.benefit-item i {
+    color: #ff6a00;
+    font-size: 1.2rem;
+}
+
+.close-modal-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    width: 35px;
+    height: 35px;
+    background: var(--gray-100);
+    border: none;
+    border-radius: 50%;
+    color: var(--gray-500);
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.close-modal-btn:hover {
+    background: var(--gray-200);
+    color: var(--gray-700);
+    transform: rotate(90deg);
+}
+
+/* Mobile Collection Modal Animations */
+@keyframes modalSlideUp {
+    0% {
+        transform: translateY(100px) scale(0.9);
+        opacity: 0;
+    }
+    100% {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes badgePulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+@keyframes shake {
+    0%, 100% {
+        transform: translateX(0);
+    }
+    25% {
+        transform: translateX(-10px);
+    }
+    75% {
+        transform: translateX(10px);
+    }
+}
+
+/* Celebration Overlay */
+.celebration-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.celebration-overlay.show {
+    opacity: 1;
+}
+
+.celebration-content {
+    background: white;
+    padding: 40px;
+    border-radius: 24px;
+    text-align: center;
+    max-width: 400px;
+    position: relative;
+    animation: celebrationBounce 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.celebration-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #10b981, #059669);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    animation: celebrationPulse 0.6s ease-out;
+}
+
+.celebration-icon i {
+    color: white;
+    font-size: 2.5rem;
+    animation: celebrationCheck 0.6s ease-out 0.2s both;
+}
+
+.celebration-content h3 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--gray-900);
+    margin-bottom: 10px;
+    font-family: 'Poppins', sans-serif;
+}
+
+.celebration-content p {
+    font-size: 1.1rem;
+    color: var(--gray-600);
+    margin-bottom: 0;
+}
+
+.celebration-amount {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #10b981;
+    display: block;
+    margin-top: 5px;
+}
+
+.confetti-container {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.confetti {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    top: -10px;
+    animation: confettiFall 3s linear forwards;
+}
+
+/* Celebration Animations */
+@keyframes celebrationBounce {
+    0% {
+        transform: scale(0.3) translateY(100px);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    70% {
+        transform: scale(0.95);
+    }
+    100% {
+        transform: scale(1) translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes celebrationPulse {
+    0% {
+        transform: scale(0);
+    }
+    50% {
+        transform: scale(1.2);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes celebrationCheck {
+    0% {
+        transform: scale(0) rotate(-45deg);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1) rotate(0deg);
+        opacity: 1;
+    }
+}
+
+@keyframes confettiFall {
+    to {
+        transform: translateY(100vh) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-5px);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+@keyframes slideInScale {
+    0% {
+        transform: scale(0.8) translateY(-20px);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1) translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Final Price Section */
+.final-price-section {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    border-radius: 12px;
+    padding: 15px;
+    margin: 15px 0;
+    border: 1px solid var(--secondary-color);
+}
+.price-breakdown { display: flex; flex-direction: column; gap: 8px; }
+.price-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9rem;
+}
+.price-row.total {
+    border-top: 2px solid var(--secondary-color);
+    padding-top: 8px;
+    margin-top: 8px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--dark-color);
+}
+.price-row .discount { color: var(--accent-color); font-weight: 600; }
+
+.service-details { margin-bottom: 18px; }
+.service-details h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--gray-800);
+    margin-bottom: 12px;
+}
+.inclusions-list { list-style: none; margin-bottom: 12px; }
+.inclusions-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 6px;
+    font-size: 0.9rem;
+    color: var(--gray-700);
+    line-height: 1.4;
+}
+.inclusions-list li i {
+    color: var(--accent-color);
+    font-size: 0.9rem;
+    margin-top: 2px;
+    flex-shrink: 0;
+}
+.see-more-btn {
+    background: transparent;
+    color: var(--primary-color);
+    border: 1px solid var(--primary-color);
+    padding: 6px 14px;
+    border-radius: 15px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    margin-bottom: 12px;
+    font-size: 0.85rem;
+}
+.see-more-btn:hover {
+    background: var(--primary-color);
+    color: var(--white);
+}
+
+.service-info {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 18px;
+    padding: 12px;
+    background: var(--gray-50);
+    border-radius: 12px;
+}
+.info-item { text-align: center; flex: 1; }
+.info-item i {
+    color: var(--primary-color);
+    font-size: 1rem;
+    margin-bottom: 4px;
+    display: block;
+}
+.info-item .label {
+    font-size: 0.75rem;
+    color: var(--gray-500);
+    display: block;
+    margin-bottom: 2px;
+}
+.info-item .value {
+    font-weight: 600;
+    color: var(--gray-800);
+    font-size: 0.8rem;
+}
+
+.book-service-btn {
+    background: var(--gradient-secondary);
+    color: var(--white);
+    border: none;
+    padding: 12px 25px;
+    border-radius: 20px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-md);
+}
+.book-service-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+/* Success Page */
+.success-page {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--white);
+    z-index: 3000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.5s ease;
+}
+.success-page.show { opacity: 1; visibility: visible; }
+.success-content {
+    text-align: center;
+    max-width: 500px;
+    padding: 40px 30px;
+}
+.success-animation {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 30px;
+    background: var(--gradient-success);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    animation: successPulse 2s infinite;
+}
+.success-animation i { color: var(--white); font-size: 3rem; }
+.success-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--gray-900);
+    margin-bottom: 15px;
+    font-family: 'Poppins', sans-serif;
+}
+.success-subtitle {
+    font-size: 1.1rem;
+    color: var(--gray-600);
+    margin-bottom: 30px;
+    line-height: 1.6;
+}
+.success-details {
+    background: var(--gray-50);
+    border-radius: 20px;
+    padding: 25px;
+    margin-bottom: 30px;
+    text-align: left;
+}
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--gray-200);
+}
+.detail-row:last-child { border-bottom: none; }
+.detail-label { font-weight: 600; color: var(--gray-700); }
+.detail-value { color: var(--gray-900); font-weight: 500; }
+.success-actions { display: flex; gap: 15px; flex-direction: column; }
+.btn-whatsapp {
+    background: #25d366;
+    color: var(--white);
+    padding: 15px 25px;
+    border-radius: 20px;
+    text-decoration: none;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+    font-size: 1.1rem;
+}
+.btn-whatsapp:hover {
+    background: #128c7e;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+.btn-home {
+    background: var(--gradient-primary);
+    color: var(--white);
+    padding: 12px 25px;
+    border-radius: 20px;
+    text-decoration: none;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+}
+.btn-home:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+/* Coupon Modal */
+.coupon-button {
+    background: linear-gradient(135deg, #ff6a00, #ff3d00);
+    color: #fff;
+    padding: 12px 22px;
+    border-radius: 30px;
+    font-weight: 600;
+    text-decoration: none;
+    animation: pulseGlow 1.8s infinite;
+    box-shadow: 0 0 0 rgba(255, 106, 0, 0.7);
+    cursor: pointer;
+    border: none;
+    font-size: 14px;
+}
+.coupon-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.75);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(5px);
+}
+.coupon-modal.show { display: flex; }
+.coupon-content {
+    background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+    padding: 35px 30px;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+    border-radius: 20px;
+    animation: slideUpBounce 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    position: relative;
+}
+.close-btn {
+    position: absolute;
+    right: 15px;
+    top: 15px;
+    font-size: 28px;
+    cursor: pointer;
+    color: var(--gray-400);
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--gray-100);
+    transition: all 0.3s ease;
+    line-height: 1;
+}
+.close-btn:hover {
+    background: var(--gray-200);
+    color: var(--gray-700);
+    transform: rotate(90deg);
+}
+.coupon-content h2 {
+    font-size: 1.8rem;
+    margin-bottom: 10px;
+    color: var(--gray-900);
+    font-family: 'Poppins', sans-serif;
+}
+.coupon-content > p {
+    color: var(--gray-600);
+    margin-bottom: 25px;
+    font-size: 0.95rem;
+}
+.scratch-container {
+    position: relative;
+    width: 100%;
+    max-width: 300px;
+    height: 150px;
+    margin: 20px auto;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+.scratch-card-bg {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+.scratch-card-bg .coupon-code-reveal {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 3px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    margin-bottom: 8px;
+}
+.scratch-card-bg .coupon-subtitle {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 500;
+}
+.scratch-canvas {
+    position: absolute;
+    inset: 0;
+    cursor: pointer;
+    touch-action: none;
+}
+.scratch-instruction {
+    margin-top: 15px;
+    color: var(--gray-600);
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+.scratch-instruction i {
+    color: var(--primary-color);
+    font-size: 1rem;
+}
+.copy-btn {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    color: #fff;
+    border: none;
+    padding: 12px 28px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 1rem;
+    margin-top: 20px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+}
+.copy-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+}
+.copy-btn:active { transform: translateY(0); }
+.copy-msg {
+    margin-top: 12px;
+    font-size: 0.9rem;
+    color: var(--accent-color);
+    font-weight: 600;
+    min-height: 20px;
+}
+
+/* Loading State */
+.loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+    color: var(--primary-color);
+    font-size: 1rem;
+}
+.spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid var(--gray-200);
+    border-top: 3px solid var(--primary-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-right: 12px;
+}
+
+/* Animations */
+@keyframes pulseGlow {
+    0% { box-shadow: 0 0 0 0 rgba(255, 106, 0, 0.7); }
+    70% { box-shadow: 0 0 0 14px rgba(255, 106, 0, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 106, 0, 0); }
+}
+@keyframes slideUpBounce {
+    0% { transform: translateY(100px) scale(0.8); opacity: 0; }
+    100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+@keyframes successPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+@keyframes slideInLeft {
+    from { opacity: 0; transform: translateX(-50px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+@keyframes slideInRight {
+    from { opacity: 0; transform: translateX(50px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in { animation: fadeIn 0.5s ease-in; }
+.slide-in-left { animation: slideInLeft 0.5s ease-out; }
+.slide-in-right { animation: slideInRight 0.5s ease-out; }
+
+/* Utility Classes */
+.hidden { display: none !important; }
+.text-center { text-align: center; }
+.mb-20 { margin-bottom: 20px; }
+.mt-20 { margin-top: 20px; }
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .header-top { display: none; }
+    .header-main { padding: 10px 0; }
+    .header-main .container { padding: 0 12px; }
+    .logo { font-size: 20px; }
+    .nav { display: none; }
+    .cta-button { padding: 8px 16px; font-size: 13px; }
+    .main-content { margin-top: 70px; padding: 15px 10px; }
+    .section-title h1 { font-size: 1.5rem; }
+    .section-title p { font-size: 0.9rem; }
+    .progress-bar { max-width: 100%; margin-bottom: 25px; }
+    .step { width: 30px; height: 30px; font-size: 12px; }
+    .grid-container { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .brand-card { padding: 15px 8px; border-radius: 12px; }
+    .brand-card img { width: 40px; height: 40px; margin-bottom: 8px; }
+    .brand-card h3 { font-size: 0.8rem; line-height: 1.2; }
+    .car-card img { height: 90px; padding: 6px; background: var(--gray-50); }
+    .car-card-content { padding: 12px 8px; }
+    .car-card h3 { font-size: 0.8rem; }
+    .selected-car { padding: 15px; margin-bottom: 20px; }
+    .selected-car img { height: 100px; max-width: 160px; padding: 6px; }
+    .selected-car h2 { font-size: 1.1rem; }
+    .mobile-section { padding: 20px; margin: 0 10px 20px; }
+    .mobile-section .icon { width: 50px; height: 50px; font-size: 1.3rem; }
+    .mobile-section h3 { font-size: 1.2rem; }
+    .mobile-input-group { flex-direction: column; max-width: 100%; }
+    .country-code { text-align: center; width: 100%; }
+    .mobile-submit-btn { width: 100%; min-width: auto; }
+    .service-card { margin-bottom: 15px; border-radius: 15px; }
+    .service-header { padding: 15px; }
+    .service-header h3 { font-size: 1.1rem; }
+    .service-tag { font-size: 0.7rem; padding: 3px 8px; }
+    .service-content { padding: 15px; }
+    .service-image { height: 140px; }
+    .price-section { gap: 8px; }
+    .original-price { font-size: 0.9rem; }
+    .discounted-price { font-size: 1.3rem; }
+    .mobile-collection-content { 
+        padding: 30px 20px; 
+        max-width: 95%; 
+        border-radius: 20px;
+    }
+    .mobile-collection-header h3 { 
+        font-size: 1.5rem; 
+    }
+    .coupon-badge-modal { 
+        font-size: 1rem; 
+        padding: 6px 16px; 
+    }
+    .mobile-input-wrapper { 
+        flex-direction: column; 
+        gap: 10px; 
+    }
+    .country-code-modal { 
+        width: 100%; 
+        text-align: center; 
+    }
+    .mobile-collection-benefits { 
+        gap: 15px; 
+        padding: 12px; 
+    }
+    .benefit-item { 
+        font-size: 0.7rem; 
+    }
+    .benefit-item i { 
+        font-size: 1rem; 
+    }
+    .apply-with-mobile-btn { 
+        padding: 12px 20px; 
+        font-size: 0.95rem; 
+    }
+    .coupon-section { padding: 15px; margin: 15px 0; }
+    .coupon-promo { flex-direction: column; align-items: flex-start; gap: 12px; }
+    .coupon-promo-content { flex-direction: column; align-items: flex-start; gap: 12px; width: 100%; }
+    .coupon-icon { width: 45px; height: 45px; font-size: 1.3rem; }
+    .coupon-promo-text h4 { font-size: 1rem; }
+    .coupon-promo-text p { font-size: 0.85rem; }
+    .coupon-promo-text .highlight { font-size: 1rem; }
+    .apply-coupon-direct-btn { width: 100%; justify-content: center; padding: 12px 20px; }
+    .coupon-applied-badge { padding: 12px 15px; font-size: 0.9rem; }
+    .celebration-content { padding: 30px 20px; max-width: 90%; }
+    .celebration-icon { width: 70px; height: 70px; }
+    .celebration-icon i { font-size: 2rem; }
+    .celebration-content h3 { font-size: 1.5rem; }
+    .celebration-content p { font-size: 1rem; }
+    .celebration-amount { font-size: 1.7rem; }
+    .coupon-input-group { flex-direction: column; gap: 10px; }
+    .apply-coupon-btn { width: 100%; padding: 12px 16px; }
+    .final-price-section { padding: 12px; margin: 12px 0; }
+    .service-info { gap: 8px; padding: 10px; }
+    .info-item { display: flex; align-items: center; justify-content: space-between; text-align: left; }
+    .info-item i { margin-bottom: 0; margin-right: 8px; }
+    .book-service-btn { font-size: 0.95rem; padding: 11px 20px; }
+    .success-content { padding: 30px 20px; }
+    .success-title { font-size: 1.6rem; }
+    .success-actions { gap: 12px; }
+    .back-btn { font-size: 0.85rem; padding: 8px 14px; }
+    .coupon-content { padding: 30px 20px; width: 95%; }
+    .coupon-content h2 { font-size: 1.5rem; }
+    .scratch-container { max-width: 280px; height: 140px; }
+    .scratch-card-bg .coupon-code-reveal { font-size: 1.6rem; letter-spacing: 2px; }
+}
+
+@media (max-width: 480px) {
+    .main-content { padding: 12px 8px; }
+    .grid-container { gap: 6px; }
+    .brand-card { padding: 12px 6px; }
+    .brand-card img { width: 35px; height: 35px; }
+    .brand-card h3 { font-size: 0.75rem; }
+    .section-title h1 { font-size: 1.3rem; }
+    .success-animation { width: 100px; height: 100px; }
+    .success-animation i { font-size: 2.5rem; }
+    .scratch-container { max-width: 260px; height: 130px; }
+    .scratch-card-bg .coupon-code-reveal { font-size: 1.4rem; }
+}
+</style>    
+    <!-- Mixpanel -->
+    <script type="text/javascript">
+    (function(f,b){if(!b.__SV){var e,g,i,h;window.mixpanel=b;b._i=[];b.init=function(e,f,c){function g(a,d){var b=d.split(".");2==b.length&&(a=a[b[0]],d=b[1]);a[d]=function(){a.push([d].concat(Array.prototype.slice.call(arguments,0)))}}var a=b;"undefined"!==typeof c?a=b[c]=[]:c="mixpanel";a.people=a.people||[];a.toString=function(a){var d="mixpanel";"mixpanel"!==c&&(d+="."+c);a||(d+=" (stub)");return d};a.people.toString=function(){return a.toString(1)+".people (stub)"};i="disable time_event track track_pageview track_links track_forms track_with_groups add_group set_group remove_group register register_once alias unregister identify name_tag set_config reset opt_in_tracking opt_out_tracking has_opted_in_tracking has_opted_out_tracking clear_opt_in_out_tracking start_batch_senders people.set people.set_once people.unset people.increment people.append people.union people.track_charge people.clear_charges people.delete_user people.remove".split(" ");
+    for(h=0;h<i.length;h++)g(a,i[h]);var j="set set_once union unset remove delete".split(" ");a.get_group=function(){function b(c){d[c]=function(){call2_args=arguments;call2=[c].concat(Array.prototype.slice.call(call2_args,0));a.push([e,call2])}}for(var d={},e=["get_group"].concat(Array.prototype.slice.call(arguments,0)),c=0;c<j.length;c++)b(j[c]);return d};b._i.push([e,f,c])};b.__SV=1.2;e=f.createElement("script");e.type="text/javascript";e.async=!0;e.src="undefined"!==typeof MIXPANEL_CUSTOM_LIB_URL?MIXPANEL_CUSTOM_LIB_URL:"file:"===f.location.protocol&&"//cdn.mxpnl.com/libs/mixpanel-2-latest.min.js".match(/^\/\//)?"https://cdn.mxpnl.com/libs/mixpanel-2-latest.min.js":"//cdn.mxpnl.com/libs/mixpanel-2-latest.min.js";g=f.getElementsByTagName("script")[0];g.parentNode.insertBefore(e,g)}})(document,window.mixpanel||[]);
+    mixpanel.init("afeb927e0d7ee7ddfa033985ab2fe603", {debug: true, track_pageview: true, persistence: 'localStorage'});
+    </script>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=AW-11438043010"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'AW-11438043010');
+    </script>
+
+    <!-- Meta Pixel Code -->
+    <script>
+      !function(f,b,e,v,n,t,s)
+      {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+      n.queue=[];t=b.createElement(e);t.async=!0;
+      t.src=v;s=b.getElementsByTagName(e)[0];
+      s.parentNode.insertBefore(t,s)}(window, document,'script',
+      'https://connect.facebook.net/en_US/fbevents.js');
+      fbq('init', '479182611911558');
+      fbq('track', 'PageView');
+    </script>
+    <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=479182611911558&ev=PageView&noscript=1"/></noscript>
 </head>
+
 <body>
     <!-- Header -->
-    <header>
-        <nav class="container">
-            <a href="#" class="logo">📱 Techzinia</a>
-            <a href="https://wa.me/918901339256?text=Hi! I want to know more about Techzinia's AI WhatsApp automation" class="cta-header">
-                📞 Book Free Demo
-            </a>
-        </nav>
+    <header class="header">
+        <div class="header-top">
+            <div class="container">
+                <div class="header-info">
+                    <span><i class="fas fa-phone"></i> +91 9266961110</span>
+                    <span><i class="fas fa-map-marker-alt"></i> Sector 75, Gurgaon, Haryana</span>
+                </div>
+                <div class="header-social">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="header-main">
+            <div class="container">
+                <a href="index.html" class="logo">Instant Mechanic</a>
+                <nav class="nav">
+                    <a href="#home">Home</a>
+                    <a href="#services">Services</a>
+                    <a href="#about">About</a>
+                    <a href="#contact">Contact</a>
+                </nav>
+                <a href="javascript:void(0)" class="coupon-button" onclick="openHeaderCouponPopup()">🎁 Get ₹500 OFF</a>
+            </div>
+        </div>
     </header>
 
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="container">
-            <div class="hero-content animate-on-scroll">
-                <div class="hero-text">
-                    <h1>AI-Powered WhatsApp Automation</h1>
-                    <p class="subtitle">Automate Your Customer Support, Sales & Bookings – All on WhatsApp</p>
-                    <p>Engage with customers 24/7, close more sales, and provide instant support using Techzinia's AI-driven WhatsApp assistant. No missed leads. No delayed replies. Just seamless conversations that grow your business.</p>
-                    
-                    <div class="cta-buttons">
-                        <a href="https://wa.me/918901339256?text=Hi! I want to book a free demo of Techzinia" class="btn-primary">
-                            🚀 Get Free Demo
-                        </a>
-                        <a href="#features" class="btn-secondary">
-                            ✨ Learn More
-                        </a>
-                    </div>
-                </div>
-                
-                <div class="hero-visual">
-                    <div class="phone-mockup">
-                        <div class="whatsapp-ui">
-                            <div class="chat-header">
-                                <div style="width: 40px; height: 40px; background: #ddd; border-radius: 50%; display: flex; align-items: center; justify-content: center;">🤖</div>
-                                <div>
-                                    <div style="font-weight: bold;">Techzinia AI</div>
-                                    <div style="font-size: 12px; opacity: 0.8;">Online</div>
-                                </div>
-                            </div>
-                            
-                            <div class="chat-bubble user">Hi, I need help with booking</div>
-                            <div class="chat-bubble">Hello! I'm here to help you with your booking. What service are you looking for?</div>
-                            <div class="chat-bubble user">Car service appointment</div>
-                            <div class="chat-bubble">Perfect! I can schedule that for you. What's your preferred date and time?</div>
-                            <div style="margin-top: 20px; text-align: center; color: #666; font-size: 12px;">
-                                <div class="loading-dots">
-                                    <span></span>
-                                    <span></span>
-                                    <span></span>
-                                </div>
-                                <div style="margin-top: 5px;">AI typing...</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Progress Bar -->
+        <div class="progress-bar">
+            <div class="progress-steps">
+                <div class="progress-line" id="progressLine"></div>
+                <div class="step active" id="step1">1</div>
+                <div class="step" id="step2">2</div>
+                <div class="step" id="step3">3</div>
+                <div class="step" id="step4">4</div>
             </div>
         </div>
-    </section>
 
-    <!-- Features Section -->
-    <section class="features" id="features">
-        <div class="container">
-            <div class="section-header animate-on-scroll">
-                <h2>🚀 Why Choose Techzinia?</h2>
-                <p>Powerful AI automation features that transform your WhatsApp into a sales and support powerhouse</p>
+        <!-- Dynamic Content -->
+        <div class="content-container">
+            <button class="back-btn hidden" id="backBtn" onclick="goBack()">
+                <i class="fas fa-arrow-left"></i> Back
+            </button>
+
+            <div class="section-title" id="sectionTitle">
+                <h1>Choose Your Car Brand</h1>
+                <p>Select your car brand to get started with our premium service experience</p>
             </div>
-            
-            <div class="features-grid">
-                <div class="feature-card animate-on-scroll">
-                    <div class="feature-icon">🤖</div>
-                    <h3>AI That Works for You</h3>
-                    <p>Handle queries, bookings, feedback & support automatically with advanced AI that understands context and responds naturally.</p>
-                </div>
+
+            <div class="grid-container" id="brandContainer"></div>
+            <div class="grid-container hidden" id="carContainer"></div>
+            <div class="selected-car hidden" id="selectedCarDisplay"></div>
+
+            <!-- Mobile Number Section -->
+            <div class="mobile-section hidden" id="mobileSection">
+                <div class="icon"><i class="fas fa-mobile-alt"></i></div>
+                <h3>Get Service Prices Instantly!</h3>
+                <p>Enter your mobile number to view personalized service packages and pricing for your vehicle.</p>
                 
-                <div class="feature-card animate-on-scroll">
-                    <div class="feature-icon">📊</div>
-                    <h3>Smart Dashboard</h3>
-                    <p>Manage all conversations, leads & bookings in one intuitive dashboard. Real-time analytics and insights at your fingertips.</p>
-                </div>
-                
-                <div class="feature-card animate-on-scroll">
-                    <div class="feature-icon">🌙</div>
-                    <h3>24/7 Engagement</h3>
-                    <p>Never miss a customer, even after hours. Your AI assistant works around the clock to capture every lead.</p>
-                </div>
-                
-                <div class="feature-card animate-on-scroll">
-                    <div class="feature-icon">📈</div>
-                    <h3>Boost Conversions</h3>
-                    <p>Faster replies = happier customers = more sales. Increase conversion rates by up to 40% with instant responses.</p>
-                </div>
-                
-                <div class="feature-card animate-on-scroll">
-                    <div class="feature-icon">💬</div>
-                    <h3>Click-to-WhatsApp Ads</h3>
-                    <p>Convert ad clicks into instant WhatsApp chats. Seamless integration with Google Ads and Facebook campaigns.</p>
-                </div>
-                
-                <div class="feature-card animate-on-scroll">
-                    <div class="feature-icon">💳</div>
-                    <h3>In-Chat Payments</h3>
-                    <p>Customers can book & pay directly in WhatsApp. Streamlined checkout process that reduces abandonment.</p>
-                </div>
+                <form class="mobile-form" id="mobileForm">
+                    <div class="mobile-input-group">
+                        <div class="country-code">+91</div>
+                        <input type="tel" id="mobileNumber" class="mobile-input" 
+                               placeholder="Enter your 10-digit mobile number" maxlength="10" pattern="[0-9]{10}">
+                    </div>
+                    <div class="mobile-error hidden" id="mobileError"></div>
+                    <button type="submit" class="mobile-submit-btn" id="mobileSubmitBtn">
+                        <i class="fas fa-search"></i> View Service Prices for Free
+                    </button>
+                </form>
+            </div>
+
+            <div class="content-container hidden" id="serviceContainer"></div>
+            <div class="loading hidden" id="loadingState">
+                <div class="spinner"></div> Loading services...
             </div>
         </div>
-    </section>
+    </main>
 
-    <!-- Dashboard Preview -->
-    <section class="dashboard-preview">
-        <div class="container">
-            <div class="section-header animate-on-scroll">
-                <h2>Smart Dashboard in Action</h2>
-                <p>See how our intelligent dashboard helps you manage all customer interactions effortlessly</p>
-            </div>
-            
-            <div class="dashboard-mockup animate-on-scroll">
-                <div class="dashboard-header">
-                    <h3>📊 Techzinia Dashboard</h3>
-                    <span>Live Data</span>
-                </div>
-                
-                <div class="dashboard-stats">
-                    <div class="stat-card">
-                        <div class="stat-number">2,847</div>
-                        <div class="stat-label">Active Conversations</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number">94%</div>
-                        <div class="stat-label">Response Rate</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number">156</div>
-                        <div class="stat-label">Bookings Today</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number">₹1.2L</div>
-                        <div class="stat-label">Revenue Generated</div>
-                    </div>
-                </div>
-                
-                <div style="background: white; padding: 1.5rem; border-radius: 15px; box-shadow: var(--shadow-light);">
-                    <h4 style="margin-bottom: 1rem; color: var(--text-dark);">📈 Real-time Analytics</h4>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
-                        <div style="text-align: center; padding: 1rem; background: var(--bg-light); border-radius: 10px;">
-                            <div style="font-size: 1.2rem; font-weight: bold; color: var(--primary-color);">30%</div>
-                            <div style="font-size: 0.9rem; color: var(--text-light);">More Engagement</div>
-                        </div>
-                        <div style="text-align: center; padding: 1rem; background: var(--bg-light); border-radius: 10px;">
-                            <div style="font-size: 1.2rem; font-weight: bold; color: var(--primary-color);">40%</div>
-                            <div style="font-size: 0.9rem; color: var(--text-light);">Higher Conversions</div>
-                        </div>
-                        <div style="text-align: center; padding: 1rem; background: var(--bg-light); border-radius: 10px;">
-                            <div style="font-size: 1.2rem; font-weight: bold; color: var(--primary-color);">5M+</div>
-                            <div style="font-size: 0.9rem; color: var(--text-light);">Messages/Month</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Industries Section -->
-    <section class="industries">
-        <div class="container">
-            <div class="section-header animate-on-scroll">
-                <h2>🌍 Who Uses Techzinia</h2>
-                <p>Trusted by businesses across industries to automate and grow their WhatsApp presence</p>
-            </div>
-            
-            <div class="industries-grid">
-                <div class="industry-card animate-on-scroll">
-                    <div class="industry-icon">🚗</div>
-                    <div>
-                        <h4>Automobile</h4>
-                        <p>Service reminders, roadside assistance, lead follow-ups</p>
-                    </div>
-                </div>
-                
-                <div class="industry-card animate-on-scroll">
-                    <div class="industry-icon">🛒</div>
-                    <div>
-                        <h4>E-Commerce</h4>
-                        <p>Cart recovery, product catalogs, in-chat checkout</p>
-                    </div>
-                </div>
-                
-                <div class="industry-card animate-on-scroll">
-                    <div class="industry-icon">🏥</div>
-                    <div>
-                        <h4>Healthcare</h4>
-                        <p>Appointment scheduling & patient updates</p>
-                    </div>
-                </div>
-                
-                <div class="industry-card animate-on-scroll">
-                    <div class="industry-icon">🏢</div>
-                    <div>
-                        <h4>Real Estate</h4>
-                        <p>Virtual tours, lead qualification & instant inquiries</p>
-                    </div>
-                </div>
-                
-                <div class="industry-card animate-on-scroll">
-                    <div class="industry-icon">🎓</div>
-                    <div>
-                        <h4>Education</h4>
-                        <p>Student inquiries, course updates, exam notifications</p>
-                    </div>
-                </div>
-                
-                <div class="industry-card animate-on-scroll">
-                    <div class="industry-icon">🔧</div>
-                    <div>
-                        <h4>Service Industry</h4>
-                        <p>Instant quotes & 24/7 support</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Offer Section -->
-    <section class="offer">
-        <div class="container">
-            <div class="offer-content animate-on-scroll">
-                <div class="offer-badge">⚡ Limited-Time Offer</div>
-                <h2>Get 2 Months FREE Access!</h2>
-                <p style="font-size: 1.2rem; margin-bottom: 2rem; opacity: 0.9;">
-                    Get FREE access to Techzinia's Smart CRM when you sign up today! Manage unlimited leads, track chats, and nurture customers – at no extra cost.
-                </p>
-                <p style="font-size: 1rem; margin-bottom: 2rem;">
-                    <strong>*Offer valid for the first 25 businesses only*</strong>
-                </p>
-                
-                <a href="https://wa.me/918901339256?text=Hi! I want to claim the 2-month FREE CRM offer from Techzinia" class="btn-primary" style="background: var(--white); color: var(--accent-color); font-size: 1.2rem; padding: 1.2rem 2.5rem;">
-                    🎉 Claim FREE Offer Now
+    <!-- Success Page -->
+    <div class="success-page" id="successPage">
+        <div class="success-content">
+            <div class="success-animation"><i class="fas fa-check"></i></div>
+            <h1 class="success-title">Booking Confirmed!</h1>
+            <p class="success-subtitle">Thank you for choosing Instant Mechanic! Your service has been successfully booked. Our expert team will contact you shortly to confirm the appointment details.</p>
+            <div class="success-details" id="bookingDetails"></div>
+            <div class="success-actions">
+                <a href="#" class="btn-whatsapp" id="whatsappLink">
+                    <i class="fab fa-whatsapp"></i> Chat on WhatsApp
                 </a>
+                <a href="/" class="btn-home"><i class="fas fa-home"></i> Back to Home</a>
             </div>
         </div>
-    </section>
+    </div>
 
-    <!-- Contact Section -->
-    <section class="contact">
-        <div class="container">
-            <div class="animate-on-scroll">
-                <h2 style="font-size: 2.5rem; margin-bottom: 1rem; color: var(--text-dark);">📞 Get Started Today</h2>
-                <p style="font-size: 1.2rem; color: var(--text-light); margin-bottom: 2rem; max-width: 600px; margin-left: auto; margin-right: auto;">
-                    Supercharge your WhatsApp with Techzinia AI. Book a free demo, claim your 2-month free CRM, and start converting conversations into customers.
-                </p>
-                
-                <a href="https://wa.me/918901339256?text=Hi! I want to book a FREE demo of Techzinia's AI WhatsApp automation. Please tell me more!" class="whatsapp-button">
-                    📱 WhatsApp Us: +91 89013 39256
-                </a>
-                
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 3rem; max-width: 600px; margin-left: auto; margin-right: auto;">
-                    <div style="text-align: center; padding: 1rem;">
-                        <div style="font-size: 2rem; color: var(--primary-color); margin-bottom: 0.5rem;">✅</div>
-                        <div style="font-weight: 600;">Book a Free Demo</div>
-                    </div>
-                    <div style="text-align: center; padding: 1rem;">
-                        <div style="font-size: 2rem; color: var(--primary-color); margin-bottom: 0.5rem;">🎁</div>
-                        <div style="font-weight: 600;">Claim 2-Month Free CRM</div>
-                    </div>
-                    <div style="text-align: center; padding: 1rem;">
-                        <div style="font-size: 2rem; color: var(--primary-color); margin-bottom: 0.5rem;">🚀</div>
-                        <div style="font-weight: 600;">Start Growing Business</div>
-                    </div>
+    <!-- Coupon Modal -->
+    <div id="couponModal" class="coupon-modal">
+        <div class="coupon-content">
+            <span class="close-btn" onclick="closeCouponPopup()">×</span>
+            <h2>🎉 Exclusive Offer!</h2>
+            <p>Scratch to reveal your coupon code</p>
+            <div class="scratch-container">
+                <div class="scratch-card-bg">
+                    <div class="coupon-code-reveal">INSTANT500</div>
+                    <div class="coupon-subtitle">₹500 OFF on Services</div>
                 </div>
-                
-                <div style="margin-top: 3rem; padding: 2rem; background: var(--bg-light); border-radius: 20px;">
-                    <h3 style="margin-bottom: 1rem;">🤝 End-to-End Support</h3>
-                    <p style="color: var(--text-light);">We don't just give you a tool – we give you success with dedicated onboarding, 24/7 support, and custom solutions for your industry.</p>
-                </div>
+                <canvas id="scratchCanvas" class="scratch-canvas"></canvas>
             </div>
+            <div class="scratch-instruction">
+                <i class="fas fa-hand-pointer"></i>
+                <span id="scratchText">Scratch above to reveal code</span>
+            </div>
+            <button class="copy-btn" onclick="copyCoupon()">
+                <i class="fas fa-copy"></i> Copy Code
+            </button>
+            <p class="copy-msg" id="copyMsg"></p>
         </div>
-    </section>
+    </div>
 
-    <!-- Footer -->
-    <footer>
-        <div class="container">
-            <p style="margin-bottom: 1rem;">
-                <strong>Techzinia – Automating WhatsApp. Growing Businesses.</strong>
-            </p>
-            <p style="opacity: 0.8;">
-                © 2025 Techzinia. All Rights Reserved. | 📱 Contact: +91 89013 39256
-            </p>
-        </div>
-    </footer>
+    <!-- External JavaScript -->
+<script>
+    // ==================== Global Variables ====================
+let brands = [], cars = [], currentStep = 1;
+let selectedBrand = null, selectedCar = null, selectedService = null;
+let userMobile = null, appliedCoupon = null, couponDiscount = 0;
+let canvas, ctx, isDrawing = false, scratchRevealed = false;
 
-    <script>
-        // Smooth scrolling for anchor links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
+// ==================== Initialization ====================
+document.addEventListener('DOMContentLoaded', function() {
+    // Check if mobile is already in localStorage
+    const storedMobile = localStorage.getItem('userMobile');
+    if (storedMobile && isValidMobile(storedMobile)) {
+        userMobile = storedMobile;
+        mixpanel.identify(storedMobile);
+        console.log('Mobile loaded from localStorage:', storedMobile);
+    }
+    
+    initializeTracking();
+    Promise.all([loadBrandData(), loadCarData()]).then(() => {
+        if (!checkDirectAccess()) displayBrands();
+    }).catch(() => displayBrands());
+});
+
+// ==================== URL Parameters ====================
+function getURLParams() {
+    const urlParams = new URLSearchParams(window.location.search);
+    return {
+        mobile: extractMobile(urlParams.get('mobile')),
+        brand_id: urlParams.get('brand_id'),
+        brand_name: urlParams.get('brand_name') || urlParams.get('brand'),
+        car_id: urlParams.get('car_id'),
+        car_name: urlParams.get('car_name') || urlParams.get('car'),
+        car_image: urlParams.get('car_image')
+    };
+}
+
+function extractMobile(mobileParam) {
+    if (!mobileParam) return null;
+    let mobile = decodeURIComponent(mobileParam);
+    if (mobile.includes('/')) mobile = mobile.split('/')[0];
+    mobile = mobile.replace(/[^0-9]/g, '');
+    if (mobile.startsWith('91') && mobile.length === 12) mobile = mobile.substring(2);
+    return mobile.length === 10 ? mobile : null;
+}
+
+// ==================== Tracking ====================
+function initializeTracking() {
+    const urlParams = getURLParams();
+    if (urlParams.mobile && isValidMobile(urlParams.mobile)) {
+        userMobile = urlParams.mobile;
+        mixpanel.identify(userMobile);
+        mixpanel.people.set({ "$phone": userMobile, "Last Seen": new Date() });
+    }
+    const trackingData = {
+        'Source': 'Service Selection Page',
+        'Mobile': userMobile,
+        'Timestamp': new Date().toISOString()
+    };
+    if (urlParams.brand_id || urlParams.car_id) {
+        trackingData['Direct Access'] = true;
+        trackingData['Brand ID'] = urlParams.brand_id;
+        trackingData['Car ID'] = urlParams.car_id;
+        trackingData['Brand Name'] = urlParams.brand_name;
+        trackingData['Car Name'] = urlParams.car_name;
+    }
+    mixpanel.track('Service Page Opened', trackingData);
+}
+
+function isValidMobile(mobile) {
+    return /^[6-9]\d{9}$/.test(mobile);
+}
+
+// ==================== Direct Access ====================
+function checkDirectAccess() {
+    const urlParams = getURLParams();
+    if (urlParams.brand_id && urlParams.car_id) {
+        const brandId = parseInt(urlParams.brand_id);
+        const carId = urlParams.car_id;
+        let matchingBrand = brands.find(b => b.id === brandId);
+        let matchingCar = cars.find(c => 
+            c.car_type_id === carId || 
+            c.car_type_id === parseInt(carId) || 
+            c.car_type_id.toString() === carId.toString()
+        );
+        
+        if (matchingBrand && matchingCar) {
+            selectedBrand = matchingBrand;
+            selectedCar = matchingCar;
+            localStorage.setItem('selectedBrand', JSON.stringify(selectedBrand));
+            localStorage.setItem("selectedCarId", selectedCar.car_type_id);
+            localStorage.setItem("selectedCarName", selectedCar.name);
+            localStorage.setItem("carImage", selectedCar.image_path);
+            localStorage.setItem("brand", selectedCar.brand.name);
+            localStorage.setItem("carName", selectedCar.name);
+            mixpanel.track('Direct Service Access', {
+                'Brand': selectedBrand.name,
+                'Car Model': selectedCar.name,
+                'Car ID': selectedCar.car_type_id,
+                'Fuel Type': selectedCar.fuel_type,
+                'Mobile': userMobile,
+                'Access Type': 'Agent Shared Link',
+                'URL Format': 'ID Based',
+                'Timestamp': new Date().toISOString()
             });
-        });
+            skipToPricingPage();
+            return true;
+        } else if (matchingBrand && !matchingCar) {
+            selectedBrand = matchingBrand;
+            localStorage.setItem('selectedBrand', JSON.stringify(selectedBrand));
+            skipToCarSelection();
+            return true;
+        }
+    }
+    return false;
+}
 
-        // Animate on scroll
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
+function skipToCarSelection() {
+    updateProgress(2);
+    updateSectionTitle('Select Your Car Model', `Choose your ${selectedBrand.name} model`);
+    document.getElementById('brandContainer').classList.add('hidden');
+    document.getElementById('backBtn').classList.remove('hidden');
+    document.getElementById('loadingState').classList.remove('hidden');
+    setTimeout(() => {
+        document.getElementById('loadingState').classList.add('hidden');
+        displayCars(selectedBrand.id);
+    }, 800);
+}
+
+function skipToMobileCollection() {
+    // Check if mobile is already in localStorage
+    const storedMobile = localStorage.getItem('userMobile');
+    
+    if (storedMobile && isValidMobile(storedMobile)) {
+        // Mobile already exists, skip directly to pricing
+        userMobile = storedMobile;
+        console.log('Mobile found in localStorage, skipping mobile collection:', storedMobile);
+        
+        mixpanel.track('Mobile Step Skipped', {
+            'Mobile': storedMobile,
+            'Reason': 'Already in localStorage',
+            'Timestamp': new Date().toISOString()
+        });
+        
+        skipToPricingPage();
+    } else {
+        // No mobile in localStorage, show mobile collection
+        updateProgress(3);
+        updateSectionTitle('Enter Your Mobile Number', 'Get instant service prices for your selected vehicle');
+        document.getElementById('carContainer').classList.add('hidden');
+        displaySelectedCar(selectedCar);
+        showMobileSection();
+    }
+}
+
+function skipToPricingPage() {
+    updateProgress(4);
+    updateSectionTitle('Choose Your Service', `Perfect service packages for your ${selectedBrand.name} ${selectedCar.name}`);
+    document.getElementById('brandContainer').classList.add('hidden');
+    document.getElementById('carContainer').classList.add('hidden');
+    document.getElementById('mobileSection').classList.add('hidden');
+    document.getElementById('backBtn').classList.remove('hidden');
+    displaySelectedCar(selectedCar);
+    loadServices(selectedCar.car_type_id);
+}
+
+// ==================== Navigation ====================
+function goBack() {
+    if (currentStep === 4) {
+        updateProgress(3);
+        updateSectionTitle('Enter Your Mobile Number', 'Get instant service prices for your selected vehicle');
+        document.getElementById('serviceContainer').classList.add('hidden');
+        document.getElementById('mobileSection').classList.remove('hidden');
+        showMobileSection();
+    } else if (currentStep === 3) {
+        updateProgress(2);
+        updateSectionTitle('Select Your Car Model', `Choose your ${selectedBrand.name} model`);
+        document.getElementById('mobileSection').classList.add('hidden');
+        document.getElementById('selectedCarDisplay').classList.add('hidden');
+        document.getElementById('carContainer').classList.remove('hidden');
+    } else if (currentStep === 2) {
+        updateProgress(1);
+        updateSectionTitle('Choose Your Car Brand', 'Select your car brand to get started with our premium service experience');
+        document.getElementById('carContainer').classList.add('hidden');
+        document.getElementById('brandContainer').classList.remove('hidden');
+        document.getElementById('backBtn').classList.add('hidden');
+        selectedBrand = null;
+        selectedCar = null;
+    }
+}
+
+// ==================== Data Loading ====================
+async function loadBrandData() {
+    const response = await fetch('car_brand.json');
+    brands = await response.json();
+}
+
+async function loadCarData() {
+    const response = await fetch('car.json');
+    cars = await response.json();
+}
+
+// ==================== Display Functions ====================
+function displayBrands() {
+    const container = document.getElementById('brandContainer');
+    container.innerHTML = '';
+    brands.forEach((brand, index) => {
+        const brandCard = document.createElement('div');
+        brandCard.className = 'brand-card fade-in';
+        brandCard.style.animationDelay = `${index * 0.1}s`;
+        brandCard.innerHTML = `
+            <img src="${brand.brand_logo}" alt="${brand.name}" loading="lazy">
+            <h3>${brand.name}</h3>
+        `;
+        brandCard.addEventListener('click', () => selectBrand(brand));
+        container.appendChild(brandCard);
+    });
+}
+
+function selectBrand(brand) {
+    selectedBrand = brand;
+    localStorage.setItem('selectedBrand', JSON.stringify(brand));
+    mixpanel.track('Service Page - Brand Selected', {
+        'Brand': brand.name,
+        'Brand ID': brand.id,
+        'Mobile': userMobile,
+        'Timestamp': new Date().toISOString()
+    });
+    updateProgress(2);
+    updateSectionTitle('Select Your Car Model', `Choose your ${brand.name} model`);
+    document.getElementById('brandContainer').classList.add('hidden');
+    document.getElementById('backBtn').classList.remove('hidden');
+    document.getElementById('loadingState').classList.remove('hidden');
+    setTimeout(() => {
+        document.getElementById('loadingState').classList.add('hidden');
+        displayCars(brand.id);
+    }, 800);
+}
+
+function displayCars(brandId) {
+    const container = document.getElementById('carContainer');
+    container.innerHTML = '';
+    container.classList.remove('hidden');
+    if (cars.length === 0) {
+        container.innerHTML = '<p class="text-center">No car data available. Please try again.</p>';
+        return;
+    }
+    let filteredCars = cars.filter(car => car.brand && car.brand.id === brandId);
+    if (filteredCars.length === 0) {
+        container.innerHTML = '<p class="text-center">No cars found for this brand.</p>';
+        return;
+    }
+    let uniqueCars = [];
+    let seenNames = new Set();
+    filteredCars.forEach(car => {
+        if (!seenNames.has(car.name)) {
+            seenNames.add(car.name);
+            uniqueCars.push(car);
+        }
+    });
+    uniqueCars.forEach((car, index) => {
+        const carCard = document.createElement('div');
+        carCard.className = 'car-card slide-in-left';
+        carCard.style.animationDelay = `${index * 0.1}s`;
+        carCard.innerHTML = `
+            <img src="${car.image_path || 'assets/img/default-car.jpg'}" alt="${car.name}" loading="lazy" 
+                 onerror="this.src='assets/img/logo.svg'">
+            <div class="car-card-content">
+                <h3>${car.name}</h3>
+            </div>
+        `;
+        carCard.addEventListener('click', () => selectCar(car));
+        container.appendChild(carCard);
+    });
+}
+
+function selectCar(car) {
+    selectedCar = car;
+    localStorage.setItem("selectedCarId", car.car_type_id);
+    localStorage.setItem("selectedCarName", car.name);
+    localStorage.setItem("carImage", car.image_path);
+    localStorage.setItem("brand", car.brand.name);
+    localStorage.setItem("carName", car.name);
+    mixpanel.track('Service Page - Car Selected', {
+        'Brand': car.brand.name,
+        'Car Model': car.name,
+        'Car ID': car.car_type_id,
+        'Mobile': userMobile,
+        'Timestamp': new Date().toISOString()
+    });
+    skipToMobileCollection();
+}
+
+function displaySelectedCar(car) {
+    const container = document.getElementById('selectedCarDisplay');
+    container.classList.remove('hidden');
+    const carName = `${car.brand.name} ${car.name}`;
+    container.innerHTML = `
+        <img src="${car.image_path}" alt="Selected Car" loading="lazy" class="fade-in" 
+             onerror="this.src='assets/img/default-car.jpg'">
+        <h2 class="fade-in">${carName}</h2>
+    `;
+}
+
+function showMobileSection() {
+    const mobileSection = document.getElementById('mobileSection');
+    mobileSection.classList.remove('hidden');
+    
+    // Pre-fill mobile if exists in localStorage
+    const storedMobile = localStorage.getItem('userMobile');
+    if (storedMobile && isValidMobile(storedMobile)) {
+        document.getElementById('mobileNumber').value = storedMobile;
+    }
+    
+    setTimeout(() => document.getElementById('mobileNumber').focus(), 300);
+}
+
+// ==================== Mobile Form ====================
+document.getElementById('mobileForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const mobileInput = document.getElementById('mobileNumber');
+    const mobile = mobileInput.value.trim();
+    const errorDiv = document.getElementById('mobileError');
+    const submitBtn = document.getElementById('mobileSubmitBtn');
+    
+    errorDiv.classList.add('hidden');
+    errorDiv.textContent = '';
+    mobileInput.classList.remove('error');
+    
+    if (!mobile) {
+        errorDiv.textContent = 'Please enter your mobile number';
+        errorDiv.classList.remove('hidden');
+        mobileInput.classList.add('error');
+        return;
+    }
+    
+    if (!isValidMobile(mobile)) {
+        errorDiv.textContent = 'Please enter a valid 10-digit mobile number starting with 6-9';
+        errorDiv.classList.remove('hidden');
+        mobileInput.classList.add('error');
+        return;
+    }
+    
+    submitBtn.disabled = true;
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<div class="spinner"></div> Processing...';
+    
+    try {
+        userMobile = mobile;
+        mixpanel.identify(mobile);
+        mixpanel.people.set({ "$phone": mobile, "Last Updated": new Date() });
+        
+        const brand = selectedCar.brand.name;
+        const carName = selectedCar.name;
+        const message = `Mobile number collected - Brand: ${brand}, Car Model: ${carName}, Mobile: ${mobile}`;
+        
+        await fetch('https://ai.instantmechanic.online/bot/service-query/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ mobile: mobile, message: message })
+        });
+        
+        mixpanel.track('Mobile Number Collected', {
+            'Brand': brand,
+            'Car Model': carName,
+            'Mobile': mobile,
+            'Source': 'Service Selection Flow',
+            'Timestamp': new Date().toISOString()
+        });
+        
+        setTimeout(() => {
+            skipToPricingPage();
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalText;
+        }, 1000);
+    } catch (error) {
+        mixpanel.track('Mobile Collection API Error', {
+            'Brand': selectedCar.brand.name,
+            'Car Model': selectedCar.name,
+            'Mobile': mobile,
+            'Error': error.message,
+            'Timestamp': new Date().toISOString()
+        });
+        setTimeout(() => {
+            skipToPricingPage();
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalText;
+        }, 1000);
+    }
+});
+
+document.getElementById('mobileNumber').addEventListener('input', function() {
+    this.value = this.value.replace(/[^0-9]/g, '');
+    if (this.value.length > 0) {
+        this.classList.remove('error');
+        document.getElementById('mobileError').classList.add('hidden');
+    }
+});
+
+document.getElementById('mobileNumber').addEventListener('paste', function() {
+    setTimeout(() => {
+        this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);
+    }, 10);
+});
+
+// ==================== Service Loading ====================
+async function loadServices(carId) {
+    document.getElementById('loadingState').classList.remove('hidden');
+    const apiUrl = `https://gomechanic.app/api/v2/oauth/customer/get-services-details-by-category?car_id=${carId}&city_id=6&category_id=0&user_car_id=null`;
+    const headers = {
+        "Accept": "*/*",
+        "Authorization": "Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJiNGJjM2NhZjVkMWVhOTlkYzk2YjQzM2NjYzQzMDI0ZTAyM2I0MGM2YjQ5ZjExN2JjMDk5OGY2MWU3ZDI1ZjM2MTU1YWU5ZDIxNjE2ZTc5NSIsImV4cCI6MTc3MTA2OTMxNi4wLCJhdWQiOiIzIiwic2NvcGVzIjpbXSwiaWF0IjoxNzY4NDc3MzE2LjAsInN1YiI6IjE3Njg0NzczMTY3MiIsIm5iZiI6MTc2ODQ3NzMxNi4wfQ.Ko0LyX_QvqLdLgx-3qbgRDFXycG1P4eQnPPNbTJQQSh9hHnnTE6yK172TqH8k-2-3Hsj88GvEZyb_KB0loU-ROG6Esn2JSm-_FQx6Wqy5aO2j3gW-4-ceSwEbC1hXS4raN9Tq9DlL8Gn_L3i9Y-7B7T98MiulCV21WOiVq8Y-O_jk-mS-9KJDHdahxcfLCAxla6fCmAVGNq7zBj6wiAHcpJABUl4go5ZjGdzGHtYe_HQLC_6ckY6VNVlJZX2z-30e3dZDMmrPxcD_oexwgvqgL5VyoMBFInp1JnlFCvOPGb4n1UqVufIHA6JPy11ocoDFTaUgmM2Pj6UMhfQ3S8JR806f9PBx91Z3ZZ9xKAXCUZeAYq6bJAk3ideIpwg5b8n63phZCAKBVVU-zxYx0pnueycudoqriY841vOGjPSU5ALoDCATKriJ0ODL7mDqldRFm16hXL9U2lmOw8O1OKFrJq-19EDYXfo_nyfWo3bvOE2Qd8olPoZ0wrKKTBlIRypEmFmcZxXpp5DUwF5eIFZ0pRs9M-sQvUj55D7-8VVwUqJKYebRmi6PjDkKynpni2Z2ySJue9q0q5yScF_6D-42CzAcCzO6UxvmChQ_dxyL3swkUQX2VqsMcu7CJwrUivALLKzR_RNl1nFRJ_q-Cr4i31L3rPrrh-r4vV3SynemN4",
+        "Content-Type": "application/json"
+    };
+    
+    try {
+        const response = await fetch(apiUrl, { method: "GET", headers: headers });
+        const data = await response.json();
+        document.getElementById('loadingState').classList.add('hidden');
+        
+        if (data.status && data.data.length > 0) {
+            const services = data.data[0].services;
+            if (services && services.length > 0) {
+                const extractedServices = services.map(service => ({
+                    name: service.name || "N/A",
+                    service_tag: service.service_tag || "Every 3 Month",
+                    price: service.package_details?.[0]?.strikethrough || "N/A",
+                    discounted_price: service.package_details?.[0]?.total || "N/A",
+                    image: getServiceImage(service.name),
+                    description: service.desc_details || {},
+                    inclusion: service.desc_details?.inclusion || [],
+                    time_taken: service.desc_details?.time_taken || "N/A",
+                    warranty: service.desc_details?.warranty || "N/A"
+                }));
+                displayServices(extractedServices);
+            } else {
+                displayNoServicesMessage();
+            }
+        } else {
+            displayNoServicesMessage();
+        }
+    } catch (error) {
+        document.getElementById('loadingState').classList.add('hidden');
+        displayErrorMessage();
+    }
+}
+
+function displayNoServicesMessage() {
+    const container = document.getElementById('serviceContainer');
+    container.classList.remove('hidden');
+    container.innerHTML = `
+        <div class="text-center" style="padding: 40px;">
+            <i class="fas fa-exclamation-circle" style="font-size: 3rem; color: var(--gray-400); margin-bottom: 20px;"></i>
+            <h3 style="color: var(--gray-600); margin-bottom: 10px;">No Services Available</h3>
+            <p style="color: var(--gray-500);">We couldn't find services for this vehicle. Please contact us directly.</p>
+            <a href="tel:+918393990942" class="cta-button" style="display: inline-block; margin-top: 20px;">
+                <i class="fas fa-phone"></i> Call Now
+            </a>
+        </div>
+    `;
+}
+
+function displayErrorMessage() {
+    const container = document.getElementById('serviceContainer');
+    container.classList.remove('hidden');
+    container.innerHTML = `
+        <div class="text-center" style="padding: 40px;">
+            <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: var(--secondary-color); margin-bottom: 20px;"></i>
+            <h3 style="color: var(--gray-600); margin-bottom: 10px;">Unable to Load Services</h3>
+            <p style="color: var(--gray-500);">There was an error loading services. Please try again or contact us.</p>
+            <div style="margin-top: 20px; display: flex; gap: 15px; justify-content: center;">
+                <button onclick="loadServices(selectedCar.car_type_id)" class="btn-primary" style="padding: 10px 20px;">
+                    <i class="fas fa-refresh"></i> Try Again
+                </button>
+                <a href="tel:+919266961110" class="cta-button">
+                    <i class="fas fa-phone"></i> Call Now
+                </a>
+            </div>
+        </div>
+    `;
+}
+
+function getServiceImage(serviceName) {
+    const imageMap = {
+        "Standard Service": "assets/img/standard.jpg",
+        "Comprehensive Service": "assets/img/premium.jpg",
+        "Basic Service": "assets/img/basic.jpg"
+    };
+    return imageMap[serviceName] || "assets/img/basic.jpg";
+}
+
+// ==================== Service Display ====================
+function displayServices(services) {
+    const container = document.getElementById('serviceContainer');
+    container.classList.remove('hidden');
+    container.innerHTML = '';
+    
+    services.forEach((service, index) => {
+        const serviceCard = document.createElement('div');
+        serviceCard.className = 'service-card slide-in-right';
+        serviceCard.style.animationDelay = `${index * 0.2}s`;
+        
+        const inclusions = Array.isArray(service.inclusion) ? service.inclusion : [];
+        const visibleInclusions = inclusions.slice(0, 5);
+        const hiddenInclusions = inclusions.slice(5);
+        
+        const apiDiscountedPrice = parseInt(service.discounted_price);
+        const priceWithCharges = apiDiscountedPrice + 300;
+        const priceExcludingGST = Math.round(priceWithCharges / 1.18);
+        const gstAmount = priceWithCharges - priceExcludingGST;
+        
+        const originalPrice = parseInt(service.price);
+        const savings = originalPrice - priceWithCharges;
+        const discountPercentage = Math.round((savings / originalPrice) * 100);
+        
+        serviceCard.innerHTML = `
+            <div class="service-header">
+                <h3>${service.name}</h3>
+                <div class="service-tag">${service.service_tag}</div>
+            </div>
+            <div class="service-content">
+                <img src="${service.image}" alt="${service.name}" class="service-image" loading="lazy">
+                <div class="gst-notice">*Prices are excluding GST</div>
+                <div class="price-section">
+                    <span class="original-price">₹${service.price}</span>
+                    <span class="discounted-price">₹${priceExcludingGST}</span>
+                    <span class="discount-badge">Save ${discountPercentage}%</span>
+                </div>
+                <div class="price-details-box">
+
+                    <div class="price-row-detail">
+                        <span class="label">Service Price:</span>
+                        <span class="value">₹${priceExcludingGST}</span>
+                    </div>
+                    <div class="price-row-detail">
+                        <span class="label">GST (18%):</span>
+                        <span class="value">₹${gstAmount}</span>
+                    </div>
+                    <div class="price-row-detail">
+                        <span class="label">Total Payable: <span class="gst-info-tag"><i class="fas fa-info-circle"></i> Inc. GST</span></span>
+                        <span class="value">₹${priceWithCharges}</span>
+                    </div>
+                </div>
+                <div class="coupon-section">
+                    <div class="coupon-promo" id="coupon-promo-${index}">
+                        <div class="coupon-promo-content">
+                            <div class="coupon-icon">
+                                <i class="fas fa-gift"></i>
+                            </div>
+                            <div class="coupon-promo-text">
+                                <h4>Special Offer!</h4>
+                                <p>Get <span class="highlight">₹500 OFF</span> on this service</p>
+                            </div>
+                        </div>
+                        <button class="apply-coupon-direct-btn" id="apply-direct-btn-${index}" 
+                                onclick="applyDirectCoupon(${index}, ${apiDiscountedPrice})">
+                            <i class="fas fa-tag"></i> Apply Coupon
+                        </button>
+                    </div>
+                    <div class="coupon-applied-badge hidden" id="coupon-applied-${index}">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Coupon Applied! You saved ₹500</span>
+                    </div>
+                    <button class="manual-coupon-btn" id="manual-coupon-btn-${index}" 
+                            onclick="toggleManualCoupon(${index})">
+                        Have a different code? Click here
+                    </button>
+                    <div class="coupon-input-section hidden" id="coupon-input-${index}">
+                        <div class="coupon-input-group">
+                            <input type="text" class="coupon-input" id="coupon-code-${index}" 
+                                   placeholder="Enter coupon code" maxlength="15">
+                            <button class="apply-coupon-btn" id="apply-btn-${index}" 
+                                    onclick="applyCoupon(${index}, ${apiDiscountedPrice})">Apply</button>
+                        </div>
+                        <div class="coupon-message" id="coupon-message-${index}"></div>
+                    </div>
+                </div>
+                <div class="final-price-section" id="final-price-${index}" style="display: none;"></div>
+                <div class="service-details">
+                    <h4><i class="fas fa-check-circle"></i> What's Included:</h4>
+                    <ul class="inclusions-list">
+                        ${visibleInclusions.map(item => `<li><i class="fas fa-check"></i> ${item}</li>`).join('')}
+                        <div class="hidden-inclusions hidden" id="more-${index}">
+                            ${hiddenInclusions.map(item => `<li><i class="fas fa-check"></i> ${item}</li>`).join('')}
+                        </div>
+                    </ul>
+                    ${hiddenInclusions.length > 0 ? `
+                        <button class="see-more-btn" onclick="toggleInclusions(${index})">
+                            <i class="fas fa-chevron-down"></i> Show More
+                        </button>
+                    ` : ''}
+                </div>
+                <div class="service-info">
+                    <div class="info-item">
+                        <i class="fas fa-clock"></i>
+                        <div>
+                            <span class="label">Duration</span>
+                            <span class="value">${service.time_taken}</span>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-shield-alt"></i>
+                        <div>
+                            <span class="label">Warranty</span>
+                            <span class="value">${service.warranty}</span>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-star"></i>
+                        <div>
+                            <span class="label">Rating</span>
+                            <span class="value">4.8/5</span>
+                        </div>
+                    </div>
+                </div>
+                <button class="book-service-btn" onclick="bookService('${service.name}', ${priceWithCharges}, ${index})">
+                    <i class="fas fa-calendar-check"></i> Book Service Now
+                </button>
+            </div>
+        `;
+        container.appendChild(serviceCard);
+    });
+}
+
+function toggleInclusions(index) {
+    const moreDiv = document.getElementById(`more-${index}`);
+    const button = event.target;
+    if (moreDiv.classList.contains('hidden')) {
+        moreDiv.classList.remove('hidden');
+        button.innerHTML = '<i class="fas fa-chevron-up"></i> Show Less';
+    } else {
+        moreDiv.classList.add('hidden');
+        button.innerHTML = '<i class="fas fa-chevron-down"></i> Show More';
+    }
+}
+
+// ==================== Coupon Functions ====================
+function applyDirectCoupon(serviceIndex, originalPrice) {
+    // Check if mobile number is already collected
+    const storedMobile = localStorage.getItem('userMobile');
+    
+    if (storedMobile && isValidMobile(storedMobile)) {
+        // User already provided mobile, apply coupon directly
+        userMobile = storedMobile;
+        proceedWithCouponApplication(serviceIndex, originalPrice);
+    } else {
+        // Show mobile collection modal
+        showMobileCollectionModal(serviceIndex, originalPrice);
+    }
+}
+
+function proceedWithCouponApplication(serviceIndex, originalPrice) {
+    // Apply the INSTANT500 coupon directly
+    appliedCoupon = { code: 'INSTANT500', discount: 500, serviceIndex: serviceIndex };
+    couponDiscount = 500;
+    
+    // Hide promo section
+    const promoSection = document.getElementById(`coupon-promo-${serviceIndex}`);
+    const appliedBadge = document.getElementById(`coupon-applied-${serviceIndex}`);
+    const manualBtn = document.getElementById(`manual-coupon-btn-${serviceIndex}`);
+    
+    promoSection.style.display = 'none';
+    manualBtn.style.display = 'none';
+    appliedBadge.classList.remove('hidden');
+    
+    // Show celebration animation
+    showCelebration(serviceIndex);
+    
+    // Update final price
+    updateFinalPrice(serviceIndex, originalPrice);
+    
+    // Track event
+    mixpanel.track('Direct Coupon Applied', {
+        'Coupon Code': 'INSTANT500',
+        'Discount Amount': 500,
+        'Service Index': serviceIndex,
+        'Original Price': originalPrice,
+        'Mobile': userMobile,
+        'Timestamp': new Date().toISOString()
+    });
+    
+    // Send to API
+    sendMobileToAPI(userMobile, 'Coupon Applied');
+}
+
+function showMobileCollectionModal(serviceIndex, originalPrice) {
+    // Create mobile collection modal
+    const modal = document.createElement('div');
+    modal.className = 'mobile-collection-modal';
+    modal.id = 'mobileCollectionModal';
+    modal.innerHTML = `
+        <div class="mobile-collection-content">
+            <div class="mobile-collection-header">
+                <div class="coupon-badge-modal">
+                    <i class="fas fa-gift"></i>
+                    <span>₹500 OFF</span>
+                </div>
+                <h3>Unlock Your Coupon!</h3>
+                <p>Enter your mobile number to apply ₹500 discount instantly</p>
+            </div>
+            
+            <div class="mobile-collection-form">
+                <div class="mobile-input-wrapper">
+                    <div class="country-code-modal">+91</div>
+                    <input 
+                        type="tel" 
+                        id="couponMobileInput" 
+                        class="mobile-input-modal" 
+                        placeholder="Enter 10-digit mobile number"
+                        maxlength="10"
+                        pattern="[0-9]{10}"
+                        autocomplete="tel"
+                    >
+                </div>
+                <div class="mobile-error-modal hidden" id="couponMobileError"></div>
+                <button class="apply-with-mobile-btn" id="applyWithMobileBtn">
+                    <i class="fas fa-check-circle"></i> Apply Coupon
+                </button>
+            </div>
+            
+            <div class="mobile-collection-benefits">
+                <div class="benefit-item">
+                    <i class="fas fa-lock"></i>
+                    <span>100% Secure</span>
+                </div>
+                <div class="benefit-item">
+                    <i class="fas fa-bell"></i>
+                    <span>Get Updates</span>
+                </div>
+                <div class="benefit-item">
+                    <i class="fas fa-tag"></i>
+                    <span>Exclusive Offers</span>
+                </div>
+            </div>
+            
+            <button class="close-modal-btn" onclick="closeMobileCollectionModal()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Animate in
+    setTimeout(() => modal.classList.add('show'), 10);
+    
+    // Focus on input
+    setTimeout(() => document.getElementById('couponMobileInput').focus(), 300);
+    
+    // Setup event listeners
+    const mobileInput = document.getElementById('couponMobileInput');
+    const applyBtn = document.getElementById('applyWithMobileBtn');
+    const errorDiv = document.getElementById('couponMobileError');
+    
+    // Input validation
+    mobileInput.addEventListener('input', function() {
+        this.value = this.value.replace(/[^0-9]/g, '');
+        if (this.value.length > 0) {
+            this.classList.remove('error');
+            errorDiv.classList.add('hidden');
+        }
+    });
+    
+    // Enter key submit
+    mobileInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            applyBtn.click();
+        }
+    });
+    
+    // Apply button click
+    applyBtn.addEventListener('click', function() {
+        const mobile = mobileInput.value.trim();
+        
+        // Clear previous errors
+        errorDiv.classList.add('hidden');
+        errorDiv.textContent = '';
+        mobileInput.classList.remove('error');
+        
+        // Validate
+        if (!mobile) {
+            errorDiv.textContent = 'Please enter your mobile number';
+            errorDiv.classList.remove('hidden');
+            mobileInput.classList.add('error');
+            return;
+        }
+        
+        if (!isValidMobile(mobile)) {
+            errorDiv.textContent = 'Please enter a valid 10-digit mobile number (6-9)';
+            errorDiv.classList.remove('hidden');
+            mobileInput.classList.add('error');
+            return;
+        }
+        
+        // Show loading
+        applyBtn.disabled = true;
+        const originalText = applyBtn.innerHTML;
+        applyBtn.innerHTML = '<div class="spinner" style="width: 20px; height: 20px; margin: 0 auto;"></div>';
+        
+        // Save mobile
+        userMobile = mobile;
+        localStorage.setItem('userMobile', mobile);
+        
+        // Identify user in Mixpanel
+        mixpanel.identify(mobile);
+        mixpanel.people.set({
+            "$phone": mobile,
+            "Coupon Interest": true,
+            "Last Seen": new Date().toISOString()
+        });
+        
+        // Track mobile collection
+        mixpanel.track('Mobile Collected via Coupon', {
+            'Mobile': mobile,
+            'Service Index': serviceIndex,
+            'Collection Method': 'Coupon Button',
+            'Timestamp': new Date().toISOString()
+        });
+        
+        // Close modal and apply coupon
+        setTimeout(() => {
+            closeMobileCollectionModal();
+            proceedWithCouponApplication(serviceIndex, originalPrice);
+        }, 800);
+    });
+    
+    // Close on outside click
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            closeMobileCollectionModal();
+        }
+    });
+}
+
+function closeMobileCollectionModal() {
+    const modal = document.getElementById('mobileCollectionModal');
+    if (modal) {
+        modal.classList.remove('show');
+        setTimeout(() => modal.remove(), 300);
+    }
+}
+
+async function sendMobileToAPI(mobile, context) {
+    try {
+        const brand = selectedCar ? selectedCar.brand.name : 'Unknown';
+        const carName = selectedCar ? selectedCar.name : 'Unknown';
+        const message = `Mobile collected via ${context} - Brand: ${brand}, Car: ${carName}, Mobile: ${mobile}`;
+        
+        await fetch('https://ai.instantmechanic.online/bot/service-query/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ mobile: mobile, message: message })
+        });
+    } catch (error) {
+        console.log('API call failed:', error);
+    }
+}
+
+function toggleManualCoupon(serviceIndex) {
+    const inputSection = document.getElementById(`coupon-input-${serviceIndex}`);
+    inputSection.classList.toggle('hidden');
+}
+
+function showCelebration(serviceIndex) {
+    // Create celebration overlay
+    const celebration = document.createElement('div');
+    celebration.className = 'celebration-overlay';
+    celebration.innerHTML = `
+        <div class="celebration-content">
+            <div class="celebration-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h3>Coupon Applied!</h3>
+            <p>You saved <span class="celebration-amount">₹500</span></p>
+            <div class="confetti-container">
+                ${generateConfetti()}
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(celebration);
+    
+    // Animate in
+    setTimeout(() => celebration.classList.add('show'), 10);
+    
+    // Remove after animation
+    setTimeout(() => {
+        celebration.classList.remove('show');
+        setTimeout(() => celebration.remove(), 500);
+    }, 2500);
+    
+    // Play success sound (optional)
+    playSuccessSound();
+}
+
+function generateConfetti() {
+    let confetti = '';
+    const colors = ['#f59e0b', '#10b981', '#2563eb', '#f093fb', '#ff6a00'];
+    for (let i = 0; i < 50; i++) {
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        const left = Math.random() * 100;
+        const delay = Math.random() * 0.5;
+        const duration = 2 + Math.random() * 1;
+        confetti += `<div class="confetti" style="left: ${left}%; background: ${color}; animation-delay: ${delay}s; animation-duration: ${duration}s;"></div>`;
+    }
+    return confetti;
+}
+
+function playSuccessSound() {
+    // Optional: Add a subtle success sound
+    try {
+        const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBiuBzvLZiTQIG2m98OSfTREIXrPp66hVFApGn+DyvmwhBiuBzvLZiTQIG2m98OSfTREIXrPp66hVFApGn+DyvmwhBiuBzvLZiTQIG2m98OSfTREIXrPp66hVFApGn+DyvmwhBiuBzvLZiTQIG2m98OSfTREIXrPp66hVFApGn+DyvmwhBiuBzvLZiTQIG2m98OSfTREIXrPp66hVFApGn+DyvmwhBiuBzvLZiTQIG2m98OSfTREIXrPp66hVFApGn+DyvmwhBiuBzvLZiTQIG2m98OSfTREIXrPp66hVFApGn+DyvmwhBiuBzvLZiTQIG2m98OSfTREIXrPp66hVFApGn+DyvmwhBiuBzvLZiTQIG2m98OSfTREIXrPp66hVFApGn+DyvmwhBiuBzvLZiTQIG2m98OSfTREIXrPp66hVFApGn+DyvmwhBiuBzvLZiTQIG2m98OSfTREIXrPp66hVFApGn+DyvmwhBiuBzvLZiTQIG2m98OSfTREIXrPp66hVFApGn+DyvmwhBiuBzvLZiTQIG2m98OSfTREIXrPp66hVFApGn+DyvmwhBiuBzvLZiTQIG2m98OSfTREIXrPp66hVFApGn+DyvmwhBiuBzvLZiTQIG2m98OSfTREIXrPp66hVFApGn+DyvmwhBiuBzvLZiTQIG2m98OSfTREIXrPp66hVFApGn+DyvmwhBiuBzvLZiTQIG2m98OSfTREIXrPp66hVFApGn+DyvmwhBiuBzvLZiTQIG2m98OSfTREIXrPp66hVFApGn+DyvmwhBiuBzvLZiTQIG2m98OSfTREIXrPp66hVFApGn+DyvmwhBiuBzvLZiTQIG2m98OSfTREIXrPp66hVFA==');
+        audio.volume = 0.3;
+        audio.play().catch(() => {}); // Ignore if autoplay is blocked
+    } catch (e) {}
+}
+
+function toggleCouponSection(serviceIndex) {
+    const couponInput = document.getElementById(`coupon-input-${serviceIndex}`);
+    const couponToggle = document.getElementById(`coupon-toggle-${serviceIndex}`);
+    if (couponInput.classList.contains('active')) {
+        couponInput.classList.remove('active');
+        couponToggle.classList.remove('expanded');
+    } else {
+        couponInput.classList.add('active');
+        couponToggle.classList.add('expanded');
+    }
+}
+
+function applyCoupon(serviceIndex, originalPrice) {
+    const couponInput = document.getElementById(`coupon-code-${serviceIndex}`);
+    const applyBtn = document.getElementById(`apply-btn-${serviceIndex}`);
+    const messageDiv = document.getElementById(`coupon-message-${serviceIndex}`);
+    const couponCode = couponInput.value.trim().toUpperCase();
+    
+    couponInput.classList.remove('success', 'error');
+    messageDiv.innerHTML = '';
+    
+    if (!couponCode) {
+        showCouponMessage(serviceIndex, 'Please enter a coupon code', 'error');
+        couponInput.classList.add('error');
+        return;
+    }
+    
+    applyBtn.disabled = true;
+    applyBtn.innerHTML = '<div class="spinner" style="width: 16px; height: 16px; margin: 0;"></div>';
+    
+    setTimeout(() => {
+        if (couponCode === 'INSTANT500') {
+            appliedCoupon = { code: couponCode, discount: 500, serviceIndex: serviceIndex };
+            couponDiscount = 500;
+            couponInput.classList.add('success');
+            showCouponMessage(serviceIndex, 'Coupon applied successfully! ₹500 discount added.', 'success');
+            showCouponSavings(serviceIndex, 500);
+            updateFinalPrice(serviceIndex, originalPrice);
+            mixpanel.track('Coupon Applied Successfully', {
+                'Coupon Code': couponCode,
+                'Discount Amount': 500,
+                'Service Index': serviceIndex,
+                'Original Price': originalPrice,
+                'Mobile': userMobile,
+                'Timestamp': new Date().toISOString()
+            });
+            applyBtn.style.display = 'none';
+            couponInput.disabled = true;
+        } else {
+            couponInput.classList.add('error');
+            showCouponMessage(serviceIndex, 'Invalid coupon code. Please try again.', 'error');
+            mixpanel.track('Coupon Application Failed', {
+                'Coupon Code': couponCode,
+                'Service Index': serviceIndex,
+                'Mobile': userMobile,
+                'Timestamp': new Date().toISOString()
+            });
+        }
+        applyBtn.disabled = false;
+        applyBtn.innerHTML = 'Apply';
+    }, 1000);
+}
+
+function showCouponMessage(serviceIndex, message, type) {
+    const messageDiv = document.getElementById(`coupon-message-${serviceIndex}`);
+    const icon = type === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-circle';
+    messageDiv.innerHTML = `<i class="${icon}"></i> ${message}`;
+    messageDiv.className = `coupon-message ${type}`;
+}
+
+function showCouponSavings(serviceIndex, savings) {
+    const savingsDiv = document.getElementById(`coupon-savings-${serviceIndex}`);
+    savingsDiv.innerHTML = `🎉 You saved ₹${savings} with this coupon!`;
+    savingsDiv.style.display = 'block';
+}
+
+function updateFinalPrice(serviceIndex, originalPrice) {
+    const finalPriceDiv = document.getElementById(`final-price-${serviceIndex}`);
+    const basePrice = originalPrice + 300;
+    const finalPrice = basePrice - couponDiscount;
+    finalPriceDiv.innerHTML = `
+        <div class="price-breakdown">
+            <div class="price-row">
+                <span>Service Price:</span>
+                <span>₹${basePrice}</span>
+            </div>
+
+            ${couponDiscount > 0 ? `
+            <div class="price-row">
+                <span class="discount">Coupon Discount (${appliedCoupon.code}):</span>
+                <span class="discount">-₹${couponDiscount}</span>
+            </div>` : ''}
+            <div class="price-row total">
+                <span>Final Amount:</span>
+                <span>₹${finalPrice}</span>
+            </div>
+        </div>
+    `;
+    finalPriceDiv.style.display = 'block';
+}
+
+// ==================== Booking ====================
+function bookService(serviceName, basePrice, serviceIndex) {
+    let finalPrice = basePrice;
+    if (appliedCoupon && appliedCoupon.serviceIndex === serviceIndex) {
+        finalPrice = basePrice - couponDiscount;
+    }
+    selectedService = {
+        name: serviceName,
+        basePrice: basePrice,
+        finalPrice: finalPrice,
+        couponApplied: appliedCoupon ? appliedCoupon.code : null,
+        discountAmount: couponDiscount
+    };
+    proceedWithBooking();
+}
+
+async function proceedWithBooking() {
+    const brand = localStorage.getItem("brand");
+    const carName = localStorage.getItem("carName");
+    
+    try {
+        document.getElementById('loadingState').classList.remove('hidden');
+        updateSectionTitle('Processing Your Booking...', 'Please wait while we confirm your service booking');
+        
+        let bookingMessage = `Service Booking: ${selectedService.name} for ${brand} ${carName}`;
+        if (selectedService.couponApplied) {
+            bookingMessage += ` - Original Price: ₹${selectedService.basePrice} - Coupon Applied: ${selectedService.couponApplied} (₹${selectedService.discountAmount} discount) - Final Price: ₹${selectedService.finalPrice}`;
+        } else {
+            bookingMessage += ` - Price: ₹${selectedService.finalPrice}`;
+        }
+        
+        await fetch('https://ai.instantmechanic.online/bot/service-query/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ mobile: userMobile, message: bookingMessage })
+        });
+        
+        const trackingData = {
+            'Service': selectedService.name,
+            'Brand': brand,
+            'Car Model': carName,
+            'Base Price': selectedService.basePrice,
+            'Final Price': selectedService.finalPrice,
+            'Mobile': userMobile,
+            'Booking Status': 'Confirmed',
+            'Timestamp': new Date().toISOString()
         };
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('animate');
-                }
-            });
-        }, observerOptions);
-
-        // Observe all elements with animate-on-scroll class
-        document.querySelectorAll('.animate-on-scroll').forEach(el => {
-            observer.observe(el);
-        });
-
-        // Chat bubble animation
-        function animateChat() {
-            const bubbles = document.querySelectorAll('.chat-bubble');
-            bubbles.forEach((bubble, index) => {
-                setTimeout(() => {
-                    bubble.style.opacity = '1';
-                    bubble.style.transform = 'translateX(0)';
-                }, index * 800);
+        
+        if (selectedService.couponApplied) {
+            trackingData['Coupon Used'] = selectedService.couponApplied;
+            trackingData['Discount Amount'] = selectedService.discountAmount;
+            trackingData['Coupon Savings'] = selectedService.discountAmount;
+        }
+        
+        mixpanel.track('Service Booking Confirmed', trackingData);
+        
+        if (typeof fbq !== 'undefined') {
+            fbq('track', 'Purchase', {
+                content_name: selectedService.name,
+                content_category: 'Car Service',
+                value: selectedService.finalPrice,
+                currency: 'INR'
             });
         }
-
-        // Start chat animation when hero is visible
-        const heroObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    setTimeout(animateChat, 1000);
-                    heroObserver.unobserve(entry.target);
-                }
-            });
+        
+        document.getElementById('loadingState').classList.add('hidden');
+        showSuccessPage();
+    } catch (error) {
+        document.getElementById('loadingState').classList.add('hidden');
+        mixpanel.track('Service Booking Error', {
+            'Service': selectedService.name,
+            'Brand': brand,
+            'Car Model': carName,
+            'Mobile': userMobile,
+            'Error': error.message,
+            'Timestamp': new Date().toISOString()
         });
+        alert('Booking failed. Please try again or contact us directly.');
+    }
+}
 
-        heroObserver.observe(document.querySelector('.hero'));
+function showSuccessPage() {
+    const brand = localStorage.getItem("brand");
+    const carName = localStorage.getItem("carName");
+    const detailsContainer = document.getElementById('bookingDetails');
+    
+    let detailsHTML = `
+        <div class="detail-row">
+            <span class="detail-label">Service:</span>
+            <span class="detail-value">${selectedService.name}</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">Vehicle:</span>
+            <span class="detail-value">${brand} ${carName}</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">Mobile:</span>
+            <span class="detail-value">+91 ${userMobile}</span>
+        </div>`;
+    
+    if (selectedService.couponApplied) {
+        detailsHTML += `
+        <div class="detail-row">
+            <span class="detail-label">Base Price:</span>
+            <span class="detail-value">₹${selectedService.basePrice}</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">Coupon Applied:</span>
+            <span class="detail-value">${selectedService.couponApplied} (-₹${selectedService.discountAmount})</span>
+        </div>`;
+    }
+    
+    detailsHTML += `
+        <div class="detail-row">
+            <span class="detail-label">Final Price:</span>
+            <span class="detail-value">₹${selectedService.finalPrice}</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">Booking ID:</span>
+            <span class="detail-value">#IM${Date.now().toString().slice(-6)}</span>
+        </div>`;
+    
+    detailsContainer.innerHTML = detailsHTML;
+    
+    let message = `Hi Instant Mechanic team! 👋\n\nMy service booking details:\n🔧 Service: ${selectedService.name}\n🚗 Vehicle: ${brand} ${carName}`;
+    if (selectedService.couponApplied) {
+        message += `\n💰 Base Price: ₹${selectedService.basePrice}\n🎟️ Coupon: ${selectedService.couponApplied} (₹${selectedService.discountAmount} off)\n💵 Final Price: ₹${selectedService.finalPrice}`;
+    } else {
+        message += `\n💰 Price: ₹${selectedService.finalPrice}`;
+    }
+    message += `\n📱 Mobile: ${userMobile}\n\nPlease confirm my appointment. Thank you!`;
+    
+    document.getElementById('whatsappLink').href = `https://wa.me/919266961110?text=${encodeURIComponent(message)}`;
+    document.getElementById('successPage').classList.add('show');
+}
 
-        // Add click tracking for demo buttons
-        document.querySelectorAll('a[href*="wa.me"]').forEach(button => {
-            button.addEventListener('click', function() {
-                // You can add analytics tracking here
-                console.log('Demo button clicked');
-            });
-        });
+// ==================== Scratch Card ====================
+function openHeaderCouponPopup() {
+    // Check if mobile is already collected
+    const storedMobile = localStorage.getItem('userMobile');
+    
+    if (storedMobile && isValidMobile(storedMobile)) {
+        // User already provided mobile, show scratch card directly
+        userMobile = storedMobile;
+        openCouponPopup();
+    } else {
+        // Show mobile collection modal first
+        showHeaderMobileCollection();
+    }
+}
 
-        // Parallax effect for hero background
-        window.addEventListener('scroll', () => {
-            const scrolled = window.pageYOffset;
-            const hero = document.querySelector('.hero');
-            const heroBackground = hero.querySelector('::before');
+function showHeaderMobileCollection() {
+    // Create mobile collection modal for header coupon
+    const modal = document.createElement('div');
+    modal.className = 'mobile-collection-modal';
+    modal.id = 'headerMobileModal';
+    modal.innerHTML = `
+        <div class="mobile-collection-content">
+            <div class="mobile-collection-header">
+                <div class="coupon-badge-modal">
+                    <i class="fas fa-gift"></i>
+                    <span>₹500 OFF Coupon</span>
+                </div>
+                <h3>Get Your Exclusive Coupon!</h3>
+                <p>Enter your mobile number to unlock ₹500 discount code</p>
+            </div>
             
-            if (scrolled < hero.offsetHeight) {
-                hero.style.transform = `translateY(${scrolled * 0.5}px)`;
-            }
-        });
-
-        // Dynamic stats counter animation
-        function animateCounter(element, target) {
-            const start = 0;
-            const duration = 2000;
-            const startTime = performance.now();
-
-            function updateCounter(currentTime) {
-                const elapsed = currentTime - startTime;
-                const progress = Math.min(elapsed / duration, 1);
-                const current = Math.floor(progress * target);
-                
-                element.textContent = current.toLocaleString();
-                
-                if (progress < 1) {
-                    requestAnimationFrame(updateCounter);
-                }
-            }
+            <div class="mobile-collection-form">
+                <div class="mobile-input-wrapper">
+                    <div class="country-code-modal">+91</div>
+                    <input 
+                        type="tel" 
+                        id="headerMobileInput" 
+                        class="mobile-input-modal" 
+                        placeholder="Enter 10-digit mobile number"
+                        maxlength="10"
+                        pattern="[0-9]{10}"
+                        autocomplete="tel"
+                    >
+                </div>
+                <div class="mobile-error-modal hidden" id="headerMobileError"></div>
+                <button class="apply-with-mobile-btn" id="headerApplyBtn">
+                    <i class="fas fa-gift"></i> Get Coupon Code
+                </button>
+            </div>
             
-            requestAnimationFrame(updateCounter);
+            <div class="mobile-collection-benefits">
+                <div class="benefit-item">
+                    <i class="fas fa-lock"></i>
+                    <span>100% Secure</span>
+                </div>
+                <div class="benefit-item">
+                    <i class="fas fa-tag"></i>
+                    <span>Instant Discount</span>
+                </div>
+                <div class="benefit-item">
+                    <i class="fas fa-star"></i>
+                    <span>Exclusive Deals</span>
+                </div>
+            </div>
+            
+            <button class="close-modal-btn" onclick="closeHeaderMobileModal()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Animate in
+    setTimeout(() => modal.classList.add('show'), 10);
+    
+    // Focus on input
+    setTimeout(() => document.getElementById('headerMobileInput').focus(), 300);
+    
+    // Setup event listeners
+    const mobileInput = document.getElementById('headerMobileInput');
+    const applyBtn = document.getElementById('headerApplyBtn');
+    const errorDiv = document.getElementById('headerMobileError');
+    
+    // Input validation
+    mobileInput.addEventListener('input', function() {
+        this.value = this.value.replace(/[^0-9]/g, '');
+        if (this.value.length > 0) {
+            this.classList.remove('error');
+            errorDiv.classList.add('hidden');
         }
-
-        // Animate dashboard stats when visible
-        const statsObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const statNumbers = entry.target.querySelectorAll('.stat-number');
-                    statNumbers.forEach(stat => {
-                        const text = stat.textContent;
-                        const number = parseInt(text.replace(/[^\d]/g, ''));
-                        if (number) {
-                            animateCounter(stat, number);
-                        }
-                    });
-                    statsObserver.unobserve(entry.target);
-                }
-            });
-        });
-
-        const dashboardStats = document.querySelector('.dashboard-stats');
-        if (dashboardStats) {
-            statsObserver.observe(dashboardStats);
+    });
+    
+    // Enter key submit
+    mobileInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            applyBtn.click();
         }
-
-        // Preload WhatsApp links for faster loading
-        document.addEventListener('DOMContentLoaded', function() {
-            const whatsappLinks = document.querySelectorAll('a[href*="wa.me"]');
-            whatsappLinks.forEach(link => {
-                const preloadLink = document.createElement('link');
-                preloadLink.rel = 'preload';
-                preloadLink.href = link.href;
-                preloadLink.as = 'document';
-                document.head.appendChild(preloadLink);
-            });
+    });
+    
+    // Apply button click
+    applyBtn.addEventListener('click', function() {
+        const mobile = mobileInput.value.trim();
+        
+        // Clear previous errors
+        errorDiv.classList.add('hidden');
+        errorDiv.textContent = '';
+        mobileInput.classList.remove('error');
+        
+        // Validate
+        if (!mobile) {
+            errorDiv.textContent = 'Please enter your mobile number';
+            errorDiv.classList.remove('hidden');
+            mobileInput.classList.add('error');
+            return;
+        }
+        
+        if (!isValidMobile(mobile)) {
+            errorDiv.textContent = 'Please enter a valid 10-digit mobile number (6-9)';
+            errorDiv.classList.remove('hidden');
+            mobileInput.classList.add('error');
+            return;
+        }
+        
+        // Show loading
+        applyBtn.disabled = true;
+        const originalText = applyBtn.innerHTML;
+        applyBtn.innerHTML = '<div class="spinner" style="width: 20px; height: 20px; margin: 0 auto;"></div>';
+        
+        // Save mobile
+        userMobile = mobile;
+        localStorage.setItem('userMobile', mobile);
+        
+        // Identify user in Mixpanel
+        mixpanel.identify(mobile);
+        mixpanel.people.set({
+            "$phone": mobile,
+            "Header Coupon Interest": true,
+            "Last Seen": new Date().toISOString()
         });
-    </script>
+        
+        // Track mobile collection
+        mixpanel.track('Mobile Collected via Header Coupon', {
+            'Mobile': mobile,
+            'Collection Method': 'Header Button',
+            'Page': 'Service Selection',
+            'Timestamp': new Date().toISOString()
+        });
+        
+        // Send to API
+        sendMobileToAPI(mobile, 'Header Coupon Button');
+        
+        // Close modal and show scratch card
+        setTimeout(() => {
+            closeHeaderMobileModal();
+            openCouponPopup();
+        }, 800);
+    });
+    
+    // Close on outside click
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            closeHeaderMobileModal();
+        }
+    });
+}
+
+function closeHeaderMobileModal() {
+    const modal = document.getElementById('headerMobileModal');
+    if (modal) {
+        modal.classList.remove('show');
+        setTimeout(() => modal.remove(), 300);
+    }
+}
+
+function initScratchCard() {
+    canvas = document.getElementById('scratchCanvas');
+    if (!canvas) return;
+    ctx = canvas.getContext('2d');
+    const container = canvas.parentElement;
+    canvas.width = container.offsetWidth;
+    canvas.height = container.offsetHeight;
+    
+    ctx.fillStyle = '#e0e0e0';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#c0c0c0';
+    ctx.font = 'bold 16px Arial';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('🎁 SCRATCH HERE 🎁', canvas.width / 2, canvas.height / 2);
+    
+    for (let i = 0; i < 15; i++) {
+        ctx.beginPath();
+        ctx.arc(Math.random() * canvas.width, Math.random() * canvas.height, 3, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+        ctx.fill();
+    }
+    
+    canvas.addEventListener('mousedown', startScratch);
+    canvas.addEventListener('mousemove', scratch);
+    canvas.addEventListener('mouseup', endScratch);
+    canvas.addEventListener('mouseleave', endScratch);
+    canvas.addEventListener('touchstart', startScratch);
+    canvas.addEventListener('touchmove', scratch);
+    canvas.addEventListener('touchend', endScratch);
+}
+
+function startScratch(e) {
+    e.preventDefault();
+    isDrawing = true;
+    scratch(e);
+}
+
+function scratch(e) {
+    if (!isDrawing) return;
+    e.preventDefault();
+    const rect = canvas.getBoundingClientRect();
+    const x = (e.clientX || e.touches[0].clientX) - rect.left;
+    const y = (e.clientY || e.touches[0].clientY) - rect.top;
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.beginPath();
+    ctx.arc(x, y, 20, 0, Math.PI * 2);
+    ctx.fill();
+    checkScratchComplete();
+}
+
+function endScratch() {
+    isDrawing = false;
+}
+
+function checkScratchComplete() {
+    if (scratchRevealed) return;
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const pixels = imageData.data;
+    let transparent = 0;
+    for (let i = 3; i < pixels.length; i += 4) {
+        if (pixels[i] === 0) transparent++;
+    }
+    const percentScratched = (transparent / (pixels.length / 4)) * 100;
+    if (percentScratched > 50) {
+        scratchRevealed = true;
+        revealCoupon();
+    }
+}
+
+function revealCoupon() {
+    canvas.style.transition = 'opacity 0.5s';
+    canvas.style.opacity = '0';
+    setTimeout(() => {
+        canvas.style.display = 'none';
+        document.getElementById('scratchText').innerHTML = '<i class="fas fa-check-circle"></i> Code Revealed!';
+        mixpanel.track('Coupon Scratch Completed', {
+            'Coupon Code': 'INSTANT500',
+            'Mobile': userMobile,
+            'Timestamp': new Date().toISOString()
+        });
+    }, 500);
+}
+
+function openCouponPopup() {
+    const modal = document.getElementById('couponModal');
+    modal.classList.add('show');
+    scratchRevealed = false;
+    setTimeout(() => initScratchCard(), 100);
+    mixpanel.track('Scratch Card Opened', {
+        'Mobile': userMobile,
+        'Has Mobile': userMobile ? true : false,
+        'Source': 'Header Button',
+        'Timestamp': new Date().toISOString()
+    });
+}
+
+function closeCouponPopup() {
+    document.getElementById('couponModal').classList.remove('show');
+    document.getElementById('copyMsg').innerText = '';
+}
+
+function copyCoupon() {
+    const code = 'INSTANT500';
+    navigator.clipboard.writeText(code).then(() => {
+        document.getElementById('copyMsg').innerText = "✅ Coupon code copied!";
+        mixpanel.track('Coupon Code Copied', {
+            'Coupon Code': code,
+            'Mobile': userMobile,
+            'Timestamp': new Date().toISOString()
+        });
+        setTimeout(() => closeCouponPopup(), 1500);
+    });
+}
+
+document.getElementById('couponModal').addEventListener('click', function(e) {
+    if (e.target === this) closeCouponPopup();
+});
+
+// ==================== Progress & UI Updates ====================
+function updateProgress(step) {
+    currentStep = step;
+    for (let i = 1; i <= 4; i++) {
+        const stepElement = document.getElementById(`step${i}`);
+        stepElement.classList.remove('active', 'completed');
+        if (i < step) {
+            stepElement.classList.add('completed');
+            stepElement.innerHTML = '<i class="fas fa-check"></i>';
+        } else if (i === step) {
+            stepElement.classList.add('active');
+            stepElement.innerHTML = i;
+        } else {
+            stepElement.innerHTML = i;
+        }
+    }
+    const progressLine = document.getElementById('progressLine');
+    progressLine.style.width = `${((step - 1) / 3) * 100}%`;
+}
+
+function updateSectionTitle(title, subtitle) {
+    document.getElementById('sectionTitle').innerHTML = `
+        <h1 class="fade-in">${title}</h1>
+        <p class="fade-in">${subtitle}</p>
+    `;
+}
+
+window.addEventListener('beforeunload', function(e) {
+    if (currentStep > 1) {
+        e.preventDefault();
+        e.returnValue = 'Are you sure you want to leave? Your progress will be lost.';
+    }
+});
+</script>
 </body>
 </html>
