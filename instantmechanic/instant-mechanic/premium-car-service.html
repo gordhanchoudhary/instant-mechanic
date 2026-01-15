@@ -2060,43 +2060,41 @@
             };
 
             try {
-                const response = await fetch(apiUrl, { method: "GET", headers: headers });
-                const data = await response.json();
-                
-                document.getElementById('loadingState').classList.add('hidden');
-                
-                if (data.status && data.data.length > 0) {
-                    const services = data.data[0].services;
-                    
-                    // Filter to only show "Standard Service"
-                    const standardService = services.find(service => 
-                        service.name && service.name.toLowerCase().includes('standard')
-                    );
-                    
-                    if (standardService) {
-                        const extractedServices = [{
-                            name: standardService.name || "N/A",
-                            service_tag: standardService.service_tag || "Every 3 Month",
-                            price: standardService.package_details[0].strikethrough || "N/A",
-                            discounted_price: standardService.package_details[0].total || "N/A",
-                            image: getServiceImage(standardService.name),
-                            description: standardService.desc_details || {},
-                            inclusion: standardService.desc_details?.inclusion || [],
-                            time_taken: standardService.desc_details?.time_taken || "N/A",
-                            warranty: standardService.desc_details?.warranty || "N/A"
-                        }];
+    const response = await fetch(apiUrl, { method: "GET", headers: headers });
+    const data = await response.json();
+    
+    document.getElementById('loadingState').classList.add('hidden');
+    
+    if (data.status && data.data.length > 0) {
+        const services = data.data[0].services;
 
-                        displayServices(extractedServices);
-                    } else {
-                        displayNoServicesMessage();
-                    }
-                } else {
-                    displayNoServicesMessage();
-                }
-            } catch (error) {
-                document.getElementById('loadingState').classList.add('hidden');
-                displayErrorMessage();
-            }
+        if (services && services.length > 0) {
+
+            const extractedServices = services.map(service => ({
+                name: service.name || "N/A",
+                service_tag: service.service_tag || "Every 3 Month",
+                price: service.package_details?.[0]?.strikethrough || "N/A",
+                discounted_price: service.package_details?.[0]?.total || "N/A",
+                image: getServiceImage(service.name),
+                description: service.desc_details || {},
+                inclusion: service.desc_details?.inclusion || [],
+                time_taken: service.desc_details?.time_taken || "N/A",
+                warranty: service.desc_details?.warranty || "N/A"
+            }));
+
+            displayServices(extractedServices);
+
+        } else {
+            displayNoServicesMessage();
+        }
+    } else {
+        displayNoServicesMessage();
+    }
+} catch (error) {
+    document.getElementById('loadingState').classList.add('hidden');
+    displayErrorMessage();
+}
+
         }
 
         // Display no services message
