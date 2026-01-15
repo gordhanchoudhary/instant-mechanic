@@ -2343,7 +2343,10 @@ document.getElementById('couponModal').addEventListener('click', function(e) {
 
         // Initialize application
         document.addEventListener('DOMContentLoaded', function() {
+            console.log("******************11************)
             initializeTracking();
+            console.log("******************12************)
+
             
             Promise.all([loadBrandData(), loadCarData()]).then(() => {
                 if (!checkDirectAccess()) {
