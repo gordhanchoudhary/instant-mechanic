@@ -2055,7 +2055,7 @@
             
             const headers = {
                 "Accept": "*/*",
-                "Authorization": "Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJiNGJjM2NhZjVkMWVhOTlkYzk2YjQzM2NjYzQzMDI0ZTAyM2I0MGM2YjQ5ZjExN2JjMDk5OGY2MWU3ZDI1ZjM2MTU1YWU5ZDIxNjE2ZTc5NSIsImV4cCI6MTc3MTA2OTMxNi4wLCJhdWQiOiIzIiwic2NvcGVzIjpbXSwiaWF0IjoxNzY4NDc3MzE2LjAsInN1YiI6IjE3Njg0NzczMTY3MiIsIm5iZiI6MTc2ODQ3NzMxNi4wfQ.Ko0LyX_QvqLdLgx-3qbgRDFXycG1P4eQnPPNbTJQQSh9hHnnTE6yK172TqH8k-2-3Hsj88GvEZyb_KB0loU-ROG6Esn2JSm-_FQx6Wqy5aO2j3gW-4-ceSwEbC1hXS4raN9Tq9DlL8Gn_L3i9Y-7B7T98MiulCV21WOiVq8Y-O_jk-mS-9KJDHdahxcfLCAxla6fCmAVGNq7zBj6wiAHcpJABUl4go5ZjGdzGHtYe_HQLC_6ckY6VNVlJZX2z-30e3dZDMmrPxcD_oexwgvqgL5VyoMBFInp1JnlFCvOPGb4n1UqVufIHA6JPy11ocoDFTaUgmM2Pj6UMhfQ3S8JR806f9PBx91Z3ZZ9xKAXCUZeAYq6bJAk3ideIpwg5b8n63phZCAKBVVU-zxYx0pnueycudoqriY841vOGjPSU5ALoDCATKriJ0ODL7mDqldRFm16hXL9U2lmOw8O1OKFrJq-19EDYXfo_nyfWo3bvOE2Qd8olPoZ0wrKKTBlIRypEmFmcZxXpp5DUwF5eIFZ0pRs9M-sQvUj55D7-8VVwUqJKYebRmi6PjDkKynpni2Z2ySJue9q0q5yScF_6D-42CzAcCzO6UxvmChQ_dxyL3swkUQX2VqsMcu7CJwrUivALLKzR_RNl1nFRJ_q-Cr4i31L3rPrrh-r4vV3SynemN4",
+                "Authorization": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJuYmYiOjE3NjQ5MjkwNzkuMCwiaWF0IjoxNzY0OTI5MDc5LjAsInNjb3BlcyI6W10sInN1YiI6IjE3NjQ5MjkwNzk5MiIsImF1ZCI6IjMiLCJqdGkiOiJiNGJjM2NhZjVkMWVhOTlkYzk2YjQzM2NjYzQzMDI0ZTAyM2I0MGM2YjQ5ZjExN2JjMDk5OGY2MWU3ZDI1ZjM2MTU1YWU5ZDIxNjE2ZTc5NSIsImV4cCI6MTc2NzUyMTA3OS4wfQ.syWvrIh8fXaKNWChxTtahaYWisDM4ubyHCq5hu27LJg0M3dcE5wPyDv0r7aIWtNiQrSn9_HvlHE7e31CUymXLjmBPSAKDREix-8qDWjVq4A6ircHgk6uB3qPrcJcBzkiCTf06kIjLYWPV2nlhcAI8ZICdidlZbJ4yJaItHnoWwDhXwn65uMXIdMAvccbje6MCUxSFlSKw4owfeSHjUZMitM-fODJYPCyR2a3GR-hDY-dBLVdrqqdae-mZzSbpyi6JcXiHlvve13mr4ajTWVspnc9R4wpG8gLHdjjXEvGrtPAPoqyY34w29KG3oNqZUe8VkyzDX9ydNgO9hJ4Qk3D_lksRFGIJZZQyHC9XQryZsnhP4318rknrjOKahed8ihH-VQC-CgWPHJ7ymvelrZh16xaTjSQPiB2daldAa3CZhke1frJ-3FgghtTZfqnNKCcberAbRiud7CMNaD1EKxVY3pKr-aNqrHK8_vtgCeq1AnBK0q5BKEfyxsZG5n1khar1AeWnxQdXY0_I_qFueoNtCK7HRWs7wniVuulZJzX-RTi-jEQX5Ft70E1XYhuhV6pZ85YKsceT3TZfYzTNSihNbVsPYhUdIeKEQ2MV0JokbFNLA-QhlfRQNCgvAO6mLBn35S-QOxFNSbHxPD2ekHsBrpcZ6NdyZOVZ-yczUy7duM",
                 "Content-Type": "application/json"
             };
 
@@ -2072,7 +2072,6 @@
                     const standardService = services.find(service => 
                         service.name && service.name.toLowerCase().includes('standard')
                     );
-
                     
                     if (standardService) {
                         const extractedServices = [{
