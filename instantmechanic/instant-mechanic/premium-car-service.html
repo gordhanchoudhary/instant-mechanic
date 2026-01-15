@@ -283,6 +283,97 @@
             font-family: 'Poppins', sans-serif;
         }
 
+        /* Coupon Button */
+.coupon-button {
+    background: linear-gradient(135deg, #ff6a00, #ff3d00);
+    color: #fff;
+    padding: 12px 22px;
+    border-radius: 30px;
+    font-weight: 600;
+    text-decoration: none;
+    animation: pulseGlow 1.8s infinite;
+    box-shadow: 0 0 0 rgba(255, 106, 0, 0.7);
+}
+
+@keyframes pulseGlow {
+    0% {
+        box-shadow: 0 0 0 0 rgba(255, 106, 0, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 14px rgba(255, 106, 0, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(255, 106, 0, 0);
+    }
+}
+
+/* Modal Background */
+.coupon-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Modal Box */
+.coupon-content {
+    background: #fff;
+    padding: 25px;
+    width: 320px;
+    text-align: center;
+    border-radius: 16px;
+    animation: slideUp 0.4s ease;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(40px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.close-btn {
+    position: absolute;
+    right: 18px;
+    top: 12px;
+    font-size: 22px;
+    cursor: pointer;
+}
+
+.coupon-code {
+    background: #f3f4f6;
+    padding: 12px;
+    margin: 15px 0;
+    font-size: 20px;
+    font-weight: bold;
+    border-radius: 10px;
+    letter-spacing: 1px;
+}
+
+.copy-btn {
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.copy-msg {
+    margin-top: 10px;
+    font-size: 14px;
+    color: green;
+}
+
+
         .section-title p {
             font-size: 0.95rem;
             color: var(--gray-600);
@@ -1461,8 +1552,10 @@
                     <a href="#contact">Contact</a>
                 </nav>
                 
-                <a href="tel:+919266961110" class="cta-button">
-                    <i class="fas fa-phone"></i> Call Now
+
+
+                <a href="javascript:void(0)" class="coupon-button" onclick="openCouponPopup()">
+                    🎁 Get ₹500 OFF
                 </a>
             </div>
         </div>
@@ -2637,5 +2730,42 @@
             }
         });
     </script>
+
+    <div id="couponModal" class="coupon-modal">
+    <div class="coupon-content">
+        <span class="close-btn" onclick="closeCouponPopup()">×</span>
+        
+        <h2>🎉 Coupon Unlocked!</h2>
+        <p>Use this code at checkout</p>
+
+        <div class="coupon-code" id="couponCode">
+            INSTANT500
+        </div>
+
+        <button class="copy-btn" onclick="copyCoupon()">
+            Copy Code
+        </button>
+
+        <p class="copy-msg" id="copyMsg"></p>
+    </div>
+</div>
+
+    <script>
+function openCouponPopup() {
+    document.getElementById('couponModal').style.display = 'flex';
+}
+
+function closeCouponPopup() {
+    document.getElementById('couponModal').style.display = 'none';
+}
+
+function copyCoupon() {
+    const code = document.getElementById('couponCode').innerText;
+    navigator.clipboard.writeText(code);
+    document.getElementById('copyMsg').innerText = "✅ Coupon copied!";
+}
+</script>
+
+
 </body>
 </html>
