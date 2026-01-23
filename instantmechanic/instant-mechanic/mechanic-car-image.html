@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mechanic Image Upload Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        .stat-value {
+            font-size: 36px;
+            font-weight: bold;
+        }
+
+        .stat-card.total .stat-value { color: #667eea; }
+        .stat-card.with-image .stat-value { color: #10b981; }
+        .stat-card.without-image .stat-value { color: #ef4444; }
+        .stat-card.rate .stat-value { color: #f59e0b; }
+
+        .filters {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .filter-group label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .filter-group input,
+        .filter-group select {
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .filter-group input:focus,
+        .filter-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .bookings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .booking-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s;
+        }
+
+        .booking-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .image-container {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .no-image {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #9ca3af;
+        }
+
+        .no-image svg {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 10px;
+        }
+
+        .image-status {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .status-uploaded {
+            background: #10b981;
+        }
+
+        .status-missing {
+            background: #ef4444;
+        }
+
+        .booking-details {
+            padding: 20px;
+        }
+
+        .car-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .detail-label {
+            color: #666;
+            font-weight: 500;
+        }
+
+        .detail-value {
+            color: #333;
+            font-weight: 600;
+        }
+
+        .problem {
+            background: #f3f4f6;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-size: 13px;
+            color: #555;
+        }
+
+        .mechanic-name {
+            background: #667eea;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .loading-spinner {
+            border: 4px solid #f3f4f6;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 60px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            color: #666;
+        }
+
+        @media (max-width: 768px) {
+            .bookings-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 22px;
+            }
+            
+            .stat-value {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🔧 Mechanic Image Upload Tracker</h1>
+            <p>Monitor which mechanics are uploading car images for bookings</p>
+        </div>
+
+        <!-- Statistics -->
+        <div class="stats-grid">
+            <div class="stat-card total">
+                <div class="stat-label">Total Bookings</div>
+                <div class="stat-value" id="totalBookings">0</div>
+            </div>
+            <div class="stat-card with-image">
+                <div class="stat-label">With Images</div>
+                <div class="stat-value" id="withImages">0</div>
+            </div>
+            <div class="stat-card without-image">
+                <div class="stat-label">Without Images</div>
+                <div class="stat-value" id="withoutImages">0</div>
+            </div>
+            <div class="stat-card rate">
+                <div class="stat-label">Upload Rate</div>
+                <div class="stat-value" id="uploadRate">0%</div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters">
+            <div class="filter-grid">
+                <div class="filter-group">
+                    <label for="dateFilter">📅 Select Date</label>
+                    <input type="date" id="dateFilter">
+                </div>
+                <div class="filter-group">
+                    <label for="mechanicFilter">👨‍🔧 Filter by Mechanic</label>
+                    <select id="mechanicFilter">
+                        <option value="all">All Mechanics</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="searchFilter">🔍 Search</label>
+                    <input type="text" id="searchFilter" placeholder="Car, mobile, problem...">
+                </div>
+            </div>
+        </div>
+
+        <!-- Bookings Grid -->
+        <div id="bookingsContainer">
+            <div class="loading">
+                <div class="loading-spinner"></div>
+                <p>Loading bookings...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let allBookings = [];
+
+        // Set today's date as default
+        document.getElementById('dateFilter').valueAsDate = new Date();
+
+        // Fetch bookings on load
+        fetchBookings();
+
+        // Event listeners
+        document.getElementById('dateFilter').addEventListener('change', fetchBookings);
+        document.getElementById('mechanicFilter').addEventListener('change', filterBookings);
+        document.getElementById('searchFilter').addEventListener('input', filterBookings);
+
+        async function fetchBookings() {
+            const date = document.getElementById('dateFilter').value;
+            const container = document.getElementById('bookingsContainer');
+            
+            container.innerHTML = `
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <p>Loading bookings...</p>
+                </div>
+            `;
+
+            try {
+                const response = await fetch(
+                    `https://ai.instantmechanic.online/bot/api/booking/by-date/?date=${date}`,
+                    {
+                        headers: {
+                            'Accept': '*/*',
+                            'Origin': 'https://instantmechanic.online',
+                            'Referer': 'https://instantmechanic.online/',
+                        }
+                    }
+                );
+
+                const data = await response.json();
+                
+                // Filter only non-cancelled bookings
+                allBookings = data.filter(booking => booking.is_cancelled === false);
+                
+                // Update mechanics dropdown
+                updateMechanicsFilter();
+                
+                // Display bookings
+                filterBookings();
+                
+            } catch (error) {
+                console.error('Error fetching bookings:', error);
+                container.innerHTML = `
+                    <div class="no-results">
+                        <h2>❌ Error loading bookings</h2>
+                        <p>Please try again later</p>
+                    </div>
+                `;
+            }
+        }
+
+        function updateMechanicsFilter() {
+            const mechanicFilter = document.getElementById('mechanicFilter');
+            const mechanics = [...new Set(allBookings.map(b => b.mechanic_name).filter(Boolean))];
+            
+            mechanicFilter.innerHTML = '<option value="all">All Mechanics</option>';
+            mechanics.sort().forEach(mechanic => {
+                mechanicFilter.innerHTML += `<option value="${mechanic}">${mechanic}</option>`;
+            });
+        }
+
+        function filterBookings() {
+            const mechanicFilter = document.getElementById('mechanicFilter').value;
+            const searchTerm = document.getElementById('searchFilter').value.toLowerCase();
+            
+            let filtered = allBookings.filter(booking => {
+                const matchesMechanic = mechanicFilter === 'all' || booking.mechanic_name === mechanicFilter;
+                const matchesSearch = 
+                    (booking.customer_mobile || '').includes(searchTerm) ||
+                    (booking.car || '').toLowerCase().includes(searchTerm) ||
+                    (booking.problem || '').toLowerCase().includes(searchTerm);
+                return matchesMechanic && matchesSearch;
+            });
+
+            updateStatistics(filtered);
+            displayBookings(filtered);
+        }
+
+        function updateStatistics(bookings) {
+            const total = bookings.length;
+            const withImages = bookings.filter(b => b.user_car_image).length;
+            const withoutImages = total - withImages;
+            const rate = total > 0 ? ((withImages / total) * 100).toFixed(1) : 0;
+
+            document.getElementById('totalBookings').textContent = total;
+            document.getElementById('withImages').textContent = withImages;
+            document.getElementById('withoutImages').textContent = withoutImages;
+            document.getElementById('uploadRate').textContent = rate + '%';
+        }
+
+        function displayBookings(bookings) {
+            const container = document.getElementById('bookingsContainer');
+            
+            if (bookings.length === 0) {
+                container.innerHTML = `
+                    <div class="no-results">
+                        <h2>📭 No bookings found</h2>
+                        <p>Try changing the filters or date</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = `<div class="bookings-grid">${
+                bookings.map(booking => createBookingCard(booking)).join('')
+            }</div>`;
+        }
+
+        function createBookingCard(booking) {
+            const hasImage = booking.user_car_image;
+            const imageUrl = hasImage ? booking.user_car_image : '';
+            
+            return `
+                <div class="booking-card">
+                    <div class="image-container">
+                        ${hasImage ? 
+                            `<img src="${imageUrl}" alt="${booking.car}" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\\'no-image\\'><svg fill=\\'none\\' stroke=\\'currentColor\\' viewBox=\\'0 0 24 24\\'><path stroke-linecap=\\'round\\' stroke-linejoin=\\'round\\' stroke-width=\\'2\\' d=\\'M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z\\'></path></svg><span>Image Error</span></div>';">` 
+                            : 
+                            `<div class="no-image">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                </svg>
+                                <span>No Image</span>
+                            </div>`
+                        }
+                        <div class="image-status ${hasImage ? 'status-uploaded' : 'status-missing'}">
+                            ${hasImage ? '✓ Uploaded' : '✗ Missing'}
+                        </div>
+                    </div>
+                    <div class="booking-details">
+                        <div class="car-name">${booking.car || 'N/A'}</div>
+                        <div class="detail-row">
+                            <span class="detail-label">📱 Mobile:</span>
+                            <span class="detail-value">${booking.customer_mobile || 'N/A'}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">🆔 Booking ID:</span>
+                            <span class="detail-value">#${booking.id}</span>
+                        </div>
+                        <div class="problem">
+                            <strong>Problem:</strong> ${booking.problem || 'N/A'}
+                        </div>
+                        <div class="mechanic-name">
+                            👨‍🔧 ${booking.mechanic_name || 'No Mechanic Assigned'}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
