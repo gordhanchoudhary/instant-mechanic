@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manually Upload Customer Car Image</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; font-family: 'Inter', sans-serif; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #0f172a, #1e293b);
+      padding: 20px;
+    }
+    .card {
+      background: #ffffff;
+      width: 100%;
+      max-width: 420px;
+      border-radius: 16px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+      padding: 28px;
+    }
+    h1 {
+      font-size: 22px;
+      margin-bottom: 8px;
+      color: #0f172a;
+    }
+    p {
+      font-size: 14px;
+      color: #64748b;
+      margin-bottom: 24px;
+    }
+    label {
+      display: block;
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 6px;
+      color: #334155;
+    }
+    input[type="text"], input[type="file"] {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid #cbd5f5;
+      margin-bottom: 16px;
+      font-size: 14px;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      background: #2563eb;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+    button:hover { background: #1d4ed8; }
+    .status {
+      margin-top: 14px;
+      font-size: 14px;
+      text-align: center;
+    }
+    @media (max-width: 480px) {
+      .card { padding: 22px; }
+      h1 { font-size: 20px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Upload Customer Car Image</h1>
+    <p>Enter booking ID and select car image to upload manually.</p>
+
+    <form id="uploadForm">
+      <label for="bookingId">Booking ID</label>
+      <input type="text" id="bookingId" placeholder="e.g. 1010" required />
+
+      <label for="imageFile">Car Image</label>
+      <input type="file" id="imageFile" accept="image/*" required />
+
+      <button type="submit">Upload Image</button>
+    </form>
+
+    <div class="status" id="status"></div>
+  </div>
+
+  <script>
+    const form = document.getElementById('uploadForm');
+    const statusDiv = document.getElementById('status');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const bookingId = document.getElementById('bookingId').value.trim();
+      const fileInput = document.getElementById('imageFile');
+
+      if (!bookingId || fileInput.files.length === 0) {
+        statusDiv.textContent = 'Please provide booking ID and select an image.';
+        statusDiv.style.color = 'red';
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('image', fileInput.files[0]);
+      formData.append('booking', bookingId);
+
+      statusDiv.textContent = 'Uploading...';
+      statusDiv.style.color = '#2563eb';
+
+      try {
+        const response = await fetch(`https://ai.instantmechanic.online/bot/upload-car-image/?booking=${bookingId}`, {
+          method: 'POST',
+          body: formData
+        });
+
+        if (response.ok) {
+          statusDiv.textContent = 'Image uploaded successfully!';
+          statusDiv.style.color = 'green';
+          form.reset();
+        } else {
+          const text = await response.text();
+          statusDiv.textContent = 'Upload failed: ' + text;
+          statusDiv.style.color = 'red';
+        }
+      } catch (error) {
+        statusDiv.textContent = 'Network error: ' + error.message;
+        statusDiv.style.color = 'red';
+      }
+    });
+  </script>
+</body>
+</html>
