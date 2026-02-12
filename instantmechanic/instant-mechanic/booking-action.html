@@ -409,6 +409,18 @@
             font-weight: 600;
         }
 
+        .agent-badge {
+            background: #f3e5f5;
+            color: #7b1fa2;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
         .customer-info {
             display: flex;
             align-items: center;
@@ -827,6 +839,11 @@
                     <div class="stat-label">Avg Completion</div>
                     <div class="stat-sublabel">Booking to done</div>
                 </div>
+                <div class="stat-card primary">
+                    <div class="stat-value" id="totalAgents">-</div>
+                    <div class="stat-label">Support Agents</div>
+                    <div class="stat-sublabel">Active today</div>
+                </div>
             </div>
         </div>
 
@@ -873,6 +890,13 @@
                         <label>Mechanic:</label>
                         <select class="filter-select" id="mechanicFilter" onchange="applyFilters()">
                             <option value="">All Mechanics</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label>Support Agent:</label>
+                        <select class="filter-select" id="agentFilter" onchange="applyFilters()">
+                            <option value="">All Agents</option>
                         </select>
                     </div>
 
@@ -1062,6 +1086,9 @@
                 '-';
 
             const activeMechanics = new Set(allActions.map(a => a.mechanic_name)).size;
+            
+            // Count unique support agents
+            const activeAgents = new Set(allBookingsData.map(b => b.support_agent).filter(a => a)).size;
 
             document.getElementById('totalBookings').textContent = totalBookings;
             document.getElementById('cancelledBookings').textContent = `${cancelledCount} cancelled`;
@@ -1073,6 +1100,7 @@
             document.getElementById('activeMechanics').textContent = `${activeMechanics} mechanics`;
             document.getElementById('avgCompletion').textContent = avgCompletion;
             document.getElementById('activeMechanicsCount').textContent = activeMechanics;
+            document.getElementById('totalAgents').textContent = activeAgents;
         }
 
         // Render bookings
@@ -1189,6 +1217,7 @@
                                 <div class="car-details">
                                     <span class="car-name"><i class="fas fa-car"></i> ${booking.car}</span>
                                     <span class="problem-badge">${booking.problem}</span>
+                                    ${booking.support_agent ? `<span class="agent-badge"><i class="fas fa-headset"></i> ${booking.support_agent}</span>` : ''}
                                 </div>
                                 <div class="customer-info">
                                     <i class="fas fa-phone"></i>
@@ -1398,8 +1427,10 @@
         // Populate filters
         function populateFilters() {
             const mechanicFilter = document.getElementById('mechanicFilter');
+            const agentFilter = document.getElementById('agentFilter');
             
             const mechanics = new Set(allActions.map(a => a.mechanic_name));
+            const agents = new Set(allBookingsData.map(b => b.support_agent).filter(a => a));
 
             mechanicFilter.innerHTML = '<option value="">All Mechanics</option>';
             
@@ -1409,6 +1440,15 @@
                 option.textContent = mechanic;
                 mechanicFilter.appendChild(option);
             });
+
+            agentFilter.innerHTML = '<option value="">All Agents</option>';
+            
+            Array.from(agents).sort().forEach(agent => {
+                const option = document.createElement('option');
+                option.value = agent;
+                option.textContent = agent;
+                agentFilter.appendChild(option);
+            });
         }
 
         // Apply filters
@@ -1416,6 +1456,7 @@
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
             const actionFilter = document.getElementById('actionFilter').value;
             const mechanicFilter = document.getElementById('mechanicFilter').value;
+            const agentFilter = document.getElementById('agentFilter').value;
             const statusFilter = document.getElementById('statusFilter').value;
 
             filteredData = allBookingsData.filter(booking => {
@@ -1424,7 +1465,8 @@
                         booking.booking_id.toString().includes(searchTerm) ||
                         booking.car.toLowerCase().includes(searchTerm) ||
                         booking.problem.toLowerCase().includes(searchTerm) ||
-                        booking.customer_mobile.includes(searchTerm);
+                        booking.customer_mobile.includes(searchTerm) ||
+                        (booking.support_agent && booking.support_agent.toLowerCase().includes(searchTerm));
                     if (!searchMatch) return false;
                 }
 
@@ -1440,6 +1482,10 @@
                         action.mechanic_name === mechanicFilter
                     );
                     if (!hasMechanic) return false;
+                }
+
+                if (agentFilter) {
+                    if (booking.support_agent !== agentFilter) return false;
                 }
 
                 if (statusFilter) {
@@ -1474,6 +1520,7 @@
                     'Car': booking.car,
                     'Problem': booking.problem,
                     'Customer Mobile': booking.customer_mobile,
+                    'Support Agent': booking.support_agent || 'N/A',
                     'Booking Created': booking.created_at,
                     'Is Cancelled': booking.is_cancelled ? 'Yes' : 'No',
                     'Total Actions': booking.booking_actions.length
