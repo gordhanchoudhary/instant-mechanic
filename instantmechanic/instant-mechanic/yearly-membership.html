@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Instant Mechanic – Annual Membership</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<style>
+  :root {
+    --bg: #0a0c10;
+    --surface: #111318;
+    --surface2: #181c24;
+    --border: #ffffff0f;
+    --accent: #f97316;
+    --accent2: #fb923c;
+    --gold: #fbbf24;
+    --green: #22c55e;
+    --text: #f1f5f9;
+    --muted: #94a3b8;
+    --dim: #475569;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    overflow-x: hidden;
+    padding-bottom: 100px;
+  }
+
+  /* ──────── LOADER ──────── */
+  #loader {
+    position: fixed; inset: 0;
+    background: var(--bg);
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column; gap: 16px;
+    z-index: 999;
+    transition: opacity .5s, visibility .5s;
+  }
+  #loader.hide { opacity: 0; visibility: hidden; }
+  .loader-logo { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 800; letter-spacing: -1px; }
+  .loader-logo span { color: var(--accent); }
+  .loader-bar { width: 160px; height: 3px; background: var(--surface2); border-radius: 99px; overflow: hidden; }
+  .loader-bar::after {
+    content: ''; display: block; height: 100%; width: 40%;
+    background: var(--accent);
+    border-radius: 99px;
+    animation: loadbar 1.2s ease infinite;
+  }
+  @keyframes loadbar { 0%{transform:translateX(-100%)} 100%{transform:translateX(350%)} }
+
+  /* ──────── HEADER ──────── */
+  header {
+    padding: 20px 24px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(10,12,16,.85);
+    backdrop-filter: blur(16px);
+  }
+  .logo { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800; letter-spacing: -0.5px; }
+  .logo span { color: var(--accent); }
+  .badge-header {
+    background: linear-gradient(135deg, var(--accent), #ef4444);
+    color: white; font-size: 11px; font-weight: 700;
+    padding: 4px 10px; border-radius: 99px; letter-spacing: .5px;
+    text-transform: uppercase;
+  }
+
+  /* ──────── HERO ──────── */
+  .hero {
+    padding: 48px 24px 32px;
+    text-align: center;
+    position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; top: -80px; left: 50%; transform: translateX(-50%);
+    width: 600px; height: 400px;
+    background: radial-gradient(ellipse, rgba(249,115,22,.18) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .greeting {
+    display: inline-block;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 99px;
+    padding: 6px 16px;
+    font-size: 13px; color: var(--muted);
+    margin-bottom: 20px;
+    animation: fadeUp .6s ease both;
+  }
+  .greeting b { color: var(--accent); }
+  .hero h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(28px, 8vw, 48px);
+    font-weight: 800; line-height: 1.1;
+    letter-spacing: -1.5px;
+    animation: fadeUp .6s .1s ease both;
+  }
+  .hero h1 em { font-style: normal; color: var(--accent); }
+  .hero-sub {
+    margin: 16px auto 0;
+    max-width: 440px;
+    font-size: 15px; color: var(--muted);
+    animation: fadeUp .6s .2s ease both;
+  }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+
+  /* ──────── CAR CARD ──────── */
+  .car-card {
+    margin: 28px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 20px;
+    display: flex; gap: 16px; align-items: center;
+    animation: fadeUp .6s .3s ease both;
+    position: relative; overflow: hidden;
+  }
+  .car-card::before {
+    content: '';
+    position: absolute; right: -30px; top: -30px;
+    width: 120px; height: 120px;
+    background: radial-gradient(circle, rgba(249,115,22,.12), transparent 70%);
+  }
+  .car-icon {
+    width: 52px; height: 52px; flex-shrink: 0;
+    background: linear-gradient(135deg, rgba(249,115,22,.2), rgba(249,115,22,.05));
+    border: 1px solid rgba(249,115,22,.3);
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px;
+  }
+  .car-info { flex: 1; min-width: 0; }
+  .car-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 16px; }
+  .car-problem { font-size: 13px; color: var(--muted); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .status-dot {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 12px; color: var(--green);
+    margin-top: 6px;
+  }
+  .status-dot::before {
+    content: ''; width: 7px; height: 7px;
+    background: var(--green); border-radius: 50%;
+    box-shadow: 0 0 6px var(--green);
+    animation: pulse 2s ease infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+  /* ──────── PAID SECTION ──────── */
+  .paid-box {
+    margin: 0 16px 28px;
+    background: linear-gradient(135deg, rgba(34,197,94,.08), rgba(34,197,94,.03));
+    border: 1px solid rgba(34,197,94,.25);
+    border-radius: 16px;
+    padding: 18px 20px;
+    display: flex; gap: 12px; align-items: flex-start;
+    animation: fadeUp .6s .35s ease both;
+  }
+  .paid-icon { font-size: 22px; margin-top: 2px; }
+  .paid-title { font-weight: 600; font-size: 14px; color: var(--green); }
+  .paid-sub { font-size: 13px; color: var(--muted); margin-top: 2px; }
+
+  /* ──────── OFFER SECTION ──────── */
+  .section { padding: 0 16px 28px; animation: fadeUp .6s .4s ease both; }
+  .section-label {
+    font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px;
+    color: var(--dim); margin-bottom: 12px; font-weight: 600;
+  }
+
+  .pricing-hero {
+    background: linear-gradient(135deg, #1a1008, #0f0f14);
+    border: 1px solid rgba(249,115,22,.25);
+    border-radius: 24px;
+    padding: 28px 24px;
+    text-align: center;
+    position: relative; overflow: hidden;
+  }
+  .pricing-hero::after {
+    content: '';
+    position: absolute; bottom: -60px; right: -60px;
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(249,115,22,.15), transparent 60%);
+  }
+  .you-pay-label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+  .you-pay-amount {
+    font-family: 'Syne', sans-serif;
+    font-size: 52px; font-weight: 800;
+    color: var(--accent); line-height: 1;
+    margin: 8px 0 4px;
+  }
+  .you-pay-amount sup { font-size: 24px; vertical-align: super; }
+  .original-price {
+    font-size: 13px; color: var(--dim);
+    text-decoration: line-through;
+  }
+  .saving-pill {
+    display: inline-block;
+    background: rgba(251,191,36,.15);
+    border: 1px solid rgba(251,191,36,.3);
+    color: var(--gold);
+    font-size: 12px; font-weight: 700;
+    padding: 4px 12px; border-radius: 99px;
+    margin: 12px 0;
+    letter-spacing: .3px;
+  }
+  .per-month-note { font-size: 13px; color: var(--muted); margin-top: 4px; }
+  .per-month-note b { color: var(--text); }
+
+  .compare-row {
+    display: flex; align-items: center; gap: 8px;
+    margin: 16px 0 12px;
+  }
+  .compare-col {
+    flex: 1; border-radius: 14px; padding: 14px 10px; text-align: center;
+  }
+  .compare-col.bad {
+    background: rgba(239,68,68,.07);
+    border: 1px solid rgba(239,68,68,.2);
+  }
+  .compare-col.good {
+    background: rgba(249,115,22,.08);
+    border: 1px solid rgba(249,115,22,.35);
+  }
+  .compare-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .8px; margin-bottom: 6px; }
+  .compare-amt { font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 800; }
+  .compare-amt.accent { color: var(--accent); }
+  .compare-sub { font-size: 11px; color: var(--dim); margin-top: 4px; }
+  .compare-sub.green-text { color: var(--green); }
+  .compare-vs {
+    font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 800;
+    color: var(--dim); flex-shrink: 0;
+  }
+  .extra-callout {
+    background: rgba(251,191,36,.08);
+    border: 1px solid rgba(251,191,36,.2);
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 14px; color: var(--muted);
+    margin-bottom: 12px;
+  }
+  .extra-callout b { color: var(--gold); font-size: 16px; }
+  .value-strip {
+    display: flex; gap: 8px; margin-top: 20px; flex-wrap: wrap; justify-content: center;
+  }
+  .value-chip {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 99px;
+    font-size: 12px; color: var(--muted);
+    padding: 4px 12px;
+  }
+  .value-chip.green { border-color: rgba(34,197,94,.3); color: var(--green); background: rgba(34,197,94,.06); }
+
+  /* ──────── SERVICES ──────── */
+  .services-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .service-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px 14px 12px;
+    display: flex; flex-direction: column; gap: 8px;
+    transition: border-color .2s, transform .2s;
+    cursor: default;
+  }
+  .service-item:hover { border-color: rgba(249,115,22,.3); transform: translateY(-2px); }
+  .service-item.highlight {
+    background: linear-gradient(135deg, rgba(251,191,36,.07), rgba(249,115,22,.04));
+    border-color: rgba(251,191,36,.3);
+    grid-column: span 2;
+    flex-direction: row; align-items: center; gap: 14px;
+  }
+  .service-icon { font-size: 22px; line-height: 1; }
+  .service-name { font-size: 13px; font-weight: 500; color: var(--text); line-height: 1.3; }
+  .highlight .service-name { font-size: 14px; font-weight: 700; }
+  .highlight-tag {
+    display: inline-block;
+    background: linear-gradient(90deg, var(--gold), var(--accent));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    font-size: 11px; font-weight: 700; letter-spacing: .4px;
+    text-transform: uppercase;
+  }
+
+  /* ──────── SOCIAL PROOF ──────── */
+  .proof-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 18px;
+    display: flex; gap: 12px; align-items: flex-start;
+  }
+  .proof-avatar {
+    width: 40px; height: 40px; flex-shrink: 0;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+  }
+  .proof-name { font-weight: 600; font-size: 14px; }
+  .proof-stars { color: var(--gold); font-size: 12px; margin: 2px 0; }
+  .proof-text { font-size: 13px; color: var(--muted); line-height: 1.5; }
+
+  /* ──────── URGENCY ──────── */
+  .urgency-bar {
+    margin: 0 16px 24px;
+    background: linear-gradient(135deg, rgba(239,68,68,.1), rgba(249,115,22,.06));
+    border: 1px solid rgba(239,68,68,.25);
+    border-radius: 14px;
+    padding: 14px 18px;
+    display: flex; gap: 10px; align-items: center;
+    font-size: 13px;
+  }
+  .urgency-bar .icon { font-size: 20px; flex-shrink: 0; }
+  .urgency-bar b { color: #f87171; }
+
+  /* ──────── STICKY CTA ──────── */
+  .sticky-cta {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    padding: 16px;
+    background: rgba(10,12,16,.92);
+    backdrop-filter: blur(20px);
+    border-top: 1px solid var(--border);
+    z-index: 100;
+  }
+  .cta-inner {
+    display: flex; gap: 12px; align-items: center;
+    max-width: 480px; margin: 0 auto;
+  }
+  .cta-text { flex: 1; min-width: 0; }
+  .cta-text .amount { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 800; color: var(--accent); }
+  .cta-text .label { font-size: 11px; color: var(--muted); }
+  .btn-buy {
+    background: linear-gradient(135deg, var(--accent), #ea580c);
+    color: white;
+    border: none; border-radius: 14px;
+    padding: 14px 24px;
+    font-family: 'Syne', sans-serif;
+    font-size: 15px; font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: transform .15s, box-shadow .15s;
+    box-shadow: 0 4px 20px rgba(249,115,22,.4);
+    position: relative; overflow: hidden;
+  }
+  .btn-buy::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,.15), transparent);
+  }
+  .btn-buy:active { transform: scale(.97); }
+  .btn-buy:hover { box-shadow: 0 6px 28px rgba(249,115,22,.55); }
+  .btn-buy.loading { opacity: .7; pointer-events: none; }
+
+  /* ──────── DIVIDER ──────── */
+  .divider { height: 1px; background: var(--border); margin: 4px 16px 28px; }
+
+  /* ──────── ERROR ──────── */
+  .error-state {
+    display: none;
+    text-align: center; padding: 60px 24px;
+  }
+  .error-state .icon { font-size: 48px; margin-bottom: 12px; }
+  .error-state h2 { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 700; }
+  .error-state p { color: var(--muted); margin-top: 8px; font-size: 14px; }
+
+  /* ──────── SCROLL ANIMATIONS ──────── */
+  .reveal { opacity: 0; transform: translateY(24px); transition: opacity .6s ease, transform .6s ease; }
+  .reveal.visible { opacity: 1; transform: none; }
+
+  /* Stagger helpers */
+  .d1{animation-delay:.05s} .d2{animation-delay:.1s} .d3{animation-delay:.15s}
+  .d4{animation-delay:.2s} .d5{animation-delay:.25s}
+</style>
+</head>
+<body>
+
+<!-- LOADER -->
+<div id="loader">
+  <div class="loader-logo">Instant<span>Mechanic</span></div>
+  <div class="loader-bar"></div>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">Instant<span>Mechanic</span></div>
+  <div class="badge-header">🔒 Exclusive Offer</div>
+</header>
+
+<!-- ERROR STATE -->
+<div class="error-state" id="errorState">
+  <div class="icon">⚙️</div>
+  <h2>Offer Not Found</h2>
+  <p>We couldn't load your membership offer.<br>Please contact your support agent.</p>
+</div>
+
+<!-- MAIN CONTENT -->
+<div id="mainContent">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="greeting" id="greetingBadge">👋 Hey <b id="heroName">there</b>, your service is complete!</div>
+    <h1>One Payment.<br><em>365 Days</em> of Safety.</h1>
+    <p class="hero-sub" id="heroSub">You're already paying for this service. Make it work harder for you all year.</p>
+  </section>
+
+  <!-- CAR CARD -->
+  <div class="car-card" id="carCard">
+    <div class="car-icon">🚗</div>
+    <div class="car-info">
+      <div class="car-name" id="carName">Your Vehicle</div>
+      <div class="car-problem" id="carProblem">Service completed ✓</div>
+      <div class="status-dot">Technician on-site — awaiting payment</div>
+    </div>
+  </div>
+
+  <!-- PAID TODAY -->
+  <div class="paid-box reveal" id="paidBox">
+    <div class="paid-icon">🔧</div>
+    <div>
+      <div class="paid-title">Service Completed Successfully</div>
+      <div class="paid-sub" id="paidSubText">Your technician fixed the issue. Service charge: <b id="serviceAmtDisplay">₹788</b></div>
+    </div>
+  </div>
+
+  <!-- PRICING OFFER -->
+  <section class="section reveal">
+    <div class="section-label">Your Exclusive Offer</div>
+    <div class="pricing-hero">
+      <div class="you-pay-label">You already owe for today's service</div>
+
+      <div class="compare-row">
+        <div class="compare-col bad">
+          <div class="compare-label">Pay service only</div>
+          <div class="compare-amt">₹<span id="serviceAmtHero">788</span></div>
+          <div class="compare-sub">Get nothing extra</div>
+        </div>
+        <div class="compare-vs">VS</div>
+        <div class="compare-col good">
+          <div class="compare-label">Pay for membership</div>
+          <div class="compare-amt accent">₹<span id="membershipPriceHero">1499</span></div>
+          <div class="compare-sub green-text">1 Year FREE Service ✓</div>
+        </div>
+      </div>
+
+      <div class="extra-callout">
+        Pay just <b>₹<span id="extraAmt">711</span> extra</b> on top of today's bill
+      </div>
+
+      <div class="saving-pill">🎉 Today's service becomes FREE — + 12 months protection</div>
+      <div class="per-month-note">The extra ₹<span id="extraAmt2">711</span> = just <b>₹<span id="perMonth">59</span>/month</b> all year</div>
+      <div class="value-strip">
+        <div class="value-chip green">✓ Today's service FREE</div>
+        <div class="value-chip green">✓ Unlimited callouts</div>
+        <div class="value-chip">Valid 12 months</div>
+        <div class="value-chip">Agent: <span id="agentName">–</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SERVICES -->
+  <section class="section reveal">
+    <div class="section-label">What's Covered — All Year</div>
+    <div class="services-grid">
+      <div class="service-item d1">
+        <div class="service-icon">🔑</div>
+        <div class="service-name">Starting Problem</div>
+      </div>
+      <div class="service-item d2">
+        <div class="service-icon">🛞</div>
+        <div class="service-name">Flat Tyre Fix</div>
+      </div>
+      <div class="service-item d3">
+        <div class="service-icon">🔄</div>
+        <div class="service-name">Stepney Change</div>
+      </div>
+      <div class="service-item d4">
+        <div class="service-icon">🚪</div>
+        <div class="service-name">Key Lockout</div>
+      </div>
+      <div class="service-item d5">
+        <div class="service-icon">⚡</div>
+        <div class="service-name">Jump Start</div>
+      </div>
+      <div class="service-item d1">
+        <div class="service-icon">🔋</div>
+        <div class="service-name">Battery Jump Start</div>
+      </div>
+      <div class="service-item d2">
+        <div class="service-icon">⛽</div>
+        <div class="service-name">Fuel Delivery</div>
+      </div>
+      <div class="service-item d3">
+        <div class="service-icon">🛠️</div>
+        <div class="service-name">Minor Auto Repair</div>
+      </div>
+      <div class="service-item d4">
+        <div class="service-icon">📞</div>
+        <div class="service-name">24×7 Support</div>
+      </div>
+      <!-- HIGHLIGHT -->
+      <div class="service-item highlight d5">
+        <div class="service-icon">💰</div>
+        <div>
+          <div class="service-name">₹1,000 off on every Car Service</div>
+          <div class="highlight-tag">⭐ Most Popular Benefit</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SOCIAL PROOF -->
+  <section class="section reveal">
+    <div class="section-label">Members Love It</div>
+    <div class="proof-card">
+      <div class="proof-avatar">😊</div>
+      <div>
+        <div class="proof-name">Rahul S., Mumbai</div>
+        <div class="proof-stars">★★★★★</div>
+        <div class="proof-text">"Got a flat tyre on the highway at 11pm. One call and they were there in 20 minutes. The ₹1000 off on my next service was a bonus!"</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- URGENCY -->
+  <div class="urgency-bar reveal">
+    <div class="icon">⏱️</div>
+    <div>This offer is valid <b>only while the technician is present</b>. Once they leave, the membership price goes back to full ₹<span id="fullMembershipPrice2">1499</span>.</div>
+  </div>
+
+  <div class="divider"></div>
+
+</div><!-- /mainContent -->
+
+<!-- STICKY CTA -->
+<div class="sticky-cta" id="stickyCta">
+  <div class="cta-inner">
+    <div class="cta-text">
+      <div class="amount">Pay ₹<span id="ctaAmt">1499</span></div>
+      <div class="label" id="ctaBreakdown">service + 1yr membership</div>
+    </div>
+    <button class="btn-buy" id="buyBtn">
+      Buy Now 🔒
+    </button>
+  </div>
+</div>
+
+<script>
+(async () => {
+  const API_BASE = 'https://ai.instantmechanic.online/bot/api/memberships/';
+  const AUTH_TOKEN = 'YOUR_ACCESS_TOKEN'; // Replace with real token or fetch dynamically
+
+  const params = new URLSearchParams(location.search);
+  let mobile = params.get('mobile') || '';
+
+  const loader = document.getElementById('loader');
+  const mainContent = document.getElementById('mainContent');
+  const errorState = document.getElementById('errorState');
+  const stickyCta = document.getElementById('stickyCta');
+
+  let membershipData = null;
+
+  function hideLoader() {
+    loader.classList.add('hide');
+  }
+
+  function showError() {
+    hideLoader();
+    errorState.style.display = 'block';
+    stickyCta.style.display = 'none';
+  }
+
+  async function loadData() {
+    if (!mobile) { showError(); return; }
+
+    try {
+      const res = await fetch(`${API_BASE}?mobile=${mobile}`, {
+        headers: {
+          'Authorization': `Bearer ${AUTH_TOKEN}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      if (!res.ok) throw new Error('API error');
+      const data = await res.json();
+      if (!data || !data.length) { showError(); return; }
+      membershipData = data[0];
+      populatePage(membershipData);
+      hideLoader();
+    } catch(e) {
+      // Fallback: use demo data for preview
+      membershipData = {
+        customer: { name: 'Vin', mobile: mobile },
+        booking: { car: 'Hyundai Verna', problem: 'Two flat tyres' },
+        tier: 'standard',
+        support_agent: 'Nairah',
+        service_amount: '788.00',
+        membership_price: '1499.00',
+        status: 'pending',
+        order_id: 'order_SHspz1lvnemGx6'
+      };
+      populatePage(membershipData);
+      hideLoader();
+    }
+  }
+
+  function populatePage(d) {
+    const name = d.customer?.name || 'there';
+    const car = d.booking?.car || 'Your Vehicle';
+    const problem = d.booking?.problem || 'Service completed';
+    const agent = d.support_agent || '–';
+    const serviceAmt = parseFloat(d.service_amount || 0);
+    const membershipPrice = parseFloat(d.membership_price || 1499);
+    const extraAmt = Math.max(0, Math.round(membershipPrice - serviceAmt));
+    const perMonth = Math.round(extraAmt / 12);
+
+    // Update DOM
+    document.getElementById('heroName').textContent = name;
+    document.getElementById('heroSub').textContent = `Hey ${name}, your ${car} is back on the road. Here's something special for you.`;
+    document.getElementById('carName').textContent = car;
+    document.getElementById('carProblem').textContent = problem + ' — Fixed ✓';
+    document.getElementById('paidSubText').innerHTML = `Issue resolved: <b>${problem}</b>. You owe ₹${Math.round(serviceAmt)} for today — or pay ₹${Math.round(membershipPrice)} total and get <b style="color:var(--green)">1 year FREE</b>.`;
+    document.getElementById('serviceAmtHero').textContent = Math.round(serviceAmt);
+    document.getElementById('membershipPriceHero').textContent = Math.round(membershipPrice);
+    document.getElementById('extraAmt').textContent = extraAmt;
+    document.getElementById('extraAmt2').textContent = extraAmt;
+    document.getElementById('perMonth').textContent = perMonth;
+    document.getElementById('agentName').textContent = agent;
+    document.getElementById('fullMembershipPrice2').textContent = Math.round(membershipPrice);
+    document.getElementById('ctaAmt').textContent = Math.round(membershipPrice);
+    document.getElementById('ctaBreakdown').textContent = `(₹${Math.round(serviceAmt)} service + ₹${extraAmt} extra for 1yr membership)`;
+
+    // Total to pay via Razorpay is the full membership price
+    window.amountToPay = Math.round(membershipPrice) * 100; // paise
+    window.razorpayOrderId = d.payment_id;
+    window.customerMobile = mobile;
+  }
+
+  // Razorpay
+  document.getElementById('buyBtn').addEventListener('click', () => {
+    if (!window.razorpayOrderId) return;
+    const btn = document.getElementById('buyBtn');
+    btn.classList.add('loading');
+    btn.textContent = 'Opening...';
+
+    const options = {
+      key: 'rzp_live_NYD17iu2Juy3A5',
+      amount: window.amountToPay,
+      currency: 'INR',
+      name: 'Instant Mechanic',
+      description: 'Annual Roadside Membership',
+      order_id: window.razorpayOrderId,
+      handler: function (response) {
+        btn.classList.remove('loading');
+        btn.textContent = 'Buy Now 🔒';
+        showSuccessScreen();
+      },
+      prefill: { contact: window.customerMobile },
+      theme: { color: '#f97316' },
+      modal: {
+        ondismiss: () => {
+          btn.classList.remove('loading');
+          btn.textContent = 'Buy Now 🔒';
+        }
+      }
+    };
+    const rzp = new Razorpay(options);
+    rzp.open();
+  });
+
+  function showSuccessScreen() {
+    document.getElementById('mainContent').innerHTML = `
+      <div style="text-align:center;padding:80px 24px;">
+        <div style="font-size:64px;margin-bottom:16px;animation:fadeUp .5s ease">🎉</div>
+        <h2 style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;animation:fadeUp .5s .1s ease both">You're a Member!</h2>
+        <p style="color:#94a3b8;margin-top:10px;font-size:15px;animation:fadeUp .5s .2s ease both">Welcome to Instant Mechanic Annual Membership.<br>365 days of peace of mind starts now.</p>
+        <div style="margin-top:32px;background:#111318;border:1px solid #ffffff0f;border-radius:20px;padding:24px;animation:fadeUp .5s .3s ease both">
+          <div style="font-size:13px;color:#475569;margin-bottom:12px;text-transform:uppercase;letter-spacing:1px;">Benefits Active</div>
+          <div style="display:flex;flex-direction:column;gap:10px;text-align:left;">
+            ${['🛞 Flat Tyre Fix','⚡ Jump Start','🔑 Key Lockout','⛽ Fuel Delivery','💰 ₹1000 off every car service','📞 24×7 Support'].map(s=>`<div style="display:flex;gap:10px;align-items:center;font-size:14px;"><span style="color:#22c55e">✓</span> ${s}</div>`).join('')}
+          </div>
+        </div>
+      </div>
+    `;
+    document.getElementById('stickyCta').style.display = 'none';
+  }
+
+  // Scroll reveal
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => { if(e.isIntersecting) { e.target.classList.add('visible'); } });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  await loadData();
+
+  // Re-observe after content
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+})();
+</script>
+</body>
+</html>
