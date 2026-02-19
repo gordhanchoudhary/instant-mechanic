@@ -619,6 +619,8 @@
     const agent = d.support_agent || '–';
     const serviceAmt = parseFloat(d.service_amount || 0);
     const membershipPrice = parseFloat(d.membership_price || 1499);
+    const membershipPrice2 = parseFloat(d.need_to_pay_now || 1499);
+
     const extraAmt = Math.max(0, Math.round(membershipPrice - serviceAmt));
     const perMonth = Math.round(extraAmt / 12);
 
@@ -635,7 +637,7 @@
     document.getElementById('perMonth').textContent = perMonth;
     document.getElementById('agentName').textContent = agent;
     document.getElementById('fullMembershipPrice2').textContent = Math.round(membershipPrice);
-    document.getElementById('ctaAmt').textContent = Math.round(membershipPrice);
+    document.getElementById('ctaAmt').textContent = Math.round(membershipPrice2);
     document.getElementById('ctaBreakdown').textContent = `(₹${Math.round(serviceAmt)} service + ₹${extraAmt} extra for 1yr membership)`;
 
     // Total to pay via Razorpay is the full membership price
