@@ -605,7 +605,12 @@
         service_amount: '788.00',
         membership_price: '1499.00',
         status: 'pending',
-        order_id: 'order_SHspz1lvnemGx6'
+        need_to_pay_now: '1499.00',
+        extra_payment: '711.00',
+        created_at: new Date().toISOString(), // demo: fresh, so uses payment_id
+        order_id: 'order_SHspz1lvnemGx6',
+        payment_id: 'order_SHspz1lvnemGx6',
+        payment_id_2: 'order_SHspz1lvnemGx7'
       };
       populatePage(membershipData);
       hideLoader();
@@ -619,7 +624,24 @@
     const agent = d.support_agent || '–';
     const serviceAmt = parseFloat(d.service_amount || 0);
     const membershipPrice = parseFloat(d.membership_price || 1499);
-    const membershipPrice2 = parseFloat(d.need_to_pay_now || 1499);
+
+    // ── KEY LOGIC ──
+    // If created_at is older than 1.5 hours (90 minutes), use:
+    //   - payment_id_2 for the Razorpay order
+    //   - extra_payment as the amount to charge (instead of need_to_pay_now)
+    // Otherwise use the normal payment_id and need_to_pay_now
+    const createdAt = d.created_at ? new Date(d.created_at) : null;
+    const now = new Date();
+    const isOlderThan90Min = createdAt && (now - createdAt) > (90 * 60 * 1000);
+
+    const membershipPrice2 = isOlderThan90Min
+      ? parseFloat(d.extra_payment || d.need_to_pay_now || 1499)
+      : parseFloat(d.need_to_pay_now || 1499);
+
+    const razorpayOrderId = isOlderThan90Min
+      ? (d.payment_id_2 || d.payment_id)
+      : d.payment_id;
+    // ── END KEY LOGIC ──
 
     const extraAmt = Math.max(0, Math.round(membershipPrice - serviceAmt));
     const perMonth = Math.round(extraAmt / 12);
@@ -640,9 +662,9 @@
     document.getElementById('ctaAmt').textContent = Math.round(membershipPrice2);
     document.getElementById('ctaBreakdown').textContent = `(₹${Math.round(serviceAmt)} service + ₹${extraAmt} extra for 1yr membership)`;
 
-    // Total to pay via Razorpay is the full membership price
-    window.amountToPay = Math.round(membershipPrice) * 100; // paise
-    window.razorpayOrderId = d.payment_id;
+    // Store for Razorpay
+    window.amountToPay = Math.round(membershipPrice2) * 100; // paise
+    window.razorpayOrderId = razorpayOrderId;
     window.customerMobile = mobile;
   }
 
