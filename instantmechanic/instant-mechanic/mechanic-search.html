@@ -1263,34 +1263,57 @@
                         </button>
                     `;
                 }
+
+                let remarksHTML = "";
+
+if (mechanic.remarks) {
+    const remarksArray = mechanic.remarks
+        .split("-")
+        .map(r => r.trim())
+        .filter(r => r.length > 0);
+
+    remarksHTML = `
+        <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:6px;">
+            ${remarksArray.map(tag => `
+                <span style="
+                    background:#E8F7EF;
+                    color:#1F8A5B;
+                    font-size:12px;
+                    padding:4px 10px;
+                    border-radius:999px;
+                    font-weight:500;
+                    white-space:nowrap;
+                ">
+                    ${tag}
+                </span>
+            `).join("")}
+        </div>
+    `;
+}
                 
-                mechanicDiv.innerHTML = `
-                    <div class="mechanic-header">
-                        <div class="mechanic-name">${mechanic.name}</div>
-                        ${distanceHTML}
-                    </div>
-                    
-                    <div class="rating-container">
-                        <div class="rating">
-                            <span class="stars">${starsHTML}</span>
-                            <span class="rating-value">${mechanic.rating.toFixed(1)}</span>
-                        </div>
-                    </div>
-                    
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-value success">${mechanic.done_calls}</div>
-                            <div class="stat-label">Completed</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-value danger">${mechanic.cancelled_calls}</div>
-                            <div class="stat-label">Cancelled</div>
-                        </div>
-                    </div>
-                    
-                    ${actionButtonsHTML}
-                `;
-                
+mechanicDiv.innerHTML = `
+    <div class="mechanic-header">
+        <div class="mechanic-name">${mechanic.name}</div>
+        ${distanceHTML}
+    </div>
+
+    ${remarksHTML}
+
+
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-value success">${mechanic.done_calls}</div>
+            <div class="stat-label">Completed</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value danger">${mechanic.cancelled_calls}</div>
+            <div class="stat-label">Cancelled</div>
+        </div>
+    </div>
+
+    ${actionButtonsHTML}
+`;
                 mechanicList.appendChild(mechanicDiv);
                 mechanicElements.push(mechanicDiv);
                 
