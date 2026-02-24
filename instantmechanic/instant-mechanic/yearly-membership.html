@@ -630,7 +630,7 @@
     //   - payment_id_2 for the Razorpay order
     //   - extra_payment as the amount to charge (instead of need_to_pay_now)
     // Otherwise use the normal payment_id and need_to_pay_now
-    const createdAt = d.created_at ? new Date(d.created_at) : null;
+    const createdAt = d.booking.created_at ? new Date(d.booking.created_at) : null;
     const now = new Date();
     const isOlderThan90Min = createdAt && (now - createdAt) > (90 * 60 * 1000);
 
