@@ -1271,34 +1271,50 @@
             const rating = parseFloat(service.rating) || 5.0;
             const stars = '★'.repeat(Math.floor(rating)) + (rating % 1 ? '☆' : '');
             
-            serviceDiv.innerHTML = `
-                <div class="mechanic-header">
-                    <div>
-                        <div class="mechanic-name">${service.name}</div>
-                        <div class="mechanic-type ${service.is_garage ? 'garage' : ''}">${service.is_garage ? 'Garage' : 'Mechanic'}</div>
-                    </div>
-                </div>
-                
-                <div class="rating-container">
-                    <div class="rating">
-                        <span>${stars}</span>
-                        <span>${rating.toFixed(1)}</span>
-                    </div>
-                </div>
-                
-                <div class="stats">
-                    <span>Calls: ${service.total_calls_done || 0}</span>
-                    <span>Earnings: ₹${service.total_earnings || '0'}</span>
-                </div>
-                
-                <div class="distance-time">
-                    <div class="distance">📍 ${distance}</div>
-                    <div class="time">⏱️ ${time}</div>
-                </div>
-                
-                ${createActionButtons(service.mobile, service.whatsapp)}
-            `;
+serviceDiv.innerHTML = `
+    <div class="mechanic-header">
+        <div>
+            <div class="mechanic-name">${service.name}</div>
+            <div class="mechanic-type ${service.is_garage ? 'garage' : ''}">${service.is_garage ? 'Garage' : 'Mechanic'}</div>
+        </div>
+    </div>
+    
+    <div class="rating-container">
+        <div class="rating">
+            <span>${stars}</span>
+            <span>${rating.toFixed(1)}</span>
+        </div>
+    </div>
+    
+    <div class="stats">
+        <span>Calls: ${service.total_calls_done || 0}</span>
+        <span>Earnings: ₹${service.total_earnings || '0'}</span>
+    </div>
+    
+    <div class="distance-time">
+        <div class="distance">📍 ${distance}</div>
+        <div class="time">⏱️ ${time}</div>
+    </div>
 
+    ${service.remarks ? `
+        <div style="display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0;">
+            ${service.remarks.split('-').map(tag => tag.trim()).filter(tag => tag).map(tag => `
+                <span style="
+                    background-color: #e8f5e9;
+                    color: #2e7d32;
+                    border: 1px solid #a5d6a7;
+                    border-radius: 12px;
+                    padding: 3px 10px;
+                    font-size: 11px;
+                    font-weight: 500;
+                    white-space: nowrap;
+                ">${tag}</span>
+            `).join('')}
+        </div>
+    ` : ''}
+    
+    ${createActionButtons(service.mobile, service.whatsapp)}
+`;
             mechanicList.appendChild(serviceDiv);
         }
 
