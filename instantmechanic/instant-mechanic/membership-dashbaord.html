@@ -1,0 +1,1322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Instant Mechanic — Membership Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #070B14;
+    --surface: #0D1220;
+    --surface2: #111827;
+    --border: #1E2A3A;
+    --border-hover: #2E4A6A;
+    --text: #E8F0FF;
+    --text-muted: #5A6A85;
+    --text-sub: #8A9AB5;
+    --accent: #00C6FF;
+    --accent2: #0070F3;
+    --green: #00D68F;
+    --yellow: #FFB800;
+    --red: #FF4D6A;
+    --orange: #FF8C42;
+    --purple: #A855F7;
+    --wa-green: #25D366;
+    --card-shadow: 0 4px 24px rgba(0,0,0,0.4);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 14px;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Subtle grid pattern background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,198,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,198,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ===== SIDEBAR ===== */
+  .sidebar {
+    position: fixed;
+    left: 0; top: 0; bottom: 0;
+    width: 220px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    padding: 24px 0;
+  }
+
+  .logo {
+    padding: 0 20px 28px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 20px;
+  }
+
+  .logo-mark {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .logo-icon {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+
+  .logo-text {
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--text);
+    letter-spacing: -0.3px;
+    line-height: 1.2;
+  }
+
+  .logo-sub {
+    font-size: 10px;
+    color: var(--text-muted);
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .nav-section {
+    padding: 0 12px;
+    flex: 1;
+  }
+
+  .nav-label {
+    font-size: 10px;
+    color: var(--text-muted);
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 0 8px;
+    margin-bottom: 6px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s;
+    margin-bottom: 2px;
+    color: var(--text-muted);
+    font-weight: 500;
+    font-size: 13px;
+  }
+
+  .nav-item:hover { background: var(--surface2); color: var(--text); }
+  .nav-item.active {
+    background: rgba(0,198,255,0.1);
+    color: var(--accent);
+    border: 1px solid rgba(0,198,255,0.2);
+  }
+
+  .nav-item .icon { font-size: 16px; width: 20px; text-align: center; }
+
+  .sidebar-footer {
+    padding: 16px 20px 0;
+    border-top: 1px solid var(--border);
+    margin-top: 12px;
+  }
+
+  .agent-badge {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    background: var(--surface2);
+    border-radius: 10px;
+    border: 1px solid var(--border);
+  }
+
+  .agent-avatar {
+    width: 32px; height: 32px;
+    background: linear-gradient(135deg, #7C3AED, #A855F7);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 800; color: white;
+    flex-shrink: 0;
+  }
+
+  .agent-info { font-size: 12px; }
+  .agent-name { font-weight: 700; color: var(--text); }
+  .agent-role { color: var(--text-muted); font-size: 11px; }
+
+  /* ===== MAIN CONTENT ===== */
+  .main {
+    margin-left: 220px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ===== TOP BAR ===== */
+  .topbar {
+    position: sticky;
+    top: 0;
+    background: rgba(7,11,20,0.95);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    z-index: 50;
+    padding: 14px 28px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .topbar-title {
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--text);
+    flex-shrink: 0;
+    letter-spacing: -0.3px;
+  }
+
+  .search-box {
+    position: relative;
+    flex: 1;
+    max-width: 360px;
+  }
+
+  .search-box input {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 12px 8px 36px;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .search-box input:focus { border-color: var(--border-hover); }
+  .search-box input::placeholder { color: var(--text-muted); }
+
+  .search-icon {
+    position: absolute;
+    left: 11px; top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    font-size: 14px;
+    pointer-events: none;
+  }
+
+  .filter-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
+  }
+
+  .filter-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  select, .filter-select {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 7px 30px 7px 12px;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    outline: none;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%235A6A85'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    transition: border-color 0.2s;
+  }
+
+  select:focus { border-color: var(--border-hover); }
+
+  .refresh-btn {
+    display: flex; align-items: center; gap: 6px;
+    padding: 7px 14px;
+    background: rgba(0,198,255,0.08);
+    border: 1px solid rgba(0,198,255,0.25);
+    border-radius: 8px;
+    color: var(--accent);
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .refresh-btn:hover {
+    background: rgba(0,198,255,0.15);
+    border-color: var(--accent);
+  }
+
+  .refresh-btn.loading { opacity: 0.6; pointer-events: none; }
+  .refresh-btn .spin { display: inline-block; }
+  .refresh-btn.loading .spin { animation: spin 1s linear infinite; }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ===== STATS BAR ===== */
+  .stats-bar {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .stat-card {
+    background: var(--surface);
+    padding: 16px 20px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .stat-card:hover { background: var(--surface2); }
+  .stat-card.active-stat { background: var(--surface2); }
+
+  .stat-value {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: -1px;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .stat-label {
+    font-size: 10px;
+    color: var(--text-muted);
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+  }
+
+  .stat-dot {
+    display: inline-block;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    margin-right: 5px;
+    vertical-align: middle;
+  }
+
+  /* ===== FILTER PILLS (Agent) ===== */
+  .agent-filter-bar {
+    padding: 14px 28px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    overflow-x: auto;
+  }
+
+  .agent-filter-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-muted);
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    flex-shrink: 0;
+  }
+
+  .agent-pill {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    border-radius: 100px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-sub);
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+
+  .agent-pill:hover { border-color: var(--border-hover); color: var(--text); }
+
+  .agent-pill.active {
+    background: var(--accent2);
+    border-color: var(--accent2);
+    color: white;
+  }
+
+  .agent-pill .count {
+    background: rgba(255,255,255,0.15);
+    border-radius: 100px;
+    padding: 1px 6px;
+    font-size: 10px;
+    font-weight: 800;
+  }
+
+  .agent-pill:not(.active) .count {
+    background: var(--surface2);
+    color: var(--text-muted);
+  }
+
+  /* ===== CARDS GRID ===== */
+  .cards-container {
+    padding: 20px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .record-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 0;
+    transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+    overflow: hidden;
+    animation: fadeSlideIn 0.3s ease both;
+  }
+
+  .record-card:hover {
+    border-color: var(--border-hover);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3), 0 0 0 1px rgba(0,198,255,0.05);
+    transform: translateY(-1px);
+  }
+
+  @keyframes fadeSlideIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    padding: 14px 20px;
+    gap: 16px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface2);
+  }
+
+  .record-id {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+    background: var(--bg);
+    padding: 3px 8px;
+    border-radius: 5px;
+    border: 1px solid var(--border);
+    white-space: nowrap;
+  }
+
+  .customer-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .customer-avatar {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 800; color: white;
+    flex-shrink: 0;
+    background: linear-gradient(135deg, #2563EB, #7C3AED);
+  }
+
+  .customer-name {
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .customer-mobile {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 1px;
+  }
+
+  .header-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+
+  .tier-badge {
+    padding: 3px 10px;
+    border-radius: 100px;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .tier-basic { background: rgba(255,184,0,0.12); color: #FFB800; border: 1px solid rgba(255,184,0,0.25); }
+  .tier-standard { background: rgba(0,198,255,0.1); color: #00C6FF; border: 1px solid rgba(0,198,255,0.25); }
+  .tier-premium { background: rgba(168,85,247,0.12); color: #A855F7; border: 1px solid rgba(168,85,247,0.25); }
+
+  .status-badge {
+    padding: 3px 10px;
+    border-radius: 100px;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .status-pending { background: rgba(255,184,0,0.1); color: #FFB800; border: 1px solid rgba(255,184,0,0.2); }
+  .status-active { background: rgba(0,214,143,0.1); color: #00D68F; border: 1px solid rgba(0,214,143,0.2); }
+  .status-complete { background: rgba(0,198,255,0.1); color: #00C6FF; border: 1px solid rgba(0,198,255,0.2); }
+
+  .booking-complete { background: rgba(0,214,143,0.1); color: #00D68F; border: 1px solid rgba(0,214,143,0.2); }
+  .booking-pending { background: rgba(255,184,0,0.1); color: #FFB800; border: 1px solid rgba(255,184,0,0.2); }
+
+  .agent-chip {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 8px;
+    background: rgba(168,85,247,0.1);
+    border-radius: 100px;
+    border: 1px solid rgba(168,85,247,0.2);
+    font-size: 10px;
+    font-weight: 700;
+    color: #A855F7;
+  }
+
+  .created-time {
+    font-size: 10px;
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+
+  /* ===== CARD BODY ===== */
+  .card-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 0;
+  }
+
+  .card-section {
+    padding: 16px 20px;
+    border-right: 1px solid var(--border);
+  }
+
+  .card-section:last-child { border-right: none; }
+
+  .section-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--text-muted);
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .booking-car {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .booking-problem {
+    font-size: 12px;
+    color: var(--orange);
+    font-weight: 600;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .booking-price {
+    font-size: 11px;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+
+  .booking-date {
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-top: 6px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* Pricing grid */
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .price-item {
+    background: var(--bg);
+    border-radius: 8px;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+  }
+
+  .price-item-label {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 3px;
+  }
+
+  .price-item-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1;
+  }
+
+  .price-service { color: var(--green); }
+  .price-membership { color: var(--text); }
+  .price-pay-now { color: var(--yellow); }
+  .price-extra { color: var(--red); }
+
+  /* Actions column */
+  .card-actions {
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 180px;
+    justify-content: center;
+  }
+
+  .remarks-display {
+    background: var(--bg);
+    border-radius: 6px;
+    padding: 8px 10px;
+    font-size: 11px;
+    color: var(--text-sub);
+    border: 1px solid var(--border);
+    font-style: italic;
+    line-height: 1.4;
+    margin-bottom: 4px;
+    max-height: 52px;
+    overflow: hidden;
+  }
+
+  .btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 9px 14px;
+    border-radius: 8px;
+    border: none;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+
+  .btn-whatsapp {
+    background: linear-gradient(135deg, #128C7E, #25D366);
+    color: white;
+  }
+
+  .btn-whatsapp:hover {
+    background: linear-gradient(135deg, #075E54, #128C7E);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(37,211,102,0.3);
+  }
+
+  .btn-whatsapp.sent {
+    background: linear-gradient(135deg, #1a7a5e, #2da65c);
+  }
+
+  .btn-edit {
+    background: transparent;
+    color: var(--text-sub);
+    border: 1px solid var(--border);
+  }
+
+  .btn-edit:hover {
+    border-color: var(--border-hover);
+    color: var(--text);
+    background: var(--surface2);
+  }
+
+  /* ===== MODAL ===== */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(6px);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.15s ease;
+  }
+
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  .modal {
+    background: var(--surface2);
+    border: 1px solid var(--border-hover);
+    border-radius: 18px;
+    padding: 32px;
+    width: 520px;
+    max-width: calc(100vw - 40px);
+    box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+    animation: slideUp 0.2s ease;
+  }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+  }
+
+  .modal-title {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--text);
+    letter-spacing: -0.3px;
+  }
+
+  .modal-subtitle { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+  .modal-close {
+    width: 32px; height: 32px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text-muted);
+    font-size: 16px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+    flex-shrink: 0;
+  }
+
+  .modal-close:hover { border-color: var(--red); color: var(--red); }
+
+  .form-group {
+    margin-bottom: 18px;
+  }
+
+  .form-label {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-muted);
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    margin-bottom: 7px;
+  }
+
+  .form-input, .form-textarea {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .form-input:focus, .form-textarea:focus {
+    border-color: var(--accent2);
+    box-shadow: 0 0 0 3px rgba(0,112,243,0.1);
+  }
+
+  .form-input::placeholder, .form-textarea::placeholder { color: var(--text-muted); }
+
+  .form-textarea { resize: vertical; min-height: 90px; line-height: 1.5; }
+
+  .modal-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 24px;
+  }
+
+  .btn-primary {
+    flex: 1;
+    background: linear-gradient(135deg, var(--accent2), #0090FF);
+    color: white;
+    padding: 11px;
+    border-radius: 9px;
+    border: none;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(0,112,243,0.4);
+  }
+
+  .btn-secondary {
+    flex: 1;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-sub);
+    padding: 11px;
+    border-radius: 9px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .btn-secondary:hover { border-color: var(--border-hover); color: var(--text); }
+
+  /* ===== LOADING / EMPTY ===== */
+  .loader {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px;
+    gap: 16px;
+  }
+
+  .spinner {
+    width: 40px; height: 40px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  .loader-text { color: var(--text-muted); font-size: 13px; font-weight: 600; }
+
+  .empty-state {
+    text-align: center;
+    padding: 80px;
+    color: var(--text-muted);
+  }
+
+  .empty-icon { font-size: 48px; margin-bottom: 16px; }
+  .empty-title { font-size: 16px; font-weight: 700; color: var(--text-sub); margin-bottom: 6px; }
+  .empty-sub { font-size: 13px; }
+
+  /* ===== SCROLLBAR ===== */
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+
+  /* ===== TOAST ===== */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    box-shadow: var(--card-shadow);
+    z-index: 2000;
+    animation: slideInRight 0.3s ease, fadeOut 0.3s ease 2.7s both;
+  }
+
+  @keyframes slideInRight {
+    from { opacity: 0; transform: translateX(20px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  @keyframes fadeOut {
+    to { opacity: 0; transform: translateY(8px); }
+  }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    .sidebar { display: none; }
+    .main { margin-left: 0; }
+    .card-body { grid-template-columns: 1fr; }
+    .card-section { border-right: none; border-bottom: 1px solid var(--border); }
+    .stats-bar { grid-template-columns: repeat(3, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<div class="sidebar">
+  <div class="logo">
+    <div class="logo-mark">
+      <div class="logo-icon">⚡</div>
+      <div>
+        <div class="logo-text">Instant Mechanic</div>
+        <div class="logo-sub">Operations Hub</div>
+      </div>
+    </div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">Sales</div>
+    <div class="nav-item active"><span class="icon">💎</span> Memberships</div>
+    <div class="nav-item"><span class="icon">📋</span> Bookings</div>
+    <div class="nav-item"><span class="icon">👥</span> Customers</div>
+    <div style="margin-top: 16px;"></div>
+    <div class="nav-label">Reports</div>
+    <div class="nav-item"><span class="icon">📊</span> Analytics</div>
+    <div class="nav-item"><span class="icon">💰</span> Revenue</div>
+    <div style="margin-top: 16px;"></div>
+    <div class="nav-label">Settings</div>
+    <div class="nav-item"><span class="icon">⚙️</span> Configuration</div>
+  </div>
+  <div class="sidebar-footer">
+    <div class="agent-badge">
+      <div class="agent-avatar" id="sidebar-avatar">GD</div>
+      <div class="agent-info">
+        <div class="agent-name" id="sidebar-name">Agent</div>
+        <div class="agent-role">Support Agent</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Main -->
+<div class="main">
+
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="topbar-title">Membership Leads</div>
+    <div style="margin-left:auto">
+      <button class="refresh-btn" id="refreshBtn" onclick="fetchData()">
+        <span class="spin">↻</span> Refresh
+      </button>
+    </div>
+  </div>
+
+
+
+  <!-- Agent Filter Bar -->
+  <div class="agent-filter-bar">
+    <span class="agent-filter-label">👤 Agent</span>
+    <div id="agentPills"></div>
+  </div>
+
+  <!-- Cards -->
+  <div class="cards-container" id="cardsContainer">
+    <div class="loader">
+      <div class="spinner"></div>
+      <div class="loader-text">Loading memberships...</div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal-overlay" id="editModal" style="display:none" onclick="closeModal(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title">✏️ Edit Record</div>
+        <div class="modal-subtitle" id="modal-subtitle">Update agent & remarks</div>
+      </div>
+      <button class="modal-close" onclick="closeModalForce()">✕</button>
+    </div>
+    <input type="hidden" id="edit-id">
+    <div class="form-group">
+      <label class="form-label">Support Agent</label>
+      <input type="text" class="form-input" id="edit-agent" placeholder="Agent initials or name">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Remarks</label>
+      <textarea class="form-textarea" id="edit-remarks" placeholder="Add notes about this lead, follow-up status, customer response…"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-primary" onclick="saveEdit()">💾 Save Changes</button>
+      <button class="btn-secondary" onclick="closeModalForce()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API_URL = 'https://ai.instantmechanic.online/bot/api/memberships/';
+const MEMBERSHIP_LINK = 'https://instantmechanic.online/yearly-membership.html?mobile=';
+
+let allRecords = [];
+let activeAgent = 'all';
+
+// Color pools for avatars
+const avatarColors = [
+  'linear-gradient(135deg, #2563EB, #7C3AED)',
+  'linear-gradient(135deg, #059669, #0891B2)',
+  'linear-gradient(135deg, #DC2626, #D97706)',
+  'linear-gradient(135deg, #7C3AED, #DB2777)',
+  'linear-gradient(135deg, #0891B2, #0D9488)',
+  'linear-gradient(135deg, #B45309, #92400E)',
+];
+
+function getAvatarColor(name) {
+  const code = (name || 'U').charCodeAt(0) % avatarColors.length;
+  return avatarColors[code];
+}
+
+function getInitials(name) {
+  if (!name || name.includes('@')) return '?';
+  const parts = name.trim().split(' ');
+  if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+  return name.slice(0, 2).toUpperCase();
+}
+
+function fmt(dateStr) {
+  if (!dateStr) return '—';
+  const d = new Date(dateStr);
+  return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })
+    + ' ' + d.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+}
+
+function fmtShort(dateStr) {
+  if (!dateStr) return '—';
+  const d = new Date(dateStr);
+  return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
+}
+
+function buildMessage(r) {
+  const name = (r.customer.name || 'there').split(' ')[0];
+  const mobile = r.customer.mobile;
+  const car = (r.booking.car || '').trim();
+  const problem = r.booking.problem || 'service';
+  const svcAmt = parseFloat(r.service_amount).toLocaleString('en-IN');
+  const extra = parseFloat(r.extra_payment).toLocaleString('en-IN');
+  const membership = parseFloat(r.membership_price).toLocaleString('en-IN');
+  const link = MEMBERSHIP_LINK + mobile;
+
+  const benefitMap = {
+    premium: '✔ Free flat tyre support ✔ Free jump start ✔ Free key lockout help ✔ ₹1,500 off on every car service ✔ 24×7 priority support ✔ 2 free oil changes',
+    standard: '✔ Free flat tyre support ✔ Free jump start ✔ Free key lockout help ✔ ₹1,000 off on every car service ✔ 24×7 emergency support',
+    basic: '✔ Free flat tyre support ✔ Free jump start ✔ Free key lockout help ✔ ₹500 off on every car service ✔ 24×7 emergency support'
+  };
+  const benefits = benefitMap[r.tier] || benefitMap.basic;
+
+  return `Hi ${name} 😊\nThanks for using Instant Mechanic for your ${car} – ${problem} 🙌\nSince you already paid ₹${svcAmt} today, you can now upgrade to our 1-Year Roadside Membership by paying just ₹${extra} more 💥\n👉 Total ₹${membership} for 1 full year ${benefits}\n\nYour today's service amount is already adjusted ✅\nActivate now while the offer is exclusive to you:\n${link}\n— Team Instant Mechanic`;
+}
+
+function sendWhatsApp(id) {
+  const r = allRecords.find(x => x.id === id);
+  if (!r) return;
+  const msg = buildMessage(r);
+  const mobile = r.customer.mobile.replace(/\D/g, '');
+  window.open(`https://wa.me/${mobile}?text=${encodeURIComponent(msg)}`, '_blank');
+
+  // Visual feedback
+  const btn = document.querySelector(`[data-wa="${id}"]`);
+  if (btn) {
+    btn.innerHTML = '✓ Opened!';
+    btn.classList.add('sent');
+    setTimeout(() => {
+      btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 16.95c-.267.744-1.556 1.432-2.135 1.526-.579.094-1.294.133-2.087-.132-.481-.164-1.097-.382-1.882-.747-3.312-1.43-5.471-4.721-5.637-4.942-.166-.222-1.354-1.8-1.354-3.432 0-1.632.855-2.433 1.158-2.764.302-.33.66-.413.88-.413h.633c.208 0 .49-.079.767.587.285.683.967 2.359.993 2.472.033.133.054.287-.033.46-.087.172-.132.28-.265.43-.133.15-.28.334-.399.45-.132.128-.27.267-.116.523.154.257.684 1.129 1.468 1.829 1.008.899 1.857 1.178 2.121 1.31.264.133.418.111.572-.067.155-.178.66-.77.836-1.035.177-.264.354-.22.596-.132.242.087 1.538.726 1.802.858.264.133.44.198.505.308.066.11.066.638-.2 1.382z"/></svg> Sent!';
+      setTimeout(() => {
+        btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 16.95c-.267.744-1.556 1.432-2.135 1.526-.579.094-1.294.133-2.087-.132-.481-.164-1.097-.382-1.882-.747-3.312-1.43-5.471-4.721-5.637-4.942-.166-.222-1.354-1.8-1.354-3.432 0-1.632.855-2.433 1.158-2.764.302-.33.66-.413.88-.413h.633c.208 0 .49-.079.767.587.285.683.967 2.359.993 2.472.033.133.054.287-.033.46-.087.172-.132.28-.265.43-.133.15-.28.334-.399.45-.132.128-.27.267-.116.523.154.257.684 1.129 1.468 1.829 1.008.899 1.857 1.178 2.121 1.31.264.133.418.111.572-.067.155-.178.66-.77.836-1.035.177-.264.354-.22.596-.132.242.087 1.538.726 1.802.858.264.133.44.198.505.308.066.11.066.638-.2 1.382z"/></svg> WhatsApp Pitch';
+        btn.classList.remove('sent');
+      }, 3000);
+    }, 200);
+  }
+  showToast('✅ WhatsApp opened for ' + (r.customer.name || r.customer.mobile));
+}
+
+function openEdit(id) {
+  const r = allRecords.find(x => x.id === id);
+  if (!r) return;
+  document.getElementById('edit-id').value = id;
+  document.getElementById('edit-agent').value = r.support_agent || '';
+  document.getElementById('edit-remarks').value = r.remarks || '';
+  document.getElementById('modal-subtitle').textContent =
+    `#${id} — ${r.customer.name || r.customer.mobile} | ${(r.booking.car || '').trim()}`;
+  document.getElementById('editModal').style.display = 'flex';
+}
+
+function closeModal(e) {
+  if (e.target.id === 'editModal') closeModalForce();
+}
+
+function closeModalForce() {
+  document.getElementById('editModal').style.display = 'none';
+}
+
+async function saveEdit() {
+  const id = parseInt(document.getElementById('edit-id').value);
+  const agent = document.getElementById('edit-agent').value.trim();
+  const remarks = document.getElementById('edit-remarks').value.trim();
+
+  // Update local
+  const idx = allRecords.findIndex(x => x.id === id);
+  if (idx !== -1) {
+    allRecords[idx].support_agent = agent;
+    allRecords[idx].remarks = remarks;
+  }
+
+  // Try API
+  try {
+    await fetch(`${API_URL}${id}/`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ support_agent: agent, remarks })
+    });
+  } catch(e) {}
+
+  closeModalForce();
+  renderCards();
+  renderAgentPills();
+  showToast('💾 Record #' + id + ' updated');
+}
+
+function showToast(msg) {
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3100);
+}
+
+function buildCard(r) {
+  const initials = getInitials(r.customer.name);
+  const avatarColor = getAvatarColor(r.customer.name);
+  const tierClass = `tier-${r.tier}`;
+  const statusClass = `status-${r.status}`;
+  const bookingStatusClass = r.booking.booking_status === 'complete' ? 'booking-complete' : 'booking-pending';
+  const waIcon = `<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 16.95c-.267.744-1.556 1.432-2.135 1.526-.579.094-1.294.133-2.087-.132-.481-.164-1.097-.382-1.882-.747-3.312-1.43-5.471-4.721-5.637-4.942-.166-.222-1.354-1.8-1.354-3.432 0-1.632.855-2.433 1.158-2.764.302-.33.66-.413.88-.413h.633c.208 0 .49-.079.767.587.285.683.967 2.359.993 2.472.033.133.054.287-.033.46-.087.172-.132.28-.265.43-.133.15-.28.334-.399.45-.132.128-.27.267-.116.523.154.257.684 1.129 1.468 1.829 1.008.899 1.857 1.178 2.121 1.31.264.133.418.111.572-.067.155-.178.66-.77.836-1.035.177-.264.354-.22.596-.132.242.087 1.538.726 1.802.858.264.133.44.198.505.308.066.11.066.638-.2 1.382z"/></svg>`;
+
+  const remarksHTML = r.remarks
+    ? `<div class="remarks-display">💬 ${r.remarks}</div>`
+    : '';
+
+  return `
+  <div class="record-card" id="card-${r.id}">
+    <div class="card-header">
+      <span class="record-id">#${r.id}</span>
+      <div class="customer-info">
+        <div class="customer-avatar" style="background:${avatarColor}">${initials}</div>
+        <div>
+          <div class="customer-name">${r.customer.name || '<span style="color:var(--text-muted);font-style:italic">No name</span>'}</div>
+          <div class="customer-mobile">+${r.customer.mobile}</div>
+        </div>
+      </div>
+      <div class="header-meta">
+        <span class="tier-badge ${tierClass}">${r.tier}</span>
+        <span class="status-badge ${statusClass}">${r.status}</span>
+        <span class="agent-chip">👤 ${r.support_agent || '—'}</span>
+        <span class="created-time">📅 ${fmtShort(r.created_at)}</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="card-section">
+        <div class="section-label">🚗 Booking Details</div>
+        <div class="booking-car">
+          ${(r.booking.car || '').trim()}
+        </div>
+        <div class="booking-problem">⚠️ ${r.booking.problem}</div>
+        <div class="booking-price">${r.booking.price || '—'}</div>
+        <div class="booking-date">Booked: ${fmt(r.booking.created_at)}</div>
+        ${r.booking.location && r.booking.location.startsWith('http') ?
+          `<a href="${r.booking.location}" target="_blank" style="color:var(--accent);font-size:10px;margin-top:6px;display:inline-flex;align-items:center;gap:4px;text-decoration:none">📍 View Location →</a>` : ''}
+      </div>
+      <div class="card-section">
+        <div class="section-label">💰 Pricing</div>
+        <div class="pricing-grid">
+          <div class="price-item">
+            <div class="price-item-label">Service Paid</div>
+            <div class="price-item-value price-service">₹${parseFloat(r.service_amount).toLocaleString('en-IN')}</div>
+          </div>
+          <div class="price-item">
+            <div class="price-item-label">Membership</div>
+            <div class="price-item-value price-membership">₹${parseFloat(r.membership_price).toLocaleString('en-IN')}</div>
+          </div>
+          <div class="price-item" style="grid-column: span 2">
+            <div class="price-item-label">Pay Now (Extra Needed)</div>
+            <div class="price-item-value price-pay-now">₹${parseFloat(r.extra_payment).toLocaleString('en-IN')}</div>
+          </div>
+        </div>
+      </div>
+      <div class="card-actions">
+        ${remarksHTML}
+        <button class="btn btn-whatsapp" data-wa="${r.id}" onclick="sendWhatsApp(${r.id})">
+          ${waIcon} WhatsApp Pitch
+        </button>
+        <button class="btn btn-edit" onclick="openEdit(${r.id})">
+          ✏️ Edit / Remarks
+        </button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function getFilteredRecords() {
+  return allRecords.filter(r => {
+    return activeAgent === 'all' || r.support_agent === activeAgent;
+  });
+}
+
+function renderCards() {
+  const container = document.getElementById('cardsContainer');
+  const filtered = getFilteredRecords();
+
+  if (filtered.length === 0) {
+    container.innerHTML = `<div class="empty-state">
+      <div class="empty-icon">🔍</div>
+      <div class="empty-title">No records found</div>
+      <div class="empty-sub">Try adjusting your filters or search query</div>
+    </div>`;
+    return;
+  }
+
+  container.innerHTML = filtered.map((r, i) => {
+    const card = buildCard(r);
+    return card.replace('class="record-card"', `class="record-card" style="animation-delay:${i * 30}ms"`);
+  }).join('');
+}
+
+
+
+function renderAgentPills() {
+  const agentCounts = {};
+  allRecords.forEach(r => {
+    const a = r.support_agent || 'Unknown';
+    agentCounts[a] = (agentCounts[a] || 0) + 1;
+  });
+
+  const agents = Object.entries(agentCounts).sort((a, b) => b[1] - a[1]);
+  const total = allRecords.length;
+
+  const container = document.getElementById('agentPills');
+  container.innerHTML = `
+    <button class="agent-pill ${activeAgent === 'all' ? 'active' : ''}" onclick="setAgent('all')">
+      All Agents <span class="count">${total}</span>
+    </button>
+    ${agents.map(([name, count]) => `
+      <button class="agent-pill ${activeAgent === name ? 'active' : ''}" onclick="setAgent('${name}')">
+        ${name} <span class="count">${count}</span>
+      </button>
+    `).join('')}
+  `;
+
+  // Update sidebar
+  if (activeAgent !== 'all') {
+    document.getElementById('sidebar-avatar').textContent = getInitials(activeAgent);
+    document.getElementById('sidebar-name').textContent = activeAgent;
+  } else {
+    document.getElementById('sidebar-avatar').textContent = 'All';
+    document.getElementById('sidebar-name').textContent = 'All Agents';
+  }
+}
+
+function setAgent(agent) {
+  activeAgent = agent;
+  renderAgentPills();
+  renderCards();
+}
+
+
+
+async function fetchData() {
+  const btn = document.getElementById('refreshBtn');
+  btn.classList.add('loading');
+
+  try {
+    const res = await fetch(API_URL);
+    const data = await res.json();
+    allRecords = Array.isArray(data) ? data : [];
+  } catch (e) {
+    console.warn('API unavailable, using sample data');
+    allRecords = SAMPLE_DATA;
+    showToast('⚠️ Using sample data — API unreachable');
+  }
+
+  renderAgentPills();
+  renderCards();
+  btn.classList.remove('loading');
+}
+
+// Sample data fallback
+const SAMPLE_DATA = [
+  {"id":1078,"customer":{"id":57717,"name":"bharat daga","mobile":"918527198569"},"booking":{"id":25083,"car":"Ford EcoSport","problem":"Car not starting","service_type":null,"price":"470 (Service Charge: ₹399 + GST: ₹71)","location":"https://www.google.com/maps?q=28.399150848389,77.080528259277","booking_status":"complete","created_at":"2026-02-22T13:44:27.518722Z"},"tier":"basic","support_agent":"GD","service_amount":"470.00","membership_price":"1299.00","status":"pending","start_date":null,"need_to_pay_now":"1299.00","payment_id":"order_SJvhi1CSznbVFS","end_date":null,"remarks":null,"created_at":"2026-02-24T09:15:00.348872Z","extra_payment":"829.00","payment_id_2":"order_SJvhiJBQVkheTk"},
+  {"id":1077,"customer":{"id":57711,"name":"","mobile":"918800601134"},"booking":{"id":25077,"car":"Tata Punch","problem":"Tyre Puncture","service_type":null,"price":"450 (GoMechanic - Day)","location":"28°28'46.9\"N 77°29'19.8\"E","booking_status":"pending","created_at":"2026-02-22T13:14:00.404514Z"},"tier":"basic","support_agent":"GD","service_amount":"450.00","membership_price":"1299.00","status":"pending","start_date":null,"need_to_pay_now":"1099.00","payment_id":"order_SJvhh9cwg88ZtX","end_date":null,"remarks":null,"created_at":"2026-02-24T09:14:59.488151Z","extra_payment":"849.00","payment_id_2":"order_SJvhhJ6LHrSHxA"},
+  {"id":1076,"customer":{"id":58440,"name":"Mohd Akram","mobile":"919205823920"},"booking":{"id":25342,"car":"Hyundai","problem":"Car Not Starting","service_type":null,"price":"600 (Service Charge: ₹508, GST: ₹92)","location":"https://www.google.com/maps?q=28.4579567,76.9906211","booking_status":"complete","created_at":"2026-02-24T02:55:18.049318Z"},"tier":"standard","support_agent":"GD","service_amount":"600.00","membership_price":"1499.00","status":"pending","start_date":null,"need_to_pay_now":"1499.00","payment_id":"order_SJvgZGcf2FF6ym","end_date":null,"remarks":null,"created_at":"2026-02-24T09:13:55.417672Z","extra_payment":"899.00","payment_id_2":"order_SJvgZQfLaipcbn"},
+  {"id":1075,"customer":{"id":58443,"name":"kjoseph4140","mobile":"918882432547"},"booking":{"id":25344,"car":"Alto 800","problem":"Battery down","service_type":null,"price":"788 (Service Charge: ₹668 + GST: ₹120)","location":"https://www.google.com/maps?q=28.5374752,77.2565998","booking_status":"pending","created_at":"2026-02-24T02:58:16.923060Z"},"tier":"standard","support_agent":"GD","service_amount":"788.00","membership_price":"1499.00","status":"pending","start_date":null,"need_to_pay_now":"1499.00","payment_id":"order_SJvgYYxYbshxLh","end_date":null,"remarks":null,"created_at":"2026-02-24T09:13:54.715810Z","extra_payment":"711.00","payment_id_2":"order_SJvgYefr7g74k1"},
+  {"id":1074,"customer":{"id":58441,"name":"Vikas","mobile":"919718557857"},"booking":{"id":25343,"car":"Maruti Suzuki Swift Dzire","problem":"Battery Jump Start","service_type":null,"price":"600 (Service Charge: ₹508, GST: ₹92)","location":"https://www.google.com/maps?q=28.618125915527,77.279975891113","booking_status":"pending","created_at":"2026-02-24T02:56:59.721092Z"},"tier":"standard","support_agent":"GD","service_amount":"600.00","membership_price":"1499.00","status":"pending","start_date":null,"need_to_pay_now":"1499.00","payment_id":"order_SJvgXmWLwMU5ZS","end_date":null,"remarks":null,"created_at":"2026-02-24T09:13:54.025858Z","extra_payment":"899.00","payment_id_2":"order_SJvgXuWrspgF4G"},
+  {"id":1073,"customer":{"id":58430,"name":"luxcar31","mobile":"918759310350"},"booking":{"id":25341,"car":"Bike","problem":"Tyre Puncture","service_type":null,"price":"400 (Service Charge: ₹339, GST: ₹61)","location":"https://www.google.com/maps?q=28.5967567,77.1315869","booking_status":"pending","created_at":"2026-02-24T02:53:13.318614Z"},"tier":"basic","support_agent":"GD","service_amount":"400.00","membership_price":"1299.00","status":"pending","start_date":null,"need_to_pay_now":"1299.00","payment_id":"order_SJvgX505l3CsGw","end_date":null,"remarks":null,"created_at":"2026-02-24T09:13:53.354445Z","extra_payment":"899.00","payment_id_2":"order_SJvgXBFnCYk3Fp"},
+  {"id":1072,"customer":{"id":57973,"name":"Tanishka","mobile":"918178038950"},"booking":{"id":25340,"car":"Maruti Suzuki Grand Vitara","problem":"Car Not Starting","service_type":null,"price":"500 (Service Charge: ₹424, GST: ₹76)","location":"https://www.google.com/maps?q=28.70713155,77.13693148","booking_status":"complete","created_at":"2026-02-24T02:49:10.013755Z"},"tier":"basic","support_agent":"GD","service_amount":"500.00","membership_price":"1299.00","status":"pending","start_date":null,"need_to_pay_now":"1100.00","payment_id":"order_SJvgWM0UsCbVuN","end_date":null,"remarks":"Called twice, interested","created_at":"2026-02-24T09:13:52.702255Z","extra_payment":"799.00","payment_id_2":"order_SJvgWTHe0szPie"},
+  {"id":1071,"customer":{"id":58436,"name":"Parth Rastogi","mobile":"918287799553"},"booking":{"id":25339,"car":"Hyundai i10","problem":"Car Not Starting","service_type":null,"price":"500 (Service Charge: ₹424, GST: ₹76)","location":"https://www.google.com/maps?q=28.5427174,77.04925039999999","booking_status":"pending","created_at":"2026-02-24T02:29:06.197304Z"},"tier":"basic","support_agent":"SK","service_amount":"500.00","membership_price":"1299.00","status":"pending","start_date":null,"need_to_pay_now":"1299.00","payment_id":"order_SJvgVcXt7hHzTt","end_date":null,"remarks":null,"created_at":"2026-02-24T09:13:52.044089Z","extra_payment":"799.00","payment_id_2":"order_SJvgVkE0g36hNA"},
+  {"id":1070,"customer":{"id":58429,"name":"Jyoti Arora","mobile":"919811720350"},"booking":{"id":25337,"car":"Ford Eco Sport","problem":"Tyre Puncture","service_type":null,"price":"400 (Service Charge: ₹339, GST: ₹61)","location":"https://www.google.com/maps?q=28.5635537,77.0416845","booking_status":"complete","created_at":"2026-02-24T01:14:05.541171Z"},"tier":"basic","support_agent":"SK","service_amount":"400.00","membership_price":"1299.00","status":"pending","start_date":null,"need_to_pay_now":"1299.00","payment_id":"order_SJvgUsIvSYH562","end_date":null,"remarks":null,"created_at":"2026-02-24T09:13:51.373588Z","extra_payment":"899.00","payment_id_2":"order_SJvgV1I1DLJUog"},
+  {"id":1069,"customer":{"id":58426,"name":"sanjoykumardas278","mobile":"919560855099"},"booking":{"id":25336,"car":"Maruti Suzuki WagonR","problem":"Tyre Puncture","service_type":null,"price":"887 (Service Charge: ₹752, GST: ₹135)","location":"https://www.google.com/maps?q=28.6035087,77.0398038","booking_status":"complete","created_at":"2026-02-24T00:49:55.970728Z"},"tier":"premium","support_agent":"AM","service_amount":"887.00","membership_price":"1799.00","status":"pending","start_date":null,"need_to_pay_now":"1799.00","payment_id":"order_SJvgU7R96PbIJh","end_date":null,"remarks":"Very interested, follow up evening","created_at":"2026-02-24T09:13:50.674547Z","extra_payment":"912.00","payment_id_2":"order_SJvgUFnjURNHfn"}
+];
+
+// Init
+fetchData();
+</script>
+</body>
+</html>
