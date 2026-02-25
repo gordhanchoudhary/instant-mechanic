@@ -2,22 +2,146 @@
 <html>
 <head>
     <title>Agent Login</title>
-    <link rel="stylesheet" href="login.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #f4f6f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+        }
+
+        .login-box {
+            background: #ffffff;
+            padding: 30px;
+            width: 320px;
+            border-radius: 10px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+            text-align: center;
+        }
+
+        .login-box h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .login-box input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            font-size: 14px;
+        }
+
+        .login-box button {
+            width: 100%;
+            padding: 12px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .login-box button:hover {
+            background: #0056b3;
+        }
+
+        .error {
+            color: red;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        .loading {
+            font-size: 13px;
+            color: #666;
+            margin-top: 8px;
+        }
+    </style>
 </head>
+
 <body>
 
 <div class="login-box">
     <h2>Agent Login</h2>
 
-    <input type="text" id="mobile" placeholder="Mobile Number" />
-    <input type="password" id="password" placeholder="Password" />
+    <input type="text" id="mobile" placeholder="Mobile Number">
+    <input type="password" id="password" placeholder="Password">
 
     <button onclick="login()">Login</button>
 
-    <p id="error" class="error"></p>
+    <div class="loading" id="loading"></div>
+    <div class="error" id="error"></div>
 </div>
 
-<script src="login.js"></script>
+<script>
+function login() {
+
+    const mobile = document.getElementById("mobile").value.trim();
+    const password = document.getElementById("password").value.trim();
+    const error = document.getElementById("error");
+    const loading = document.getElementById("loading");
+
+    error.innerText = "";
+    loading.innerText = "";
+
+    if (!mobile || !password) {
+        error.innerText = "Please enter mobile and password";
+        return;
+    }
+
+    loading.innerText = "Checking...";
+
+    const formData = new FormData();
+    formData.append("mobile", mobile);
+    formData.append("captcha", password);
+
+    fetch("https://ai.instantmechanic.online/bot/api/verify-agent/", {
+        method: "POST",
+        headers: {
+            "Accept": "application/json"
+        },
+        body: formData
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("Invalid login");
+        }
+        return response.json();
+    })
+    .then(data => {
+
+        // Save in localStorage
+        localStorage.setItem("agent_mobile", mobile);
+        localStorage.setItem("agent_password", password);
+
+        // Redirect back to original page
+        const params = new URLSearchParams(window.location.search);
+        const next = params.get("next");
+
+        if (next) {
+            window.location.href = next;
+        } else {
+            window.location.href = "/dashboard.html"; // default
+        }
+
+    })
+    .catch(() => {
+        loading.innerText = "";
+        error.innerText = "Invalid mobile or password";
+    });
+
+}
+</script>
 
 </body>
 </html>
