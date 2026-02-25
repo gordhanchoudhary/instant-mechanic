@@ -587,7 +587,7 @@
                 booking.booking_actions.forEach(action => filteredActions.push(action));
             });
 
-            const activeMechanics = new Set(filteredActions.map(a => a.mechanic_name)).size;
+            const activeMechanics = new Set(filteredActions.map(a => a.mechanic_name || 'Unknown')).size;
             const activeAgents = new Set(data.map(b => b.support_agent).filter(a => a)).size;
 
             document.getElementById('totalBookings').textContent = totalBookings;
@@ -651,7 +651,7 @@
                             <div class="timeline-item action-${actionClass}">
                                 <div class="action-content">
                                     <div class="action-main">
-                                        <div class="mechanic-name"><i class="fas fa-user-cog"></i>${action.mechanic_name}</div>
+                                        <div class="mechanic-name"><i class="fas fa-user-cog"></i>${action.mechanic_name || 'Unknown'}</div>
                                         <span class="action-type ${actionClass}">${formatActionType(action.action)}</span>
                                         ${action.remarks ? `<div class="action-remarks"><i class="fas fa-quote-left"></i> ${action.remarks}</div>` : ''}
                                     </div>
@@ -707,7 +707,7 @@
                         const at = new Date(action.action_time);
                         const ac = action.action.toLowerCase().replace(/ /g, '-');
                         const bc = ac === 'accept' ? 'accept' : ac === 'complete' ? 'complete' : ac === 'noaction' ? 'noaction' : (ac === 'cancel' || ac === 'customer-denied') ? 'cancel' : 'assign';
-                        actionsCell += `<div class="m-action-row"><span class="m-mech-name">${action.mechanic_name.split(' ')[0]}</span> <span class="m-badge ${bc}">${formatActionType(action.action).replace('Assigned Sub-mechanic','Assign')}</span> <span class="m-action-time">${at.toLocaleString('en-US',{hour:'2-digit',minute:'2-digit'})}</span></div>`;
+                        actionsCell += `<div class="m-action-row"><span class="m-mech-name">${(action.mechanic_name || 'Unknown').split(' ')[0]}</span> <span class="m-badge ${bc}">${formatActionType(action.action).replace('Assigned Sub-mechanic','Assign')}</span> <span class="m-action-time">${at.toLocaleString('en-US',{hour:'2-digit',minute:'2-digit'})}</span></div>`;
                     });
                     actionsCell += '</div>';
                 }
@@ -749,7 +749,7 @@
 
             data.forEach(booking => {
                 booking.booking_actions.forEach(action => {
-                    const mechanic = action.mechanic_name;
+                    const mechanic = action.mechanic_name || 'Unknown';
                     if (!mechanicStats[mechanic]) {
                         mechanicStats[mechanic] = { totalBookings: new Set(), totalActions: 0, accepts: 0, completes: 0, noActions: 0, cancels: 0, assigns: 0, responseTimes: [], lastAction: null };
                     }
@@ -851,7 +851,7 @@
         function populateFilters() {
             const mechanicFilter = document.getElementById('mechanicFilter');
             const agentFilter = document.getElementById('agentFilter');
-            const mechanics = new Set(allActions.map(a => a.mechanic_name));
+            const mechanics = new Set(allActions.map(a => a.mechanic_name || 'Unknown'));
             const agents = new Set(allBookingsData.map(b => b.support_agent).filter(a => a));
 
             mechanicFilter.innerHTML = '<option value="">All Mechanics</option>';
@@ -891,7 +891,7 @@
                     if (!booking.booking_actions.some(a => a.action.toLowerCase() === actionFilter)) return false;
                 }
                 if (mechanicFilter) {
-                    if (!booking.booking_actions.some(a => a.mechanic_name === mechanicFilter)) return false;
+                    if (!booking.booking_actions.some(a => (a.mechanic_name || 'Unknown') === mechanicFilter)) return false;
                 }
                 if (agentFilter) {
                     if (booking.support_agent !== agentFilter) return false;
@@ -928,7 +928,7 @@
                 };
                 if (booking.booking_actions.length === 0) return [baseData];
                 return booking.booking_actions.map(action => ({
-                    ...baseData, 'Mechanic Name': action.mechanic_name,
+                    ...baseData, 'Mechanic Name': action.mechanic_name || 'Unknown',
                     'Action': action.action, 'Action Time': action.action_time, 'Remarks': action.remarks || ''
                 }));
             }).flat();
