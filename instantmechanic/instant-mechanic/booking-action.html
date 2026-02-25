@@ -50,6 +50,9 @@
         .filter-select:focus, .search-input:focus { outline: none; border-color: #667eea; box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1); }
         .search-input { background: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='%236c757d' viewBox='0 0 16 16'%3e%3cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z'/%3e%3c/svg%3e") no-repeat right 12px center; background-size: 14px; background-color: white; padding-right: 35px; }
         .content-area { max-height: 700px; overflow-y: auto; }
+        /* Desktop: hide mobile table, show cards */
+        .mobile-table-wrapper { display: none; }
+        .booking-item { display: block; }
         .content-area::-webkit-scrollbar { width: 8px; }
         .content-area::-webkit-scrollbar-track { background: #f1f3f4; }
         .content-area::-webkit-scrollbar-thumb { background: #cbd5e0; border-radius: 4px; }
@@ -136,7 +139,207 @@
         .no-data i { font-size: 3rem; margin-bottom: 15px; color: #dee2e6; }
         .error-message { background: #f8d7da; color: #721c24; padding: 25px; border-radius: 8px; text-align: center; margin: 25px; }
         @media (max-width: 1200px) { .main-content { grid-template-columns: 1fr; } }
-        @media (max-width: 768px) { .dashboard-container { padding: 15px; } .header h1 { font-size: 1.5rem; } .stats-grid { grid-template-columns: repeat(2, 1fr); } .filters-panel { flex-direction: column; align-items: stretch; } .filter-group { flex-direction: column; align-items: stretch; gap: 5px; } .filter-select, .search-input { width: 100%; } }
+
+        /* ===== MOBILE: Compact desktop-style table view ===== */
+        @media (max-width: 768px) {
+            body { font-size: 10px; }
+            .dashboard-container { padding: 4px; }
+
+            /* Header compact */
+            .header { padding: 8px 10px; border-radius: 8px; margin-bottom: 6px; }
+            .header-top { margin-bottom: 8px; gap: 6px; }
+            .header h1 { font-size: 0.95rem; gap: 6px; }
+            .header h1 i { font-size: 0.85rem; }
+            .date-controls { padding: 5px 8px; gap: 5px; border-radius: 6px; flex-wrap: wrap; }
+            .date-controls label { font-size: 10px; }
+            .date-controls input { padding: 4px 6px; font-size: 10px; min-width: 110px; border-radius: 5px; }
+            .refresh-btn { padding: 5px 8px; font-size: 10px; border-radius: 5px; gap: 4px; }
+
+            /* Stats grid: compact horizontal scrollable row */
+            .stats-grid { 
+                display: flex; 
+                flex-wrap: nowrap; 
+                overflow-x: auto; 
+                gap: 5px; 
+                padding-bottom: 4px;
+                -webkit-overflow-scrolling: touch;
+            }
+            .stats-grid::-webkit-scrollbar { height: 3px; }
+            .stats-grid::-webkit-scrollbar-thumb { background: #ccc; border-radius: 2px; }
+            .stat-card { 
+                flex: 0 0 auto; 
+                min-width: 80px; 
+                padding: 7px 8px; 
+                border-radius: 6px; 
+                border-left-width: 3px;
+            }
+            .stat-value { font-size: 1.1rem; margin-bottom: 2px; }
+            .stat-label { font-size: 8px; letter-spacing: 0; }
+            .stat-sublabel { font-size: 7.5px; margin-top: 2px; }
+            .filter-active-badge { font-size: 7px; padding: 1px 4px; }
+
+            /* Main content single column */
+            .main-content { grid-template-columns: 1fr; gap: 6px; margin-bottom: 6px; }
+            .full-width { grid-column: 1 / -1; }
+            .card { border-radius: 8px; }
+
+            /* Card header compact */
+            .card-header { padding: 8px 10px; gap: 6px; }
+            .card-title { font-size: 0.85rem; gap: 6px; }
+            .card-actions { gap: 5px; }
+            .card-actions span { font-size: 10px; }
+            .btn { padding: 4px 8px; font-size: 10px; gap: 4px; border-radius: 4px; }
+
+            /* Filters panel compact */
+            .filters-panel { 
+                padding: 6px 8px; 
+                gap: 5px; 
+                overflow-x: auto; 
+                flex-wrap: nowrap;
+                -webkit-overflow-scrolling: touch;
+            }
+            .filter-group { flex-shrink: 0; gap: 4px; }
+            .filter-group label { font-size: 9px; font-weight: 700; white-space: nowrap; }
+            .filter-select, .search-input { 
+                padding: 4px 5px; 
+                font-size: 9px; 
+                min-width: 80px; 
+                max-width: 100px;
+                border-radius: 4px; 
+            }
+            .search-input { padding-right: 20px; background-size: 10px; }
+
+            /* ===== BOOKINGS: Compact table layout on mobile ===== */
+            .content-area { max-height: 65vh; overflow-y: auto; overflow-x: auto; }
+
+            /* Hide the card-style booking items, show table instead */
+            .booking-item { display: none !important; }
+            /* Show mobile table */
+            .mobile-table-wrapper { display: block !important; }
+
+            /* Mobile table container */
+            .mobile-table-wrapper {
+                display: block;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            .mobile-table-wrapper::-webkit-scrollbar { height: 4px; }
+            .mobile-table-wrapper::-webkit-scrollbar-thumb { background: #bbb; border-radius: 2px; }
+
+            .mobile-booking-table {
+                width: 100%;
+                border-collapse: collapse;
+                font-size: 9px;
+                white-space: nowrap;
+            }
+            .mobile-booking-table thead tr {
+                background: linear-gradient(135deg, #667eea, #764ba2);
+                color: white;
+                position: sticky;
+                top: 0;
+                z-index: 10;
+            }
+            .mobile-booking-table th {
+                padding: 5px 6px;
+                font-size: 8px;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.3px;
+                text-align: left;
+                border-right: 1px solid rgba(255,255,255,0.15);
+            }
+            .mobile-booking-table th:last-child { border-right: none; }
+            .mobile-booking-table tbody tr {
+                border-bottom: 1px solid #f0f0f0;
+                transition: background 0.15s;
+            }
+            .mobile-booking-table tbody tr:hover { background: #f8f9ff; }
+            .mobile-booking-table tbody tr.row-no-action { background: #fff5f5; border-left: 3px solid #dc3545; }
+            .mobile-booking-table tbody tr.row-cancelled { background: #fafafa; opacity: 0.75; }
+            .mobile-booking-table tbody tr.row-completed { }
+            .mobile-booking-table td {
+                padding: 4px 6px;
+                font-size: 9px;
+                color: #333;
+                vertical-align: middle;
+                border-right: 1px solid #f3f3f3;
+                max-width: 120px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            .mobile-booking-table td:last-child { border-right: none; }
+            .mobile-booking-table .td-id { 
+                font-weight: 800; 
+                color: #667eea; 
+                cursor: pointer; 
+                font-size: 9px;
+                min-width: 38px;
+            }
+            .mobile-booking-table .td-id:hover { text-decoration: underline; }
+            .mobile-booking-table .td-time { color: #888; font-size: 8px; min-width: 46px; }
+            .mobile-booking-table .td-car { font-weight: 700; color: #2c3e50; min-width: 80px; max-width: 90px; }
+            .mobile-booking-table .td-problem { color: #1976d2; min-width: 70px; max-width: 85px; }
+            .mobile-booking-table .td-mobile { font-family: monospace; font-size: 8.5px; color: #555; min-width: 80px; }
+            .mobile-booking-table .td-mechanic { color: #444; min-width: 70px; max-width: 90px; }
+            .mobile-booking-table .td-action { min-width: 55px; }
+            .mobile-booking-table .td-agent { color: #7b1fa2; min-width: 55px; max-width: 70px; }
+            .mobile-booking-table .td-response { min-width: 38px; }
+            .mobile-booking-table .td-status { min-width: 52px; }
+
+            .m-badge {
+                display: inline-block;
+                padding: 1px 5px;
+                border-radius: 6px;
+                font-size: 7.5px;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.2px;
+                white-space: nowrap;
+            }
+            .m-badge.accept { background: #d4edda; color: #155724; }
+            .m-badge.complete { background: #d1ecf1; color: #0c5460; }
+            .m-badge.noaction { background: #fff3cd; color: #856404; }
+            .m-badge.cancel, .m-badge.customer-denied { background: #f8d7da; color: #721c24; }
+            .m-badge.assign { background: #e2e3e5; color: #383d41; }
+            .m-badge.status-completed { background: #d4edda; color: #155724; }
+            .m-badge.status-cancelled { background: #f8d7da; color: #721c24; }
+            .m-badge.status-noaction { background: #fff3cd; color: #856404; }
+            .m-badge.status-pending { background: #e2e8f8; color: #1e3a8a; }
+
+            .m-response { font-size: 8px; font-weight: 700; padding: 1px 4px; border-radius: 4px; }
+            .m-response.excellent { background: #d4edda; color: #155724; }
+            .m-response.good { background: #d1ecf1; color: #0c5460; }
+            .m-response.slow { background: #fff3cd; color: #856404; }
+            .m-response.very-slow { background: #f8d7da; color: #721c24; }
+            .m-response.none { color: #bbb; }
+
+            /* Sub-actions inside table cell */
+            .m-actions-cell { display: flex; flex-direction: column; gap: 2px; }
+            .m-action-row { display: flex; align-items: center; gap: 3px; }
+            .m-mech-name { font-weight: 600; color: #444; }
+            .m-action-time { color: #aaa; font-size: 7.5px; }
+
+            /* Mechanic performance compact */
+            .mechanic-card { padding: 10px 12px; }
+            .mechanic-header { margin-bottom: 8px; gap: 8px; }
+            .mechanic-name-large { font-size: 0.85rem; margin-bottom: 4px; }
+            .mechanic-meta { gap: 5px; }
+            .mechanic-status { font-size: 8px; padding: 2px 6px; }
+            .score-circle { width: 44px; height: 44px; font-size: 13px; }
+            .score-label { font-size: 7.5px; }
+            .mechanic-stats { gap: 5px; }
+            .stat-box { padding: 6px 5px; border-left-width: 2px; }
+            .stat-number { font-size: 1rem; }
+            .stat-text { font-size: 7.5px; }
+            .avg-response { font-size: 9px; margin-top: 6px; padding-top: 6px; }
+
+            .no-data { padding: 30px 15px; }
+            .no-data i { font-size: 1.8rem; margin-bottom: 8px; }
+            .no-data h3, .no-data h4 { font-size: 0.85rem; }
+            .no-data p { font-size: 0.75rem; }
+            .loading { padding: 30px; }
+            .spinner { width: 25px; height: 25px; border-width: 3px; margin-right: 8px; }
+        }
     </style>
 </head>
 <body>
@@ -407,7 +610,8 @@
                 return;
             }
             document.getElementById('filteredCount').textContent = filteredData.length;
-            let bookingsHTML = '';
+            let cardsHTML = '';
+            let tableRowsHTML = '';
             const sortedData = [...filteredData].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
             sortedData.forEach(booking => {
@@ -418,18 +622,16 @@
                 if (!hasActions) itemClass += ' no-actions';
                 if (booking.is_cancelled) itemClass += ' cancelled';
 
-                let responseTime = '-', completionTime = '-', responseClass = '';
+                const sortedActions = [...booking.booking_actions].sort((a, b) => new Date(a.action_time) - new Date(b.action_time));
+                let responseTime = '-', completionTime = '-', responseClass = '', responseMinutes = null;
                 if (hasActions) {
-                    const firstAction = booking.booking_actions.reduce((earliest, action) =>
-                        new Date(action.action_time) < new Date(earliest.action_time) ? action : earliest
-                    );
-                    const responseMinutes = getTimeDiff(booking.created_at, firstAction.action_time);
+                    responseMinutes = getTimeDiff(booking.created_at, sortedActions[0].action_time);
                     responseTime = formatDuration(responseMinutes);
                     if (responseMinutes < 5) responseClass = 'excellent';
                     else if (responseMinutes < 15) responseClass = 'good';
                     else if (responseMinutes < 30) responseClass = 'slow';
                     else responseClass = 'very-slow';
-                    const completeAction = booking.booking_actions.find(a => a.action === 'complete');
+                    const completeAction = sortedActions.find(a => a.action === 'complete');
                     if (completeAction) completionTime = formatDuration(getTimeDiff(booking.created_at, completeAction.action_time));
                 }
 
@@ -438,7 +640,7 @@
                 if (!hasActions) badges += '<span class="badge no-action"><i class="fas fa-exclamation-triangle"></i> No Actions</span>';
                 if (isCompleted) badges += '<span class="badge completed"><i class="fas fa-check-circle"></i> Completed</span>';
 
-                const sortedActions = [...booking.booking_actions].sort((a, b) => new Date(a.action_time) - new Date(b.action_time));
+                // Desktop timeline
                 let timelineHTML = '';
                 if (hasActions) {
                     timelineHTML = '<div class="action-timeline">';
@@ -460,7 +662,8 @@
                     timelineHTML += '</div>';
                 }
 
-                bookingsHTML += `
+                // Desktop card
+                cardsHTML += `
                     <div class="${itemClass}">
                         <div class="booking-header">
                             <div class="booking-info">
@@ -487,8 +690,55 @@
                         </div>
                         ${timelineHTML}
                     </div>`;
+
+                // Mobile table row
+                let statusBadge = '';
+                if (booking.is_cancelled) statusBadge = '<span class="m-badge status-cancelled">Cancel</span>';
+                else if (isCompleted) statusBadge = '<span class="m-badge status-completed">Done</span>';
+                else if (!hasActions) statusBadge = '<span class="m-badge status-noaction">No Act</span>';
+                else statusBadge = '<span class="m-badge status-pending">Active</span>';
+
+                let actionsCell = '';
+                if (sortedActions.length === 0) {
+                    actionsCell = '<span style="color:#bbb;font-size:8px">—</span>';
+                } else {
+                    actionsCell = '<div class="m-actions-cell">';
+                    sortedActions.forEach(action => {
+                        const at = new Date(action.action_time);
+                        const ac = action.action.toLowerCase().replace(/ /g, '-');
+                        const bc = ac === 'accept' ? 'accept' : ac === 'complete' ? 'complete' : ac === 'noaction' ? 'noaction' : (ac === 'cancel' || ac === 'customer-denied') ? 'cancel' : 'assign';
+                        actionsCell += `<div class="m-action-row"><span class="m-mech-name">${action.mechanic_name.split(' ')[0]}</span> <span class="m-badge ${bc}">${formatActionType(action.action).replace('Assigned Sub-mechanic','Assign')}</span> <span class="m-action-time">${at.toLocaleString('en-US',{hour:'2-digit',minute:'2-digit'})}</span></div>`;
+                    });
+                    actionsCell += '</div>';
+                }
+
+                const respCell = responseMinutes !== null ? `<span class="m-response ${responseClass}">${responseTime}</span>` : `<span class="m-response none">—</span>`;
+                const rowClass = !hasActions ? 'row-no-action' : booking.is_cancelled ? 'row-cancelled' : '';
+                const timeStr = createdAt.toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+                tableRowsHTML += `<tr class="${rowClass}">
+                    <td class="td-id" onclick="viewBookingDetails(${booking.booking_id})">#${booking.booking_id}</td>
+                    <td class="td-time">${timeStr}</td>
+                    <td class="td-car">${booking.car}</td>
+                    <td class="td-problem">${booking.problem}</td>
+                    <td class="td-mobile">${booking.customer_mobile}</td>
+                    <td class="td-mechanic">${actionsCell}</td>
+                    <td class="td-response">${respCell}</td>
+                    <td class="td-agent">${booking.support_agent || '<span style="color:#ccc">—</span>'}</td>
+                    <td class="td-status">${statusBadge}</td>
+                </tr>`;
             });
-            container.innerHTML = bookingsHTML;
+
+            container.innerHTML = cardsHTML + `
+                <div class="mobile-table-wrapper">
+                    <table class="mobile-booking-table">
+                        <thead><tr>
+                            <th>ID</th><th>Time</th><th>Car</th><th>Problem</th>
+                            <th>Mobile</th><th>Actions</th><th>Resp</th><th>Agent</th><th>Status</th>
+                        </tr></thead>
+                        <tbody>${tableRowsHTML}</tbody>
+                    </table>
+                </div>`;
         }
 
         // ✅ FIX: renderMechanics now accepts a dataset parameter (uses filteredData)
