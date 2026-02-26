@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Instant Mechanic Agent</title>
@@ -473,11 +474,11 @@
       }
     }
 
-    if (localStorage.getItem("agent_login") === "Yes") {
-      document.getElementById("loginBox").classList.add("hidden");
-      document.getElementById("bookingBox").classList.remove("hidden");
-      fetchBooking();
-    }
+
+    document.getElementById("loginBox").classList.add("hidden");
+    document.getElementById("bookingBox").classList.remove("hidden");
+    fetchBooking();
+
 
     function handleLogin() {
       const mobile = document.getElementById("mobile").value;
