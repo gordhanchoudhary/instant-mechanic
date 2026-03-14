@@ -1,0 +1,109 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>Service Areas Map</title>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
+<style>
+#map{
+height:100vh;
+width:100%;
+}
+</style>
+
+</head>
+
+<body>
+
+<div id="map"></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+
+const API_URL = "https://ai.instantmechanic.online/bot/api/areas/";
+const TOKEN = "YOUR_TOKEN";
+
+
+/* Create Map */
+
+const map = L.map("map").setView([28.6139,77.2090],10);
+
+L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{
+maxZoom:19
+}).addTo(map);
+
+
+/* Fetch Areas */
+
+fetch(API_URL,{
+method:"GET",
+headers:{
+"Authorization":"Bearer "+TOKEN,
+"Content-Type":"application/json"
+}
+})
+.then(res=>res.json())
+.then(data=>{
+
+/* Fix if response is string */
+if(typeof data === "string"){
+data = JSON.parse(data)
+}
+
+/* Draw GeoJSON */
+
+const geoLayer = L.geoJSON(data,{
+
+style:function(feature){
+
+return{
+color:"#0066ff",
+weight:2,
+fillOpacity:0.35
+}
+
+},
+
+onEachFeature:function(feature,layer){
+
+let name = feature.properties?.name || "Unknown"
+let city = feature.properties?.city || "Unknown"
+
+layer.bindPopup(`
+<b>Name:</b> ${name} <br>
+<b>City:</b> ${city}
+`)
+
+layer.on("mouseover",function(){
+this.setStyle({
+fillOpacity:0.6
+})
+})
+
+layer.on("mouseout",function(){
+this.setStyle({
+fillOpacity:0.35
+})
+})
+
+}
+
+}).addTo(map)
+
+
+/* Fit map to areas */
+
+map.fitBounds(geoLayer.getBounds())
+
+})
+.catch(err=>{
+console.log("API Error:",err)
+})
+
+</script>
+
+</body>
+</html>
