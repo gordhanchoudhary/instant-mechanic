@@ -1167,188 +1167,199 @@
         }
 
         // Display historical data
-        async function displayHistoricalData(data, customerLat, customerLng) {
-            const mechanicList = document.getElementById('mechanic-list');
-            const resultsCount = document.getElementById('results-count');
-            
-            if (!data || Object.keys(data).length === 0) {
-                mechanicList.innerHTML = `
-                    <div class="no-results">
-                        <div class="no-results-icon">🔍</div>
-                        <h3>No Historical Data Available</h3>
-                        <p>No mechanics have performed services in this area within the selected radius.</p>
-                        <p>Try increasing the search radius to find more results.</p>
+async function displayHistoricalData(data, customerLat, customerLng) {
+    const mechanicList = document.getElementById('mechanic-list');
+    const resultsCount = document.getElementById('results-count');
+    
+    if (!data || Object.keys(data).length === 0) {
+        mechanicList.innerHTML = `
+            <div class="no-results">
+                <div class="no-results-icon">🔍</div>
+                <h3>No Historical Data Available</h3>
+                <p>No mechanics have performed services in this area within the selected radius.</p>
+                <p>Try increasing the search radius to find more results.</p>
+            </div>
+        `;
+        resultsCount.textContent = 'No mechanics found';
+        return;
+    }
+    
+    // Convert object to array and sort by priority (high to low)
+    const mechanicsArray = Object.entries(data).map(([name, details]) => ({
+        name,
+        ...details
+    })).sort((a, b) => b.priority - a.priority);
+    
+    resultsCount.textContent = `Found ${mechanicsArray.length} mechanic${mechanicsArray.length > 1 ? 's' : ''} with historical data`;
+    
+    mechanicList.innerHTML = '';
+    const mechanicElements = [];
+    
+    // Create cards for all mechanics immediately
+    mechanicsArray.forEach((mechanic, index) => {
+        const mechanicDiv = document.createElement('div');
+        mechanicDiv.className = 'historical-mechanic';
+        mechanicDiv.style.position = 'relative';
+        mechanicDiv.mechanicData = mechanic;
+        
+        // Generate star rating
+        const fullStars = Math.floor(mechanic.rating);
+        const hasHalfStar = mechanic.rating % 1 !== 0;
+        const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+        const starsHTML = '★'.repeat(fullStars) + (hasHalfStar ? '☆' : '') + '☆'.repeat(emptyStars);
+        
+        // Create action buttons
+        const hasWhatsApp = mechanic.whatsapp && mechanic.whatsapp !== null && mechanic.whatsapp !== '';
+        
+        let actionButtonsHTML = '';
+        if (hasWhatsApp) {
+            actionButtonsHTML = `
+                <div class="action-buttons">
+                    <a class="action-button call-button" href="tel:${mechanic.mobile}">
+                        📞 Call
+                    </a>
+                    <a class="action-button whatsapp-button" href="${mechanic.whatsapp}" target="_blank">
+                        <img 
+                            src="https://cdn-icons-png.freepik.com/512/1322/1322089.png?ga=GA1.1.30113634.1732615020" 
+                            alt="WhatsApp Icon" 
+                            style="width:18px; height:18px; vertical-align:middle; margin-right:6px;">
+                        WhatsApp Group
+                    </a>
+                </div>
+            `;
+        } else {
+            actionButtonsHTML = `
+                <div class="action-buttons single">
+                    <a class="action-button call-button" href="tel:${mechanic.mobile}">
+                        📞 Call ${mechanic.mobile}
+                    </a>
+                </div>
+            `;
+        }
+        
+        // Check if we have cached distance data for this mechanic
+        const cachedData = mechanicsWithDistanceData.find(m => m.name === mechanic.name);
+        
+        // Determine distance display based on position and cache
+        let distanceHTML = '';
+        if (cachedData) {
+            distanceHTML = `
+                <div class="distance-badge loaded">
+                    <div class="distance-info">
+                        <div class="distance-text">${cachedData.distance}</div>
+                        <div class="time-text">${cachedData.duration}</div>
                     </div>
-                `;
-                resultsCount.textContent = 'No mechanics found';
-                return;
-            }
-            
-            // Convert object to array and sort by priority (high to low)
-            const mechanicsArray = Object.entries(data).map(([name, details]) => ({
-                name,
-                ...details
-            })).sort((a, b) => b.priority - a.priority);
-            
-            resultsCount.textContent = `Found ${mechanicsArray.length} mechanic${mechanicsArray.length > 1 ? 's' : ''} with historical data`;
-            
-            mechanicList.innerHTML = '';
-            const mechanicElements = [];
-            
-            // Create cards for all mechanics immediately
-            mechanicsArray.forEach((mechanic, index) => {
-                const mechanicDiv = document.createElement('div');
-                mechanicDiv.className = 'historical-mechanic';
-                mechanicDiv.style.position = 'relative'; // For great match tag positioning
-                mechanicDiv.mechanicData = mechanic; // Store mechanic data on element
-                
-                // Generate star rating
-                const fullStars = Math.floor(mechanic.rating);
-                const hasHalfStar = mechanic.rating % 1 !== 0;
-                const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
-                const starsHTML = '★'.repeat(fullStars) + (hasHalfStar ? '☆' : '') + '☆'.repeat(emptyStars);
-                
-                // Create action buttons (removed maps button)
-                const hasWhatsApp = mechanic.whatsapp && mechanic.whatsapp !== null && mechanic.whatsapp !== '';
-                
-                let actionButtonsHTML = '';
-                if (hasWhatsApp) {
-                    actionButtonsHTML = `
-                        <div class="action-buttons">
-                            <a class="action-button call-button" href="tel:${mechanic.mobile}">
-                                📞 Call
-                            </a>
-<a class="action-button whatsapp-button" href="${mechanic.whatsapp}" target="_blank">
-    <img 
-        src="https://cdn-icons-png.freepik.com/512/1322/1322089.png?ga=GA1.1.30113634.1732615020" 
-        alt="WhatsApp Icon" 
-        style="width:18px; height:18px; vertical-align:middle; margin-right:6px;">
-    WhatsApp Group
-</a>
+                </div>
+            `;
+        } else if (index < 5) {
+            distanceHTML = `<div class="distance-placeholder" style="width: 80px; height: 20px;"></div>`;
+        } else {
+            distanceHTML = `
+                <button class="get-distance-btn" onclick="handleGetDistance(this, ${customerLat}, ${customerLng}, window.mechanicElements[${index}].mechanicData, window.mechanicElements[${index}])">
+                    Get Distance
+                </button>
+            `;
+        }
 
-                        </div>
-                    `;
-                } else {
-                    actionButtonsHTML = `
-                        <div class="action-buttons single">
-                            <a class="action-button call-button" href="tel:${mechanic.mobile}">
-                                📞 Call ${mechanic.mobile}
-                            </a>
-                        </div>
-                    `;
-                }
-                
-                // Check if we have cached distance data for this mechanic
-                const cachedData = mechanicsWithDistanceData.find(m => m.name === mechanic.name);
-                
-                // Determine distance display based on position and cache
-                let distanceHTML = '';
-                if (cachedData) {
-                    // Use cached data - show immediately
-                    distanceHTML = `
-                        <div class="distance-badge loaded">
-                            <div class="distance-info">
-                                <div class="distance-text">${cachedData.distance}</div>
-                                <div class="time-text">${cachedData.duration}</div>
-                            </div>
-                        </div>
-                    `;
-                } else if (index < 5) {
-                    // Top 5 mechanics - show empty space, will be filled silently
-                    distanceHTML = `<div class="distance-placeholder" style="width: 80px; height: 20px;"></div>`;
-                } else {
-                    // Rest of mechanics - show "Get Distance" button
-                    distanceHTML = `
-                        <button class="get-distance-btn" onclick="handleGetDistance(this, ${customerLat}, ${customerLng}, window.mechanicElements[${index}].mechanicData, window.mechanicElements[${index}])">
-                            Get Distance
-                        </button>
-                    `;
-                }
+        let remarksHTML = "";
+        if (mechanic.remarks) {
+            const remarksArray = mechanic.remarks
+                .split("-")
+                .map(r => r.trim())
+                .filter(r => r.length > 0);
 
-                let remarksHTML = "";
+            remarksHTML = `
+                <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:6px;">
+                    ${remarksArray.map(tag => `
+                        <span style="
+                            background:#E8F7EF;
+                            color:#1F8A5B;
+                            font-size:12px;
+                            padding:4px 10px;
+                            border-radius:999px;
+                            font-weight:500;
+                            white-space:nowrap;
+                        ">
+                            ${tag}
+                        </span>
+                    `).join("")}
+                </div>
+            `;
+        }
+        
+        mechanicDiv.innerHTML = `
+            <div class="mechanic-header">
+                <div class="mechanic-name">${mechanic.name}</div>
+                ${distanceHTML}
+            </div>
 
-if (mechanic.remarks) {
-    const remarksArray = mechanic.remarks
-        .split("-")
-        .map(r => r.trim())
-        .filter(r => r.length > 0);
+            ${remarksHTML}
 
-    remarksHTML = `
-        <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:6px;">
-            ${remarksArray.map(tag => `
-                <span style="
-                    background:#E8F7EF;
-                    color:#1F8A5B;
-                    font-size:12px;
-                    padding:4px 10px;
-                    border-radius:999px;
-                    font-weight:500;
-                    white-space:nowrap;
-                ">
-                    ${tag}
-                </span>
-            `).join("")}
-        </div>
-    `;
-}
-                
-mechanicDiv.innerHTML = `
-    <div class="mechanic-header">
-        <div class="mechanic-name">${mechanic.name}</div>
-        ${distanceHTML}
-    </div>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value success">${mechanic.done_calls}</div>
+                    <div class="stat-label">Completed</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value danger">${mechanic.cancelled_calls}</div>
+                    <div class="stat-label">Cancelled</div>
+                </div>
+            </div>
 
-    ${remarksHTML}
+            ${actionButtonsHTML}
+        `;
 
+        mechanicList.appendChild(mechanicDiv);
+        mechanicElements.push(mechanicDiv);
+        
+        // Add great match tag and styling if cached data shows it's a great match
+        if (cachedData && isGreatMatch(mechanic, cachedData)) {
+            const greatMatchTag = document.createElement('div');
+            greatMatchTag.className = 'great-match-tag';
+            greatMatchTag.textContent = 'Great Match';
+            mechanicDiv.appendChild(greatMatchTag);
+            mechanicDiv.classList.add('great-match');
+        }
+    });
+    
+    // Make mechanicElements globally accessible for button clicks
+    window.mechanicElements = mechanicElements;
+    
+    // Calculate distances for top 5 mechanics
+    const top5Elements = mechanicElements.slice(0, 5);
 
-
-    <div class="stats-grid">
-        <div class="stat-card">
-            <div class="stat-value success">${mechanic.done_calls}</div>
-            <div class="stat-label">Completed</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-value danger">${mechanic.cancelled_calls}</div>
-            <div class="stat-label">Cancelled</div>
-        </div>
-    </div>
-
-    ${actionButtonsHTML}
-`;
-                mechanicList.appendChild(mechanicDiv);
-                mechanicElements.push(mechanicDiv);
-                
-                // Add great match tag and styling if cached data shows it's a great match
-                if (cachedData && isGreatMatch(mechanic, cachedData)) {
-                    const greatMatchTag = document.createElement('div');
-                    greatMatchTag.className = 'great-match-tag';
-                    greatMatchTag.textContent = 'Great Match';
-                    mechanicDiv.appendChild(greatMatchTag);
-                    mechanicDiv.classList.add('great-match');
-                }
-            });
-            
-            // Make mechanicElements globally accessible for button clicks
-            window.mechanicElements = mechanicElements;
-            
-            // Calculate distances for top 5 mechanics that don't have cached data - silently in background
-            const top5NeedingDistance = mechanicElements.slice(0, 5).filter((element, index) => {
-                const mechanic = element.mechanicData;
-                return !mechanicsWithDistanceData.find(m => m.name === mechanic.name);
-            });
-            
-            if (top5NeedingDistance.length > 0) {
-                // Start distance calculations silently in background
-                top5NeedingDistance.forEach(async (element) => {
-                    const mechanicData = element.mechanicData;
-                    try {
-                        await calculateDistance(customerLat, customerLng, mechanicData, element);
-                    } catch (error) {
-                        console.error('Error calculating distance for', mechanicData.name, ':', error);
-                    }
-                });
+    const distancePromises = top5Elements.map(async (element) => {
+        const mechanicData = element.mechanicData;
+        const cached = mechanicsWithDistanceData.find(m => m.name === mechanicData.name);
+        if (!cached) {
+            try {
+                await calculateDistance(customerLat, customerLng, mechanicData, element);
+            } catch (error) {
+                console.error('Error calculating distance for', mechanicData.name, ':', error);
             }
         }
+    });
+
+    // Once all top 5 distances are calculated, re-sort cards by travel time ascending
+    Promise.all(distancePromises).then(() => {
+        const list = document.getElementById('mechanic-list');
+        const allCards = Array.from(list.children);
+
+        const top5Cards = allCards.slice(0, 5);
+        const restCards = allCards.slice(5);
+
+        top5Cards.sort((a, b) => {
+            const nameA = a.mechanicData?.name;
+            const nameB = b.mechanicData?.name;
+            const dataA = mechanicsWithDistanceData.find(m => m.name === nameA);
+            const dataB = mechanicsWithDistanceData.find(m => m.name === nameB);
+            return parseTimeToMinutes(dataA?.duration) - parseTimeToMinutes(dataB?.duration);
+        });
+
+        // Re-append: sorted top 5 first, then rest in original backend order
+        [...top5Cards, ...restCards].forEach(card => list.appendChild(card));
+    });
+}
 
         // Make handleGetDistance globally accessible
         window.handleGetDistance = handleGetDistance;
