@@ -290,14 +290,14 @@
                 <input type="checkbox" ${agent.is_live ? "checked" : ""} onchange="toggleLive(${agent.id}, this.checked)">
                 <span class="slider"></span>
               </label>
-              <span class="toggle-label">Live</span>
+              <span class="toggle-label">NCR</span>
             </div>
             <div class="toggle-item">
               <label class="switch inactive">
                 <input type="checkbox" ${agent.is_inactive_team_member ? "checked" : ""} onchange="toggleInactive(${agent.id}, this.checked)">
                 <span class="slider"></span>
               </label>
-              <span class="toggle-label">Inactive CS</span>
+              <span class="toggle-label">Outside NCR</span>
             </div>
           </div>
         `;
