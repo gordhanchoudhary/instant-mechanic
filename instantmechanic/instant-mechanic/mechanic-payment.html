@@ -2075,6 +2075,10 @@
                                     <i class="fab fa-whatsapp"></i>
                                     Send Hisab
                                 </button>
+                                <button class="btn btn-primary" onclick="viewQRPayments('${item.mechanic_name}')" style="padding: 8px 16px; font-size: 13px;">
+    <i class="fas fa-qrcode"></i>
+    View QR Payments
+</button>
                             ` : '<span class="settled-badge"><i class="fas fa-check"></i> Settled</span>'}
                         </div>
                     </td>
@@ -2100,6 +2104,11 @@
                 }
             }
         }
+
+        function viewQRPayments(mechanicName) {
+    const url = `http://65.2.179.242:3000/public/question/71d15a57-a148-49f4-a401-2c4e1b249184?mechanic_name=${encodeURIComponent(mechanicName)}`;
+    window.open(url, '_blank');
+}
 
         // View details function
         function viewDetails(date, mechanicName) {
