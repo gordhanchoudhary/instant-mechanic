@@ -1366,6 +1366,13 @@
                     <label>Remarks (Optional)</label>
                     <textarea class="form-control" id="paymentRemarks" placeholder="Enter any additional notes..." rows="3"></textarea>
                 </div>
+                <div class="form-group" style="flex-direction: row; align-items: center; gap: 12px; padding: 16px; background: rgba(245, 158, 11, 0.05); border: 1px solid rgba(245, 158, 11, 0.2); border-radius: var(--border-radius);">
+    <input type="checkbox" id="isAdjustmentCheck" style="transform: scale(1.3); accent-color: var(--warning); cursor: pointer;">
+    <div>
+        <label for="isAdjustmentCheck" style="font-weight: 600; color: var(--gray-800); cursor: pointer; margin-bottom: 2px; display: block;">Is Adjustment</label>
+        <span style="font-size: 0.8rem; color: var(--gray-500);">Mark this payment as a balance adjustment</span>
+    </div>
+</div>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" onclick="closeCreateModal()">Cancel</button>
@@ -2126,6 +2133,7 @@
             document.getElementById('partialPendingBalance').value = formatCurrency(pendingAmount);
             document.getElementById('partialSettlementAmount').value = '';
             document.getElementById('partialRemarks').value = '';
+            document.getElementById('isAdjustmentCheck').checked = false;
             
             // Store data for processing
             window.partialSettlementData = {
@@ -2175,7 +2183,8 @@
             try {
                 const requestBody = {
                     mechanic_id: mechanic.id,
-                    pending_amount: settlementAmount
+                    pending_amount: settlementAmount,
+                    is_adjustment: document.getElementById('isAdjustmentCheck').checked  // add this line
                 };
 
                 if (remarks.trim()) {
