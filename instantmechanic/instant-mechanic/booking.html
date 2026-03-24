@@ -630,9 +630,9 @@
             <div class="security-amount-container">
               <div class="security-amount-row">
                 <span><strong>Security Amount:</strong>  ₹${data.advance_payment_amount}</span>
-                <button class="security-amount-button" onclick="updateSecurityAmount()">Set to ₹199</button>
+                <button class="security-amount-button" onclick="updateSecurityAmount()">Set to ₹100</button>
               </div>
-              <small style="color: #666;">Click button to update security amount to ₹199</small>
+              <small style="color: #666;">Click button to update security amount to ₹100</small>
             </div>
           `;
         }
@@ -646,7 +646,7 @@
       
       const updateData = {
         agent: agentName,
-        advance_payment_amount: 199
+        advance_payment_amount: 100
       };
 
       fetch(`https://ai.instantmechanic.online/bot/api/booking/security-update/${bookingId}/`, {
@@ -666,14 +666,14 @@
               trackMixpanelEvent("Booking Security Changed", {
                 "agent_name": agentName,
                 "booking_id": bookingId,
-                "new_security_amount": 199,
+                "new_security_amount": 100,
                 "customer_mobile": customerMobile,
                 "timestamp": new Date().toISOString()
               });
             });
           }
           
-          alert("Security amount updated to ₹199 successfully.");
+          alert("Security amount updated to ₹100 successfully.");
           fetchBooking(); // Refresh the booking details
         })
         .catch(error => {
