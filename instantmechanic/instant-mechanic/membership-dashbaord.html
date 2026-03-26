@@ -1091,7 +1091,7 @@ function sendWhatsApp(id) {
   // Convert string to proper UTF-8 before encoding
 const bytes = new TextEncoder().encode(msg);
 const utf8str = new TextDecoder('utf-8').decode(bytes);
-window.open(`https://wa.me/${mobile}?text=${encodeURIComponent(utf8str)}`, '_blank');
+  window.open('https://api.whatsapp.com/send?phone=' + mobile + '&text=' + encodeURIComponent(msg), '_blank');
 
   // Visual feedback
   const btn = document.querySelector(`[data-wa="${id}"]`);
