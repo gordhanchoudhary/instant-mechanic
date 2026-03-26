@@ -1056,14 +1056,31 @@ function buildMessage(r) {
   const membership = parseFloat(r.membership_price).toLocaleString('en-IN');
   const link = MEMBERSHIP_LINK + mobile;
 
+  const WAVE  = '\uD83D\uDE0A'; // 😊
+  const RAISE = '\uD83D\uDE4C'; // 🙌
+  const BOOM  = '\uD83D\uDCA5'; // 💥
+  const POINT = '\uD83D\uDC49'; // 👉
+  const CHECK = '\u2705';       // ✅
+  const TICK  = '\u2714';       // ✔
+
   const benefitMap = {
-    premium: '✔ Free flat tyre support ✔ Free jump start ✔ Free key lockout help ✔ ₹1,500 off on every car service ✔ 24×7 priority support ✔ 2 free oil changes',
-    standard: '✔ Free flat tyre support ✔ Free jump start ✔ Free key lockout help ✔ ₹1,000 off on every car service ✔ 24×7 emergency support',
-    basic: '✔ Free flat tyre support ✔ Free jump start ✔ Free key lockout help ✔ ₹500 off on every car service ✔ 24×7 emergency support'
+    premium:  `${TICK} Free flat tyre support\n${TICK} Free jump start\n${TICK} Free key lockout help\n${TICK} \u20B91,500 off on every car service\n${TICK} 24\u00D77 priority support\n${TICK} 2 free oil changes`,
+    standard: `${TICK} Free flat tyre support\n${TICK} Free jump start\n${TICK} Free key lockout help\n${TICK} \u20B91,000 off on every car service\n${TICK} 24\u00D77 emergency support`,
+    basic:    `${TICK} Free flat tyre support\n${TICK} Free jump start\n${TICK} Free key lockout help\n${TICK} \u20B9500 off on every car service\n${TICK} 24\u00D77 emergency support`
   };
   const benefits = benefitMap[r.tier] || benefitMap.basic;
 
-  return `Hi ${name} 😊\nThanks for using Instant Mechanic for your ${car} – ${problem} 🙌\nSince you already paid ₹${svcAmt} today, you can now upgrade to our 1-Year Roadside Membership by paying just ₹${extra} more 💥\n👉 Total ₹${membership} for 1 full year ${benefits}\n\nYour today's service amount is already adjusted ✅\nActivate now while the offer is exclusive to you:\n${link}\n— Team Instant Mechanic`;
+  return (
+    `Hi ${name} ${WAVE}\n` +
+    `Thanks for using Instant Mechanic for your ${car} \u2013 ${problem} ${RAISE}\n` +
+    `Since you already paid \u20B9${svcAmt} today, you can now upgrade to our 1-Year Roadside Membership by paying just \u20B9${extra} more ${BOOM}\n\n` +
+    `${POINT} Total \u20B9${membership} for 1 full year\n` +
+    `${benefits}\n\n` +
+    `Your today's service amount is already adjusted ${CHECK}\n` +
+    `Activate now while the offer is exclusive to you:\n` +
+    `${link}\n` +
+    `\u2014 Team Instant Mechanic`
+  );
 }
 
 function sendWhatsApp(id) {
