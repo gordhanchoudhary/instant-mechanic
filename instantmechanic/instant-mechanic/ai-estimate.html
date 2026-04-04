@@ -1,0 +1,1652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>InstantMechanic AI — Smart Car Advisor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #0a0b0f;
+    --surface: #13151c;
+    --surface2: #1c1f2a;
+    --border: rgba(255,255,255,0.07);
+    --border-active: rgba(255,165,0,0.4);
+    --orange: #ff8c00;
+    --orange-glow: #ff6b00;
+    --orange-soft: rgba(255,140,0,0.12);
+    --orange-mid: rgba(255,140,0,0.25);
+    --text: #f0f0f0;
+    --text-muted: #8a8f9e;
+    --text-dim: #555b6e;
+    --green: #22d3a4;
+    --red: #ff4d6a;
+    --blue: #4da6ff;
+    --radius: 16px;
+    --radius-sm: 10px;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ─── NOISE OVERLAY ─── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 0; opacity: .5;
+  }
+
+  /* ─── AMBIENT GLOW ─── */
+  .ambient {
+    position: fixed; border-radius: 50%; filter: blur(120px);
+    pointer-events: none; z-index: 0;
+  }
+  .ambient-1 {
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(255,120,0,0.07) 0%, transparent 70%);
+    top: -200px; right: -100px;
+  }
+  .ambient-2 {
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(77,166,255,0.05) 0%, transparent 70%);
+    bottom: -100px; left: -100px;
+  }
+
+  /* ─── HEADER ─── */
+  header {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(10,11,15,0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    height: 64px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .logo {
+    display: flex; align-items: center; gap: 10px;
+    font-family: 'Syne', sans-serif; font-weight: 800; font-size: 18px;
+  }
+  .logo-icon {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, var(--orange), var(--orange-glow));
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+  .logo span { color: var(--orange); }
+  .header-badge {
+    font-size: 11px; font-weight: 500; letter-spacing: .06em;
+    padding: 4px 10px; border-radius: 20px;
+    background: var(--orange-soft);
+    border: 1px solid rgba(255,140,0,0.2);
+    color: var(--orange);
+  }
+
+  /* ─── MAIN ─── */
+  main {
+    padding-top: 64px;
+    min-height: 100vh;
+    position: relative; z-index: 1;
+  }
+
+  /* ─── LANDING SCREEN ─── */
+  #landing {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    min-height: calc(100vh - 64px);
+    padding: 40px 20px;
+    text-align: center;
+  }
+  .landing-eyebrow {
+    font-size: 12px; font-weight: 500; letter-spacing: .15em; text-transform: uppercase;
+    color: var(--orange); margin-bottom: 20px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .landing-eyebrow::before, .landing-eyebrow::after {
+    content: ''; height: 1px; width: 40px; background: var(--orange); opacity: .4;
+  }
+  .landing-title {
+    font-family: 'Syne', sans-serif; font-size: clamp(36px, 6vw, 72px);
+    font-weight: 800; line-height: 1.05; margin-bottom: 20px;
+    letter-spacing: -.02em;
+  }
+  .landing-title em { font-style: normal; color: var(--orange); }
+  .landing-sub {
+    max-width: 480px; color: var(--text-muted); font-size: 16px;
+    margin-bottom: 56px; font-weight: 300;
+  }
+
+  .mode-cards {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+    max-width: 700px; width: 100%;
+  }
+  .mode-card {
+    position: relative; overflow: hidden;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 32px 28px;
+    cursor: pointer;
+    transition: all .35s cubic-bezier(.4,0,.2,1);
+    text-align: left;
+  }
+  .mode-card:hover {
+    border-color: var(--border-active);
+    background: var(--surface2);
+    transform: translateY(-3px);
+    box-shadow: 0 20px 60px rgba(255,140,0,0.1);
+  }
+  .mode-card::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, var(--orange-soft) 0%, transparent 60%);
+    opacity: 0; transition: opacity .35s;
+  }
+  .mode-card:hover::before { opacity: 1; }
+  .mode-icon {
+    width: 52px; height: 52px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px; margin-bottom: 20px;
+    background: var(--orange-soft);
+    border: 1px solid rgba(255,140,0,0.2);
+  }
+  .mode-card h3 {
+    font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .mode-card p { color: var(--text-muted); font-size: 13.5px; line-height: 1.5; }
+  .mode-arrow {
+    position: absolute; bottom: 24px; right: 24px;
+    width: 32px; height: 32px; border-radius: 8px;
+    background: var(--orange-soft); border: 1px solid rgba(255,140,0,0.2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; transition: all .25s;
+  }
+  .mode-card:hover .mode-arrow {
+    background: var(--orange); border-color: var(--orange);
+    transform: translate(2px, -2px);
+  }
+  .mode-badge {
+    display: inline-block; font-size: 10px; font-weight: 600; letter-spacing: .08em;
+    text-transform: uppercase; padding: 3px 8px; border-radius: 4px;
+    margin-bottom: 12px;
+  }
+  .badge-estimate { background: rgba(34,211,164,0.12); color: var(--green); border: 1px solid rgba(34,211,164,0.2); }
+  .badge-audit { background: rgba(255,77,106,0.12); color: var(--red); border: 1px solid rgba(255,77,106,0.2); }
+
+  /* ─── APP SCREEN ─── */
+  #app { display: none; }
+  #app.active { display: flex; height: calc(100vh - 64px); }
+
+  /* ─── SIDEBAR ─── */
+  .sidebar {
+    width: 320px; flex-shrink: 0;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex; flex-direction: column;
+    overflow: hidden;
+  }
+  .sidebar-header {
+    padding: 20px 20px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .back-btn {
+    display: flex; align-items: center; gap: 6px;
+    background: none; border: none; color: var(--text-muted);
+    font-family: 'DM Sans', sans-serif; font-size: 13px;
+    cursor: pointer; padding: 6px 0; margin-bottom: 14px;
+    transition: color .2s;
+  }
+  .back-btn:hover { color: var(--text); }
+  .mode-label {
+    display: flex; align-items: center; gap: 8px;
+    font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700;
+  }
+  .mode-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--orange); }
+
+  .sidebar-steps {
+    padding: 16px 20px; flex: 1; overflow-y: auto;
+  }
+  .step-group { margin-bottom: 24px; }
+  .step-group-title {
+    font-size: 10px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--text-dim); margin-bottom: 10px;
+  }
+
+  /* ─── CAR SELECTOR ─── */
+  .car-display {
+    background: var(--surface2); border-radius: var(--radius-sm);
+    border: 1px solid var(--border); padding: 14px;
+    display: flex; align-items: center; gap: 12px;
+    cursor: pointer; transition: border-color .2s;
+  }
+  .car-display:hover { border-color: var(--border-active); }
+  .car-display-img {
+    width: 64px; height: 42px; object-fit: contain;
+    filter: drop-shadow(0 2px 8px rgba(0,0,0,.4));
+  }
+  .car-display-img-placeholder {
+    width: 64px; height: 42px;
+    background: var(--border); border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+  }
+  .car-display-info { flex: 1; }
+  .car-display-name { font-weight: 600; font-size: 13.5px; }
+  .car-display-sub { font-size: 12px; color: var(--text-muted); }
+  .car-display-chevron { color: var(--text-dim); font-size: 12px; }
+
+  /* ─── SELECTORS PANEL ─── */
+  .selector-panel {
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    background: var(--surface); z-index: 50;
+    display: flex; flex-direction: column;
+  }
+  .selector-panel.hidden { display: none; }
+  .sel-header {
+    padding: 16px 20px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .sel-back {
+    width: 32px; height: 32px; border-radius: 8px;
+    background: var(--surface2); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; font-size: 14px;
+  }
+  .sel-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 15px; }
+  .sel-search {
+    margin: 12px 20px;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 10px 14px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .sel-search input {
+    background: none; border: none; color: var(--text);
+    font-family: 'DM Sans', sans-serif; font-size: 14px; flex: 1; outline: none;
+  }
+  .sel-search input::placeholder { color: var(--text-dim); }
+  .sel-list { flex: 1; overflow-y: auto; padding: 0 12px 12px; }
+  .brand-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .brand-item {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 12px;
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    cursor: pointer; transition: all .2s;
+  }
+  .brand-item:hover, .brand-item.selected {
+    border-color: var(--orange); background: var(--orange-soft);
+  }
+  .brand-item img { width: 40px; height: 28px; object-fit: contain; }
+  .brand-item span { font-size: 12px; font-weight: 500; text-align: center; }
+  .popular-badge {
+    font-size: 9px; background: var(--orange-soft); color: var(--orange);
+    padding: 2px 5px; border-radius: 3px;
+  }
+
+  .model-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 12px; border-radius: var(--radius-sm);
+    cursor: pointer; transition: background .15s; border: 1px solid transparent;
+  }
+  .model-item:hover, .model-item.selected {
+    background: var(--surface2); border-color: var(--border);
+  }
+  .model-item img { width: 56px; height: 36px; object-fit: contain; }
+  .model-info { flex: 1; }
+  .model-name { font-weight: 600; font-size: 13.5px; }
+  .model-sub { font-size: 12px; color: var(--text-muted); }
+  .fuel-badge {
+    font-size: 10px; font-weight: 600; padding: 3px 7px; border-radius: 4px;
+  }
+  .fuel-petrol { background: rgba(255,200,50,0.1); color: #ffcc33; }
+  .fuel-diesel { background: rgba(100,150,255,0.1); color: #6699ff; }
+  .fuel-cng { background: rgba(34,211,164,0.1); color: var(--green); }
+  .fuel-ev { background: rgba(160,120,255,0.1); color: #a078ff; }
+
+  /* ─── PROGRESS STEPS ─── */
+  .progress-steps {
+    display: flex; align-items: center; gap: 0;
+    padding: 12px 20px; border-top: 1px solid var(--border);
+  }
+  .prog-step {
+    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px;
+    position: relative;
+  }
+  .prog-step::after {
+    content: ''; position: absolute; top: 11px; left: 50%; right: -50%;
+    height: 1px; background: var(--border);
+  }
+  .prog-step:last-child::after { display: none; }
+  .prog-dot {
+    width: 22px; height: 22px; border-radius: 50%;
+    border: 2px solid var(--border); background: var(--bg);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 700; position: relative; z-index: 1;
+    transition: all .3s;
+  }
+  .prog-step.done .prog-dot { background: var(--orange); border-color: var(--orange); color: #fff; }
+  .prog-step.active .prog-dot { border-color: var(--orange); color: var(--orange); }
+  .prog-label { font-size: 10px; color: var(--text-dim); text-align: center; }
+  .prog-step.active .prog-label, .prog-step.done .prog-label { color: var(--text-muted); }
+
+  /* ─── CHAT AREA ─── */
+  .chat-area {
+    flex: 1; display: flex; flex-direction: column; overflow: hidden;
+    position: relative;
+  }
+  .chat-messages {
+    flex: 1; overflow-y: auto; padding: 28px 32px;
+    display: flex; flex-direction: column; gap: 20px;
+  }
+  .chat-messages::-webkit-scrollbar { width: 4px; }
+  .chat-messages::-webkit-scrollbar-track { background: transparent; }
+  .chat-messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  /* ─── MESSAGES ─── */
+  .msg { max-width: 76%; display: flex; flex-direction: column; gap: 4px; }
+  .msg.ai { align-self: flex-start; }
+  .msg.user { align-self: flex-end; }
+  .msg-meta {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 11px; color: var(--text-dim);
+  }
+  .msg.user .msg-meta { justify-content: flex-end; }
+  .ai-avatar {
+    width: 22px; height: 22px; border-radius: 6px;
+    background: linear-gradient(135deg, var(--orange), var(--orange-glow));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px;
+  }
+  .msg-bubble {
+    padding: 14px 18px; border-radius: 16px; font-size: 14.5px; line-height: 1.65;
+  }
+  .msg.ai .msg-bubble {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top-left-radius: 4px;
+  }
+  .msg.user .msg-bubble {
+    background: linear-gradient(135deg, #ff8c00, #ff6b00);
+    color: #fff; border-bottom-right-radius: 4px;
+  }
+
+  /* Typing dots */
+  .typing-dot {
+    display: inline-block; width: 6px; height: 6px; border-radius: 50%;
+    background: var(--orange); margin: 0 2px;
+    animation: typingBounce .8s infinite ease-in-out;
+  }
+  .typing-dot:nth-child(2) { animation-delay: .15s; }
+  .typing-dot:nth-child(3) { animation-delay: .3s; }
+  @keyframes typingBounce { 0%,80%,100%{transform:translateY(0)} 40%{transform:translateY(-6px)} }
+
+  /* Streaming cursor */
+  .stream-cursor {
+    display: inline-block; width: 2px; height: 14px;
+    background: var(--orange); margin-left: 2px; vertical-align: middle;
+    animation: cursorBlink .7s infinite;
+  }
+  @keyframes cursorBlink { 0%,50%{opacity:1} 51%,100%{opacity:0} }
+
+  /* ─── RESULT CARD ─── */
+  .result-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 20px; margin-top: 4px;
+    max-width: 600px;
+  }
+  .result-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--border);
+  }
+  .result-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 16px; }
+  .overcharge-badge {
+    font-size: 12px; font-weight: 700; padding: 6px 12px; border-radius: 8px;
+  }
+  .overcharge-high { background: rgba(255,77,106,0.15); color: var(--red); border: 1px solid rgba(255,77,106,.3); }
+  .overcharge-med { background: rgba(255,200,0,0.12); color: #ffcc00; border: 1px solid rgba(255,200,0,.25); }
+  .overcharge-low { background: rgba(34,211,164,0.12); color: var(--green); border: 1px solid rgba(34,211,164,.25); }
+
+  .result-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .result-table th {
+    text-align: left; padding: 7px 10px;
+    background: var(--surface2); color: var(--text-muted);
+    font-weight: 500; font-size: 11px; letter-spacing: .05em;
+  }
+  .result-table th:first-child { border-radius: 6px 0 0 6px; }
+  .result-table th:last-child { border-radius: 0 6px 6px 0; }
+  .result-table td { padding: 9px 10px; border-bottom: 1px solid var(--border); }
+  .result-table tr:last-child td { border-bottom: none; }
+  .price-fair { color: var(--green); font-weight: 600; }
+  .price-charged { color: var(--text); font-weight: 600; }
+  .price-diff-pos { color: var(--red); font-weight: 700; }
+  .price-diff-neg { color: var(--green); font-weight: 700; }
+
+  .result-summary {
+    margin-top: 14px; padding: 12px 14px; border-radius: var(--radius-sm);
+    background: var(--surface2); border: 1px solid var(--border);
+    font-size: 13px; color: var(--text-muted); line-height: 1.6;
+  }
+  .result-summary strong { color: var(--text); }
+
+  .verdict-bar {
+    margin-top: 12px; padding: 12px 14px; border-radius: var(--radius-sm);
+    display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600;
+  }
+  .verdict-high { background: rgba(255,77,106,0.1); color: var(--red); border: 1px solid rgba(255,77,106,.2); }
+  .verdict-med { background: rgba(255,200,0,0.08); color: #ffcc00; border: 1px solid rgba(255,200,0,.18); }
+  .verdict-low { background: rgba(34,211,164,0.08); color: var(--green); border: 1px solid rgba(34,211,164,.18); }
+
+  /* Estimate card */
+  .estimate-section { margin-bottom: 16px; }
+  .estimate-section-title {
+    font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--text-dim); margin-bottom: 10px;
+  }
+  .estimate-item {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    padding: 9px 0; border-bottom: 1px solid var(--border); gap: 12px;
+  }
+  .estimate-item:last-child { border-bottom: none; }
+  .estimate-item-name { font-size: 13.5px; font-weight: 500; }
+  .estimate-item-desc { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+  .estimate-range { text-align: right; }
+  .estimate-price { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 15px; color: var(--orange); }
+  .estimate-note { font-size: 11px; color: var(--text-dim); }
+  .estimate-total {
+    margin-top: 12px; padding: 12px 14px; border-radius: var(--radius-sm);
+    background: var(--orange-soft); border: 1px solid rgba(255,140,0,0.2);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .estimate-total span { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 17px; color: var(--orange); }
+
+  /* Questions card */
+  .questions-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 18px; margin-top: 8px; max-width: 560px;
+  }
+  .questions-card h4 {
+    font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700;
+    margin-bottom: 12px; color: var(--orange);
+  }
+  .q-item {
+    display: flex; gap: 10px; padding: 8px 0;
+    border-bottom: 1px solid var(--border); font-size: 13.5px; line-height: 1.5;
+  }
+  .q-item:last-child { border-bottom: none; }
+  .q-num {
+    width: 22px; height: 22px; border-radius: 6px;
+    background: var(--orange-soft); border: 1px solid rgba(255,140,0,0.2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; color: var(--orange); flex-shrink: 0;
+  }
+
+  /* ─── INPUT AREA ─── */
+  .chat-input-area {
+    border-top: 1px solid var(--border);
+    background: rgba(10,11,15,0.95);
+    backdrop-filter: blur(12px);
+    padding: 16px 32px 20px;
+  }
+  .file-preview {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 12px; background: var(--surface2);
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    margin-bottom: 10px; font-size: 13px;
+  }
+  .file-preview.hidden { display: none; }
+  .file-preview-name { flex: 1; color: var(--text-muted); }
+  .file-remove {
+    cursor: pointer; color: var(--red); font-size: 16px; line-height: 1;
+  }
+
+  .input-row {
+    display: flex; align-items: flex-end; gap: 10px;
+  }
+  .input-box {
+    flex: 1; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 14px;
+    padding: 12px 16px; color: var(--text);
+    font-family: 'DM Sans', sans-serif; font-size: 14.5px;
+    resize: none; outline: none; line-height: 1.5; min-height: 48px; max-height: 160px;
+    transition: border-color .2s;
+  }
+  .input-box:focus { border-color: rgba(255,140,0,0.4); }
+  .input-box::placeholder { color: var(--text-dim); }
+  .input-actions {
+    display: flex; align-items: center; gap: 8px;
+  }
+  .btn-icon {
+    width: 44px; height: 44px; border-radius: 12px;
+    border: 1px solid var(--border); background: var(--surface);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all .2s; font-size: 17px; color: var(--text-muted);
+  }
+  .btn-icon:hover { border-color: var(--border-active); color: var(--orange); background: var(--orange-soft); }
+  .btn-send {
+    width: 44px; height: 44px; border-radius: 12px;
+    background: linear-gradient(135deg, var(--orange), var(--orange-glow));
+    border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; color: #fff;
+    transition: all .2s; box-shadow: 0 4px 20px rgba(255,140,0,0.3);
+  }
+  .btn-send:hover { transform: scale(1.07); box-shadow: 0 6px 24px rgba(255,140,0,0.45); }
+  .btn-send:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+  .input-hint {
+    font-size: 11px; color: var(--text-dim); margin-top: 8px;
+    display: flex; align-items: center; gap: 6px;
+  }
+
+  /* ─── MOBILE MODAL ─── */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,.7);
+    backdrop-filter: blur(8px); z-index: 200;
+    display: flex; align-items: center; justify-content: center; padding: 20px;
+    opacity: 0; pointer-events: none; transition: opacity .3s;
+  }
+  .modal-overlay.show { opacity: 1; pointer-events: all; }
+  .modal {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 20px; padding: 28px; max-width: 400px; width: 100%;
+    transform: translateY(20px); transition: transform .3s;
+  }
+  .modal-overlay.show .modal { transform: translateY(0); }
+  .modal h3 { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; margin-bottom: 6px; }
+  .modal p { color: var(--text-muted); font-size: 14px; margin-bottom: 20px; }
+  .modal-input {
+    width: 100%; background: var(--surface2); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 13px 16px;
+    color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 15px;
+    outline: none; transition: border-color .2s; margin-bottom: 14px;
+  }
+  .modal-input:focus { border-color: var(--border-active); }
+  .btn-primary {
+    width: 100%; padding: 13px;
+    background: linear-gradient(135deg, var(--orange), var(--orange-glow));
+    border: none; border-radius: var(--radius-sm); color: #fff;
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: 15px;
+    cursor: pointer; transition: all .2s;
+    box-shadow: 0 4px 20px rgba(255,140,0,0.3);
+  }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 28px rgba(255,140,0,0.45); }
+
+  /* ─── BILL UPLOAD MODE ─── */
+  .bill-upload-zone {
+    border: 2px dashed var(--border); border-radius: var(--radius);
+    padding: 32px; text-align: center; cursor: pointer;
+    transition: all .25s; margin: 16px 20px;
+  }
+  .bill-upload-zone:hover, .bill-upload-zone.drag { border-color: var(--orange); background: var(--orange-soft); }
+  .upload-icon { font-size: 32px; margin-bottom: 10px; }
+  .upload-label { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+  .upload-sub { font-size: 12px; color: var(--text-muted); }
+  .upload-preview {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px; background: var(--surface2); border-radius: var(--radius-sm);
+    margin: 0 20px 12px; border: 1px solid var(--border);
+  }
+  .upload-preview.hidden { display: none; }
+  .upload-preview-icon { font-size: 24px; }
+  .upload-preview-info { flex: 1; }
+  .upload-preview-name { font-size: 13px; font-weight: 500; }
+  .upload-preview-size { font-size: 11px; color: var(--text-muted); }
+  .upload-remove { cursor: pointer; color: var(--red); font-size: 18px; }
+
+  /* ─── BILL ANALYZE BUTTON ─── */
+  .analyze-btn {
+    margin: 0 20px 16px;
+    width: calc(100% - 40px);
+    padding: 13px;
+    background: linear-gradient(135deg, var(--orange), var(--orange-glow));
+    border: none; border-radius: var(--radius-sm); color: #fff;
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: 15px;
+    cursor: pointer; transition: all .2s;
+    box-shadow: 0 4px 20px rgba(255,140,0,0.3);
+  }
+  .analyze-btn:disabled { opacity: .4; cursor: not-allowed; }
+  .analyze-btn:not(:disabled):hover { box-shadow: 0 6px 28px rgba(255,140,0,0.45); transform: translateY(-1px); }
+
+  /* ─── EMPTY STATE ─── */
+  .empty-state {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 40px; text-align: center; color: var(--text-dim);
+  }
+  .empty-icon { font-size: 48px; margin-bottom: 16px; opacity: .4; }
+  .empty-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 18px; margin-bottom: 8px; color: var(--text-muted); }
+  .empty-sub { font-size: 14px; max-width: 280px; line-height: 1.5; }
+
+  /* ─── CHIPS ─── */
+  .suggestion-chips {
+    display: flex; flex-wrap: wrap; gap: 8px;
+    margin-top: 10px;
+  }
+  .chip {
+    padding: 7px 14px; border-radius: 20px;
+    background: var(--surface2); border: 1px solid var(--border);
+    font-size: 12.5px; cursor: pointer; transition: all .2s;
+    color: var(--text-muted);
+  }
+  .chip:hover { border-color: var(--orange); color: var(--orange); background: var(--orange-soft); }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 768px) {
+    .mode-cards { grid-template-columns: 1fr; }
+    .sidebar { width: 100%; }
+    #app.active { flex-direction: column; }
+    .chat-area { height: 60vh; }
+    .sidebar { height: 40vh; }
+    .chat-messages { padding: 16px; }
+    .chat-input-area { padding: 12px 16px 16px; }
+    .msg { max-width: 90%; }
+  }
+
+  /* ─── ANIMATIONS ─── */
+  @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:none; } }
+  .fade-in { animation: fadeUp .35s ease both; }
+  @keyframes shimmer { 0%{background-position:-200%} 100%{background-position:200%} }
+  .skeleton {
+    background: linear-gradient(90deg, var(--surface2) 0%, var(--surface) 50%, var(--surface2) 100%);
+    background-size: 200% auto;
+    animation: shimmer 1.2s infinite; border-radius: 6px;
+  }
+
+  /* Mode indicator in sidebar */
+  .mode-indicator {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 20px;
+    margin-top: 6px;
+  }
+  .mode-estimate { background: rgba(34,211,164,0.1); color: var(--green); }
+  .mode-audit { background: rgba(255,77,106,0.1); color: var(--red); }
+</style>
+</head>
+<body>
+
+<div class="ambient ambient-1"></div>
+<div class="ambient ambient-2"></div>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">
+    <div class="logo-icon">🔧</div>
+    Instant<span>Mechanic</span>
+  </div>
+  <div class="header-badge">⚡ AI-Powered</div>
+</header>
+
+<main>
+
+<!-- ═══════════════════════════════════
+     LANDING SCREEN
+════════════════════════════════════ -->
+<section id="landing">
+  <div class="landing-eyebrow">Powered by GPT-4o</div>
+  <h1 class="landing-title">Your Car, Our<br/><em>AI Expert</em></h1>
+  <p class="landing-sub">Get fair price estimates before visiting a garage, or check if your last repair bill was overpriced.</p>
+  <div class="mode-cards">
+    <div class="mode-card" onclick="enterMode('estimate')">
+      <div class="mode-badge badge-estimate">Free Service</div>
+      <div class="mode-icon">💬</div>
+      <h3>Get AI Estimate</h3>
+      <p>Describe your car issue and get an instant fair-price estimate before visiting any garage.</p>
+      <div class="mode-arrow">→</div>
+    </div>
+    <div class="mode-card" onclick="enterMode('audit')">
+      <div class="mode-badge badge-audit">Bill Auditor</div>
+      <div class="mode-icon">🧾</div>
+      <h3>Check Old Bill</h3>
+      <p>Upload your repair bill and our AI will tell you exactly how much you were overcharged.</p>
+      <div class="mode-arrow">→</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════
+     APP SCREEN
+════════════════════════════════════ -->
+<div id="app">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar" id="sidebar">
+    <!-- Car selector display -->
+    <div class="sidebar-header">
+      <button class="back-btn" onclick="goBack()">← Back to Home</button>
+      <div class="mode-label">
+        <div class="mode-dot"></div>
+        <span id="mode-title">AI Estimator</span>
+      </div>
+      <div class="mode-indicator" id="mode-indicator">💬 Estimate Mode</div>
+    </div>
+
+    <div class="sidebar-steps" id="sidebar-steps">
+      <!-- Car Card -->
+      <div class="step-group">
+        <div class="step-group-title">Your Vehicle</div>
+        <div class="car-display" id="car-display" onclick="openBrandSelector()">
+          <div class="car-display-img-placeholder" id="car-placeholder">🚗</div>
+          <img class="car-display-img" id="car-img" style="display:none" src="" alt=""/>
+          <div class="car-display-info">
+            <div class="car-display-name" id="car-name">Select Your Car</div>
+            <div class="car-display-sub" id="car-sub">Brand → Model → Fuel</div>
+          </div>
+          <div class="car-display-chevron">›</div>
+        </div>
+      </div>
+
+      <!-- Bill upload (audit mode only) -->
+      <div class="step-group" id="bill-upload-group" style="display:none">
+        <div class="step-group-title">Upload Bill</div>
+        <div class="bill-upload-zone" id="bill-zone" onclick="triggerBillUpload()">
+          <div class="upload-icon">📄</div>
+          <div class="upload-label">Upload Your Bill</div>
+          <div class="upload-sub">JPG, PNG or PDF — max 2MB</div>
+        </div>
+        <div class="upload-preview hidden" id="bill-preview">
+          <div class="upload-preview-icon">📎</div>
+          <div class="upload-preview-info">
+            <div class="upload-preview-name" id="bill-name">bill.jpg</div>
+            <div class="upload-preview-size" id="bill-size">-</div>
+          </div>
+          <div class="upload-remove" onclick="removeBill()">✕</div>
+        </div>
+        <input type="file" id="bill-file-input" accept="image/*,application/pdf" style="display:none" onchange="handleBillFile(this)"/>
+        <button class="analyze-btn" id="analyze-btn" onclick="analyzeBill()" disabled>🔍 Analyze Bill</button>
+      </div>
+    </div>
+
+    <!-- Progress Steps -->
+    <div class="progress-steps" id="progress-steps">
+      <div class="prog-step" id="prog-1">
+        <div class="prog-dot">1</div>
+        <div class="prog-label">Car</div>
+      </div>
+      <div class="prog-step" id="prog-2">
+        <div class="prog-dot">2</div>
+        <div class="prog-label">Issue</div>
+      </div>
+      <div class="prog-step" id="prog-3">
+        <div class="prog-dot">3</div>
+        <div class="prog-label">Details</div>
+      </div>
+      <div class="prog-step" id="prog-4">
+        <div class="prog-dot">4</div>
+        <div class="prog-label">Result</div>
+      </div>
+    </div>
+
+    <!-- Brand Selector Panel -->
+    <div class="selector-panel hidden" id="brand-panel">
+      <div class="sel-header">
+        <div class="sel-back" onclick="closeBrandSelector()">←</div>
+        <div class="sel-title">Select Brand</div>
+      </div>
+      <div class="sel-search">
+        <span>🔍</span>
+        <input type="text" placeholder="Search brand..." id="brand-search" oninput="filterBrands(this.value)"/>
+      </div>
+      <div class="sel-list">
+        <div style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);margin-bottom:10px;">Popular Brands</div>
+        <div class="brand-grid" id="popular-brands"></div>
+        <div style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);margin:16px 0 10px">All Brands</div>
+        <div class="brand-grid" id="all-brands"></div>
+      </div>
+    </div>
+
+    <!-- Model Selector Panel -->
+    <div class="selector-panel hidden" id="model-panel">
+      <div class="sel-header">
+        <div class="sel-back" onclick="closeModelSelector()">←</div>
+        <div class="sel-title" id="model-panel-title">Select Model</div>
+      </div>
+      <div class="sel-search">
+        <span>🔍</span>
+        <input type="text" placeholder="Search model..." id="model-search" oninput="filterModels(this.value)"/>
+      </div>
+      <div class="sel-list" id="model-list"></div>
+    </div>
+  </div>
+
+  <!-- CHAT AREA -->
+  <div class="chat-area">
+    <!-- Empty state -->
+    <div class="empty-state" id="empty-state">
+      <div class="empty-icon">🤖</div>
+      <div class="empty-title">Ready to Help</div>
+      <div class="empty-sub">Select your car from the sidebar to get started. Then describe what's happening.</div>
+    </div>
+
+    <div class="chat-messages" id="chat-messages" style="display:none"></div>
+
+    <!-- Input -->
+    <div class="chat-input-area">
+      <div class="file-preview hidden" id="file-preview">
+        <span>📎</span>
+        <span class="file-preview-name" id="file-preview-name">image.jpg</span>
+        <span class="file-remove" onclick="removeAttachment()">✕</span>
+      </div>
+      <div class="input-row">
+        <textarea class="input-box" id="chat-input" placeholder="Describe your car issue…" rows="1"
+          onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+        <div class="input-actions">
+          <label class="btn-icon" title="Attach image" style="cursor:pointer">
+            📎
+            <input type="file" id="attach-input" accept="image/*,application/pdf" style="display:none" onchange="handleAttachment(this)"/>
+          </label>
+          <button class="btn-send" id="send-btn" onclick="sendMessage()" title="Send">➤</button>
+        </div>
+      </div>
+      <div class="input-hint">
+        <span>Enter to send</span> · <span>Shift+Enter for new line</span> · <span id="turn-hint">Select your car first</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<!-- MOBILE MODAL -->
+<div class="modal-overlay" id="mobile-modal">
+  <div class="modal">
+    <h3>Last Step 🎉</h3>
+    <p>Enter your mobile number to receive your AI analysis report.</p>
+    <input class="modal-input" type="tel" id="mobile-input" placeholder="10-digit mobile number" maxlength="10"/>
+    <button class="btn-primary" onclick="submitWithMobile()">Get My Report →</button>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════
+const API_BASE = 'https://ai.instantmechanic.online/bot/api';
+const BRANDS_URL = 'https://instantmechanic.online/car_brand.json';
+
+let state = {
+  mode: null, // 'estimate' | 'audit'
+  selectedBrand: null,
+  selectedModel: null,
+  carReady: false,
+  conversationStep: 0, // 0=idle 1=issue 2=followup 3=final
+  messages: [],
+  pendingMessage: null,
+  billFile: null,
+  attachFile: null,
+  mobile: null,
+  allBrands: [],
+  allModels: [],
+  sessionId: Date.now().toString(36),
+};
+
+// ═══════════════════════════════════════
+// MODE ENTRY
+// ═══════════════════════════════════════
+function enterMode(mode) {
+  state.mode = mode;
+  document.getElementById('landing').style.display = 'none';
+  const app = document.getElementById('app');
+  app.style.display = 'flex';
+  app.classList.add('active');
+
+  document.getElementById('mode-title').textContent = mode === 'estimate' ? 'AI Estimator' : 'Bill Auditor';
+  const ind = document.getElementById('mode-indicator');
+  ind.className = 'mode-indicator ' + (mode === 'estimate' ? 'mode-estimate' : 'mode-audit');
+  ind.textContent = mode === 'estimate' ? '💬 Estimate Mode' : '🧾 Audit Mode';
+
+  if (mode === 'audit') {
+    document.getElementById('bill-upload-group').style.display = '';
+    document.getElementById('progress-steps').style.display = 'none';
+  }
+
+  loadBrands();
+}
+
+function goBack() {
+  document.getElementById('landing').style.display = 'flex';
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('app').classList.remove('active');
+  resetState();
+}
+
+function resetState() {
+  state = { ...state, selectedBrand:null, selectedModel:null, carReady:false,
+    conversationStep:0, messages:[], pendingMessage:null, billFile:null, attachFile:null, mobile:null };
+  document.getElementById('chat-messages').innerHTML = '';
+  document.getElementById('chat-messages').style.display = 'none';
+  document.getElementById('empty-state').style.display = 'flex';
+  updateCarDisplay();
+  setProgress(0);
+}
+
+// ═══════════════════════════════════════
+// BRANDS & MODELS
+// ═══════════════════════════════════════
+async function loadBrands() {
+  try {
+    const res = await fetch(BRANDS_URL);
+    state.allBrands = await res.json();
+    renderBrands(state.allBrands);
+  } catch(e) {
+    console.error('Failed to load brands', e);
+  }
+}
+
+function renderBrands(brands) {
+  const popular = brands.filter(b => b.is_popular);
+  const all = brands;
+  document.getElementById('popular-brands').innerHTML = popular.map(brandCard).join('');
+  document.getElementById('all-brands').innerHTML = all.map(brandCard).join('');
+}
+
+function brandCard(b) {
+  return `<div class="brand-item" onclick="selectBrand(${b.id})">
+    <img src="${b.brand_logo}" alt="${b.name}" onerror="this.style.display='none'"/>
+    <span>${b.name}</span>
+    ${b.is_popular ? '<span class="popular-badge">★ Popular</span>' : ''}
+  </div>`;
+}
+
+function filterBrands(q) {
+  const filtered = state.allBrands.filter(b => b.name.toLowerCase().includes(q.toLowerCase()));
+  renderBrands(filtered);
+}
+
+async function selectBrand(id) {
+  state.selectedBrand = state.allBrands.find(b => b.id === id);
+  state.selectedModel = null;
+  closeBrandSelector();
+  openModelSelector();
+  try {
+    const res = await fetch(`https://instantmechanic.online/car.json?brand_id=${id}`);
+    const data = await res.json();
+    state.allModels = Array.isArray(data) ? data : (data.results || []);
+    renderModels(state.allModels);
+  } catch(e) {
+    // fallback: try alternate
+    try {
+      const res2 = await fetch(`https://instantmechanic.online/car_models.json`);
+      const data2 = await res2.json();
+      state.allModels = data2.filter(m => m.brand && m.brand.id === id);
+      renderModels(state.allModels);
+    } catch(_) { renderModels([]); }
+  }
+}
+
+function renderModels(models) {
+  const list = document.getElementById('model-list');
+  if (!models.length) { list.innerHTML = '<div style="padding:20px;color:var(--text-muted);font-size:13px;text-align:center">No models found</div>'; return; }
+  list.innerHTML = models.map(m => `
+    <div class="model-item" onclick='selectModel(${JSON.stringify(m).replace(/'/g,"&#39;")})'>
+      <img src="${m.image_path}" alt="${m.name}" onerror="this.style.display='none'" style="width:56px;height:36px;object-fit:contain"/>
+      <div class="model-info">
+        <div class="model-name">${m.name}</div>
+        <div class="model-sub">${m.segment || ''}</div>
+      </div>
+      <span class="fuel-badge fuel-${m.fuel_type?.toLowerCase()}">${m.fuel_type}</span>
+    </div>`).join('');
+}
+
+function filterModels(q) {
+  const filtered = state.allModels.filter(m =>
+    m.name.toLowerCase().includes(q.toLowerCase()) ||
+    (m.fuel_type||'').toLowerCase().includes(q.toLowerCase())
+  );
+  renderModels(filtered);
+}
+
+function selectModel(model) {
+  state.selectedModel = model;
+  state.carReady = true;
+  closeModelSelector();
+  updateCarDisplay();
+  setProgress(1);
+  onCarSelected();
+}
+
+function updateCarDisplay() {
+  if (state.selectedModel && state.selectedBrand) {
+    document.getElementById('car-placeholder').style.display = 'none';
+    const img = document.getElementById('car-img');
+    img.src = state.selectedModel.image_path;
+    img.style.display = 'block';
+    img.onerror = () => { img.style.display='none'; document.getElementById('car-placeholder').style.display='flex'; };
+    document.getElementById('car-name').textContent = `${state.selectedBrand.name} ${state.selectedModel.name}`;
+    document.getElementById('car-sub').textContent = `${state.selectedModel.segment||''} · ${state.selectedModel.fuel_type}`;
+  } else {
+    document.getElementById('car-placeholder').style.display = 'flex';
+    document.getElementById('car-img').style.display = 'none';
+    document.getElementById('car-name').textContent = 'Select Your Car';
+    document.getElementById('car-sub').textContent = 'Brand → Model → Fuel';
+  }
+}
+
+// ═══════════════════════════════════════
+// PANELS
+// ═══════════════════════════════════════
+function openBrandSelector() { document.getElementById('brand-panel').classList.remove('hidden'); }
+function closeBrandSelector() { document.getElementById('brand-panel').classList.add('hidden'); }
+function openModelSelector() {
+  document.getElementById('model-panel-title').textContent = `${state.selectedBrand?.name || ''} Models`;
+  document.getElementById('model-list').innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-muted)">Loading…</div>';
+  document.getElementById('model-panel').classList.remove('hidden');
+}
+function closeModelSelector() { document.getElementById('model-panel').classList.add('hidden'); }
+
+// ═══════════════════════════════════════
+// PROGRESS
+// ═══════════════════════════════════════
+function setProgress(n) {
+  for (let i = 1; i <= 4; i++) {
+    const el = document.getElementById('prog-'+i);
+    if (i < n+1) el.classList.add('done'), el.classList.remove('active');
+    else if (i === n+1) el.classList.add('active'), el.classList.remove('done');
+    else el.classList.remove('done','active');
+  }
+}
+
+// ═══════════════════════════════════════
+// CHAT
+// ═══════════════════════════════════════
+function onCarSelected() {
+  showChat();
+  const carLabel = `${state.selectedBrand.name} ${state.selectedModel.name} (${state.selectedModel.fuel_type})`;
+  if (state.mode === 'estimate') {
+    addAIMessage(`Great! I see you have a **${carLabel}**.\n\nPlease describe what's happening with your car. What symptoms are you experiencing? The more detail you give, the more accurate my estimate will be.`,
+      `<div class="suggestion-chips">
+        <div class="chip" onclick="sendChip('Engine making knocking noise')">🔊 Engine noise</div>
+        <div class="chip" onclick="sendChip('Car not starting')">🔑 Won't start</div>
+        <div class="chip" onclick="sendChip('AC not cooling')">❄️ AC issue</div>
+        <div class="chip" onclick="sendChip('Brake issues / vibration')">🛑 Brake issue</div>
+        <div class="chip" onclick="sendChip('Gear shifting problem')">⚙️ Gear problem</div>
+      </div>`
+    );
+    state.conversationStep = 1;
+    document.getElementById('turn-hint').textContent = 'Step 1: Describe your issue';
+  } else {
+    addAIMessage(`Perfect! I can see your **${carLabel}**.\n\nYou can either upload your repair bill using the sidebar, or type in the services and amounts charged and I'll analyze if the prices were fair.`);
+    state.conversationStep = 1;
+  }
+  setProgress(2);
+}
+
+function showChat() {
+  document.getElementById('empty-state').style.display = 'none';
+  document.getElementById('chat-messages').style.display = 'flex';
+}
+
+function addAIMessage(text, extraHTML = '', animate = true) {
+  const msgs = document.getElementById('chat-messages');
+  const div = document.createElement('div');
+  div.className = 'msg ai' + (animate ? ' fade-in' : '');
+  div.innerHTML = `
+    <div class="msg-meta"><div class="ai-avatar">🤖</div> InstantMechanic AI <span style="color:var(--text-dim)">${timeNow()}</span></div>
+    <div class="msg-bubble">${formatMD(text)}</div>
+    ${extraHTML}
+  `;
+  msgs.appendChild(div);
+  scrollBottom();
+  return div;
+}
+
+function addUserMessage(text) {
+  const msgs = document.getElementById('chat-messages');
+  const div = document.createElement('div');
+  div.className = 'msg user fade-in';
+  div.innerHTML = `
+    <div class="msg-meta">${timeNow()}</div>
+    <div class="msg-bubble">${escapeHtml(text)}</div>
+  `;
+  msgs.appendChild(div);
+  scrollBottom();
+}
+
+function addTypingIndicator() {
+  const msgs = document.getElementById('chat-messages');
+  const div = document.createElement('div');
+  div.className = 'msg ai fade-in'; div.id = 'typing-indicator';
+  div.innerHTML = `<div class="msg-meta"><div class="ai-avatar">🤖</div> InstantMechanic AI</div>
+    <div class="msg-bubble"><span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span></div>`;
+  msgs.appendChild(div);
+  scrollBottom();
+  return div;
+}
+
+function removeTypingIndicator() {
+  const el = document.getElementById('typing-indicator');
+  if (el) el.remove();
+}
+
+async function streamAIMessage(promptText, context) {
+  const msgs = document.getElementById('chat-messages');
+  const div = document.createElement('div');
+  div.className = 'msg ai fade-in';
+  div.innerHTML = `<div class="msg-meta"><div class="ai-avatar">🤖</div> InstantMechanic AI <span style="color:var(--text-dim)">${timeNow()}</span></div>
+    <div class="msg-bubble" id="stream-bubble"><span class="stream-cursor"></span></div>`;
+  msgs.appendChild(div);
+  scrollBottom();
+
+  const bubble = document.getElementById('stream-bubble');
+  let fullText = '';
+
+  try {
+    const res = await fetch(`${API_BASE}/ai-chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer token' },
+      body: JSON.stringify({ prompt: promptText, context, session: state.sessionId })
+    });
+
+    if (!res.ok) throw new Error('API error');
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    bubble.innerHTML = '<span class="stream-cursor"></span>';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      const chunk = decoder.decode(value);
+      const lines = chunk.split('\n');
+      for (const line of lines) {
+        if (line.startsWith('data: ')) {
+          const data = line.slice(6);
+          if (data === '[DONE]') break;
+          try {
+            const json = JSON.parse(data);
+            const token = json.choices?.[0]?.delta?.content || '';
+            if (token) {
+              fullText += token;
+              bubble.innerHTML = formatMD(fullText) + '<span class="stream-cursor"></span>';
+              scrollBottom();
+            }
+          } catch(_) {}
+        }
+      }
+    }
+    bubble.innerHTML = formatMD(fullText);
+  } catch(e) {
+    // Fallback: call our backend or simulate
+    fullText = await callBackendChat(promptText, context);
+    bubble.innerHTML = formatMD(fullText);
+  }
+
+  return { div, text: fullText };
+}
+
+// ═══════════════════════════════════════
+// BACKEND CALLS
+// ═══════════════════════════════════════
+async function callBackendChat(userMessage, context) {
+  // Build messages for OpenAI through backend
+  const systemPrompt = buildSystemPrompt();
+  const conversationHistory = state.messages.map(m => ({ role: m.role, content: m.content }));
+  conversationHistory.push({ role: 'user', content: userMessage });
+
+  try {
+    const res = await fetch(`${API_BASE}/ai-estimate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        system: systemPrompt,
+        messages: conversationHistory,
+        car: {
+          brand: state.selectedBrand?.name,
+          model: state.selectedModel?.name,
+          fuel: state.selectedModel?.fuel_type,
+          segment: state.selectedModel?.segment,
+        },
+        mode: state.mode,
+        mobile: state.mobile,
+        session: state.sessionId
+      })
+    });
+    const data = await res.json();
+    return data.reply || 'I apologize, I could not process your request right now.';
+  } catch(_) {
+    return simulateAIResponse(userMessage, context);
+  }
+}
+
+function buildSystemPrompt() {
+  const car = state.selectedModel ? `${state.selectedBrand?.name} ${state.selectedModel?.name} ${state.selectedModel?.fuel_type}` : 'Unknown car';
+  if (state.mode === 'estimate') {
+    return `You are an expert Indian car mechanic and pricing specialist for InstantMechanic. The customer has a ${car}.
+Your job:
+1. First ask 3 specific cross-questions about the symptom to diagnose accurately.
+2. After the customer answers, give a FINAL detailed estimate with:
+   - Diagnosis
+   - Parts needed with individual costs (Indian Rupees ₹)
+   - Labour charges
+   - Total range (min-max)
+   - Time to fix
+   - Tips to avoid future issues
+Use Indian market prices. Be specific with ₹ amounts. Format final answer with clear sections.`;
+  } else {
+    return `You are a car repair bill auditor for Indian garages. The customer has a ${car}.
+Analyze repair bills and compare with fair market rates in India. Identify overcharging.
+Provide a table: Service | Charged | Fair Price | Difference | Verdict
+Give overall overcharge % and total savings possible.`;
+  }
+}
+
+// ═══════════════════════════════════════
+// SIMULATE (fallback when backend offline)
+// ═══════════════════════════════════════
+function simulateAIResponse(msg, ctx) {
+  const car = `${state.selectedBrand?.name || ''} ${state.selectedModel?.name || ''}`;
+  const step = state.conversationStep;
+
+  if (step === 1) {
+    return `Thanks for sharing that about your **${car}**. To give you the most accurate estimate, I need to understand a bit more:\n\n**Q1.** How long has this issue been happening — sudden onset or gradual over days/weeks?\n\n**Q2.** Does the issue occur only at specific times — like while starting, while driving at high speed, or when braking?\n\n**Q3.** Have you noticed any warning lights on your dashboard, unusual smells, or fluids leaking under the car?`;
+  } else if (step === 2) {
+    const issue = ctx?.issue || msg;
+    return generateEstimateCard(car, issue);
+  }
+  return `I'm here to help with your **${car}**. Please describe the issue you're facing.`;
+}
+
+function generateEstimateCard(car, issue) {
+  return `Based on your description and the typical issues with a **${car}**, here is your estimated repair cost:\n\n__ESTIMATE_CARD__`;
+}
+
+// ═══════════════════════════════════════
+// SEND MESSAGE
+// ═══════════════════════════════════════
+async function sendMessage() {
+  if (!state.carReady) {
+    shakeElement(document.getElementById('car-display'));
+    return;
+  }
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if (!text && !state.attachFile) return;
+
+  input.value = '';
+  autoResize(input);
+
+  if (state.conversationStep >= 2) {
+    // Ask for mobile before final answer
+    state.pendingMessage = { text, file: state.attachFile };
+    showMobileModal();
+    return;
+  }
+
+  sendMessageCore(text);
+}
+
+async function sendMessageCore(text) {
+  addUserMessage(text);
+  state.messages.push({ role: 'user', content: text });
+  document.getElementById('send-btn').disabled = true;
+
+  if (state.conversationStep === 1) {
+    // First message — ask 3 cross questions
+    setProgress(3);
+    document.getElementById('turn-hint').textContent = 'Step 2: Answer the questions';
+    state.conversationStep = 2;
+    state.issueDescription = text;
+
+    showTypingThenStream(text, { step: 'questions', issue: text });
+  } else if (state.conversationStep === 2) {
+    // Second message — give final answer
+    setProgress(4);
+    document.getElementById('turn-hint').textContent = 'Generating estimate…';
+    state.conversationStep = 3;
+
+    showTypingThenStream(text, { step: 'final', issue: state.issueDescription, details: text }, true);
+  }
+}
+
+async function showTypingThenStream(text, context, isFinal = false) {
+  addTypingIndicator();
+  await sleep(800);
+  removeTypingIndicator();
+
+  if (isFinal) {
+    // Get final answer
+    try {
+      const result = await callBackendFinal(text, context);
+      displayFinalResult(result);
+    } catch(e) {
+      displayFinalResult(null);
+    }
+    document.getElementById('send-btn').disabled = false;
+  } else {
+    const { text: reply } = await streamAIMessage(text, context);
+    state.messages.push({ role: 'assistant', content: reply });
+    document.getElementById('send-btn').disabled = false;
+    document.getElementById('turn-hint').textContent = 'Step 3: Answer follow-up questions';
+  }
+}
+
+async function callBackendFinal(userAnswer, context) {
+  const systemPrompt = buildSystemPrompt();
+  const history = [
+    { role: 'user', content: context.issue },
+    ...state.messages.filter(m => m.role === 'assistant').slice(-1),
+    { role: 'user', content: userAnswer }
+  ];
+
+  try {
+    const formData = new FormData();
+    formData.append('system', systemPrompt);
+    formData.append('messages', JSON.stringify(history));
+    formData.append('car_brand', state.selectedBrand?.name || '');
+    formData.append('car_model', state.selectedModel?.name || '');
+    formData.append('car_fuel', state.selectedModel?.fuel_type || '');
+    formData.append('mobile', state.mobile || '');
+    formData.append('mode', state.mode);
+    if (state.attachFile) formData.append('file', state.attachFile);
+
+    const res = await fetch(`${API_BASE}/ai-estimate`, { method: 'POST', body: formData });
+    const data = await res.json();
+    return data;
+  } catch(e) {
+    return getMockFinalResult(context.issue);
+  }
+}
+
+function getMockFinalResult(issue) {
+  const car = `${state.selectedBrand?.name || 'Maruti'} ${state.selectedModel?.name || 'Swift'}`;
+  return {
+    mode: state.mode,
+    car,
+    issue,
+    diagnosis: 'Based on your described symptoms, the issue appears to be with the brake pads and possibly the brake discs.',
+    items: [
+      { name: 'Brake Pads (Front)', category: 'Parts', min: 1800, max: 2500, note: 'OEM recommended' },
+      { name: 'Brake Pads (Rear)', category: 'Parts', min: 1500, max: 2200, note: 'OEM recommended' },
+      { name: 'Brake Disc Check & Resurface', category: 'Service', min: 800, max: 1200, note: 'If worn beyond limit, replacement ₹3000–₹4500' },
+      { name: 'Labour Charges', category: 'Labour', min: 600, max: 900, note: 'Approx 2 hrs work' },
+    ],
+    totalMin: 4700,
+    totalMax: 6800,
+    timeToFix: '2–3 hours',
+    tips: 'Avoid hard braking; get pads checked every 20,000 km.',
+    overcharge: null,
+  };
+}
+
+function displayFinalResult(data) {
+  if (!data) {
+    addAIMessage('Sorry, I was unable to process your request. Please try again or call our helpline.');
+    return;
+  }
+
+  const msgs = document.getElementById('chat-messages');
+  const div = document.createElement('div');
+  div.className = 'msg ai fade-in';
+  div.innerHTML = `<div class="msg-meta"><div class="ai-avatar">🤖</div> InstantMechanic AI <span style="color:var(--text-dim)">${timeNow()}</span></div>
+    <div class="msg-bubble">Here is your detailed analysis for your <strong>${data.car}</strong>:</div>
+    ${buildResultCard(data)}`;
+  msgs.appendChild(div);
+  scrollBottom();
+}
+
+function buildResultCard(data) {
+  if (state.mode === 'audit' && data.bill_items) {
+    return buildAuditCard(data);
+  }
+  return buildEstimateCard(data);
+}
+
+function buildEstimateCard(data) {
+  const rows = (data.items || []).map(item => `
+    <div class="estimate-item">
+      <div>
+        <div class="estimate-item-name">${item.name}</div>
+        <div class="estimate-item-desc">${item.note || item.category}</div>
+      </div>
+      <div class="estimate-range">
+        <div class="estimate-price">₹${item.min?.toLocaleString()} – ₹${item.max?.toLocaleString()}</div>
+      </div>
+    </div>`).join('');
+
+  return `<div class="result-card fade-in">
+    <div class="result-header">
+      <div class="result-title">🔧 Repair Estimate</div>
+      <div class="overcharge-badge overcharge-low">Fair Price Guide</div>
+    </div>
+    <div class="estimate-section">
+      <div class="estimate-section-title">Breakdown</div>
+      ${rows}
+    </div>
+    <div class="estimate-total">
+      <span style="color:var(--text-muted);font-size:14px;font-weight:500">Total Estimate</span>
+      <span>₹${data.totalMin?.toLocaleString()} – ₹${data.totalMax?.toLocaleString()}</span>
+    </div>
+    ${data.diagnosis ? `<div class="result-summary"><strong>Diagnosis:</strong> ${data.diagnosis}</div>` : ''}
+    ${data.timeToFix ? `<div class="result-summary" style="margin-top:8px">⏱️ <strong>Time to fix:</strong> ${data.timeToFix} &nbsp; 💡 <strong>Tip:</strong> ${data.tips||''}</div>` : ''}
+  </div>`;
+}
+
+function buildAuditCard(data) {
+  const totalCharged = data.bill_items.reduce((s, i) => s + (i.charged||0), 0);
+  const totalFair = data.bill_items.reduce((s, i) => s + (i.fair||0), 0);
+  const diff = totalCharged - totalFair;
+  const pct = totalFair > 0 ? Math.round((diff/totalFair)*100) : 0;
+  const cls = pct > 30 ? 'high' : pct > 10 ? 'med' : 'low';
+  const verdictCls = 'verdict-' + cls;
+  const overCls = 'overcharge-' + cls;
+
+  const rows = data.bill_items.map(item => {
+    const d = (item.charged||0) - (item.fair||0);
+    return `<tr>
+      <td>${item.name}</td>
+      <td class="price-charged">₹${(item.charged||0).toLocaleString()}</td>
+      <td class="price-fair">₹${(item.fair||0).toLocaleString()}</td>
+      <td class="${d>0?'price-diff-pos':'price-diff-neg'}">${d>0?'+':''}₹${d.toLocaleString()}</td>
+      <td>${item.verdict||'—'}</td>
+    </tr>`;
+  }).join('');
+
+  return `<div class="result-card fade-in">
+    <div class="result-header">
+      <div class="result-title">🧾 Bill Analysis</div>
+      <div class="overcharge-badge ${overCls}">${pct > 0 ? `+${pct}% Overcharged` : 'Fair Price'}</div>
+    </div>
+    <table class="result-table">
+      <tr><th>Service</th><th>Charged</th><th>Fair Price</th><th>Difference</th><th>Verdict</th></tr>
+      ${rows}
+      <tr style="font-weight:700">
+        <td>TOTAL</td>
+        <td class="price-charged">₹${totalCharged.toLocaleString()}</td>
+        <td class="price-fair">₹${totalFair.toLocaleString()}</td>
+        <td class="${diff>0?'price-diff-pos':'price-diff-neg'}">${diff>0?'+':''}₹${diff.toLocaleString()}</td>
+        <td>—</td>
+      </tr>
+    </table>
+    <div class="verdict-bar ${verdictCls}">
+      ${pct > 30 ? '⚠️ Significantly overcharged — you could have saved ₹'+diff.toLocaleString() :
+        pct > 10 ? '⚠️ Slightly overpriced — ₹'+diff.toLocaleString()+' above fair rates' :
+        '✅ Prices were within fair market range'}
+    </div>
+    ${data.summary ? `<div class="result-summary">${data.summary}</div>` : ''}
+  </div>`;
+}
+
+// ═══════════════════════════════════════
+// BILL AUDIT
+// ═══════════════════════════════════════
+function triggerBillUpload() { document.getElementById('bill-file-input').click(); }
+
+function handleBillFile(input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (file.size > 2 * 1024 * 1024) { alert('File must be under 2MB'); return; }
+  state.billFile = file;
+  document.getElementById('bill-zone').style.display = 'none';
+  const preview = document.getElementById('bill-preview');
+  preview.classList.remove('hidden');
+  document.getElementById('bill-name').textContent = file.name;
+  document.getElementById('bill-size').textContent = (file.size/1024).toFixed(1) + ' KB';
+  document.getElementById('analyze-btn').disabled = false;
+}
+
+function removeBill() {
+  state.billFile = null;
+  document.getElementById('bill-zone').style.display = '';
+  document.getElementById('bill-preview').classList.add('hidden');
+  document.getElementById('analyze-btn').disabled = true;
+  document.getElementById('bill-file-input').value = '';
+}
+
+async function analyzeBill() {
+  if (!state.carReady) { alert('Please select your car first'); return; }
+  if (!state.billFile && !state.mobile) {
+    showMobileModal(); state.pendingMessage = { type: 'bill' }; return;
+  }
+  showMobileModal(); state.pendingMessage = { type: 'bill' };
+}
+
+async function analyzeBillCore() {
+  showChat();
+  addUserMessage('📎 Uploaded bill for analysis');
+  addTypingIndicator();
+
+  try {
+    const formData = new FormData();
+    formData.append('brand', state.selectedBrand?.name || '');
+    formData.append('model', state.selectedModel?.name || '');
+    formData.append('fuel_type', state.selectedModel?.fuel_type || '');
+    formData.append('mobile', state.mobile || '');
+    if (state.billFile) formData.append('bill', state.billFile);
+
+    const res = await fetch(`${API_BASE}/ai-bill`, {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer YOUR_ACCESS_TOKEN' },
+      body: formData
+    });
+    const data = await res.json();
+    removeTypingIndicator();
+    displayFinalResult(data);
+  } catch(e) {
+    removeTypingIndicator();
+    displayFinalResult(getMockBillResult());
+  }
+}
+
+function getMockBillResult() {
+  return {
+    mode: 'audit',
+    car: `${state.selectedBrand?.name} ${state.selectedModel?.name}`,
+    bill_items: [
+      { name: 'Engine Oil Change (5W-30)', charged: 2200, fair: 1400, verdict: '⚠️ Overpriced' },
+      { name: 'Oil Filter Replacement', charged: 800, fair: 350, verdict: '🔴 Very High' },
+      { name: 'Air Filter Cleaning', charged: 500, fair: 200, verdict: '⚠️ Overpriced' },
+      { name: 'Labour Charges', charged: 1500, fair: 700, verdict: '⚠️ Overpriced' },
+    ],
+    summary: 'Your local garage charged <strong>₹1,900 extra</strong> compared to standard market prices. The oil filter and labour charges were significantly inflated. We recommend using authorized service centers or getting quotes from 2-3 garages next time.'
+  };
+}
+
+// ═══════════════════════════════════════
+// MOBILE MODAL
+// ═══════════════════════════════════════
+function showMobileModal() { document.getElementById('mobile-modal').classList.add('show'); }
+function hideMobileModal() { document.getElementById('mobile-modal').classList.remove('show'); }
+
+async function submitWithMobile() {
+  const mobile = document.getElementById('mobile-input').value.trim();
+  if (!/^\d{10}$/.test(mobile)) {
+    shakeElement(document.getElementById('mobile-input'));
+    document.getElementById('mobile-input').style.borderColor = 'var(--red)';
+    return;
+  }
+  state.mobile = mobile;
+  hideMobileModal();
+
+  if (state.pendingMessage?.type === 'bill') {
+    await analyzeBillCore();
+  } else if (state.pendingMessage) {
+    sendMessageCore(state.pendingMessage.text);
+    state.pendingMessage = null;
+  }
+}
+
+// ═══════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════
+function handleAttachment(input) {
+  const file = input.files[0];
+  if (!file) return;
+  state.attachFile = file;
+  const preview = document.getElementById('file-preview');
+  preview.classList.remove('hidden');
+  document.getElementById('file-preview-name').textContent = file.name;
+}
+function removeAttachment() {
+  state.attachFile = null;
+  document.getElementById('file-preview').classList.add('hidden');
+  document.getElementById('attach-input').value = '';
+}
+
+function sendChip(text) {
+  document.getElementById('chat-input').value = text;
+  sendMessage();
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+}
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 160) + 'px';
+}
+
+function scrollBottom() {
+  const msgs = document.getElementById('chat-messages');
+  setTimeout(() => msgs.scrollTo({ top: msgs.scrollHeight, behavior: 'smooth' }), 50);
+}
+
+function timeNow() {
+  return new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+}
+
+function escapeHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function formatMD(text) {
+  return text
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/__(.*?)__/g, '<em>$1</em>')
+    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+    .replace(/\n\n/g, '<br/><br/>')
+    .replace(/\n/g, '<br/>')
+    .replace(/\*\*(Q\d\..*?)<br\/>/g, '<br/><strong>$1</strong><br/>')
+    .replace(/^- (.+)/gm, '• $1');
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+function shakeElement(el) {
+  el.animate([
+    {transform:'translateX(0)'},{transform:'translateX(-6px)'},{transform:'translateX(6px)'},
+    {transform:'translateX(-4px)'},{transform:'translateX(4px)'},{transform:'translateX(0)'}
+  ], { duration: 400 });
+}
+
+// Close modal on outside click
+document.getElementById('mobile-modal').addEventListener('click', function(e) {
+  if (e.target === this) hideMobileModal();
+});
+
+// Init
+document.getElementById('mobile-input').addEventListener('input', function() {
+  this.style.borderColor = '';
+});
+</script>
+</body>
+</html>
