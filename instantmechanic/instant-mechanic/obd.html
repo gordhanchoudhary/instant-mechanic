@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OBD-II Scanner — ELM 327</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#0a0e17;--surface:#0f1420;--card:rgba(15,23,42,.6);
+    --border:rgba(99,102,241,.15);--border-active:rgba(99,102,241,.35);
+    --text:#e2e8f0;--text-dim:#94a3b8;--text-muted:#64748b;--text-dark:#475569;
+    --accent:#818cf8;--accent2:#38bdf8;--green:#34d399;--red:#ef4444;
+    --amber:#f59e0b;--orange:#fb923c;--purple:#a78bfa;
+    --gradient:linear-gradient(90deg,#818cf8,#38bdf8,#34d399);
+  }
+  body{font-family:'JetBrains Mono','Fira Code','SF Mono',monospace;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+  ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#334155;border-radius:2px}
+
+  /* Animations */
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  @keyframes scanLine{0%{top:0;opacity:1}50%{opacity:.6}100%{top:100%;opacity:0}}
+  @keyframes glow{0%,100%{box-shadow:0 0 8px rgba(129,140,248,.3)}50%{box-shadow:0 0 20px rgba(129,140,248,.6)}}
+
+  .app{max-width:520px;margin:0 auto;padding-bottom:40px}
+
+  /* ── Header ── */
+  .header{background:linear-gradient(135deg,#0f172a,#1e1b4b);padding:24px 20px 20px;border-bottom:1px solid var(--border-active);position:relative;overflow:hidden}
+  .header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:var(--gradient);opacity:.5}
+  .header-row{display:flex;justify-content:space-between;align-items:flex-start}
+  .logo{font-size:26px;font-weight:800;background:var(--gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:-.5px}
+  .logo-sub{font-size:10px;color:var(--text-muted);margin-top:3px;letter-spacing:2.5px;text-transform:uppercase}
+  .status{display:flex;align-items:center;gap:7px;margin-top:5px}
+  .status-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;transition:all .3s}
+  .status-dot.on{background:var(--green);box-shadow:0 0 10px var(--green);animation:pulse 2s infinite}
+  .status-dot.off{background:var(--red);box-shadow:0 0 8px var(--red)}
+  .status-label{font-size:11px;color:var(--text-dim);letter-spacing:.5px}
+
+  /* Buttons */
+  .btn-row{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+  .btn{border:none;border-radius:8px;padding:12px 22px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;letter-spacing:.5px;position:relative;overflow:hidden}
+  .btn:active{transform:scale(.97)}
+  .btn-primary{background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff}
+  .btn-primary:hover{box-shadow:0 4px 20px rgba(79,70,229,.4)}
+  .btn-outline{background:transparent;color:var(--accent);border:1px solid rgba(129,140,248,.35)}
+  .btn-outline:hover{background:rgba(129,140,248,.08)}
+  .btn-danger{background:rgba(239,68,68,.12);color:var(--red);border:1px solid rgba(239,68,68,.25);padding:10px 18px;font-size:12px}
+  .btn-scan{width:100%;background:linear-gradient(135deg,#059669,#10b981);color:#fff;padding:16px;font-size:15px;letter-spacing:1.5px;text-transform:uppercase;border-radius:10px}
+  .btn-scan:hover{box-shadow:0 4px 24px rgba(16,185,129,.35)}
+  .btn-scan:disabled{opacity:.5;cursor:not-allowed}
+  .btn-clear{width:100%;background:transparent;color:var(--amber);border:1px solid rgba(245,158,11,.25);border-radius:10px;padding:12px;font-size:12px;margin-top:10px}
+
+  .connecting-row{display:flex;align-items:center;gap:10px;margin-top:16px}
+  .spinner{width:16px;height:16px;border:2px solid var(--accent);border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite}
+
+  .notice{margin-top:12px;font-size:11px;color:var(--amber);background:rgba(245,158,11,.08);padding:8px 12px;border-radius:6px;border:1px solid rgba(245,158,11,.15)}
+
+  /* ── Tabs ── */
+  .tabs{display:flex;border-bottom:1px solid var(--border);background:var(--surface);position:sticky;top:0;z-index:10}
+  .tab{flex:1;padding:13px 6px;text-align:center;font-size:12px;font-weight:500;color:var(--text-muted);background:transparent;border:none;border-bottom:2px solid transparent;cursor:pointer;font-family:inherit;transition:all .2s;letter-spacing:.3px}
+  .tab.active{color:var(--accent);font-weight:700;border-bottom-color:var(--accent)}
+  .tab:hover:not(.active){color:var(--text-dim)}
+
+  /* ── Cards ── */
+  .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;margin:12px 16px}
+
+  /* Progress */
+  .progress-bar{width:100%;height:5px;background:rgba(99,102,241,.08);border-radius:3px;overflow:hidden;margin:16px 0 4px}
+  .progress-fill{height:100%;background:var(--gradient);border-radius:3px;transition:width .25s ease;width:0%}
+
+  /* ── DTC Results ── */
+  .results-header{font-size:12px;color:var(--text-dim);display:flex;justify-content:space-between;padding:0 16px;margin:14px 0 8px}
+  .cel-warning{color:var(--red)}
+
+  .dtc-card{background:rgba(15,23,42,.45);border:1px solid var(--border);border-radius:10px;padding:16px 16px;margin:0 16px 10px;cursor:pointer;transition:all .2s;animation:fadeIn .35s ease both;border-left:4px solid var(--text-muted)}
+  .dtc-card:hover{border-color:var(--accent);background:rgba(99,102,241,.06)}
+  .dtc-card.selected{background:rgba(99,102,241,.1);border-color:var(--accent)}
+  .dtc-card.sev-high{border-left-color:var(--red)}.dtc-card.sev-medium{border-left-color:var(--amber)}.dtc-card.sev-low{border-left-color:var(--green)}
+
+  .dtc-top{display:flex;justify-content:space-between;align-items:center;gap:10px}
+  .dtc-info{display:flex;align-items:center;gap:10px}
+  .dtc-icon{font-size:20px;flex-shrink:0}
+  .dtc-code{font-size:17px;font-weight:800;color:var(--text);letter-spacing:1px}
+  .dtc-system{font-size:11px;color:var(--text-dim);margin-top:2px}
+  .dtc-desc{font-size:12px;color:#cbd5e1;margin-top:10px;line-height:1.6}
+
+  .badge{display:inline-block;padding:2px 10px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.5px}
+  .badge-high{background:rgba(239,68,68,.15);color:var(--red)}.badge-medium{background:rgba(245,158,11,.15);color:var(--amber)}.badge-low{background:rgba(52,211,153,.15);color:var(--green)}
+
+  .fix-panel{margin-top:14px;padding:14px;background:rgba(99,102,241,.07);border-radius:8px;border:1px solid rgba(99,102,241,.12);animation:fadeIn .25s ease}
+  .fix-label{font-size:10px;color:var(--accent);font-weight:700;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:8px}
+  .fix-text{font-size:12px;color:var(--text);line-height:1.7}
+
+  .no-codes{text-align:center;color:var(--green);padding:10px 0}
+  .no-codes .icon{font-size:40px;margin-bottom:8px}
+  .no-codes .title{font-size:15px;font-weight:700}
+  .no-codes .sub{font-size:11px;color:var(--text-muted);margin-top:6px}
+
+  /* ── Live Data ── */
+  .gauges{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 16px;margin-top:12px}
+  .gauge{background:rgba(15,23,42,.5);border:1px solid var(--border);border-radius:10px;padding:14px 16px;text-align:center;transition:border-color .3s}
+  .gauge:hover{border-color:var(--border-active)}
+  .gauge-label{font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:6px}
+  .gauge-value{font-size:28px;font-weight:800;line-height:1}
+  .gauge-unit{font-size:11px;font-weight:400;color:var(--text-muted);margin-left:3px}
+  .gauge-bar{height:3px;background:rgba(99,102,241,.08);border-radius:2px;margin-top:10px;overflow:hidden}
+  .gauge-bar-fill{height:100%;border-radius:2px;transition:width .6s ease}
+  .live-footer{font-size:10px;color:var(--text-dark);text-align:center;margin-top:14px}
+
+  /* ── History ── */
+  .history-item{display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid var(--border)}
+  .history-item:last-child{border:none}
+  .history-date{font-size:11px;color:var(--text-muted)}
+  .history-codes{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+  .history-tag{font-size:12px;font-weight:700;color:var(--accent);background:rgba(99,102,241,.1);padding:3px 10px;border-radius:6px}
+  .history-empty{text-align:center;color:var(--text-muted);font-size:13px;padding:30px 0}
+
+  /* ── Terminal ── */
+  .terminal-label{font-size:10px;color:var(--accent);font-weight:700;letter-spacing:1.2px;margin-bottom:10px}
+  .terminal-scroll{max-height:380px;overflow-y:auto}
+  .log-line{font-size:11px;padding:3px 0;border-bottom:1px solid rgba(99,102,241,.05);display:flex;gap:8px}
+  .log-time{color:var(--text-dark);flex-shrink:0;min-width:70px}
+  .log-msg{word-break:break-word}
+  .log-msg.info{color:var(--text-muted)}.log-msg.success{color:var(--green)}.log-msg.error{color:var(--red)}
+
+  /* ── Setup Guide ── */
+  .guide{padding:20px 16px}
+  .guide-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:12px}
+  .guide-text{font-size:12px;color:var(--text-dim);line-height:1.9}
+  .guide-text br{margin-bottom:2px}
+
+  /* Responsive */
+  @media(max-width:400px){.logo{font-size:22px}.btn{padding:10px 16px;font-size:12px}.gauges{gap:8px}.gauge-value{font-size:24px}}
+</style>
+</head>
+<body>
+
+<div class="app" id="app">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-row">
+      <div>
+        <div class="logo">OBD-II Scanner</div>
+        <div class="logo-sub">ELM 327 Diagnostic Interface</div>
+      </div>
+      <div class="status">
+        <div class="status-dot off" id="statusDot"></div>
+        <span class="status-label" id="statusLabel">Disconnected</span>
+      </div>
+    </div>
+
+    <!-- Connection Buttons -->
+    <div id="connectUI">
+      <div class="btn-row" id="btnConnect">
+        <button class="btn btn-primary" onclick="connectBluetooth()" id="btBtn">ᛒ Connect Bluetooth</button>
+        <button class="btn btn-outline" onclick="connectDemo()">▶ Demo Mode</button>
+      </div>
+    </div>
+    <div id="connectingUI" style="display:none">
+      <div class="connecting-row"><div class="spinner"></div><span style="font-size:12px;color:var(--accent)">Searching for ELM 327…</span></div>
+    </div>
+    <div id="connectedUI" style="display:none">
+      <div class="btn-row"><button class="btn btn-danger" onclick="disconnect()">✕ Disconnect</button></div>
+    </div>
+    <div class="notice" id="btNotice" style="display:none">⚠ Web Bluetooth not available here. Use Chrome/Edge on desktop or Android. Try Demo Mode instead.</div>
+  </div>
+
+  <!-- Tabs (hidden until connected) -->
+  <div class="tabs" id="tabs" style="display:none">
+    <button class="tab active" data-tab="scan" onclick="switchTab('scan',this)">🔍 Scan</button>
+    <button class="tab" data-tab="live" onclick="switchTab('live',this)">📊 Live</button>
+    <button class="tab" data-tab="history" onclick="switchTab('history',this)">📋 History</button>
+    <button class="tab" data-tab="logs" onclick="switchTab('logs',this)">⌨ Terminal</button>
+  </div>
+
+  <!-- Tab Panels -->
+  <div id="panel-scan" class="panel" style="display:none"></div>
+  <div id="panel-live" class="panel" style="display:none"></div>
+  <div id="panel-history" class="panel" style="display:none"></div>
+  <div id="panel-logs" class="panel" style="display:none"></div>
+
+  <!-- Disconnected Guide -->
+  <div id="guide" class="guide">
+    <div class="card">
+      <div class="guide-title">How to Connect</div>
+      <div class="guide-text">
+        1. Plug ELM 327 into your car's OBD-II port (under dashboard, driver's side)<br>
+        2. Turn ignition ON or start the engine<br>
+        3. Blue LED on ELM 327 should light up<br>
+        4. Click "Connect Bluetooth" and select your device<br>
+        5. Or try "Demo Mode" to explore without a car
+      </div>
+    </div>
+    <div class="card" style="margin-top:4px">
+      <div class="guide-title">Supported Features</div>
+      <div class="guide-text">
+        ⚡ Read & clear diagnostic trouble codes<br>
+        📊 Real-time engine data (RPM, speed, temp…)<br>
+        🔧 Detailed fix recommendations per code<br>
+        📋 Scan history tracking<br>
+        🔌 All OBD-II vehicles (1996+ US, 2001+ EU, 2005+ IN)
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+//  DTC DATABASE
+// ═══════════════════════════════════════════
+const DTC_DB = {
+  "P0100":{d:"Mass or Volume Air Flow Circuit Malfunction",s:"medium",sys:"Fuel/Air",f:"Check MAF sensor connector, clean or replace MAF sensor, check for vacuum leaks"},
+  "P0101":{d:"Mass or Volume Air Flow Circuit Range/Performance",s:"medium",sys:"Fuel/Air",f:"Clean MAF sensor with MAF cleaner spray, check air filter, inspect intake ducts for leaks"},
+  "P0102":{d:"Mass or Volume Air Flow Circuit Low Input",s:"medium",sys:"Fuel/Air",f:"Check MAF sensor wiring, replace MAF sensor if faulty, check for air leaks before MAF"},
+  "P0103":{d:"Mass or Volume Air Flow Circuit High Input",s:"medium",sys:"Fuel/Air",f:"Inspect MAF sensor wiring for shorts, replace MAF sensor, check PCM grounds"},
+  "P0110":{d:"Intake Air Temperature Circuit Malfunction",s:"low",sys:"Fuel/Air",f:"Check IAT sensor connector, test IAT sensor resistance, replace if out of spec"},
+  "P0112":{d:"Intake Air Temperature Circuit Low Input",s:"low",sys:"Fuel/Air",f:"Check wiring for short to ground, replace IAT sensor"},
+  "P0113":{d:"Intake Air Temperature Circuit High Input",s:"low",sys:"Fuel/Air",f:"Check for open circuit in IAT wiring, replace IAT sensor"},
+  "P0115":{d:"Engine Coolant Temperature Circuit Malfunction",s:"high",sys:"Engine",f:"Check ECT sensor connector, test sensor resistance, replace ECT sensor"},
+  "P0116":{d:"Engine Coolant Temperature Circuit Range/Performance",s:"medium",sys:"Engine",f:"Check thermostat operation, replace ECT sensor, check coolant level"},
+  "P0117":{d:"Engine Coolant Temperature Circuit Low Input",s:"medium",sys:"Engine",f:"Check ECT wiring for short to ground, replace ECT sensor"},
+  "P0118":{d:"Engine Coolant Temperature Circuit High Input",s:"high",sys:"Engine",f:"Check for open circuit, replace ECT sensor, check connector"},
+  "P0120":{d:"Throttle Position Sensor/Switch A Circuit Malfunction",s:"high",sys:"Fuel/Air",f:"Check TPS connector, adjust or replace TPS, check wiring harness"},
+  "P0121":{d:"Throttle Position Sensor Range/Performance",s:"high",sys:"Fuel/Air",f:"Replace TPS, clean throttle body, check for binding in throttle linkage"},
+  "P0122":{d:"Throttle Position Sensor Circuit Low Input",s:"high",sys:"Fuel/Air",f:"Check TPS ground wire, replace TPS, inspect connector pins"},
+  "P0123":{d:"Throttle Position Sensor Circuit High Input",s:"high",sys:"Fuel/Air",f:"Check TPS signal wire for short to voltage, replace TPS"},
+  "P0125":{d:"Insufficient Coolant Temp for Closed Loop",s:"low",sys:"Engine",f:"Replace thermostat (likely stuck open), check ECT sensor"},
+  "P0128":{d:"Coolant Thermostat Below Regulating Temperature",s:"medium",sys:"Engine",f:"Replace thermostat — likely stuck open, causing engine to run cool"},
+  "P0130":{d:"O2 Sensor Circuit Malfunction (Bank 1, Sensor 1)",s:"medium",sys:"Emissions",f:"Replace upstream O2 sensor, check wiring and connector, check for exhaust leaks"},
+  "P0131":{d:"O2 Sensor Circuit Low Voltage (Bank 1, Sensor 1)",s:"medium",sys:"Emissions",f:"Check for vacuum leaks, replace O2 sensor, check fuel pressure"},
+  "P0132":{d:"O2 Sensor Circuit High Voltage (Bank 1, Sensor 1)",s:"medium",sys:"Emissions",f:"Check for rich condition, replace O2 sensor, check fuel injectors"},
+  "P0133":{d:"O2 Sensor Circuit Slow Response (Bank 1, Sensor 1)",s:"medium",sys:"Emissions",f:"Replace O2 sensor, check for exhaust leaks near sensor"},
+  "P0134":{d:"O2 Sensor Circuit No Activity (Bank 1, Sensor 1)",s:"medium",sys:"Emissions",f:"Check O2 sensor heater fuse, replace O2 sensor, check wiring"},
+  "P0135":{d:"O2 Sensor Heater Circuit Malfunction (Bank 1, Sensor 1)",s:"medium",sys:"Emissions",f:"Check heater fuse, replace O2 sensor, check heater circuit wiring"},
+  "P0136":{d:"O2 Sensor Circuit Malfunction (Bank 1, Sensor 2)",s:"medium",sys:"Emissions",f:"Replace downstream O2 sensor, check catalytic converter efficiency"},
+  "P0141":{d:"O2 Sensor Heater Circuit Malfunction (Bank 1, Sensor 2)",s:"medium",sys:"Emissions",f:"Replace downstream O2 sensor, check heater fuse and relay"},
+  "P0171":{d:"System Too Lean (Bank 1)",s:"medium",sys:"Fuel/Air",f:"Check for vacuum leaks, clean MAF sensor, check fuel pressure, inspect PCV valve"},
+  "P0172":{d:"System Too Rich (Bank 1)",s:"medium",sys:"Fuel/Air",f:"Check fuel pressure (may be too high), inspect leaking injectors, check purge valve"},
+  "P0174":{d:"System Too Lean (Bank 2)",s:"medium",sys:"Fuel/Air",f:"Check for vacuum leaks on Bank 2 side, inspect intake manifold gasket"},
+  "P0175":{d:"System Too Rich (Bank 2)",s:"medium",sys:"Fuel/Air",f:"Check fuel pressure regulator, inspect Bank 2 injectors for leaks"},
+  "P0300":{d:"Random/Multiple Cylinder Misfire Detected",s:"high",sys:"Ignition",f:"Check spark plugs, ignition coils, fuel injectors, compression test, check for vacuum leaks"},
+  "P0301":{d:"Cylinder 1 Misfire Detected",s:"high",sys:"Ignition",f:"Swap coil/plug with another cylinder to isolate. Replace spark plug, coil pack, or check injector on Cyl 1"},
+  "P0302":{d:"Cylinder 2 Misfire Detected",s:"high",sys:"Ignition",f:"Check Cylinder 2 spark plug, coil, and injector. Do a swap test to isolate the faulty part"},
+  "P0303":{d:"Cylinder 3 Misfire Detected",s:"high",sys:"Ignition",f:"Check Cylinder 3 spark plug, coil, and injector. Compression test if plug/coil are good"},
+  "P0304":{d:"Cylinder 4 Misfire Detected",s:"high",sys:"Ignition",f:"Check Cylinder 4 spark plug, coil, and injector. Swap test to diagnose"},
+  "P0305":{d:"Cylinder 5 Misfire Detected",s:"high",sys:"Ignition",f:"Inspect Cylinder 5 ignition components and fuel injector"},
+  "P0306":{d:"Cylinder 6 Misfire Detected",s:"high",sys:"Ignition",f:"Inspect Cylinder 6 ignition components and fuel injector"},
+  "P0325":{d:"Knock Sensor 1 Circuit Malfunction",s:"medium",sys:"Ignition",f:"Replace knock sensor, check wiring harness, torque sensor to spec"},
+  "P0335":{d:"Crankshaft Position Sensor A Circuit Malfunction",s:"high",sys:"Ignition",f:"Replace CKP sensor, check wiring, inspect reluctor wheel for damage"},
+  "P0336":{d:"Crankshaft Position Sensor A Range/Performance",s:"high",sys:"Ignition",f:"Check CKP sensor air gap, inspect reluctor ring teeth, replace sensor"},
+  "P0340":{d:"Camshaft Position Sensor Circuit Malfunction",s:"high",sys:"Ignition",f:"Replace CMP sensor, check timing belt/chain condition, inspect wiring"},
+  "P0341":{d:"Camshaft Position Sensor Range/Performance",s:"high",sys:"Ignition",f:"Check timing belt/chain tension, replace CMP sensor"},
+  "P0400":{d:"Exhaust Gas Recirculation Flow Malfunction",s:"medium",sys:"Emissions",f:"Clean EGR valve and passages, replace EGR valve if stuck, check vacuum lines"},
+  "P0401":{d:"EGR Flow Insufficient Detected",s:"medium",sys:"Emissions",f:"Clean carbon from EGR valve and passages, replace EGR valve, check DPFE sensor"},
+  "P0402":{d:"EGR Flow Excessive Detected",s:"medium",sys:"Emissions",f:"Replace EGR valve (stuck open), check vacuum hoses, replace DPFE sensor"},
+  "P0420":{d:"Catalyst System Efficiency Below Threshold (Bank 1)",s:"medium",sys:"Emissions",f:"Replace catalytic converter, check for exhaust leaks, verify O2 sensors working"},
+  "P0430":{d:"Catalyst System Efficiency Below Threshold (Bank 2)",s:"medium",sys:"Emissions",f:"Replace Bank 2 catalytic converter, check downstream O2 sensor"},
+  "P0440":{d:"Evaporative Emission Control System Malfunction",s:"low",sys:"Emissions",f:"Check gas cap, inspect EVAP hoses, check purge and vent valves"},
+  "P0441":{d:"EVAP System Incorrect Purge Flow",s:"low",sys:"Emissions",f:"Replace purge valve, check vacuum hoses to EVAP canister"},
+  "P0442":{d:"EVAP System Leak Detected (Small)",s:"low",sys:"Emissions",f:"Tighten or replace gas cap, smoke test EVAP system for small leaks"},
+  "P0443":{d:"EVAP Purge Control Valve Circuit",s:"low",sys:"Emissions",f:"Replace EVAP purge solenoid, check wiring to purge valve"},
+  "P0446":{d:"EVAP Vent Control Circuit Malfunction",s:"low",sys:"Emissions",f:"Replace EVAP vent valve, check wiring, inspect canister"},
+  "P0449":{d:"EVAP Vent Valve/Solenoid Circuit",s:"low",sys:"Emissions",f:"Replace vent solenoid, check connector and wiring"},
+  "P0455":{d:"EVAP System Leak Detected (Gross/Large)",s:"low",sys:"Emissions",f:"Check gas cap (likely loose or damaged), smoke test EVAP system"},
+  "P0456":{d:"EVAP System Leak Detected (Very Small)",s:"low",sys:"Emissions",f:"Replace gas cap first, then smoke test if code returns"},
+  "P0500":{d:"Vehicle Speed Sensor Malfunction",s:"medium",sys:"Transmission",f:"Replace vehicle speed sensor, check wiring, inspect speedometer gear"},
+  "P0505":{d:"Idle Control System Malfunction",s:"medium",sys:"Fuel/Air",f:"Clean idle air control valve, clean throttle body, check for vacuum leaks"},
+  "P0506":{d:"Idle Control System RPM Lower Than Expected",s:"low",sys:"Fuel/Air",f:"Clean throttle body and IAC valve, check for vacuum leaks, check PCV valve"},
+  "P0507":{d:"Idle Control System RPM Higher Than Expected",s:"low",sys:"Fuel/Air",f:"Check for vacuum leaks, clean IAC valve, inspect throttle body"},
+  "P0700":{d:"Transmission Control System Malfunction",s:"high",sys:"Transmission",f:"Scan transmission module for specific codes, check transmission fluid level and condition"},
+  "P0705":{d:"Transmission Range Sensor Circuit Malfunction",s:"high",sys:"Transmission",f:"Adjust or replace transmission range sensor (neutral safety switch)"},
+  "P0715":{d:"Input/Turbine Speed Sensor Circuit Malfunction",s:"high",sys:"Transmission",f:"Replace input speed sensor, check wiring, check transmission fluid"},
+  "P0720":{d:"Output Speed Sensor Circuit Malfunction",s:"high",sys:"Transmission",f:"Replace output speed sensor, check wiring and connector"},
+  "P0730":{d:"Incorrect Gear Ratio",s:"high",sys:"Transmission",f:"Check transmission fluid, may need transmission rebuild or replacement"},
+  "P0740":{d:"Torque Converter Clutch Circuit Malfunction",s:"high",sys:"Transmission",f:"Check TCC solenoid, replace if needed, check transmission fluid"},
+  "P0741":{d:"Torque Converter Clutch Performance/Stuck Off",s:"high",sys:"Transmission",f:"Replace TCC solenoid, check wiring, flush transmission fluid"},
+  "P0750":{d:"Shift Solenoid A Malfunction",s:"high",sys:"Transmission",f:"Replace shift solenoid A, check wiring, change transmission fluid"},
+  "P0755":{d:"Shift Solenoid B Malfunction",s:"high",sys:"Transmission",f:"Replace shift solenoid B, check wiring, change transmission fluid"},
+  "C0035":{d:"Left Front Wheel Speed Sensor Circuit",s:"medium",sys:"ABS",f:"Replace left front wheel speed sensor, check wiring, inspect tone ring"},
+  "C0040":{d:"Right Front Wheel Speed Sensor Circuit",s:"medium",sys:"ABS",f:"Replace right front wheel speed sensor, check tone ring"},
+  "C0045":{d:"Left Rear Wheel Speed Sensor Circuit",s:"medium",sys:"ABS",f:"Replace left rear wheel speed sensor, inspect wiring"},
+  "C0050":{d:"Right Rear Wheel Speed Sensor Circuit",s:"medium",sys:"ABS",f:"Replace right rear wheel speed sensor, inspect wiring"},
+  "U0100":{d:"Lost Communication with ECM/PCM",s:"high",sys:"Network",f:"Check CAN bus wiring, inspect ECM connectors, check for blown fuses"},
+  "U0101":{d:"Lost Communication with TCM",s:"high",sys:"Network",f:"Check transmission module connectors, inspect CAN bus wiring"},
+  "U0121":{d:"Lost Communication with ABS Module",s:"high",sys:"Network",f:"Check ABS module connector, inspect CAN bus wires, check power/ground"},
+  "U0140":{d:"Lost Communication with BCM",s:"medium",sys:"Network",f:"Check body control module connector, inspect CAN bus network"},
+  "B0001":{d:"Driver Frontal Stage 1 Deployment Control",s:"high",sys:"Airbag",f:"Inspect airbag clockspring, check SRS wiring, scan with SRS-capable tool"},
+};
+
+const SYSTEM_ICONS = {"Fuel/Air":"⛽","Engine":"🔧","Ignition":"⚡","Emissions":"💨","Transmission":"⚙️","ABS":"🛞","Airbag":"🎈","Network":"🔌"};
+const SEV_LABELS = {high:"Critical",medium:"Warning",low:"Minor"};
+const CAT_MAP = {P:"Powertrain",B:"Body",C:"Chassis",U:"Network"};
+
+const DEMO_SCENARIOS = [
+  ["P0300","P0171","P0420"],["P0128","P0455","P0507"],["P0301","P0135"],
+  ["P0700","P0741","P0730"],["P0340","P0325","P0172"],["C0035","C0050"],["U0100","P0335"],
+];
+
+// ═══════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════
+let state = {
+  connection: "disconnected",  // disconnected | connecting | connected
+  mode: null,                  // "bluetooth" | "demo"
+  dtcCodes: [],
+  scanning: false,
+  scanProgress: 0,
+  selectedCode: -1,
+  liveData: null,
+  logs: [],
+  history: [],
+  liveInterval: null,
+  btDevice: null,
+  btChar: null,
+};
+
+// ═══════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════
+document.addEventListener("DOMContentLoaded", () => {
+  const hasBT = typeof navigator !== "undefined" && "bluetooth" in navigator;
+  if (!hasBT) {
+    document.getElementById("btBtn").style.display = "none";
+    document.getElementById("btNotice").style.display = "block";
+  }
+});
+
+// ═══════════════════════════════════════════
+//  CONNECTION
+// ═══════════════════════════════════════════
+async function connectBluetooth() {
+  setConnection("connecting");
+  addLog("Searching for ELM 327 devices…","info");
+  try {
+    const device = await navigator.bluetooth.requestDevice({
+      filters:[{namePrefix:"OBDII"},{namePrefix:"ELM"},{namePrefix:"OBD"},{namePrefix:"Vgate"},{namePrefix:"V-LINK"}],
+      optionalServices:["0000fff0-0000-1000-8000-00805f9b34fb","0000ffe0-0000-1000-8000-00805f9b34fb","00001101-0000-1000-8000-00805f9b34fb"]
+    });
+    addLog("Found: "+device.name,"success");
+    state.btDevice = device;
+    const server = await device.gatt.connect();
+    addLog("GATT connected","success");
+    const services = await server.getPrimaryServices();
+    for(const svc of services){
+      const chars = await svc.getCharacteristics();
+      for(const c of chars){
+        if(c.properties.write||c.properties.writeWithoutResponse){state.btChar=c;break}
+      }
+      if(state.btChar)break;
+    }
+    setConnection("connected");
+    state.mode = "bluetooth";
+    addLog("✓ ELM 327 connected!","success");
+    await sendCmd("ATZ");await sendCmd("ATE0");await sendCmd("ATL0");await sendCmd("ATS0");await sendCmd("ATSP0");
+  } catch(e) {
+    addLog("Bluetooth error: "+e.message,"error");
+    setConnection("disconnected");
+  }
+}
+
+function connectDemo() {
+  setConnection("connecting");
+  addLog("Initializing demo mode…","info");
+  setTimeout(()=>{
+    addLog("ATZ → ELM327 v2.1","success");
+    addLog("ATE0 → OK","success");
+    addLog("ATSP0 → Auto Protocol","success");
+    state.mode = "demo";
+    setConnection("connected");
+    addLog("✓ Demo mode active","success");
+    startLiveData();
+  },1200);
+}
+
+function disconnect() {
+  if(state.btDevice?.gatt?.connected) state.btDevice.gatt.disconnect();
+  state.btDevice=null;state.btChar=null;
+  if(state.liveInterval) clearInterval(state.liveInterval);
+  state.liveInterval=null;state.liveData=null;state.dtcCodes=[];state.selectedCode=-1;state.mode=null;
+  setConnection("disconnected");
+  addLog("Disconnected","info");
+}
+
+function setConnection(s) {
+  state.connection = s;
+  const dot = document.getElementById("statusDot");
+  const lbl = document.getElementById("statusLabel");
+  document.getElementById("connectUI").style.display = s==="disconnected"?"block":"none";
+  document.getElementById("connectingUI").style.display = s==="connecting"?"block":"none";
+  document.getElementById("connectedUI").style.display = s==="connected"?"block":"none";
+  document.getElementById("tabs").style.display = s==="connected"?"flex":"none";
+  document.getElementById("guide").style.display = s==="disconnected"?"block":"none";
+  dot.className = "status-dot "+(s==="connected"?"on":"off");
+  lbl.textContent = s==="connected"?"Connected":s==="connecting"?"Connecting…":"Disconnected";
+  if(s==="connected") switchTab("scan",document.querySelector('.tab[data-tab="scan"]'));
+  else hidePanels();
+}
+
+async function sendCmd(cmd) {
+  if(!state.btChar) return "";
+  const enc = new TextEncoder();
+  await state.btChar.writeValue(enc.encode(cmd+"\r"));
+  await new Promise(r=>setTimeout(r,300));
+  return "";
+}
+
+// ═══════════════════════════════════════════
+//  TABS
+// ═══════════════════════════════════════════
+function hidePanels(){document.querySelectorAll('.panel').forEach(p=>p.style.display='none')}
+function switchTab(tab, el) {
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  if(el) el.classList.add('active');
+  hidePanels();
+  document.getElementById('panel-'+tab).style.display='block';
+  renderPanel(tab);
+}
+
+function renderPanel(tab) {
+  if(tab==='scan') renderScan();
+  else if(tab==='live') renderLive();
+  else if(tab==='history') renderHistory();
+  else if(tab==='logs') renderLogs();
+}
+
+// ═══════════════════════════════════════════
+//  SCAN TAB
+// ═══════════════════════════════════════════
+function renderScan() {
+  const p = document.getElementById('panel-scan');
+  let h = `<div class="card">
+    <button class="btn btn-scan" onclick="scanDTCs()" id="scanBtn" ${state.scanning?'disabled':''}>
+      ${state.scanning?'⏳ Scanning ECU…':'⚡ Read Trouble Codes'}
+    </button>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:${state.scanProgress}%"></div></div>
+    ${state.dtcCodes.length?'<button class="btn btn-clear" onclick="clearDTCs()">⚠ Clear All DTCs (Reset Check Engine Light)</button>':''}
+  </div>`;
+
+  if(state.dtcCodes.length) {
+    h += `<div class="results-header"><span>${state.dtcCodes.length} code${state.dtcCodes.length>1?'s':''} found</span><span class="cel-warning">⚠ Check Engine Light ON</span></div>`;
+    state.dtcCodes.forEach((c,i)=>{
+      const info = DTC_DB[c]||{d:"Unknown DTC — check vehicle service manual",s:"medium",sys:CAT_MAP[c[0]]||"Unknown",f:"Consult a qualified mechanic"};
+      const sel = state.selectedCode===i;
+      h += `<div class="dtc-card sev-${info.s} ${sel?'selected':''}" onclick="toggleCode(${i})" style="animation-delay:${i*.08}s">
+        <div class="dtc-top">
+          <div class="dtc-info">
+            <span class="dtc-icon">${SYSTEM_ICONS[info.sys]||'🔍'}</span>
+            <div>
+              <div class="dtc-code">${c}</div>
+              <div class="dtc-system">${info.sys} · ${CAT_MAP[c[0]]||''}</div>
+            </div>
+          </div>
+          <span class="badge badge-${info.s}">${SEV_LABELS[info.s]}</span>
+        </div>
+        <div class="dtc-desc">${info.d}</div>
+        ${sel?`<div class="fix-panel"><div class="fix-label">🔧 Recommended Fix</div><div class="fix-text">${info.f}</div></div>`:''}
+      </div>`;
+    });
+  } else if(!state.scanning && state.scanProgress===100) {
+    h += `<div class="card no-codes"><div class="icon">✓</div><div class="title">No Trouble Codes Found</div><div class="sub">Your vehicle systems are operating normally</div></div>`;
+  }
+  p.innerHTML = h;
+}
+
+function toggleCode(i) {
+  state.selectedCode = state.selectedCode===i?-1:i;
+  renderScan();
+}
+
+async function scanDTCs() {
+  state.scanning=true;state.scanProgress=0;state.dtcCodes=[];state.selectedCode=-1;
+  renderScan();
+  addLog("Sending 03 (Mode 3: Read DTCs)…","info");
+
+  const fill = document.getElementById('progressFill');
+  for(let p=0;p<=100;p+=4){
+    await sleep(90);
+    state.scanProgress=p;
+    if(fill) fill.style.width=p+'%';
+  }
+  state.scanProgress=100;
+
+  const scenario = DEMO_SCENARIOS[Math.floor(Math.random()*DEMO_SCENARIOS.length)];
+  state.dtcCodes = scenario;
+  state.scanning=false;
+  addLog(`Found ${scenario.length} DTC(s)`,"error");
+  scenario.forEach(c=>addLog(`  → ${c}: ${(DTC_DB[c]||{d:"Unknown"}).d}`,"info"));
+
+  state.history.unshift({date:new Date().toLocaleString(),codes:[...scenario]});
+  if(state.history.length>20)state.history.pop();
+
+  renderScan();
+}
+
+async function clearDTCs() {
+  addLog("Sending 04 (Mode 4: Clear DTCs)…","info");
+  await sleep(800);
+  state.dtcCodes=[];state.selectedCode=-1;state.scanProgress=0;
+  addLog("✓ All DTCs cleared. MIL should turn off after driving.","success");
+  renderScan();
+}
+
+// ═══════════════════════════════════════════
+//  LIVE DATA
+// ═══════════════════════════════════════════
+function startLiveData() {
+  updateLive();
+  state.liveInterval = setInterval(updateLive, 1500);
+}
+function updateLive() {
+  state.liveData = {
+    rpm: Math.floor(800+Math.random()*2500),
+    speed: Math.floor(Math.random()*120),
+    coolant: Math.floor(75+Math.random()*30),
+    throttle: Math.floor(Math.random()*100),
+    load: Math.floor(15+Math.random()*70),
+    fuel: Math.floor(30+Math.random()*60),
+    volts: (12.2+Math.random()*2.2).toFixed(1),
+    intake: Math.floor(25+Math.random()*35),
+  };
+  if(document.getElementById('panel-live').style.display==='block') renderLive();
+}
+
+function renderLive() {
+  const d = state.liveData;
+  if(!d){document.getElementById('panel-live').innerHTML='<div class="card" style="text-align:center;color:var(--text-muted)">Waiting for data…</div>';return}
+  const gauges = [
+    {l:"RPM",v:d.rpm,u:"rpm",max:6000,c:"var(--accent)"},
+    {l:"Speed",v:d.speed,u:"km/h",max:200,c:"var(--accent2)"},
+    {l:"Coolant",v:d.coolant,u:"°C",max:120,c:d.coolant>100?"var(--red)":"var(--green)"},
+    {l:"Throttle",v:d.throttle,u:"%",max:100,c:"var(--amber)"},
+    {l:"Engine Load",v:d.load,u:"%",max:100,c:"var(--purple)"},
+    {l:"Fuel Level",v:d.fuel,u:"%",max:100,c:"var(--orange)"},
+    {l:"Battery",v:d.volts,u:"V",max:16,c:"var(--green)"},
+    {l:"Intake Temp",v:d.intake,u:"°C",max:80,c:"var(--accent2)"},
+  ];
+  let h = '<div class="gauges">';
+  gauges.forEach(g=>{
+    const pct = (parseFloat(g.v)/g.max*100).toFixed(0);
+    h += `<div class="gauge">
+      <div class="gauge-label">${g.l}</div>
+      <div class="gauge-value" style="color:${g.c}">${g.v}<span class="gauge-unit">${g.u}</span></div>
+      <div class="gauge-bar"><div class="gauge-bar-fill" style="width:${pct}%;background:${g.c}"></div></div>
+    </div>`;
+  });
+  h += '</div><div class="live-footer">Live data updates every 1.5s · Demo mode</div>';
+  document.getElementById('panel-live').innerHTML = h;
+}
+
+// ═══════════════════════════════════════════
+//  HISTORY
+// ═══════════════════════════════════════════
+function renderHistory() {
+  const p = document.getElementById('panel-history');
+  if(!state.history.length){p.innerHTML='<div class="card history-empty">No scan history yet. Run a scan first.</div>';return}
+  let h = '<div class="card">';
+  state.history.forEach(item=>{
+    h += `<div class="history-item"><div><div class="history-date">${item.date}</div>
+      <div class="history-codes">${item.codes.map(c=>'<span class="history-tag">'+c+'</span>').join('')}</div>
+    </div><span class="badge badge-${item.codes.length>2?'high':item.codes.length?'medium':'low'}">${item.codes.length} code${item.codes.length!==1?'s':''}</span></div>`;
+  });
+  h += '</div>';
+  p.innerHTML = h;
+}
+
+// ═══════════════════════════════════════════
+//  TERMINAL / LOGS
+// ═══════════════════════════════════════════
+function addLog(msg, type="info") {
+  state.logs.push({msg, type, time: new Date().toLocaleTimeString()});
+  if(state.logs.length>80) state.logs.shift();
+  if(document.getElementById('panel-logs').style.display==='block') renderLogs();
+}
+
+function renderLogs() {
+  const p = document.getElementById('panel-logs');
+  let h = '<div class="card"><div class="terminal-label">ELM 327 TERMINAL</div><div class="terminal-scroll">';
+  if(!state.logs.length) h += '<div style="font-size:12px;color:var(--text-dark)">No activity yet…</div>';
+  state.logs.forEach(l=>{
+    h += `<div class="log-line"><span class="log-time">${l.time}</span><span class="log-msg ${l.type}">${l.msg}</span></div>`;
+  });
+  h += '</div></div>';
+  p.innerHTML = h;
+  const scroll = p.querySelector('.terminal-scroll');
+  if(scroll) scroll.scrollTop = scroll.scrollHeight;
+}
+
+// ═══════════════════════════════════════════
+//  UTILS
+// ═══════════════════════════════════════════
+function sleep(ms){return new Promise(r=>setTimeout(r,ms))}
+</script>
+</body>
+</html>
