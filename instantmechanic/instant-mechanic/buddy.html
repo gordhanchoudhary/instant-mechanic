@@ -679,35 +679,41 @@ function mapInput(t){
   // Touch/feel triggers
   if(a("bouncy ride","unstable ride","car bouncing","rough ride","body roll","leans in corners","rolls in corners","seat vibrates","seat shakes","feels loose","handling feels"))return"touch feel diagnosis";
   // Original + extended triggers
-  if(a("clutch slip","slipping clutch","revving but not","rpm high but"))return"clutch slipping";
-  if(a("clutch hard","clutch heavy","clutch stiff","heavy clutch","hard clutch","clutch pedal hard"))return"clutch hard";
-  if(a("clutch not return","clutch stuck","pedal stuck","clutch not coming","clutch floor"))return"clutch not returning";
-  if(a("brake pedal hard","hard brake pedal","stiff brake pedal","brake booster"))return"brake pedal hard";
-  if(a("brake soft","soft brake","sinking pedal","pedal sink","brake going down","pedal going down"))return"brake pedal soft";
-  if(a("pulling","car pull","pulls left","pulls right"))return"car pulling braking";
-  if(a("wheel lock","wheel locking","skidding","abs light","brakes lock"))return"wheel lock";
-  if(a("gear not","not shifting","gear stuck","gear hard","gear engage","grinding gear"))return"gear not shifting";
-  if(a("automatic delay","auto gear","transmission delay","gear jerk","gearbox delay","auto transmission"))return"automatic gear delay";
-  if(a("suspension","thud","clunk on bump","bump noise","pothole noise","shock absorber"))return"suspension noise";
-  if(a("misfire","misfiring","engine shake","rough idle","shaking engine"))return"engine misfire";
-  if(a("shuts off","shut off","dies while","stall","stops while driving","engine dies"))return"car shuts off";
-  if(a("no response","not responding","accelerator not","no acceleration"))return"engine no response";
-  if(a("ac intermittent","ac comes and goes","ac stops","intermittent cool","ac on and off","sometimes cool"))return"ac intermittent";
-  if(a("not starting","won't start","wont start","not start"))return"car not starting";
-  if(a("battery","drain"))return"battery";
-  if(a("overheat","temperature high","running hot","engine heat"))return"engine overheating";
-  if(h("brake ")||h(" braking"))return"brake";
+  // Clutch — broad natural language matching
+  var hasBoth=function(w1,w2){return t.includes(w1)&&t.includes(w2);};
+  if(a("clutch slip","slipping clutch","revving but not","rpm high but")||hasBoth("clutch","slip")||hasBoth("clutch","not moving")||hasBoth("rpm","not moving"))return"clutch slipping";
+  if(a("clutch hard","clutch heavy","clutch stiff","heavy clutch","hard clutch","clutch pedal hard","clutch become hard","clutch gone hard","clutch getting hard","clutch is hard","pedal hard","pedal heavy","pedal stiff")||hasBoth("clutch","hard")||hasBoth("clutch","heavy")||hasBoth("clutch","stiff")||hasBoth("clutch","difficult")||hasBoth("clutch","tight"))return"clutch hard";
+  if(a("clutch not return","clutch stuck","clutch not coming","clutch floor","pedal stuck","pedal not coming","pedal not return")||hasBoth("clutch","stuck")||hasBoth("pedal","stuck")||hasBoth("clutch","not come back")||hasBoth("clutch","on floor"))return"clutch not returning";
+  // Brake pedal specifics
+  if(a("brake pedal hard","hard brake pedal","stiff brake pedal","brake booster")||hasBoth("brake","booster")||(hasBoth("brake","hard")&&!t.includes("grinding")&&!t.includes("squeal")))return"brake pedal hard";
+  if(a("brake soft","soft brake","sinking pedal","pedal sink","brake going down","pedal going down")||hasBoth("brake","soft")||hasBoth("brake","sinking")||hasBoth("pedal","sinking")||hasBoth("brake","low"))return"brake pedal soft";
+  if(a("pulling","car pull","pulls left","pulls right")||hasBoth("car","pull")||hasBoth("pulling","side"))return"car pulling braking";
+  if(a("wheel lock","wheel locking","skidding","abs light","brakes lock")||hasBoth("wheel","lock")||hasBoth("abs","light"))return"wheel lock";
+  // Gear issues
+  if(a("gear not","not shifting","gear stuck","gear hard","gear engage","grinding gear")||hasBoth("gear","not")||hasBoth("gear","stuck")||hasBoth("gear","hard")||hasBoth("cannot","gear")||hasBoth("gear","engage"))return"gear not shifting";
+  if(a("automatic delay","auto gear","transmission delay","gear jerk","gearbox delay","auto transmission")||hasBoth("automatic","delay")||hasBoth("auto","jerk")||hasBoth("transmission","delay"))return"automatic gear delay";
+  // Other mechanical
+  if(a("suspension","thud","clunk on bump","bump noise","pothole noise","shock absorber")||hasBoth("noise","bump")||hasBoth("noise","pothole"))return"suspension noise";
+  if(a("misfire","misfiring","engine shake","rough idle","shaking engine")||hasBoth("engine","misfire")||hasBoth("engine","shake")||hasBoth("rough","idle"))return"engine misfire";
+  if(a("shuts off","shut off","dies while","stall","stops while driving","engine dies")||hasBoth("engine","die")||hasBoth("car","stall")||hasBoth("car","shut off"))return"car shuts off";
+  if(a("no response","not responding","accelerator not","no acceleration")||hasBoth("accelerator","no response")||hasBoth("pressing","no response")||(hasBoth("no","response")&&!t.includes("start")))return"engine no response";
+  if(a("ac intermittent","ac comes and goes","ac stops","intermittent cool","ac on and off","sometimes cool")||hasBoth("ac","intermittent")||hasBoth("ac","sometimes"))return"ac intermittent";
+  // Car not starting
+  if(a("not starting","won't start","wont start","not start","car dead","wont crank","won't crank")||hasBoth("car","not start")||hasBoth("car","won't")||hasBoth("engine","not start")||hasBoth("won't","start"))return"car not starting";
+  if(a("battery","drain")||hasBoth("battery","dead")||hasBoth("battery","flat")||hasBoth("battery","not charge"))return"battery";
+  if(a("overheat","temperature high","running hot","engine heat")||hasBoth("engine","hot")||hasBoth("temp","high")||hasBoth("overheating","car"))return"engine overheating";
+  if(h("brake ")||h(" braking")||h("brakes"))return"brake";
   if(a("ac not","air conditioning","air con","not cooling","no cooling")||(t.includes(" ac ")&&a("not work","noise","problem","compressor")))return"ac not cooling";
-  if(a("check engine","engine light","warning light"))return"check engine";
-  if(a("jerk","jolting"))return"car jerking";
-  if(a("smoke","exhaust fume"))return"smoke";
-  if(a("vibrat","shaking","shake"))return"vibration";
-  if(a("steering","hard to turn","heavy steering"))return"steering";
-  if(a("lean","tilt","one side low","lopsided"))return"car leaning";
-  if(a("differential","diff noise","rear noise","noise from rear"))return"differential noise";
-  if(a("fuse blow","fuse keep","blowing fuse"))return"fuse blowing";
-  if(a("steering vibrat","steering shake","high speed vibrat","highway shake"))return"steering vibration speed";
-  if(a("vibrat when braking","shudder when braking","braking vibrat","pulsating brake"))return"vibration braking";
+  if(a("check engine","engine light","warning light")||hasBoth("engine","light")||hasBoth("check","engine"))return"check engine";
+  if(a("jerk","jolting")||hasBoth("car","jerk"))return"car jerking";
+  if(a("smoke","exhaust fume")||hasBoth("smoke","exhaust")||hasBoth("smoke","car"))return"smoke";
+  if(a("vibrat","shaking","shake")||hasBoth("car","vibrate")||hasBoth("steering","shake"))return"vibration";
+  if(a("steering","hard to turn","heavy steering")||hasBoth("steering","problem")||hasBoth("steering","issue"))return"steering";
+  if(a("lean","tilt","one side low","lopsided")||hasBoth("car","lean")||hasBoth("car","tilt"))return"car leaning";
+  if(a("differential","diff noise","rear noise","noise from rear")||hasBoth("rear","noise")||hasBoth("diff","noise"))return"differential noise";
+  if(a("fuse blow","fuse keep","blowing fuse")||hasBoth("fuse","blow")||hasBoth("fuse","keep"))return"fuse blowing";
+  if(a("steering vibrat","steering shake","high speed vibrat","highway shake")||hasBoth("steering","vibrat"))return"steering vibration speed";
+  if(a("vibrat when braking","shudder when braking","braking vibrat","pulsating brake")||hasBoth("vibrat","brake")||hasBoth("shudder","brake"))return"vibration braking";
   return null;
 }
 
