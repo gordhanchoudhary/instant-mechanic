@@ -101,7 +101,7 @@ nav{background:var(--nav);padding:0 16px;height:64px;display:flex;align-items:ce
       <div class="ns"><span class="sd"></span>AI Diagnosis Active</div>
     </div>
   </div>
-  <div class="nb"><span class="nbd"></span>40 issues covered</div>
+  <div class="nb"><span class="nbd"></span>50+ issues covered</div>
 </nav>
 <div class="cbg" id="cbg">
   <div class="dsep">Today</div>
@@ -491,13 +491,194 @@ var trees={
     if(a[0]==="Yes, stops after 10-20 minutes")return{issue:"Evaporator icing up — airflow or temperature sensor issue",sev:"med",steps:["Replace cabin air filter (restricted airflow causes freeze-up)","Check AC thermostat / evaporator temperature sensor","Inspect evaporator coil for ice buildup","Check blower motor speed settings"]};
     return{issue:"Compressor clutch or AC pressure switch fault",sev:"med",steps:["Inspect compressor clutch engagement","Test AC pressure switch operation","Check refrigerant levels","Have full AC system diagnostic done"]};
   }
+},
+"sound diagnosis":{icon:"🔊",title:"Noise Diagnosis",
+  qd:function(t){return null;},
+  qs:[
+    {q:"What kind of noise are you hearing?",opts:["Knocking / banging","Clicking / popping","Grinding","Squealing / squeaking","Hissing / whistling","Rattling / clunking","Humming / whirring","Sputtering / backfiring"]},
+    {q:"When does the noise happen?",opts:["When starting the car","While driving","When braking","When turning","When going over bumps","Constantly / at idle","When shifting gears"]},
+    {q:"Where does the sound seem to come from?",opts:["Engine area","Front of car","Rear of car","Under the car","Brakes","Steering wheel area"]}
+  ],
+  dx:function(a){
+    var n=a[0],w=a[1],loc=a[2];
+    if(n==="Knocking / banging"&&w==="When going over bumps")return{issue:"Suspension component failure",sev:"med",steps:["Inspect ball joints and control arm bushings","Check stabilizer bar links and end links","Inspect strut mounts and struts","Check for loose exhaust components under car"]};
+    if(n==="Knocking / banging"&&w==="While driving")return{issue:"Bad sway bar link or worn ball joint",sev:"med",steps:["Inspect sway bar links and drop links","Check ball joints for play or wear","Inspect tie rod ends","Check wheel bearings for roughness"]};
+    if(n==="Clicking / popping"&&w==="When turning")return{issue:"Worn CV joint or torn CV boot",sev:"high",steps:["Inspect CV boots for tearing or grease leakage","Test drive in tight circles to confirm CV joint click","Replace CV joint or full axle shaft","Inspect driveshaft and differential"]};
+    if(n==="Clicking / popping"&&(w==="While driving"||w==="Constantly / at idle"))return{issue:"Low engine oil, loose belt, or dead battery symptom",sev:"high",steps:["Check engine oil level immediately","Inspect serpentine belt and tensioner","Check battery voltage","Inspect hubcaps and wheel covers for looseness"]};
+    if(n==="Grinding"&&w==="When braking")return{issue:"Severe brake pad wear or debris in brakes",sev:"high",steps:["Stop driving if grinding is severe","Inspect brake pads — likely metal on metal","Check for foreign debris lodged in calipers","Inspect rotors for damage and wear indicators"]};
+    if(n==="Grinding"&&w==="When shifting gears")return{issue:"Worn clutch, synchronizers, or low transmission fluid",sev:"high",steps:["Check transmission fluid level and condition","Inspect clutch for wear and proper adjustment","Check for worn gear synchronizers","Avoid forcing gears — get transmission inspected"]};
+    if(n==="Grinding"&&w==="When starting the car")return{issue:"Bad starter drive gear or solenoid",sev:"high",steps:["Inspect starter motor and drive gear","Check starter solenoid operation","Inspect flywheel ring gear for damage","Replace starter motor if gear is worn"]};
+    if(n==="Squealing / squeaking"&&w==="When braking")return{issue:"Worn brake pads or glazed rotors",sev:"med",steps:["Replace brake pads (wear indicators squealing)","Inspect rotors for glazing or oxidation","Check brake master cylinder and caliper","Inspect brake backing plate for contact"]};
+    if(n==="Squealing / squeaking"&&w==="When turning")return{issue:"Low power steering fluid or worn suspension",sev:"med",steps:["Check power steering fluid level","Inspect power steering belt for wear","Check ball joints and tie rod ends","Inspect suspension bushings for dryness"]};
+    if(n==="Squealing / squeaking"&&(w==="When starting the car"||w==="Constantly / at idle"))return{issue:"Worn serpentine/auxiliary belt or failing tensioner",sev:"med",steps:["Inspect serpentine belt for cracks or glazing","Check belt tension and tensioner operation","Inspect all pulleys for seizure or misalignment","Replace belt and tensioner if worn"]};
+    if(n==="Hissing / whistling")return{issue:"Vacuum leak, coolant leak, or brake booster issue",sev:"high",steps:["Check for hissing near brake pedal — may be brake booster diaphragm leak","Inspect all vacuum hoses for cracks","Check coolant hoses for leaks or overheating","Inspect brake booster vacuum line"]};
+    if(n==="Rattling / clunking"&&w==="When going over bumps")return{issue:"Worn struts, bushings, or loose exhaust",sev:"med",steps:["Bounce test each corner — worn struts will keep bouncing","Check heat shields and exhaust hangers under car","Inspect control arm bushings","Check anti-roll bar links"]};
+    if(n==="Humming / whirring")return{issue:"Failing wheel bearing or uneven tyre wear",sev:"med",steps:["Jack up each wheel and spin by hand — rough feeling = worn bearing","Check tyres for uneven or cupped wear patterns","Inspect wheel bearing play side-to-side","Replace faulty wheel bearing immediately"]};
+    if(n==="Sputtering / backfiring")return{issue:"Engine misfire, fuel, or ignition issue",sev:"med",steps:["Scan OBD for misfire codes (P030X)","Inspect fuel injectors for blockage","Check ignition timing and spark plugs","Inspect vacuum hoses and air intake valve"]};
+    return{issue:"Unusual noise — inspection needed",sev:"med",steps:["Note exact conditions when noise occurs","Record a voice note of the noise to share with mechanic","Visit your nearest Instant Mechanic partner garage for hands-on diagnosis","Early inspection prevents costly damage"]};
+  }
+},
+"smell diagnosis":{icon:"👃",title:"Smell Diagnosis",
+  qd:function(t){
+    var h=function(w){return t.includes(w);};
+    if(h("burning rubber")||h("burning tyre")||h("burning tire"))return{issue:"Overheating brakes or tyres",sev:"high",steps:["Stop driving immediately and let brakes cool","Check brake calipers for sticking or dragging","Inspect tyre condition for flat or extremely low pressure","Check for brake pad contact with rotor while not braking"]};
+    if(h("burning wood")||h("clutch smell")||h("burning clutch"))return{issue:"Malfunctioning or slipping clutch",sev:"high",steps:["Stop driving — clutch is overheating","Avoid hill starts and heavy clutch slipping","Have clutch plate inspected immediately","Clutch replacement likely required"]};
+    if(h("burning oil")||h("oil smell")||h("exhaust smell"))return{issue:"Engine oil leak onto hot surface",sev:"high",steps:["Check engine oil level immediately","Inspect gaskets and seals for leaks (valve cover, sump)","Look for smoke from engine bay","Visit Instant Mechanic garage — oil on exhaust is a fire risk"]};
+    if(h("petrol")||h("gasoline")||h("fuel smell"))return{issue:"Fuel system leak",sev:"high",steps:["Do not start the car if strong fuel smell","Inspect fuel lines, injectors, and fuel cap","Check evaporative emissions system (EVAP)","Have fuel system pressure-tested immediately"]};
+    if(h("sweet")||h("sweet smell")||h("coolant"))return{issue:"Coolant leak",sev:"high",steps:["Check coolant level in reservoir","Inspect radiator hoses and clamps for leaks","Look for puddles of green/pink/orange fluid under car","Do not drive — overheating risk is severe"]};
+    if(h("sulphur")||h("rotten egg")||h("egg smell"))return{issue:"Failing catalytic converter or overcharged battery",sev:"high",steps:["Check battery for overcharging (voltage above 14.8V running)","Inspect catalytic converter condition","Check for rich fuel mixture causing cat overload","Have emissions system scanned for fault codes"]};
+    if(h("mildew")||h("mould")||h("musty"))return{issue:"Cabin air filter needs replacement or mould on evaporator",sev:"low",steps:["Replace cabin air filter immediately","Clean AC evaporator with anti-bacterial cleaner","Check for water ingress inside the car","Run AC on fresh air mode to dry out the system"]};
+    if(h("exhaust")||h("fumes")||h("carbon monoxide")||h("co "))return{issue:"Exhaust fumes entering cabin — CO risk",sev:"high",steps:["Open windows immediately and pull over safely","Do not continue driving — CO is life-threatening","Inspect exhaust system for cracks or holes","Check door and boot seals for gaps"]};
+    return null;
+  },
+  qs:[
+    {q:"What kind of smell are you noticing?",opts:["Burning rubber or wood","Burning oil / exhaust smell","Petrol / fuel smell","Sweet smell","Sulphur / rotten egg","Mildew / musty","Exhaust fumes inside cabin"]},
+    {q:"When do you notice the smell?",opts:["While driving","After braking","When AC is on","After parking / engine off","When starting the car","Constantly"]}
+  ],
+  dx:function(a){
+    var s=a[0];
+    if(s==="Burning rubber or wood")return{issue:"Overheating brakes, tyres, or slipping clutch",sev:"high",steps:["Stop and let car cool — check which corner smells strongest","Inspect brake calipers for dragging (hot wheel = sticking caliper)","Check clutch — burning wood smell = slipping clutch plate","Inspect tyres for contact with bodywork or flat tyre"]};
+    if(s==="Burning oil / exhaust smell")return{issue:"Engine oil leaking onto hot surfaces",sev:"high",steps:["Check engine oil level immediately","Inspect valve cover gasket, sump, and seals for leaks","Look for blue smoke from exhaust (oil burning)","Visit Instant Mechanic garage — oil on hot metal is a fire risk"]};
+    if(s==="Petrol / fuel smell")return{issue:"Fuel system leak or EVAP system fault",sev:"high",steps:["Check fuel cap is tight — loose cap is common cause","Inspect fuel lines and injectors for leaks","Do not start car if smell is very strong — fire risk","Have EVAP system scanned for codes"]};
+    if(s==="Sweet smell")return{issue:"Coolant leak — urgent",sev:"high",steps:["Check coolant reservoir level","Inspect radiator hoses and heater hose connections","Look under car for green/pink/orange puddle","Do not drive — sweet smell means coolant is escaping"]};
+    if(s==="Sulphur / rotten egg")return{issue:"Failing catalytic converter or battery overcharging",sev:"high",steps:["Test alternator output — overcharging battery produces sulphur smell","Inspect catalytic converter for damage or clogging","Check for rich fuel mixture causing cat overload","Scan for emission system fault codes"]};
+    if(s==="Mildew / musty")return{issue:"Cabin air filter or AC evaporator contamination",sev:"low",steps:["Replace cabin air filter (primary cause)","Clean evaporator with AC anti-bacterial spray","Check under floor mats for water ingress","Run AC on recirculate then fresh air to flush system"]};
+    if(s==="Exhaust fumes inside cabin")return{issue:"Exhaust leak or seal failure — CO poisoning risk",sev:"high",steps:["Open windows immediately and stop safely","Do not continue driving — carbon monoxide is odourless and deadly","Inspect exhaust manifold, pipe, and muffler for cracks","Check boot and door seals for gaps letting fumes in"]};
+    return{issue:"Unusual smell — diagnostic inspection needed",sev:"med",steps:["Note when and where smell is strongest","Check all fluid levels as a first step","Visit your nearest Instant Mechanic partner garage","Smells often indicate early-stage leaks or failures"]};
+  }
+},
+"touch feel diagnosis":{icon:"✋",title:"Feel / Handling Diagnosis",
+  qd:function(t){
+    var h=function(w){return t.includes(w);};
+    if(h("bouncy")||h("bouncing")||h("unstable ride"))return{issue:"Damaged shock absorbers or struts",sev:"med",steps:["Bounce test each corner — if it keeps bouncing, shocks are worn","Inspect strut assemblies for leaks or damage","Check tyre inflation — incorrect pressure causes bounce","Inspect suspension bushings for wear"]};
+    if(h("body roll")||h("leans in corners")||h("rolls a lot"))return{issue:"Worn shocks or damaged stabilizer bar",sev:"med",steps:["Inspect shock absorbers and struts","Check stabilizer bar and drop links","Check tyre condition and inflation","Look for suspension modifications affecting roll stiffness"]};
+    if(h("steering loose")||h("loose steering")||h("steering play"))return{issue:"Worn tie rods, ball joints, or steering linkage",sev:"high",steps:["Check tie rod ends for play — grab tyre and shake side-to-side","Inspect pitman and idler arms","Check ball joints for vertical play","Have steering geometry and alignment checked"]};
+    if(h("vibration going uphill")||h("shudder uphill")||h("uphill vibration"))return{issue:"Damaged CV axle or U-joint",sev:"high",steps:["Inspect CV axles and joints under load","Check U-joint for wear or looseness","Inspect differential fluid level and condition","Check for engine misfire under load"]};
+    return null;
+  },
+  qs:[
+    {q:"What does the car feel like?",opts:["Bouncy / unstable ride","Excessive body roll in corners","Car pulling to one side while driving","Car shaking or vibrating","Steering feels loose or vague","Steering is hard to turn","Braking feels wrong","Hesitating / bucking when accelerating"]},
+    {q:"When does this feeling occur?",opts:["Constantly while driving","When braking","When accelerating","When turning","Over bumps / uneven road","At high speed","Randomly"]}
+  ],
+  dx:function(a){
+    var f=a[0],w=a[1];
+    if(f==="Bouncy / unstable ride")return{issue:"Worn shock absorbers, struts, or tyre issue",sev:"med",steps:["Bounce test each corner — continued bouncing = worn shocks","Check tyre inflation pressure on all four wheels","Inspect strut assemblies for oil leaks (wetness on strut body)","Check suspension bushings — poorly lubricated bushings cause bounce"]};
+    if(f==="Excessive body roll in corners")return{issue:"Worn shocks, stabilizer bar, or tyre issue",sev:"med",steps:["Inspect shock absorbers and strut mounts","Check stabilizer bar links and bushings","Verify tyre inflation — underinflated tyres increase body roll","Inspect for previous suspension modifications"]};
+    if(f==="Car pulling to one side while driving")return{issue:"Uneven tyre pressure, alignment, or brake issue",sev:"med",steps:["Check tyre pressures on both sides first","Get wheel alignment checked","Inspect brake calipers for dragging (pull = sticking caliper on that side)","Check wheel bearings and steering linkage"]};
+    if(f==="Car shaking or vibrating")return{issue:"Tyre, wheel, engine mount, or brake issue",sev:"med",steps:["Check tyre condition and get all four wheels balanced","Inspect engine mounts for wear or collapse","Check for warped brake rotors (vibration when braking)","Scan OBD for engine misfire codes if shaking is engine-related"]};
+    if(f==="Steering feels loose or vague")return{issue:"Worn tie rods, ball joints, or steering rack",sev:"high",steps:["Shake each front tyre side-to-side to feel for loose tie rod","Check ball joints for play (jack up wheel, check for vertical movement)","Inspect steering rack for play and leaks","Have full steering geometry check done"]};
+    if(f==="Steering is hard to turn")return{issue:"Low power steering fluid, pump issue, or low tyre pressure",sev:"med",steps:["Check power steering fluid level immediately","Check tyre pressure on all four wheels","Inspect power steering belt and pump","Listen for whining — indicates pump wear"]};
+    if(f==="Braking feels wrong")return{issue:"Brake system issue — fluid, pads, rotors, or booster",sev:"high",steps:["Check brake fluid level in reservoir","Inspect all four brake pads for wear","Check rotors for warping (if pedal vibrates)","Test brake booster — pedal should be easy to press with engine running"]};
+    if(f==="Hesitating / bucking when accelerating")return{issue:"Misfire, fuel, or sensor issue",sev:"med",steps:["Scan OBD for misfire codes (P030X)","Check fuel filter — clogged filter causes hesitation","Test fuel pump pressure","Inspect oxygen sensor and EGR valve","Replace worn spark plugs and wires"]};
+    return{issue:"Handling issue — full inspection recommended",sev:"med",steps:["Note exact conditions when the feeling occurs","Check tyre pressures and tread depth as a first step","Visit your nearest Instant Mechanic partner garage","Handling issues can quickly become safety-critical"]};
+  }
+},
+"no airflow":{icon:"💨",title:"No Air from Vents",
+  qd:function(t){
+    var h=function(w){return t.includes(w);};
+    if(h("no air")||h("no airflow")||h("vents not working")||h("blower not working"))return{issue:"Blower motor, fuse, or relay failure",sev:"med",steps:["Check blower motor fuse in fuse box first","Test blower relay replacement","Inspect blower motor for failure (no noise at all = motor dead)","Check blower resistor — controls fan speed levels"]};
+    return null;
+  },
+  qs:[
+    {q:"What is the airflow situation?",opts:["No air at all from any vent","Air comes on some speeds only","Air from some vents but not others","Very weak airflow on all settings"]},
+    {q:"When did this start?",opts:["Suddenly stopped working","Gradually got worse","Only on certain settings","After getting wet / flooded"]}
+  ],
+  dx:function(a){
+    if(a[0]==="No air at all from any vent")return{issue:"Blown fuse, failed relay, or dead blower motor",sev:"med",steps:["Check blower motor fuse (refer to owner manual for location)","Replace blower relay (cheap and quick test)","Test blower motor directly with 12V — if no spin, motor is dead","Check wiring harness connector at blower motor"]};
+    if(a[0]==="Air comes on some speeds only")return{issue:"Blower motor resistor failure",sev:"low",steps:["Replace blower motor resistor (usually behind glove box)","Cheap and common repair — resistor controls multi-speed operation","Check wiring to resistor for heat damage","Test all fan speed positions after replacement"]};
+    if(a[0]==="Air from some vents but not others")return{issue:"Blend door or duct blockage",sev:"low",steps:["Check for blocked air intake (leaves, debris in cowl)","Inspect blend door actuator — common fault on many cars","Check for broken duct or hose inside dashboard","Have HVAC system checked for actuator fault codes"]};
+    return{issue:"Restricted airflow — cabin filter or intake clog",sev:"low",steps:["Replace cabin air filter immediately","Check fresh air intake in engine bay for debris","Inspect blower motor for obstructions","Have full HVAC system inspection"]};
+  }
+},
+"car leaning":{icon:"🛞",title:"Car Leaning / Tilting",
+  qd:function(t){
+    var h=function(w){return t.includes(w);};
+    if(h("lean")||h("tilt")||h("one side low")||h("lopsided"))return{issue:"Suspension spring collapsed or broken",sev:"high",steps:["Inspect coil spring on the low side — may be broken","Check for flat tyre or very low pressure first","Inspect shock absorber for collapse","Do not drive at speed — handling is compromised"]};
+    return null;
+  },
+  qs:[
+    {q:"Is one side of the car noticeably lower than the other?",opts:["Yes, one corner is lower","It looks even but handles oddly"]},
+    {q:"Did this happen after an accident or hitting a deep pothole?",opts:["Yes, after an impact","No, happened gradually"]}
+  ],
+  dx:function(a){
+    if(a[1]==="Yes, after an impact")return{issue:"Suspension damage from impact — spring or strut broken",sev:"high",steps:["Have full suspension inspection done","Check strut, spring, and subframe for cracks","Check wheel alignment after suspension repair","Inspect steering geometry"]};
+    return{issue:"Coil spring failure or suspension sag",sev:"high",steps:["Inspect coil springs for breakage or significant sag","Check shock absorbers for oil leaks","Compare ride height side to side","Replace spring and shock as a pair"]};
+  }
+},
+"steering vibration speed":{icon:"🛞",title:"Steering Vibration at Speed",
+  qd:function(t){
+    var h=function(w){return t.includes(w);};
+    if(h("high speed")||h("highway")||h("shaking steering"))return{issue:"Wheel balance or bent rim",sev:"med",steps:["Get all four wheels balanced immediately","Inspect rims for bends or cracks","Check tyre condition for bulges or uneven wear","Re-check alignment after balancing"]};
+    return null;
+  },
+  qs:[
+    {q:"At what speed does the vibration start?",opts:["60-80 km/h","Above 100 km/h","Throughout all speeds"]},
+    {q:"Did this start after a recent tyre change or repair?",opts:["Yes, after tyre work","No, started on its own"]}
+  ],
+  dx:function(a){
+    if(a[1]==="Yes, after tyre work")return{issue:"Wheel not balanced after tyre work",sev:"med",steps:["Return to tyre shop for wheel balancing","Check that wheel nuts are torqued correctly","Inspect for tyre bead seating issue","Re-balance and road test"]};
+    return{issue:"Wheel balance or alignment issue",sev:"med",steps:["Balance all four wheels","Check wheel alignment","Inspect tyres for irregular wear or bulges","Check wheel rims for bends"]};
+  }
+},
+"vibration braking":{icon:"🛑",title:"Vibration While Braking",
+  qd:function(t){
+    var h=function(w){return t.includes(w);};
+    if(h("vibrat")||h("shudder")||h("pulsate"))return{issue:"Warped brake discs",sev:"med",steps:["Have brake disc thickness and runout measured","Resurface discs if within minimum thickness","Replace discs if below minimum","Replace brake pads at same time"]};
+    return null;
+  },
+  qs:[
+    {q:"Does the vibration happen when braking at high speed?",opts:["Yes, mainly at high speed braking","Happens at all speeds"]},
+    {q:"Does the steering wheel shake when you brake?",opts:["Yes, steering shakes","No, felt only through the seat / floor"]}
+  ],
+  dx:function(a){
+    if(a[1]==="Yes, steering shakes")return{issue:"Front brake disc warped",sev:"med",steps:["Inspect front brake discs for warping (lateral runout)","Resurface or replace front discs","Replace front brake pads at same time","Check front caliper for sticking"]};
+    return{issue:"Rear brake disc or drum warped",sev:"med",steps:["Inspect rear brake discs or drums","Check rear caliper / wheel cylinder operation","Replace worn rear discs or drums","Check rear brake balance"]};
+  }
+},
+"differential noise":{icon:"🚗",title:"Differential / Rear Noise",
+  qd:function(t){
+    var h=function(w){return t.includes(w);};
+    if(h("whine")||h("howl")||h("rear noise")||h("noise from rear"))return{issue:"Differential bearing or gear wear",sev:"med",steps:["Check differential oil level and condition","Whine increasing with speed suggests bearing wear","Have differential inspected by a mechanic","Change differential oil as first step"]};
+    return null;
+  },
+  qs:[
+    {q:"Does the noise increase as your speed increases?",opts:["Yes, louder with speed","Constant noise regardless of speed"]},
+    {q:"Does it happen more when turning?",opts:["Yes, especially while turning","No, happens while going straight too"]}
+  ],
+  dx:function(a){
+    if(a[1]==="Yes, especially while turning")return{issue:"Wheel bearing or differential side gear wear",sev:"med",steps:["Check wheel bearings on rear axle","Inspect differential side gears","Change differential oil","Bearing replacement if whining on turns"]};
+    return{issue:"Differential pinion bearing or gear wear",sev:"med",steps:["Check and change differential oil immediately","Inspect ring and pinion gear condition","Listen at different speeds to isolate bearing","Specialist differential inspection required"]};
+  }
+},
+"fuse blowing":{icon:"⚡",title:"Fuse Keeps Blowing",
+  qd:function(t){
+    if(t.includes("fuse")||t.includes("blowing"))return{issue:"Short circuit in the affected system",sev:"high",steps:["Do not keep replacing the fuse — find the root cause","Identify which component loses power when fuse blows","Inspect wiring harness for chafing or bare wires","Have auto electrician trace the short circuit"]};
+    return null;
+  },
+  qs:[
+    {q:"Which system stops working when the fuse blows?",opts:["Headlights / taillights","AC / blower","Power windows","Something else"]},
+    {q:"Does it blow immediately after you replace it?",opts:["Yes, immediately","Lasts a short while then blows"]}
+  ],
+  dx:function(a){
+    if(a[1]==="Yes, immediately")return{issue:"Active short circuit — direct wire-to-ground fault",sev:"high",steps:["Disconnect the affected circuit before replacing fuse again","Inspect connector and wiring near the component","Look for pinched or melted wiring","Auto electrician required — do not ignore"]};
+    return{issue:"Intermittent short circuit or overloaded circuit",sev:"med",steps:["Check if aftermarket accessories are on that circuit","Inspect all connectors in the circuit for corrosion","Look for wiring damage near moving parts","Have circuit tested under load by electrician"]};
+  }
 }
 };
 
 function mapInput(t){
+  var raw=t;
   t=" "+t.toLowerCase().replace(/[^\w\s]/g," ")+" ";
   var h=function(w){return t.includes(w);};
   var a=function(){for(var i=0;i<arguments.length;i++)if(t.includes(arguments[i]))return true;return false;};
+  // Smell triggers
+  if(a("burning rubber","burning tyre","burning tire","smell of rubber","smell rubber","smells like rubber","burning wood","clutch smell","burning clutch","burning oil","oil smell","exhaust smell","petrol smell","fuel smell","smells like petrol","smells like fuel","smells like gas","sweet smell","smells sweet","sulphur","rotten egg","egg smell","mildew","musty smell","musty","exhaust fumes inside","fumes inside","carbon monoxide","smell inside car","bad smell","strange smell","weird smell","odour","odor"))return"smell diagnosis";
+  // Sound triggers
+  if(a("knocking sound","banging sound","clicking sound","popping sound","grinding sound","squealing sound","squeaking sound","hissing sound","rattling sound","clunking sound","humming sound","whirring sound","sputtering sound","backfire","backfiring","makes noise","strange noise","weird noise","unusual noise","loud noise","noise from car","car making noise","hear a sound","hear noise","what sound","what noise"))return"sound diagnosis";
+  if(a("no air from vents","vents not working","blower not working","no airflow from","air not coming","fan not working","heater not blowing","no heat from vents"))return"no airflow";
+  // Touch/feel triggers
+  if(a("bouncy ride","unstable ride","car bouncing","rough ride","body roll","leans in corners","rolls in corners","seat vibrates","seat shakes","feels loose","handling feels"))return"touch feel diagnosis";
+  // Original + extended triggers
   if(a("clutch slip","slipping clutch","revving but not","rpm high but"))return"clutch slipping";
   if(a("clutch hard","clutch heavy","clutch stiff","heavy clutch","hard clutch","clutch pedal hard"))return"clutch hard";
   if(a("clutch not return","clutch stuck","pedal stuck","clutch not coming","clutch floor"))return"clutch not returning";
@@ -522,6 +703,11 @@ function mapInput(t){
   if(a("smoke","exhaust fume"))return"smoke";
   if(a("vibrat","shaking","shake"))return"vibration";
   if(a("steering","hard to turn","heavy steering"))return"steering";
+  if(a("lean","tilt","one side low","lopsided"))return"car leaning";
+  if(a("differential","diff noise","rear noise","noise from rear"))return"differential noise";
+  if(a("fuse blow","fuse keep","blowing fuse"))return"fuse blowing";
+  if(a("steering vibrat","steering shake","high speed vibrat","highway shake"))return"steering vibration speed";
+  if(a("vibrat when braking","shudder when braking","braking vibrat","pulsating brake"))return"vibration braking";
   return null;
 }
 
@@ -694,7 +880,7 @@ function resetAll(){
 document.getElementById("sbtn").addEventListener("click",sendMsg);
 document.getElementById("inp").addEventListener("keydown",function(e){if(e.key==="Enter")sendMsg();});
 
-setTimeout(function(){addMsg("Hi! I am <strong>CarBuddy</strong> — describe your car issue and I will diagnose it for you right away.","bot");},300);
+setTimeout(function(){addMsg("Hi! I am <strong>CarBuddy</strong> — describe your car issue, or tell me about any unusual <strong>noise</strong>, <strong>smell</strong>, or <strong>feeling</strong> from your car and I will diagnose it right away.","bot");},300);
 </script>
 </body>
 </html>
