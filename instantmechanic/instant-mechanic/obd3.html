@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>OBD-II Pro — ELM 327</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0e17;--surface:#0f1420;--card:rgba(15,23,42,.6);
+  --border:rgba(99,102,241,.15);--border-a:rgba(99,102,241,.35);
+  --text:#e2e8f0;--dim:#94a3b8;--muted:#64748b;--dark:#475569;
+  --accent:#818cf8;--accent2:#38bdf8;--green:#34d399;--red:#ef4444;
+  --amber:#f59e0b;--orange:#fb923c;--purple:#a78bfa;
+  --grad:linear-gradient(90deg,#818cf8,#38bdf8,#34d399);
+}
+body{font-family:'JetBrains Mono','Fira Code',monospace;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:#334155;border-radius:2px}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.app{max-width:520px;margin:0 auto;padding-bottom:60px}
+
+/* Header */
+.hdr{background:linear-gradient(135deg,#0f172a,#1e1b4b);padding:20px 16px 16px;border-bottom:1px solid var(--border-a);position:relative}
+.hdr::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:var(--grad);opacity:.5}
+.hdr-row{display:flex;justify-content:space-between;align-items:flex-start}
+.logo{font-size:24px;font-weight:800;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.logo-sub{font-size:9px;color:var(--muted);margin-top:2px;letter-spacing:2px;text-transform:uppercase}
+.st{display:flex;align-items:center;gap:6px}
+.st-dot{width:8px;height:8px;border-radius:50%;transition:.3s}
+.st-dot.on{background:var(--green);box-shadow:0 0 8px var(--green);animation:pulse 2s infinite}
+.st-dot.off{background:var(--red);box-shadow:0 0 6px var(--red)}
+.st-lbl{font-size:10px;color:var(--dim)}
+
+/* Buttons */
+.br{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;align-items:center}
+.b{border:none;border-radius:8px;padding:10px 18px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:.15s;letter-spacing:.3px}
+.b:active{transform:scale(.97)}
+.b1{background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff}
+.b2{background:transparent;color:var(--accent);border:1px solid rgba(129,140,248,.3)}
+.b-d{background:rgba(239,68,68,.12);color:var(--red);border:1px solid rgba(239,68,68,.2);padding:8px 14px;font-size:11px}
+.b-scan{width:100%;background:linear-gradient(135deg,#059669,#10b981);color:#fff;padding:14px;font-size:14px;letter-spacing:1px;text-transform:uppercase;border-radius:10px}
+.b-scan:disabled{opacity:.5;cursor:not-allowed}
+.b-clr{width:100%;background:transparent;color:var(--amber);border:1px solid rgba(245,158,11,.2);border-radius:8px;padding:10px;font-size:11px;margin-top:8px}
+.b-sm{padding:8px 14px;font-size:11px;border-radius:6px}
+.spin{width:14px;height:14px;border:2px solid var(--accent);border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite}
+.notice{margin-top:10px;font-size:10px;color:var(--amber);background:rgba(245,158,11,.07);padding:6px 10px;border-radius:6px}
+.badge{display:inline-block;font-size:8px;padding:2px 7px;border-radius:10px;font-weight:700;letter-spacing:.5px}
+.badge-bt{background:rgba(56,189,248,.15);color:var(--accent2)}
+.badge-demo{background:rgba(129,140,248,.15);color:var(--accent)}
+.proto{font-size:10px;color:var(--dim);margin-top:6px;padding:6px 8px;background:rgba(99,102,241,.05);border-radius:4px}
+
+/* Tabs */
+.tabs{display:flex;border-bottom:1px solid var(--border);background:var(--surface);position:sticky;top:0;z-index:10;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:0 0 auto;padding:11px 12px;text-align:center;font-size:10px;font-weight:500;color:var(--muted);background:transparent;border:none;border-bottom:2px solid transparent;cursor:pointer;font-family:inherit;transition:.2s;white-space:nowrap}
+.tab.active{color:var(--accent);font-weight:700;border-bottom-color:var(--accent)}
+
+/* Cards */
+.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;margin:10px 12px}
+.card-t{font-size:12px;font-weight:700;color:var(--text);margin-bottom:8px}
+.card-s{font-size:10px;color:var(--muted)}
+.pbar{width:100%;height:4px;background:rgba(99,102,241,.08);border-radius:2px;overflow:hidden;margin:10px 0}
+.pfill{height:100%;background:var(--grad);border-radius:2px;transition:width .2s}
+
+/* Gauges */
+.gauges{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 12px;margin-top:10px}
+.ga{background:rgba(15,23,42,.5);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center}
+.ga:hover{border-color:var(--border-a)}
+.ga-l{font-size:8px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+.ga-v{font-size:26px;font-weight:800;line-height:1}
+.ga-u{font-size:10px;font-weight:400;color:var(--muted);margin-left:2px}
+.ga-bar{height:3px;background:rgba(99,102,241,.08);border-radius:2px;margin-top:8px;overflow:hidden}
+.ga-bf{height:100%;border-radius:2px;transition:width .5s}
+
+/* Big Gauge (speedometer) */
+.big-gauge{text-align:center;padding:16px 12px 8px}
+.bg-circle{position:relative;width:180px;height:180px;margin:0 auto}
+.bg-svg{width:100%;height:100%}
+.bg-val{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:42px;font-weight:800;line-height:1}
+.bg-unit{font-size:12px;color:var(--muted);display:block;margin-top:2px;font-weight:400}
+.bg-label{font-size:10px;color:var(--dim);margin-top:4px;letter-spacing:1px;text-transform:uppercase}
+.bg-row{display:flex;justify-content:center;gap:24px;margin-top:12px}
+.bg-mini{text-align:center}
+.bg-mini-v{font-size:20px;font-weight:800}
+.bg-mini-l{font-size:8px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px}
+
+/* DTC */
+.dtc{background:rgba(15,23,42,.45);border:1px solid var(--border);border-radius:8px;padding:14px;margin:0 12px 8px;cursor:pointer;transition:.2s;animation:fadeIn .3s ease both;border-left:3px solid var(--muted)}
+.dtc:hover{background:rgba(99,102,241,.06)}
+.dtc.sel{background:rgba(99,102,241,.1);border-color:var(--accent)}
+.dtc.s-h{border-left-color:var(--red)}.dtc.s-m{border-left-color:var(--amber)}.dtc.s-l{border-left-color:var(--green)}
+.dtc-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.dtc-info{display:flex;align-items:center;gap:8px}
+.dtc-icon{font-size:18px}
+.dtc-code{font-size:16px;font-weight:800;letter-spacing:1px}
+.dtc-sys{font-size:10px;color:var(--dim);margin-top:1px}
+.dtc-desc{font-size:11px;color:#cbd5e1;margin-top:8px;line-height:1.5}
+.sev{display:inline-block;padding:2px 8px;border-radius:12px;font-size:9px;font-weight:700;letter-spacing:.5px}
+.sev-h{background:rgba(239,68,68,.15);color:var(--red)}.sev-m{background:rgba(245,158,11,.15);color:var(--amber)}.sev-l{background:rgba(52,211,153,.15);color:var(--green)}
+.fix{margin-top:10px;padding:10px;background:rgba(99,102,241,.06);border-radius:6px;border:1px solid rgba(99,102,241,.1);animation:fadeIn .2s}
+.fix-l{font-size:9px;color:var(--accent);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.fix-t{font-size:11px;color:var(--text);line-height:1.6}
+
+/* Freeze frame */
+.ff{margin-top:8px;padding:10px;background:rgba(56,189,248,.05);border:1px solid rgba(56,189,248,.1);border-radius:6px}
+.ff-l{font-size:9px;color:var(--accent2);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.ff-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px 12px}
+.ff-item{font-size:10px;color:var(--dim);display:flex;justify-content:space-between}
+.ff-val{color:var(--text);font-weight:600}
+
+/* Readiness */
+.rd-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.rd-item{display:flex;align-items:center;gap:6px;padding:8px 10px;background:rgba(15,23,42,.4);border-radius:6px;font-size:10px;border:1px solid var(--border)}
+.rd-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.rd-dot.pass{background:var(--green);box-shadow:0 0 6px var(--green)}
+.rd-dot.fail{background:var(--red);box-shadow:0 0 6px var(--red)}
+.rd-dot.na{background:var(--muted)}
+
+/* Trip */
+.trip-stat{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:11px}
+.trip-stat:last-child{border:none}
+.trip-k{color:var(--dim)}
+.trip-v{font-weight:700}
+
+/* Timer */
+.timer-big{text-align:center;padding:20px 0}
+.timer-val{font-size:56px;font-weight:800;color:var(--accent2);line-height:1}
+.timer-unit{font-size:14px;color:var(--muted);margin-top:4px}
+.timer-speed{font-size:18px;font-weight:700;margin-top:8px;color:var(--dim)}
+
+/* Score */
+.score-circle{width:120px;height:120px;margin:0 auto}
+.score-val{font-size:36px;font-weight:800;text-align:center}
+.score-bars{margin-top:12px}
+.sc-bar{margin-bottom:8px}
+.sc-bar-l{display:flex;justify-content:space-between;font-size:10px;color:var(--dim);margin-bottom:3px}
+.sc-bar-bg{height:6px;background:rgba(99,102,241,.08);border-radius:3px;overflow:hidden}
+.sc-bar-f{height:100%;border-radius:3px;transition:width .5s}
+
+/* Service */
+.svc-item{padding:10px 0;border-bottom:1px solid var(--border)}
+.svc-item:last-child{border:none}
+.svc-row{display:flex;justify-content:space-between;align-items:center}
+.svc-name{font-size:12px;font-weight:700}
+.svc-detail{font-size:10px;color:var(--dim);margin-top:3px}
+.svc-bar{height:4px;background:rgba(99,102,241,.08);border-radius:2px;margin-top:6px;overflow:hidden}
+.svc-bf{height:100%;border-radius:2px}
+
+/* Health */
+.health-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)}
+.health-item:last-child{border:none}
+.health-icon{font-size:18px}
+.health-info{flex:1}
+.health-name{font-size:11px;font-weight:700}
+.health-val{font-size:10px;color:var(--dim);margin-top:1px}
+.health-st{font-size:9px;font-weight:700;padding:2px 8px;border-radius:10px}
+.h-ok{background:rgba(52,211,153,.15);color:var(--green)}
+.h-warn{background:rgba(245,158,11,.15);color:var(--amber)}
+.h-crit{background:rgba(239,68,68,.15);color:var(--red)}
+
+/* Log */
+.log-l{font-size:10px;padding:2px 0;border-bottom:1px solid rgba(99,102,241,.04);display:flex;gap:6px}
+.log-t{color:var(--dark);flex-shrink:0;min-width:60px;font-size:9px}
+.log-m{word-break:break-all;font-size:10px}
+.log-m.info{color:var(--muted)}.log-m.success{color:var(--green)}.log-m.error{color:var(--red)}.log-m.tx{color:var(--amber)}.log-m.rx{color:var(--accent2)}
+.raw{margin-top:6px;padding:8px;background:rgba(0,0,0,.3);border-radius:4px;font-size:10px;color:var(--accent2);word-break:break-all;border:1px solid rgba(56,189,248,.1)}
+
+/* Panels */
+.panel{display:none;padding:4px 0 20px;min-height:300px}
+.panel.active{display:block}
+
+/* Guide */
+.guide{padding:16px 12px}
+.guide-t{font-size:13px;font-weight:700;margin-bottom:8px}
+.guide-p{font-size:11px;color:var(--dim);line-height:1.8}
+
+/* Footer */
+.foot{font-size:9px;color:var(--dark);text-align:center;padding:8px}
+
+@media(max-width:380px){.logo{font-size:20px}.ga-v{font-size:22px}.bg-val{font-size:34px}}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <div class="hdr">
+    <div class="hdr-row">
+      <div><div class="logo">OBD-II Pro</div><div class="logo-sub">ELM 327 Diagnostic Suite</div></div>
+      <div class="st"><div class="st-dot off" id="stDot"></div><span class="st-lbl" id="stLbl">Disconnected</span></div>
+    </div>
+    <div id="uiConn"><div class="br"><button class="b b1" onclick="connectBT()" id="btBtn">ᛒ Bluetooth</button><button class="b b2" onclick="connectDemo()">▶ Demo</button></div></div>
+    <div id="uiIng" style="display:none"><div class="br"><div class="spin"></div><span style="font-size:11px;color:var(--accent)">Connecting…</span></div></div>
+    <div id="uiOn" style="display:none"><div class="br"><button class="b b-d" onclick="disc()">✕ Disconnect</button><span id="modeBadge"></span></div><div class="proto" id="protoInfo" style="display:none"></div></div>
+    <div class="notice" id="btN" style="display:none">⚠ Web Bluetooth unavailable — use Chrome/Edge/Android. Try Demo Mode.</div>
+  </div>
+
+  <div class="tabs" id="tabs" style="display:none">
+    <button class="tab active" onclick="goTab('dash',this)">🏎 Dash</button>
+    <button class="tab" onclick="goTab('scan',this)">🔍 DTC</button>
+    <button class="tab" onclick="goTab('health',this)">💚 Health</button>
+    <button class="tab" onclick="goTab('puc',this)">📋 PUC</button>
+    <button class="tab" onclick="goTab('trip',this)">🛣 Trip</button>
+    <button class="tab" onclick="goTab('perf',this)">⏱ 0-100</button>
+    <button class="tab" onclick="goTab('score',this)">⭐ Score</button>
+    <button class="tab" onclick="goTab('svc',this)">🔧 Service</button>
+    <button class="tab" onclick="goTab('log',this)">⌨ Log</button>
+  </div>
+
+  <div id="p-dash" class="panel"></div>
+  <div id="p-scan" class="panel"></div>
+  <div id="p-health" class="panel"></div>
+  <div id="p-puc" class="panel"></div>
+  <div id="p-trip" class="panel"></div>
+  <div id="p-perf" class="panel"></div>
+  <div id="p-score" class="panel"></div>
+  <div id="p-svc" class="panel"></div>
+  <div id="p-log" class="panel"></div>
+
+  <div id="guide" class="guide">
+    <div class="card"><div class="guide-t">Welcome to OBD-II Pro</div><div class="guide-p">
+      1. Plug ELM 327 into your car's OBD-II port<br>2. Turn ignition ON or start engine<br>3. Click Bluetooth or try Demo Mode<br><br>
+      <b>Features:</b> Live dashboard, DTC scanner, freeze frame, engine health monitor, PUC readiness, trip logger, 0-100 km/h timer, driving score, service reminders, fuel efficiency tracker
+    </div></div>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════
+// DTC DATABASE
+// ════════════════════════════════════════
+const DB={
+"P0100":{d:"MAF Circuit Malfunction",s:"m",sys:"Fuel/Air",f:"Clean/replace MAF sensor, check vacuum leaks"},
+"P0101":{d:"MAF Circuit Range/Performance",s:"m",sys:"Fuel/Air",f:"Clean MAF sensor, check air filter and intake ducts"},
+"P0110":{d:"IAT Circuit Malfunction",s:"l",sys:"Fuel/Air",f:"Check IAT sensor connector and resistance"},
+"P0115":{d:"ECT Circuit Malfunction",s:"h",sys:"Engine",f:"Check ECT sensor connector, test resistance, replace"},
+"P0116":{d:"ECT Circuit Range/Performance",s:"m",sys:"Engine",f:"Check thermostat, replace ECT sensor"},
+"P0118":{d:"ECT Circuit High Input",s:"h",sys:"Engine",f:"Check for open circuit, replace ECT sensor"},
+"P0120":{d:"TPS Circuit Malfunction",s:"h",sys:"Fuel/Air",f:"Check TPS connector, replace TPS"},
+"P0121":{d:"TPS Range/Performance",s:"h",sys:"Fuel/Air",f:"Replace TPS, clean throttle body"},
+"P0125":{d:"Insufficient Coolant Temp for Closed Loop",s:"l",sys:"Engine",f:"Replace thermostat (stuck open)"},
+"P0128":{d:"Thermostat Below Regulating Temp",s:"m",sys:"Engine",f:"Replace thermostat — stuck open"},
+"P0130":{d:"O2 Sensor Malfunction (B1S1)",s:"m",sys:"Emissions",f:"Replace upstream O2 sensor, check wiring"},
+"P0131":{d:"O2 Sensor Low Voltage (B1S1)",s:"m",sys:"Emissions",f:"Check vacuum leaks, replace O2 sensor"},
+"P0133":{d:"O2 Sensor Slow Response (B1S1)",s:"m",sys:"Emissions",f:"Replace O2 sensor"},
+"P0135":{d:"O2 Heater Circuit (B1S1)",s:"m",sys:"Emissions",f:"Check heater fuse, replace O2 sensor"},
+"P0171":{d:"System Too Lean (Bank 1)",s:"m",sys:"Fuel/Air",f:"Check vacuum leaks, clean MAF, check fuel pressure"},
+"P0172":{d:"System Too Rich (Bank 1)",s:"m",sys:"Fuel/Air",f:"Check fuel pressure, inspect injectors, check purge valve"},
+"P0174":{d:"System Too Lean (Bank 2)",s:"m",sys:"Fuel/Air",f:"Check vacuum leaks on Bank 2, inspect intake gasket"},
+"P0300":{d:"Random/Multiple Misfire",s:"h",sys:"Ignition",f:"Check spark plugs, coils, injectors, compression test"},
+"P0301":{d:"Cylinder 1 Misfire",s:"h",sys:"Ignition",f:"Swap coil/plug to isolate. Replace plug/coil on Cyl 1"},
+"P0302":{d:"Cylinder 2 Misfire",s:"h",sys:"Ignition",f:"Check Cyl 2 plug, coil, injector"},
+"P0303":{d:"Cylinder 3 Misfire",s:"h",sys:"Ignition",f:"Check Cyl 3 plug, coil, injector"},
+"P0304":{d:"Cylinder 4 Misfire",s:"h",sys:"Ignition",f:"Check Cyl 4 plug, coil, injector"},
+"P0325":{d:"Knock Sensor 1 Malfunction",s:"m",sys:"Ignition",f:"Replace knock sensor, check wiring"},
+"P0335":{d:"CKP Sensor Circuit Malfunction",s:"h",sys:"Ignition",f:"Replace crankshaft position sensor"},
+"P0340":{d:"CMP Sensor Circuit Malfunction",s:"h",sys:"Ignition",f:"Replace camshaft position sensor"},
+"P0400":{d:"EGR Flow Malfunction",s:"m",sys:"Emissions",f:"Clean EGR valve and passages"},
+"P0401":{d:"EGR Flow Insufficient",s:"m",sys:"Emissions",f:"Clean carbon from EGR valve, replace if stuck"},
+"P0420":{d:"Catalyst Below Threshold (B1)",s:"m",sys:"Emissions",f:"Replace catalytic converter, check O2 sensors"},
+"P0430":{d:"Catalyst Below Threshold (B2)",s:"m",sys:"Emissions",f:"Replace Bank 2 catalytic converter"},
+"P0440":{d:"EVAP System Malfunction",s:"l",sys:"Emissions",f:"Check gas cap, inspect EVAP hoses"},
+"P0442":{d:"EVAP Leak (Small)",s:"l",sys:"Emissions",f:"Tighten/replace gas cap, smoke test EVAP"},
+"P0455":{d:"EVAP Leak (Large)",s:"l",sys:"Emissions",f:"Check gas cap, smoke test EVAP system"},
+"P0456":{d:"EVAP Leak (Very Small)",s:"l",sys:"Emissions",f:"Replace gas cap first"},
+"P0500":{d:"VSS Malfunction",s:"m",sys:"Trans",f:"Replace vehicle speed sensor"},
+"P0505":{d:"Idle Control System Malfunction",s:"m",sys:"Fuel/Air",f:"Clean IAC valve and throttle body"},
+"P0507":{d:"Idle RPM Higher Than Expected",s:"l",sys:"Fuel/Air",f:"Check vacuum leaks, clean IAC valve"},
+"P0700":{d:"Transmission Control Malfunction",s:"h",sys:"Trans",f:"Scan TCM for specific codes, check fluid"},
+"P0715":{d:"Input Speed Sensor Malfunction",s:"h",sys:"Trans",f:"Replace input speed sensor"},
+"P0730":{d:"Incorrect Gear Ratio",s:"h",sys:"Trans",f:"Check fluid, may need rebuild"},
+"P0741":{d:"TCC Performance/Stuck Off",s:"h",sys:"Trans",f:"Replace TCC solenoid, flush fluid"},
+"C0035":{d:"LF Wheel Speed Sensor",s:"m",sys:"ABS",f:"Replace LF wheel speed sensor"},
+"C0050":{d:"RR Wheel Speed Sensor",s:"m",sys:"ABS",f:"Replace RR wheel speed sensor"},
+"U0100":{d:"Lost Comm with ECM/PCM",s:"h",sys:"Network",f:"Check CAN bus wiring, ECM connectors, fuses"},
+"U0101":{d:"Lost Comm with TCM",s:"h",sys:"Network",f:"Check TCM connectors, CAN bus wiring"},
+};
+const ICONS={"Fuel/Air":"⛽","Engine":"🔧","Ignition":"⚡","Emissions":"💨","Trans":"⚙️","ABS":"🛞","Network":"🔌"};
+const SEVL={h:"Critical",m:"Warning",l:"Minor"};
+const CATM={P:"Powertrain",B:"Body",C:"Chassis",U:"Network"};
+const DEMOS=[["P0300","P0171","P0420"],["P0128","P0455","P0507"],["P0301","P0135"],["P0700","P0741","P0730"],["P0340","P0325","P0172"],["C0035","C0050"],["U0100","P0335"]];
+
+// ════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════
+let S={
+  conn:"off",mode:null,protocol:"",
+  // BLE
+  btDev:null,btW:null,btN:null,rxBuf:"",rxRes:null,
+  // Live data
+  live:{rpm:0,speed:0,coolant:0,throttle:0,load:0,fuel:"N/S",volts:"N/S",intake:0,maf:0},
+  liveRun:false,pidPause:false,unsupported:new Set(),
+  // DTC
+  dtcs:[],scanning:false,clearing:false,scanPct:0,selDtc:-1,rawResp:"",
+  freezeFrame:null,
+  // PUC readiness
+  readiness:null,
+  // Trip
+  tripActive:false,tripStart:null,tripDist:0,tripMaxRpm:0,tripMaxSpeed:0,tripFuelUsed:0,
+  tripHarshBrake:0,tripHarshAccel:0,tripIdleTime:0,tripSamples:0,
+  prevSpeed:0,prevTime:0,
+  // 0-100
+  perfState:"idle",perfStart:0,perfTime:0,perfSpeed:0,
+  // Score
+  scoreSmooth:80,scoreBrake:85,scoreRpm:90,scoreIdle:75,
+  // Service
+  totalKm:0,lastOilKm:0,lastFilterKm:0,lastBrakeKm:0,lastSparkKm:0,
+  // History
+  history:[],logs:[],
+};
+
+// ════════════════════════════════════════
+// BLE
+// ════════════════════════════════════════
+const SVCS=["0000fff0-0000-1000-8000-00805f9b34fb","0000ffe0-0000-1000-8000-00805f9b34fb","000018f0-0000-1000-8000-00805f9b34fb"];
+document.addEventListener("DOMContentLoaded",()=>{if(!("bluetooth" in navigator)){$("btBtn").style.display="none";$("btN").style.display="block"}});
+function $(id){return document.getElementById(id)}
+
+async function connectBT(){
+  setUI("ing");log("Searching BLE…","info");
+  try{
+    const d=await navigator.bluetooth.requestDevice({
+      filters:[{namePrefix:"OBDII"},{namePrefix:"ELM"},{namePrefix:"OBD"},{namePrefix:"Vgate"},{namePrefix:"V-LINK"},{namePrefix:"KONNWEI"},{namePrefix:"Veepeak"},{namePrefix:"IOS-Vlink"}],
+      optionalServices:SVCS
+    });
+    log("Found: "+(d.name||"?"),"success");S.btDev=d;
+    d.addEventListener("gattserverdisconnected",()=>{log("BLE lost","error");disc()});
+    const srv=await d.gatt.connect();log("GATT OK","success");
+    const svcs=await srv.getPrimaryServices();
+    for(const s of svcs){const cs=await s.getCharacteristics();for(const c of cs){const p=c.properties;if(!S.btW&&(p.write||p.writeWithoutResponse))S.btW=c;if(!S.btN&&(p.notify||p.indicate))S.btN=c}if(S.btW)break}
+    if(!S.btW)throw new Error("No writable char");
+    if(S.btN){await S.btN.startNotifications();S.btN.addEventListener("characteristicvaluechanged",onN);log("Notify OK","success")}
+    S.mode="bluetooth";setUI("on");log("✓ BLE connected","success");await initELM();
+  }catch(e){log("BLE err: "+e.message,"error");setUI("off")}
+}
+
+function onN(e){const c=new TextDecoder().decode(e.target.value);S.rxBuf+=c;if(S.rxBuf.includes(">")){const r=S.rxBuf.replace(/>/g,"").trim();if(S.rxRes){S.rxRes(r);S.rxRes=null}S.rxBuf=""}}
+
+function elm(cmd,t=5000){return new Promise(async r=>{
+  S.rxBuf="";const tid=setTimeout(()=>{S.rxRes=null;r("TIMEOUT")},t);
+  S.rxRes=v=>{clearTimeout(tid);r(v)};
+  const d=new TextEncoder().encode(cmd+"\r");
+  try{S.btW.properties.writeWithoutResponse?await S.btW.writeValueWithoutResponse(d):await S.btW.writeValueWithResponse(d);log("TX → "+cmd,"tx")}
+  catch(e){clearTimeout(tid);log("Write err: "+e.message,"error");r("ERROR")}
+})}
+
+async function initELM(){
+  for(const[c,d]of[["ATZ","Reset"],["ATE0","Echo off"],["ATL0","LF off"],["ATS1","Spaces on"],["ATH0","Headers off"],["ATSP0","Auto protocol"]]){
+    const r=await elm(c,3000);log(d+": "+(r||"OK"),"rx");await slp(200)}
+  const p=await elm("ATDPN",2000);S.protocol=p;log("Protocol: "+p,"success");
+  $("protoInfo").style.display="block";$("protoInfo").textContent="Protocol: "+p;
+  // Detect supported PIDs
+  log("Detecting PIDs…","info");
+  const r00=await elm("0100",4000);
+  const h00=r00.replace(/[\r\n\s]/g,"").toUpperCase();
+  const i00=h00.indexOf("4100");
+  if(i00!==-1){const b=h00.substring(i00+4,i00+12);if(b.length===8){const v=parseInt(b,16);for(let i=0;i<32;i++){const pid=(i+1).toString(16).toUpperCase().padStart(2,"0");if(!(v&(1<<(31-i))))S.unsupported.add(pid)}}}
+  log("✓ Ready!","success");
+  S.liveRun=true;pollPIDs();
+}
+
+function connectDemo(){
+  setUI("ing");log("Demo init…","info");
+  setTimeout(()=>{S.mode="demo";S.protocol="AUTO, ISO 15765-4 (CAN)";setUI("on");log("✓ Demo mode","success");S.liveRun=true;demoLive()},1000);
+}
+
+function disc(){
+  S.liveRun=false;S.pidPause=false;S.tripActive=false;S.perfState="idle";
+  try{S.btN?.removeEventListener("characteristicvaluechanged",onN)}catch(e){}
+  try{S.btN?.stopNotifications()}catch(e){}
+  if(S.btDev?.gatt?.connected)S.btDev.gatt.disconnect();
+  S.btDev=null;S.btW=null;S.btN=null;S.mode=null;S.dtcs=[];S.selDtc=-1;S.rawResp="";S.freezeFrame=null;S.readiness=null;
+  setUI("off");log("Disconnected","info");
+}
+
+function setUI(s){
+  S.conn=s;
+  $("stDot").className="st-dot "+(s==="on"?"on":"off");
+  $("stLbl").textContent=s==="on"?"Connected":s==="ing"?"Connecting…":"Disconnected";
+  $("uiConn").style.display=s==="off"?"block":"none";
+  $("uiIng").style.display=s==="ing"?"block":"none";
+  $("uiOn").style.display=s==="on"?"block":"none";
+  $("tabs").style.display=s==="on"?"flex":"none";
+  $("guide").style.display=s==="off"?"block":"none";
+  $("modeBadge").innerHTML=s==="on"&&S.mode?
+    (S.mode==="bluetooth"?'<span class="badge badge-bt">BLUETOOTH</span>':'<span class="badge badge-demo">DEMO</span>'):"";
+  if(s!=="on")$("protoInfo").style.display="none";
+  if(s==="on")goTab("dash",document.querySelector('.tab'));
+  else document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+}
+
+// ════════════════════════════════════════
+// LIVE PID POLLING
+// ════════════════════════════════════════
+function parsePID(raw,pid){
+  let c=raw.replace(/[\r\n\s]/g,"").toUpperCase();
+  const pfx="41"+pid.toUpperCase();const i=c.indexOf(pfx);if(i===-1)return null;
+  const d=c.substring(i+pfx.length);if(d.length<2)return null;
+  const A=parseInt(d.substring(0,2),16),B=d.length>=4?parseInt(d.substring(2,4),16):0;
+  if(isNaN(A))return null;
+  switch(pid.toUpperCase()){
+    case"0C":return Math.round(((A*256)+B)/4);
+    case"0D":return A;
+    case"05":return A-40;
+    case"11":return Math.round(A*100/255);
+    case"04":return Math.round(A*100/255);
+    case"2F":return Math.round(A*100/255);
+    case"42":return(((A*256)+B)/1000).toFixed(1);
+    case"0F":return A-40;
+    case"10":return((A*256)+B)/100; // MAF g/s
+    default:return A;
+  }
+}
+
+async function pollPIDs(){
+  const pids=[
+    {p:"0C",k:"rpm"},{p:"0D",k:"speed"},{p:"05",k:"coolant"},{p:"11",k:"throttle"},
+    {p:"04",k:"load"},{p:"2F",k:"fuel"},{p:"42",k:"volts"},{p:"0F",k:"intake"},{p:"10",k:"maf"}
+  ];
+  while(S.liveRun&&S.conn==="on"&&S.mode==="bluetooth"){
+    if(S.pidPause){await slp(200);continue}
+    for(const{p,k}of pids){
+      if(!S.liveRun||S.pidPause)break;
+      if(S.unsupported.has(p)){S.live[k]="N/S";continue}
+      try{
+        const r=await elm("01"+p,2000);
+        if(r.includes("NO DATA")||r==="TIMEOUT"){S.unsupported.add(p);S.live[k]="N/S"}
+        else{const v=parsePID(r,p);S.live[k]=v!==null?v:"--"}
+      }catch(e){S.live[k]="--"}
+    }
+    updateTrip();updatePerf();updateScore();
+    renderActive();
+    await slp(200);
+  }
+}
+
+function demoLive(){
+  setInterval(()=>{
+    if(!S.liveRun||S.conn!=="on")return;
+    const spd=S.live.speed||0;
+    S.live.rpm=Math.floor(800+Math.random()*2800);
+    S.live.speed=Math.max(0,spd+Math.floor(Math.random()*10-4));
+    S.live.coolant=Math.floor(78+Math.random()*18);
+    S.live.throttle=Math.floor(Math.random()*60);
+    S.live.load=Math.floor(20+Math.random()*50);
+    S.live.fuel="N/S";S.live.volts="N/S";
+    S.live.intake=Math.floor(30+Math.random()*20);
+    S.live.maf=(3+Math.random()*15).toFixed(1);
+    updateTrip();updatePerf();updateScore();
+    renderActive();
+  },800);
+}
+
+// ════════════════════════════════════════
+// TRIP LOGGER
+// ════════════════════════════════════════
+function updateTrip(){
+  if(!S.tripActive)return;
+  const now=Date.now();const dt=(now-(S.prevTime||now))/1000;S.prevTime=now;
+  const spd=typeof S.live.speed==="number"?S.live.speed:0;
+  const rpm=typeof S.live.rpm==="number"?S.live.rpm:0;
+  // Distance
+  S.tripDist+=(spd/3600)*dt; // km
+  S.totalKm+=(spd/3600)*dt;
+  // Max
+  if(rpm>S.tripMaxRpm)S.tripMaxRpm=rpm;
+  if(spd>S.tripMaxSpeed)S.tripMaxSpeed=spd;
+  // Harsh braking (speed drop >15 km/h per second)
+  const decel=(S.prevSpeed-spd)/Math.max(dt,.1);
+  if(decel>15)S.tripHarshBrake++;
+  // Harsh accel
+  const accel=(spd-S.prevSpeed)/Math.max(dt,.1);
+  if(accel>12)S.tripHarshAccel++;
+  // Idle
+  if(spd<3&&rpm>400)S.tripIdleTime+=dt;
+  // Fuel (MAF-based estimate: L/h = MAF * 3600 / (14.7 * 820))
+  const maf=parseFloat(S.live.maf)||0;
+  if(maf>0)S.tripFuelUsed+=(maf/(14.7*820*1000))*dt*3600; // liters
+  S.prevSpeed=spd;
+  S.tripSamples++;
+}
+
+function startTrip(){
+  S.tripActive=true;S.tripStart=Date.now();S.tripDist=0;S.tripMaxRpm=0;S.tripMaxSpeed=0;
+  S.tripFuelUsed=0;S.tripHarshBrake=0;S.tripHarshAccel=0;S.tripIdleTime=0;S.tripSamples=0;
+  S.prevSpeed=0;S.prevTime=Date.now();
+  log("Trip started","success");renderActive();
+}
+function stopTrip(){
+  S.tripActive=false;
+  S.history.unshift({type:"trip",date:new Date().toLocaleString(),dist:S.tripDist.toFixed(1),dur:((Date.now()-S.tripStart)/60000).toFixed(1),maxSpd:S.tripMaxSpeed,maxRpm:S.tripMaxRpm,fuel:S.tripFuelUsed.toFixed(2),harsh:S.tripHarshBrake+S.tripHarshAccel});
+  log("Trip ended: "+S.tripDist.toFixed(1)+" km","success");renderActive();
+}
+
+// ════════════════════════════════════════
+// 0-100 TIMER
+// ════════════════════════════════════════
+function updatePerf(){
+  const spd=typeof S.live.speed==="number"?S.live.speed:0;
+  S.perfSpeed=spd;
+  if(S.perfState==="waiting"&&spd>=2){S.perfState="running";S.perfStart=Date.now();log("0-100: GO!","success")}
+  if(S.perfState==="running"){S.perfTime=(Date.now()-S.perfStart)/1000;if(spd>=100){S.perfState="done";log("0-100: "+S.perfTime.toFixed(2)+"s","success")}}
+}
+function startPerf(){S.perfState="waiting";S.perfTime=0;S.perfSpeed=0;log("0-100: Waiting for launch…","info");renderActive()}
+function resetPerf(){S.perfState="idle";S.perfTime=0;renderActive()}
+
+// ════════════════════════════════════════
+// DRIVING SCORE
+// ════════════════════════════════════════
+function updateScore(){
+  const rpm=typeof S.live.rpm==="number"?S.live.rpm:0;
+  const spd=typeof S.live.speed==="number"?S.live.speed:0;
+  // RPM score: penalize >4000
+  if(rpm>4000)S.scoreRpm=Math.max(20,S.scoreRpm-.3);else if(rpm<3000)S.scoreRpm=Math.min(100,S.scoreRpm+.05);
+  // Smooth: penalize rapid throttle changes
+  const thr=typeof S.live.throttle==="number"?S.live.throttle:0;
+  if(thr>80)S.scoreSmooth=Math.max(20,S.scoreSmooth-.2);else S.scoreSmooth=Math.min(100,S.scoreSmooth+.03);
+  // Idle penalty
+  if(spd<3&&rpm>400)S.scoreIdle=Math.max(20,S.scoreIdle-.1);else S.scoreIdle=Math.min(100,S.scoreIdle+.02);
+}
+
+// ════════════════════════════════════════
+// DTC PARSING
+// ════════════════════════════════════════
+function parseDTCs(raw){
+  const codes=[];let c=raw.replace(/[\r\n]/g," ").replace(/\s+/g," ").trim().toUpperCase();
+  if(c.includes("NO DATA")||c.includes("UNABLE")||c.includes("ERROR"))return codes;
+  c=c.replace(/SEARCHING\.\.\./g,"").trim();
+  if(!c.includes("43")){log("⚠ No 43 header — not valid DTC response","error");return codes}
+  c=c.replace(/41\s*[0-9A-F]{2}\s*[0-9A-F]{2,}/g,"").trim();
+  const parts=c.split(/43/).filter(p=>p.trim().length>=4);
+  for(const part of parts){
+    const hex=part.replace(/\s/g,"");let si=0;if(hex.length>4&&hex.length%4!==0)si=2;
+    for(let i=si;i<=hex.length-4;i+=4){
+      const hb=parseInt(hex.substring(i,i+2),16),lb=parseInt(hex.substring(i+2,i+4),16);
+      if(isNaN(hb)||isNaN(lb)||(!hb&&!lb))continue;
+      const pre=['P','C','B','U'][(hb>>6)&3];
+      const code=pre+((hb>>4)&3).toString(16).toUpperCase()+(hb&0xF).toString(16).toUpperCase()+((lb>>4)&0xF).toString(16).toUpperCase()+(lb&0xF).toString(16).toUpperCase();
+      if(!codes.includes(code))codes.push(code);
+    }
+  }
+  return codes;
+}
+
+// ════════════════════════════════════════
+// SCAN / CLEAR / FREEZE / READINESS
+// ════════════════════════════════════════
+async function scanDTCs(){
+  S.scanning=true;S.scanPct=0;S.dtcs=[];S.selDtc=-1;S.rawResp="";S.freezeFrame=null;renderPanel("scan");
+  if(S.mode==="bluetooth"){
+    S.pidPause=true;log("⏸ Paused PIDs","info");await slp(1500);S.rxBuf="";if(S.rxRes){S.rxRes("FLUSH");S.rxRes=null}await slp(300);
+    setP(20);const r03=await elm("03",8000);log("RX ← "+r03,"rx");S.rawResp="Mode 03: "+r03;
+    setP(50);const r07=await elm("07",5000);
+    if(r07&&!r07.includes("NO DATA")&&r07!=="TIMEOUT")S.rawResp+="\nMode 07: "+r07;
+    setP(70);
+    const stored=parseDTCs(r03);let pending=[];
+    if(r07&&r07.includes("47"))pending=parseDTCs(r07.replace(/47/g,"43"));
+    const all=[...stored];pending.forEach(c=>{if(!all.includes(c))all.push(c)});
+    // Read freeze frame if DTCs found
+    if(all.length){
+      log("Reading freeze frame (Mode 02)…","info");
+      S.freezeFrame={};
+      for(const[pid,key]of[["0C","rpm"],["0D","speed"],["05","coolant"],["04","load"],["11","throttle"]]){
+        const r=await elm("02"+pid+"00",3000);
+        const v=parsePID(r.replace(/42/g,"41"),pid);
+        S.freezeFrame[key]=v!==null?v:"--";
+      }
+    }
+    S.dtcs=all;setP(100);S.scanning=false;S.pidPause=false;log("▶ Resumed PIDs","info");
+    if(all.length){log(`Found ${all.length} DTC(s)`,"error");all.forEach(c=>log("  → "+c+": "+(DB[c]?.d||"Unknown"),"info"))}
+    else log("✓ No DTCs!","success");
+  }else{
+    for(let p=0;p<=100;p+=5){await slp(50);setP(p)}
+    const sc=DEMOS[Math.floor(Math.random()*DEMOS.length)];S.dtcs=sc;
+    S.freezeFrame={rpm:1850,speed:45,coolant:92,load:67,throttle:32};
+    let hex="43";sc.forEach(c=>{const ci=['P','C','B','U'].indexOf(c[0]);const hi=(ci<<6)|(parseInt(c[1],16)<<4)|parseInt(c[2],16);const lo=(parseInt(c[3],16)<<4)|parseInt(c[4],16);hex+=" "+hi.toString(16).padStart(2,"0").toUpperCase()+" "+lo.toString(16).padStart(2,"0").toUpperCase()});
+    S.rawResp=hex;setP(100);S.scanning=false;
+  }
+  S.history.unshift({type:"scan",date:new Date().toLocaleString(),codes:[...S.dtcs]});
+  renderPanel("scan");
+}
+
+async function clearDTCs(){
+  if(!confirm("Clear all DTCs and reset Check Engine Light?\n\nThis will:\n• Erase all stored trouble codes\n• Turn off the Check Engine Light\n• Reset emissions readiness monitors\n\nNote: If the underlying problem isn't fixed, codes will return."))return;
+
+  S.clearing=true;renderPanel("scan");
+
+  if(S.mode==="bluetooth"){
+    // 1. Pause live PID polling
+    S.pidPause=true;
+    log("⏸ Paused PIDs for clear","info");
+
+    // 2. Wait for any in-flight PID request to finish
+    await slp(2000);
+
+    // 3. Flush BLE receive buffer
+    S.rxBuf="";
+    if(S.rxRes){S.rxRes("FLUSH");S.rxRes=null}
+    await slp(500);
+
+    // 4. Send Mode 04 (Clear DTCs)
+    log("TX → 04 (Clear DTCs & Reset MIL)","tx");
+    const r=await elm("04",8000);
+    log("RX ← "+r,"rx");
+
+    // 5. Check if response is valid (should be "44" = positive response)
+    const clean=r.replace(/[\r\n\s]/g,"").toUpperCase();
+    if(clean.includes("44")){
+      log("✓ ECU confirmed: DTCs cleared (response 44)","success");
+    }else if(r==="TIMEOUT"){
+      // Some ECUs take long — retry once
+      log("⚠ Timeout — retrying…","error");
+      await slp(1000);
+      S.rxBuf="";
+      const r2=await elm("04",10000);
+      log("RX ← retry: "+r2,"rx");
+      if(r2.replace(/[\r\n\s]/g,"").toUpperCase().includes("44")){
+        log("✓ ECU confirmed on retry","success");
+      }else{
+        log("⚠ ECU did not confirm clear — try turning ignition off and on","error");
+      }
+    }else{
+      log("⚠ Unexpected response: "+r+" — codes may still be cleared","info");
+    }
+
+    // 6. Small delay then verify by re-scanning
+    await slp(1000);
+    log("Verifying — re-reading DTCs…","info");
+    S.rxBuf="";
+    const verify=await elm("03",5000);
+    log("RX ← verify: "+verify,"rx");
+    const remaining=parseDTCs(verify);
+    if(remaining.length>0){
+      log("⚠ "+remaining.length+" code(s) still present — underlying issue not fixed","error");
+      S.dtcs=remaining;
+    }else{
+      log("✓ Verified: No DTCs remaining!","success");
+      S.dtcs=[];
+    }
+
+    // 7. Resume polling
+    S.pidPause=false;
+    log("▶ Resumed PIDs","info");
+
+  }else{
+    // Demo mode
+    await slp(800);
+    log("TX → 04 [Demo]","tx");
+    log("RX ← 44","rx");
+    log("✓ DTCs cleared [Demo]","success");
+    S.dtcs=[];
+  }
+
+  S.selDtc=-1;S.scanPct=0;S.rawResp="";S.freezeFrame=null;S.clearing=false;
+  renderPanel("scan");
+}
+
+async function checkReadiness(){
+  if(S.mode==="bluetooth"){
+    S.pidPause=true;
+    log("⏸ Paused PIDs for readiness check","info");
+    await slp(1500);
+    S.rxBuf="";
+    if(S.rxRes){S.rxRes("FLUSH");S.rxRes=null}
+    await slp(500);
+    const r=await elm("0101",5000);log("Readiness: "+r,"rx");
+    const c=r.replace(/[\r\n\s]/g,"").toUpperCase();
+    const idx=c.indexOf("4101");
+    if(idx!==-1){
+      const d=c.substring(idx+4);
+      if(d.length>=8){
+        const B=parseInt(d.substring(2,4),16);const C=parseInt(d.substring(4,6),16);const D=parseInt(d.substring(6,8),16);
+        S.readiness={
+          mil:!!(B&0x80),dtcCount:B&0x7F,
+          misfire:{avail:!!(B&0x01),complete:!(C&0x10)},
+          fuelSys:{avail:!!(B&0x02),complete:!(C&0x20)},
+          components:{avail:!!(B&0x04),complete:!(C&0x40)},
+          catalyst:{avail:!!(D&0x01),complete:!(D&0x10)},
+          heated_cat:{avail:!!(D&0x02),complete:!(D&0x20)},
+          evap:{avail:!!(D&0x04),complete:!(D&0x40)},
+          air_sys:{avail:!!(D&0x08),complete:!(D&0x80)},
+          o2_sensor:{avail:!!(C&0x01),complete:!(C&0x10)},
+          egr:{avail:!!(C&0x08),complete:!(C&0x80)},
+        };
+      }
+    }
+    S.pidPause=false;log("▶ Resumed PIDs","info");
+  }else{
+    await slp(800);
+    S.readiness={mil:false,dtcCount:0,
+      misfire:{avail:true,complete:true},fuelSys:{avail:true,complete:true},
+      components:{avail:true,complete:true},catalyst:{avail:true,complete:true},
+      heated_cat:{avail:false,complete:false},evap:{avail:true,complete:false},
+      air_sys:{avail:false,complete:false},o2_sensor:{avail:true,complete:true},
+      egr:{avail:true,complete:true}};
+  }
+  renderPanel("puc");
+}
+
+function setP(v){S.scanPct=v;const e=$("pFill");if(e)e.style.width=v+"%"}
+
+// ════════════════════════════════════════
+// TABS & RENDERING
+// ════════════════════════════════════════
+let activeTab="dash";
+function goTab(t,el){
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  if(el)el.classList.add('active');
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  $("p-"+t).classList.add('active');
+  activeTab=t;renderPanel(t);
+}
+function renderActive(){renderPanel(activeTab)}
+
+function renderPanel(t){
+  const p=$("p-"+t);if(!p)return;
+  switch(t){
+    case"dash":rDash(p);break;case"scan":rScan(p);break;case"health":rHealth(p);break;
+    case"puc":rPuc(p);break;case"trip":rTrip(p);break;case"perf":rPerf(p);break;
+    case"score":rScore(p);break;case"svc":rSvc(p);break;case"log":rLog(p);break;
+  }
+}
+
+// ── DASHBOARD ──
+function rDash(p){
+  const d=S.live;const spd=typeof d.speed==="number"?d.speed:0;
+  const rpm=typeof d.rpm==="number"?d.rpm:0;
+  const spdPct=Math.min(spd/200*100,100);const rpmPct=Math.min(rpm/8000*100,100);
+  // Fuel efficiency: km/l from MAF
+  const maf=parseFloat(d.maf)||0;
+  let kml="--";
+  if(maf>0&&spd>5)kml=(spd/(maf*3600/(14.7*820*1000)*3600)).toFixed(1);
+
+  p.innerHTML=`
+  <div class="big-gauge">
+    <div class="bg-circle">
+      <svg class="bg-svg" viewBox="0 0 120 120">
+        <circle cx="60" cy="60" r="52" fill="none" stroke="rgba(99,102,241,.1)" stroke-width="8"/>
+        <circle cx="60" cy="60" r="52" fill="none" stroke="var(--accent2)" stroke-width="8"
+          stroke-dasharray="${326.7}" stroke-dashoffset="${326.7-(326.7*spdPct/100)}"
+          stroke-linecap="round" transform="rotate(-90 60 60)" style="transition:stroke-dashoffset .5s"/>
+      </svg>
+      <div class="bg-val" style="color:var(--accent2)">${spd}<span class="bg-unit">km/h</span></div>
+    </div>
+    <div class="bg-label">Speed</div>
+    <div class="bg-row">
+      <div class="bg-mini"><div class="bg-mini-v" style="color:var(--accent)">${rpm}</div><div class="bg-mini-l">RPM</div></div>
+      <div class="bg-mini"><div class="bg-mini-v" style="color:var(--green)">${kml}</div><div class="bg-mini-l">km/L</div></div>
+      <div class="bg-mini"><div class="bg-mini-v" style="color:${(typeof d.coolant==="number"&&d.coolant>100)?"var(--red)":"var(--amber)"}">${d.coolant}</div><div class="bg-mini-l">°C Cool</div></div>
+    </div>
+  </div>
+  <div class="gauges">
+    ${gauge("Throttle",d.throttle,"%",100,"var(--amber)")}
+    ${gauge("Engine Load",d.load,"%",100,"var(--purple)")}
+    ${gauge("Intake Temp",d.intake,"°C",80,"var(--accent2)")}
+    ${gauge("Fuel Level",d.fuel,d.fuel==="N/S"?"":"%" ,100,"var(--orange)")}
+    ${gauge("Battery",d.volts,d.volts==="N/S"?"":"V",16,"var(--green)")}
+    ${gauge("MAF",typeof d.maf==="number"?d.maf.toFixed?.(1)||d.maf:d.maf,"g/s",50,"var(--accent)")}
+  </div>
+  <div class="foot">🔄 ${S.mode==="bluetooth"?"Live from ECU":"Demo mode"}</div>`;
+}
+
+function gauge(l,v,u,mx,c){
+  const isNS=v==="N/S"||v==="--";
+  const pct=isNS?0:Math.min(parseFloat(v)/mx*100,100);
+  return`<div class="ga"><div class="ga-l">${l}</div><div class="ga-v" style="color:${isNS?"var(--muted)":c}">${isNS?"N/S":v}<span class="ga-u">${isNS?"":u}</span></div><div class="ga-bar"><div class="ga-bf" style="width:${pct}%;background:${c}"></div></div></div>`;
+}
+
+// ── DTC SCAN ──
+function rScan(p){
+  let h=`<div class="card">
+    <button class="b b-scan" onclick="scanDTCs()" ${S.scanning?"disabled":""}>${S.scanning?"⏳ Scanning…":"⚡ READ TROUBLE CODES"}</button>
+    <div class="pbar"><div class="pfill" id="pFill" style="width:${S.scanPct}%"></div></div>
+    ${S.dtcs.length?`<button class="b b-clr" onclick="clearDTCs()" ${S.clearing?"disabled":""}>${S.clearing?"⏳ Clearing…":"⚠ Clear DTCs (Reset Check Engine Light)"}</button>`:''}
+  </div>`;
+  if(S.rawResp)h+=`<div class="card" style="padding:10px"><div style="font-size:8px;color:var(--dark);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Raw ECU Response</div><div class="raw">${S.rawResp}</div></div>`;
+  if(S.dtcs.length){
+    h+=`<div style="font-size:11px;color:var(--dim);display:flex;justify-content:space-between;padding:0 12px;margin:10px 0 6px"><span>${S.dtcs.length} code${S.dtcs.length>1?"s":""}</span><span style="color:var(--red)">⚠ CEL ON</span></div>`;
+    S.dtcs.forEach((c,i)=>{
+      const info=DB[c]||{d:"Unknown DTC — check service manual",s:"m",sys:CATM[c[0]]||"?",f:"Consult a mechanic"};
+      const sel=S.selDtc===i;const sv=info.s;
+      h+=`<div class="dtc s-${sv} ${sel?"sel":""}" onclick="S.selDtc=S.selDtc===${i}?-1:${i};renderPanel('scan')" style="animation-delay:${i*.06}s">
+        <div class="dtc-top"><div class="dtc-info"><span class="dtc-icon">${ICONS[info.sys]||"🔍"}</span><div><div class="dtc-code">${c}</div><div class="dtc-sys">${info.sys} · ${CATM[c[0]]||""}</div></div></div><span class="sev sev-${sv}">${SEVL[sv]}</span></div>
+        <div class="dtc-desc">${info.d}</div>
+        ${sel?`<div class="fix"><div class="fix-l">🔧 Recommended Fix</div><div class="fix-t">${info.f}</div></div>
+          ${S.freezeFrame?`<div class="ff"><div class="ff-l">📸 Freeze Frame (conditions when code set)</div><div class="ff-grid">
+            <div class="ff-item"><span>RPM</span><span class="ff-val">${S.freezeFrame.rpm}</span></div>
+            <div class="ff-item"><span>Speed</span><span class="ff-val">${S.freezeFrame.speed} km/h</span></div>
+            <div class="ff-item"><span>Coolant</span><span class="ff-val">${S.freezeFrame.coolant}°C</span></div>
+            <div class="ff-item"><span>Load</span><span class="ff-val">${S.freezeFrame.load}%</span></div>
+            <div class="ff-item"><span>Throttle</span><span class="ff-val">${S.freezeFrame.throttle}%</span></div>
+          </div></div>`:""}`:""}</div>`;
+    });
+  }else if(!S.scanning&&S.scanPct===100){
+    h+=`<div class="card" style="text-align:center;color:var(--green)"><div style="font-size:36px;margin-bottom:6px">✓</div><div style="font-size:14px;font-weight:700">No Trouble Codes</div><div class="card-s" style="margin-top:4px">Vehicle systems operating normally</div></div>`;
+  }
+  p.innerHTML=h;
+}
+
+// ── ENGINE HEALTH ──
+function rHealth(p){
+  const d=S.live;
+  const items=[
+    {icon:"🌡️",name:"Coolant Temperature",val:(typeof d.coolant==="number"?d.coolant+"°C":"--"),
+      st:typeof d.coolant==="number"?(d.coolant>105?"crit":d.coolant>98?"warn":"ok"):"ok",
+      tip:typeof d.coolant==="number"?(d.coolant>105?"OVERHEATING! Stop immediately":d.coolant>98?"Running hot — monitor closely":d.coolant<60?"Still warming up":"Normal operating range"):"--"},
+    {icon:"⚡",name:"Engine RPM",val:(typeof d.rpm==="number"?d.rpm+" rpm":"--"),
+      st:typeof d.rpm==="number"?(d.rpm>5500?"crit":d.rpm>4500?"warn":"ok"):"ok",
+      tip:typeof d.rpm==="number"?(d.rpm>5500?"Redline! Shift up immediately":d.rpm>4500?"High RPM — shift up":d.rpm<600?"Idle too low":"Normal"):"--"},
+    {icon:"📊",name:"Engine Load",val:(typeof d.load==="number"?d.load+"%":"--"),
+      st:typeof d.load==="number"?(d.load>90?"warn":d.load>95?"crit":"ok"):"ok",
+      tip:typeof d.load==="number"?(d.load>90?"Heavy load — engine working hard":"Normal load"):"--"},
+    {icon:"🎚️",name:"Throttle Position",val:(typeof d.throttle==="number"?d.throttle+"%":"--"),st:"ok",tip:"Throttle opening"},
+    {icon:"🌬️",name:"Intake Air Temp",val:(typeof d.intake==="number"?d.intake+"°C":"--"),
+      st:typeof d.intake==="number"?(d.intake>55?"warn":"ok"):"ok",
+      tip:typeof d.intake==="number"?(d.intake>55?"Hot intake air — reduced power":"Normal"):"--"},
+    {icon:"💨",name:"MAF Sensor",val:(typeof d.maf==="number"?(parseFloat(d.maf)).toFixed(1)+" g/s":"N/S"),st:"ok",tip:"Mass air flow rate"},
+  ];
+  let h=`<div class="card"><div class="card-t">💚 Engine Health Monitor</div><div class="card-s">Real-time system status with warnings</div></div>`;
+  h+=`<div class="card">`;
+  items.forEach(i=>{
+    h+=`<div class="health-item"><span class="health-icon">${i.icon}</span><div class="health-info"><div class="health-name">${i.name}</div><div class="health-val">${i.tip}</div></div><div><div style="font-size:13px;font-weight:700;text-align:right;margin-bottom:2px">${i.val}</div><span class="health-st h-${i.st}">${i.st==="ok"?"OK":i.st==="warn"?"WARN":"DANGER"}</span></div></div>`;
+  });
+  h+=`</div>`;p.innerHTML=h;
+}
+
+// ── PUC READINESS ──
+function rPuc(p){
+  let h=`<div class="card"><div class="card-t">📋 PUC / Emissions Readiness</div><div class="card-s">Check if your car will pass the PUC (Pollution Under Control) test</div>
+    <button class="b b1 b-sm" onclick="checkReadiness()" style="margin-top:10px;width:100%">🔍 Check Readiness</button></div>`;
+  if(S.readiness){
+    const r=S.readiness;
+    h+=`<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <div class="card-t" style="margin:0">MIL (Check Engine Light)</div>
+      <span class="sev ${r.mil?"sev-h":"sev-l"}">${r.mil?"ON — FAIL":"OFF — OK"}</span>
+    </div>
+    <div style="font-size:10px;color:var(--dim);margin-bottom:10px">Stored DTCs: ${r.dtcCount}</div>
+    <div class="card-t" style="font-size:11px">Readiness Monitors</div>
+    <div class="rd-grid">`;
+    const monitors=[
+      ["Misfire",r.misfire],["Fuel System",r.fuelSys],["Components",r.components],
+      ["Catalyst",r.catalyst],["EVAP System",r.evap],["O2 Sensor",r.o2_sensor],
+      ["EGR System",r.egr],["Heated Cat",r.heated_cat],["Secondary Air",r.air_sys]
+    ];
+    monitors.forEach(([name,m])=>{
+      const cls=!m.avail?"na":m.complete?"pass":"fail";
+      const lbl=!m.avail?"N/A":m.complete?"Ready":"Not Ready";
+      h+=`<div class="rd-item"><div class="rd-dot ${cls}"></div><div><div style="font-weight:700">${name}</div><div style="font-size:9px;color:var(--dim)">${lbl}</div></div></div>`;
+    });
+    h+=`</div>`;
+    // Overall verdict
+    const allReady=monitors.every(([,m])=>!m.avail||m.complete);
+    h+=`<div style="margin-top:12px;text-align:center;padding:10px;border-radius:6px;background:${allReady&&!r.mil?"rgba(52,211,153,.1)":"rgba(239,68,68,.1)"}">
+      <div style="font-size:16px;font-weight:800;color:${allReady&&!r.mil?"var(--green)":"var(--red)"}">${allReady&&!r.mil?"✓ READY FOR PUC":"✗ NOT READY"}</div>
+      <div style="font-size:10px;color:var(--dim);margin-top:4px">${allReady&&!r.mil?"All monitors complete, MIL off":"Drive more to complete monitors or fix DTCs"}</div>
+    </div></div>`;
+  }
+  p.innerHTML=h;
+}
+
+// ── TRIP ──
+function rTrip(p){
+  const dur=S.tripActive?((Date.now()-S.tripStart)/60000).toFixed(1):"0.0";
+  const avgSpd=S.tripActive&&parseFloat(dur)>0?(S.tripDist/(parseFloat(dur)/60)).toFixed(0):0;
+  const kml=S.tripFuelUsed>0?(S.tripDist/S.tripFuelUsed).toFixed(1):"--";
+  let h=`<div class="card">
+    <div class="card-t">🛣 Trip Logger</div>
+    <button class="b ${S.tripActive?"b-d":"b1"} b-sm" onclick="${S.tripActive?"stopTrip()":"startTrip()"}" style="width:100%;margin-top:6px">${S.tripActive?"⏹ Stop Trip":"▶ Start Trip"}</button>
+    ${S.tripActive?'<div style="font-size:9px;color:var(--green);text-align:center;margin-top:6px">● Recording…</div>':""}
+  </div>
+  <div class="card">
+    <div class="trip-stat"><span class="trip-k">Distance</span><span class="trip-v">${S.tripDist.toFixed(2)} km</span></div>
+    <div class="trip-stat"><span class="trip-k">Duration</span><span class="trip-v">${dur} min</span></div>
+    <div class="trip-stat"><span class="trip-k">Avg Speed</span><span class="trip-v">${avgSpd} km/h</span></div>
+    <div class="trip-stat"><span class="trip-k">Max Speed</span><span class="trip-v">${S.tripMaxSpeed} km/h</span></div>
+    <div class="trip-stat"><span class="trip-k">Max RPM</span><span class="trip-v">${S.tripMaxRpm}</span></div>
+    <div class="trip-stat"><span class="trip-k">Fuel Used (est.)</span><span class="trip-v">${S.tripFuelUsed.toFixed(2)} L</span></div>
+    <div class="trip-stat"><span class="trip-k">Fuel Efficiency</span><span class="trip-v">${kml} km/L</span></div>
+    <div class="trip-stat"><span class="trip-k">Harsh Brakes</span><span class="trip-v" style="color:${S.tripHarshBrake>3?"var(--red)":"var(--green)"}">${S.tripHarshBrake}</span></div>
+    <div class="trip-stat"><span class="trip-k">Harsh Accel</span><span class="trip-v" style="color:${S.tripHarshAccel>3?"var(--red)":"var(--green)"}">${S.tripHarshAccel}</span></div>
+    <div class="trip-stat"><span class="trip-k">Idle Time</span><span class="trip-v">${(S.tripIdleTime/60).toFixed(1)} min</span></div>
+  </div>`;
+  // Past trips
+  const trips=S.history.filter(x=>x.type==="trip");
+  if(trips.length){
+    h+=`<div class="card"><div class="card-t">Past Trips</div>`;
+    trips.slice(0,5).forEach(t=>{
+      h+=`<div class="trip-stat"><span class="trip-k">${t.date}</span><span class="trip-v">${t.dist} km · ${t.dur} min · ${t.fuel}L</span></div>`;
+    });
+    h+=`</div>`;
+  }
+  p.innerHTML=h;
+}
+
+// ── 0-100 TIMER ──
+function rPerf(p){
+  const st=S.perfState;
+  p.innerHTML=`<div class="card">
+    <div class="card-t">⏱ 0-100 km/h Timer</div>
+    <div class="card-s">Measures acceleration from standstill to 100 km/h</div>
+  </div>
+  <div class="card">
+    <div class="timer-big">
+      <div class="timer-val" style="color:${st==="done"?"var(--green)":st==="running"?"var(--accent2)":"var(--dim)"}">${S.perfTime.toFixed(2)}</div>
+      <div class="timer-unit">seconds</div>
+      <div class="timer-speed">${st==="running"||st==="done"?S.perfSpeed+" km/h":"—"}</div>
+    </div>
+    <div style="text-align:center;font-size:11px;color:var(--dim);margin:8px 0">
+      ${st==="idle"?"Press Start, then accelerate from 0":st==="waiting"?"Ready — start moving!":st==="running"?"Measuring… keep accelerating!":"🏁 Result: "+S.perfTime.toFixed(2)+"s"}
+    </div>
+    <button class="b ${st==="idle"||st==="done"?"b1":"b-d"} b-sm" onclick="${st==="idle"||st==="done"?"startPerf()":"resetPerf()"}" style="width:100%">
+      ${st==="idle"?"▶ Start":st==="done"?"🔄 Try Again":"✕ Cancel"}
+    </button>
+  </div>`;
+}
+
+// ── DRIVING SCORE ──
+function rScore(p){
+  const avg=Math.round((S.scoreSmooth+S.scoreBrake+S.scoreRpm+S.scoreIdle)/4);
+  const col=avg>=80?"var(--green)":avg>=60?"var(--amber)":"var(--red)";
+  const grade=avg>=90?"A+":avg>=80?"A":avg>=70?"B":avg>=60?"C":avg>=50?"D":"F";
+  p.innerHTML=`<div class="card"><div class="card-t">⭐ Driving Score</div><div class="card-s">Real-time rating based on your driving habits</div></div>
+  <div class="card" style="text-align:center">
+    <div class="score-val" style="color:${col}">${avg}<span style="font-size:14px;color:var(--dim)">/100</span></div>
+    <div style="font-size:20px;font-weight:800;color:${col};margin-top:4px">Grade: ${grade}</div>
+    <div class="score-bars">
+      ${scoreBar("Smooth Driving",S.scoreSmooth,"var(--accent2)")}
+      ${scoreBar("Braking",S.scoreBrake,"var(--amber)")}
+      ${scoreBar("RPM Discipline",S.scoreRpm,"var(--accent)")}
+      ${scoreBar("Idle Management",S.scoreIdle,"var(--green)")}
+    </div>
+  </div>
+  <div class="card"><div class="card-s">💡 Tips: Avoid sudden acceleration, keep RPM below 3000, minimize idling, brake gradually</div></div>`;
+}
+
+function scoreBar(l,v,c){
+  return`<div class="sc-bar"><div class="sc-bar-l"><span>${l}</span><span style="color:var(--text);font-weight:700">${Math.round(v)}</span></div><div class="sc-bar-bg"><div class="sc-bar-f" style="width:${v}%;background:${c}"></div></div></div>`;
+}
+
+// ── SERVICE REMINDERS ──
+function rSvc(p){
+  const services=[
+    {name:"Engine Oil Change",interval:5000,last:S.lastOilKm,icon:"🛢️"},
+    {name:"Air Filter",interval:15000,last:S.lastFilterKm,icon:"🌬️"},
+    {name:"Brake Pads",interval:30000,last:S.lastBrakeKm,icon:"🛞"},
+    {name:"Spark Plugs",interval:40000,last:S.lastSparkKm,icon:"⚡"},
+  ];
+  let h=`<div class="card"><div class="card-t">🔧 Service Reminders</div><div class="card-s">Based on ${S.totalKm.toFixed(0)} km total tracked</div></div><div class="card">`;
+  services.forEach(s=>{
+    const driven=S.totalKm-s.last;const remaining=Math.max(0,s.interval-driven);
+    const pct=Math.min(driven/s.interval*100,100);
+    const col=pct>90?"var(--red)":pct>70?"var(--amber)":"var(--green)";
+    const status=pct>90?"Due now!":pct>70?"Due soon":"OK";
+    h+=`<div class="svc-item">
+      <div class="svc-row"><div><span style="margin-right:6px">${s.icon}</span><span class="svc-name">${s.name}</span></div><span class="sev ${pct>90?"sev-h":pct>70?"sev-m":"sev-l"}">${status}</span></div>
+      <div class="svc-detail">Next in ${remaining.toFixed(0)} km · Every ${(s.interval/1000).toFixed(0)}k km · Driven ${driven.toFixed(0)} km since last</div>
+      <div class="svc-bar"><div class="svc-bf" style="width:${pct}%;background:${col}"></div></div>
+    </div>`;
+  });
+  h+=`</div>
+  <div class="card"><div class="card-s">💡 Tap "Reset" after a service to restart the counter</div>
+    <div class="br" style="margin-top:8px;flex-wrap:wrap">
+      <button class="b b2 b-sm" onclick="S.lastOilKm=S.totalKm;renderPanel('svc')">Reset Oil</button>
+      <button class="b b2 b-sm" onclick="S.lastFilterKm=S.totalKm;renderPanel('svc')">Reset Filter</button>
+      <button class="b b2 b-sm" onclick="S.lastBrakeKm=S.totalKm;renderPanel('svc')">Reset Brakes</button>
+      <button class="b b2 b-sm" onclick="S.lastSparkKm=S.totalKm;renderPanel('svc')">Reset Plugs</button>
+    </div>
+  </div>`;
+  p.innerHTML=h;
+}
+
+// ── TERMINAL LOG ──
+function rLog(p){
+  let h='<div class="card"><div style="font-size:9px;color:var(--accent);font-weight:700;letter-spacing:1px;margin-bottom:6px">ELM 327 TERMINAL</div><div style="max-height:400px;overflow-y:auto">';
+  if(!S.logs.length)h+='<div style="font-size:11px;color:var(--dark)">No activity…</div>';
+  S.logs.forEach(l=>{h+=`<div class="log-l"><span class="log-t">${l.time}</span><span class="log-m ${l.type}">${l.msg}</span></div>`});
+  h+='</div></div>';p.innerHTML=h;
+  const sc=p.querySelector('div[style*="overflow"]');if(sc)sc.scrollTop=sc.scrollHeight;
+}
+
+function log(msg,type="info"){
+  S.logs.push({msg,type,time:new Date().toLocaleTimeString()});
+  if(S.logs.length>150)S.logs.shift();
+  if(activeTab==="log")renderPanel("log");
+}
+function slp(ms){return new Promise(r=>setTimeout(r,ms))}
+</script>
+</body>
+</html>
