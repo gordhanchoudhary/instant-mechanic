@@ -1214,6 +1214,10 @@ function mapInput(t){
   if((c("grinding")&&c("not starting"))||(c("grinding")&&c("starting car"))||(c("grinding sound")&&c("start")))return"self start issue";
 
   // ── SOUND DIAGNOSIS ──────────────────────────────────────────────────
+  if(a("noise aa raha","awaaz aa raha","awaaz aati","noise aata","awaaz nahi band",
+       "khat khat","khad khad","tak tak noise","awaaz","khad-khad","khat-khat")||
+     both("awaaz","aa"))return"sound diagnosis";
+
   if(a("knocking sound","banging sound","clicking sound","popping sound","grinding sound",
        "squealing sound","squeaking sound","hissing sound","rattling sound","clunking sound",
        "humming sound","whirring sound","sputtering sound","backfire","backfiring",
@@ -1265,7 +1269,7 @@ function mapInput(t){
        "new tyre","tyre replace","car tire","car tyre")||
      both("tyre","flat")||both("tire","flat")||both("tyre","damage")||
      both("tyre","burst")||both("tyre","issue")||both("tyre","puncture")||
-     both("flat","tyre"))return"tyre puncture";
+     both("flat","tyre")||both("phat","tyre")||both("tyre","phat"))return"tyre puncture";
 
   // ── CNG ───────────────────────────────────────────────────────────────
   if(a("cng","compressed natural gas","cng issue","cng not working","cng leak","gas kit",
@@ -1284,6 +1288,8 @@ function mapInput(t){
        "music system not working"))return"music electronics";
 
   // ── INSPECTION ────────────────────────────────────────────────────────
+  if(a("service chahiye","service karo","service de do","check karo","full check karo",
+       "car check karo","dekho zara"))return"inspection";
   if(a("inspection","pre-purchase","used car check","car inspection","health check",
        "pre-trip check","second hand car","2nd hand car","purani gaadi","car check up",
        "full check","comprehensive car inspection","inspection required",
@@ -1300,11 +1306,10 @@ function mapInput(t){
        "oil on floor","leakage issue","fluid leaking","oil stain","engine oil leak",
        "engine oil leakage","oil under car","engine oil issue","engine oil over",
        "engine oil refill","oil drip","dark drip","tela leak","tel leak",
-       "gasket issue","fluid leakage"))return"engine oil leak";
+       "oil aa raha","tel aa raha","tela aa raha","gasket issue","fluid leakage"))return"engine oil leak";
 
   // ── CLUTCH SLIPPING ───────────────────────────────────────────────────
-  if(a("clutch slip","slipping clutch","revving but not","rpm high but","clutch free",
-       "clutch got free","clutch is free","clutch burned out","clutch burn")||
+  if(a("clutch slip","slipping clutch","revving but not","rpm high but","clutch burned out","clutch burn")||
      both("clutch","slip")||both("clutch","not moving")||both("rpm","not moving"))return"clutch slipping";
 
   // ── CLUTCH PEDAL HARD ─────────────────────────────────────────────────
@@ -1319,13 +1324,13 @@ function mapInput(t){
      both("clutch","stuck")||both("pedal","stuck"))return"clutch not returning";
 
   // ── CLUTCH ISSUE (general) ────────────────────────────────────────────
-  if(a("clutch broke","clutch broken","clutch issue","clutch problem","clutch cable",
+  if(a("gear free","gear got free","gear ho gaya free","clutch broke","clutch broken","clutch issue","clutch problem","clutch cable",
        "clutch not working","clutch repair","clutch plate","clutch fail","clutch damage",
        "clutch wire","clutch oil leak","clutch cylinder","clutch pad","clutch pads",
        "clutch patti","clutch release bearing","clutch blade","clutch and gear",
-       "clutch down","clutch free issue","gear and clutch","clutch breakdown",
-       "clutch loose","clutch jammed","gear clutch issue","clutch pedal issue",
-       "clutch plate related")||
+       "clutch free","clutch is free","clutch got free","clutch down","clutch free issue",
+       "gear and clutch","clutch breakdown","clutch loose","clutch jammed",
+       "gear clutch issue","clutch pedal issue","clutch plate related")||
      both("clutch","issue")||both("clutch","broke")||both("clutch","problem"))return"clutch issue";
 
   // ── BRAKE PEDAL HARD ──────────────────────────────────────────────────
@@ -1340,6 +1345,7 @@ function mapInput(t){
 
   // ── CAR PULLING WHILE BRAKING ─────────────────────────────────────────
   if(a("car pull","pulls left","pulls right","pulling to one side","car drift",
+       "car sideways","car veering","car going sideways","car lean while driving",
        "pulls to one")||
      both("car","pull")||both("pulling","side"))return"car pulling braking";
 
@@ -1367,6 +1373,7 @@ function mapInput(t){
   if(a("automatic delay","auto gear","transmission delay","gear jerk","gearbox delay",
        "auto transmission","automatic problem","atf","automatic jerk","transmission problem",
        "gearbox oil","automatic issue","automatic not","high temperature transmission",
+       "transmission fluid","transmission oil","atf change","gearbox fluid","torque converter",
        "not engaging into drive","car not engaging into drive")||
      both("automatic","delay")||both("auto","jerk")||both("transmission","problem"))return"automatic gear delay";
 
@@ -1381,9 +1388,10 @@ function mapInput(t){
 
   // ── ENGINE MISFIRE / SHAKING ──────────────────────────────────────────
   if(a("misfire","misfiring","engine shake","rough idle","shaking engine","engine vibration",
-       "idle rough","car shudder","engine shudder","spark plug","ignition coil","engine miss",
-       "engine missing","engine and body shaking","injector problem","injector prblm",
-       "coil problem","engine not generating power")||
+       "idle rough","car shudder","engine shudder","spark plug","spark plug issue",
+       "ignition coil","engine miss","engine missing","engine and body shaking",
+       "injector problem","injector issue","injector prblm","injector fault",
+       "coil problem","coil issue","coil fault","engine not generating power")||
      both("engine","misfire")||both("engine","shake")||both("rough","idle")||
      both("engine","vibration"))return"engine misfire";
 
@@ -1391,9 +1399,9 @@ function mapInput(t){
   if(a("shuts off","shut off","dies while","engine dies","car died","engine stopped",
        "car stopped suddenly","suddenly stopped","engine cut off","engine shuts down",
        "engine not switching off","takes self stops immediately","car starts and off",
-       "starting but turns off","gaadi band","engine off while","car stops while",
-       "car stopped midway","car stopped on the bridge","stopped running","stopped in between",
-       "stopped while driving","stopped while moving","car stopped while")||
+       "starting but turns off","engine off","engine band ho gaya","engine off while",
+       "car stops while","car stopped midway","car stopped on the bridge","stopped running",
+       "stopped in between","stopped while driving","stopped while moving","car stopped while")||
      both("engine","die")||both("car","stall")||both("car","shut off"))return"car shuts off";
 
   // ── ENGINE NO RESPONSE ────────────────────────────────────────────────
@@ -1411,6 +1419,7 @@ function mapInput(t){
      both("ac","intermittent")||both("ac","sometimes"))return"ac intermittent";
 
   // ── TOWING / ACCIDENT / RECOVERY ─────────────────────────────────────
+  if(a("tow chahiye","tow karo","tow bhejo","tow de do","tow service chahiye"))return"towing needed";
   if(a("towing","tow needed","tow the car","tow truck","roadside recovery","recovery needed",
        "car tow","need tow","tow service","breakdown recovery","car breakdown","breakdown",
        "car stuck in mud","car stuck in pit","car stuck in water","ev car towing",
@@ -1429,11 +1438,15 @@ function mapInput(t){
        "headlight change","headlight not working","horn not stopping","horn not working",
        "car headlight relay","headlight relay","indicator lights")||
      both("horn","not")||both("indicator","not")||both("headlight","not")||
-     both("light","not")||both("horn","working"))return"lights indicators horn";
+     both("light","not")||both("horn","working")||
+     both("horn","band")||both("indicator","band")||both("light","band")||
+     both("horn","nahi")||both("indicator","nahi")||
+     both("headlight","nahi")||both("light","nahi"))return"lights indicators horn";
 
   // ── WHEEL / RIM / AXLE ────────────────────────────────────────────────
   if(a("alloy bent","alloy crack","axle issue","axle problem","wheel dislocated","wheel bearing",
-       "wheel wobble","rim issue","rim bent","cv joint","driveshaft","axle broken",
+       "wheel wobble","rim issue","rim bent","cv joint","cv joint noise","cv joint sound",
+       "axle sound","axle noise","axle click","driveshaft","axle broken",
        "rim damage","alloy damage","wheel vibrate","rim crack","cv axle","hub bearing",
        "back tyre dislocated","back wheel jammed","inside wheel cover issue",
        "front wheel issue","wheel cover","alloy bent issue","wheel not moving")||
@@ -1447,7 +1460,8 @@ function mapInput(t){
        "mirror replacement","constant ticking sound from the right mirror",
        "windscreen wiper","front glass","window up","window down")||
      both("window","stuck")||both("wiper","not")||both("window","not")||
-     both("mirror","broken"))return"window mirror wiper";
+     both("mirror","broken")||both("window","band")||both("wiper","band")||
+     both("window","nahi")||both("wiper","nahi"))return"window mirror wiper";
 
   // ── DOOR / BOOT / BONNET ──────────────────────────────────────────────
   if(a("door not opening","bonnet issue","boot not","bonnet came off","door stuck","car door",
@@ -1458,7 +1472,8 @@ function mapInput(t){
        "door lock not working","front door","left gate not opening","divider stuck",
        "bonnet issue","bonnet fell","car door locked")||
      both("door","stuck")||both("bonnet","open")||both("door","open")||
-     both("boot","open")||both("door","not"))return"door boot bonnet";
+     both("boot","open")||both("door","not")||
+     both("boot","nahi")||both("door","nahi")||both("bonnet","nahi"))return"door boot bonnet";
 
   // ── CAR NOT MOVING / STUCK ────────────────────────────────────────────
   if(a("car not moving","car stuck","won't move","wont move","not moving","can't move",
@@ -1532,6 +1547,8 @@ function mapInput(t){
      both("belt","off")||both("alternator","belt")||both("fan","belt"))return"engine belt";
 
   // ── ACCELERATION / PICKUP / THROTTLE ──────────────────────────────────
+  if(a("turbo issue","turbo problem","turbo not working","turbo lag","turbo failure",
+       "turbocharger","intercooler","boost pressure"))return"acceleration issue";
   if(a("pick up issue","pickup issue","acceleration issue","acceleration not","accelerator not working",
        "sluggish","no pickup","lost power","power loss","poor pickup","low pickup","car slow",
        "not accelerating","wont accelerate","throttle response","acceleration low",
@@ -1542,6 +1559,8 @@ function mapInput(t){
      both("no","pickup"))return"acceleration issue";
 
   // ── CAR BODY / PHYSICAL DAMAGE ────────────────────────────────────────
+  if(a("rust","body rust","car rust","rusting","rust issue","rust repair",
+       "dent repair","denting painting","panel beat","panel repair"))return"car body";
   if(a("bumper","bumper fell","bumper off","bumper hanging","bumper damage","bumper broken",
        "bumper crack","front bumper","rear bumper","bumper repair","bumper replace",
        "bumper grill","bonnet flew","bonnet fly","bonnet flap","bonnet open while driving",
@@ -1568,7 +1587,7 @@ function mapInput(t){
      both("coolant","issue")||both("coolant","low")||both("radiator","damage")||
      both("radiator","problem")||both("radiator","issue")||both("hose","leak")||
      both("pipe","leak")||both("pipe","damage")||both("pipe","burst")||
-     both("coolant","leak"))return"coolant issue";
+     both("coolant","leak")||both("paani","aa")||both("pani","nikal"))return"coolant issue";
 
   // ── ELECTRICAL / WIRING / FUSE ────────────────────────────────────────
   if(a("wiring issue","fuse check","electrical failure","wiring fault","burned fuse",
@@ -1580,9 +1599,14 @@ function mapInput(t){
        "relay issue","relay problem","relay not working","relay electric","electric issue",
        "relay burnt","relay fuse","relay faulty","wiring relay","relay switch")||
      both("wiring","issue")||both("electrical","problem")||both("fuse","burnt")||
-     both("fuse","issue")||both("fuse","problem")||both("wire","short"))return"electrical issue";
+     both("fuse","issue")||both("fuse","problem")||both("wire","short")||
+     both("bijli","nahi")||both("current","nahi")||both("electric","issue"))return"electrical issue";
 
   // ── CHECK ENGINE / ENGINE ISSUE ───────────────────────────────────────
+  if(a("sensor issue","sensor problem","sensor fault","sensor error","obd error","obd scan",
+       "fault code","engine code","error code","car error","ecu issue","ecu problem",
+       "map sensor","maf sensor","o2 sensor","lambda sensor","crankshaft sensor",
+       "camshaft sensor","throttle sensor","tps issue","mass airflow"))return"check engine";
   if(a("check engine","engine light","engine warning","engine issue","engine problem",
        "engine failure","engine fault","engine dead","engine seized","engine locked",
        "engine knock","engine noise","engine sound","engine shaking","engine error",
@@ -1596,6 +1620,7 @@ function mapInput(t){
   // ── SMOKE / BURNING SMELL ─────────────────────────────────────────────
   if(a("smoke","exhaust fume","burning smell","car smoke","white smoke","black smoke",
        "blue smoke","smoke from bonnet","smoke from engine","car steaming","steam from car",
+       "dhuan","dhua","dhuan aa raha","dhua nikal raha","engine se dhua",
        "engine overheating and smoke","engine shaking emitting smoke")||
      both("smoke","car")||both("burning","smell")||both("smoke","engine")||
      both("steam","car"))return"smoke burning smell";
@@ -1630,7 +1655,8 @@ function mapInput(t){
        "dynamo belt missing and car heating","engine heating with coolant",
        "coolant leak and car heating","check engine light and car heating")||
      both("engine","hot")||both("temp","high")||both("car","heating")||
-     both("engine","heating")||both("overheating","car"))return"engine overheating";
+     both("engine","heating")||both("overheating","car")||
+     both("car","heat")||both("car","garam")||both("gaadi","garam"))return"engine overheating";
 
   // ── BRAKE ────────────────────────────────────────────────────────────
   if(a("brake issue","brake jam","brake jammed","brake locked","brake pads","brake pedal",
@@ -1644,8 +1670,10 @@ function mapInput(t){
        "ac gas","ac compressor","ac blower","ac fan","ac coolant","ac stopped",
        "ac not cooling","ac not working","car ac not working","checking air conditioning",
        "ac wire bitten","a c wire","wire bitten by rats","ac radiator","ac gas filling","ac gas refill",
-       "ac gas replacement","cooling not","ac repair","ac service","ac kam","thanda nahi")||
-     (c(" ac ")&&a("not work","noise","problem","compressor","cool","gas","fan","blower")))return"ac not cooling";
+       "ac gas replacement","cooling not","ac repair","ac service","ac kam","thanda nahi",
+       "ac band","ac nahi chal","ac off ho gaya","ac off ho","thanda nahi aa raha",
+       "ac chalta nahi","cooling nahi")||
+     (c(" ac ")&&a("not work","noise","problem","compressor","cool","gas","fan","blower","band","off")))return"ac not cooling";
 
   // ── CHECK ENGINE (catch-all for engine issues not caught above) ────────
   if(c("check engine")||both("engine","light")||both("engine","warning"))return"check engine";
