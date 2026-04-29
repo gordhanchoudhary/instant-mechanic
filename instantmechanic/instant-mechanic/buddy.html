@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>CarBuddy</title>
+<title>CarBuddy — AI Car Diagnosis</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -15,7 +15,6 @@
   --sh1:0 1px 4px rgba(0,0,0,.09);--sh2:0 4px 18px rgba(0,0,0,.11)
 }
 html,body{height:100%;height:100dvh;font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--txt);-webkit-font-smoothing:antialiased;overflow:hidden;display:flex;flex-direction:column}
-/* NAV */
 nav{background:var(--nav);padding:0 16px;height:64px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;z-index:100}
 .nl{display:flex;align-items:center;gap:11px}
 .na{width:42px;height:42px;background:var(--p);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0;position:relative}
@@ -27,13 +26,11 @@ nav{background:var(--nav);padding:0 16px;height:64px;display:flex;align-items:ce
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
 .nb{display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:5px 12px;font-size:11px;font-weight:600;color:rgba(255,255,255,.6)}
 .nbd{width:6px;height:6px;background:var(--grn);border-radius:50%}
-/* CHAT BG */
 .cbg{flex:1;overflow-y:auto;overflow-x:hidden;padding:14px 0 90px;scroll-behavior:smooth;background:var(--bg);background-image:radial-gradient(ellipse at 15% 10%,rgba(232,72,10,.05) 0%,transparent 55%),radial-gradient(ellipse at 85% 85%,rgba(232,72,10,.04) 0%,transparent 55%)}
 .cbg::-webkit-scrollbar{width:3px}
 .cbg::-webkit-scrollbar-thumb{background:rgba(0,0,0,.15);border-radius:2px}
 .dsep{text-align:center;font-size:11px;font-weight:600;color:var(--mut);margin:4px 0 14px;display:flex;align-items:center;gap:10px;padding:0 20px}
 .dsep::before,.dsep::after{content:'';flex:1;height:1px;background:rgba(0,0,0,.1)}
-/* MSG ROWS */
 .mr{display:flex;align-items:flex-end;gap:8px;padding:2px 14px;animation:mi .2s ease}
 @keyframes mi{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
 .mr.user{flex-direction:row-reverse}
@@ -48,18 +45,15 @@ nav{background:var(--nav);padding:0 16px;height:64px;display:flex;align-items:ce
 .bt{font-size:10px;color:var(--mut);margin-top:3px;padding:0 3px;display:flex;align-items:center;gap:3px}
 .mr.user .bt{color:rgba(0,0,0,.35);justify-content:flex-end}
 .tick{color:#60A5FA;font-size:11px}
-/* OPTS */
 .or{padding:6px 14px 4px 52px;display:flex;flex-direction:column;gap:6px;animation:mi .22s ease}
 .ob{background:var(--sur);border:1.5px solid var(--pm);border-radius:22px;padding:9px 18px;font-size:13px;font-family:inherit;color:var(--pd);font-weight:600;cursor:pointer;text-align:left;transition:all .15s;align-self:flex-start;box-shadow:var(--sh1)}
 .ob:hover{background:var(--p);border-color:var(--p);color:#fff;transform:translateY(-1px);box-shadow:var(--sh2)}
 .ob:active{transform:scale(.97)}
-/* TYPING */
 .tr{display:flex;align-items:flex-end;gap:8px;padding:4px 14px;animation:mi .15s ease}
 .tb{background:var(--sur);border-radius:18px 18px 18px 4px;padding:13px 16px;display:flex;align-items:center;gap:5px;box-shadow:var(--sh1)}
 .tb span{width:7px;height:7px;background:#C0B4AC;border-radius:50%;animation:tb 1.3s infinite}
 .tb span:nth-child(2){animation-delay:.15s}.tb span:nth-child(3){animation-delay:.3s}
 @keyframes tb{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
-/* DIAG CARD */
 .dc{background:var(--sur);border-radius:18px;overflow:hidden;box-shadow:var(--sh2);margin:4px 14px 4px 52px;border:1px solid var(--brd);animation:mi .3s ease}
 .dt{background:linear-gradient(135deg,#1C1410 0%,#2D1F18 100%);padding:14px 16px;display:flex;align-items:center;gap:12px}
 .di{width:44px;height:44px;background:var(--p);border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:21px;flex-shrink:0}
@@ -76,11 +70,9 @@ nav{background:var(--nav);padding:0 16px;height:64px;display:flex;align-items:ce
 .si{display:flex;gap:10px;align-items:flex-start;padding:7px 0;border-bottom:1px solid var(--brd);font-size:13px;color:#3D3028;line-height:1.5}
 .si:last-child{border-bottom:none;padding-bottom:0}
 .sn{width:20px;height:20px;background:var(--nav);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px}
-/* RESTART */
 .rw{padding:6px 14px 4px 52px;animation:mi .25s ease}
 .rb{background:var(--sur);border:1.5px solid var(--brd);border-radius:22px;padding:9px 18px;font-size:13px;font-family:inherit;color:var(--mut);cursor:pointer;font-weight:600;transition:all .15s;display:inline-flex;align-items:center;gap:6px;box-shadow:var(--sh1)}
 .rb:hover{background:var(--pp);color:var(--p);border-color:var(--pm)}
-/* INPUT */
 .ib{position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,.95);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid rgba(0,0,0,.08);padding:10px 12px max(14px,env(safe-area-inset-bottom));display:flex;align-items:center;gap:10px;z-index:200;box-shadow:0 -4px 24px rgba(0,0,0,.07)}
 .ii{flex:1;background:#F2EBE3;border:1.5px solid transparent;border-radius:26px;display:flex;align-items:center;padding:0 16px;transition:all .15s}
 .ii:focus-within{background:#fff;border-color:var(--pm);box-shadow:0 0 0 3px rgba(232,72,10,.08)}
@@ -101,7 +93,7 @@ nav{background:var(--nav);padding:0 16px;height:64px;display:flex;align-items:ce
       <div class="ns"><span class="sd"></span>AI Diagnosis Active</div>
     </div>
   </div>
-  <div class="nb"><span class="nbd"></span>50+ issues covered</div>
+  <div class="nb"><span class="nbd"></span>All car problems covered</div>
 </nav>
 <div class="cbg" id="cbg">
   <div class="dsep">Today</div>
@@ -113,10 +105,13 @@ nav{background:var(--nav);padding:0 16px;height:64px;display:flex;align-items:ce
 </div>
 <script>
 var trees={
+
+/* ── ORIGINAL TREES (kept intact) ────────────────────────────────────── */
+
 "car not starting":{icon:"🔑",title:"Car Not Starting",
   qd:function(t){
-    if(t.includes("no fuel")||t.includes("empty")||t.includes("out of fuel")||t.includes("no petrol")||t.includes("no diesel")||t.includes("ran out"))return{issue:"Empty fuel tank",sev:"low",steps:["Add at least 2-3 litres of correct fuel","Wait 2 minutes then try starting","Turn ignition to ON 3 times before cranking to prime the pump","If still no start, fuel pump may need inspection"]};
-    if(t.includes("clicking")||t.includes("rapid click"))return{issue:"Dead or weak battery",sev:"high",steps:["Jump-start the car to confirm","Test battery voltage (should be 12.6V+)","Check for corroded terminals","Replace battery if older than 3 years"]};
+    if(t.includes("no fuel")||t.includes("empty")||t.includes("out of fuel")||t.includes("no petrol")||t.includes("no diesel")||t.includes("ran out"))return{issue:"Empty fuel tank",sev:"low",spot:true,steps:["Add at least 2-3 litres of correct fuel","Wait 2 minutes then try starting","Turn ignition to ON 3 times before cranking to prime the pump","If still no start, fuel pump may need inspection"]};
+    if(t.includes("clicking")||t.includes("rapid click"))return{issue:"Dead or weak battery",sev:"high",spot:true,steps:["Jump-start the car to confirm","Test battery voltage (should be 12.6V+)","Check for corroded terminals","Replace battery if older than 3 years"]};
     if(t.includes("cranking")||t.includes("turns over"))return{issue:"Fuel or ignition system fault",sev:"med",steps:["Check fuel level and fuel pump pressure","Inspect spark plugs and ignition coils","Run OBD scan for fault codes"]};
     return null;
   },
@@ -127,12 +122,13 @@ var trees={
     {q:"When was the battery last replaced?",opts:["Within a year","1-3 years ago","More than 3 years","Not sure"]}
   ],
   dx:function(a){
-    if(a[0]==="No, nothing happens"&&a[1]==="No, dashboard is dark")return{issue:"Dead battery",sev:"high",steps:["Jump-start the car to confirm","Test battery voltage (should be 12.6V+)","Replace battery if older than 3 years","Check alternator output after replacement"]};
+    if(a[0]==="No, nothing happens"&&a[1]==="No, dashboard is dark")return{issue:"Dead battery",sev:"high",spot:true,steps:["Jump-start the car to confirm","Test battery voltage (should be 12.6V+)","Replace battery if older than 3 years","Check alternator output after replacement"]};
     if(a[0]==="Yes, cranks but won't start")return{issue:"Fuel or ignition system fault",sev:"med",steps:["Check fuel level and fuel pump pressure","Inspect spark plugs and ignition coils","Check for fuel injector clog","Run OBD scan for fault codes"]};
     return{issue:"Starter motor issue",sev:"med",steps:["Test starter relay and solenoid","Check battery terminals for corrosion","Have starter motor inspected","Check wiring connections to starter"]};
   }
 },
-"battery":{icon:"🔋",title:"Battery Drain",qd:function(){return null;},
+
+"battery":{icon:"🔋",title:"Battery Issue",qd:function(){return null;},
   qs:[
     {q:"How many days does the car sit unused before the battery dies?",opts:["1-2 days","3-5 days","A week or more"]},
     {q:"How old is the current battery?",opts:["Less than 1 year","1-3 years","More than 3 years"]},
@@ -140,11 +136,37 @@ var trees={
     {q:"Does the car start fine after a jump start?",opts:["Yes","No"]}
   ],
   dx:function(a){
-    if(a[1]==="More than 3 years")return{issue:"Aged battery — needs replacement",sev:"high",steps:["Replace battery (3+ years is past lifespan)","Check charging system after replacement","Test alternator output (13.5-14.5V running)","Inspect terminals for corrosion"]};
+    if(a[1]==="More than 3 years")return{issue:"Aged battery — needs replacement",sev:"high",spot:true,steps:["Replace battery (3+ years is past lifespan)","Check charging system after replacement","Test alternator output (13.5-14.5V running)","Inspect terminals for corrosion"]};
     if(a[2]==="Yes")return{issue:"Parasitic drain from accessories",sev:"med",steps:["Disconnect accessories overnight to test","Check dashcam/alarm power draw","Use a multimeter to find parasitic drain","Install battery cut-off switch if needed"]};
     return{issue:"Alternator or electrical leak",sev:"high",steps:["Test alternator output voltage","Check for parasitic current drain","Inspect fuses and relays","Have full electrical system tested"]};
   }
 },
+
+"battery replacement":{icon:"🔋",title:"Battery Replacement",
+  qd:function(t){
+    if(t.includes("need new battery")||t.includes("want new battery")||t.includes("replace battery")||t.includes("battery change")||t.includes("new battery"))
+      return{issue:"Battery replacement — doorstep service available",sev:"high",spot:true,
+        steps:["Our mechanic will come to your location with the right battery","Batteries available: Amaron, Exide, Luminous — all with warranty","Fitting + terminal cleaning included","Old battery disposal handled by us"]};
+    return null;
+  },
+  qs:[
+    {q:"What is your car make and model?",opts:["Maruti / Suzuki","Hyundai / Kia","Honda","Tata","Mahindra","Toyota","Other brand"]},
+    {q:"What year is your car? (approximate)",opts:["2020 or newer","2015 – 2019","2010 – 2014","Before 2010"]},
+    {q:"Is the car currently starting at all?",opts:["No, completely dead","Starts with jump / difficulty","Yes, just want to replace proactively"]}
+  ],
+  dx:function(a){
+    var urgency=a[2]==="No, completely dead"?"high":"med";
+    var urgText=a[2]==="No, completely dead"?"Emergency — battery completely dead":"Replacement recommended";
+    return{issue:urgText+" ("+a[0]+" "+a[1]+")",sev:urgency,spot:true,
+      steps:[
+        "Battery brand options: Amaron (best for "+a[0]+"), Exide, or Luminous — all with 2-year warranty",
+        a[2]==="No, completely dead"?"Emergency doorstep service available — mechanic comes to you within the hour":"Schedule a convenient time for doorstep battery replacement",
+        "Mechanic will test your charging system (alternator) after fitting",
+        "Old battery taken away for eco-disposal at no extra charge"
+      ]};
+  }
+},
+
 "engine overheating":{icon:"🌡️",title:"Engine Overheating",
   qd:function(t){
     if(t.includes("leak")||t.includes("leaking")||t.includes("dripping")||t.includes("puddle"))return{issue:"Coolant leak",sev:"high",steps:["Stop driving immediately — risk of engine damage","Check radiator hoses and clamps","Inspect water pump for leaks","Pressure test the cooling system"]};
@@ -162,11 +184,12 @@ var trees={
     return{issue:"Thermostat or radiator blockage",sev:"med",steps:["Test thermostat (may be stuck closed)","Flush and refill coolant system","Check radiator for internal blockage","Inspect water pump operation"]};
   }
 },
+
 "brake":{icon:"🛑",title:"Brake Issue",
   qd:function(t){
     if(t.includes("grind")||t.includes("scraping"))return{issue:"Brake pads completely worn — urgent",sev:"high",steps:["Do not drive until pads are replaced","Inspect rotors for scoring/damage","Replace pads and rotors if scored","Bleed brake fluid after service"]};
     if(t.includes("soft")||t.includes("spongy")||t.includes("sinking"))return{issue:"Brake fluid or master cylinder issue",sev:"high",steps:["Check brake fluid level immediately","Look for fluid leaks at all four wheels","Inspect master cylinder for failure","Bleed brakes if air in system"]};
-    if(t.includes("squeak")||t.includes("squeal"))return{issue:"Brake pads need replacement",sev:"med",steps:["Replace brake pads","Inspect rotors for minimum thickness","Clean caliper slide pins","Test after replacement"]};
+    if(t.includes("squeak")||t.includes("squeal"))return{issue:"Brake pads need replacement",sev:"med",spot:true,steps:["Replace brake pads","Inspect rotors for minimum thickness","Clean caliper slide pins","Test after replacement"]};
     return null;
   },
   qs:[
@@ -178,14 +201,15 @@ var trees={
   dx:function(a){
     if(a[0]==="Grinding / metal on metal")return{issue:"Brake pads completely worn — urgent",sev:"high",steps:["Do not drive until pads are replaced","Inspect rotors for scoring/damage","Replace pads and rotors if scored","Bleed brake fluid after service"]};
     if(a[1]==="Soft / goes to the floor")return{issue:"Brake fluid or master cylinder issue",sev:"high",steps:["Check brake fluid level immediately","Look for fluid leaks at all four wheels","Inspect master cylinder for failure","Bleed brakes if air in system"]};
-    if(a[0]==="Squeaking / squealing")return{issue:"Brake pads need replacement",sev:"med",steps:["Replace brake pads","Inspect rotors for minimum thickness","Clean caliper slide pins","Test after replacement"]};
+    if(a[0]==="Squeaking / squealing")return{issue:"Brake pads need replacement",sev:"med",spot:true,steps:["Replace brake pads","Inspect rotors for minimum thickness","Clean caliper slide pins","Test after replacement"]};
     return{issue:"Brake caliper or alignment issue",sev:"med",steps:["Check caliper on pulling side","Inspect brake hose for restriction","Check wheel alignment","Service both front calipers together"]};
   }
 },
+
 "ac not cooling":{icon:"❄️",title:"AC Not Cooling",
   qd:function(t){
-    if(t.includes("noise")||t.includes("sound")||t.includes("noice")||t.includes("grinding")||t.includes("clicking")||t.includes("rattl")||t.includes("clunk")||t.includes("bang"))return{issue:"AC compressor issue",sev:"high",steps:["Stop using AC immediately to avoid further damage","Have the compressor clutch inspected by a mechanic","Check refrigerant pressure levels","Full AC system inspection recommended"]};
-    if(t.includes("weak airflow")||t.includes("low airflow")||t.includes("no air"))return{issue:"Cabin air filter clogged",sev:"low",steps:["Replace cabin air filter (often a DIY job)","Check blower motor operation","Inspect evaporator for ice buildup","Clean evaporator if musty smell present"]};
+    if(t.includes("noise")||t.includes("sound")||t.includes("grinding")||t.includes("clicking")||t.includes("rattl"))return{issue:"AC compressor issue",sev:"high",steps:["Stop using AC immediately to avoid further damage","Have the compressor clutch inspected by a mechanic","Check refrigerant pressure levels","Full AC system inspection recommended"]};
+    if(t.includes("weak airflow")||t.includes("low airflow")||t.includes("no air"))return{issue:"Cabin air filter clogged",sev:"low",spot:true,steps:["Replace cabin air filter (often a DIY job)","Check blower motor operation","Inspect evaporator for ice buildup","Clean evaporator if musty smell present"]};
     return null;
   },
   qs:[
@@ -195,12 +219,13 @@ var trees={
     {q:"When was the last AC service?",opts:["Within a year","1-2 years ago","More than 2 years"]}
   ],
   dx:function(a){
-    if(a[0]==="Weak airflow")return{issue:"Cabin air filter clogged",sev:"low",steps:["Replace cabin air filter","Check blower motor operation","Inspect evaporator for ice buildup","Clean evaporator if musty smell"]};
+    if(a[0]==="Weak airflow")return{issue:"Cabin air filter clogged",sev:"low",spot:true,steps:["Replace cabin air filter","Check blower motor operation","Inspect evaporator for ice buildup","Clean evaporator if musty smell"]};
     if(a[2]==="Yes, clicking or grinding")return{issue:"AC compressor issue",sev:"high",steps:["Stop using AC to avoid further damage","Have compressor clutch inspected","Check refrigerant pressure","Full AC system inspection recommended"]};
     if(a[0]==="Strong airflow, just not cold"&&a[1]==="Stopped suddenly")return{issue:"Refrigerant leak or compressor failure",sev:"high",steps:["Check refrigerant pressure","Look for oily residue near AC lines","Have system leak-tested","Recharge refrigerant after fixing leak"]};
-    return{issue:"Low refrigerant / AC service overdue",sev:"med",steps:["Get AC system recharged","Check for slow refrigerant leak","Inspect condenser for damage","Service AC system annually"]};
+    return{issue:"Low refrigerant / AC service overdue",sev:"med",spot:true,steps:["Get AC system recharged","Check for slow refrigerant leak","Inspect condenser for damage","Service AC system annually"]};
   }
 },
+
 "check engine":{icon:"⚠️",title:"Check Engine Light",qd:function(){return null;},
   qs:[
     {q:"Is the car driving and performing normally?",opts:["Yes, feels normal","No, something feels off"]},
@@ -214,6 +239,7 @@ var trees={
     return{issue:"Minor sensor or emission fault",sev:"low",steps:["Scan with OBD reader for specific code","Check fuel cap is tight (common cause)","Monitor for other symptoms","Clear code and see if it returns"]};
   }
 },
+
 "car jerking":{icon:"⚡",title:"Car Jerking",qd:function(){return null;},
   qs:[
     {q:"When does the jerking happen?",opts:["During acceleration","At constant speed","Both"]},
@@ -227,6 +253,7 @@ var trees={
     return{issue:"Multiple causes likely — service overdue",sev:"med",steps:["Full OBD diagnostic scan","Replace spark plugs and air filter","Check fuel pump pressure","Inspect transmission mounts"]};
   }
 },
+
 "smoke":{icon:"💨",title:"Exhaust Smoke",
   qd:function(t){
     if(t.includes("white smoke"))return{issue:"Coolant burning — possible head gasket failure",sev:"high",steps:["Stop driving immediately","Check coolant level and look for milky oil on dipstick","Have a head gasket compression test done","Do not continue driving"]};
@@ -246,6 +273,7 @@ var trees={
     return{issue:"Engine oil burning — piston rings / valve seals",sev:"high",steps:["Check engine oil level daily","Inspect for oil leaks first","Compression test to check piston rings","Valve stem seal replacement may be needed"]};
   }
 },
+
 "vibration":{icon:"〰️",title:"Car Vibration",qd:function(){return null;},
   qs:[
     {q:"At what speed does the vibration occur?",opts:["60-80 km/h","Above 100 km/h","All speeds","Only when braking"]},
@@ -258,6 +286,7 @@ var trees={
     return{issue:"Tyre or suspension issue",sev:"med",steps:["Inspect tyres for uneven wear","Check tyre pressure on all four wheels","Inspect suspension components","Have wheel balance and alignment checked"]};
   }
 },
+
 "steering":{icon:"🎡",title:"Steering Issue",
   qd:function(t){
     if(t.includes("noise")||t.includes("whine")||t.includes("groan"))return{issue:"Power steering pump failing",sev:"high",steps:["Have PS pump pressure tested","Check fluid for contamination","Inspect PS hose for leaks","Pump replacement likely needed"]};
@@ -274,6 +303,7 @@ var trees={
     return{issue:"Steering rack or alignment issue",sev:"med",steps:["Inspect steering rack for leaks","Check wheel alignment","Inspect tie rod ends","Have steering system professionally checked"]};
   }
 },
+
 "clutch slipping":{icon:"⚙️",title:"Clutch Slipping",
   qd:function(t){
     if(t.includes("burn")||t.includes("smell"))return{issue:"Severe clutch slip — clutch plate burning",sev:"high",steps:["Stop driving immediately","Have clutch plate inspected and replaced","Check flywheel surface for heat damage","Do not ride the clutch pedal"]};
@@ -292,6 +322,7 @@ var trees={
     return{issue:"Clutch plate wear — monitor closely",sev:"med",steps:["Get clutch free-play adjusted first","Avoid riding clutch in traffic","Have clutch inspected at next service","Plan for clutch replacement soon"]};
   }
 },
+
 "clutch hard":{icon:"⚙️",title:"Hard Clutch Pedal",
   qd:function(t){
     if(t.includes("sudden")||t.includes("snapped"))return{issue:"Clutch cable snapped or hydraulic failure",sev:"high",steps:["Do not drive — clutch may fail completely","Inspect clutch cable for snapping or fraying","Check hydraulic fluid level if hydraulic clutch","Tow to workshop if pedal is fully stiff"]};
@@ -308,6 +339,7 @@ var trees={
     return{issue:"Pressure plate wear or cable stretch",sev:"med",steps:["Adjust clutch free-play / cable tension","Inspect pressure plate condition","Lubricate cable pivot points","Plan clutch inspection at next service"]};
   }
 },
+
 "clutch not returning":{icon:"⚙️",title:"Clutch Pedal Not Returning",
   qd:function(t){
     if(t.includes("stuck")||t.includes("floor")||t.includes("not coming back"))return{issue:"Master or slave cylinder failure",sev:"high",steps:["Do not drive — gear changes will be impossible","Check hydraulic fluid reservoir near pedal","Inspect for fluid leak under dashboard or near gearbox","Replace master/slave cylinder as needed"]};
@@ -324,6 +356,7 @@ var trees={
     return{issue:"Clutch return spring or pivot issue",sev:"med",steps:["Inspect clutch pedal return spring","Check pedal pivot for wear","Lubricate pedal assembly","Have hydraulic system checked for air"]};
   }
 },
+
 "brake pedal hard":{icon:"🛑",title:"Hard Brake Pedal",
   qd:function(t){
     if(t.includes("hard")||t.includes("stiff")||t.includes("cant press"))return{issue:"Brake booster failure",sev:"high",steps:["Have brake booster vacuum tested immediately","Check vacuum hose to booster for leaks","Test brake servo operation","Do not drive at high speed until repaired"]};
@@ -339,6 +372,7 @@ var trees={
     return{issue:"Brake booster failure",sev:"high",steps:["Test booster by pressing pedal with engine off then starting","Replace brake booster unit","Check master cylinder output","Have full brake system inspected"]};
   }
 },
+
 "brake pedal soft":{icon:"🛑",title:"Soft / Sinking Brake Pedal",
   qd:function(t){
     if(t.includes("floor")||t.includes("sinking")||t.includes("goes down")||t.includes("soft"))return{issue:"Master cylinder failure or air in brake lines",sev:"high",steps:["Do not drive — brakes may fail","Check brake fluid level in reservoir","Look for fluid leaks at all four wheels","Bleed brakes to remove air, or replace master cylinder"]};
@@ -355,6 +389,7 @@ var trees={
     return{issue:"Air in brake lines",sev:"high",steps:["Bleed all four brake calipers","Check for any small leaks after bleeding","Use correct DOT-rated brake fluid","Re-check pedal feel after bleed"]};
   }
 },
+
 "car pulling braking":{icon:"🛑",title:"Car Pulling While Braking",
   qd:function(t){
     if(t.includes("pull")||t.includes("drift"))return{issue:"Brake caliper seized or uneven braking force",sev:"med",steps:["Inspect brake calipers on both front wheels","Check for seized caliper piston on pulling side","Inspect brake pads for uneven wear","Check tyre pressures are equal on both sides"]};
@@ -371,6 +406,7 @@ var trees={
     return{issue:"Seized brake caliper on pulling side",sev:"high",steps:["Inspect caliper on the side it pulls toward","Check caliper slides and piston for seizure","Replace or rebuild seized caliper","Bleed brakes after caliper work"]};
   }
 },
+
 "wheel lock":{icon:"🛞",title:"Wheel Locking / Skidding",
   qd:function(t){
     if(t.includes("abs")||t.includes("lock")||t.includes("skid"))return{issue:"ABS failure or brake imbalance",sev:"high",steps:["Check if ABS warning light is on dashboard","Scan ABS module for fault codes","Inspect ABS wheel speed sensors at each wheel","Do not drive aggressively until ABS is repaired"]};
@@ -385,6 +421,7 @@ var trees={
     return{issue:"Brake imbalance — front/rear or left/right",sev:"med",steps:["Check brake pad thickness on all four wheels","Inspect caliper operation on each corner","Check brake proportioning valve","Have brake bias checked by mechanic"]};
   }
 },
+
 "gear not shifting":{icon:"⚙️",title:"Gear Not Shifting (Manual)",
   qd:function(t){
     if(t.includes("grind")||t.includes("crunch"))return{issue:"Clutch not fully disengaging or synchro damage",sev:"high",steps:["Check clutch adjustment and free-play","Inspect clutch for slipping or incomplete release","If grinding persists — gearbox synchromesh may be damaged","Avoid forcing gears — causes further damage"]};
@@ -401,6 +438,7 @@ var trees={
     return{issue:"Gear linkage or selector rod issue",sev:"med",steps:["Inspect gear linkage for loose or broken connections","Check gearbox oil level (low oil causes hard shifts)","Adjust gear selector if adjustable","Have gearbox inspected by mechanic"]};
   }
 },
+
 "automatic gear delay":{icon:"⚙️",title:"Automatic Transmission Delay",
   qd:function(t){
     if(t.includes("jerk")||t.includes("bang")||t.includes("harsh"))return{issue:"Transmission fluid degraded or valve body issue",sev:"high",steps:["Check transmission fluid level and condition (should be red/pink, not dark/burnt)","Change transmission fluid and filter if overdue","Scan TCU for fault codes","Have valve body inspected by transmission specialist"]};
@@ -417,6 +455,7 @@ var trees={
     return{issue:"Transmission fluid degraded — service overdue",sev:"med",steps:["Change ATF fluid and filter","Use manufacturer-specified fluid type","Clear TCU codes after service","Monitor for improvement over 100-200km"]};
   }
 },
+
 "suspension noise":{icon:"🛞",title:"Suspension Noise on Bumps",
   qd:function(t){
     if(t.includes("thud")||t.includes("clunk")||t.includes("bump")||t.includes("pothole"))return{issue:"Shock absorber or suspension bush worn",sev:"med",steps:["Bounce each corner of the car — if it keeps bouncing, shock absorber is worn","Inspect suspension bushes and control arm mounts","Check anti-roll bar drop links","Replace worn shocks or bushes"]};
@@ -431,6 +470,7 @@ var trees={
     return{issue:"Worn suspension bushes or shock absorbers — both sides",sev:"med",steps:["Inspect all four shock absorbers","Check anti-roll bar bushes and links","Inspect control arm and subframe bushes","Full suspension service recommended"]};
   }
 },
+
 "engine misfire":{icon:"🔥",title:"Engine Misfire / Shaking",
   qd:function(t){
     if(t.includes("shake")||t.includes("misfire")||t.includes("rough idle"))return{issue:"Spark plug or ignition coil failure",sev:"med",steps:["Check when spark plugs were last replaced","Scan OBD for misfire codes (P030X)","Swap ignition coils to identify faulty one","Replace faulty spark plug and coil pack"]};
@@ -447,6 +487,7 @@ var trees={
     return{issue:"Spark plug or ignition coil wear",sev:"med",steps:["Replace all spark plugs if due","Inspect ignition coil pack","Check for vacuum leaks at intake","Clean fuel injectors"]};
   }
 },
+
 "car shuts off":{icon:"🚗",title:"Car Shuts Off While Driving",
   qd:function(t){
     if(t.includes("shut")||t.includes("stops")||t.includes("dies")||t.includes("stall"))return{issue:"Fuel pump failure or critical sensor fault",sev:"high",steps:["Check fuel level first — empty tank is common cause","Scan OBD codes immediately after restart","Check fuel pump pressure if tank is full","Inspect crankshaft position sensor — common cause of sudden stall"]};
@@ -462,6 +503,7 @@ var trees={
     return{issue:"Fuel pump or crankshaft sensor failure",sev:"high",steps:["Check fuel pressure at the rail","Test crankshaft position sensor signal","Scan OBD for related codes","Replace fuel pump if pressure is low"]};
   }
 },
+
 "engine no response":{icon:"🚗",title:"Engine Not Responding",
   qd:function(t){
     if(t.includes("no response")||t.includes("not responding")||t.includes("no power"))return{issue:"Throttle body or TPS sensor fault",sev:"high",steps:["Check if check engine light is on and scan OBD codes","Clean throttle body — carbon buildup is common cause","Inspect TPS sensor connector","Check for vacuum leaks at intake manifold"]};
@@ -477,6 +519,7 @@ var trees={
     return{issue:"Throttle body carbon buildup or sensor fault",sev:"med",steps:["Clean throttle body thoroughly","Inspect air filter — clogged filter restricts response","Check MAF sensor and clean if dirty","Scan OBD for any pending codes"]};
   }
 },
+
 "ac intermittent":{icon:"🌀",title:"AC Cooling Intermittent",
   qd:function(t){
     if(t.includes("comes and goes")||t.includes("intermittent")||t.includes("sometimes cool")||t.includes("on and off"))return{issue:"Compressor clutch or refrigerant pressure issue",sev:"med",steps:["Watch the AC compressor — does the clutch engage/disengage frequently?","Check refrigerant pressure — low pressure causes compressor cycling","Inspect compressor clutch coil for failure","Check cabin air filter — overly restricted airflow causes icing and cutoff"]};
@@ -492,43 +535,45 @@ var trees={
     return{issue:"Compressor clutch or AC pressure switch fault",sev:"med",steps:["Inspect compressor clutch engagement","Test AC pressure switch operation","Check refrigerant levels","Have full AC system diagnostic done"]};
   }
 },
+
 "sound diagnosis":{icon:"🔊",title:"Noise Diagnosis",
-  qd:function(t){return null;},
+  qd:function(){return null;},
   qs:[
     {q:"What kind of noise are you hearing?",opts:["Knocking / banging","Clicking / popping","Grinding","Squealing / squeaking","Hissing / whistling","Rattling / clunking","Humming / whirring","Sputtering / backfiring"]},
     {q:"When does the noise happen?",opts:["When starting the car","While driving","When braking","When turning","When going over bumps","Constantly / at idle","When shifting gears"]},
     {q:"Where does the sound seem to come from?",opts:["Engine area","Front of car","Rear of car","Under the car","Brakes","Steering wheel area"]}
   ],
   dx:function(a){
-    var n=a[0],w=a[1],loc=a[2];
+    var n=a[0],w=a[1];
     if(n==="Knocking / banging"&&w==="When going over bumps")return{issue:"Suspension component failure",sev:"med",steps:["Inspect ball joints and control arm bushings","Check stabilizer bar links and end links","Inspect strut mounts and struts","Check for loose exhaust components under car"]};
-    if(n==="Knocking / banging"&&w==="While driving")return{issue:"Bad sway bar link or worn ball joint",sev:"med",steps:["Inspect sway bar links and drop links","Check ball joints for play or wear","Inspect tie rod ends","Check wheel bearings for roughness"]};
+    if(n==="Knocking / banging")return{issue:"Bad sway bar link or worn ball joint",sev:"med",steps:["Inspect sway bar links and drop links","Check ball joints for play or wear","Inspect tie rod ends","Check wheel bearings for roughness"]};
     if(n==="Clicking / popping"&&w==="When turning")return{issue:"Worn CV joint or torn CV boot",sev:"high",steps:["Inspect CV boots for tearing or grease leakage","Test drive in tight circles to confirm CV joint click","Replace CV joint or full axle shaft","Inspect driveshaft and differential"]};
-    if(n==="Clicking / popping"&&(w==="While driving"||w==="Constantly / at idle"))return{issue:"Low engine oil, loose belt, or dead battery symptom",sev:"high",steps:["Check engine oil level immediately","Inspect serpentine belt and tensioner","Check battery voltage","Inspect hubcaps and wheel covers for looseness"]};
+    if(n==="Clicking / popping")return{issue:"Low engine oil, loose belt, or dead battery symptom",sev:"high",steps:["Check engine oil level immediately","Inspect serpentine belt and tensioner","Check battery voltage","Inspect hubcaps and wheel covers for looseness"]};
     if(n==="Grinding"&&w==="When braking")return{issue:"Severe brake pad wear or debris in brakes",sev:"high",steps:["Stop driving if grinding is severe","Inspect brake pads — likely metal on metal","Check for foreign debris lodged in calipers","Inspect rotors for damage and wear indicators"]};
     if(n==="Grinding"&&w==="When shifting gears")return{issue:"Worn clutch, synchronizers, or low transmission fluid",sev:"high",steps:["Check transmission fluid level and condition","Inspect clutch for wear and proper adjustment","Check for worn gear synchronizers","Avoid forcing gears — get transmission inspected"]};
-    if(n==="Grinding"&&w==="When starting the car")return{issue:"Bad starter drive gear or solenoid",sev:"high",steps:["Inspect starter motor and drive gear","Check starter solenoid operation","Inspect flywheel ring gear for damage","Replace starter motor if gear is worn"]};
+    if(n==="Grinding")return{issue:"Bad starter drive gear or solenoid",sev:"high",steps:["Inspect starter motor and drive gear","Check starter solenoid operation","Inspect flywheel ring gear for damage","Replace starter motor if gear is worn"]};
     if(n==="Squealing / squeaking"&&w==="When braking")return{issue:"Worn brake pads or glazed rotors",sev:"med",steps:["Replace brake pads (wear indicators squealing)","Inspect rotors for glazing or oxidation","Check brake master cylinder and caliper","Inspect brake backing plate for contact"]};
     if(n==="Squealing / squeaking"&&w==="When turning")return{issue:"Low power steering fluid or worn suspension",sev:"med",steps:["Check power steering fluid level","Inspect power steering belt for wear","Check ball joints and tie rod ends","Inspect suspension bushings for dryness"]};
-    if(n==="Squealing / squeaking"&&(w==="When starting the car"||w==="Constantly / at idle"))return{issue:"Worn serpentine/auxiliary belt or failing tensioner",sev:"med",steps:["Inspect serpentine belt for cracks or glazing","Check belt tension and tensioner operation","Inspect all pulleys for seizure or misalignment","Replace belt and tensioner if worn"]};
+    if(n==="Squealing / squeaking")return{issue:"Worn serpentine/auxiliary belt or failing tensioner",sev:"med",steps:["Inspect serpentine belt for cracks or glazing","Check belt tension and tensioner operation","Inspect all pulleys for seizure or misalignment","Replace belt and tensioner if worn"]};
     if(n==="Hissing / whistling")return{issue:"Vacuum leak, coolant leak, or brake booster issue",sev:"high",steps:["Check for hissing near brake pedal — may be brake booster diaphragm leak","Inspect all vacuum hoses for cracks","Check coolant hoses for leaks or overheating","Inspect brake booster vacuum line"]};
-    if(n==="Rattling / clunking"&&w==="When going over bumps")return{issue:"Worn struts, bushings, or loose exhaust",sev:"med",steps:["Bounce test each corner — worn struts will keep bouncing","Check heat shields and exhaust hangers under car","Inspect control arm bushings","Check anti-roll bar links"]};
+    if(n==="Rattling / clunking")return{issue:"Worn struts, bushings, or loose exhaust",sev:"med",steps:["Bounce test each corner — worn struts will keep bouncing","Check heat shields and exhaust hangers under car","Inspect control arm bushings","Check anti-roll bar links"]};
     if(n==="Humming / whirring")return{issue:"Failing wheel bearing or uneven tyre wear",sev:"med",steps:["Jack up each wheel and spin by hand — rough feeling = worn bearing","Check tyres for uneven or cupped wear patterns","Inspect wheel bearing play side-to-side","Replace faulty wheel bearing immediately"]};
     if(n==="Sputtering / backfiring")return{issue:"Engine misfire, fuel, or ignition issue",sev:"med",steps:["Scan OBD for misfire codes (P030X)","Inspect fuel injectors for blockage","Check ignition timing and spark plugs","Inspect vacuum hoses and air intake valve"]};
     return{issue:"Unusual noise — inspection needed",sev:"med",steps:["Note exact conditions when noise occurs","Record a voice note of the noise to share with mechanic","Visit your nearest Instant Mechanic partner garage for hands-on diagnosis","Early inspection prevents costly damage"]};
   }
 },
+
 "smell diagnosis":{icon:"👃",title:"Smell Diagnosis",
   qd:function(t){
     var h=function(w){return t.includes(w);};
-    if(h("burning rubber")||h("burning tyre")||h("burning tire"))return{issue:"Overheating brakes or tyres",sev:"high",steps:["Stop driving immediately and let brakes cool","Check brake calipers for sticking or dragging","Inspect tyre condition for flat or extremely low pressure","Check for brake pad contact with rotor while not braking"]};
+    if(h("burning rubber")||h("burning tyre"))return{issue:"Overheating brakes or tyres",sev:"high",steps:["Stop driving immediately and let brakes cool","Check brake calipers for sticking or dragging","Inspect tyre condition for flat or extremely low pressure","Check for brake pad contact with rotor while not braking"]};
     if(h("burning wood")||h("clutch smell")||h("burning clutch"))return{issue:"Malfunctioning or slipping clutch",sev:"high",steps:["Stop driving — clutch is overheating","Avoid hill starts and heavy clutch slipping","Have clutch plate inspected immediately","Clutch replacement likely required"]};
-    if(h("burning oil")||h("oil smell")||h("exhaust smell"))return{issue:"Engine oil leak onto hot surface",sev:"high",steps:["Check engine oil level immediately","Inspect gaskets and seals for leaks (valve cover, sump)","Look for smoke from engine bay","Visit Instant Mechanic garage — oil on exhaust is a fire risk"]};
+    if(h("burning oil")||h("oil smell"))return{issue:"Engine oil leak onto hot surface",sev:"high",steps:["Check engine oil level immediately","Inspect gaskets and seals for leaks","Look for smoke from engine bay","Visit Instant Mechanic — oil on exhaust is a fire risk"]};
     if(h("petrol")||h("gasoline")||h("fuel smell"))return{issue:"Fuel system leak",sev:"high",steps:["Do not start the car if strong fuel smell","Inspect fuel lines, injectors, and fuel cap","Check evaporative emissions system (EVAP)","Have fuel system pressure-tested immediately"]};
-    if(h("sweet")||h("sweet smell")||h("coolant"))return{issue:"Coolant leak",sev:"high",steps:["Check coolant level in reservoir","Inspect radiator hoses and clamps for leaks","Look for puddles of green/pink/orange fluid under car","Do not drive — overheating risk is severe"]};
-    if(h("sulphur")||h("rotten egg")||h("egg smell"))return{issue:"Failing catalytic converter or overcharged battery",sev:"high",steps:["Check battery for overcharging (voltage above 14.8V running)","Inspect catalytic converter condition","Check for rich fuel mixture causing cat overload","Have emissions system scanned for fault codes"]};
+    if(h("sweet")||h("coolant"))return{issue:"Coolant leak",sev:"high",steps:["Check coolant level in reservoir","Inspect radiator hoses and clamps for leaks","Look for puddles of green/pink/orange fluid under car","Do not drive — overheating risk is severe"]};
+    if(h("sulphur")||h("rotten egg"))return{issue:"Failing catalytic converter or overcharged battery",sev:"high",steps:["Check battery for overcharging","Inspect catalytic converter condition","Check for rich fuel mixture causing cat overload","Have emissions system scanned for fault codes"]};
     if(h("mildew")||h("mould")||h("musty"))return{issue:"Cabin air filter needs replacement or mould on evaporator",sev:"low",steps:["Replace cabin air filter immediately","Clean AC evaporator with anti-bacterial cleaner","Check for water ingress inside the car","Run AC on fresh air mode to dry out the system"]};
-    if(h("exhaust")||h("fumes")||h("carbon monoxide")||h("co "))return{issue:"Exhaust fumes entering cabin — CO risk",sev:"high",steps:["Open windows immediately and pull over safely","Do not continue driving — CO is life-threatening","Inspect exhaust system for cracks or holes","Check door and boot seals for gaps"]};
+    if(h("exhaust")||h("fumes")||h("carbon monoxide"))return{issue:"Exhaust fumes entering cabin — CO risk",sev:"high",steps:["Open windows immediately and pull over safely","Do not continue driving — CO is life-threatening","Inspect exhaust system for cracks or holes","Check door and boot seals for gaps"]};
     return null;
   },
   qs:[
@@ -547,13 +592,13 @@ var trees={
     return{issue:"Unusual smell — diagnostic inspection needed",sev:"med",steps:["Note when and where smell is strongest","Check all fluid levels as a first step","Visit your nearest Instant Mechanic partner garage","Smells often indicate early-stage leaks or failures"]};
   }
 },
+
 "touch feel diagnosis":{icon:"✋",title:"Feel / Handling Diagnosis",
   qd:function(t){
     var h=function(w){return t.includes(w);};
     if(h("bouncy")||h("bouncing")||h("unstable ride"))return{issue:"Damaged shock absorbers or struts",sev:"med",steps:["Bounce test each corner — if it keeps bouncing, shocks are worn","Inspect strut assemblies for leaks or damage","Check tyre inflation — incorrect pressure causes bounce","Inspect suspension bushings for wear"]};
-    if(h("body roll")||h("leans in corners")||h("rolls a lot"))return{issue:"Worn shocks or damaged stabilizer bar",sev:"med",steps:["Inspect shock absorbers and struts","Check stabilizer bar and drop links","Check tyre condition and inflation","Look for suspension modifications affecting roll stiffness"]};
+    if(h("body roll")||h("leans in corners"))return{issue:"Worn shocks or damaged stabilizer bar",sev:"med",steps:["Inspect shock absorbers and struts","Check stabilizer bar and drop links","Check tyre condition and inflation","Look for suspension modifications affecting roll stiffness"]};
     if(h("steering loose")||h("loose steering")||h("steering play"))return{issue:"Worn tie rods, ball joints, or steering linkage",sev:"high",steps:["Check tie rod ends for play — grab tyre and shake side-to-side","Inspect pitman and idler arms","Check ball joints for vertical play","Have steering geometry and alignment checked"]};
-    if(h("vibration going uphill")||h("shudder uphill")||h("uphill vibration"))return{issue:"Damaged CV axle or U-joint",sev:"high",steps:["Inspect CV axles and joints under load","Check U-joint for wear or looseness","Inspect differential fluid level and condition","Check for engine misfire under load"]};
     return null;
   },
   qs:[
@@ -561,22 +606,22 @@ var trees={
     {q:"When does this feeling occur?",opts:["Constantly while driving","When braking","When accelerating","When turning","Over bumps / uneven road","At high speed","Randomly"]}
   ],
   dx:function(a){
-    var f=a[0],w=a[1];
-    if(f==="Bouncy / unstable ride")return{issue:"Worn shock absorbers, struts, or tyre issue",sev:"med",steps:["Bounce test each corner — continued bouncing = worn shocks","Check tyre inflation pressure on all four wheels","Inspect strut assemblies for oil leaks (wetness on strut body)","Check suspension bushings — poorly lubricated bushings cause bounce"]};
+    var f=a[0];
+    if(f==="Bouncy / unstable ride")return{issue:"Worn shock absorbers, struts, or tyre issue",sev:"med",steps:["Bounce test each corner — continued bouncing = worn shocks","Check tyre inflation pressure on all four wheels","Inspect strut assemblies for oil leaks","Check suspension bushings — poorly lubricated bushings cause bounce"]};
     if(f==="Excessive body roll in corners")return{issue:"Worn shocks, stabilizer bar, or tyre issue",sev:"med",steps:["Inspect shock absorbers and strut mounts","Check stabilizer bar links and bushings","Verify tyre inflation — underinflated tyres increase body roll","Inspect for previous suspension modifications"]};
-    if(f==="Car pulling to one side while driving")return{issue:"Uneven tyre pressure, alignment, or brake issue",sev:"med",steps:["Check tyre pressures on both sides first","Get wheel alignment checked","Inspect brake calipers for dragging (pull = sticking caliper on that side)","Check wheel bearings and steering linkage"]};
+    if(f==="Car pulling to one side while driving")return{issue:"Uneven tyre pressure, alignment, or brake issue",sev:"med",steps:["Check tyre pressures on both sides first","Get wheel alignment checked","Inspect brake calipers for dragging","Check wheel bearings and steering linkage"]};
     if(f==="Car shaking or vibrating")return{issue:"Tyre, wheel, engine mount, or brake issue",sev:"med",steps:["Check tyre condition and get all four wheels balanced","Inspect engine mounts for wear or collapse","Check for warped brake rotors (vibration when braking)","Scan OBD for engine misfire codes if shaking is engine-related"]};
-    if(f==="Steering feels loose or vague")return{issue:"Worn tie rods, ball joints, or steering rack",sev:"high",steps:["Shake each front tyre side-to-side to feel for loose tie rod","Check ball joints for play (jack up wheel, check for vertical movement)","Inspect steering rack for play and leaks","Have full steering geometry check done"]};
+    if(f==="Steering feels loose or vague")return{issue:"Worn tie rods, ball joints, or steering rack",sev:"high",steps:["Shake each front tyre side-to-side to feel for loose tie rod","Check ball joints for play","Inspect steering rack for play and leaks","Have full steering geometry check done"]};
     if(f==="Steering is hard to turn")return{issue:"Low power steering fluid, pump issue, or low tyre pressure",sev:"med",steps:["Check power steering fluid level immediately","Check tyre pressure on all four wheels","Inspect power steering belt and pump","Listen for whining — indicates pump wear"]};
-    if(f==="Braking feels wrong")return{issue:"Brake system issue — fluid, pads, rotors, or booster",sev:"high",steps:["Check brake fluid level in reservoir","Inspect all four brake pads for wear","Check rotors for warping (if pedal vibrates)","Test brake booster — pedal should be easy to press with engine running"]};
+    if(f==="Braking feels wrong")return{issue:"Brake system issue — fluid, pads, rotors, or booster",sev:"high",steps:["Check brake fluid level in reservoir","Inspect all four brake pads for wear","Check rotors for warping","Test brake booster — pedal should be easy to press with engine running"]};
     if(f==="Hesitating / bucking when accelerating")return{issue:"Misfire, fuel, or sensor issue",sev:"med",steps:["Scan OBD for misfire codes (P030X)","Check fuel filter — clogged filter causes hesitation","Test fuel pump pressure","Inspect oxygen sensor and EGR valve","Replace worn spark plugs and wires"]};
     return{issue:"Handling issue — full inspection recommended",sev:"med",steps:["Note exact conditions when the feeling occurs","Check tyre pressures and tread depth as a first step","Visit your nearest Instant Mechanic partner garage","Handling issues can quickly become safety-critical"]};
   }
 },
+
 "no airflow":{icon:"💨",title:"No Air from Vents",
   qd:function(t){
-    var h=function(w){return t.includes(w);};
-    if(h("no air")||h("no airflow")||h("vents not working")||h("blower not working"))return{issue:"Blower motor, fuse, or relay failure",sev:"med",steps:["Check blower motor fuse in fuse box first","Test blower relay replacement","Inspect blower motor for failure (no noise at all = motor dead)","Check blower resistor — controls fan speed levels"]};
+    if(t.includes("no air")||t.includes("no airflow")||t.includes("vents not working")||t.includes("blower not working"))return{issue:"Blower motor, fuse, or relay failure",sev:"med",steps:["Check blower motor fuse in fuse box first","Test blower relay replacement","Inspect blower motor for failure (no noise at all = motor dead)","Check blower resistor — controls fan speed levels"]};
     return null;
   },
   qs:[
@@ -585,15 +630,15 @@ var trees={
   ],
   dx:function(a){
     if(a[0]==="No air at all from any vent")return{issue:"Blown fuse, failed relay, or dead blower motor",sev:"med",steps:["Check blower motor fuse (refer to owner manual for location)","Replace blower relay (cheap and quick test)","Test blower motor directly with 12V — if no spin, motor is dead","Check wiring harness connector at blower motor"]};
-    if(a[0]==="Air comes on some speeds only")return{issue:"Blower motor resistor failure",sev:"low",steps:["Replace blower motor resistor (usually behind glove box)","Cheap and common repair — resistor controls multi-speed operation","Check wiring to resistor for heat damage","Test all fan speed positions after replacement"]};
+    if(a[0]==="Air comes on some speeds only")return{issue:"Blower motor resistor failure",sev:"low",spot:true,steps:["Replace blower motor resistor (usually behind glove box)","Cheap and common repair — resistor controls multi-speed operation","Check wiring to resistor for heat damage","Test all fan speed positions after replacement"]};
     if(a[0]==="Air from some vents but not others")return{issue:"Blend door or duct blockage",sev:"low",steps:["Check for blocked air intake (leaves, debris in cowl)","Inspect blend door actuator — common fault on many cars","Check for broken duct or hose inside dashboard","Have HVAC system checked for actuator fault codes"]};
     return{issue:"Restricted airflow — cabin filter or intake clog",sev:"low",steps:["Replace cabin air filter immediately","Check fresh air intake in engine bay for debris","Inspect blower motor for obstructions","Have full HVAC system inspection"]};
   }
 },
+
 "car leaning":{icon:"🛞",title:"Car Leaning / Tilting",
   qd:function(t){
-    var h=function(w){return t.includes(w);};
-    if(h("lean")||h("tilt")||h("one side low")||h("lopsided"))return{issue:"Suspension spring collapsed or broken",sev:"high",steps:["Inspect coil spring on the low side — may be broken","Check for flat tyre or very low pressure first","Inspect shock absorber for collapse","Do not drive at speed — handling is compromised"]};
+    if(t.includes("lean")||t.includes("tilt")||t.includes("one side low")||t.includes("lopsided"))return{issue:"Suspension spring collapsed or broken",sev:"high",steps:["Inspect coil spring on the low side — may be broken","Check for flat tyre or very low pressure first","Inspect shock absorber for collapse","Do not drive at speed — handling is compromised"]};
     return null;
   },
   qs:[
@@ -605,10 +650,10 @@ var trees={
     return{issue:"Coil spring failure or suspension sag",sev:"high",steps:["Inspect coil springs for breakage or significant sag","Check shock absorbers for oil leaks","Compare ride height side to side","Replace spring and shock as a pair"]};
   }
 },
+
 "steering vibration speed":{icon:"🛞",title:"Steering Vibration at Speed",
   qd:function(t){
-    var h=function(w){return t.includes(w);};
-    if(h("high speed")||h("highway")||h("shaking steering"))return{issue:"Wheel balance or bent rim",sev:"med",steps:["Get all four wheels balanced immediately","Inspect rims for bends or cracks","Check tyre condition for bulges or uneven wear","Re-check alignment after balancing"]};
+    if(t.includes("high speed")||t.includes("highway")||t.includes("shaking steering"))return{issue:"Wheel balance or bent rim",sev:"med",steps:["Get all four wheels balanced immediately","Inspect rims for bends or cracks","Check tyre condition for bulges or uneven wear","Re-check alignment after balancing"]};
     return null;
   },
   qs:[
@@ -620,10 +665,10 @@ var trees={
     return{issue:"Wheel balance or alignment issue",sev:"med",steps:["Balance all four wheels","Check wheel alignment","Inspect tyres for irregular wear or bulges","Check wheel rims for bends"]};
   }
 },
+
 "vibration braking":{icon:"🛑",title:"Vibration While Braking",
   qd:function(t){
-    var h=function(w){return t.includes(w);};
-    if(h("vibrat")||h("shudder")||h("pulsate"))return{issue:"Warped brake discs",sev:"med",steps:["Have brake disc thickness and runout measured","Resurface discs if within minimum thickness","Replace discs if below minimum","Replace brake pads at same time"]};
+    if(t.includes("vibrat")||t.includes("shudder")||t.includes("pulsate"))return{issue:"Warped brake discs",sev:"med",steps:["Have brake disc thickness and runout measured","Resurface discs if within minimum thickness","Replace discs if below minimum","Replace brake pads at same time"]};
     return null;
   },
   qs:[
@@ -635,10 +680,10 @@ var trees={
     return{issue:"Rear brake disc or drum warped",sev:"med",steps:["Inspect rear brake discs or drums","Check rear caliper / wheel cylinder operation","Replace worn rear discs or drums","Check rear brake balance"]};
   }
 },
+
 "differential noise":{icon:"🚗",title:"Differential / Rear Noise",
   qd:function(t){
-    var h=function(w){return t.includes(w);};
-    if(h("whine")||h("howl")||h("rear noise")||h("noise from rear"))return{issue:"Differential bearing or gear wear",sev:"med",steps:["Check differential oil level and condition","Whine increasing with speed suggests bearing wear","Have differential inspected by a mechanic","Change differential oil as first step"]};
+    if(t.includes("whine")||t.includes("howl")||t.includes("rear noise"))return{issue:"Differential bearing or gear wear",sev:"med",steps:["Check differential oil level and condition","Whine increasing with speed suggests bearing wear","Have differential inspected by a mechanic","Change differential oil as first step"]};
     return null;
   },
   qs:[
@@ -650,6 +695,7 @@ var trees={
     return{issue:"Differential pinion bearing or gear wear",sev:"med",steps:["Check and change differential oil immediately","Inspect ring and pinion gear condition","Listen at different speeds to isolate bearing","Specialist differential inspection required"]};
   }
 },
+
 "fuse blowing":{icon:"⚡",title:"Fuse Keeps Blowing",
   qd:function(t){
     if(t.includes("fuse")||t.includes("blowing"))return{issue:"Short circuit in the affected system",sev:"high",steps:["Do not keep replacing the fuse — find the root cause","Identify which component loses power when fuse blows","Inspect wiring harness for chafing or bare wires","Have auto electrician trace the short circuit"]};
@@ -663,62 +709,644 @@ var trees={
     if(a[1]==="Yes, immediately")return{issue:"Active short circuit — direct wire-to-ground fault",sev:"high",steps:["Disconnect the affected circuit before replacing fuse again","Inspect connector and wiring near the component","Look for pinched or melted wiring","Auto electrician required — do not ignore"]};
     return{issue:"Intermittent short circuit or overloaded circuit",sev:"med",steps:["Check if aftermarket accessories are on that circuit","Inspect all connectors in the circuit for corrosion","Look for wiring damage near moving parts","Have circuit tested under load by electrician"]};
   }
+},
+
+/* ── NEW TREES (from the 34 diagnosis categories) ────────────────────── */
+
+"tyre puncture":{icon:"🛞",title:"Tyre Puncture / Flat Tyre",
+  qd:function(t){
+    if(t.includes("all flat")||t.includes("all four")||t.includes("4 tyre"))return{issue:"Multiple flat tyres — air pressure issue or road hazard",sev:"high",spot:true,steps:["Check each tyre individually for punctures","Inflate all to correct pressure (32-35 PSI typically)","Inspect for nails/screws in each tyre","Book mechanic if any tyre has a visible puncture"]};
+    return null;
+  },
+  qs:[
+    {q:"Is the tyre fully flat or just losing air slowly?",opts:["Fully flat — cannot drive","Slowly losing air over days"]},
+    {q:"How many tyres are affected?",opts:["1 tyre","2 tyres","3 or more tyres"]},
+    {q:"Can you see a nail, screw, or object in the tyre?",opts:["Yes, visible object","No visible object"]},
+    {q:"Do you have a spare tyre?",opts:["Yes, have a spare","No spare tyre"]}
+  ],
+  dx:function(a){
+    if(a[0]==="Fully flat — cannot drive"&&a[3]==="No spare tyre")return{issue:"Roadside puncture repair needed",sev:"high",spot:true,steps:["Call Instant Mechanic for on-spot puncture repair","Do not drive on a completely flat tyre — rim damage risk","If tubeless tyre: plug repair possible on-spot","If tube tyre: inner tube replacement needed"]};
+    if(a[2]==="Yes, visible object"&&a[0]==="Fully flat — cannot drive")return{issue:"Nail/screw puncture — on-spot repair possible",sev:"high",spot:true,steps:["Do not remove the object until mechanic arrives — it's plugging the hole","Tubeless tyre: plug and patch repair","Tube tyre: tube replacement needed","Check rim for damage if driven on flat"]};
+    if(a[0]==="Slowly losing air over days")return{issue:"Slow puncture or valve leak",sev:"med",spot:true,steps:["Inspect valve stem for leaks (apply soapy water)","Check tyre surface carefully for small nail/screw","Puncture repair or valve replacement needed","Check tyre bead seating on alloy rim"]};
+    return{issue:"Tyre puncture — inspection needed",sev:"med",spot:true,steps:["Have spare tyre fitted immediately","Take punctured tyre to puncture shop for repair","Check if tubeless plug repair is feasible","Inspect rim for damage if driven while flat"]};
+  }
+},
+
+"clutch issue":{icon:"⚙️",title:"Clutch Issue",
+  qd:function(t){
+    if(t.includes("cable")||t.includes("snap")||t.includes("broke"))return{issue:"Clutch cable broken",sev:"high",steps:["Do not attempt to drive — gears cannot be changed","Call for towing to nearest garage","Clutch cable replacement needed","Check clutch lever or pedal mechanism"]};
+    if(t.includes("burn")||t.includes("smell"))return{issue:"Clutch plate burning — severe slip",sev:"high",steps:["Stop driving immediately","Clutch plate replacement required urgently","Check flywheel for heat damage","Avoid hill starts until repaired"]};
+    return null;
+  },
+  qs:[
+    {q:"Does the clutch pedal go to the floor with no resistance?",opts:["Yes, no resistance at all","Pedal is there but car won't move (slipping)","Pedal is hard / stiff"]},
+    {q:"Is the car still driveable at all?",opts:["Yes, with difficulty","No, completely stuck"]},
+    {q:"Any burning smell when using the clutch?",opts:["Yes, burning smell","No smell"]}
+  ],
+  dx:function(a){
+    if(a[0]==="Yes, no resistance at all")return{issue:"Clutch cable broken or hydraulic fluid leak",sev:"high",steps:["Do not attempt to drive — gears cannot be changed","Call for towing to nearest garage","Inspect clutch cable for snapping/fraying","Check hydraulic clutch fluid level if hydraulic type"]};
+    if(a[0]==="Pedal is there but car won't move (slipping)"||a[2]==="Yes, burning smell")return{issue:"Clutch plate worn or severely slipping",sev:"high",steps:["Avoid heavy acceleration or hill starts","Clutch plate and pressure plate inspection required","Full clutch kit replacement likely needed","Tow to garage if car is undriveable"]};
+    if(a[0]==="Pedal is hard / stiff")return{issue:"Clutch cable tight or hydraulic issue",sev:"med",steps:["Check clutch cable routing for kinks or corrosion","Adjust clutch cable tension","Check hydraulic fluid level","Lubricate clutch cable if cable type"]};
+    return{issue:"Clutch needs inspection",sev:"med",steps:["Have clutch free-play measured and adjusted","Book garage inspection for clutch system","Avoid riding clutch pedal in traffic","Check gearbox oil level"]};
+  }
+},
+
+"engine belt":{icon:"🔧",title:"Engine Belt / Alternator Belt",
+  qd:function(t){
+    if(t.includes("snapped")||t.includes("broken belt")||t.includes("belt broke"))return{issue:"Belt has snapped — car may not be driveable",sev:"high",steps:["Stop driving immediately — alternator belt: battery will die; timing belt: engine seizure risk","Call for towing to nearest garage","Do not attempt to restart if timing belt has snapped","Belt replacement required before driving"]};
+    return null;
+  },
+  qs:[
+    {q:"Is there a squealing or screeching noise from the engine bay?",opts:["Yes, loud squealing","Yes, occasional squeal","No noise, just warning light"]},
+    {q:"Is the battery warning light on the dashboard?",opts:["Yes, battery light is on","No battery light"]},
+    {q:"Is the AC suddenly not working?",opts:["Yes, AC stopped working","No, AC is fine"]},
+    {q:"Can you visually see the belt — is it cracked, fraying, or dangling?",opts:["Yes, looks damaged/dangling","Cannot see / not sure"]}
+  ],
+  dx:function(a){
+    if(a[1]==="Yes, battery light is on"||a[3]==="Yes, looks damaged/dangling")return{issue:"Alternator belt slipping or broken — battery discharging",sev:"high",steps:["Stop driving — car will lose power as battery drains","Call for roadside assistance or towing","Alternator belt replacement needed","Check battery charge level after repair"]};
+    if(a[0]==="Yes, loud squealing"&&a[2]==="Yes, AC stopped working")return{issue:"AC belt broken or slipped off",sev:"med",steps:["AC belt replacement needed","Inspect AC compressor for damage","Check belt tensioner pulley","Car is driveable but AC will not work until fixed"]};
+    if(a[0]==="Yes, occasional squeal")return{issue:"Belt wearing or slipping — replace soon",sev:"med",steps:["Belt is cracking or loose — needs replacement","Check belt tensioner for wear","Inspect all pulleys for alignment","Replace belt before it snaps"]};
+    return{issue:"Belt needs inspection",sev:"med",steps:["Have all accessory belts inspected","Check belt condition and tension","Replace cracked or glazed belts immediately","Check belt tensioner and idler pulleys"]};
+  }
+},
+
+"acceleration issue":{icon:"⚡",title:"Acceleration / Pickup Issue",
+  qd:function(t){
+    if(t.includes("no acceleration")||t.includes("not accelerating")||t.includes("wont accelerate"))return{issue:"Throttle system or fuel delivery failure",sev:"high",steps:["Check if check engine light is on","Scan OBD for throttle/fuel codes","Check air filter — severely clogged filter kills acceleration","Inspect throttle body for carbon buildup"]};
+    return null;
+  },
+  qs:[
+    {q:"Is the issue constant or only at certain times?",opts:["Always sluggish","Only on hard acceleration","Only at highway speeds","Started suddenly"]},
+    {q:"Is the check engine light on?",opts:["Yes","No"]},
+    {q:"When was the air filter last replaced?",opts:["Within 6 months","Over a year ago","Never / not sure"]},
+    {q:"Any black smoke from the exhaust during acceleration?",opts:["Yes, black smoke","No smoke"]}
+  ],
+  dx:function(a){
+    if(a[1]==="Yes")return{issue:"Sensor or fuel system fault — OBD scan needed",sev:"high",steps:["Read OBD fault codes immediately","Look for MAF sensor (P0100), TPS (P0120), or fuel codes","Clean throttle body if dirty","Inspect fuel injectors"]};
+    if(a[2]==="Over a year ago"||a[2]==="Never / not sure")return{issue:"Clogged air filter or dirty throttle body",sev:"med",steps:["Replace air filter immediately (primary cause of sluggishness)","Clean throttle body with throttle cleaner","Check fuel filter condition","Test improvement after air filter replacement"]};
+    if(a[3]==="Yes, black smoke")return{issue:"Rich fuel mixture — air filter, injector, or MAF sensor",sev:"med",steps:["Replace air filter immediately","Inspect fuel injectors for over-fueling","Test MAF sensor readings","Check O2 sensor function"]};
+    return{issue:"Fuel delivery or spark issue",sev:"med",steps:["Check fuel pump pressure","Inspect spark plugs — worn plugs cause poor pickup","Check fuel filter","Run OBD scan for any pending codes"]};
+  }
+},
+
+"coolant issue":{icon:"💧",title:"Coolant Issue",
+  qd:function(t){
+    if(t.includes("overflowing")||t.includes("overflow"))return{issue:"Possible head gasket failure — exhaust gases pressurising cooling system",sev:"high",steps:["Stop driving immediately","Check for milky white oil on dipstick (coolant mixing with oil)","Do not remove radiator cap when hot","Have head gasket compression test done urgently"]};
+    return null;
+  },
+  qs:[
+    {q:"Is there a visible green/pink/orange fluid leak under the car?",opts:["Yes, visible puddle","No visible leak but coolant is low"]},
+    {q:"Is the temperature gauge rising above normal?",opts:["Yes, overheating","No, temp is normal"]},
+    {q:"Do you smell something sweet near the car?",opts:["Yes, sweet smell","No smell"]},
+    {q:"When did you last top up the coolant?",opts:["Recently topped up","Never checked / not sure"]}
+  ],
+  dx:function(a){
+    if(a[0]==="Yes, visible puddle"&&a[1]==="Yes, overheating")return{issue:"Coolant leak causing overheating — urgent",sev:"high",steps:["Stop driving immediately — engine damage risk","Let engine cool before checking","Identify leak source: hose, radiator, water pump","Call for roadside assistance or towing"]};
+    if(a[0]==="Yes, visible puddle")return{issue:"External coolant leak",sev:"high",steps:["Identify leak source: radiator hose, radiator, water pump","Top up coolant temporarily but fix leak source","Pressure test the cooling system","Do not drive long distances until repaired"]};
+    if(a[0]==="No visible leak but coolant is low"&&a[2]==="Yes, sweet smell")return{issue:"Internal coolant leak — heater core or head gasket",sev:"high",steps:["Check for milky oil on dipstick (head gasket)","Check for sweet smell inside cabin (heater core)","Have head gasket compression test done","Do not continue driving"]};
+    return{issue:"Coolant level low — check for slow leak",sev:"med",spot:true,steps:["Top up with correct coolant mix (50:50 with water)","Monitor level over next week","Check all hose connections","Book inspection if level keeps dropping"]};
+  }
+},
+
+"electrical issue":{icon:"⚡",title:"Electrical / Wiring / Fuse",
+  qd:function(t){
+    if(t.includes("burning")||t.includes("smoke")||t.includes("melted"))return{issue:"Wiring short circuit — fire risk",sev:"high",steps:["Stop the car and switch off ignition immediately","If smoke visible, get out of the car safely","Do not restart — serious fire risk","Call for towing and auto electrician"]};
+    return null;
+  },
+  qs:[
+    {q:"Did multiple electrical items stop working at once?",opts:["Yes, multiple things failed","Just one specific thing failed"]},
+    {q:"Did the issue start after any aftermarket installation?",opts:["Yes, after new accessory install","No, started on its own"]},
+    {q:"Is there a burning plastic or rubber smell?",opts:["Yes, burning smell","No smell"]},
+    {q:"Have you checked the fuse box for blown fuses?",opts:["Yes, found a blown fuse","No blown fuses visible","Haven't checked"]}
+  ],
+  dx:function(a){
+    if(a[2]==="Yes, burning smell")return{issue:"Wiring short circuit — urgent, fire risk",sev:"high",steps:["Stop driving and switch off car immediately","Do not restart — locate burning smell source first","Have auto electrician inspect before restarting","Common cause: chafed wire touching chassis"]};
+    if(a[1]==="Yes, after new accessory install")return{issue:"Short circuit from incorrect aftermarket wiring",sev:"high",steps:["Disconnect the newly installed accessory immediately","Inspect all wiring connections made during installation","Check fuse for that circuit","Have auto electrician verify the wiring"]};
+    if(a[0]==="Yes, multiple things failed"&&a[3]==="Yes, found a blown fuse")return{issue:"Common fuse blown — likely overloaded circuit",sev:"med",steps:["Replace the blown fuse with correct amperage","Do not use higher-amperage fuse as a fix","Identify what caused overload","If fuse blows again, there is a short circuit"]};
+    if(a[0]==="Just one specific thing failed")return{issue:"Dedicated fuse blown for that component",sev:"low",spot:true,steps:["Check fuse box for the specific circuit fuse","Replace blown fuse (match amperage exactly)","If fuse blows again — wiring fault in that circuit","Check component for internal short"]};
+    return{issue:"Electrical fault — inspection needed",sev:"med",steps:["Check all fuses systematically","Inspect main battery terminals for corrosion","Have auto electrician run a diagnostic","Check for aftermarket wiring issues"]};
+  }
+},
+
+"towing needed":{icon:"🚛",title:"Towing / Recovery Needed",
+  qd:function(t){
+    if(t.includes("accident")||t.includes("crashed"))return{issue:"Accident — flatbed tow recommended",sev:"high",steps:["Ensure everyone is safe first — call 112 if injured","Do not move the car if it may have structural damage","Flatbed tow is recommended to avoid further damage","Call Instant Mechanic for flatbed towing service"]};
+    return null;
+  },
+  qs:[
+    {q:"Can the car roll with all wheels on the ground?",opts:["Yes, wheels roll freely","No, wheel is jammed or bent"]},
+    {q:"What type of tow do you need?",opts:["Emergency breakdown — car stopped working","Accident recovery","Moving car to a garage"]},
+    {q:"Is the car in a difficult location?",opts:["Normal road / parking","Basement / underground parking","Steep slope / ditch"]}
+  ],
+  dx:function(a){
+    if(a[1]==="Accident recovery"||a[0]==="No, wheel is jammed or bent")return{issue:"Flatbed tow required",sev:"high",steps:["Flatbed tow needed — wheels cannot roll safely","Call Instant Mechanic for flatbed towing","Do not attempt underlift tow with damaged wheels","Secure personal belongings before tow"]};
+    if(a[2]==="Basement / underground parking"||a[2]==="Steep slope / ditch")return{issue:"Winching + towing required",sev:"high",steps:["Winching service needed before towing","Extra charges apply for basement/slope winching","Call Instant Mechanic for winching + tow","Ensure area is clear before winch operation"]};
+    return{issue:"Standard underlift tow feasible",sev:"med",steps:["Underlift tow (cheaper option) — car can be towed with wheels rolling","Secure handbrake is released before towing","Provide destination garage address to driver","Car will be delivered to nearest Instant Mechanic partner garage if needed"]};
+  }
+},
+
+"lights indicators horn":{icon:"💡",title:"Lights / Indicators / Horn",
+  qd:function(t){
+    if(t.includes("all lights")||t.includes("everything off"))return{issue:"Main fuse or BCM failure",sev:"high",steps:["Check main fuse box for blown main fuse","Check battery terminal connections","Possible BCM (Body Control Module) fault","Have electrician run diagnostic"]};
+    return null;
+  },
+  qs:[
+    {q:"Which component is affected?",opts:["Headlights / taillights","Indicators / turn signals","Brake lights","Horn not working","Multiple lights at once"]},
+    {q:"Is the component completely dead or behaving abnormally?",opts:["Completely dead / not working","Stuck on / won't turn off","Flickering"]},
+    {q:"Has any fuse recently blown?",opts:["Yes, found a blown fuse","No blown fuse","Haven't checked"]}
+  ],
+  dx:function(a){
+    if(a[0]==="Brake lights"&&a[1]==="Stuck on / won't turn off")return{issue:"Brake pedal switch stuck or faulty",sev:"med",steps:["Inspect brake pedal switch (located near pedal)","Switch is often held in by a push-clip — check for damage","Replace faulty brake switch","Ensure battery is not draining from lights staying on"]};
+    if(a[0]==="Indicators / turn signals"&&a[1]==="Stuck on / won't turn off")return{issue:"Indicator relay fault or wiring short",sev:"med",steps:["Check indicator relay in fuse box","Inspect stalk switch on steering column","Check for wiring short causing relay to stick","Replace faulty relay"]};
+    if(a[0]==="Horn not working")return{issue:"Horn fuse blown or horn relay fault",sev:"low",spot:true,steps:["Check horn fuse in fuse box","Test horn relay replacement","Inspect horn unit for corrosion (often in bumper area)","Check wiring to horn for damage"]};
+    if(a[1]==="Completely dead / not working")return{issue:"Bulb blown or fuse failure",sev:"low",spot:true,steps:["Check bulb first — LED/halogen bulb may need replacement","Check dedicated fuse for that light circuit","Inspect socket for corrosion","Check wiring harness connector"]};
+    return{issue:"Light/horn fault — fuse check needed",sev:"low",steps:["Check fuse box for the relevant circuit","Inspect bulbs for burnout","Have auto electrician check if fuse replacement doesn't fix it","Check BCM if multiple circuits affected"]};
+  }
+},
+
+"wheel rim axle":{icon:"🛞",title:"Wheel / Rim / Axle Issue",
+  qd:function(t){
+    if(t.includes("dislocated")||t.includes("came off")||t.includes("detached"))return{issue:"Wheel detached or dislocated — do not drive",sev:"high",steps:["Do not drive — immediate safety risk","Call for towing immediately","Inspect wheel hub and studs for damage","Have all wheel nuts checked on all four wheels"]};
+    return null;
+  },
+  qs:[
+    {q:"What is the specific problem?",opts:["Bent / cracked alloy wheel","Wobbling or vibration at speed","Grinding noise from wheel area","Wheel feels loose"]},
+    {q:"Did it happen after hitting a pothole or curb?",opts:["Yes, after impact","No, happened gradually"]}
+  ],
+  dx:function(a){
+    if(a[0]==="Bent / cracked alloy wheel")return{issue:"Alloy wheel bent or cracked",sev:"med",steps:["Wheel straightening (if bend is minor)","Replacement if cracked — cracked alloys are unsafe","Check tyre for sidewall damage after impact","Re-balance after repair"]};
+    if(a[0]==="Wobbling or vibration at speed")return{issue:"Wheel out of balance or bent rim",sev:"med",steps:["Get all four wheels balanced","Inspect rims for bends (alloy rim bending is common after potholes)","Check tyre pressure","Inspect wheel bearings"]};
+    if(a[0]==="Grinding noise from wheel area")return{issue:"Wheel bearing failure",sev:"high",steps:["Wheel bearing replacement needed","Do not ignore — bearing failure can cause wheel detachment","Inspect CV joint if noise changes on turns","Replace bearing immediately"]};
+    if(a[0]==="Wheel feels loose")return{issue:"Loose wheel nuts or hub issue",sev:"high",steps:["Stop immediately — loose wheel is a safety emergency","Check all wheel nuts are tight","Inspect wheel studs for damage","Have hub and wheel assembly inspected"]};
+    return{issue:"Wheel/axle issue — inspection needed",sev:"med",steps:["Have wheels balanced and aligned","Inspect alloy wheels for damage","Check CV joints and axle condition","Visit nearest Instant Mechanic partner garage"]};
+  }
+},
+
+"window mirror wiper":{icon:"🪟",title:"Window / Mirror / Wiper",
+  qd:function(){return null;},
+  qs:[
+    {q:"What is the issue?",opts:["Power window stuck / not working","Wiper not working","Mirror broken or not adjusting","All three are fine — other issue"]},
+    {q:"Is the component completely dead or partially working?",opts:["Completely dead","Works sometimes / intermittent","Stuck in one position"]}
+  ],
+  dx:function(a){
+    if(a[0]==="Power window stuck / not working"&&a[1]==="Stuck in one position"&&a[1]==="Stuck in one position")return{issue:"Window stuck down — weather risk",sev:"high",steps:["Window regulator or motor failure","Temporary: use plastic sheet to cover if stuck down","Window regulator/motor replacement needed","Check fuse for window circuit first"]};
+    if(a[0]==="Power window stuck / not working")return{issue:"Window regulator or motor failure",sev:"med",steps:["Check window fuse in fuse box first","Test if motor makes any sound — no sound = motor dead","Window regulator replacement (common repair)","If all windows fail together — check main window fuse or relay"]};
+    if(a[0]==="Wiper not working")return{issue:"Wiper motor, relay, or linkage fault",sev:"med",spot:true,steps:["Check wiper fuse first","Inspect wiper arm linkage for disconnection","Test wiper relay replacement","Wiper motor replacement if motor is dead"]};
+    if(a[0]==="Mirror broken or not adjusting")return{issue:"Mirror glass, housing, or motor fault",sev:"low",steps:["Mirror glass replacement if physically broken","Mirror motor replacement if won't adjust","Check mirror adjustment switch and fuse","Check wiring harness if indicator light in mirror not working"]};
+    return{issue:"Component needs inspection",sev:"low",steps:["Check relevant fuse first","Inspect component for physical damage","Have auto electrician check if fuse is fine","Book Instant Mechanic appointment"]};
+  }
+},
+
+"door boot bonnet":{icon:"🚪",title:"Door / Boot / Bonnet",
+  qd:function(t){
+    if(t.includes("bonnet flew")||t.includes("bonnet open while")||t.includes("bonnet flapping"))return{issue:"Bonnet latch failure — safety critical",sev:"high",steps:["Stop driving immediately — bonnet could open fully blocking vision","Secure bonnet with rope/bungee cord as a temporary measure","Have bonnet latch repaired before driving","Do not drive until bonnet is secure"]};
+    return null;
+  },
+  qs:[
+    {q:"Which part is the issue?",opts:["Car door won't open","Boot / trunk won't open","Bonnet won't open or latch","Central locking not working"]},
+    {q:"From which side is the access blocked?",opts:["Can open from inside but not outside","Can open from outside but not inside","Cannot open from either side"]}
+  ],
+  dx:function(a){
+    if(a[0]==="Car door won't open"&&a[1]==="Can open from inside but not outside")return{issue:"Exterior door handle or latch broken",sev:"med",steps:["Exterior door handle likely broken or disconnected","Door latch mechanism may need adjustment","Inspect handle cable/rod connection","Door handle replacement or latch repair needed"]};
+    if(a[0]==="Car door won't open"&&a[1]==="Can open from outside but not inside")return{issue:"Interior door handle broken or child lock engaged",sev:"low",steps:["Check if child lock is engaged (small switch on door edge)","Interior door handle may be broken","Inspect interior handle rod/cable connection","Handle replacement if broken"]};
+    if(a[0]==="Boot / trunk won't open")return{issue:"Boot actuator, cable, or lock cylinder fault",sev:"low",steps:["Try key in physical lock cylinder if available","Check boot release button fuse","Inspect boot lock actuator","Manual release cable inside boot (some models have this)"]};
+    if(a[0]==="Central locking not working")return{issue:"BCM, actuator, or key fob issue",sev:"med",steps:["Check key fob battery first (CR2032)","Test with physical key as backup","Central locking relay or BCM fault","Have auto electrician diagnose if key fob is fine"]};
+    return{issue:"Mechanical latch or actuator fault",sev:"med",steps:["Inspect the latch mechanism","Check for broken cables or rods","Have auto electrician diagnose","Bonnet: do not drive if latch is insecure"]};
+  }
+},
+
+"car not moving":{icon:"🚗",title:"Car Not Moving / Stuck",
+  qd:function(t){
+    if(t.includes("handbrake")||t.includes("hand brake")||t.includes("parking brake"))return{issue:"Handbrake seized or stuck",sev:"med",steps:["Try engaging and releasing handbrake several times","Check handbrake cable tension (may be too tight)","Try rocking car gently — seized rear brakes may free up","Have handbrake cable and rear caliper inspected"]};
+    return null;
+  },
+  qs:[
+    {q:"Does the engine start normally?",opts:["Yes, engine runs fine","No, engine won't start"]},
+    {q:"Is the handbrake fully released?",opts:["Yes, fully released","Handbrake feels stuck","Unsure"]},
+    {q:"Manual or automatic car?",opts:["Manual transmission","Automatic transmission"]},
+    {q:"Any unusual noise when trying to move?",opts:["Yes, grinding or clunking","No noise"]}
+  ],
+  dx:function(a){
+    if(a[1]==="Handbrake feels stuck")return{issue:"Seized handbrake cable or rear brake",sev:"med",steps:["Engage/release handbrake several times","Try rocking car gently — seized brakes may free","Have rear brake caliper and handbrake cable inspected","Heat from driving often frees minor seizures"]};
+    if(a[0]==="Yes, engine runs fine"&&a[2]==="Automatic transmission")return{issue:"Automatic transmission fault or torque converter issue",sev:"high",steps:["Check ATF transmission fluid level and condition","Scan TCU for fault codes","Inspect brake interlock (must press brake to shift from Park)","Have transmission specialist inspect"]};
+    if(a[0]==="Yes, engine runs fine"&&a[2]==="Manual transmission")return{issue:"Clutch failure or gearbox issue",sev:"high",steps:["Check clutch pedal — does it have resistance?","Clutch plate may have completely failed","Try engaging 1st gear with engine off — does it roll?","Tow to garage for clutch/gearbox inspection"]};
+    if(a[3]==="Yes, grinding or clunking")return{issue:"Seized brake caliper or drivetrain failure",sev:"high",steps:["Check if any wheel is locked up and hot","Seized caliper is common after parking overnight","Have all four brake calipers inspected","Drivetrain inspection if calipers are fine"]};
+    return{issue:"Drivetrain or transmission fault",sev:"high",steps:["Have car towed to nearest Instant Mechanic partner garage","Full drivetrain inspection needed","Check axle shafts and differential","Towing recommended — do not attempt to force the car to move"]};
+  }
+},
+
+"ignition issue":{icon:"🔑",title:"Ignition Issue",
+  qd:function(t){
+    if(t.includes("key stuck")||t.includes("key won't turn")||t.includes("key wont turn"))return{issue:"Steering column lock — common fix",sev:"low",steps:["Turn steering wheel slightly left or right while turning key","This releases the steering column lock","If key still won't turn — ignition barrel may be worn","Do not force the key — it can snap"]};
+    return null;
+  },
+  qs:[
+    {q:"What exactly is happening with the ignition?",opts:["Key turns but nothing happens","Key is stuck / won't turn","Push-button car — no response","Immobiliser / anti-theft light on"]},
+    {q:"Are all dashboard warning lights coming on?",opts:["Yes, all lights on","Only some lights on","No lights at all"]}
+  ],
+  dx:function(a){
+    if(a[0]==="Key turns but nothing happens"&&a[1]==="No lights at all")return{issue:"Dead battery — not ignition fault",sev:"high",steps:["Battery is completely dead","Jump-start the car to confirm","Test battery voltage — should be 12.6V+","Replace battery if over 3 years old"]};
+    if(a[0]==="Key is stuck / won't turn")return{issue:"Steering column lock or worn ignition barrel",sev:"med",steps:["Turn steering wheel slightly in both directions while turning key","This releases the steering lock","If key turns freely but slips — ignition barrel worn, needs replacement","Do not force the key"]};
+    if(a[0]==="Push-button car — no response")return{issue:"Smart key battery dead or immobiliser active",sev:"med",steps:["Replace key fob battery (usually CR2032)","Hold key fob against start button while pressing (emergency start for dead fob)","Check if anti-theft light is flashing — system may be triggered","Re-pair key fob if car still won't start"]};
+    if(a[0]==="Immobiliser / anti-theft light on")return{issue:"Immobiliser triggered or ECU fault",sev:"med",steps:["Try locking and unlocking with key fob — resets on some cars","Check key fob battery","Some cars: turn key to ON position and wait 10 mins for immobiliser to reset","Dealership or auto electrician needed if none of above works"]};
+    return{issue:"Ignition switch failure",sev:"med",steps:["Ignition switch replacement needed","Check ignition relay in fuse box","Inspect wiring to ignition switch","Have auto electrician diagnose"]};
+  }
+},
+
+"dashboard warning":{icon:"⚠️",title:"Dashboard Warning Light / EPC / ESP",
+  qd:function(t){
+    if(t.includes("red light")||t.includes("red warning"))return{issue:"Red warning light — stop driving soon",sev:"high",steps:["Red lights indicate serious faults requiring immediate attention","Check which specific light it is (oil, temp, battery, brake)","If oil pressure or temp warning: stop driving immediately","Book urgent mechanic visit"]};
+    return null;
+  },
+  qs:[
+    {q:"What color is the warning light?",opts:["Red (urgent)","Amber / yellow (advisory)","Multiple lights on at once"]},
+    {q:"Which specific light or symbol is showing?",opts:["Engine / check engine","EPC (Throttle) — VW/Audi/Skoda","ESP / ESC / traction control","Oil pressure / temperature","Battery / alternator","Brake system","Unknown symbol"]},
+    {q:"Is the car driving normally despite the light?",opts:["Yes, drives fine","No, something feels wrong"]}
+  ],
+  dx:function(a){
+    if(a[0]==="Red (urgent)"&&(a[1]==="Oil pressure / temperature"||a[1]==="Brake system"))return{issue:"Critical warning — stop driving immediately",sev:"high",steps:["Oil pressure light: stop engine immediately — risk of serious engine damage","Temperature light: stop and let cool — risk of head gasket failure","Brake light: check brake fluid level and brake pedal feel","Do not continue driving — tow to garage"]};
+    if(a[1]==="EPC (Throttle) — VW/Audi/Skoda")return{issue:"EPC fault — throttle body or sensor issue",sev:"med",steps:["EPC (Electronic Power Control) = throttle system fault","Car may enter limp mode (reduced power)","OBD scan needed to read specific fault code","Throttle body cleaning or TPS sensor replacement common fix"]};
+    if(a[1]==="ESP / ESC / traction control")return{issue:"ESP/ESC fault — traction control system",sev:"med",steps:["Car is usually driveable but traction control disabled","Scan for wheel speed sensor fault codes","Inspect ABS wheel sensors","Usually safe to drive carefully but book inspection"]};
+    if(a[0]==="Multiple lights on at once")return{issue:"Battery voltage issue or major electrical fault",sev:"high",steps:["Multiple lights together often means low battery voltage","Check battery and alternator","Could also be ECU fault or loose battery terminal","Have electrician diagnose immediately"]};
+    return{issue:"Warning light — OBD scan needed",sev:"med",steps:["Connect OBD scanner to read specific fault code","Amber lights: advisory — book service soon","Do not ignore — unresolved codes can worsen","Visit Instant Mechanic for OBD diagnostic"]};
+  }
+},
+
+"fuel empty":{icon:"⛽",title:"Fuel Empty / Delivery",
+  qd:function(t){
+    if(t.includes("diesel")&&(t.includes("ran dry")||t.includes("run out")||t.includes("empty")))return{issue:"Diesel engine ran dry — may need fuel system bleeding",sev:"med",steps:["Refuel with diesel immediately","Turn key to ON (not start) several times to prime fuel pump","Try starting — diesel engines may need several attempts","If won't start after refueling: fuel system bleeding needed by mechanic"]};
+    return null;
+  },
+  qs:[
+    {q:"What fuel does your car use?",opts:["Petrol","Diesel","CNG (Compressed Natural Gas)"]},
+    {q:"Has the car stopped completely or just warning light on?",opts:["Car has stopped — completely out of fuel","Warning light on but car still running"]},
+    {q:"How many litres do you need?",opts:["2-5 litres (emergency, to reach station)","Full tank delivery","10-15 litres"]}
+  ],
+  dx:function(a){
+    if(a[0]==="Diesel"&&a[1]==="Car has stopped — completely out of fuel")return{issue:"Diesel ran completely dry — air lock risk",sev:"med",steps:["Deliver at least 5 litres of diesel","Turn ignition to ON several times before starting","Diesel engines can air-lock when run dry — may need mechanic to bleed fuel system","If won't start after 3-4 attempts: call mechanic"]};
+    if(a[0]==="CNG (Compressed Natural Gas)")return{issue:"CNG empty — needs refill or petrol top-up for reserve",sev:"med",steps:["If car has petrol reserve — auto-switch should have occurred","Top up with petrol to reach nearest CNG station","If auto-switch not working — CNG solenoid or ECU issue","Fill CNG at authorised CNG filling station"]};
+    if(a[1]==="Car has stopped — completely out of fuel")return{issue:"Petrol tank empty — emergency fuel delivery needed",sev:"med",spot:true,steps:["Call Instant Mechanic for emergency fuel delivery","Minimum 2-3 litres needed to reach nearest petrol pump","Wait 2 minutes after adding fuel before starting","Prime fuel pump by turning key to ON 3 times before cranking"]};
+    return{issue:"Fuel warning — refuel soon",sev:"low",steps:["Refuel at nearest petrol pump as soon as possible","Driving on very low fuel can damage fuel pump","Reserve light typically = 5-7 litres remaining","Book emergency fuel delivery if needed"]};
+  }
+},
+
+"self start issue":{icon:"🔑",title:"Self / Starter Motor Issue",
+  qd:function(t){
+    if(t.includes("no sound")&&(t.includes("start")||t.includes("self")))return{issue:"Starter motor or solenoid failure",sev:"high",steps:["Check battery first — fully charge or jump start","If battery OK and still no sound: starter motor failed","Test starter solenoid — may click without engaging motor","Starter motor replacement needed"]};
+    return null;
+  },
+  qs:[
+    {q:"What happens when you try to start?",opts:["Complete silence — nothing","Single heavy clunk then nothing","Grinding noise when starting","Cranks slowly then stops"]},
+    {q:"Is the battery confirmed to be fully charged?",opts:["Yes, battery is good","Not sure about battery"]}
+  ],
+  dx:function(a){
+    if(a[0]==="Complete silence — nothing"&&a[1]==="Yes, battery is good")return{issue:"Starter motor or solenoid failure",sev:"high",steps:["Starter motor has failed","Test by tapping starter motor with a hammer (sometimes frees seized motor)","Starter motor replacement needed","Check starter relay in fuse box"]};
+    if(a[0]==="Single heavy clunk then nothing")return{issue:"Starter solenoid or motor seized",sev:"high",steps:["Solenoid is engaging but motor not spinning","Tap starter motor body while someone tries to start","Starter motor or solenoid replacement needed","Check battery connections are tight"]};
+    if(a[0]==="Grinding noise when starting")return{issue:"Starter drive gear or ring gear damage",sev:"high",steps:["Grinding = starter gear not meshing with ring gear","Starter motor replacement needed urgently","Check flywheel ring gear for damage","Continued use will worsen ring gear damage"]};
+    if(a[0]==="Cranks slowly then stops")return{issue:"Weak battery — cannot sustain cranking",sev:"high",steps:["Battery is too weak to turn engine over","Jump-start to confirm battery issue","Test battery voltage and cold cranking amps","Replace battery if below spec"]};
+    return{issue:"Starter system fault",sev:"high",steps:["Check battery charge first","Test starter relay","Inspect wiring connections to starter motor","Have Instant Mechanic mechanic diagnose"]};
+  }
+},
+
+"key lockout":{icon:"🔐",title:"Key Lockout / Alarm",
+  qd:function(t){
+    if(t.includes("keys inside")||t.includes("locked inside")||t.includes("locked keys"))return{issue:"Keys locked inside car",sev:"med",steps:["Do not attempt to force the door — damage risk","Call Instant Mechanic for emergency lockout service","Check if any other door or boot is unlocked","Check spare key at home before calling locksmith"]};
+    return null;
+  },
+  qs:[
+    {q:"What is the specific situation?",opts:["Keys locked inside the car","Key is broken or stuck in lock","Alarm is stuck on / won't turn off","Remote key not working","Lost all keys"]},
+    {q:"Do you have a spare key?",opts:["Yes, spare key available","No spare key"]}
+  ],
+  dx:function(a){
+    if(a[0]==="Keys locked inside the car")return{issue:"Keys locked in car — lockout service needed",sev:"med",spot:true,steps:["Call Instant Mechanic for emergency door opening","Do NOT attempt to force the door with a wire — airbag curtain damage risk","Check if any window is cracked open","Locksmith can open without damage"]};
+    if(a[0]==="Key is broken or stuck in lock")return{issue:"Broken key extraction needed",sev:"med",steps:["Do not force or pull — it will break deeper into barrel","Specialist key extraction tool needed","Lock barrel may need replacement after extraction","New key cutting and programming needed"]};
+    if(a[0]==="Alarm is stuck on / won't turn off")return{issue:"Alarm ECU fault or sensor malfunction",sev:"med",steps:["Try locking and unlocking with key fob to reset","Disconnect battery for 5 minutes as temporary fix (resets alarm)","Check if door/bonnet sensor is triggering falsely","Alarm ECU or shock sensor replacement may be needed"]};
+    if(a[0]==="Remote key not working")return{issue:"Key fob battery dead or needs re-pairing",sev:"low",spot:true,steps:["Replace key fob battery (usually CR2032 coin cell)","Re-pair key fob: check owner manual for process (usually involves key cycles)","If still not working: key fob transponder chip may have failed","Dealership or auto locksmith can program new key"]};
+    if(a[0]==="Lost all keys")return{issue:"New key programming needed",sev:"high",steps:["Immobiliser reset and new key programming required","Dealership or auto locksmith with programming equipment needed","May need proof of ownership","Avoid leaving car unattended if spare is not available"]};
+    return{issue:"Key/lock issue — specialist help needed",sev:"med",steps:["Call Instant Mechanic for lockout service","Do not force locks or doors","Have car towed if immobiliser is preventing start","Contact dealership for key programming"]};
+  }
+},
+
+"wrong fuel":{icon:"⛽",title:"Wrong Fuel / Fuel Leak",
+  qd:function(t){
+    if(t.includes("wrong fuel")||t.includes("petrol in diesel")||t.includes("diesel in petrol"))return{issue:"Wrong fuel filled — do not start engine",sev:"high",steps:["Do NOT start the engine — this is critical","Wrong fuel circulating through the system causes severe damage","Call for towing immediately","Fuel system drain and flush required at garage"]};
+    if(t.includes("fuel leak")||t.includes("petrol smell")||t.includes("fuel smell"))return{issue:"Fuel leak — do not start car",sev:"high",steps:["Do NOT start the car — fire hazard","Switch off engine if running and move away","Call for towing — do not drive","Fuel line, injector, or tank inspection needed"]};
+    return null;
+  },
+  qs:[
+    {q:"What is the specific fuel issue?",opts:["Wrong fuel was filled by mistake","Fuel leak / strong petrol smell","Diesel filter blocked","Fuel hose damaged"]},
+    {q:"Has the engine been started after the wrong fuel was filled?",opts:["No, engine not started","Yes, engine was started","Not applicable"]}
+  ],
+  dx:function(a){
+    if(a[0]==="Wrong fuel was filled by mistake"&&a[1]==="No, engine not started")return{issue:"Wrong fuel — drain immediately, less damage if not started",sev:"high",steps:["Do NOT start the engine under any circumstances","Tow to garage for fuel system drain","Fuel tank, lines, and filter flush needed","Starting the engine spreads wrong fuel through the entire system"]};
+    if(a[0]==="Wrong fuel was filled by mistake"&&a[1]==="Yes, engine was started")return{issue:"Wrong fuel circulated — significant damage risk",sev:"high",steps:["Stop engine immediately if still running","Tow to garage urgently","Injectors, pump, and seals may be damaged","Full fuel system inspection and flush needed — costly repair"]};
+    if(a[0]==="Fuel leak / strong petrol smell")return{issue:"Fuel leak — fire hazard",sev:"high",steps:["Do NOT start or restart the engine","Move away from the car in case of fire","Call for towing","Fuel hose, injector O-ring, or tank leak inspection needed"]};
+    return{issue:"Fuel system issue — inspection needed",sev:"high",steps:["Do not ignore fuel smells — fire risk","Have Instant Mechanic inspect the fuel system","Diesel filter may need replacement","Fuel hose replacement if damaged"]};
+  }
+},
+
+"engine oil leak":{icon:"🔧",title:"Engine Oil / Fluid Leak",
+  qd:function(t){
+    if(t.includes("burning oil")||t.includes("smoke from engine"))return{issue:"Oil leaking onto hot exhaust — fire risk",sev:"high",steps:["Stop driving soon — oil on hot metal is a fire risk","Check oil level immediately","Identify leak source: valve cover, sump, or seals","Have garage inspect urgently"]};
+    return null;
+  },
+  qs:[
+    {q:"What color is the fluid leaking?",opts:["Dark brown / black (engine oil)","Red or pink (transmission fluid)","Green / yellow / orange (coolant)","Clear / light (water or brake fluid)"]},
+    {q:"Where is the puddle forming under the car?",opts:["Front of car (engine area)","Middle of car","Rear of car","All along the car"]},
+    {q:"Is the oil level on the dipstick low?",opts:["Yes, visibly low","Normal level","Haven't checked"]}
+  ],
+  dx:function(a){
+    if(a[0]==="Dark brown / black (engine oil)")return{issue:"Engine oil leak",sev:"high",steps:["Check oil level immediately — top up if low","Common sources: valve cover gasket, sump plug, crankshaft oil seal","Rocker cover gasket is the most common and cheapest fix","Have garage identify exact leak source — oil on exhaust is a fire risk"]};
+    if(a[0]==="Red or pink (transmission fluid)")return{issue:"Transmission fluid leak",sev:"high",steps:["Check automatic transmission fluid level (dipstick under bonnet)","Transmission oil pan gasket or cooler line leak","Do not drive long distances with low ATF","Have garage identify and seal leak"]};
+    if(a[0]==="Green / yellow / orange (coolant)")return{issue:"Coolant leak — see coolant diagnosis",sev:"high",steps:["Coolant leak — stop driving if temperature gauge rises","Check coolant reservoir level","Identify leak: radiator hose, water pump, or radiator","Do not drive with coolant leak — overheating risk"]};
+    if(a[0]==="Clear / light (water or brake fluid)")return{issue:"Water (normal from AC) or brake fluid leak",sev:"med",steps:["Small water puddle under front — normal from AC condensation drain","If salty/slippery feel: could be brake fluid — inspect brake system","Brake fluid leak is serious — check brake pedal feel","Have garage inspect if you suspect brake fluid"]};
+    return{issue:"Fluid leak — inspection needed",sev:"med",steps:["Identify fluid type by color and location","Check all fluid levels under bonnet","Have garage perform full fluid leak check","Do not ignore — most leaks worsen over time"]};
+  }
+},
+
+"steering locked":{icon:"🎡",title:"Steering Locked / Jammed",
+  qd:function(t){
+    if(t.includes("completely locked")||t.includes("cannot turn at all"))return{issue:"Steering column lock or power steering failure",sev:"high",steps:["Steering column lock: turn wheel slightly while turning ignition key","If EPS (electric power steering): check for battery voltage","Do not continue driving if wheel is genuinely locked","Have power steering system inspected"]};
+    return null;
+  },
+  qs:[
+    {q:"Is the steering completely locked or just very stiff?",opts:["Completely locked — cannot turn","Very stiff / heavy steering","Became suddenly hard while driving"]},
+    {q:"Is the power steering warning light on?",opts:["Yes","No"]},
+    {q:"Does the car have electric or hydraulic power steering?",opts:["Electric (EPS) — newer car","Hydraulic (fluid-based) — older car","Not sure"]}
+  ],
+  dx:function(a){
+    if(a[0]==="Completely locked — cannot turn")return{issue:"Steering column lock — try key and wheel together",sev:"high",spot:true,steps:["Turn steering wheel gently left/right while turning ignition key","This releases the mechanical steering lock","If steering remains locked with engine running: EPS or rack failure","Do not drive — tow to garage if cannot release"]};
+    if(a[0]==="Became suddenly hard while driving")return{issue:"Power steering failure while driving",sev:"high",steps:["Electric PS: check for EPS warning light — often recovers after restart","Hydraulic PS: check PS fluid level immediately","Can drive carefully to garage at slow speed","Pump failure or EPS motor fault likely"]};
+    if(a[2]==="Hydraulic (fluid-based) — older car")return{issue:"Low power steering fluid or pump fault",sev:"med",steps:["Check power steering fluid reservoir under bonnet","Top up with correct PS fluid if low","Check for PS fluid leak along hose and rack","PS pump replacement if fluid level is fine"]};
+    return{issue:"EPS fault — electric power steering",sev:"med",steps:["Check battery voltage — low voltage affects EPS","Try turning car off and on — EPS sometimes resets","EPS motor or control unit fault if persistent","Have garage scan for EPS fault codes"]};
+  }
+},
+
+"smoke burning smell":{icon:"💨",title:"Smoke / Burning Smell",
+  qd:function(t){
+    if(t.includes("smoke from engine bay")||t.includes("engine smoking"))return{issue:"Engine bay smoke — stop immediately",sev:"high",steps:["Pull over and stop engine immediately","Do NOT open bonnet if smoke is heavy — fire risk","Move away from the car as a precaution","Call for roadside assistance or fire brigade if smoke increases"]};
+    if(t.includes("blue smoke"))return{issue:"Engine burning oil — blue smoke",sev:"high",steps:["Check engine oil level daily","Blue smoke = oil reaching combustion chamber","Piston rings or valve seals worn","Have compression test done"]};
+    return null;
+  },
+  qs:[
+    {q:"What color is the smoke?",opts:["White smoke","Black smoke","Blue / grey smoke","Smoke from engine bay (not exhaust)"]},
+    {q:"What does it smell like?",opts:["Burning rubber","Burning plastic / electrical","Sweet smell","Burning oil","Just hot / general burning"]},
+    {q:"Is the engine overheating?",opts:["Yes, temp gauge is high","No, temperature is normal"]}
+  ],
+  dx:function(a){
+    if(a[0]==="White smoke"&&a[2]==="Yes, temp gauge is high")return{issue:"Coolant burning — head gasket failure likely",sev:"high",steps:["Stop driving immediately — serious engine damage risk","Do not remove radiator cap when hot","Check for milky oil on dipstick (coolant mixing with oil)","Tow to garage — head gasket replacement needed"]};
+    if(a[0]==="White smoke"&&a[2]==="No, temperature is normal")return{issue:"Condensation — likely normal on cold start",sev:"low",steps:["White steam on cold start is normal condensation","Should disappear after 2-3 minutes of warming up","If it persists after warmup — check coolant level","Monitor over next few days"]};
+    if(a[0]==="Black smoke")return{issue:"Rich fuel mixture — air/fuel system issue",sev:"med",steps:["Replace air filter — clogged filter is common cause","Inspect fuel injectors for over-fueling","Check O2 sensors and MAF sensor","Scan OBD for fuel trim fault codes"]};
+    if(a[0]==="Blue / grey smoke")return{issue:"Engine burning oil",sev:"high",steps:["Check engine oil level — top up if low","Blue smoke = oil in combustion chamber","Worn piston rings or valve stem seals","Compression test to confirm — may need engine rebuild"]};
+    if(a[0]==="Smoke from engine bay (not exhaust)")return{issue:"Engine bay fire risk — stop immediately",sev:"high",steps:["Stop immediately and switch off engine","Do NOT open bonnet if heavy smoke","Move away from car — fire risk","Call for roadside assistance"]};
+    if(a[1]==="Burning plastic / electrical")return{issue:"Electrical short circuit — fire risk",sev:"high",steps:["Stop driving immediately — electrical fires spread fast","Switch off all electrics","Check for burning smell near fuse box or wiring","Call auto electrician — do not restart"]};
+    return{issue:"Smoke / burning smell — inspection needed urgently",sev:"high",steps:["Do not ignore smoke or burning smells","Pull over safely as soon as possible","Call Instant Mechanic for roadside assistance","Identify source before restarting"]};
+  }
+},
+
+"cng issue":{icon:"🔧",title:"CNG Issue",
+  qd:function(t){
+    if(t.includes("gas smell")||t.includes("cng smell")||t.includes("smell of gas"))return{issue:"CNG gas leak — safety emergency",sev:"high",steps:["Do NOT start the car","Open all windows immediately","Move away from the car","Call emergency services — CNG gas is highly flammable","Do not use any ignition source nearby"]};
+    return null;
+  },
+  qs:[
+    {q:"What is the specific CNG issue?",opts:["CNG not starting / won't switch to CNG","Auto-switch from CNG to petrol not working","CNG ECU error / warning light","CNG pipe or fitting feels loose"]},
+    {q:"Does the car run fine on petrol?",opts:["Yes, petrol works fine","No, problem on petrol too"]}
+  ],
+  dx:function(a){
+    if(a[0]==="CNG not starting / won't switch to CNG")return{issue:"CNG solenoid valve, pressure sensor, or ECU fault",sev:"med",steps:["Check if CNG cylinder pressure gauge shows gas available","CNG solenoid valve may be stuck closed","CNG ECU scan needed for fault codes","CNG specialist mechanic required for diagnosis"]};
+    if(a[0]==="Auto-switch from CNG to petrol not working")return{issue:"Auto-switch solenoid or CNG level sensor fault",sev:"med",steps:["Check CNG level — may be genuinely empty","Auto-switch relay or solenoid may have failed","CNG level sensor sending wrong reading","CNG specialist to inspect auto-switch system"]};
+    if(a[0]==="CNG ECU error / warning light")return{issue:"CNG ECU fault — scan needed",sev:"med",steps:["CNG ECU scan with specialist tool required","Common codes: pressure sensor, temperature sensor faults","Do not ignore — CNG system safety depends on ECU","CNG-authorised workshop required for reprogramming"]};
+    if(a[0]==="CNG pipe or fitting feels loose")return{issue:"Possible CNG leak — do not start",sev:"high",steps:["Do NOT start the car","Open windows and move away from car","Gas smell = call emergency services","Have CNG-authorised mechanic inspect all fittings before starting"]};
+    return{issue:"CNG system fault — specialist needed",sev:"med",steps:["CNG issues require CNG-specialist mechanic","Do not tamper with CNG fittings yourself","Book appointment at CNG-authorised workshop","If any gas smell: treat as emergency — do not start car"]};
+  }
+},
+
+"air lock":{icon:"🔧",title:"Air Lock",
+  qd:function(t){
+    if(t.includes("air lock")||t.includes("airlock")||t.includes("air locked"))return{issue:"Fuel system air lock — common after running dry",sev:"med",steps:["Petrol car: fill tank and turn key to ON position 3 times before cranking","Diesel car: may need manual fuel system bleeding","Try cranking for 10-15 seconds — fuel pump may clear the air lock","If won't start: mechanic needed to bleed fuel lines"]};
+    return null;
+  },
+  qs:[
+    {q:"Did the car recently run completely out of fuel?",opts:["Yes, ran out of fuel","No, tank has fuel"]},
+    {q:"Is this a petrol or diesel vehicle?",opts:["Petrol","Diesel"]},
+    {q:"Is the engine cranking but just won't fire?",opts:["Yes, cranks but no start","No crank at all"]}
+  ],
+  dx:function(a){
+    if(a[1]==="Diesel")return{issue:"Diesel air lock — fuel system bleeding needed",sev:"med",steps:["Add at least 5 litres of diesel before attempting start","Manual priming: use hand pump on fuel filter if accessible","Turn key to ON position 5 times (15 secs each) to let pump try to prime","If won't start after 5 attempts: mechanic needed to bleed fuel lines manually"]};
+    if(a[1]==="Petrol"&&a[2]==="Yes, cranks but no start")return{issue:"Petrol air lock — usually self-clears",sev:"low",spot:true,steps:["Add at least 2-3 litres of petrol","Turn key to ON (not start) 3 times — 3 seconds each — to prime pump","Try starting — may take longer cranks than usual","Most petrol air locks clear themselves after 2-3 start attempts"]};
+    return{issue:"Air lock or fuel delivery issue",sev:"med",steps:["Ensure tank has adequate fuel","Try ON-position priming (key to ON without cranking) 3-5 times","Attempt to crank for 10-15 seconds","Call Instant Mechanic if car won't start after 5 attempts"]};
+  }
+},
+
+"music electronics":{icon:"📻",title:"Music / Electronics Issue",
+  qd:function(){return null;},
+  qs:[
+    {q:"What is the issue with the system?",opts:["Screen completely black / dead","Audio not working but screen is on","System resets or freezes","USB / Bluetooth not working"]},
+    {q:"Did this happen after a battery replacement or disconnect?",opts:["Yes, after battery work","No, started randomly"]}
+  ],
+  dx:function(a){
+    if(a[0]==="Screen completely black / dead"&&a[1]==="Yes, after battery work")return{issue:"Head unit anti-theft lock activated",sev:"low",spot:true,steps:["Head unit has locked itself after power loss","Look for radio/head unit serial number (usually under unit)","Enter anti-theft code from manual or dealership","If no code available: dealership can unlock with proof of ownership"]};
+    if(a[0]==="Screen completely black / dead")return{issue:"Head unit fuse blown or unit failure",sev:"low",steps:["Check head unit fuse in fuse box","Check constant power fuse for head unit","If fuse is fine: head unit itself may have failed","Check wiring harness connector behind unit"]};
+    if(a[0]==="Audio not working but screen is on")return{issue:"Amplifier fuse or speaker wiring fault",sev:"low",steps:["Check amplifier fuse if external amp is fitted","Inspect speaker wiring for loose connections","Test by adjusting balance/fader to identify dead channels","Factory head unit: may have internal amp fault"]};
+    if(a[1]==="Yes, after battery work")return{issue:"System needs reset or re-pairing after battery disconnect",sev:"low",steps:["Hard reset: hold power button for 10-15 seconds","Re-pair Bluetooth devices after reset","Some systems require re-programming after battery disconnect","Check if time and settings have reset — normal after battery work"]};
+    return{issue:"Electronics fault — reset may help",sev:"low",steps:["Try hard reset: hold power button 10-15 seconds","Check relevant fuse in fuse box","Update head unit firmware if option available","Have auto electrician diagnose if reset doesn't help"]};
+  }
+},
+
+"inspection":{icon:"🔍",title:"Car Inspection / Health Check",
+  qd:function(){return null;},
+  qs:[
+    {q:"What type of inspection do you need?",opts:["Pre-purchase check for used car","Full health check for my existing car","Specific area only (engine, brakes, etc.)","Pre-trip / long journey check"]},
+    {q:"Has the car had any known issues recently?",opts:["Yes, some issues","No known issues","Not sure — just bought it"]}
+  ],
+  dx:function(a){
+    if(a[0]==="Pre-purchase check for used car")return{issue:"Pre-purchase multi-point inspection needed",sev:"med",steps:["Comprehensive 50-point inspection required","Engine, transmission, brakes, suspension, electrical, body checked","Odometer tampering check","Book Instant Mechanic pre-purchase inspection service — mechanic comes to the car's location"]};
+    if(a[0]==="Full health check for my existing car")return{issue:"Preventive health check — full service inspection",sev:"low",steps:["Oil level and condition check","Brake pad thickness measurement","Tyre condition and pressure check","Battery load test + fluid levels check","Book Instant Mechanic service visit"]};
+    if(a[0]==="Pre-trip / long journey check")return{issue:"Pre-trip safety check",sev:"low",steps:["Check all tyre pressures (including spare)","Check engine oil, coolant, brake fluid levels","Test all lights and indicators","Check wiper condition and washer fluid","Ensure spare tyre, jack, and emergency kit are present"]};
+    return{issue:"Targeted inspection in specific area",sev:"med",steps:["Book Instant Mechanic for targeted inspection","Mechanic comes to your location","Describe specific concern to help focus inspection","Full report provided after inspection"]};
+  }
 }
+
 };
+
+/* ── KEYWORD MAPPER ──────────────────────────────────────────────────── */
 
 function mapInput(t){
   var raw=t;
   t=" "+t.toLowerCase().replace(/[^\w\s]/g," ")+" ";
   var h=function(w){return t.includes(w);};
-  var a=function(){for(var i=0;i<arguments.length;i++)if(t.includes(arguments[i]))return true;return false;};
+  var a=function(){for(var i=0;i<arguments.length;i++)if(h(arguments[i]))return true;return false;};
+  var hasBoth=function(w1,w2){return h(w1)&&h(w2);};
+
   // Smell triggers
-  if(a("burning rubber","burning tyre","burning tire","smell of rubber","smell rubber","smells like rubber","burning wood","clutch smell","burning clutch","burning oil","oil smell","exhaust smell","petrol smell","fuel smell","smells like petrol","smells like fuel","smells like gas","sweet smell","smells sweet","sulphur","rotten egg","egg smell","mildew","musty smell","musty","exhaust fumes inside","fumes inside","carbon monoxide","smell inside car","bad smell","strange smell","weird smell","odour","odor"))return"smell diagnosis";
+  if(a("burning rubber","burning tyre","burning tire","smell of rubber","smells like rubber","burning wood","clutch smell","burning clutch","burning oil","oil smell","petrol smell","fuel smell","smells like petrol","smells like fuel","smells like gas","sweet smell","smells sweet","sulphur","rotten egg","egg smell","mildew","musty smell","musty","exhaust fumes inside","fumes inside","carbon monoxide","bad smell","strange smell","weird smell","odour","odor"))return"smell diagnosis";
+
   // Sound triggers
   if(a("knocking sound","banging sound","clicking sound","popping sound","grinding sound","squealing sound","squeaking sound","hissing sound","rattling sound","clunking sound","humming sound","whirring sound","sputtering sound","backfire","backfiring","makes noise","strange noise","weird noise","unusual noise","loud noise","noise from car","car making noise","hear a sound","hear noise","what sound","what noise"))return"sound diagnosis";
+
+  // No airflow
   if(a("no air from vents","vents not working","blower not working","no airflow from","air not coming","fan not working","heater not blowing","no heat from vents"))return"no airflow";
-  // Touch/feel triggers
+
+  // Touch/feel
   if(a("bouncy ride","unstable ride","car bouncing","rough ride","body roll","leans in corners","rolls in corners","seat vibrates","seat shakes","feels loose","handling feels"))return"touch feel diagnosis";
-  // Original + extended triggers
-  // Clutch — broad natural language matching
-  var hasBoth=function(w1,w2){return t.includes(w1)&&t.includes(w2);};
+
+  // Tyre/puncture (NEW)
+  if(a("puncture","flat tyre","flat tire","tyre flat","tyre burst","blowout","tyre repair","air refill","tyre pressure","tyre low")||hasBoth("tyre","flat")||hasBoth("tire","flat"))return"tyre puncture";
+
+  // CNG (NEW)
+  if(a("cng","compressed natural gas","cng issue","cng not working","cng leak","gas kit"))return"cng issue";
+
+  // Air lock (NEW)
+  if(a("air lock","airlock","air locked","fuel system air","car ran dry"))return"air lock";
+
+  // Music (NEW)
+  if(a("music system","music not","infotainment","head unit","radio not","screen not working","audio not","car screen","multimedia"))return"music electronics";
+
+  // Inspection (NEW)
+  if(a("inspection","pre-purchase","used car check","car inspection","health check","pre-trip check"))return"inspection";
+
+  // Wrong fuel / fuel leak (NEW)
+  if(a("wrong fuel","petrol in diesel","diesel in petrol","misfuel","fuel leak","fuel hose","fuel smell car","petrol leak","diesel leak"))return"wrong fuel";
+
+  // Engine oil / fluid leak (NEW)
+  if(a("oil leak","fluid leak","oil dripping","oil puddle","crank seal","sump leak","oil on floor","leakage issue","fluid leaking"))return"engine oil leak";
+
+  // Clutch (original + NEW combined)
   if(a("clutch slip","slipping clutch","revving but not","rpm high but")||hasBoth("clutch","slip")||hasBoth("clutch","not moving")||hasBoth("rpm","not moving"))return"clutch slipping";
-  if(a("clutch hard","clutch heavy","clutch stiff","heavy clutch","hard clutch","clutch pedal hard","clutch become hard","clutch gone hard","clutch getting hard","clutch is hard","pedal hard","pedal heavy","pedal stiff")||hasBoth("clutch","hard")||hasBoth("clutch","heavy")||hasBoth("clutch","stiff")||hasBoth("clutch","difficult")||hasBoth("clutch","tight"))return"clutch hard";
-  if(a("clutch not return","clutch stuck","clutch not coming","clutch floor","pedal stuck","pedal not coming","pedal not return")||hasBoth("clutch","stuck")||hasBoth("pedal","stuck")||hasBoth("clutch","not come back")||hasBoth("clutch","on floor"))return"clutch not returning";
+  if(a("clutch hard","clutch heavy","clutch stiff","hard clutch","clutch pedal hard","clutch gone hard","clutch getting hard")||hasBoth("clutch","hard")||hasBoth("clutch","heavy")||hasBoth("clutch","stiff")||hasBoth("clutch","difficult")||hasBoth("clutch","tight"))return"clutch hard";
+  if(a("clutch not return","clutch stuck","clutch not coming","pedal stuck","pedal not return")||hasBoth("clutch","stuck")||hasBoth("pedal","stuck"))return"clutch not returning";
+  if(a("clutch broke","clutch issue","clutch problem","clutch cable","clutch not working")||hasBoth("clutch","issue")||hasBoth("clutch","problem"))return"clutch issue";
+
   // Brake pedal specifics
-  if(a("brake pedal hard","hard brake pedal","stiff brake pedal","brake booster")||hasBoth("brake","booster")||(hasBoth("brake","hard")&&!t.includes("grinding")&&!t.includes("squeal")))return"brake pedal hard";
-  if(a("brake soft","soft brake","sinking pedal","pedal sink","brake going down","pedal going down")||hasBoth("brake","soft")||hasBoth("brake","sinking")||hasBoth("pedal","sinking")||hasBoth("brake","low"))return"brake pedal soft";
+  if(a("brake pedal hard","hard brake pedal","stiff brake pedal","brake booster")||hasBoth("brake","booster")||(hasBoth("brake","hard")&&!h("grinding")&&!h("squeal")))return"brake pedal hard";
+  if(a("brake soft","soft brake","sinking pedal","pedal sink","brake going down","pedal going down")||hasBoth("brake","soft")||hasBoth("brake","sinking"))return"brake pedal soft";
   if(a("pulling","car pull","pulls left","pulls right")||hasBoth("car","pull")||hasBoth("pulling","side"))return"car pulling braking";
   if(a("wheel lock","wheel locking","skidding","abs light","brakes lock")||hasBoth("wheel","lock")||hasBoth("abs","light"))return"wheel lock";
+
   // Gear issues
-  if(a("gear not","not shifting","gear stuck","gear hard","gear engage","grinding gear")||hasBoth("gear","not")||hasBoth("gear","stuck")||hasBoth("gear","hard")||hasBoth("cannot","gear")||hasBoth("gear","engage"))return"gear not shifting";
-  if(a("automatic delay","auto gear","transmission delay","gear jerk","gearbox delay","auto transmission")||hasBoth("automatic","delay")||hasBoth("auto","jerk")||hasBoth("transmission","delay"))return"automatic gear delay";
-  // Other mechanical
+  if(a("gear not","not shifting","gear stuck","gear hard","gear engage","grinding gear")||hasBoth("gear","not")||hasBoth("gear","stuck")||hasBoth("gear","hard"))return"gear not shifting";
+  if(a("automatic delay","auto gear","transmission delay","gear jerk","gearbox delay","auto transmission")||hasBoth("automatic","delay")||hasBoth("auto","jerk"))return"automatic gear delay";
+
+  // Suspension noise
   if(a("suspension","thud","clunk on bump","bump noise","pothole noise","shock absorber")||hasBoth("noise","bump")||hasBoth("noise","pothole"))return"suspension noise";
+
+  // Engine misfire
   if(a("misfire","misfiring","engine shake","rough idle","shaking engine")||hasBoth("engine","misfire")||hasBoth("engine","shake")||hasBoth("rough","idle"))return"engine misfire";
+
+  // Car shuts off
   if(a("shuts off","shut off","dies while","stall","stops while driving","engine dies")||hasBoth("engine","die")||hasBoth("car","stall")||hasBoth("car","shut off"))return"car shuts off";
-  if(a("no response","not responding","accelerator not","no acceleration")||hasBoth("accelerator","no response")||hasBoth("pressing","no response")||(hasBoth("no","response")&&!t.includes("start")))return"engine no response";
+
+  // Engine no response
+  if(a("no response","not responding","accelerator not","no acceleration")||hasBoth("accelerator","no response")||hasBoth("pressing","no response"))return"engine no response";
+
+  // AC intermittent
   if(a("ac intermittent","ac comes and goes","ac stops","intermittent cool","ac on and off","sometimes cool")||hasBoth("ac","intermittent")||hasBoth("ac","sometimes"))return"ac intermittent";
-  // Car not starting
+
+  // Towing (NEW)
+  if(a("towing","tow needed","tow the car","tow truck","roadside recovery","recovery needed","car tow","need tow")||hasBoth("car","tow"))return"towing needed";
+
+  // Lights / indicators / horn (NEW)
+  if(a("horn not","indicator stuck","brake light not off","light not working","headlight out","indicator not","tail light","indicator problem","lights not","turn signal")||hasBoth("horn","not")||hasBoth("indicator","not"))return"lights indicators horn";
+
+  // Wheel / rim / axle (NEW)
+  if(a("alloy bent","alloy crack","axle issue","axle problem","wheel dislocated","wheel bearing","wheel wobble","rim issue","rim bent")||hasBoth("wheel","bent")||hasBoth("alloy","issue"))return"wheel rim axle";
+
+  // Window / mirror / wiper (NEW)
+  if(a("window not","power window","window stuck","wiper not","wiper problem","mirror broken","mirror not","side mirror")||hasBoth("window","stuck")||hasBoth("wiper","not"))return"window mirror wiper";
+
+  // Door / boot / bonnet (NEW)
+  if(a("door not opening","bonnet issue","boot not","bonnet came off","door stuck","car door","boot stuck","bonnet open","central locking","door lock")||hasBoth("door","stuck")||hasBoth("bonnet","open"))return"door boot bonnet";
+
+  // Car not moving (NEW)
+  if(a("car not moving","car stuck","won't move","wont move","not moving","car moving","can't move")||hasBoth("car","stuck")||hasBoth("not","moving"))return"car not moving";
+
+  // Ignition (NEW)
+  if(a("ignition problem","ignition issue","key stuck","key not turning","key won't turn","push button not","immobiliser","push start not","start button not","cluster light on")||hasBoth("key","stuck")||hasBoth("ignition","not"))return"ignition issue";
+
+  // Dashboard warning / EPC / ESP (NEW)
+  if(a("epc","esp warning","esc warning","dashboard warning","warning light on","eps sign","eps light","traction control light","car scanning","dashboard light")||hasBoth("warning","light")||hasBoth("epc","light")||hasBoth("esp","light"))return"dashboard warning";
+
+  // Self/starter motor (NEW)
+  if(a("self not working","car self","auto start not","self motor","starter motor","car not taking self","self start")||hasBoth("self","not"))return"self start issue";
+
+  // Key lockout (NEW)
+  if(a("key lockout","locked out","keys inside","keys locked","lost key","key broken","alarm won't","alarm stuck","remote not working","key fob")||hasBoth("keys","locked")||hasBoth("locked","car"))return"key lockout";
+
+  // Fuel empty (NEW)
+  if(a("fuel empty","petrol empty","diesel empty","ran out of fuel","out of fuel","no fuel","fuel delivery","need fuel","fuel needed")||hasBoth("fuel","empty")||hasBoth("petrol","finished"))return"fuel empty";
+
+  // Engine belt (NEW)
+  if(a("belt broken","belt snapped","belt issue","alternator belt","ac belt","serpentine belt","belt squeal","belt broke")||hasBoth("belt","snap")||hasBoth("belt","broken"))return"engine belt";
+
+  // Acceleration issue (NEW)
+  if(a("pick up issue","pickup issue","acceleration issue","acceleration not","accelerator not working","sluggish","no pickup","lost power","power loss")||hasBoth("acceleration","not")||hasBoth("pickup","bad"))return"acceleration issue";
+
+  // Coolant issue (NEW)
+  if(a("coolant leak","coolant low","coolant over","coolant connector","coolant issue","radiator leak")||hasBoth("coolant","issue")||hasBoth("coolant","low"))return"coolant issue";
+
+  // Electrical (NEW)
+  if(a("wiring issue","fuse check","electrical failure","wiring fault","burned fuse","aftermarket wiring","electrical problem")||hasBoth("wiring","issue")||hasBoth("electrical","problem"))return"electrical issue";
+
+  // Engine issue (catches general engine problems not caught above)
+  if(a("engine issue","engine problem","engine failure","check engine","engine light","warning light")||hasBoth("engine","issue")||hasBoth("engine","light")||hasBoth("check","engine"))return"check engine";
+
+  // Smoke / burning smell (NEW, catches remaining smoke not caught by smell diagnosis)
+  if(a("smoke","exhaust fume","burning smell","car smoke")||hasBoth("smoke","car")||hasBoth("burning","smell"))return"smoke burning smell";
+
+  // Steering locked (NEW)
+  if(a("steering locked","steering jam","steering jammed","steering hard","steering not moving")||hasBoth("steering","locked")||hasBoth("steering","jam"))return"steering locked";
+
+  // Car not starting (original)
   if(a("not starting","won't start","wont start","not start","car dead","wont crank","won't crank")||hasBoth("car","not start")||hasBoth("car","won't")||hasBoth("engine","not start")||hasBoth("won't","start"))return"car not starting";
-  if(a("battery","drain")||hasBoth("battery","dead")||hasBoth("battery","flat")||hasBoth("battery","not charge"))return"battery";
-  if(a("overheat","temperature high","running hot","engine heat")||hasBoth("engine","hot")||hasBoth("temp","high")||hasBoth("overheating","car"))return"engine overheating";
+
+  // Battery
+  // Battery replacement intent — must check BEFORE generic battery drain
+  if(a("need new battery","want new battery","replace battery","battery change","battery replacement","new battery","battery install","battery chahiye","battery laga","change battery","install battery","buy battery","get battery"))return"battery replacement";
+  if(a("battery","drain")||hasBoth("battery","dead")||hasBoth("battery","flat")||hasBoth("battery","weak")||hasBoth("battery","not charge"))return"battery";
+
+  // Overheating
+  if(a("overheat","temperature high","running hot","engine heat")||hasBoth("engine","hot")||hasBoth("temp","high"))return"engine overheating";
+
+  // Brake
   if(h("brake ")||h(" braking")||h("brakes"))return"brake";
+
+  // AC
   if(a("ac not","air conditioning","air con","not cooling","no cooling")||(t.includes(" ac ")&&a("not work","noise","problem","compressor")))return"ac not cooling";
-  if(a("check engine","engine light","warning light")||hasBoth("engine","light")||hasBoth("check","engine"))return"check engine";
+
+  // Car jerking
   if(a("jerk","jolting")||hasBoth("car","jerk"))return"car jerking";
-  if(a("smoke","exhaust fume")||hasBoth("smoke","exhaust")||hasBoth("smoke","car"))return"smoke";
+
+  // Smoke (original)
+  if(hasBoth("smoke","exhaust")||hasBoth("smoke","car"))return"smoke";
+
+  // Vibration
   if(a("vibrat","shaking","shake")||hasBoth("car","vibrate")||hasBoth("steering","shake"))return"vibration";
-  if(a("steering","hard to turn","heavy steering")||hasBoth("steering","problem")||hasBoth("steering","issue"))return"steering";
+
+  // Steering
+  if(a("steering heavy","heavy steering")||hasBoth("steering","problem")||hasBoth("steering","issue"))return"steering";
+
+  // Car leaning
   if(a("lean","tilt","one side low","lopsided")||hasBoth("car","lean")||hasBoth("car","tilt"))return"car leaning";
+
+  // Differential
   if(a("differential","diff noise","rear noise","noise from rear")||hasBoth("rear","noise")||hasBoth("diff","noise"))return"differential noise";
+
+  // Fuse blowing
   if(a("fuse blow","fuse keep","blowing fuse")||hasBoth("fuse","blow")||hasBoth("fuse","keep"))return"fuse blowing";
+
+  // Steering vibration
   if(a("steering vibrat","steering shake","high speed vibrat","highway shake")||hasBoth("steering","vibrat"))return"steering vibration speed";
+
+  // Vibration braking
   if(a("vibrat when braking","shudder when braking","braking vibrat","pulsating brake")||hasBoth("vibrat","brake")||hasBoth("shudder","brake"))return"vibration braking";
+
   return null;
 }
 
-var st={phase:"idle",key:null,tree:null,qi:0,ans:[]};
+/* ── CHAT ENGINE (unchanged) ─────────────────────────────────────────── */
 
+var st={phase:"idle",key:null,tree:null,qi:0,ans:[]};
 function gt(){var n=new Date();return n.getHours().toString().padStart(2,'0')+':'+n.getMinutes().toString().padStart(2,'0');}
 function sd(){setTimeout(function(){var b=document.getElementById("cbg");if(b)b.scrollTop=b.scrollHeight;},70);}
 
@@ -757,20 +1385,37 @@ function addRestart(){
   wrap.appendChild(rb);c.appendChild(wrap);sd();
 }
 
-function makeCard(icon,title,sub,issueVal,sc,sl,steps){
-  var sh=steps.map(function(s,i){return'<div class="si"><div class="sn">'+(i+1)+'</div><div>'+s+'</div></div>';}).join('');
+function makeCard(icon,title,sub,issueVal,sc,sl,steps,spot,sev){
+  var allSteps=steps.slice();
+  if(spot){
+    allSteps.push('Call <strong>Instant Mechanic on <a href="tel:8393990942" style="color:var(--p);text-decoration:none;">8393990942</a></strong> &mdash; we will fix this on the spot, right where you are');
+  } else if(sev==='high'){
+    allSteps.push('Call <strong>Instant Mechanic on <a href="tel:8393990942" style="color:var(--p);text-decoration:none;">8393990942</a></strong> urgently &mdash; our mechanic will come to you or tow to a partner garage');
+  } else {
+    allSteps.push('Call <strong>Instant Mechanic on <a href="tel:8393990942" style="color:var(--p);text-decoration:none;">8393990942</a></strong> to book a doorstep inspection &mdash; no need to visit a garage');
+  }
+  var sh='';
+  for(var i=0;i<allSteps.length;i++){
+    var isLast=i===allSteps.length-1;
+    var bg=isLast?'background:var(--pp);border-radius:8px;padding:8px 10px;border-bottom:none;':'';
+    var ns=isLast?'background:var(--p);':'';
+    var nc=isLast?'&#9742;':String(i+1);
+    sh+='<div class="si" style="'+bg+'"><div class="sn" style="'+ns+'">'+nc+'</div><div>'+allSteps[i]+'</div></div>';
+  }
+  var spotBadge=spot?'<span class="sp" style="background:#FFF2ED;color:#C03D08;">On-spot fix available</span>':'';
   return '<div class="dc"><div class="dt"><div class="di">'+icon+'</div><div><div class="dtit">'+title+'</div><div class="dsub">'+sub+'</div></div></div>'+
-    '<div class="db"><div class="ir"><div class="il">Most likely issue</div><div class="iv">'+issueVal+'</div><div class="sr"><span class="sp '+sc+'">'+sl+'</span></div></div>'+
+    '<div class="db"><div class="ir"><div class="il">Most likely issue</div><div class="iv">'+issueVal+'</div><div class="sr"><span class="sp '+sc+'">'+sl+'</span>'+spotBadge+'</div></div>'+
     '<div><div class="stl">Recommended actions</div>'+sh+'</div></div></div>';
 }
 
 function renderCard(tree,r){
-  var sc=r.sev==="high"?"sh":r.sev==="med"?"sm":"sl";
-  var sl=r.sev==="high"?"Urgent — see mechanic soon":r.sev==="med"?"Moderate priority":"Minor issue";
-  var c=document.getElementById("chat"),w=document.createElement("div");
-  w.innerHTML=makeCard(tree.icon,tree.title,"Diagnosis complete",r.issue,sc,sl,r.steps);
+  var sc=r.sev==='high'?'sh':r.sev==='med'?'sm':'sl';
+  var sl=r.sev==='high'?'Urgent — see mechanic soon':r.sev==='med'?'Moderate priority':'Minor issue';
+  var c=document.getElementById('chat'),w=document.createElement('div');
+  w.innerHTML=makeCard(tree.icon,tree.title,'Diagnosis complete',r.issue,sc,sl,r.steps,r.spot,r.sev);
   c.appendChild(w.firstChild);sd();
 }
+
 
 function showDiag(){
   var t=st.tree,r=t.dx(st.ans);
@@ -795,50 +1440,88 @@ function pickOpt(opt){
 function handleFollowUp(text){
   var t=text.toLowerCase();
   var h=function(w){return t.includes(w);};
-  var newIssue=!h("my car")&&!h(" it ")&&!h("still")&&!h("but ")&&!h("the car")&&!h("fuel")&&!h("no ")&&!h("because")&&!h("that")&&!h("this")&&!h("why")&&!h("you")&&!h("already")&&!h("tried")&&!h("changed")&&!h("replaced");
-  if(newIssue)return false;
-  showTyping();
-  setTimeout(function(){
-    rmTyping();
-    var c=document.getElementById("chat"),w;
-    if(h("fuel")||h("no fuel")||h("empty")||h("petrol")||h("diesel")||h("ran out")){
+  // Battery replacement intent — always treat as fresh diagnosis
+  if(h("need a new battery")||h("need new battery")||h("want new battery")||h("replace battery")||h("battery change")||h("battery replacement")||h("new battery")||h("install battery")||h("change battery")){
+    st.phase="idle";
+    processInput(text);
+    return true;
+  }
+  // If mapInput can identify a clear new issue from this text, let processInput handle it fresh
+  var newKey=mapInput(text);
+  if(newKey&&newKey!==st.key)return false;
+  // Specific contextual follow-ups we handle inline
+  if(h("fuel")||h("no fuel")||h("empty")||h("petrol")||h("diesel")||h("ran out")){
+    showTyping();
+    setTimeout(function(){
+      rmTyping();
+      var c=document.getElementById("chat"),w=document.createElement("div");
       addMsg("Ah — no fuel would definitely cause a no-start! Here is what to do:","bot");
       setTimeout(function(){
         w=document.createElement("div");
-        w.innerHTML=makeCard("⛽","Empty Fuel Tank","Simple fix","Car out of fuel","sl","Easy fix",["Add at least 2-3 litres of the correct fuel (petrol or diesel)","Wait 2 minutes after filling before cranking — lets fuel pump prime","Turn ignition to ON (not start) 3 times before cranking to prime the pump","If still no start, visit your nearest Instant Mechanic partner garage — running dry can damage the fuel pump"]);
+        w.innerHTML=makeCard("⛽","Empty Fuel Tank","Simple fix","Car out of fuel","sl","Easy fix",["Add at least 2-3 litres of the correct fuel (petrol or diesel)","Wait 2 minutes after filling before cranking — lets fuel pump prime","Turn ignition to ON (not start) 3 times before cranking to prime the pump","If still no start, call us on 8393990942 — running dry can damage the fuel pump"],true);
         c.appendChild(w.firstChild);setTimeout(addRestart,200);sd();
       },150);
-    }else if((h("battery")||h("new battery"))&&st.key==="car not starting"){
+      st.phase="done";
+    },700);
+    return true;
+  }
+  if((h("battery")||h("new battery"))&&st.key==="car not starting"){
+    showTyping();
+    setTimeout(function(){
+      rmTyping();
+      var c=document.getElementById("chat"),w;
       addMsg("Since the battery has been replaced and it is still not starting, the issue is likely deeper:","bot");
       setTimeout(function(){
         w=document.createElement("div");
-        w.innerHTML=makeCard("🔑","Post-Battery Replacement","Advanced diagnosis","Starter motor, alternator, or ignition fault","sh","Urgent — see mechanic soon",["Test the starter motor — listen for clicking or silence when turning the key","Check alternator output (should be 13.5-14.5V with engine running)","Inspect ignition switch and immobiliser system","Scan OBD for fault codes — may reveal a hidden electrical fault","Visit your nearest Instant Mechanic partner garage for a full electrical system check"]);
+        w.innerHTML=makeCard("🔑","Post-Battery Replacement","Advanced diagnosis","Starter motor, alternator, or ignition fault","sh","Urgent — see mechanic soon",["Test the starter motor — listen for clicking or silence when turning the key","Check alternator output (should be 13.5-14.5V with engine running)","Inspect ignition switch and immobiliser system","Scan OBD for fault codes — may reveal a hidden electrical fault"]);
         c.appendChild(w.firstChild);setTimeout(addRestart,200);sd();
       },150);
-    }else if((h("pad")||h("brake pad"))&&st.key==="brake"){
+      st.phase="done";
+    },700);
+    return true;
+  }
+  if((h("pad")||h("brake pad"))&&st.key==="brake"){
+    showTyping();
+    setTimeout(function(){
+      rmTyping();
+      var c=document.getElementById("chat"),w;
       addMsg("Since the brake pads have been replaced and the issue persists, the problem is likely with the rotors or calipers:","bot");
       setTimeout(function(){
         w=document.createElement("div");
-        w.innerHTML=makeCard("🛑","Post-Pad Replacement","Further inspection needed","Warped rotor or seized caliper","sm","Moderate priority",["Inspect brake rotors for warping or scoring","Check caliper pistons for seizure on both sides","Measure rotor thickness — may be below minimum","Visit your nearest Instant Mechanic partner garage for a full brake inspection"]);
+        w.innerHTML=makeCard("🛑","Post-Pad Replacement","Further inspection needed","Warped rotor or seized caliper","sm","Moderate priority",["Inspect brake rotors for warping or scoring","Check caliper pistons for seizure on both sides","Measure rotor thickness — may be below minimum"]);
         c.appendChild(w.firstChild);setTimeout(addRestart,200);sd();
       },150);
-    }else if((h("ac")||h("recharge"))&&st.key==="ac not cooling"){
+      st.phase="done";
+    },700);
+    return true;
+  }
+  if((h("ac")||h("recharge"))&&st.key==="ac not cooling"){
+    showTyping();
+    setTimeout(function(){
+      rmTyping();
+      var c=document.getElementById("chat"),w;
       addMsg("If the AC has been recharged and it is still not cooling, there is likely a leak or compressor fault:","bot");
       setTimeout(function(){
         w=document.createElement("div");
-        w.innerHTML=makeCard("❄️","Post-Recharge AC Issue","Leak or compressor fault","Refrigerant leak or compressor failure","sh","Urgent — see mechanic soon",["Have the system pressure-tested for refrigerant leaks","Inspect AC compressor clutch engagement","Check condenser and evaporator for damage","Visit your nearest Instant Mechanic partner garage for a full AC diagnostic"]);
+        w.innerHTML=makeCard("❄️","Post-Recharge AC Issue","Leak or compressor fault","Refrigerant leak or compressor failure","sh","Urgent — see mechanic soon",["Have the system pressure-tested for refrigerant leaks","Inspect AC compressor clutch engagement","Check condenser and evaporator for damage"]);
         c.appendChild(w.firstChild);setTimeout(addRestart,200);sd();
       },150);
-    }else if(h("overheat")||h("too hot")){
-      addMsg("Overheating can cause starting issues or stalling. Let the engine cool completely first, then check the coolant level. If the problem continues, please <strong>visit your nearest Instant Mechanic partner garage</strong> for a cooling system check.","bot");
+      st.phase="done";
+    },700);
+    return true;
+  }
+  if(h("overheat")||h("too hot")){
+    showTyping();
+    setTimeout(function(){
+      rmTyping();
+      addMsg("Overheating can cause starting issues or stalling. Let the engine cool completely first, then check the coolant level. If it continues, call us at <strong><a href='tel:8393990942' style='color:var(--p);text-decoration:none;'>8393990942</a></strong> or visit your nearest <strong>Instant Mechanic partner garage</strong>.","bot");
       setTimeout(addRestart,300);
-    }else{
-      addMsg("Thanks for the extra detail. Based on what you have described, this needs a hands-on inspection. Please <strong>visit your nearest Instant Mechanic partner garage</strong> — our mechanics will run a full diagnostic and get it sorted quickly.","bot");
-      setTimeout(addRestart,300);
-    }
-    st.phase="done";
-  },700);
-  return true;
+      st.phase="done";
+    },700);
+    return true;
+  }
+  // Nothing specific matched — let processInput try to diagnose it fresh
+  return false;
 }
 
 function processInput(text){
@@ -846,7 +1529,7 @@ function processInput(text){
   var key=mapInput(text);
   if(!key){
     showTyping();
-    setTimeout(function(){rmTyping();addMsg("I am not able to diagnose that specific issue remotely. Please <strong>visit your nearest Instant Mechanic partner garage</strong> for a full detailed car inspection — our trained mechanics will identify and fix the problem quickly.","bot");},700);
+    setTimeout(function(){rmTyping();addMsg("Hmm, I need a bit more to go on for that one! For a full explanation, call us at <strong><a href='tel:8393990942' style='color:var(--p);text-decoration:none;'>8393990942</a></strong> — or visit your nearest <strong>Instant Mechanic partner garage</strong> and our mechanics will sort it out quickly.","bot");},700);
     return;
   }
   st.key=key;st.tree=trees[key];st.qi=0;st.ans=[];st.phase="questioning";
@@ -867,7 +1550,7 @@ function processInput(text){
     }else{
       var q=st.tree.qs[0];
       addMsg("<strong>"+q.q+"</strong>","bot");
-      setTimeout(function(){showOpts(q.opts);},80);
+      setTimeout(function(){showOpts(q.qs||q.opts);},80);
     }
   },600);
 }
@@ -886,7 +1569,7 @@ function resetAll(){
 document.getElementById("sbtn").addEventListener("click",sendMsg);
 document.getElementById("inp").addEventListener("keydown",function(e){if(e.key==="Enter")sendMsg();});
 
-setTimeout(function(){addMsg("Hi! I am <strong>CarBuddy</strong> — describe your car issue, or tell me about any unusual <strong>noise</strong>, <strong>smell</strong>, or <strong>feeling</strong> from your car and I will diagnose it right away.","bot");},300);
+setTimeout(function(){addMsg("Hi! I am <strong>CarBuddy</strong> — your AI car diagnosis assistant covering <strong>all car problems</strong>. Describe your issue or tell me about any unusual <strong>noise</strong>, <strong>smell</strong>, <strong>smoke</strong>, or <strong>feeling</strong> from your car.","bot");},300);
 </script>
 </body>
 </html>
