@@ -1189,6 +1189,281 @@ var trees={
   }
 }
 
+,"abs traction":{icon:"🛑",title:"ABS / Traction Control Warning",
+  qd:function(t){
+    if(t.includes("abs light")||t.includes("abs error")||t.includes("abs fault"))
+      return{issue:"ABS warning light — wheel speed sensor or module fault",sev:"med",
+        steps:["Car is still driveable but ABS is disabled — brake carefully","Scan ABS module for fault codes","Inspect all four wheel speed sensors for damage or dirt","Check ABS sensor wiring harness for chafing"]};
+    return null;
+  },
+  qs:[
+    {q:"Which warning light is showing?",opts:["ABS light (yellow/red)","ESP / ESC / Traction control light","Both ABS and ESP together","ABS + another warning"]},
+    {q:"Is the car braking normally despite the warning?",opts:["Yes, brakes feel normal","No, braking feels different or weak"]},
+    {q:"Did it come on suddenly or after hitting a bump/pothole?",opts:["Came on suddenly","After a bump or pothole","After recent tyre or brake work"]}
+  ],
+  dx:function(a){
+    if(a[2]==="After a bump or pothole")return{issue:"ABS wheel speed sensor knocked out of alignment",sev:"med",steps:["Wheel speed sensor displaced or damaged by impact","Inspect sensor at the affected wheel","Clean sensor and tone ring — dirt causes false readings","Replacement sensor if damaged"]};
+    if(a[0]==="Both ABS and ESP together")return{issue:"Common ABS / ESP fault — likely wheel speed sensor or module",sev:"med",steps:["Scan ABS/ESP module for stored fault codes","Check all four wheel speed sensors","Inspect reluctor ring (tone ring) for damage","ABS module replacement if sensors test fine"]};
+    if(a[1]==="No, braking feels different or weak")return{issue:"ABS fault affecting brake performance — urgent",sev:"high",steps:["Do not drive at speed — braking is compromised","Have ABS system professionally scanned immediately","Check brake fluid level and master cylinder","Tow to garage if braking feels severely impaired"]};
+    return{issue:"ABS / Traction control sensor or module fault",sev:"med",steps:["OBD scan for ABS fault codes (C-series codes)","Inspect wheel speed sensors at all four corners","Check ABS fuse in fuse box","Replace faulty sensor or ABS module"]};
+  }
+},
+
+"jerking stalling":{icon:"⚡",title:"Jerking / Misfiring / Stalling",
+  qd:function(t){
+    if(t.includes("stall")||t.includes("keeps dying")||t.includes("stops repeatedly"))
+      return{issue:"Repeated stalling — fuel, ignition or sensor fault",sev:"high",
+        steps:["Check fuel level first — running low causes intermittent stalling","Scan OBD for misfire or fuel codes","Inspect fuel pump pressure — weak pump causes stalling under load","Check crankshaft position sensor — most common stall cause"]};
+    return null;
+  },
+  qs:[
+    {q:"When exactly does the jerking or stalling happen?",opts:["At idle / just started","During slow acceleration","At highway speed","When stopping at signals"]},
+    {q:"Does the engine cut off completely or just jerk?",opts:["Cuts off completely (stalls)","Just jerks or shudders — engine keeps running"]},
+    {q:"Is the check engine light on?",opts:["Yes","No"]}
+  ],
+  dx:function(a){
+    if(a[0]==="At idle / just started"&&a[1]==="Cuts off completely (stalls)")return{issue:"Idle air control valve or fuel pressure issue",sev:"high",steps:["Clean or replace idle air control (IAC) valve","Check fuel pressure at idle — should be 2.5-4 bar","Inspect vacuum hoses for leaks affecting idle","Scan for P0505 (IAC), P030X (misfire) codes"]};
+    if(a[0]==="During slow acceleration")return{issue:"Fuel delivery or throttle body issue causing hesitation",sev:"med",steps:["Clean throttle body — carbon buildup causes hesitation","Check fuel filter condition","Inspect fuel injectors for partial clogging","Test accelerator pedal position sensor"]};
+    if(a[0]==="At highway speed")return{issue:"Fuel pump weakening or ignition coil failing under load",sev:"high",steps:["Test fuel pump pressure under load (key symptom)","Inspect ignition coils — failing coils miss at high load","Check fuel filter — clogged filter causes high-speed miss","Scan for misfire codes on specific cylinder"]};
+    if(a[0]==="When stopping at signals")return{issue:"Idle quality issue — IAC, EGR or vacuum leak",sev:"med",steps:["Clean throttle body and IAC valve","Check EGR valve for sticking open","Inspect all vacuum hoses near intake manifold","Check for air leaks at intake manifold gasket"]};
+    return{issue:"Misfire or fuel delivery fault — OBD scan needed",sev:"high",steps:["OBD scan for misfire codes (P030X) and fuel codes","Replace spark plugs if overdue","Inspect ignition coils — swap to identify faulty one","Check fuel pump pressure"]};
+  }
+},
+
+"waterlogging":{icon:"🌊",title:"Waterlogging / Car Stuck in Water or Pit",
+  qd:function(t){
+    if(t.includes("flood")||t.includes("waterlog")||t.includes("water inside")||t.includes("stuck in water")||t.includes("stuck in mud")||t.includes("stuck in pit"))
+      return{issue:"Car stuck / waterlogged — towing / recovery service needed",sev:"high",spot:true,
+        steps:["Do NOT start the car if water has entered the engine — hydrolock destroys the engine","Recovery towing or winching needed to get the car out safely","Do not spin wheels in mud or water — worsens the situation","Full engine, electrics, and brake inspection before driving after recovery"]};
+    return null;
+  },
+  qs:[
+    {q:"What is the situation?",opts:["Car is stuck in waterlogged road","Car drove through water and stopped","Car stuck in a pit or manhole","Car stuck in mud or soft ground"]},
+    {q:"Has water entered the engine bay or cabin?",opts:["Yes, water inside the car","Only tyres submerged, cabin dry","Not sure"]},
+    {q:"Is the car starting at all?",opts:["Yes, starts but something feels wrong","No, will not start"]}
+  ],
+  dx:function(a){
+    if(a[1]==="Yes, water inside the car"||a[2]==="No, will not start")
+      return{issue:"Waterlogged engine — do NOT start, tow out immediately",sev:"high",spot:true,
+        steps:["Do NOT attempt to start — hydrolocking destroys the engine instantly","Flatbed tow required — do not drive even a metre","Remove spark plugs after towing to expel trapped water","Full engine, electrical, and brake inspection before restarting"]};
+    if(a[0]==="Car stuck in a pit or manhole")
+      return{issue:"Vehicle stuck in pit / manhole — winching + towing needed",sev:"high",spot:true,
+        steps:["Standard tow truck CANNOT reach — specialised winch/recovery service needed","Winching safely extracts car without further damage","Check underbody, axles and tyres after extraction","Full inspection before driving — mud can block brake vents and cooling"]};
+    if(a[0]==="Car stuck in mud or soft ground")
+      return{issue:"Car stuck in mud — recovery towing needed",sev:"high",spot:true,
+        steps:["Do not spin wheels — makes it worse and can damage drivetrain","Recovery / winch service needed to pull car free","After extraction: inspect underbody, exhaust, and brake discs for mud","Clean wheel arches — packed mud causes vibration and tyre wear"]};
+    if(a[0]==="Car is stuck in waterlogged road")
+      return{issue:"Car stuck in waterlogged road — towing recommended",sev:"high",spot:true,
+        steps:["Do NOT rev hard in standing water — risk of hydrolocking","If water level is above exhaust pipe — do not start or move","Tow out of water first, then inspect before restarting","After towing: check brakes, air filter, electrics, and underbody"]};
+    if(a[0]==="Car drove through water and stopped")
+      return{issue:"Car stopped after driving through water — possible hydrolock or electrical fault",sev:"high",spot:true,
+        steps:["Do NOT attempt to restart — water may be in the engine","Tow to garage immediately for engine and electrical inspection","Air filter inspection — wet filter collapses and can be sucked into engine","If car restarts: check brakes by applying gently several times to dry them"]};
+    return{issue:"Water exposure — post-drive inspection needed",sev:"med",spot:true,
+      steps:["Dry brakes by applying gently several times while driving slowly","Check air filter for water ingestion","Inspect electrical connectors in engine bay for moisture","Book Instant Mechanic doorstep inspection to ensure all systems are safe"]};
+  }
+},
+
+"ev hybrid":{icon:"⚡",title:"EV / Hybrid / Charging Issue",
+  qd:function(t){
+    // EV battery empty / out of charge → towing to charging station
+    if(t.includes("battery empty")||t.includes("charge over")||t.includes("ev empty")||
+       t.includes("out of charge")||t.includes("ev dead")||t.includes("ev not starting")||
+       t.includes("charge khatam")||t.includes("battery khatam")||t.includes("ev band")||
+       t.includes("0% battery")||t.includes("zero charge")||t.includes("ev stopped")||
+       t.includes("ev car stopped")||t.includes("range over")||t.includes("range finished"))
+      return{issue:"EV battery depleted — towing to nearest charging station needed",sev:"high",spot:true,
+        steps:["Do NOT attempt to push-start or jump-start an EV — it will cause damage","EV flatbed tow to nearest charging station or service centre required","Flatbed tow recommended over underlift — protects the drivetrain","Once charged to at least 20%, test drive before returning to normal use"]};
+    // Charging fault
+    if(t.includes("ev charging")||t.includes("charging not")||t.includes("won't charge")||
+       t.includes("not charging")||t.includes("charge not working"))
+      return{issue:"EV not charging — charger, port or battery management fault",sev:"high",
+        steps:["Check charger cable and connector for damage","Try a different charging point to isolate the fault","Check for error codes on the dashboard display","Battery management system (BMS) fault if multiple chargers fail"]};
+    return null;
+  },
+  qs:[
+    {q:"What type of vehicle is this?",opts:["Full EV (no petrol engine)","Hybrid (EV + petrol)","48V mild hybrid","CNG + electric combo"]},
+    {q:"What is the specific problem?",opts:["EV battery empty / out of charge — car stopped","Not charging / charge not increasing","Hybrid battery warning light","Reduced range or power","High voltage system warning"]},
+    {q:"Any warning lights or error codes on the display?",opts:["Yes, specific error code showing","Just warning lights, no code","No warnings, just poor performance"]}
+  ],
+  dx:function(a){
+    if(a[1]==="EV battery empty / out of charge — car stopped")return{issue:"EV battery depleted — flatbed tow to charging station",sev:"high",spot:true,steps:["Do NOT jump-start or push-start an EV — it causes serious damage","Flatbed tow required (not underlift) — EV drivetrain must not rotate when unpowered","Tow to nearest fast-charging station (DC fast charger) or EV service centre","Charge to minimum 20% before attempting to drive — do not run flat repeatedly, it degrades battery"]};
+    if(a[1]==="Not charging / charge not increasing")return{issue:"Charging system fault — charger, port or BMS",sev:"high",steps:["Test with different charging cable first","Check charging port for damage or debris","OBD scan for charging system fault codes","BMS (Battery Management System) inspection at EV-specialist"]};
+    if(a[1]==="High voltage system warning")return{issue:"High voltage system warning — do not ignore",sev:"high",steps:["Do NOT attempt any repairs yourself — high voltage is lethal","Take to EV-certified workshop immediately","Avoid driving if HV warning is active","OBD scan for HV fault codes by certified technician"]};
+    if(a[1]==="Reduced range or power")return{issue:"Battery degradation or thermal management fault",sev:"med",steps:["Check battery state of health (SOH) at EV workshop","Thermal management system inspection","Avoid fast charging repeatedly — reduces battery life","OBD scan for battery cell imbalance codes"]};
+    if(a[0]==="Hybrid (EV + petrol)"&&a[1]==="Hybrid battery warning light")return{issue:"Hybrid battery or inverter fault",sev:"high",steps:["Hybrid battery pack inspection required","Inverter fault can cause sudden power loss","Do not ignore — hybrid system faults can leave you stranded","OBD scan at hybrid-certified workshop"]};
+    return{issue:"EV/Hybrid fault — specialist diagnosis needed",sev:"high",steps:["EV/Hybrid issues require specialist certified workshop","Do not attempt self-diagnosis on high-voltage systems","Book OBD scan with EV-certified mechanic","Check warranty status — many EV faults are covered"]};
+  }
+},
+
+"starter push button":{icon:"🔑",title:"Starter / Push Start Issue",
+  qd:function(t){
+    if(t.includes("push button")&&(t.includes("not")||t.includes("no response")))
+      return{issue:"Push-button start not responding — smart key or brake interlock",sev:"med",
+        steps:["Ensure foot is firmly on brake pedal while pressing start button","Replace key fob battery (CR2032) — dead fob is most common cause","Hold key fob against start button to use emergency NFC start","Check if steering wheel is locked — turn wheel while pressing start"]};
+    return null;
+  },
+  qs:[
+    {q:"What happens when you try to start?",opts:["Push button has no response at all","Button lights up but engine won't crank","Engine cranks but won't fire","Keyless entry stopped working"]},
+    {q:"Is your car a keyless / push-button start?",opts:["Yes, push-button start","Traditional key ignition","Not sure"]},
+    {q:"Any error on the dashboard display?",opts:["Key not detected message","No key symbol","No message, just no start","Multiple warning lights"]}
+  ],
+  dx:function(a){
+    if(a[2]==="Key not detected message"||a[2]==="No key symbol")return{issue:"Smart key battery dead or key not pairing",sev:"med",spot:true,steps:["Replace key fob battery (CR2032 coin cell — available at any shop)","Emergency start: hold key fob directly against start button","If still not detected: key fob may need re-pairing at dealership","Check if a metal object near key is interfering with signal"]};
+    if(a[0]==="Push button has no response at all")return{issue:"Brake pedal switch, start button fuse or ECU fault",sev:"med",steps:["Ensure brake is fully pressed — brake switch must signal ECU","Check start button fuse in fuse box","Inspect brake pedal switch connection","ECU fault if all above check out — workshop scan needed"]};
+    if(a[0]==="Engine cranks but won't fire")return{issue:"Fuel, ignition or immobiliser fault",sev:"high",steps:["Check fuel level — common oversight","Immobiliser may be triggered — lock/unlock car with key fob and retry","OBD scan for immobiliser or fuel system codes","Inspect crankshaft position sensor"]};
+    if(a[0]==="Keyless entry stopped working")return{issue:"Key fob battery or receiver module fault",sev:"low",spot:true,steps:["Replace key fob battery (CR2032)","Test from closer distance — range reduces as battery weakens","Re-pair fob if battery replacement doesn't help","Door receiver module fault if multiple fobs fail"]};
+    return{issue:"Push-start system fault — diagnosis needed",sev:"med",steps:["Replace key fob battery first (cheapest fix)","Check brake pedal switch","OBD scan for immobiliser or start system codes","Dealership or auto electrician for smart key reprogramming"]};
+  }
+},
+
+"radiator issue":{icon:"🌡️",title:"Radiator Issue",
+  qd:function(t){
+    if(t.includes("radiator fan")||t.includes("fan not working"))
+      return{issue:"Radiator fan failure — overheating risk",sev:"high",
+        steps:["Stop driving if temperature gauge is rising","Check if fan spins when engine is hot (with AC on it should definitely spin)","Radiator fan motor or relay failure","Replace fan motor or thermal switch"]};
+    if(t.includes("radiator leak")||t.includes("radiator cracked"))
+      return{issue:"Radiator leak — coolant loss",sev:"high",
+        steps:["Stop driving immediately — coolant will run out causing overheating","Do not remove radiator cap when hot","Radiator repair (if minor leak) or replacement needed","Pressure test to confirm leak location"]};
+    return null;
+  },
+  qs:[
+    {q:"What is the specific radiator issue?",opts:["Radiator leaking / cracked","Radiator fan not working","Radiator fins blocked / clogged","Radiator replacement needed","Radiator hose issue"]},
+    {q:"Is the car overheating?",opts:["Yes, temperature gauge is high","No, temperature is normal"]},
+    {q:"Is there coolant loss (low reservoir level)?",opts:["Yes, coolant is low","No, coolant level is fine","Haven't checked"]}
+  ],
+  dx:function(a){
+    if(a[0]==="Radiator leaking / cracked")return{issue:"Radiator leak — coolant loss causing overheating risk",sev:"high",steps:["Stop driving — coolant loss leads to overheating and engine damage","Radiator repair possible for hairline cracks (radiator seal/epoxy)","Radiator replacement if cracked or severely corroded","Flush and refill coolant system after repair"]};
+    if(a[0]==="Radiator fan not working")return{issue:"Radiator fan motor or relay failure",sev:"high",steps:["Fan failure causes overheating in traffic (airflow at speed may mask it)","Check fan relay in fuse box first","Test fan motor directly — no spin = motor dead","Replace fan motor or dual-fan assembly"]};
+    if(a[0]==="Radiator fins blocked / clogged")return{issue:"Blocked radiator — reduced cooling efficiency",sev:"med",steps:["Radiator fin cleaning with low-pressure water or compressed air","Do not use high-pressure — fins bend easily","Chemical flush may help with internal blockage","Check condenser fins (AC radiator in front) too"]};
+    if(a[0]==="Radiator hose issue")return{issue:"Radiator hose leak or collapse",sev:"high",steps:["Upper or lower radiator hose may be cracked or collapsing","Check both hoses when cold for soft spots or cracks","Hose replacement — clamp both ends securely","Refill coolant after hose replacement"]};
+    return{issue:"Radiator inspection needed",sev:"med",steps:["Full cooling system pressure test","Inspect radiator fins, hoses, and connections","Check thermostat and water pump operation","Flush and refill coolant if not done recently"]};
+  }
+},
+
+"silencer exhaust":{icon:"💨",title:"Silencer / Exhaust Issue",
+  qd:function(t){
+    if(t.includes("silencer fell")||t.includes("silencer hanging")||t.includes("exhaust fell"))
+      return{issue:"Silencer / exhaust pipe detached — dragging hazard",sev:"high",
+        steps:["Stop driving immediately — dragging exhaust is a road hazard","Do not drive over the detached pipe","Temporary fix: secure with wire/hanger to prevent dragging","Exhaust hanger and silencer reattachment or replacement needed"]};
+    return null;
+  },
+  qs:[
+    {q:"What is the exhaust issue?",opts:["Silencer / exhaust fell off or hanging","Loud roaring noise from exhaust","Exhaust pipe broken or cracked","Exhaust smoke (white/black/blue)","Rattling noise from under the car"]},
+    {q:"When did this start?",opts:["Suddenly started","After hitting a speed bump or pothole","Gradually got louder","After recent garage work"]}
+  ],
+  dx:function(a){
+    if(a[0]==="Silencer / exhaust fell off or hanging")return{issue:"Exhaust / silencer detached — road hazard",sev:"high",steps:["Do not drive — dragging exhaust can snag or cause accidents","Temporary wire/hanger fix to get to a garage","Exhaust hanger bracket welded or replaced","Silencer replacement if damaged by dragging"]};
+    if(a[0]==="Loud roaring noise from exhaust")return{issue:"Silencer baffle failed or exhaust leak",sev:"med",steps:["Silencer internal baffle has collapsed — replacement needed","Check for exhaust manifold crack (louder at startup)","Inspect exhaust pipe joints for leaks","Silencer replacement is most common fix"]};
+    if(a[0]==="Exhaust pipe broken or cracked")return{issue:"Exhaust pipe crack — fumes risk",sev:"high",steps:["Cracked exhaust pipe can allow CO fumes into cabin","Open windows if fumes detected inside","Exhaust pipe welding or section replacement needed","Check flexi-pipe section (common failure point)"]};
+    if(a[0]==="Rattling noise from under the car")return{issue:"Heat shield loose or exhaust hanger broken",sev:"med",steps:["Heat shield rattle — common and cheap fix (tighten or remove loose shield)","Exhaust hanger rubber may be broken","Shake exhaust pipe gently (cold) to identify loose section","Hanger rubber replacement or heat shield clipping"]};
+    return{issue:"Exhaust inspection needed",sev:"med",steps:["Full exhaust system visual inspection","Check from manifold to silencer for cracks or holes","Inspect exhaust hangers and rubber mounts","Repair or replace as needed"]};
+  }
+},
+
+"mirror orvm":{icon:"🪟",title:"Mirror / ORVM Issue",
+  qd:function(t){
+    if(t.includes("mirror broke")||t.includes("mirror hit")||t.includes("mirror accident"))
+      return{issue:"Mirror physically broken — replacement needed",sev:"med",spot:true,
+        steps:["Mirror glass replacement if only glass is broken (cheaper option)","Full ORVM housing replacement if motor or bracket damaged","Check indicator light in ORVM if fitted","Colour-matched cover replacement available"]};
+    return null;
+  },
+  qs:[
+    {q:"What is the mirror issue?",opts:["Mirror glass broken / cracked","Mirror won't fold / unfold","Mirror not adjusting (motor fault)","Indicator in mirror not working","Mirror vibrating at speed","Rear-view (interior) mirror issue"]},
+    {q:"Which mirror is affected?",opts:["Driver side (right)","Passenger side (left)","Both sides","Interior rear-view mirror"]}
+  ],
+  dx:function(a){
+    if(a[0]==="Mirror glass broken / cracked")return{issue:"ORVM glass broken — replacement needed",sev:"med",spot:true,steps:["Mirror glass only replacement is cheaper than full ORVM","Ensure correct convex/flat glass type for your car","Check if heating element (if fitted) still works","Temporary: use clear tape to hold cracked glass until replaced"]};
+    if(a[0]==="Mirror won't fold / unfold")return{issue:"Mirror fold motor or actuator fault",sev:"low",steps:["Check mirror fold fuse in fuse box","Test mirror fold button — may need button/switch replacement","Mirror fold motor replacement inside ORVM housing","Check wiring connector on mirror hinge"]};
+    if(a[0]==="Mirror not adjusting (motor fault)")return{issue:"Mirror adjustment motor failure",sev:"low",steps:["Check mirror adjustment fuse","Test all four adjustment directions — partial failure = motor wear","Mirror motor replacement inside ORVM","Check mirror control switch on door"]};
+    if(a[0]==="Indicator in mirror not working")return{issue:"Mirror indicator LED or wiring fault",sev:"low",steps:["Check indicator fuse in fuse box","Inspect wiring at mirror hinge — common breakage point","LED strip replacement inside ORVM housing","Full ORVM replacement if wiring is integrated and damaged"]};
+    if(a[0]==="Mirror vibrating at speed")return{issue:"Mirror bracket loose or worn adjustment mechanism",sev:"low",steps:["Tighten mirror mounting bolts (inside door trim)","Check if mirror adjustment gears are stripped","Mirror housing replacement if bracket is cracked","Aftermarket ORVM available for most models"]};
+    return{issue:"Mirror inspection needed",sev:"low",spot:true,steps:["Visual inspection of mirror glass, housing and adjustment","Check all electrical functions (adjust, fold, indicator)","Mirror glass replacement or full ORVM replacement as needed","Book Instant Mechanic doorstep mirror replacement"]};
+  }
+},
+
+"hose pipe leak":{icon:"💧",title:"Hose Pipe / Water Pipe Leak",
+  qd:function(t){
+    if(t.includes("pipe burst")||t.includes("hose burst")||t.includes("pipe broke"))
+      return{issue:"Hose / pipe burst — stop driving immediately",sev:"high",
+        steps:["Stop driving immediately — burst hose causes rapid coolant loss and overheating","Do not remove radiator cap when hot","Allow engine to cool completely before inspecting","Tow to garage — driving without coolant seizes the engine"]};
+    return null;
+  },
+  qs:[
+    {q:"Which pipe or hose is leaking?",opts:["Radiator hose (top or bottom)","AC pipe / hose","Power steering hose","Windshield washer pipe","Brake hose / pipe","Fuel hose","Unknown — just see a leak"]},
+    {q:"Is fluid actively dripping or just a slow seep?",opts:["Active drip or stream","Slow seep / damp patch only"]},
+    {q:"What color is the fluid?",opts:["Green / pink / orange (coolant)","Black / dark (oil)","Clear / light (water or brake fluid)","Oily rainbow sheen (power steering)","No visible fluid"]}
+  ],
+  dx:function(a){
+    if(a[0]==="Radiator hose (top or bottom)")return{issue:"Radiator hose leak — coolant loss",sev:"high",steps:["Top hose: hot coolant under pressure — do not touch when hot","Bottom hose: drains coolant rapidly — stop driving","Hose replacement with correct OEM-spec hose","Refill coolant system and check for air bubbles after replacement"]};
+    if(a[0]==="AC pipe / hose")return{issue:"AC refrigerant or condensate hose issue",sev:"med",steps:["Refrigerant pipe leak: AC will stop cooling (gas escapes)","Condensate drain pipe: blocked drain causes water inside cabin","AC system pressure test to find refrigerant leak","Recharge AC after fixing the leak"]};
+    if(a[0]==="Power steering hose")return{issue:"Power steering hose leak",sev:"high",steps:["Low PS fluid from leak causes sudden heavy steering","Top up PS fluid temporarily to drive carefully to garage","PS hose replacement — high-pressure and low-pressure hoses differ","Flush and refill PS system after hose replacement"]};
+    if(a[0]==="Brake hose / pipe")return{issue:"Brake hose leak — do NOT drive",sev:"high",steps:["DO NOT DRIVE — brake failure risk is immediate","Brake hose failure causes loss of braking on that corner","Tow to garage immediately","Brake hose replacement and full system bleed required"]};
+    if(a[0]==="Fuel hose")return{issue:"Fuel hose leak — fire hazard",sev:"high",steps:["Do NOT start car — fuel leak is a fire risk","Move away from the car in open space","Call for towing — do not drive","Fuel hose replacement and pressure test needed"]};
+    return{issue:"Hose / pipe leak — identification needed",sev:"high",steps:["Identify fluid type by colour (see: green=coolant, dark=oil, clear=water)","Locate source by tracing wetness to its origin","Stop driving if coolant, fuel or brake fluid is leaking","Book Instant Mechanic inspection to identify and fix the leak"]};
+  }
+},
+
+"sensor ecu scan":{icon:"💻",title:"Sensor / ECU / Diagnostic Scan",
+  qd:function(t){
+    if(t.includes("laptop reset")||t.includes("ecu reset")||t.includes("car scanning"))
+      return{issue:"ECU scan / diagnostic needed",sev:"med",
+        steps:["OBD-II scan required to read stored fault codes","Laptop/diagnostic tool connects to OBD port (under dashboard, driver side)","Codes identify exact faulty sensor or system","Some codes clear on their own — persistent codes need fixing"]};
+    return null;
+  },
+  qs:[
+    {q:"What is the specific issue?",opts:["Car needs OBD / diagnostic scan","Sensor warning light on","ECU fault / car in limp mode","Laptop reset / ECU reprogramming needed","Speed sensor issue","ABS/airbag sensor fault"]},
+    {q:"Is the car driveable right now?",opts:["Yes, drives but with a warning light","In limp mode — very slow / no power","Not starting at all"]}
+  ],
+  dx:function(a){
+    if(a[0]==="Car needs OBD / diagnostic scan")return{issue:"Diagnostic scan required — fault codes need reading",sev:"med",steps:["OBD scan reads stored P/C/B/U codes identifying faults","Scan done at your location with Instant Mechanic's diagnostic tool","Common codes: P030X (misfire), P0420 (catalytic converter), P0XXX (sensor)","Some lights clear after fix — rescan to confirm"]};
+    if(a[0]==="ECU fault / car in limp mode"||a[1]==="In limp mode — very slow / no power")return{issue:"Limp mode activated — ECU protecting engine from damage",sev:"high",steps:["Limp mode limits RPM and speed to prevent further damage","Read fault codes immediately to identify the trigger","Common causes: turbo pressure, throttle body, transmission temp","Do not ignore — fix the underlying fault to exit limp mode"]};
+    if(a[0]==="Laptop reset / ECU reprogramming needed")return{issue:"ECU reprogramming / reset required",sev:"med",steps:["ECU reset clears adaptive values — car may run rough briefly after","Proper reset requires correct software, not just battery disconnect","Reprogramming may be needed after ECU replacement","Specialist workshop with manufacturer software recommended"]};
+    if(a[0]==="Speed sensor issue")return{issue:"Speed sensor (VSS or ABS wheel sensor) fault",sev:"med",steps:["Speed sensor fault affects speedometer, ABS, and cruise control","Wheel speed sensor most common (same sensor used by ABS)","Transmission speed sensor affects gear shift quality","OBD scan for P0500 (VSS) or C-series ABS codes"]};
+    return{issue:"Sensor fault — OBD scan needed to identify",sev:"med",steps:["OBD scan at your location by Instant Mechanic mechanic","Sensor replacement after identifying faulty unit","Common sensors: O2, MAF, crankshaft, camshaft, throttle","Clear codes after repair and retest"]};
+  }
+},
+
+"number plate fitting":{icon:"💡",title:"Number Plate / Misc Fitting / Lights",
+  qd:function(t){
+    if(t.includes("fog light")||t.includes("fog lamp"))
+      return{issue:"Fog light installation or replacement",sev:"low",spot:true,
+        steps:["Front fog lights: usually DRL or halogen — check bulb first","Rear fog light: single red lamp, check bulb and fuse","Fog light relay or switch fault if bulb is fine","Aftermarket fog light fitting available"]};
+    return null;
+  },
+  qs:[
+    {q:"What is the fitting or installation needed?",opts:["Number plate broken / replacement","Fog light installation or repair","LED / bulb upgrade or replacement","Accessory fitting (dashcam, sensors, etc.)","Sticker / vinyl / wrap removal","Number plate light not working"]},
+    {q:"Is this urgent or a convenience request?",opts:["Urgent — legally required (e.g. number plate)","Non-urgent convenience fitting"]}
+  ],
+  dx:function(a){
+    if(a[0]==="Number plate broken / replacement")return{issue:"Number plate broken or damaged — legal requirement",sev:"med",spot:true,steps:["Number plate must be clearly visible by law — fine if missing or illegible","HSRP (High Security Registration Plate) may be required in your state","Acrylic plate replacement available immediately","Book Instant Mechanic for doorstep number plate fitting"]};
+    if(a[0]==="Fog light installation or repair")return{issue:"Fog light fitting or repair",sev:"low",spot:true,steps:["Check fog light fuse and relay before replacing bulb","Fog light bulb types: H11, H8, or LED — check spec for your car","Aftermarket LED fog light kits available for most cars","Wiring harness check if fog lights were never working"]};
+    if(a[0]==="LED / bulb upgrade or replacement")return{issue:"Bulb or LED replacement / upgrade",sev:"low",spot:true,steps:["Headlight bulb replacement: H4, H7, H11 most common","LED upgrades: check CANBUS compatibility to avoid error lights","Tail light / brake light LED replacement available","Ambient lighting kits also available through Instant Mechanic"]};
+    if(a[0]==="Number plate light not working")return{issue:"Number plate light bulb or wiring fault",sev:"low",spot:true,steps:["Check number plate light bulb (small festoon or LED bulb)","Check fuse for tail lights / plate lights (shared circuit)","Inspect wiring near number plate for corrosion","Bulb replacement is usually a 2-minute job"]};
+    return{issue:"Accessory fitting / misc job",sev:"low",spot:true,steps:["Book Instant Mechanic for doorstep fitting","Bring or source the part — mechanic will fit it","Most accessory fittings done in 30-60 minutes","Dashcam, sensors, and accessories all available"]};
+  }
+},
+
+"airbag issue":{icon:"🛡️",title:"Airbag Issue",
+  qd:function(t){
+    if(t.includes("airbag deployed")||t.includes("airbags went off")||t.includes("airbag opened"))
+      return{issue:"Airbag deployed — car needs full safety inspection before driving",sev:"high",
+        steps:["Do NOT drive — deployed airbags mean crash sensors have triggered","Seatbelt pretensioners may also have fired and need replacement","Full airbag and restraint system reset required at specialist workshop","Deployed airbag modules must be replaced — they cannot be reused"]};
+    return null;
+  },
+  qs:[
+    {q:"What is the airbag issue?",opts:["Airbag warning light on dashboard","Airbags deployed in an accident","Airbag light came on after repair","Steering wheel airbag cover damaged"]},
+    {q:"Has the car been in an accident?",opts:["Yes, recent accident","No accident — light appeared on its own","Minor bump, airbags didn't deploy"]}
+  ],
+  dx:function(a){
+    if(a[0]==="Airbags deployed in an accident")return{issue:"Airbags deployed — full SRS system replacement needed",sev:"high",steps:["All deployed airbag modules must be replaced","Seatbelt pretensioners replaced (fire during deployment)","SRS control module (airbag ECU) may need replacement or reset","Only SRS-certified workshop should perform this work"]};
+    if(a[0]==="Airbag warning light on dashboard"&&a[1]==="No accident — light appeared on its own")return{issue:"Airbag system fault — SRS scan needed",sev:"high",steps:["SRS scan to read airbag fault codes","Common causes: faulty clock spring (steering wheel rotation sensor), seat sensor, connector","Do not ignore — airbag may not deploy in an accident if fault is active","SRS code reader is different from standard OBD — needs specialist tool"]};
+    if(a[0]==="Airbag light came on after repair")return{issue:"Airbag connector disturbed during repair",sev:"med",steps:["Connector under seat or near dashboard may have been bumped","SRS scan to identify which sensor or module triggered the fault","Re-seat connectors and clear codes","If light returns: sensor or clock spring fault"]};
+    if(a[0]==="Steering wheel airbag cover damaged")return{issue:"Airbag cover (pad) damaged — cosmetic and safety concern",sev:"med",steps:["Cracked airbag cover can affect deployment direction — safety risk","Steering wheel airbag cover / pad replacement","Do not attempt DIY — airbag must be safely depowered before any work","SRS-certified workshop required for safe replacement"]};
+    return{issue:"Airbag system — specialist inspection needed",sev:"high",steps:["Airbag faults require SRS-certified workshop and tools","Do not attempt to clear airbag codes without fixing the root cause","OBD scan to identify fault area","Ignoring airbag faults means airbag may not deploy in a crash"]};
+  }
+}
+
+
 };
 
 /* ── KEYWORD MAPPER ──────────────────────────────────────────────────── */
@@ -1236,6 +1511,141 @@ function mapInput(t){
        "leans in corners","rolls in corners","seat vibrates","seat shakes",
        "feels loose","handling feels"))return"touch feel diagnosis";
 
+  // ── ABS / TRACTION CONTROL WARNING ──────────────────────────────────────
+  if(a("traction control","tcs light","tcs warning","stability control",
+       "vsc light","vsc warning","dsc light","dsc warning","asr light",
+       "anti skid","antiskid","anti-skid","skid control","abs traction",
+       "abs light","abs warning","abs warning light","abs error","abs fault",
+       "abs not working","abs issue","abs problem","abs check","check abs",
+       "abs sensor","abs module","abs scan","wheel speed sensor",
+       "abs and esp","antilock braking","anti lock braking","anti-lock braking")||
+     both("traction","control")||both("stability","control")||
+     both("abs","light")||both("abs","error")||both("abs","fault")||
+     both("abs","issue")||both("abs","warning"))return"abs traction";
+  // ── JERKING / STALLING ───────────────────────────────────────────────
+  if(a("keeps stalling","repeatedly stalling","stalls repeatedly","keeps dying while driving",
+       "engine keeps dying","keeps cutting off","keeps shutting off","idling rough",
+       "rough idle problem","idle problem","engine surging","surging","hesitation under load",
+       "hesitates under acceleration","engine hesitation","engine stumble","stumble",
+       "sputtering","spluttering","engine sputter","car sputter","fuel starvation",
+       "fuel starving","lean misfire","jerking stalling")||
+     both("stall","keep")||both("engine","surge")||both("idle","rough"))return"jerking stalling";
+
+  // ── WATERLOGGING / STUCK ─────────────────────────────────────────────
+  if(a("waterlog","waterlogged","water logging","flood","flooded","stuck in water",
+       "drove through water","car in water","water in engine","water inside car",
+       "submerged","water entered","hydrolocked","hydrolock",
+       "stuck in pit","stuck in manhole","stuck in ditch","stuck in mud",
+       "car in ditch","car in pit","car in mud","stuck in rain","water damage",
+       "monsoon damage","rain damage","car recovery water")||
+     both("car","flood")||both("stuck","mud")||both("stuck","water")||
+     both("stuck","pit")||both("stuck","ditch"))return"waterlogging";
+
+  // ── EV / HYBRID / CHARGING ───────────────────────────────────────────
+  if(a("ev charging","electric vehicle","ev car","electric car","hybrid car","hybrid issue",
+       "hybrid battery","hybrid warning","ev warning","ev battery","ev range",
+       "charging issue","not charging","wont charge","charge not","charger not working",
+       "charging port","charging cable","ev fault","hv warning","high voltage warning",
+       "48v system","48 volt","mild hybrid","bms fault","battery management system",
+       "inverter fault","ev towing","electric car towing","regen braking",
+       "regenerative braking","ev range low","ev not starting","electric motor",
+       "ev motor issue","ev battery empty","ev out of charge","ev dead","ev stopped",
+       "ev car stopped","charge khatam","battery khatam","ev band","range over",
+       "range finished","0 percent charge","ev range zero","ev charge over")||
+     both("ev","issue")||both("hybrid","fault")||both("charging","not")||
+     both("ev","empty")||both("ev","dead")||both("ev","stopped")||
+     both("out","charge")||both("range","over"))return"ev hybrid";
+
+  // ── STARTER / PUSH BUTTON ────────────────────────────────────────────
+  if(a("push button not working","push start not working","push to start not",
+       "keyless start not","smart key not working","key not detected","no key detected",
+       "push button start issue","start button not responding","ignition button not responding",
+       "push start issue","push button problem","keyless ignition issue",
+       "remote start not","auto start stop issue","stop start issue","idle stop issue")||
+     both("push","start")||both("push","button")||both("smart","key")||
+     both("key","detected"))return"starter push button";
+
+  // ── RADIATOR (separate from overheating) ─────────────────────────────
+  if(a("radiator issue","radiator problem","radiator repair","radiator replacement",
+       "radiator fan not","radiator block","radiator flush","radiator cap",
+       "radiator fin","radiator clog","radiator crack","radiator broken","radiator burst",
+       "new radiator","replace radiator","radiator change","radiator service",
+       "fan motor not working","cooling fan motor","fan relay","radiator fan relay",
+       "fan not spinning","fan not rotating","fan stopped","fan motor dead")||
+     both("radiator","fan")||both("radiator","replace")||both("radiator","broken"))return"radiator issue";
+
+  // ── SILENCER / EXHAUST ────────────────────────────────────────────────
+  if(a("silencer","muffler","exhaust fell","exhaust hanging","exhaust dragging",
+       "exhaust loose","exhaust issue","exhaust noise","exhaust repair","exhaust replacement",
+       "exhaust loud","heat shield rattle","heat shield loose","heat shield noise",
+       "catalytic converter","cat converter","dpf filter","dpf issue","exhaust manifold",
+       "manifold leak","exhaust crack","exhaust hole","silencer baffle","flexi pipe",
+       "exhaust flex","pipe rattling under car","silencer fell","silencer hanging",
+       "silencer broken","silencer issue","silencer noise","silencer loud")||
+     both("silencer","fell")||both("exhaust","fell")||both("silencer","issue")||
+     both("exhaust","broken"))return"silencer exhaust";
+
+  // ── MIRROR / ORVM ─────────────────────────────────────────────────────
+  if(a("orvm","side mirror broken","side mirror not working","side mirror issue",
+       "side mirror repair","mirror fold not","mirror not folding","mirror motor",
+       "mirror indicator not","mirror glass broken","mirror fell","mirror came off",
+       "mirror housing","wing mirror","mirror vibrating","mirror fitting",
+       "mirror replacement","orvm broken","orvm not working","orvm repair",
+       "rearview mirror issue","rear view mirror issue","interior mirror")||
+     both("orvm","broke")||both("mirror","fold")||both("mirror","motor")||
+     both("mirror","fell")||both("side","mirror"))return"mirror orvm";
+
+  // ── HOSE PIPE / WATER PIPE LEAK ──────────────────────────────────────
+  if(a("hosepipe","hose pipe leak","water pipe leak","pipe burst","pipe broke",
+       "hose burst","hose broke","hose connector broken","rubber hose leak",
+       "coolant hose leak","radiator hose leak","upper hose leak","lower hose leak",
+       "power steering hose leak","ps hose leak","brake hose leak","brake pipe leak",
+       "fuel pipe leak","fuel hose leak","ac pipe leak","ac hose leak",
+       "washer hose","water outlet pipe","coolant pipe broken","hose pipe issue",
+       "down hose","down hosepipe")||
+     both("hose","broke")||both("hose","burst")||
+     (both("pipe","leak")&&!both("exhaust","pipe")))return"hose pipe leak";
+
+  // ── SENSOR / ECU / DIAGNOSTIC SCAN ───────────────────────────────────
+  if(a("obd scan","obd check","obd diagnostic","obd reader","obd code","diagnostic scan",
+       "laptop scan","laptop check","laptop reset","car scanning needed",
+       "ecu reset","ecu reprogram","ecu fault","ecu issue","ecu problem","ecu replace",
+       "engine control unit","car computer","car computer reset","fault code reading",
+       "read fault code","clear fault code","scan tool needed","scan needed",
+       "speed sensor issue","vss sensor","vehicle speed sensor","map sensor broken",
+       "maf sensor broken","o2 sensor broken","oxygen sensor fault","lambda sensor",
+       "temp sensor fault","knock sensor","crankshaft sensor fault",
+       "camshaft sensor fault","throttle position sensor","mass airflow sensor broken",
+       "sensor broken","sensor replace","sensor calibration","limp mode",
+       "car in limp","limp home mode","restricted performance","reduced power mode",
+       "ecu coding","ecu programming","diagnostic needed")||
+     both("sensor","broke")||both("sensor","fault")||both("obd","scan")||
+     both("ecu","fault")||both("limp","mode"))return"sensor ecu scan";
+
+  // ── NUMBER PLATE / MISC FITTING ───────────────────────────────────────
+  if(a("number plate broken","number plate missing","number plate light",
+       "plate light not working","number plate fitting","hsrp plate","hsrp fitting",
+       "fog light fitting","fog light not working","fog lamp issue","fog lamp fitting",
+       "led fitting","led installation","led headlight upgrade","led upgrade",
+       "bulb change","bulb replacement","headlight bulb change","tail light bulb",
+       "brake light bulb","indicator bulb","drl fitting","drl not working",
+       "daytime running light","dashcam fitting","dashcam installation","dashcam install",
+       "camera fitting","parking sensor fitting","reverse sensor","reverse camera fitting",
+       "ambient light fitting","interior light fitting","accessory fitting",
+       "sticker removal","vinyl wrap removal")||
+     both("number","plate")||both("fog","lamp")||both("led","fitting")||
+     both("bulb","change")||both("dashcam","fit"))return"number plate fitting";
+
+  // ── AIRBAG ISSUE ──────────────────────────────────────────────────────
+  if(a("airbag","airbag light","airbag warning","airbag fault","airbag deployed",
+       "airbag went off","airbags deployed","airbag error","airbag sensor",
+       "airbag ecu","srs light","srs warning","srs fault","srs error",
+       "supplemental restraint","airbag module","airbag clock spring","clock spring",
+       "seatbelt pretensioner","pretensioner","airbag cover","airbag pad",
+       "steering wheel airbag","curtain airbag","side airbag","knee airbag",
+       "airbag reset","airbag reprogramming","airbag issue","airbag problem")||
+     both("airbag","fault")||both("airbag","light")||both("srs","fault")||
+     both("airbag","deployed")||both("airbag","issue"))return"airbag issue";
   // ── BATTERY REPLACEMENT (before generic battery) ──────────────────────
   if(a("need new battery","want new battery","replace battery","battery change",
        "battery replacement","new battery","battery install","battery chahiye",
@@ -1349,12 +1759,10 @@ function mapInput(t){
        "pulls to one")||
      both("car","pull")||both("pulling","side"))return"car pulling braking";
 
+
   // ── WHEEL LOCKING / ABS ───────────────────────────────────────────────
-  if(a("wheel lock","wheel locking","skidding","abs light","brakes lock","abs warning",
-       "abs not working","abs error","abs fault","check abs","abs check","abs issue",
-       "abs problem","abs sensor","abs module","abs scan","abs warning light",
-       "anti lock","antilock","anti-lock")||
-     both("wheel","lock")||both("abs","light")||both("abs","error")||both("abs","issue"))return"wheel lock";
+  if(a("wheel lock","wheel locking","skidding","brakes lock")||
+     both("wheel","lock"))return"wheel lock";
 
   // ── GEAR NOT SHIFTING (MANUAL) ────────────────────────────────────────
   if(a("gear not changing","gear not engaging","gear not working","gear not shifting",
@@ -1682,6 +2090,7 @@ function mapInput(t){
   if(a("jerk","jolting","lurching","car jerks","car jolt","jhatka","jhatkay")||
      both("car","jerk")||both("car","lurch"))return"car jerking";
 
+
   // ── VIBRATION ────────────────────────────────────────────────────────
   if(a("vibrat","shaking","shake")||both("car","vibrate")||both("steering","shake"))return"vibration";
 
@@ -1804,6 +2213,37 @@ function pickOpt(opt){
 function handleFollowUp(text){
   var t=text.toLowerCase();
   var h=function(w){return t.includes(w);};
+
+  // Towing / recovery requests as follow-up
+  if(h("tow")||h("recovery")||h("need towing")||h("want tow")||h("book tow")||
+     h("charging station")||h("tow to charging")||h("tow to garage")||
+     h("tow karo")||h("tow chahiye")||h("gaadi tow")||h("tow service")){
+    showTyping();
+    setTimeout(function(){
+      rmTyping();
+      var isEV=(st.key==='ev hybrid');
+      var msg='';
+      if(isEV||h("charging station")||h("ev")||h("electric car")){
+        msg='For EV towing, a <b>flatbed tow</b> is essential &mdash; never an underlift, as the drivetrain must not rotate when unpowered.<br><br>'+
+          '<b>EV Flatbed tow (up to 10 km):</b> <b>&#8377;1,000 &ndash; &#8377;1,500</b> &mdash; &#8377;100/km beyond 10 km<br>'+
+          '<b>What we do:</b> Tow your EV safely to the nearest charging station or EV service centre<br>'+
+          '<b>Important:</b> Charge to at least 20% before driving after a full depletion<br><br>'+
+          'Call <strong><a href="tel:8393990942" style="color:var(--p);text-decoration:none;">8393990942</a></strong> &mdash; our flatbed tow will reach you and take you to the nearest charging point.';
+      } else {
+        msg='Here are the towing prices in Delhi NCR:<br><br>'+
+          '<b>Underlift tow (car can roll, up to 10 km):</b> <b>&#8377;800 &ndash; &#8377;1,200</b> &mdash; &#8377;80/km beyond<br>'+
+          '<b>Flatbed tow (accident / jammed wheels, up to 10 km):</b> <b>&#8377;1,000 &ndash; &#8377;1,500</b> &mdash; &#8377;100/km beyond<br>'+
+          '<b>Winching (basement / mud / pit):</b> <b>&#8377;500 &ndash; &#8377;800</b> extra<br>'+
+          '<b>Luxury / EV car:</b> Flatbed only, rate on request<br><br>'+
+          'Call <strong><a href="tel:8393990942" style="color:var(--p);text-decoration:none;">8393990942</a></strong> &mdash; we will dispatch a tow truck to your location right away.';
+      }
+      addMsg(msg,'bot');
+      setTimeout(addRestart,400);
+      st.phase='done';
+    },700);
+    return true;
+  }
+
   // Battery replacement intent — always treat as fresh diagnosis
   if(h("need a new battery")||h("need new battery")||h("want new battery")||h("replace battery")||h("battery change")||h("battery replacement")||h("new battery")||h("install battery")||h("change battery")){
     st.phase="idle";
