@@ -1154,6 +1154,27 @@ var trees={
   }
 },
 
+"car body":{icon:"🔨",title:"Car Body / Physical Damage",
+  qd:function(t){
+    if(t.includes("bumper fell")||t.includes("bumper fall")||t.includes("bumper came off")||t.includes("bumper hanging"))
+      return{issue:"Bumper detached — safety risk while driving",sev:"high",steps:["Do not drive at speed — loose bumper can fall and cause accidents","Secure temporarily with rope/cable tie if possible","Bumper reattachment or replacement needed","Check for hidden damage to bumper support brackets"]};
+    if(t.includes("bonnet flew")||t.includes("bonnet open while driving")||t.includes("bonnet fly"))
+      return{issue:"Bonnet latch failure — stop driving immediately",sev:"high",steps:["Stop the car immediately — open bonnet blocks vision completely","Secure bonnet with rope as temporary fix","Bonnet latch mechanism needs urgent repair","Do not drive until bonnet is secured"]};
+    return null;
+  },
+  qs:[
+    {q:"What type of body damage are you dealing with?",opts:["Bumper fell off / hanging","Bonnet unlatched / flapping","Body dent or scratch","Number plate / guard broken","Underbody plastic guard loose"]},
+    {q:"Is the damage affecting your ability to drive safely?",opts:["Yes, unsafe to drive","No, just cosmetic"]}
+  ],
+  dx:function(a){
+    if(a[0]==="Bumper fell off / hanging")return{issue:"Bumper detached — needs reattachment or replacement",sev:"high",steps:["Do not drive fast — loose bumper can snag and cause accident","Secure temporarily with tie/tape if possible","Bumper clips, brackets, or bumper replacement needed","Check impact absorber and support bracket underneath"]};
+    if(a[0]==="Bonnet unlatched / flapping")return{issue:"Bonnet latch failure — safety critical",sev:"high",steps:["Do not drive — open bonnet can flip up and block windscreen","Secure bonnet with rope or bungee cord as a temporary measure","Bonnet latch and safety catch repair needed","Replace latch mechanism before driving"]};
+    if(a[0]==="Number plate / guard broken")return{issue:"Number plate or underbody guard damaged",sev:"low",steps:["Number plate replacement — required by law to be clearly visible","Underbody plastic guard: if dragging, remove before driving further","Guard reattachment or replacement needed","Check for scraping sounds while driving"]};
+    if(a[0]==="Underbody plastic guard loose")return{issue:"Underbody guard loose — scraping risk",sev:"med",steps:["If dragging on the ground — remove immediately (road snagging risk)","Guard clips or screws have failed","Reattachment with correct clips needed","Check for damage to guard itself — may need replacement"]};
+    return{issue:"Body damage — cosmetic repair needed",sev:"low",steps:["Dent and scratch repair by body shop","PDR (Paintless Dent Repair) available for minor dents","Panel beating for deeper damage","Get a repair estimate from Instant Mechanic partner garage"]};
+  }
+},
+
 "inspection":{icon:"🔍",title:"Car Inspection / Health Check",
   qd:function(){return null;},
   qs:[
@@ -1175,176 +1196,482 @@ var trees={
 function mapInput(t){
   var raw=t;
   t=" "+t.toLowerCase().replace(/[^\w\s]/g," ")+" ";
-  var h=function(w){return t.includes(w);};
-  var a=function(){for(var i=0;i<arguments.length;i++)if(h(arguments[i]))return true;return false;};
-  var hasBoth=function(w1,w2){return h(w1)&&h(w2);};
+  var h=function(w){return t.includes(" "+w+" ")||t.includes(" "+w+"s ")||t.endsWith(" "+w);};
+  var c=function(w){return t.includes(w);};
+  var a=function(){for(var i=0;i<arguments.length;i++)if(c(arguments[i]))return true;return false;};
+  var both=function(w1,w2){return c(w1)&&c(w2);};
 
-  // Smell triggers
-  if(a("burning rubber","burning tyre","burning tire","smell of rubber","smells like rubber","burning wood","clutch smell","burning clutch","burning oil","oil smell","petrol smell","fuel smell","smells like petrol","smells like fuel","smells like gas","sweet smell","smells sweet","sulphur","rotten egg","egg smell","mildew","musty smell","musty","exhaust fumes inside","fumes inside","carbon monoxide","bad smell","strange smell","weird smell","odour","odor"))return"smell diagnosis";
+  // ── SMELL DIAGNOSIS ──────────────────────────────────────────────────
+  if(a("burning rubber","burning tyre","burning tire","smell of rubber","smells like rubber",
+       "burning wood","clutch smell","burning clutch","burning oil","oil smell",
+       "petrol smell","fuel smell","smells like petrol","smells like fuel","smells like gas",
+       "sweet smell","smells sweet","sulphur","rotten egg","egg smell","mildew","musty smell",
+       "musty","exhaust fumes inside","fumes inside","carbon monoxide","bad smell inside",
+       "strange smell","weird smell","odour","odor","smell from car","battery water leakage and smell",
+       "leakage issue and smell"))return"smell diagnosis";
 
-  // Sound triggers
-  if(a("knocking sound","banging sound","clicking sound","popping sound","grinding sound","squealing sound","squeaking sound","hissing sound","rattling sound","clunking sound","humming sound","whirring sound","sputtering sound","backfire","backfiring","makes noise","strange noise","weird noise","unusual noise","loud noise","noise from car","car making noise","hear a sound","hear noise","what sound","what noise"))return"sound diagnosis";
+  // ── SOUND DIAGNOSIS ──────────────────────────────────────────────────
+  if(a("knocking sound","banging sound","clicking sound","popping sound","grinding sound",
+       "squealing sound","squeaking sound","hissing sound","rattling sound","clunking sound",
+       "humming sound","whirring sound","sputtering sound","backfire","backfiring",
+       "makes noise","strange noise","weird noise","unusual noise","loud noise",
+       "noise from car","car making noise","hear a sound","hear noise","what sound","what noise",
+       "ticking sound","grinding noise","knocking noise","rattling noise","squeaking noise",
+       "constant ticking","door sound","car sound while driving"))return"sound diagnosis";
 
-  // No airflow
-  if(a("no air from vents","vents not working","blower not working","no airflow from","air not coming","fan not working","heater not blowing","no heat from vents"))return"no airflow";
+  // ── NO AIRFLOW ───────────────────────────────────────────────────────
+  if(a("no air from vents","vents not working","no airflow from","air not coming from vents",
+       "heater not blowing","no heat from vents","blower fan not working")||
+     (c("blower not working")&&!c("ac blower")))return"no airflow";
 
-  // Touch/feel
-  if(a("bouncy ride","unstable ride","car bouncing","rough ride","body roll","leans in corners","rolls in corners","seat vibrates","seat shakes","feels loose","handling feels"))return"touch feel diagnosis";
+  // ── TOUCH / FEEL DIAGNOSIS ───────────────────────────────────────────
+  if(a("bouncy ride","unstable ride","car bouncing","rough ride","body roll",
+       "leans in corners","rolls in corners","seat vibrates","seat shakes",
+       "feels loose","handling feels"))return"touch feel diagnosis";
 
-  // Tyre/puncture (NEW)
-  if(a("puncture","flat tyre","flat tire","tyre flat","tyre burst","blowout","tyre repair","air refill","tyre pressure","tyre low")||hasBoth("tyre","flat")||hasBoth("tire","flat"))return"tyre puncture";
+  // ── BATTERY REPLACEMENT (before generic battery) ──────────────────────
+  if(a("need new battery","want new battery","replace battery","battery change",
+       "battery replacement","new battery","battery install","battery chahiye",
+       "battery laga","change battery","install battery","buy battery","get battery",
+       "battery banana","battery lagana","new battery installation","battery replace",
+       "battery exchange","spare battery","amaron","exide battery","luminous battery"))return"battery replacement";
 
-  // CNG (NEW)
-  if(a("cng","compressed natural gas","cng issue","cng not working","cng leak","gas kit"))return"cng issue";
+  // ── BATTERY ──────────────────────────────────────────────────────────
+  if(a("battery dead","battery down","battery low","battery drain","battery discharge",
+       "battery drained","battery discharged","battery died","battery weak","battery fail",
+       "battery issue","battery problem","jump start","jumpstart","jump-start",
+       "battery not starting","battery not working","battery not charging","battery carbon",
+       "battery connection","battery terminal","battery wire","battery sign","battery symbol",
+       "battery light","dead battery","car battery","battery over","battery shutdown",
+       "battery shut","battery finish","distilled water battery","battery water",
+       "key fob battery","remote battery","battery and start","battery or electrical",
+       "battery or fuse","battery or starter","eps and battery","electric car battery",
+       "automatic car battery")||
+     both("battery","start")||both("battery","not")||both("jump","start")||
+     both("jumpstart","needed")||both("battery","flat")||both("battery","weak"))return"battery";
 
-  // Air lock (NEW)
-  if(a("air lock","airlock","air locked","fuel system air","car ran dry"))return"air lock";
+  // ── TYRE / PUNCTURE ───────────────────────────────────────────────────
+  if(a("puncture","flat tyre","flat tire","tyre flat","tyre burst","blowout","stepney",
+       "tyre repair","air refill","tyre pressure","tyre low","tyre damage","tyre problem",
+       "deflated tyre","burst tyre","flat","air filling","airfilling","air fill",
+       "tube replacement","tubeless","tyre change","tyre nahi","puncture hua",
+       "all tyres punctured","all four tyres","couple of flat","car puncture",
+       "back tyre puncture","front tyre puncture","iron rod in tyre","nozzle cap",
+       "fill air in tyre","tyre and nozzle","back feels bump","tyre not working",
+       "front wheel puncture","wheel puncture","spare tyre","stepney change",
+       "new tyre","tyre replace","car tire","car tyre")||
+     both("tyre","flat")||both("tire","flat")||both("tyre","damage")||
+     both("tyre","burst")||both("tyre","issue")||both("tyre","puncture")||
+     both("flat","tyre"))return"tyre puncture";
 
-  // Music (NEW)
-  if(a("music system","music not","infotainment","head unit","radio not","screen not working","audio not","car screen","multimedia"))return"music electronics";
+  // ── CNG ───────────────────────────────────────────────────────────────
+  if(a("cng","compressed natural gas","cng issue","cng not working","cng leak","gas kit",
+       "cng problem","cng repair","cng nahi","cng light","cng pipe","cng point",
+       "cng switch","auto shift cng","cng to petrol","cng ecu","gas switch",
+       "fill air in tyre and nozzle cap needed for cng"))return"cng issue";
 
-  // Inspection (NEW)
-  if(a("inspection","pre-purchase","used car check","car inspection","health check","pre-trip check"))return"inspection";
+  // ── AIR LOCK ──────────────────────────────────────────────────────────
+  if(a("air lock","airlock","air locked","fuel system air","car ran dry","ran dry",
+       "fuel line air","no fuel in line"))return"air lock";
 
-  // Wrong fuel / fuel leak (NEW)
-  if(a("wrong fuel","petrol in diesel","diesel in petrol","misfuel","fuel leak","fuel hose","fuel smell car","petrol leak","diesel leak"))return"wrong fuel";
+  // ── MUSIC / MISC ELECTRONICS ──────────────────────────────────────────
+  if(a("music system","music not","infotainment","head unit","radio not","screen not working",
+       "audio not","car screen","multimedia","touchscreen","display not working",
+       "screen black","stereo not","car audio","speakers not","car display not working",
+       "display not starting","ignition not displaying","music system not working"))return"music electronics";
 
-  // Engine oil / fluid leak (NEW)
-  if(a("oil leak","fluid leak","oil dripping","oil puddle","crank seal","sump leak","oil on floor","leakage issue","fluid leaking"))return"engine oil leak";
+  // ── INSPECTION ────────────────────────────────────────────────────────
+  if(a("inspection","pre-purchase","used car check","car inspection","health check",
+       "pre-trip check","second hand car","2nd hand car","purani gaadi","car check up",
+       "full check","comprehensive car inspection","inspection required",
+       "jump start & inspection","jump start and check"))return"inspection";
 
-  // Clutch (original + NEW combined)
-  if(a("clutch slip","slipping clutch","revving but not","rpm high but")||hasBoth("clutch","slip")||hasBoth("clutch","not moving")||hasBoth("rpm","not moving"))return"clutch slipping";
-  if(a("clutch hard","clutch heavy","clutch stiff","hard clutch","clutch pedal hard","clutch gone hard","clutch getting hard")||hasBoth("clutch","hard")||hasBoth("clutch","heavy")||hasBoth("clutch","stiff")||hasBoth("clutch","difficult")||hasBoth("clutch","tight"))return"clutch hard";
-  if(a("clutch not return","clutch stuck","clutch not coming","pedal stuck","pedal not return")||hasBoth("clutch","stuck")||hasBoth("pedal","stuck"))return"clutch not returning";
-  if(a("clutch broke","clutch issue","clutch problem","clutch cable","clutch not working")||hasBoth("clutch","issue")||hasBoth("clutch","problem"))return"clutch issue";
+  // ── WRONG FUEL / FUEL LEAK ────────────────────────────────────────────
+  if(a("wrong fuel","petrol in diesel","diesel in petrol","misfuel","fuel leak",
+       "fuel hose","fuel smell car","petrol leak","diesel leak","filled diesel in a petrol",
+       "diesel filter issue","diesel supply issue","fuel hose cut","fuel line leakage",
+       "fuel leaking","fuel tank leak","front pipeline leak","fuel leakage near engine"))return"wrong fuel";
 
-  // Brake pedal specifics
-  if(a("brake pedal hard","hard brake pedal","stiff brake pedal","brake booster")||hasBoth("brake","booster")||(hasBoth("brake","hard")&&!h("grinding")&&!h("squeal")))return"brake pedal hard";
-  if(a("brake soft","soft brake","sinking pedal","pedal sink","brake going down","pedal going down")||hasBoth("brake","soft")||hasBoth("brake","sinking"))return"brake pedal soft";
-  if(a("pulling","car pull","pulls left","pulls right")||hasBoth("car","pull")||hasBoth("pulling","side"))return"car pulling braking";
-  if(a("wheel lock","wheel locking","skidding","abs light","brakes lock")||hasBoth("wheel","lock")||hasBoth("abs","light"))return"wheel lock";
+  // ── ENGINE OIL / FLUID LEAK ───────────────────────────────────────────
+  if(a("oil leak","fluid leak","oil dripping","oil puddle","crank seal","sump leak",
+       "oil on floor","leakage issue","fluid leaking","oil stain","engine oil leak",
+       "engine oil leakage","oil under car","engine oil issue","engine oil over",
+       "engine oil refill","oil drip","dark drip","tela leak","tel leak",
+       "gasket issue","fluid leakage"))return"engine oil leak";
 
-  // Gear issues
-  if(a("gear not","not shifting","gear stuck","gear hard","gear engage","grinding gear")||hasBoth("gear","not")||hasBoth("gear","stuck")||hasBoth("gear","hard"))return"gear not shifting";
-  if(a("automatic delay","auto gear","transmission delay","gear jerk","gearbox delay","auto transmission")||hasBoth("automatic","delay")||hasBoth("auto","jerk"))return"automatic gear delay";
+  // ── CLUTCH SLIPPING ───────────────────────────────────────────────────
+  if(a("clutch slip","slipping clutch","revving but not","rpm high but","clutch free",
+       "clutch got free","clutch is free","clutch burned out","clutch burn")||
+     both("clutch","slip")||both("clutch","not moving")||both("rpm","not moving"))return"clutch slipping";
 
-  // Suspension noise
-  if(a("suspension","thud","clunk on bump","bump noise","pothole noise","shock absorber")||hasBoth("noise","bump")||hasBoth("noise","pothole"))return"suspension noise";
+  // ── CLUTCH PEDAL HARD ─────────────────────────────────────────────────
+  if(a("clutch hard","clutch heavy","clutch stiff","hard clutch","clutch pedal hard",
+       "clutch gone hard","clutch getting hard","clutch tight","clutch difficult",
+       "clutch is pushing hard")||
+     both("clutch","hard")||both("clutch","heavy")||both("clutch","stiff"))return"clutch hard";
 
-  // Engine misfire
-  if(a("misfire","misfiring","engine shake","rough idle","shaking engine")||hasBoth("engine","misfire")||hasBoth("engine","shake")||hasBoth("rough","idle"))return"engine misfire";
+  // ── CLUTCH PEDAL NOT RETURNING ────────────────────────────────────────
+  if(a("clutch not return","clutch stuck","clutch not coming","pedal stuck",
+       "pedal not return","clutch pedal has fallen","clutch pedal is free","pedal is free")||
+     both("clutch","stuck")||both("pedal","stuck"))return"clutch not returning";
 
-  // Car shuts off
-  if(a("shuts off","shut off","dies while","stall","stops while driving","engine dies")||hasBoth("engine","die")||hasBoth("car","stall")||hasBoth("car","shut off"))return"car shuts off";
+  // ── CLUTCH ISSUE (general) ────────────────────────────────────────────
+  if(a("clutch broke","clutch broken","clutch issue","clutch problem","clutch cable",
+       "clutch not working","clutch repair","clutch plate","clutch fail","clutch damage",
+       "clutch wire","clutch oil leak","clutch cylinder","clutch pad","clutch pads",
+       "clutch patti","clutch release bearing","clutch blade","clutch and gear",
+       "clutch down","clutch free issue","gear and clutch","clutch breakdown",
+       "clutch loose","clutch jammed","gear clutch issue","clutch pedal issue",
+       "clutch plate related")||
+     both("clutch","issue")||both("clutch","broke")||both("clutch","problem"))return"clutch issue";
 
-  // Engine no response
-  if(a("no response","not responding","accelerator not","no acceleration")||hasBoth("accelerator","no response")||hasBoth("pressing","no response"))return"engine no response";
+  // ── BRAKE PEDAL HARD ──────────────────────────────────────────────────
+  if(a("brake pedal hard","hard brake pedal","stiff brake pedal","brake booster","brake stiff",
+       "brake pedal hard caliper","brake booster limited")||
+     both("brake","booster")||(both("brake","hard")&&!c("grinding")&&!c("squeal")))return"brake pedal hard";
 
-  // AC intermittent
-  if(a("ac intermittent","ac comes and goes","ac stops","intermittent cool","ac on and off","sometimes cool")||hasBoth("ac","intermittent")||hasBoth("ac","sometimes"))return"ac intermittent";
+  // ── BRAKE PEDAL SOFT ──────────────────────────────────────────────────
+  if(a("brake soft","soft brake","sinking pedal","pedal sink","brake going down",
+       "pedal going down","spongy brake","brake spongy","brake low")||
+     both("brake","soft")||both("brake","sinking"))return"brake pedal soft";
 
-  // Towing (NEW)
-  if(a("towing","tow needed","tow the car","tow truck","roadside recovery","recovery needed","car tow","need tow")||hasBoth("car","tow"))return"towing needed";
+  // ── CAR PULLING WHILE BRAKING ─────────────────────────────────────────
+  if(a("car pull","pulls left","pulls right","pulling to one side","car drift",
+       "pulls to one")||
+     both("car","pull")||both("pulling","side"))return"car pulling braking";
 
-  // Lights / indicators / horn (NEW)
-  if(a("horn not","indicator stuck","brake light not off","light not working","headlight out","indicator not","tail light","indicator problem","lights not","turn signal")||hasBoth("horn","not")||hasBoth("indicator","not"))return"lights indicators horn";
+  // ── WHEEL LOCKING / ABS ───────────────────────────────────────────────
+  if(a("wheel lock","wheel locking","skidding","abs light","brakes lock","abs warning",
+       "abs not working")||
+     both("wheel","lock")||both("abs","light"))return"wheel lock";
 
-  // Wheel / rim / axle (NEW)
-  if(a("alloy bent","alloy crack","axle issue","axle problem","wheel dislocated","wheel bearing","wheel wobble","rim issue","rim bent")||hasBoth("wheel","bent")||hasBoth("alloy","issue"))return"wheel rim axle";
+  // ── GEAR NOT SHIFTING (MANUAL) ────────────────────────────────────────
+  if(a("gear not changing","gear not engaging","gear not working","gear not shifting",
+       "gear stuck","gear hard","gear jam","gear jammed","gear lock","gear lock jammed",
+       "gear locked","gear wire broke","gear knob stuck","gear lever issue","gear is not changing",
+       "gear isn't shifting","gear free issue","gearbox jammed","gearbox stuck",
+       "gearbox not working","gearbox breakdown","gear system not working","gear problems",
+       "gear box not","gear issue","gear problem","gearbox issue","gear cable",
+       "car handle locked and gear","gear and clutch","gear knob loose","gear wire",
+       "grinding gear","emergency park issue")||
+     both("gear","not")||both("gear","stuck")||both("gear","hard")||
+     both("gear","issue")||both("gear","problem")||both("gear","jam"))return"gear not shifting";
 
-  // Window / mirror / wiper (NEW)
-  if(a("window not","power window","window stuck","wiper not","wiper problem","mirror broken","mirror not","side mirror")||hasBoth("window","stuck")||hasBoth("wiper","not"))return"window mirror wiper";
+  // ── AUTOMATIC GEAR DELAY ──────────────────────────────────────────────
+  if(a("automatic delay","auto gear","transmission delay","gear jerk","gearbox delay",
+       "auto transmission","automatic problem","atf","automatic jerk","transmission problem",
+       "gearbox oil","automatic issue","automatic not","high temperature transmission",
+       "not engaging into drive","car not engaging into drive")||
+     both("automatic","delay")||both("auto","jerk")||both("transmission","problem"))return"automatic gear delay";
 
-  // Door / boot / bonnet (NEW)
-  if(a("door not opening","bonnet issue","boot not","bonnet came off","door stuck","car door","boot stuck","bonnet open","central locking","door lock")||hasBoth("door","stuck")||hasBoth("bonnet","open"))return"door boot bonnet";
+  // ── SUSPENSION / SHOCK / NOISE ────────────────────────────────────────
+  if(a("suspension","thud","clunk on bump","bump noise","pothole noise","shock absorber",
+       "spring broken","shock not","bouncy ride","rough ride","car bouncing","strut",
+       "control arm","ball joint","bushing","knocking on road","a part broke",
+       "back shock absorber","car making noise","door sound and car sound while driving",
+       "noise while driving","noise on road","clunking","rattling while driving")||
+     both("noise","bump")||both("noise","pothole")||both("shock","issue")||
+     both("suspension","problem")||both("suspension","noise"))return"suspension noise";
 
-  // Car not moving (NEW)
-  if(a("car not moving","car stuck","won't move","wont move","not moving","car moving","can't move")||hasBoth("car","stuck")||hasBoth("not","moving"))return"car not moving";
+  // ── ENGINE MISFIRE / SHAKING ──────────────────────────────────────────
+  if(a("misfire","misfiring","engine shake","rough idle","shaking engine","engine vibration",
+       "idle rough","car shudder","engine shudder","spark plug","ignition coil","engine miss",
+       "engine missing","engine and body shaking","injector problem","injector prblm",
+       "coil problem","engine not generating power")||
+     both("engine","misfire")||both("engine","shake")||both("rough","idle")||
+     both("engine","vibration"))return"engine misfire";
 
-  // Ignition (NEW)
-  if(a("ignition problem","ignition issue","key stuck","key not turning","key won't turn","push button not","immobiliser","push start not","start button not","cluster light on")||hasBoth("key","stuck")||hasBoth("ignition","not"))return"ignition issue";
+  // ── CAR SHUTS OFF ─────────────────────────────────────────────────────
+  if(a("shuts off","shut off","dies while","engine dies","car died","engine stopped",
+       "car stopped suddenly","suddenly stopped","engine cut off","engine shuts down",
+       "engine not switching off","takes self stops immediately","car starts and off",
+       "starting but turns off","gaadi band","engine off while","car stops while",
+       "car stopped midway","car stopped on the bridge","stopped running","stopped in between",
+       "stopped while driving","stopped while moving","car stopped while")||
+     both("engine","die")||both("car","stall")||both("car","shut off"))return"car shuts off";
 
-  // Dashboard warning / EPC / ESP (NEW)
-  if(a("epc","esp warning","esc warning","dashboard warning","warning light on","eps sign","eps light","traction control light","car scanning","dashboard light")||hasBoth("warning","light")||hasBoth("epc","light")||hasBoth("esp","light"))return"dashboard warning";
+  // ── ENGINE NO RESPONSE ────────────────────────────────────────────────
+  if(a("no response","not responding","accelerator not","no acceleration","throttle not",
+       "press accelerator","pressing gas","no power when","engine not responding",
+       "car not taking accelerator","car not taking race","engine sign on not exceeding",
+       "car not going up the slope","car not speeding up","car not maintaining power",
+       "can't accelerate")||
+     both("accelerator","no response")||both("pressing","no response")||
+     both("throttle","not"))return"engine no response";
 
-  // Self/starter motor (NEW)
-  if(a("self not working","car self","auto start not","self motor","starter motor","car not taking self","self start")||hasBoth("self","not"))return"self start issue";
+  // ── AC INTERMITTENT ───────────────────────────────────────────────────
+  if(a("ac intermittent","ac comes and goes","ac stops","intermittent cool","ac on and off",
+       "sometimes cool","ac works sometimes","cooling sometimes")||
+     both("ac","intermittent")||both("ac","sometimes"))return"ac intermittent";
 
-  // Key lockout (NEW)
-  if(a("key lockout","locked out","keys inside","keys locked","lost key","key broken","alarm won't","alarm stuck","remote not working","key fob")||hasBoth("keys","locked")||hasBoth("locked","car"))return"key lockout";
+  // ── TOWING / ACCIDENT / RECOVERY ─────────────────────────────────────
+  if(a("towing","tow needed","tow the car","tow truck","roadside recovery","recovery needed",
+       "car tow","need tow","tow service","breakdown recovery","car breakdown","breakdown",
+       "car stuck in mud","car stuck in pit","car stuck in water","ev car towing",
+       "accident tow","accident recovery","car accident","hit on left","car hit",
+       "car crashed","crashed","underlift","flatbed","winch")||
+     both("car","tow")||both("need","tow")||both("car","breakdown")||
+     both("car","accident"))return"towing needed";
 
-  // Fuel empty (NEW)
-  if(a("fuel empty","petrol empty","diesel empty","ran out of fuel","out of fuel","no fuel","fuel delivery","need fuel","fuel needed")||hasBoth("fuel","empty")||hasBoth("petrol","finished"))return"fuel empty";
+  // ── LIGHTS / INDICATORS / HORN ────────────────────────────────────────
+  if(a("horn not","indicator stuck","brake light not off","light not working","headlight out",
+       "indicator not","tail light","indicator problem","lights not","turn signal",
+       "headlight","tail light","fog light","interior light","cabin light","indicator blink",
+       "horn kaam nahi","light nahi","blinker","hazard light","parking light","dome light",
+       "back side indicator lights not off","brake light not switching off",
+       "brake light not turning off","headlamp not working","headlight broken",
+       "headlight change","headlight not working","horn not stopping","horn not working",
+       "car headlight relay","headlight relay","indicator lights")||
+     both("horn","not")||both("indicator","not")||both("headlight","not")||
+     both("light","not")||both("horn","working"))return"lights indicators horn";
 
-  // Engine belt (NEW)
-  if(a("belt broken","belt snapped","belt issue","alternator belt","ac belt","serpentine belt","belt squeal","belt broke")||hasBoth("belt","snap")||hasBoth("belt","broken"))return"engine belt";
+  // ── WHEEL / RIM / AXLE ────────────────────────────────────────────────
+  if(a("alloy bent","alloy crack","axle issue","axle problem","wheel dislocated","wheel bearing",
+       "wheel wobble","rim issue","rim bent","cv joint","driveshaft","axle broken",
+       "rim damage","alloy damage","wheel vibrate","rim crack","cv axle","hub bearing",
+       "back tyre dislocated","back wheel jammed","inside wheel cover issue",
+       "front wheel issue","wheel cover","alloy bent issue","wheel not moving")||
+     both("wheel","bent")||both("alloy","issue")||both("axle","issue")||
+     both("rim","damage")||both("cv","joint"))return"wheel rim axle";
 
-  // Acceleration issue (NEW)
-  if(a("pick up issue","pickup issue","acceleration issue","acceleration not","accelerator not working","sluggish","no pickup","lost power","power loss")||hasBoth("acceleration","not")||hasBoth("pickup","bad"))return"acceleration issue";
+  // ── WINDOW / MIRROR / WIPER ───────────────────────────────────────────
+  if(a("window not","power window","window stuck","wiper not","wiper problem","mirror broken",
+       "mirror not","side mirror","windshield wiper","window glass","window motor",
+       "wiper blade","wiper smear","window regulator","driver side mirror","passenger side mirror",
+       "mirror replacement","constant ticking sound from the right mirror","glass broken",
+       "windscreen wiper","front glass","window up","window down")||
+     both("window","stuck")||both("wiper","not")||both("window","not")||
+     both("mirror","broken"))return"window mirror wiper";
 
-  // Coolant issue (NEW)
-  if(a("coolant leak","coolant low","coolant over","coolant connector","coolant issue","radiator leak")||hasBoth("coolant","issue")||hasBoth("coolant","low"))return"coolant issue";
+  // ── DOOR / BOOT / BONNET ──────────────────────────────────────────────
+  if(a("door not opening","bonnet issue","boot not","bonnet came off","door stuck","car door",
+       "boot stuck","bonnet open","central locking","door lock","door handle","boot open",
+       "boot lock","bonnet latch","door hinge","car lock","child lock","boot release",
+       "door nahi","bonnet band nahi","back door not opening","door not closing",
+       "door closing problem","door lock issue","driver door not opening",
+       "door lock not working","front door","left gate not opening","divider stuck",
+       "bonnet issue","bonnet fell","car locked","car door locked")||
+     both("door","stuck")||both("bonnet","open")||both("door","open")||
+     both("boot","open")||both("door","not"))return"door boot bonnet";
 
-  // Electrical (NEW)
-  if(a("wiring issue","fuse check","electrical failure","wiring fault","burned fuse","aftermarket wiring","electrical problem")||hasBoth("wiring","issue")||hasBoth("electrical","problem"))return"electrical issue";
+  // ── CAR NOT MOVING / STUCK ────────────────────────────────────────────
+  if(a("car not moving","car stuck","won't move","wont move","not moving","can't move",
+       "car wont move","gaadi nahi chal","handbrake stuck","handbrake jammed",
+       "parking brake stuck","car not moving forward","car not moving forward or back",
+       "car starting but not moving","car starts but not moving","excel issue not moving",
+       "front carwheel is not moving","front tyres not working","epc issue car not moving")||
+     both("car","stuck")||both("not","moving")||both("wont","move")||
+     both("handbrake","stuck"))return"car not moving";
 
-  // Engine issue (catches general engine problems not caught above)
-  if(a("engine issue","engine problem","engine failure","check engine","engine light","warning light")||hasBoth("engine","issue")||hasBoth("engine","light")||hasBoth("check","engine"))return"check engine";
+  // ── IGNITION ISSUE ────────────────────────────────────────────────────
+  if(a("ignition problem","ignition issue","key stuck","key not turning","key won't turn",
+       "push button not","immobiliser","push start not","start button not","cluster light on",
+       "ignition barrel","ignition switch","ignition key stuck","ignition not starting",
+       "ignition not working","auto ignition not working","ignition not displaying",
+       "ignition button blinking","key symbol flashing","key not detected",
+       "key broken inside ignition","car can't start cluster light","lock issue car not starting",
+       "constant honking doors locked")||
+     both("key","stuck")||both("ignition","not")||both("key","not")||
+     both("start","button"))return"ignition issue";
 
-  // Smoke / burning smell (NEW, catches remaining smoke not caught by smell diagnosis)
-  if(a("smoke","exhaust fume","burning smell","car smoke")||hasBoth("smoke","car")||hasBoth("burning","smell"))return"smoke burning smell";
+  // ── DASHBOARD WARNING / EPC / ESP ─────────────────────────────────────
+  if(a("epc","esp warning","esc warning","dashboard warning","warning light on","eps sign",
+       "eps light","traction control light","car scanning","dashboard light","abs warning",
+       "airbag light","service light","oil light","temperature light","battery light on",
+       "engine warning","mil light","check light","dash light","red light on dash",
+       "amber light","yellow warning","epc light","epc sign","epc error","epc indication",
+       "esc showing","esp service light","car showing eps","display not working",
+       "car display not working","engine heat symbol","engine sign on")||
+     both("warning","light")||both("epc","light")||both("esp","light")||
+     both("dashboard","light")||both("epc","issue"))return"dashboard warning";
 
-  // Steering locked (NEW)
-  if(a("steering locked","steering jam","steering jammed","steering hard","steering not moving")||hasBoth("steering","locked")||hasBoth("steering","jam"))return"steering locked";
+  // ── SELF / STARTER MOTOR ─────────────────────────────────────────────
+  if(a("self not working","car self","auto start not","self motor","starter motor",
+       "car not taking self","self start","self nahi","starter not","crank not","no crank",
+       "starter dead","self lag nahi","current not passing after self","grinding sound not starting",
+       "car self not working","car self not starting")||
+     both("self","not")||both("starter","not")||both("self","issue")||
+     both("car","self"))return"self start issue";
 
-  // Car not starting (original)
-  if(a("not starting","won't start","wont start","not start","car dead","wont crank","won't crank")||hasBoth("car","not start")||hasBoth("car","won't")||hasBoth("engine","not start")||hasBoth("won't","start"))return"car not starting";
+  // ── KEY LOCKOUT / ALARM ───────────────────────────────────────────────
+  if(a("key lockout","locked out","keys inside","keys locked","lost key","key broken",
+       "alarm won't","alarm stuck","remote not working","key fob","locked keys",
+       "locked in car","key inside","chabi andar","chabi kho","key lost","car locked",
+       "door locked out","key remote","key lockout problem","key locked inside",
+       "key not working","key battery issue","key under handbrake","fuel tank lockout",
+       "battery and key","key lockout and battery","car not started key symbol",
+       "key symbol flashing car not starting")||
+     both("keys","locked")||both("locked","car")||both("key","inside")||
+     both("key","lost")||both("key","lockout"))return"key lockout";
 
-  // Battery
-  // Battery replacement intent — must check BEFORE generic battery drain
-  if(a("need new battery","want new battery","replace battery","battery change","battery replacement","new battery","battery install","battery chahiye","battery laga","change battery","install battery","buy battery","get battery"))return"battery replacement";
-  if(a("battery","drain")||hasBoth("battery","dead")||hasBoth("battery","flat")||hasBoth("battery","weak")||hasBoth("battery","not charge"))return"battery";
+  // ── FUEL EMPTY / DELIVERY ─────────────────────────────────────────────
+  if(a("fuel empty","petrol empty","diesel empty","ran out of fuel","out of fuel","no fuel",
+       "fuel delivery","need fuel","fuel needed","petrol khatam","diesel khatam","no petrol",
+       "tank empty","fuel khatam","need petrol","need diesel","petrol nahi","fuel over",
+       "empty petrol","fuel shortage","def level empty","5 liter petrol","5 litre petrol",
+       "5-6 l fuel","fuel delivery petrol","fuel not available","petrol required",
+       "car not starting petrol required","engine check light and petrol turbo")||
+     both("fuel","empty")||both("petrol","finished")||both("petrol","khatam")||
+     both("diesel","empty")||both("fuel","delivery")||both("petrol","delivery"))return"fuel empty";
 
-  // Overheating
-  if(a("overheat","temperature high","running hot","engine heat")||hasBoth("engine","hot")||hasBoth("temp","high"))return"engine overheating";
+  // ── ENGINE BELT / ALTERNATOR BELT ─────────────────────────────────────
+  if(a("belt broken","belt snapped","belt issue","alternator belt","ac belt","serpentine belt",
+       "belt squeal","belt broke","timing belt","fan belt","belt damage","belt snap",
+       "belt noise","belt off","belt problem","patta toot","belt toot","dynamo issue",
+       "alternator issue","alternator not working","alternator wire","engine belt broke",
+       "engine belt damaged","engine belt issue","fan belt broken","fan belt dislodged",
+       "fan belt replacement","charging belt","battery charging belt")||
+     both("belt","snap")||both("belt","broken")||both("belt","issue")||
+     both("belt","off")||both("alternator","belt")||both("fan","belt"))return"engine belt";
 
-  // Brake
-  if(h("brake ")||h(" braking")||h("brakes"))return"brake";
+  // ── ACCELERATION / PICKUP / THROTTLE ──────────────────────────────────
+  if(a("pick up issue","pickup issue","acceleration issue","acceleration not","accelerator not working",
+       "sluggish","no pickup","lost power","power loss","poor pickup","low pickup","car slow",
+       "not accelerating","wont accelerate","throttle response","acceleration low",
+       "pickup nahi","car dheela","gaadi slow","car not taking pickup","car not speeding up",
+       "car not going up the slope","car pickup issue when ac","could not pick up on ramp",
+       "car not maintaining power","car missing and not getting thrust")||
+     both("acceleration","not")||both("pickup","bad")||both("car","slow")||
+     both("no","pickup"))return"acceleration issue";
 
-  // AC
-  if(a("ac not","air conditioning","air con","not cooling","no cooling")||(t.includes(" ac ")&&a("not work","noise","problem","compressor")))return"ac not cooling";
+  // ── CAR BODY / PHYSICAL DAMAGE ────────────────────────────────────────
+  if(a("bumper","bumper fell","bumper off","bumper hanging","bumper damage","bumper broken",
+       "bumper crack","front bumper","rear bumper","bumper repair","bumper replace",
+       "bumper grill","bonnet flew","bonnet fly","bonnet flap","bonnet open while driving",
+       "bonnet fell","number plate","numberplate","underbody guard","plastic guard",
+       "body damage","body dent","car dent","scratch","panel damage","fender",
+       "mudguard","side skirt","body panel","car body","physical damage","denting",
+       "painting","paint work","body repair","bent panel","crumple","body bent",
+       "exhaust system error","hit on left side","broken number plate","glass broken",
+       "grill broken","down hosepipe","down hose pipe")||
+     both("bumper","off")||both("bumper","fell")||both("bumper","damage")||
+     both("bumper","broken")||both("body","damage")||both("bonnet","flew")||
+     both("guard","loose")||both("guard","broken")||both("dent","car"))return"car body";
 
-  // Car jerking
-  if(a("jerk","jolting")||hasBoth("car","jerk"))return"car jerking";
+  // ── COOLANT / RADIATOR / HOSE ─────────────────────────────────────────
+  if(a("coolant leak","coolant low","coolant over","coolant connector","coolant issue",
+       "coolant temperature","coolant leakage","coolant pipe","coolant tank",
+       "engine coolant needed","coolant needed","coolant over","coolent pipe",
+       "radiator leak","radiator pipe","radiator hose","radiator damage","radiator broken",
+       "radiator crack","radiator fan","hose burst","hose leak","hose damage","hose broken",
+       "pipe burst","pipe leak","pipe damage","water pump","waterpump","coolant pipe burst",
+       "coolant pipe broken","coolant pipe damaged","coolant pipe issue","coolant pipe leakage",
+       "antifreeze","coolant smell","green fluid","pink fluid","overflow tank","expansion tank",
+       "engine error needs coolant","engine coolant","coolant and engine","coolant issue due to")||
+     both("coolant","issue")||both("coolant","low")||both("radiator","damage")||
+     both("radiator","problem")||both("radiator","issue")||both("hose","leak")||
+     both("pipe","leak")||both("pipe","damage")||both("pipe","burst")||
+     both("coolant","leak"))return"coolant issue";
 
-  // Smoke (original)
-  if(hasBoth("smoke","exhaust")||hasBoth("smoke","car"))return"smoke";
+  // ── ELECTRICAL / WIRING / FUSE ────────────────────────────────────────
+  if(a("wiring issue","fuse check","electrical failure","wiring fault","burned fuse",
+       "aftermarket wiring","electrical problem","short circuit","wire melted","wire burnt",
+       "fuse box","main fuse","electrical short","wires burned","car electrical",
+       "lights flickering","electrical issue","electric system not working","fuse issue",
+       "fuse problem","click wire broken","fan wire","loose wiring","cutting current",
+       "indications blinking","electrical wiring and fuse inspection","dashboard lights flickering")||
+     both("wiring","issue")||both("electrical","problem")||both("fuse","burnt")||
+     both("fuse","issue")||both("fuse","problem")||both("wire","short"))return"electrical issue";
 
-  // Vibration
-  if(a("vibrat","shaking","shake")||hasBoth("car","vibrate")||hasBoth("steering","shake"))return"vibration";
+  // ── CHECK ENGINE / ENGINE ISSUE ───────────────────────────────────────
+  if(a("check engine","engine light","engine warning","engine issue","engine problem",
+       "engine failure","engine fault","engine dead","engine seized","engine locked",
+       "engine knock","engine noise","engine sound","engine shaking","engine error",
+       "engine not generating","engine not switching off","engine oil issue",
+       "engine oil over","engine bolt","exhaust not functioning","coil problem",
+       "injector problem","glow plug","engine sign on","engine sign","engine light blinking",
+       "engine light on","engine light not turning on")||
+     both("engine","issue")||both("engine","light")||both("check","engine")||
+     both("engine","noise")||both("engine","knock")||both("engine","problem"))return"check engine";
 
-  // Steering
-  if(a("steering heavy","heavy steering")||hasBoth("steering","problem")||hasBoth("steering","issue"))return"steering";
+  // ── SMOKE / BURNING SMELL ─────────────────────────────────────────────
+  if(a("smoke","exhaust fume","burning smell","car smoke","white smoke","black smoke",
+       "blue smoke","smoke from bonnet","smoke from engine","car steaming","steam from car",
+       "engine overheating and smoke","engine shaking emitting smoke")||
+     both("smoke","car")||both("burning","smell")||both("smoke","engine")||
+     both("steam","car"))return"smoke burning smell";
 
-  // Car leaning
-  if(a("lean","tilt","one side low","lopsided")||hasBoth("car","lean")||hasBoth("car","tilt"))return"car leaning";
+  // ── STEERING LOCKED / JAM ─────────────────────────────────────────────
+  if(a("steering locked","steering jam","steering jammed","steering hard","steering not moving",
+       "steering stiff","heavy steering","power steering","eps problem","eps warning",
+       "steering wheel lock","steering issue","eps light on steering hard",
+       "car suddenly stopped steering jammed")||
+     both("steering","locked")||both("steering","jam")||both("steering","stiff")||
+     both("power","steering")||both("steering","hard"))return"steering locked";
 
-  // Differential
-  if(a("differential","diff noise","rear noise","noise from rear")||hasBoth("rear","noise")||hasBoth("diff","noise"))return"differential noise";
+  // ── CAR NOT STARTING ─────────────────────────────────────────────────
+  if(a("not starting","won't start","wont start","not start","car dead","wont crank","won't crank",
+       "car wont","car won't","engine not cranking","start nahi","car band","gaadi start",
+       "car does not start","car doesn't start","car unable to start","cannot start",
+       "car not restarting","car breakdown","car broke down","car has stopped","car stopped",
+       "car did not start","car didn't start","complete stopped","car shut down",
+       "car not started","car not turning on","car isn't starting","diesel car not starting",
+       "automatic car not starting","engine not starting","heating and not starting",
+       "car not starting after petrol refill","lock issue car not starting")||
+     both("car","not start")||both("car","won't")||both("engine","not start")||
+     both("won't","start")||both("car","start"))return"car not starting";
 
-  // Fuse blowing
-  if(a("fuse blow","fuse keep","blowing fuse")||hasBoth("fuse","blow")||hasBoth("fuse","keep"))return"fuse blowing";
+  // ── ENGINE OVERHEATING ────────────────────────────────────────────────
+  if(a("overheat","overheating","overheated","temperature high","running hot","engine heat",
+       "temp gauge","car heating","engine heating","getting hot","too hot","car temp",
+       "heating up","gaadi garam","heat problem","heating issue","high temperature",
+       "car overheated","engine heat symbol","cooling issue","cooling indicator",
+       "cooler problem","fan not getting on heating","fan not working",
+       "dynamo belt missing and car heating","engine heating with coolant",
+       "coolant leak and car heating","check engine light and car heating")||
+     both("engine","hot")||both("temp","high")||both("car","heating")||
+     both("engine","heating")||both("overheating","car"))return"engine overheating";
 
-  // Steering vibration
-  if(a("steering vibrat","steering shake","high speed vibrat","highway shake")||hasBoth("steering","vibrat"))return"steering vibration speed";
+  // ── BRAKE ────────────────────────────────────────────────────────────
+  if(a("brake issue","brake jam","brake jammed","brake locked","brake pads","brake pedal",
+       "brakes not working","brake not working","disc brake","brake caliper","handbrake",
+       "brake fluid","brake light issue","chamber alignment out or break","brake fail",
+       "break issue","disc problem","brake locked")||
+     c("brake ")||c(" braking")||c("brakes"))return"brake";
 
-  // Vibration braking
-  if(a("vibrat when braking","shudder when braking","braking vibrat","pulsating brake")||hasBoth("vibrat","brake")||hasBoth("shudder","brake"))return"vibration braking";
+  // ── AC ISSUE ─────────────────────────────────────────────────────────
+  if(a("ac not","air conditioning","air con","not cooling","no cooling","ac issue","ac problem",
+       "ac gas","ac compressor","ac blower","ac fan","ac coolant","ac stopped",
+       "ac not cooling","ac not working","car ac not working","checking air conditioning",
+       "a/c wire bitten","ac wire bitten","ac radiator","ac gas filling","ac gas refill",
+       "ac gas replacement","cooling not","ac repair","ac service","ac kam","thanda nahi")||
+     (c(" ac ")&&a("not work","noise","problem","compressor","cool","gas","fan","blower")))return"ac not cooling";
+
+  // ── CHECK ENGINE (catch-all for engine issues not caught above) ────────
+  if(c("check engine")||both("engine","light")||both("engine","warning"))return"check engine";
+
+  // ── CAR JERKING ───────────────────────────────────────────────────────
+  if(a("jerk","jolting","lurching","car jerks","car jolt","jhatka","jhatkay")||
+     both("car","jerk")||both("car","lurch"))return"car jerking";
+
+  // ── VIBRATION ────────────────────────────────────────────────────────
+  if(a("vibrat","shaking","shake")||both("car","vibrate")||both("steering","shake"))return"vibration";
+
+  // ── STEERING ─────────────────────────────────────────────────────────
+  if(both("steering","problem")||both("steering","issue"))return"steering";
+
+  // ── CAR LEANING ───────────────────────────────────────────────────────
+  if(a("lean","tilt","one side low","lopsided")||both("car","lean")||both("car","tilt"))return"car leaning";
+
+  // ── DIFFERENTIAL ──────────────────────────────────────────────────────
+  if(a("differential","diff noise","rear noise","noise from rear")||
+     both("rear","noise")||both("diff","noise"))return"differential noise";
+
+  // ── FUSE BLOWING ──────────────────────────────────────────────────────
+  if(a("fuse blow","fuse keep","blowing fuse")||both("fuse","blow")||both("fuse","keep"))return"fuse blowing";
+
+  // ── STEERING VIBRATION AT SPEED ───────────────────────────────────────
+  if(a("steering vibrat","steering shake","high speed vibrat","highway shake")||
+     both("steering","vibrat"))return"steering vibration speed";
+
+  // ── VIBRATION WHILE BRAKING ───────────────────────────────────────────
+  if(a("vibrat when braking","shudder when braking","braking vibrat","pulsating brake")||
+     both("vibrat","brake")||both("shudder","brake"))return"vibration braking";
 
   return null;
 }
 
-/* ── CHAT ENGINE (unchanged) ─────────────────────────────────────────── */
+/* ── CHAT ENGINE ─────────────────────────────────────────────────────── */
 
 var st={phase:"idle",key:null,tree:null,qi:0,ans:[]};
 function gt(){var n=new Date();return n.getHours().toString().padStart(2,'0')+':'+n.getMinutes().toString().padStart(2,'0');}
@@ -1415,7 +1742,6 @@ function renderCard(tree,r){
   w.innerHTML=makeCard(tree.icon,tree.title,'Diagnosis complete',r.issue,sc,sl,r.steps,r.spot,r.sev);
   c.appendChild(w.firstChild);sd();
 }
-
 
 function showDiag(){
   var t=st.tree,r=t.dx(st.ans);
