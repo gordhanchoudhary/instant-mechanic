@@ -1345,8 +1345,10 @@ function mapInput(t){
 
   // ── WHEEL LOCKING / ABS ───────────────────────────────────────────────
   if(a("wheel lock","wheel locking","skidding","abs light","brakes lock","abs warning",
-       "abs not working")||
-     both("wheel","lock")||both("abs","light"))return"wheel lock";
+       "abs not working","abs error","abs fault","check abs","abs check","abs issue",
+       "abs problem","abs sensor","abs module","abs scan","abs warning light",
+       "anti lock","antilock","anti-lock")||
+     both("wheel","lock")||both("abs","light")||both("abs","error")||both("abs","issue"))return"wheel lock";
 
   // ── GEAR NOT SHIFTING (MANUAL) ────────────────────────────────────────
   if(a("gear not changing","gear not engaging","gear not working","gear not shifting",
