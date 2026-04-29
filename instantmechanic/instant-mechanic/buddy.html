@@ -1446,6 +1446,72 @@ function handleFollowUp(text){
     processInput(text);
     return true;
   }
+  // Price / cost questions
+  if(h("how much")||h("cost")||h("price")||h("kitna")||h("charge")||h("rate")||h("fees")||h("fee")||h("charges")||h("pricing")){
+    showTyping();
+    setTimeout(function(){
+      rmTyping();
+      var priceMsg='';
+      var key=st.key||'';
+      if(key==='battery'||key==='battery replacement'){
+        priceMsg='Here are the approximate battery replacement prices in Delhi NCR (inclusive of fitting):<br><br>'+
+          '<b>Hatchbacks</b> (Swift, i10, Polo, WagonR): <b>&#8377;3,500 &ndash; &#8377;5,500</b><br>'+
+          '<b>Sedans / Compact SUVs</b> (Dzire, Creta, Brezza, City): <b>&#8377;4,500 &ndash; &#8377;7,000</b><br>'+
+          '<b>Full-size SUVs / MUVs</b> (Innova, Fortuner, XUV700): <b>&#8377;6,500 &ndash; &#8377;10,000</b><br><br>'+
+          'Brands: <b>Amaron</b> (longest life, best for Delhi heat), <b>Exide</b>, or <b>Luminous</b> &mdash; all carry a <b>2-year warranty</b>.<br><br>'+
+          'Call <strong><a href="tel:8393990942" style="color:var(--p);text-decoration:none;">8393990942</a></strong> for an exact quote for your car model &mdash; our mechanic brings the battery to you.';
+      } else if(key==='tyre puncture'){
+        priceMsg='Puncture repair prices in Delhi NCR:<br><br>'+
+          '<b>Tubeless tyre plug repair:</b> <b>&#8377;100 &ndash; &#8377;150</b><br>'+
+          '<b>Tube tyre repair (patch):</b> <b>&#8377;100 &ndash; &#8377;200</b><br>'+
+          '<b>New tube replacement:</b> <b>&#8377;300 &ndash; &#8377;600</b><br>'+
+          '<b>Air refill (all 4 tyres):</b> <b>&#8377;50 &ndash; &#8377;100</b><br><br>'+
+          'Call <strong><a href="tel:8393990942" style="color:var(--p);text-decoration:none;">8393990942</a></strong> for doorstep puncture repair &mdash; we come to you.';
+      } else if(key==='fuel empty'){
+        priceMsg='Emergency fuel delivery pricing:<br><br>'+
+          '<b>Service charge (call-out):</b> <b>&#8377;200 &ndash; &#8377;300</b><br>'+
+          '<b>Fuel cost:</b> At current pump rates + small handling charge<br>'+
+          '<b>Minimum fuel delivered:</b> 3 litres<br><br>'+
+          'Call <strong><a href="tel:8393990942" style="color:var(--p);text-decoration:none;">8393990942</a></strong> and we will be there within 30&ndash;45 minutes.';
+      } else if(key==='towing needed'){
+        priceMsg='Towing prices in Delhi NCR:<br><br>'+
+          '<b>Underlift tow (up to 10 km):</b> <b>&#8377;800 &ndash; &#8377;1,200</b> &mdash; &#8377;80/km beyond 10 km<br>'+
+          '<b>Flatbed tow (up to 10 km):</b> <b>&#8377;1,000 &ndash; &#8377;1,500</b> &mdash; &#8377;100/km beyond 10 km<br>'+
+          '<b>Basement / winching:</b> <b>&#8377;500 &ndash; &#8377;800</b> extra<br>'+
+          '<b>Luxury / accident car:</b> Flatbed recommended, rate on request<br><br>'+
+          'Call <strong><a href="tel:8393990942" style="color:var(--p);text-decoration:none;">8393990942</a></strong> for exact pricing based on your location.';
+      } else if(key==='ac not cooling'||key==='ac intermittent'){
+        priceMsg='AC service pricing in Delhi NCR:<br><br>'+
+          '<b>AC gas recharge (top-up):</b> <b>&#8377;1,500 &ndash; &#8377;2,500</b><br>'+
+          '<b>AC gas + leak check:</b> <b>&#8377;2,000 &ndash; &#8377;3,500</b><br>'+
+          '<b>Cabin air filter replacement:</b> <b>&#8377;400 &ndash; &#8377;800</b><br>'+
+          '<b>AC compressor repair:</b> <b>&#8377;5,000 &ndash; &#8377;15,000</b> (depends on car)<br><br>'+
+          'Call <strong><a href="tel:8393990942" style="color:var(--p);text-decoration:none;">8393990942</a></strong> for a doorstep AC diagnosis &mdash; exact quote provided on inspection.';
+      } else if(key==='brake'||key==='brake pedal soft'||key==='brake pedal hard'){
+        priceMsg='Brake service pricing in Delhi NCR:<br><br>'+
+          '<b>Brake pad replacement (per axle):</b> <b>&#8377;1,200 &ndash; &#8377;3,500</b><br>'+
+          '<b>Brake disc resurfacing:</b> <b>&#8377;800 &ndash; &#8377;1,500</b><br>'+
+          '<b>Brake fluid change:</b> <b>&#8377;400 &ndash; &#8377;700</b><br>'+
+          '<b>Full brake overhaul (all 4):</b> <b>&#8377;4,000 &ndash; &#8377;10,000</b><br><br>'+
+          'Call <strong><a href="tel:8393990942" style="color:var(--p);text-decoration:none;">8393990942</a></strong> for a free brake inspection &mdash; mechanic comes to you.';
+      } else if(key==='clutch issue'||key==='clutch slipping'||key==='clutch hard'||key==='clutch not returning'){
+        priceMsg='Clutch repair pricing in Delhi NCR:<br><br>'+
+          '<b>Clutch cable replacement:</b> <b>&#8377;500 &ndash; &#8377;1,200</b><br>'+
+          '<b>Clutch plate replacement (hatchback):</b> <b>&#8377;4,000 &ndash; &#8377;8,000</b><br>'+
+          '<b>Clutch plate replacement (sedan/SUV):</b> <b>&#8377;7,000 &ndash; &#8377;15,000</b><br>'+
+          '<b>Full clutch kit (plate + pressure plate + bearing):</b> <b>&#8377;6,000 &ndash; &#8377;18,000</b><br><br>'+
+          'Call <strong><a href="tel:8393990942" style="color:var(--p);text-decoration:none;">8393990942</a></strong> for an exact quote &mdash; price varies by car model.';
+      } else {
+        priceMsg='Prices vary by car model, issue severity, and parts required. For an <b>accurate quote</b> specific to your car:<br><br>'+
+          'Call <strong><a href="tel:8393990942" style="color:var(--p);text-decoration:none;">8393990942</a></strong> &mdash; our team will give you a transparent, no-surprise price before the mechanic starts work.<br><br>'+
+          '<b>All Instant Mechanic services include:</b> Doorstep visit &bull; Upfront pricing &bull; Warranty on parts &bull; No hidden charges.';
+      }
+      addMsg(priceMsg,'bot');
+      setTimeout(addRestart,400);
+      st.phase="done";
+    },700);
+    return true;
+  }
   // If mapInput can identify a clear new issue from this text, let processInput handle it fresh
   var newKey=mapInput(text);
   if(newKey&&newKey!==st.key)return false;
@@ -1524,7 +1590,18 @@ function handleFollowUp(text){
   return false;
 }
 
+function isPriceQuery(text){
+  var t=text.toLowerCase();
+  return t.includes("how much")||t.includes("kitna")||t.includes(" cost")||t.includes("costs")||
+    t.includes("price")||t.includes("pricing")||t.includes("charge")||t.includes("charges")||
+    t.includes("fees")||t.includes(" fee ")||t.includes("rate")||t.includes("rates")||
+    t.includes("what will it")||t.includes("how expensive")||t.includes("affordable")||
+    t.includes("budget")||t.includes("cheap")||t.includes("expensive");
+}
+
 function processInput(text){
+  // Price queries are always handled as follow-ups regardless of phase
+  if(isPriceQuery(text)){if(handleFollowUp(text))return;}
   if(st.phase==="done"){if(handleFollowUp(text))return;}
   var key=mapInput(text);
   if(!key){
