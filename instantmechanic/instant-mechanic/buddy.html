@@ -2261,7 +2261,7 @@ function mapInput(t){
 
 /* ── CHAT ENGINE ─────────────────────────────────────────────────────── */
 
-var st={phase:"idle",key:null,tree:null,qi:0,ans:[]};
+var st={phase:"idle",key:null,tree:null,qi:0,ans:[],carModel:null,pendingText:null,pendingBrand:null};
 function gt(){var n=new Date();return n.getHours().toString().padStart(2,'0')+':'+n.getMinutes().toString().padStart(2,'0');}
 function sd(){setTimeout(function(){var b=document.getElementById("cbg");if(b)b.scrollTop=b.scrollHeight;},70);}
 
@@ -2327,7 +2327,8 @@ function renderCard(tree,r){
   var sc=r.sev==='high'?'sh':r.sev==='med'?'sm':'sl';
   var sl=r.sev==='high'?'Urgent — see mechanic soon':r.sev==='med'?'Moderate priority':'Minor issue';
   var c=document.getElementById('chat'),w=document.createElement('div');
-  w.innerHTML=makeCard(tree.icon,tree.title,'Diagnosis complete',r.issue,sc,sl,r.steps,r.spot,r.sev);
+  var sub=st.carModel?'Diagnosis: '+st.carModel:'Diagnosis complete';
+  w.innerHTML=makeCard(tree.icon,tree.title,sub,r.issue,sc,sl,r.steps,r.spot,r.sev);
   c.appendChild(w.firstChild);sd();
 }
 
@@ -2338,7 +2339,34 @@ function showDiag(){
   st.phase="done";
 }
 
+var brandModels={
+  "Maruti / Suzuki":"e.g. Swift, Baleno, Dzire, WagonR, Ertiga, Brezza, Grand Vitara, Celerio, Alto",
+  "Hyundai / Kia":"e.g. Creta, i20, Verna, Tucson, Seltos, Sonet, Carens, EV6",
+  "Honda":"e.g. City, Amaze, Jazz, WR-V, CR-V, Elevate",
+  "Tata":"e.g. Nexon, Harrier, Safari, Punch, Tiago, Tigor, Altroz, Curvv",
+  "Mahindra":"e.g. Scorpio, XUV700, XUV300, Thar, Bolero, KUV100",
+  "Toyota":"e.g. Innova Crysta, Fortuner, Glanza, Urban Cruiser, Hyryder, Camry"
+};
+
 function pickOpt(opt){
+  if(st.phase==="awaiting_model"){
+    addMsg(opt,"user");
+    if(opt==="Other brand"){
+      st.phase="awaiting_model_text";
+      setTimeout(function(){
+        addMsg("Please type your car brand and model (e.g. <strong>Volkswagen Polo</strong>, <strong>Skoda Rapid</strong>, <strong>Ford EcoSport</strong>)","bot");
+      },300);
+      return;
+    }
+    // For known brands, ask for specific model
+    st.phase="awaiting_model_text";
+    st.pendingBrand=opt;
+    var hint=brandModels[opt]||"e.g. type your exact car model";
+    setTimeout(function(){
+      addMsg("Great! Which <strong>"+opt+"</strong> model do you have?<br><small style='color:var(--mut)'>"+hint+"</small>","bot");
+    },300);
+    return;
+  }
   addMsg(opt,"user");
   st.ans.push(opt);st.qi++;
   var t=st.tree;
@@ -2865,9 +2893,72 @@ function isPriceQuery(text){
     t.includes("budget")||t.includes("cheap")||t.includes("expensive");
 }
 
+function isGreeting(text){
+  var t=text.toLowerCase().trim().replace(/[^a-z\s]/g,"");
+  var greetings=["hi","hello","hey","hii","hiii","helo","helo","helllo","hola",
+    "namaste","namaskar","good morning","good afternoon","good evening","good night",
+    "sup","what's up","whats up","yo","howdy","greetings","hi there","hello there",
+    "hey there","hi buddy","hello buddy","start","ok","okay","begin","test",
+    "hy","hye","hai","haii","hullo","help","need help","i need help","can you help",
+    "who are you","are you there","anyone there","hello anyone"];
+  for(var i=0;i<greetings.length;i++){
+    if(t===greetings[i]||t.startsWith(greetings[i]+" ")||t===greetings[i].replace("'",""))return true;
+  }
+  // Very short inputs with no car-related words are likely greetings
+  if(t.split(" ").length<=2&&!mapInput(text))return true;
+  return false;
+}
+
 function processInput(text){
+  // Greeting handler — respond warmly, ask for car issue
+  if(isGreeting(text)&&st.phase==="idle"&&!st.key){
+    addMsg(text,"user");
+    showTyping();
+    setTimeout(function(){
+      rmTyping();
+      addMsg("Hello! &#128075; I am <strong>CarBuddy</strong> — your AI car diagnosis assistant.<br><br>Tell me what problem you are facing with your car and I will help diagnose it right away!","bot");
+    },500);
+    return;
+  }
+
   // Price queries are always handled as follow-ups regardless of phase
   if(isPriceQuery(text)){if(handleFollowUp(text))return;}
+  // Handle car model collection phase
+  if(st.phase==="awaiting_model"||st.phase==="awaiting_model_text"){
+    // Accept whatever the user types as car model — normalise capitalisation nicely
+    var modelRaw=text.trim();
+    var modelClean=modelRaw.charAt(0).toUpperCase()+modelRaw.slice(1).toLowerCase();
+    // Fix common brand name capitalisations
+    var brands={"maruti":"Maruti","suzuki":"Suzuki","hyundai":"Hyundai","kia":"Kia",
+      "honda":"Honda","tata":"Tata","mahindra":"Mahindra","toyota":"Toyota",
+      "volkswagen":"Volkswagen","vw":"VW","skoda":"Skoda","ford":"Ford",
+      "renault":"Renault","nissan":"Nissan","mg":"MG","jeep":"Jeep",
+      "bmw":"BMW","mercedes":"Mercedes","audi":"Audi","volvo":"Volvo",
+      "isuzu":"Isuzu","mitsubishi":"Mitsubishi","fiat":"Fiat","datsun":"Datsun"};
+    var words=modelRaw.toLowerCase().split(" ");
+    for(var wi=0;wi<words.length;wi++){
+      if(brands[words[wi]])words[wi]=brands[words[wi]];
+      else words[wi]=words[wi].charAt(0).toUpperCase()+words[wi].slice(1);
+    }
+    modelClean=words.join(" ");
+    // If user selected a brand first, prepend it (avoid duplication)
+    if(st.pendingBrand){
+      var brand=st.pendingBrand.split(" /")[0].trim(); // "Maruti / Suzuki" → "Maruti"
+      var lc=modelClean.toLowerCase();
+      var lbrand=brand.toLowerCase();
+      if(!lc.startsWith(lbrand))modelClean=brand+" "+modelClean;
+      st.pendingBrand=null;
+    }
+    st.carModel=modelClean;
+    addMsg(modelClean,"user");
+    var saved=st.pendingText;
+    st.phase="idle";
+    setTimeout(function(){
+      addMsg("Thanks! Diagnosing your <strong>"+modelClean+"</strong>...","bot");
+      setTimeout(function(){processInput(saved);},500);
+    },300);
+    return;
+  }
   if(st.phase==="done"){if(handleFollowUp(text))return;}
   var key=mapInput(text);
   if(!key){
@@ -2885,6 +2976,20 @@ function processInput(text){
     },700);
     return;
   }
+  // Ask for car model before starting diagnosis (only if not already collected)
+  if(!st.carModel){
+    st.pendingText=text;
+    st.key=key;
+    st.phase="awaiting_model";
+    showTyping();
+    setTimeout(function(){
+      rmTyping();
+      addMsg("Got it! Before I diagnose — <strong>what is your car make and model?</strong> (e.g. Maruti Swift, Hyundai Creta, Honda City)","bot");
+      showOpts(["Maruti / Suzuki","Hyundai / Kia","Honda","Tata","Mahindra","Toyota","Other brand"]);
+    },500);
+    return;
+  }
+
   st.key=key;st.tree=trees[key];st.qi=0;st.ans=[];st.phase="questioning";
   var early=trees[key].qd?trees[key].qd(text.toLowerCase()):null;
   showTyping();
@@ -2915,8 +3020,12 @@ function sendMsg(){
 
 function resetAll(){
   document.getElementById("chat").innerHTML="";
-  st={phase:"idle",key:null,tree:null,qi:0,ans:[]};
-  setTimeout(function(){addMsg("What else can I help you diagnose? Describe your car issue below.","bot");},150);
+  var savedModel=st.carModel;  // keep model across diagnoses in same session
+  st={phase:"idle",key:null,tree:null,qi:0,ans:[],carModel:savedModel,pendingText:null,pendingBrand:null};
+  var greeting=savedModel
+    ? "What else can I help you diagnose for your <strong>"+savedModel+"</strong>? Describe the issue below."
+    : "What else can I help you diagnose? Describe your car issue below.";
+  setTimeout(function(){addMsg(greeting,"bot");},150);
 }
 
 document.getElementById("sbtn").addEventListener("click",sendMsg);
