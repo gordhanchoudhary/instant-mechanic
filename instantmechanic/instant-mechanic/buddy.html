@@ -1639,7 +1639,8 @@ function mapInput(t){
   if(a("radiator issue","radiator problem","radiator repair","radiator replacement",
        "radiator fan not","radiator block","radiator flush","radiator cap",
        "radiator fin","radiator clog","radiator crack","radiator broken","radiator burst",
-       "new radiator","replace radiator","radiator change","radiator service",
+       "new radiator",
+       "replace radiator","radiator change","radiator service",
        "fan motor not working","cooling fan motor","fan relay","radiator fan relay",
        "fan not spinning","fan not rotating","fan stopped","fan motor dead")||
      both("radiator","fan")||both("radiator","replace")||both("radiator","broken"))return"radiator issue";
@@ -1787,6 +1788,19 @@ function mapInput(t){
        "fuel leaking","fuel tank leak","front pipeline leak","fuel leakage near engine"))return"wrong fuel";
 
   // ── ENGINE OIL / FLUID LEAK ───────────────────────────────────────────
+  // Brake fluid leaking → brake issue
+  if((both("brake","leak")||both("brake","leaking")||both("brake","drip")||c("brake fluid leak")||c("brake fluid drip")))return"brake";
+  // Fuel leaking → wrong fuel (fire hazard)
+  if(both("petrol","leak")||both("diesel","leak")||both("fuel","leaking")||both("petrol","leaking")||both("fuel","drip"))return"wrong fuel";
+
+  // General "leaking" / "has a leak" phrases
+  if(a("car is leaking","car leaking","is leaking oil","leaking oil","engine leaking",
+       "leaking from engine","leaking from bottom","has a leak under","has a leak","leak under car",
+       "there is a leak","a leak in","puddle under","dripping under","seeping","seep")){
+    // Determine if it's coolant or oil based on context
+    if(c("water")||c("coolant")||c("green")||c("pink")||c("sweet"))return"coolant issue";
+    return"engine oil leak";
+  }
   if(a("oil leak","fluid leak","oil dripping","oil puddle","crank seal","sump leak",
        "oil on floor","leakage issue","fluid leaking","oil stain","engine oil leak",
        "engine oil leakage","oil under car","engine oil issue","engine oil over",
@@ -2092,7 +2106,9 @@ function mapInput(t){
      both("radiator","problem")||both("radiator","issue")||both("hose","leak")||
      both("pipe","leak")||both("pipe","damage")||both("pipe","burst")||
      both("coolant","leak")||both("paani","aa")||both("pani","nikal")||
-     both("water","under")||(both("fluid","under")&&!both("oil","under")))return"coolant issue";
+     both("water","leaking")||both("water","dripping")||both("water","under")||
+     both("leaking","water")||both("radiator","leaking")||
+     (both("fluid","under")&&!both("oil","under")))return"coolant issue";
 
   // ── ELECTRICAL / WIRING / FUSE ────────────────────────────────────────
   if(a("wiring issue","fuse check","electrical failure","wiring fault","burned fuse",
