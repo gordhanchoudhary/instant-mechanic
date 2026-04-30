@@ -1468,9 +1468,58 @@ var trees={
 
 /* ── KEYWORD MAPPER ──────────────────────────────────────────────────── */
 
+function normalizeMisspellings(s){
+  // Common misspelling normalization — runs BEFORE main mapping
+  var fixes=[
+    // Puncture
+    [/punc?h?tu?r?e?e?/g,"puncture"],[/puntuer/g,"puncture"],[/punture/g,"puncture"],
+    [/pucnture/g,"puncture"],[/punchure/g,"puncture"],[/punctuer/g,"puncture"],
+    // Battery
+    [/battrey/g,"battery"],[/batery/g,"battery"],[/battary/g,"battery"],
+    [/baterry/g,"battery"],[/batterry/g,"battery"],[/batt?[ae]r[ey]/g,"battery"],
+    // Steering
+    [/st[ae][ae]r[ie]?ng/g,"steering"],[/stearing/g,"steering"],[/steerng/g,"steering"],
+    // Brake
+    [/br[ae][ae]k[es]/g,"brake"],[/breakes/g,"brake"],[/breakds/g,"brake"],[/braek/g,"brake"],
+    // Clutch
+    [/clu[tc][th][hs]/g,"clutch"],[/cluths/g,"clutch"],[/clucth/g,"clutch"],[/clutsh/g,"clutch"],
+    // Engine
+    [/eng[ie]n[e]?/g,"engine"],[/engin /g,"engine "],[/engne /g,"engine "],
+    // Overheating
+    [/overheati+ng/g,"overheating"],[/overheatng/g,"overheating"],[/overheting/g,"overheating"],
+    // Accident
+    [/accedent/g,"accident"],[/accidant/g,"accident"],[/acident/g,"accident"],
+    [/accedant/g,"accident"],[/acc[ie]d[ae]n[td]/g,"accident"],
+    // Tyre
+    [/tyr[eo]/g,"tyre"],[/tire/g,"tyre"],
+    // Gear
+    [/ge[ae]r/g,"gear"],
+    // Accelerator
+    [/accel[ae]r[ae]t/g,"accelerat"],
+    // Suspension
+    [/susp[ae]nsi[oa]n/g,"suspension"],
+    // Coolant
+    [/cool[ae]nt/g,"coolant"],[/coolent/g,"coolant"],
+    // Ignition
+    [/igni[ts][io]on/g,"ignition"],
+    // Silencer
+    [/silen[sc]er/g,"silencer"],
+    // Radiator
+    [/radi[ae]t[ao]r/g,"radiator"],
+    // Vibration
+    [/vibr[ae]ti[oa]n/g,"vibration"],
+    // Indicator
+    [/indic[ae]t[ao]r/g,"indicator"],
+    // Alternator
+    [/altern[ae]t[ao]r/g,"alternator"],
+  ];
+  for(var i=0;i<fixes.length;i++) s=s.replace(fixes[i][0],fixes[i][1]);
+  return s;
+}
+
 function mapInput(t){
   var raw=t;
-  t=" "+t.toLowerCase().replace(/[^\w\s]/g," ")+" ";
+  t=" "+normalizeMisspellings(t.toLowerCase()).replace(/[^\w\s]/g," ")+" ";
   var h=function(w){return t.includes(" "+w+" ")||t.includes(" "+w+"s ")||t.endsWith(" "+w);};
   var c=function(w){return t.includes(w);};
   var a=function(){for(var i=0;i<arguments.length;i++)if(c(arguments[i]))return true;return false;};
@@ -2177,6 +2226,19 @@ function mapInput(t){
   // ── VIBRATION WHILE BRAKING ───────────────────────────────────────────
   if(a("vibrat when braking","shudder when braking","braking vibrat","pulsating brake")||
      both("vibrat","brake")||both("shudder","brake"))return"vibration braking";
+
+  // Single-word / short inputs after normalization
+  // Note: t already has leading/trailing spaces, so t.trim() == the word
+  var tw=t.trim();
+  if(tw==="battery"||both("battery","issue")||both("battery","problem"))return"battery";
+  if(both("accident","car")||both("accident","tow")||tw==="accident")return"towing needed";
+  if(tw==="puncture"||tw==="flat")return"tyre puncture";
+  if(tw==="clutch")return"clutch issue";
+  if(tw==="brake"||tw==="brakes")return"brake";
+  if(tw==="gear")return"gear not shifting";
+  if(tw==="steering")return"steering locked";
+  if(tw==="overheating")return"engine overheating";
+  if(tw==="towing"||tw==="tow")return"towing needed";
 
   return null;
 }
