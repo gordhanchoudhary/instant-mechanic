@@ -1480,13 +1480,32 @@ function mapInput(t){
   if(a("burning rubber","burning tyre","burning tire","smell of rubber","smells like rubber",
        "burning wood","clutch smell","burning clutch","burning oil","oil smell",
        "petrol smell","fuel smell","smells like petrol","smells like fuel","smells like gas",
+       "smells of petrol","smells of diesel","smells of fuel","smells of oil",
        "sweet smell","smells sweet","sulphur","rotten egg","egg smell","mildew","musty smell",
        "musty","exhaust fumes inside","fumes inside","carbon monoxide","bad smell inside",
        "strange smell","weird smell","odour","odor","smell from car","battery water leakage and smell",
-       "leakage issue and smell"))return"smell diagnosis";
+       "ac smells","ac bad smell","ac musty","ac stinks","vent smell","car smells like",
+       "car stinks","car bad smell","leakage issue and smell"))return"smell diagnosis";
 
   // Self-start grinding: must catch before generic sound diagnosis
   if((c("grinding")&&c("not starting"))||(c("grinding")&&c("starting car"))||(c("grinding sound")&&c("start")))return"self start issue";
+
+  // AC with noise → still AC issue, not generic sound diagnosis
+  if((c(" ac ")||c("ac "))&&a("noise","sound","rattle","click","grind","bang","hiss","squeal","whistle","vibrat"))return"ac not cooling";
+
+  // Natural language sound descriptions
+  if(a("unusual sound","strange noise from","weird noise from car","car making sound",
+       "makes a noise","rattling noise","clicking noise when","clicking when turning",
+       "clicking when braking","noise when turning","noise when braking",
+       "grinding when turning","noise while driving","sound while driving",
+       "clunking noise","thudding noise","thumping noise","ticking noise",
+       "knocking from engine","knock from engine","banging noise","creaking noise",
+       "scraping noise","screeching noise","sound from wheel","noise from wheel",
+       "noise from front","noise from rear","unusual noise from car",
+       "car making clicking","car making rattling","car making knocking",
+       "car makes noise","car making noise")||
+     both("noise","engine")||both("sound","engine")||
+     both("clicking","turning")||both("noise","wheel"))return"sound diagnosis";
 
   // ── SOUND DIAGNOSIS ──────────────────────────────────────────────────
   if(a("noise aa raha","awaaz aa raha","awaaz aati","noise aata","awaaz nahi band",
@@ -1528,8 +1547,10 @@ function mapInput(t){
        "rough idle problem","idle problem","engine surging","surging","hesitation under load",
        "hesitates under acceleration","engine hesitation","engine stumble","stumble",
        "sputtering","spluttering","engine sputter","car sputter","fuel starvation",
-       "fuel starving","lean misfire","jerking stalling")||
-     both("stall","keep")||both("engine","surge")||both("idle","rough"))return"jerking stalling";
+       "fuel starving","lean misfire","jerking stalling",
+       "car hesitates","hesitates at low speed","hesitates at speed","car bucks","bucks when accelerating",
+       "car bucking","car lunges","bucking acceleration","car stumbles","car stutters")||
+     both("stall","keep")||both("engine","surge")||both("idle","rough")||both("car","hesitate")||both("car","buck"))return"jerking stalling";
 
   // ── WATERLOGGING / STUCK ─────────────────────────────────────────────
   if(a("waterlog","waterlogged","water logging","flood","flooded","stuck in water",
@@ -1654,6 +1675,9 @@ function mapInput(t){
        "battery exchange","spare battery","amaron","exide battery","luminous battery"))return"battery replacement";
 
   // ── BATTERY ──────────────────────────────────────────────────────────
+  if(a("battery keeps dying","battery keeps draining","drains overnight","drains fast",
+       "battery draining quickly","battery losing charge","battery not lasting",
+       "battery dies every","battery going dead","battery dead every morning"))return"battery";
   if(a("battery dead","battery down","battery low","battery drain","battery discharge",
        "battery drained","battery discharged","battery died","battery weak","battery fail",
        "battery issue","battery problem","jump start","jumpstart","jump-start",
@@ -1679,7 +1703,9 @@ function mapInput(t){
        "new tyre","tyre replace","car tire","car tyre")||
      both("tyre","flat")||both("tire","flat")||both("tyre","damage")||
      both("tyre","burst")||both("tyre","issue")||both("tyre","puncture")||
-     both("flat","tyre")||both("phat","tyre")||both("tyre","phat"))return"tyre puncture";
+     both("flat","tyre")||both("phat","tyre")||both("tyre","phat")||
+     both("tyre","losing")||both("tyre","air")||both("losing","air")||
+     both("tyre","slow")||both("slow","puncture"))return"tyre puncture";
 
   // ── CNG ───────────────────────────────────────────────────────────────
   if(a("cng","compressed natural gas","cng issue","cng not working","cng leak","gas kit",
@@ -1716,7 +1742,9 @@ function mapInput(t){
        "oil on floor","leakage issue","fluid leaking","oil stain","engine oil leak",
        "engine oil leakage","oil under car","engine oil issue","engine oil over",
        "engine oil refill","oil drip","dark drip","tela leak","tel leak",
-       "oil aa raha","tel aa raha","tela aa raha","gasket issue","fluid leakage"))return"engine oil leak";
+       "oil aa raha","tel aa raha","tela aa raha","gasket issue","fluid leakage",
+       "fluid dripping","dripping from car","fluid dripping from","oil dripping from",
+       "leaking from bottom","leaking from engine","dark liquid under"))return"engine oil leak";
 
   // ── CLUTCH SLIPPING ───────────────────────────────────────────────────
   if(a("clutch slip","slipping clutch","revving but not","rpm high but","clutch burned out","clutch burn")||
@@ -1756,7 +1784,8 @@ function mapInput(t){
   // ── CAR PULLING WHILE BRAKING ─────────────────────────────────────────
   if(a("car pull","pulls left","pulls right","pulling to one side","car drift",
        "car sideways","car veering","car going sideways","car lean while driving",
-       "pulls to one")||
+       "steering drifting","steering pulling","car drifts","car goes left","car goes right",
+       "pulling to the left","pulling to the right","veering to the","pulls to one")||
      both("car","pull")||both("pulling","side"))return"car pulling braking";
 
 
@@ -1808,6 +1837,12 @@ function mapInput(t){
        "car stopped suddenly","suddenly stopped","engine cut off","engine shuts down",
        "engine not switching off","takes self stops immediately","car starts and off",
        "starting but turns off","engine off","engine band ho gaya","engine off while",
+       "turns off while","turning off while","turns off at","turning off at","engine turns off","engine turns itself off","engine keeps turning off",
+       "keeps turning off","keeps shutting off","shuts down","shuts itself off",
+       "cutting out","cuts out","keeps cutting out","car cutting out",
+       "car stops running","engine stops running","engine keeps stopping",
+       "car stops by itself","engine stops by itself","car stops on its own",
+       "car stops suddenly while","car went off","car switched off",
        "car stops while","car stopped midway","car stopped on the bridge","stopped running",
        "stopped in between","stopped while driving","stopped while moving","car stopped while")||
      both("engine","die")||both("car","stall")||both("car","shut off"))return"car shuts off";
@@ -1847,6 +1882,8 @@ function mapInput(t){
        "car headlight relay","headlight relay","indicator lights")||
      both("horn","not")||both("indicator","not")||both("headlight","not")||
      both("light","not")||both("horn","working")||
+     both("horn","stop")||both("horn","stuck")||
+     both("horn","wont")||both("horn","keeps")||
      both("horn","band")||both("indicator","band")||both("light","band")||
      both("horn","nahi")||both("indicator","nahi")||
      both("headlight","nahi")||both("light","nahi"))return"lights indicators horn";
@@ -1884,7 +1921,7 @@ function mapInput(t){
      both("boot","nahi")||both("door","nahi")||both("bonnet","nahi"))return"door boot bonnet";
 
   // ── CAR NOT MOVING / STUCK ────────────────────────────────────────────
-  if(a("car not moving","car stuck","won't move","wont move","not moving","can't move",
+  if(a("car not moving","car stuck","won't move","wont move","not moving","can't move","reverse not working","wont go in reverse","not going in reverse","cant engage reverse","reverse nahi",
        "car wont move","gaadi nahi chal","handbrake stuck","handbrake jammed",
        "parking brake stuck","car not moving forward","car not moving forward or back",
        "car starting but not moving","car starts but not moving","excel issue not moving",
@@ -1962,7 +1999,9 @@ function mapInput(t){
        "not accelerating","wont accelerate","throttle response","acceleration low",
        "pickup nahi","car dheela","gaadi slow","car not taking pickup","car not taking race","car not speeding up",
        "car not going up the slope","car pickup issue when ac","could not pick up on ramp",
-       "car not maintaining power","car missing and not getting thrust")||
+       "car not maintaining power","car missing and not getting thrust",
+       "car not picking up speed","car loses power","car losing power","loss of power",
+       "car wont go fast","car cant go fast","car feels slow")||
      both("acceleration","not")||both("pickup","bad")||both("car","slow")||
      both("no","pickup"))return"acceleration issue";
 
@@ -1995,7 +2034,8 @@ function mapInput(t){
      both("coolant","issue")||both("coolant","low")||both("radiator","damage")||
      both("radiator","problem")||both("radiator","issue")||both("hose","leak")||
      both("pipe","leak")||both("pipe","damage")||both("pipe","burst")||
-     both("coolant","leak")||both("paani","aa")||both("pani","nikal"))return"coolant issue";
+     both("coolant","leak")||both("paani","aa")||both("pani","nikal")||
+     both("water","under")||(both("fluid","under")&&!both("oil","under")))return"coolant issue";
 
   // ── ELECTRICAL / WIRING / FUSE ────────────────────────────────────────
   if(a("wiring issue","fuse check","electrical failure","wiring fault","burned fuse",
@@ -2042,6 +2082,10 @@ function mapInput(t){
      both("power","steering")||both("steering","hard"))return"steering locked";
 
   // ── CAR NOT STARTING ─────────────────────────────────────────────────
+  if(a("struggles to start","hard to start","difficult to start","slow to start",
+       "takes long to start","takes time to start","cranks slowly","slow crank",
+       "cranks but doesnt start","cranks but wont start","cranks but no start",
+       "cranks but doesnt fire","cranks but no fire","cranks and stops"))return"car not starting";
   if(a("not starting","won't start","wont start","not start","car dead","wont crank","won't crank",
        "constant honking doors locked not starting",
        "car wont","car won't","engine not cranking","start nahi","car band","gaadi start",
@@ -2064,7 +2108,9 @@ function mapInput(t){
        "coolant leak and car heating","check engine light and car heating")||
      both("engine","hot")||both("temp","high")||both("car","heating")||
      both("engine","heating")||both("overheating","car")||
-     both("car","heat")||both("car","garam")||both("gaadi","garam"))return"engine overheating";
+     both("car","heat")||both("car","garam")||both("gaadi","garam")||
+     both("temperature","rising")||both("temp","rising")||both("temperature","high")||
+     both("overheating","traffic")||both("heating","traffic"))return"engine overheating";
 
   // ── BRAKE ────────────────────────────────────────────────────────────
   if(a("brake issue","brake jam","brake jammed","brake locked","brake pads","brake pedal",
@@ -2080,8 +2126,9 @@ function mapInput(t){
        "ac wire bitten","a c wire","wire bitten by rats","ac radiator","ac gas filling","ac gas refill",
        "ac gas replacement","cooling not","ac repair","ac service","ac kam","thanda nahi",
        "ac band","ac nahi chal","ac off ho gaya","ac off ho","thanda nahi aa raha",
-       "ac chalta nahi","cooling nahi")||
-     (c(" ac ")&&a("not work","noise","problem","compressor","cool","gas","fan","blower","band","off")))return"ac not cooling";
+       "ac makes noise","ac making noise","ac sound","ac noise","ac rattling","ac clicking",
+       "ac grinding","ac chalta nahi","cooling nahi")||
+     (c(" ac ")&&a("not work","noise","problem","compressor","cool","gas","fan","blower","band","off","rattle","click","grind")))return"ac not cooling";
 
   // ── CHECK ENGINE (catch-all for engine issues not caught above) ────────
   if(c("check engine")||both("engine","light")||both("engine","warning"))return"check engine";
@@ -2090,6 +2137,11 @@ function mapInput(t){
   if(a("jerk","jolting","lurching","car jerks","car jolt","jhatka","jhatkay")||
      both("car","jerk")||both("car","lurch"))return"car jerking";
 
+
+  // High speed vibration → steering vibration speed (before generic vibration)
+  if(a("vibrates at high speed","vibration at high speed","shakes at high speed",
+       "vibrates on highway","shakes on highway")||
+     (both("vibrat","high")&&both("speed","car"))||(both("vibrat","highway")))return"steering vibration speed";
 
   // ── VIBRATION ────────────────────────────────────────────────────────
   if(a("vibrat","shaking","shake")||both("car","vibrate")||both("steering","shake"))return"vibration";
@@ -2108,8 +2160,11 @@ function mapInput(t){
   if(a("fuse blow","fuse keep","blowing fuse")||both("fuse","blow")||both("fuse","keep"))return"fuse blowing";
 
   // ── STEERING VIBRATION AT SPEED ───────────────────────────────────────
-  if(a("steering vibrat","steering shake","high speed vibrat","highway shake")||
-     both("steering","vibrat"))return"steering vibration speed";
+  if(a("steering vibrat","steering shake","high speed vibrat","highway shake",
+       "wobbles on highway","wobbles at speed","car wobbles","wheel wobble at speed",
+       "vibrates at high speed","shakes at high speed","vibration at speed",
+       "shaking on highway","wobbling while driving")||
+     both("steering","vibrat")||both("car","wobble")||both("highway","vibrat"))return"steering vibration speed";
 
   // ── VIBRATION WHILE BRAKING ───────────────────────────────────────────
   if(a("vibrat when braking","shudder when braking","braking vibrat","pulsating brake")||
@@ -2394,6 +2449,119 @@ function handleFollowUp(text){
   return false;
 }
 
+// ── GENERAL CAR Q&A HANDLER ──────────────────────────────────────────────────
+var carQA = [
+  {
+    keys:["how to reset","car reset","reset ecu","ecu reset","reset car","hard reset","soft reset","battery reset","reset warning light","reset check engine","clear codes","clear fault"],
+    answer:'<b>How to reset a car / ECU:</b><br><br>'+
+      '<b>Method 1 — Battery disconnect (basic reset):</b> Disconnect the negative battery terminal for 10–15 minutes. This clears short-term memory but may not clear all fault codes.<br><br>'+
+      '<b>Method 2 — OBD reset (proper):</b> Use an OBD-II scanner to read and clear specific fault codes. This is the correct method — battery disconnect alone doesn&#39;t clear all stored codes.<br><br>'+
+      '<b>Note:</b> After a reset, the ECU re-learns your driving pattern over 50–100 km. The car may feel slightly different initially.<br><br>'+
+      '<b>Warning:</b> Resetting without fixing the underlying fault — the warning light will come back.<br><br>'+
+      'Call <strong><a href="tel:8393990942" style="color:var(--p);text-decoration:none;">8393990942</a></strong> for a proper OBD scan and code clearing at your doorstep.'
+  },
+  {
+    keys:["how to jump start","jump start kaise","jumpstart kaise","jump start car","how to jumpstart"],
+    answer:'<b>How to jump-start a car:</b><br><br>'+
+      '1. Park the working car close (not touching) to the dead car<br>'+
+      '2. Connect <b>red cable → dead battery (+)</b> first<br>'+
+      '3. Connect <b>red cable other end → good battery (+)</b><br>'+
+      '4. Connect <b>black cable → good battery (−)</b><br>'+
+      '5. Connect <b>black cable other end → unpainted metal on dead car</b> (not the battery terminal)<br>'+
+      '6. Start the working car, wait 2–3 minutes<br>'+
+      '7. Start the dead car<br>'+
+      '8. Remove cables in <b>reverse order</b><br><br>'+
+      '<b>After jump-starting:</b> Drive for at least 20–30 minutes to let the alternator recharge the battery. If it keeps dying — the battery needs replacement.<br><br>'+
+      'Call <strong><a href="tel:8393990942" style="color:var(--p);text-decoration:none;">8393990942</a></strong> for doorstep jump start or battery replacement.'
+  },
+  {
+    keys:["how to check engine oil","check oil level","engine oil kaise check","oil kaise dekhe","dipstick"],
+    answer:'<b>How to check engine oil level:</b><br><br>'+
+      '1. Park on level ground, turn engine off, wait 5 minutes<br>'+
+      '2. Open bonnet and find the dipstick (usually yellow or orange handle)<br>'+
+      '3. Pull it out, wipe clean with a cloth<br>'+
+      '4. Re-insert fully, then pull out again<br>'+
+      '5. Oil level should be between the MIN and MAX marks<br>'+
+      '6. Check oil colour — should be amber/brown. Black and thick = overdue for change. Milky = coolant mixing (head gasket concern)<br><br>'+
+      '<b>Top up if low</b> with the correct grade (check your owner&#39;s manual &mdash; typically 5W-30 or 10W-40).<br><br>'+
+      'Call <strong><a href="tel:8393990942" style="color:var(--p);text-decoration:none;">8393990942</a></strong> for doorstep oil top-up or oil change service.'
+  },
+  {
+    keys:["how to check tyre pressure","tyre pressure kaise","check air pressure","how to inflate tyre","tyre mein hawa"],
+    answer:'<b>How to check and inflate tyre pressure:</b><br><br>'+
+      '<b>Recommended pressure for most cars:</b> 32–36 PSI (check inside driver door jamb sticker for exact spec)<br><br>'+
+      '1. Check pressure when tyres are cold (not driven for 2+ hours)<br>'+
+      '2. Remove valve cap from tyre<br>'+
+      '3. Press tyre pressure gauge firmly on valve — get reading<br>'+
+      '4. Inflate at petrol pump or with portable compressor to correct PSI<br>'+
+      '5. Always check all 4 tyres + spare<br><br>'+
+      '<b>Low pressure symptoms:</b> Poor fuel economy, car pulling to one side, uneven tyre wear<br><br>'+
+      'Call <strong><a href="tel:8393990942" style="color:var(--p);text-decoration:none;">8393990942</a></strong> for doorstep tyre service.'
+  },
+  {
+    keys:["how to change gear","gear kaise change","how to drive manual","clutch kaise use","manual car kaise chalaye"],
+    answer:'<b>How to change gears in a manual car:</b><br><br>'+
+      '1. Press clutch pedal fully to the floor<br>'+
+      '2. Move gear lever to desired gear<br>'+
+      '3. Release clutch pedal slowly while pressing accelerator gently<br>'+
+      '4. For smooth shifts: release clutch at the biting point (you&#39;ll feel/hear the engine note change)<br><br>'+
+      '<b>Gear guide (approx speeds):</b><br>'+
+      '1st: 0–15 km/h | 2nd: 15–30 | 3rd: 30–50 | 4th: 50–70 | 5th: 70+ km/h<br><br>'+
+      '<b>Common mistakes:</b> Riding the clutch (keeping foot resting on pedal), changing too late, jerky release. If you notice clutch slipping or a burning smell — book an inspection.'
+  },
+  {
+    keys:["how often service","service kitne km","service kab karaye","when to service","service interval","service schedule","oil change interval","oil change kitne km"],
+    answer:'<b>Car service intervals:</b><br><br>'+
+      '<b>Engine oil change:</b> Every <b>5,000–7,500 km</b> for mineral oil / every <b>10,000–15,000 km</b> for synthetic oil<br>'+
+      '<b>Air filter:</b> Every 15,000–20,000 km<br>'+
+      '<b>Spark plugs:</b> Every 30,000–40,000 km (standard) or 60,000–100,000 km (iridium/platinum)<br>'+
+      '<b>Brake fluid:</b> Every 2 years or 40,000 km<br>'+
+      '<b>Coolant flush:</b> Every 2 years or 40,000 km<br>'+
+      '<b>Tyres rotation:</b> Every 10,000 km<br>'+
+      '<b>Full service:</b> Annually or per manufacturer schedule (check owner&#39;s manual)<br><br>'+
+      'Call <strong><a href="tel:8393990942" style="color:var(--p);text-decoration:none;">8393990942</a></strong> to book a doorstep service — mechanic comes to you.'
+  },
+  {
+    keys:["what is obd","what is ecu","what is abs","what is esp","what is epc","what is dpf","what is tcs","what is esc","what is vsc","what is bms","what is atf","what is ps fluid","car terms","car abbreviation"],
+    answer:'<b>Common car warning light abbreviations:</b><br><br>'+
+      '<b>OBD</b> — On-Board Diagnostics (the plug-in port for reading fault codes)<br>'+
+      '<b>ECU</b> — Engine Control Unit (the car&#39;s main computer)<br>'+
+      '<b>ABS</b> — Anti-lock Braking System (prevents wheel lock-up when braking hard)<br>'+
+      '<b>ESP / ESC / VSC / DSC</b> — Electronic Stability Control (prevents skidding)<br>'+
+      '<b>EPC</b> — Electronic Power Control (throttle system — common on VW/Audi/Skoda)<br>'+
+      '<b>DPF</b> — Diesel Particulate Filter (diesel cars — filters exhaust soot)<br>'+
+      '<b>TCS / ASR</b> — Traction Control System (prevents wheelspin)<br>'+
+      '<b>BMS</b> — Battery Management System (EV/Hybrid battery health monitor)<br>'+
+      '<b>ATF</b> — Automatic Transmission Fluid<br>'+
+      '<b>PS</b> — Power Steering<br><br>'+
+      'Ask me about any specific warning light and I&#39;ll diagnose it for you!'
+  },
+  {
+    keys:["what is instant mechanic","about instant mechanic","who are you","what can you do","what do you do","carbuddy kya hai","instant mechanic kya hai"],
+    answer:'<b>About Instant Mechanic &amp; CarBuddy:</b><br><br>'+
+      '<b>Instant Mechanic</b> is Delhi NCR&#39;s on-demand car care platform. We bring trained mechanics to your doorstep — no need to visit a garage.<br><br>'+
+      '<b>Our services:</b><br>'+
+      '🔧 On-spot repairs (battery, tyre, clutch, AC, etc.)<br>'+
+      '🚛 Towing &amp; roadside assistance<br>'+
+      '🔋 Doorstep battery replacement (Amaron, Exide, Luminous)<br>'+
+      '🔍 Pre-purchase car inspection<br>'+
+      '⚡ EV towing &amp; charging support<br><br>'+
+      '<b>CarBuddy</b> is our AI diagnosis assistant — describe any car problem and I&#39;ll identify the issue and recommended actions.<br><br>'+
+      'Call <strong><a href="tel:8393990942" style="color:var(--p);text-decoration:none;">8393990942</a></strong> to book a service right now.'
+  },
+];
+
+function checkCarQA(text){
+  var t = ' '+text.toLowerCase().replace(/[^\w\s]/g,' ')+' ';
+  for(var i=0;i<carQA.length;i++){
+    var qa=carQA[i];
+    for(var j=0;j<qa.keys.length;j++){
+      if(t.includes(qa.keys[j]))return qa.answer;
+    }
+  }
+  return null;
+}
+
 function isPriceQuery(text){
   var t=text.toLowerCase();
   return t.includes("how much")||t.includes("kitna")||t.includes(" cost")||t.includes("costs")||
@@ -2410,7 +2578,16 @@ function processInput(text){
   var key=mapInput(text);
   if(!key){
     showTyping();
-    setTimeout(function(){rmTyping();addMsg("Hmm, I need a bit more to go on for that one! For a full explanation, call us at <strong><a href='tel:8393990942' style='color:var(--p);text-decoration:none;'>8393990942</a></strong> — or visit your nearest <strong>Instant Mechanic partner garage</strong> and our mechanics will sort it out quickly.","bot");},700);
+    setTimeout(function(){
+      rmTyping();
+      var qaAnswer = checkCarQA(text);
+      if(qaAnswer){
+        addMsg(qaAnswer,'bot');
+        setTimeout(addRestart,400);
+      } else {
+        addMsg("Hmm, I need a bit more to go on for that one! For a full explanation, call us at <strong><a href='tel:8393990942' style='color:var(--p);text-decoration:none;'>8393990942</a></strong> — or visit your nearest <strong>Instant Mechanic partner garage</strong> and our mechanics will sort it out quickly.","bot");
+      }
+    },700);
     return;
   }
   st.key=key;st.tree=trees[key];st.qi=0;st.ans=[];st.phase="questioning";
