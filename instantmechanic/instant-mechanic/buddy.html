@@ -2709,6 +2709,61 @@ var carQA = [
       '&#x2022; U codes = Network/communication<br><br>'+
       '<b>DIY option:</b> Bluetooth OBD adapters (ELM327) are available for &#8377;300&ndash;&#8377;800 online. Use with apps like Torque Pro or Car Scanner.<br><br>'+
       'Call <strong><a href="tel:8393990942" style="color:var(--p);text-decoration:none;">8393990942</a></strong> for a professional OBD scan at your doorstep.'
+  },
+  {
+    keys:["module fault","what is module fault","module failure","module not working",
+          "bcm fault","ecm fault","tcm fault","pcm fault","abs module","srs module",
+          "body control module","engine control module","transmission control module",
+          "what module","module issue","module problem","module replacement","module error",
+          "what is bcm","what is ecm","what is pcm","what is tcm"],
+    answer:'<b>What is a Module Fault?</b><br><br>'+
+      'Modern cars have multiple electronic control modules (computers). Each controls a different system:<br><br>'+
+      '<b>ECM / ECU</b> — Engine Control Module: controls fuel injection, ignition, emissions<br>'+
+      '<b>TCM / TCU</b> — Transmission Control Module: controls automatic gearbox shift points<br>'+
+      '<b>BCM</b> — Body Control Module: controls locks, windows, lights, wipers<br>'+
+      '<b>ABS Module</b> — controls anti-lock braking system<br>'+
+      '<b>SRS Module</b> — controls airbags and seatbelt pretensioners<br>'+
+      '<b>PCM</b> — Powertrain Control Module: combined ECM + TCM (used in some cars)<br><br>'+
+      '<b>Signs of a module fault:</b><br>'+
+      '&#x2022; Warning light stays on<br>'+
+      '&#x2022; Erratic behaviour (windows, locks, lights acting on their own)<br>'+
+      '&#x2022; Car goes into limp mode<br>'+
+      '&#x2022; OBD scan shows U-codes (network/communication faults)<br><br>'+
+      '<b>Fix:</b> Module faults need an OBD scan to identify the exact module and fault code. Some are software issues (reset fixes them), others need module replacement.<br><br>'+
+      'Call <strong><a href="tel:8393990942" style="color:var(--p);text-decoration:none;">8393990942</a></strong> for a doorstep OBD scan — our mechanic will identify the faulty module.'
+  },
+  {
+    keys:["where is your garage","your garage location","instant mechanic garage","garage address",
+          "where are you located","instant mechanic location","your location","near me",
+          "nearest garage","partner garage","where to come","where to bring car",
+          "garage kahan hai","aap kahan ho","service center","service centre location"],
+    answer:'<b>Instant Mechanic — How it works:</b><br><br>'+
+      '<b>We come to YOU</b> — our mechanics travel to your home, office, or wherever your car is. You do not need to come to us.<br><br>'+
+      '<b>Service area:</b> Delhi NCR (Delhi, Gurugram, Noida, Faridabad, Ghaziabad)<br><br>'+
+      '<b>What we bring to your location:</b><br>'+
+      '&#x2022; Trained mechanics with tools and spare parts<br>'+
+      '&#x2022; Batteries (Amaron, Exide, Luminous)<br>'+
+      '&#x2022; Tow trucks (underlift and flatbed)<br>'+
+      '&#x2022; OBD diagnostic equipment<br>'+
+      '&#x2022; Tyres, puncture repair kits, and more<br><br>'+
+      '<b>Partner garages:</b> We also have partner garages in Gurugram for major repairs that cannot be done on-spot.<br><br>'+
+      'Call <strong><a href="tel:8393990942" style="color:var(--p);text-decoration:none;">8393990942</a></strong> to book — tell us your location and we will send a mechanic to you.'
+  },
+  {
+    keys:["book service","book mechanic","book appointment","book a mechanic","send mechanic",
+          "mechanic bhejo","mechanic bhejdo","mechanic book karo","mechanic kab aayega",
+          "how to book","booking kaise","service book karna","appointment kaise",
+          "schedule mechanic","i want to book","i need a mechanic","need mechanic",
+          "send someone","can you come","will you come","kab aayenge","kab aa sakte"],
+    answer:'<b>Book an Instant Mechanic — it&#39;s easy:</b><br><br>'+
+      '<b>Step 1:</b> Call <strong><a href="tel:8393990942" style="color:var(--p);text-decoration:none;">8393990942</a></strong><br>'+
+      '<b>Step 2:</b> Tell us your car issue, car model, and your location<br>'+
+      '<b>Step 3:</b> We confirm the mechanic and arrival time<br>'+
+      '<b>Step 4:</b> Mechanic arrives at your location with tools and parts<br>'+
+      '<b>Step 5:</b> Issue diagnosed and fixed on the spot (or towed if needed)<br><br>'+
+      '<b>Available:</b> 7 days a week, early morning to late evening<br>'+
+      '<b>Area:</b> Delhi NCR (Delhi, Gurugram, Noida, Faridabad, Ghaziabad)<br><br>'+
+      'Call now: <strong><a href="tel:8393990942" style="color:var(--p);text-decoration:none;">8393990942</a></strong>'
   }
 ];
 
@@ -2746,7 +2801,8 @@ function processInput(text){
         addMsg(qaAnswer,'bot');
         setTimeout(addRestart,400);
       } else {
-        addMsg("Hmm, I need a bit more to go on for that one! For a full explanation, call us at <strong><a href='tel:8393990942' style='color:var(--p);text-decoration:none;'>8393990942</a></strong> — or visit your nearest <strong>Instant Mechanic partner garage</strong> and our mechanics will sort it out quickly.","bot");
+        addMsg("I don't have a specific diagnosis for that — but our mechanics will know exactly what to do!<br><br>"+
+          "&#128222; Call <strong><a href='tel:8393990942' style='color:var(--p);text-decoration:none;'>8393990942</a></strong> for a full explanation and to book a mechanic at your doorstep.","bot");
       }
     },700);
     return;
