@@ -510,7 +510,7 @@ var trees={
     return null;
   },
   qs:[
-    {q:"Does the RPM increase when you press the accelerator?",opts:["Yes, RPM goes up but car doesn't accelerate","No, RPM doesn't increase at all"]},
+    {q:"Does the RPM increase when you press the accelerator?",opts:["Yes, RPM goes up but car doesn't accelerate","No, RPM doesn&#39;t increase at all"]},
     {q:"Is the check engine light on?",opts:["Yes","No"]}
   ],
   dx:function(a){
@@ -1837,7 +1837,13 @@ function mapInput(t){
        "car stopped suddenly","suddenly stopped","engine cut off","engine shuts down",
        "engine not switching off","takes self stops immediately","car starts and off",
        "starting but turns off","engine off","engine band ho gaya","engine off while",
-       "turns off while","turning off while","turns off at","turning off at","engine turns off","engine turns itself off","engine keeps turning off",
+       "turns off while","turning off while","turns off at","turning off at",
+       "turned off","getting turned off","getting switched off","switched off","switches off",
+       "switching off","getting shut off","going off while","getting off while",
+       "automatically turns off","auto shut","autoshut","engine turns off","engine turns itself off",
+       "engine keeps turning off","engine switching off","engine switched off",
+       "getting turn of","turn of at","turn off at","getting turn off","car turn off",
+       "turning of","turned of","gets turn off","getting switched of","switched of",
        "keeps turning off","keeps shutting off","shuts down","shuts itself off",
        "cutting out","cuts out","keeps cutting out","car cutting out",
        "car stops running","engine stops running","engine keeps stopping",
@@ -1845,7 +1851,9 @@ function mapInput(t){
        "car stops suddenly while","car went off","car switched off",
        "car stops while","car stopped midway","car stopped on the bridge","stopped running",
        "stopped in between","stopped while driving","stopped while moving","car stopped while")||
-     both("engine","die")||both("car","stall")||both("car","shut off"))return"car shuts off";
+     both("engine","die")||both("car","stall")||both("car","shut off")||
+     both("getting","turn")||both("car","turn of")||both("turn","off at")||
+     both("car","switching")||both("engine","switching")||both("switched","off"))return"car shuts off";
 
   // ── ENGINE NO RESPONSE ────────────────────────────────────────────────
   if(a("no response","not responding","accelerator not","no acceleration","throttle not",
@@ -2299,6 +2307,81 @@ function handleFollowUp(text){
     return true;
   }
 
+  // "Mechanic says / told me / suggested" — validate and inform
+  if(h("mechanic say")||h("mechanic is saying")||h("mechanic told")||h("mechanic said")||
+     h("mechanic suggest")||h("garage say")||h("garage told")||h("garage said")||
+     h("mechanic is telling")||h("mechanic advise")||h("mechanic recommend")||
+     h("mechanic bola")||h("mechanic ne bola")||h("mechanic bol raha")){
+    showTyping();
+    setTimeout(function(){
+      rmTyping();
+      var t2=text.toLowerCase();
+      var msg='';
+      // Identify what the mechanic is suggesting
+      if(t2.includes("gear oil")||t2.includes("gearbox oil")||t2.includes("transmission oil")||t2.includes("atf")){
+        msg='<b>Gear oil / Gearbox oil change</b> — your mechanic is right, this is a valid and often overlooked service.<br><br>'+
+          '<b>What is gear oil?</b> Gearbox oil lubricates the gears inside your manual or automatic transmission. Old or low oil causes hard gear changes, noise, and ultimately gearbox damage.<br><br>'+
+          '<b>When to change:</b><br>'+
+          '&#x2022; <b>Manual gearbox oil:</b> Every 40,000&ndash;60,000 km<br>'+
+          '&#x2022; <b>Automatic transmission fluid (ATF):</b> Every 40,000&ndash;60,000 km (or when dark/burnt smell)<br>'+
+          '&#x2022; <b>Signs it&#39;s overdue:</b> Difficult gear changes, whining noise from gearbox, jerking when shifting<br><br>'+
+          '<b>Cost in Delhi NCR:</b> &#8377;800&ndash;&#8377;2,500 depending on car and oil type<br><br>'+
+          'Call <strong><a href="tel:8393990942" style="color:var(--p);text-decoration:none;">8393990942</a></strong> to book a doorstep gearbox oil change &mdash; mechanic brings correct oil grade for your car.';
+      } else if(t2.includes("engine oil")||t2.includes("oil change")||t2.includes("oil flush")){
+        msg='<b>Engine oil change</b> — absolutely correct recommendation.<br><br>'+
+          '<b>When to change:</b> Every 5,000&ndash;7,500 km (mineral) or 10,000&ndash;15,000 km (synthetic)<br>'+
+          '<b>Signs overdue:</b> Dark/black oil on dipstick, engine noise, reduced fuel efficiency<br>'+
+          '<b>Cost:</b> &#8377;800&ndash;&#8377;2,500 depending on oil grade and car<br><br>'+
+          'Call <strong><a href="tel:8393990942" style="color:var(--p);text-decoration:none;">8393990942</a></strong> for doorstep oil change service.';
+      } else if(t2.includes("battery")||t2.includes("battery change")||t2.includes("replace battery")){
+        msg='<b>Battery replacement</b> — if your mechanic is recommending it, it&#39;s likely warranted.<br><br>'+
+          '<b>Check these first:</b><br>'+
+          '&#x2022; Battery age (replace every 3&ndash;4 years regardless)<br>'+
+          '&#x2022; Battery voltage test: below 12.4V = needs replacement<br>'+
+          '&#x2022; Load test: even 12.6V can fail under load<br><br>'+
+          '<b>Our batteries:</b> Amaron, Exide, Luminous &mdash; 2-year warranty, fitted at your doorstep<br>'+
+          '<b>Cost:</b> &#8377;3,500&ndash;&#8377;10,000 depending on car<br><br>'+
+          'Call <strong><a href="tel:8393990942" style="color:var(--p);text-decoration:none;">8393990942</a></strong> for a second opinion and doorstep battery replacement.';
+      } else if(t2.includes("brake pad")||t2.includes("brake disc")||t2.includes("brake fluid")){
+        msg='<b>Brake service</b> — brakes are safety-critical, so act on this soon.<br><br>'+
+          '<b>Brake pads:</b> Replace when thickness drops below 3mm or squealing starts<br>'+
+          '<b>Brake discs:</b> Replace if scored, warped, or below minimum thickness<br>'+
+          '<b>Brake fluid:</b> Change every 2 years (absorbs moisture, lowers boiling point)<br>'+
+          '<b>Cost:</b> &#8377;1,200&ndash;&#8377;10,000 depending on what needs doing<br><br>'+
+          'Call <strong><a href="tel:8393990942" style="color:var(--p);text-decoration:none;">8393990942</a></strong> for a free brake inspection before spending money.';
+      } else if(t2.includes("clutch")||t2.includes("clutch plate")){
+        msg='<b>Clutch replacement</b> — if your mechanic is recommending this, look out for:<br><br>'+
+          '&#x2022; RPM rises but speed doesn&#39;t increase (clutch slipping)<br>'+
+          '&#x2022; Burning smell when using the clutch<br>'+
+          '&#x2022; Difficulty engaging gears<br><br>'+
+          'These confirm clutch wear. <b>Cost:</b> &#8377;4,000&ndash;&#8377;18,000 depending on car<br><br>'+
+          'Call <strong><a href="tel:8393990942" style="color:var(--p);text-decoration:none;">8393990942</a></strong> for a second opinion before authorising the repair.';
+      } else if(t2.includes("alignment")||t2.includes("wheel align")){
+        msg='<b>Wheel alignment</b> — a valid and cheap service your mechanic is right about.<br><br>'+
+          '<b>Signs you need it:</b> Car pulling to one side, uneven tyre wear, steering wheel off-centre<br>'+
+          '<b>Do together with:</b> Wheel balancing (both tyres and alignment = &#8377;500&ndash;&#8377;1,200)<br>'+
+          '<b>How often:</b> Every 10,000 km or after any pothole impact<br><br>'+
+          'Call <strong><a href="tel:8393990942" style="color:var(--p);text-decoration:none;">8393990942</a></strong> to book.';
+      } else if(t2.includes("ac gas")||t2.includes("ac recharge")||t2.includes("ac refill")){
+        msg='<b>AC gas recharge</b> — correct if your AC has been getting less cold over time.<br><br>'+
+          '<b>How often:</b> Every 2&ndash;3 years typically, or when cooling reduces<br>'+
+          '<b>Important:</b> If it needs recharging again within a year, there&#39;s a leak &mdash; fix the leak first<br>'+
+          '<b>Cost:</b> &#8377;1,500&ndash;&#8377;2,500 for recharge, &#8377;2,000&ndash;&#8377;3,500 with leak check<br><br>'+
+          'Call <strong><a href="tel:8393990942" style="color:var(--p);text-decoration:none;">8393990942</a></strong> for doorstep AC service.';
+      } else {
+        msg='Thanks for sharing what your mechanic said. To help you decide whether to go ahead:<br><br>'+
+          '&#x2022; Ask your mechanic to <b>show you the worn part</b> before authorising the repair<br>'+
+          '&#x2022; Ask for a <b>written quote</b> with part cost and labour separately<br>'+
+          '&#x2022; Get a <b>second opinion</b> if the repair cost seems high<br><br>'+
+          'Call <strong><a href="tel:8393990942" style="color:var(--p);text-decoration:none;">8393990942</a></strong> &mdash; our mechanics will give you an honest second opinion at your doorstep.';
+      }
+      addMsg(msg,'bot');
+      setTimeout(addRestart,400);
+      st.phase='done';
+    },700);
+    return true;
+  }
+
   // Battery replacement intent — always treat as fresh diagnosis
   if(h("need a new battery")||h("need new battery")||h("want new battery")||h("replace battery")||h("battery change")||h("battery replacement")||h("new battery")||h("install battery")||h("change battery")){
     st.phase="idle";
@@ -2548,7 +2631,85 @@ var carQA = [
       '⚡ EV towing &amp; charging support<br><br>'+
       '<b>CarBuddy</b> is our AI diagnosis assistant — describe any car problem and I&#39;ll identify the issue and recommended actions.<br><br>'+
       'Call <strong><a href="tel:8393990942" style="color:var(--p);text-decoration:none;">8393990942</a></strong> to book a service right now.'
+  },,
+  {
+    keys:["what is maf","maf sensor","mass airflow","what is tps","tps sensor","throttle position",
+          "what is map sensor","what is o2 sensor","what is lambda","what is crankshaft sensor",
+          "what is camshaft sensor","what is iat sensor","what is coolant sensor","what is knock sensor",
+          "what is injector","fuel injector","what is egr","egr valve","what is idle control",
+          "what is iac","what is throttle body","throttle body kya","sensor kya hota",
+          "car sensor explain","what sensor","which sensor","sensor meaning"],
+    answer:'<b>Common Car Sensors Explained:</b><br><br>'+
+      '<b>MAF (Mass Air Flow) Sensor</b><br>'+
+      'Measures how much air enters the engine. A dirty or faulty MAF causes rough idle, poor pickup, and black smoke. Fix: clean with MAF cleaner spray or replace.<br><br>'+
+      '<b>TPS (Throttle Position Sensor)</b><br>'+
+      'Tells the ECU how far the accelerator is pressed. Faulty TPS causes jerking, hesitation, or sudden acceleration. Fix: clean or replace the sensor.<br><br>'+
+      '<b>O2 / Lambda Sensor</b><br>'+
+      'Measures oxygen in the exhaust. Controls fuel mixture. Faulty = poor fuel economy, failed emissions. Usually needs replacement.<br><br>'+
+      '<b>MAP (Manifold Absolute Pressure) Sensor</b><br>'+
+      'Measures engine load. Found on many petrol and diesel cars. Faulty = loss of power, black smoke.<br><br>'+
+      '<b>Crankshaft Position Sensor (CPS/CKP)</b><br>'+
+      'Tells ECU engine speed and position. If this fails — engine stalls or won&#39;t start. One of the most common sudden-stall causes.<br><br>'+
+      '<b>Knock Sensor</b><br>'+
+      'Detects engine knocking. Faulty = reduced power, poor fuel economy.<br><br>'+
+      '<b>EGR Valve (Exhaust Gas Recirculation)</b><br>'+
+      'Recirculates exhaust gases to reduce emissions. Clogged EGR causes rough idle, stalling, smoke.<br><br>'+
+      'Call <strong><a href="tel:8393990942" style="color:var(--p);text-decoration:none;">8393990942</a></strong> for doorstep OBD scan to identify which sensor is faulty.'
   },
+  {
+    keys:["what is clutch","clutch kya hai","clutch kaise kaam karta","how clutch works",
+          "what is gearbox","gearbox kya hai","what is differential","diff kya hai",
+          "what is torque converter","what is flywheel","flywheel kya","what is cv joint",
+          "cv joint kya","what is ball joint","ball joint kya","what is tie rod","tie rod kya",
+          "what is shock absorber","shock absorber kya","what is strut","strut kya",
+          "what is caliper","brake caliper kya","what is rotor","brake rotor kya",
+          "what is master cylinder","master cylinder kya","car parts explain","car parts kya"],
+    answer:'<b>Common Car Parts Explained:</b><br><br>'+
+      '<b>Clutch</b> — connects/disconnects engine from gearbox. Worn clutch = slipping (RPM rises but speed doesn&#39;t). Needs replacement every 80,000&ndash;150,000 km.<br><br>'+
+      '<b>Flywheel</b> — heavy disc attached to engine. Smooths power delivery. Ring gear on flywheel engages with starter motor.<br><br>'+
+      '<b>CV Joint (Constant Velocity Joint)</b> — transfers power from gearbox to wheel while allowing steering movement. Clicking sound when turning = worn CV joint.<br><br>'+
+      '<b>Ball Joint</b> — connects suspension control arm to wheel hub. Worn ball joint = clunking, loose handling, tyre wear. Safety critical.<br><br>'+
+      '<b>Tie Rod</b> — part of steering linkage. Connects steering rack to wheel. Worn tie rod = loose steering, uneven tyre wear.<br><br>'+
+      '<b>Shock Absorber / Strut</b> — controls ride quality. Worn shocks = bouncy ride, poor cornering. Replace every 80,000&ndash;100,000 km.<br><br>'+
+      '<b>Brake Caliper</b> — squeezes brake pads against the disc. Seized caliper causes one-sided braking and excessive pad wear.<br><br>'+
+      '<b>Brake Rotor / Disc</b> — the metal disc the brake pads clamp onto. Warped rotor = vibration when braking.<br><br>'+
+      '<b>Master Cylinder</b> — converts brake pedal pressure into hydraulic pressure. Leaking = soft/sinking pedal.<br><br>'+
+      'Ask me about any specific part and I&#39;ll diagnose what&#39;s wrong!'
+  },
+  {
+    keys:["what is alternator","alternator kya","what is starter motor","starter motor kya",
+          "what is radiator","radiator kya","what is thermostat","thermostat kya",
+          "what is water pump","water pump kya","what is timing belt","timing chain kya",
+          "what is turbo","turbo kya","what is intercooler","intercooler kya",
+          "what is dpf","dpf kya","what is catalytic converter","cat converter kya",
+          "what is serpentine belt","belt kya hota","what is idler pulley","tensioner kya"],
+    answer:'<b>Engine & Electrical Parts Explained:</b><br><br>'+
+      '<b>Alternator</b> — charges the battery while engine runs. Faulty alternator = battery dies while driving. Battery warning light on = check alternator first.<br><br>'+
+      '<b>Starter Motor</b> — turns engine over when you start the car. Failed starter = click sound or silence when turning key.<br><br>'+
+      '<b>Radiator</b> — cools the coolant. Blocked or leaking radiator = engine overheating.<br><br>'+
+      '<b>Thermostat</b> — controls coolant flow. Stuck closed = overheating. Stuck open = engine never warms up, poor heating.<br><br>'+
+      '<b>Water Pump</b> — circulates coolant through the engine. Failed water pump = overheating. Often changed with timing belt.<br><br>'+
+      '<b>Timing Belt / Chain</b> — synchronises engine valves and pistons. Snapped timing belt = engine seizure. Change every 60,000&ndash;100,000 km.<br><br>'+
+      '<b>Turbocharger</b> — forces extra air into engine for more power. Failing turbo = loss of power, black/blue smoke, whining noise.<br><br>'+
+      '<b>DPF (Diesel Particulate Filter)</b> — traps soot in diesel exhausts. Clogged DPF = loss of power, warning light. Needs regeneration or replacement.<br><br>'+
+      '<b>Serpentine / Alternator Belt</b> — drives alternator, AC compressor, and power steering pump. Snapped = battery dies, no AC, heavy steering.<br><br>'+
+      'Call <strong><a href="tel:8393990942" style="color:var(--p);text-decoration:none;">8393990942</a></strong> for doorstep diagnosis of any engine part issue.'
+  },
+  {
+    keys:["what is obd port","where is obd port","obd port location","obd plug where",
+          "how to read obd","obd scanner use","how to use obd","scan car yourself",
+          "read fault codes yourself","check car codes"],
+    answer:'<b>OBD Port — What it is and how to use it:</b><br><br>'+
+      '<b>What is it?</b> The OBD-II (On-Board Diagnostics) port is a 16-pin socket in your car that lets a mechanic read fault codes stored by the car&#39;s computer (ECU).<br><br>'+
+      '<b>Where is it?</b> Almost always under the dashboard on the driver&#39;s side — look below and to the left of the steering wheel. Usually accessible without tools.<br><br>'+
+      '<b>What can it tell you?</b><br>'+
+      '&#x2022; P codes = Powertrain (engine, gearbox)<br>'+
+      '&#x2022; C codes = Chassis (ABS, suspension)<br>'+
+      '&#x2022; B codes = Body (airbag, windows)<br>'+
+      '&#x2022; U codes = Network/communication<br><br>'+
+      '<b>DIY option:</b> Bluetooth OBD adapters (ELM327) are available for &#8377;300&ndash;&#8377;800 online. Use with apps like Torque Pro or Car Scanner.<br><br>'+
+      'Call <strong><a href="tel:8393990942" style="color:var(--p);text-decoration:none;">8393990942</a></strong> for a professional OBD scan at your doorstep.'
+  }
 ];
 
 function checkCarQA(text){
