@@ -955,6 +955,8 @@
   <div class="topbar">
     <div class="topbar-title">Membership Leads</div>
     <div style="margin-left:auto">
+      <input type="date" id="dateFilter" class="filter-select" style="padding: 7px 12px; background-image: none;"
+  onchange="fetchData()" />
       <button class="refresh-btn" id="refreshBtn" onclick="fetchData()">
         <span class="spin">↻</span> Refresh
       </button>
@@ -1306,8 +1308,11 @@ async function fetchData() {
   const btn = document.getElementById('refreshBtn');
   btn.classList.add('loading');
 
+  const dateVal = document.getElementById('dateFilter').value; // e.g. "2026-02-24"
+  const url = dateVal ? `${API_URL}?date=${dateVal}` : API_URL;
+
   try {
-    const res = await fetch(API_URL);
+    const res = await fetch(url);
     const data = await res.json();
     allRecords = Array.isArray(data) ? data : [];
   } catch (e) {
@@ -1320,7 +1325,7 @@ async function fetchData() {
   renderCards();
   btn.classList.remove('loading');
 }
-
+  
 // Sample data fallback
 const SAMPLE_DATA = [
   {"id":1078,"customer":{"id":57717,"name":"bharat daga","mobile":"918527198569"},"booking":{"id":25083,"car":"Ford EcoSport","problem":"Car not starting","service_type":null,"price":"470 (Service Charge: ₹399 + GST: ₹71)","location":"https://www.google.com/maps?q=28.399150848389,77.080528259277","booking_status":"complete","created_at":"2026-02-22T13:44:27.518722Z"},"tier":"basic","support_agent":"GD","service_amount":"470.00","membership_price":"1299.00","status":"pending","start_date":null,"need_to_pay_now":"1299.00","payment_id":"order_SJvhi1CSznbVFS","end_date":null,"remarks":null,"created_at":"2026-02-24T09:15:00.348872Z","extra_payment":"829.00","payment_id_2":"order_SJvhiJBQVkheTk"},
