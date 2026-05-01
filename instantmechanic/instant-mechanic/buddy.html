@@ -1525,7 +1525,7 @@ function normalizeMisspellings(s){
     // Indicator
     [/indic[ae]t[ao]r/g,"indicator"],
     // Alternator
-    [/altern[ae]t[ao]r/g,"alternator"],
+    [/altern[ae]t[ao]r/g,"alternator"],[/alten[ae]r[ao][td]or/g,"alternator"],[/altenator/g,"alternator"],[/altinator/g,"alternator"],[/alternater/g,"alternator"],
   ];
   for(var i=0;i<fixes.length;i++) s=s.replace(fixes[i][0],fixes[i][1]);
   return s;
@@ -2064,6 +2064,25 @@ function mapInput(t){
        "car not starting petrol required","engine check light and petrol turbo")||
      both("fuel","empty")||both("petrol","finished")||both("petrol","khatam")||
      both("diesel","empty")||both("fuel","delivery")||both("petrol","delivery"))return"fuel empty";
+
+  // ── ALTERNATOR / DYNAMO ─────────────────────────────────────────────
+  if(a("alternator issue","alternator not working","alternator fault","alternator failure",
+       "alternator problem","alternator warning","alternator light","alternator dead",
+       "alternator replace","alternator repair","dynamo issue","dynamo not working",
+       "dynamo fault","dynamo problem","dynamo dead","charging system",
+       "car not charging","battery not charging while driving",
+       "battery discharging while driving","battery draining while driving",
+       "battery goes down while driving","charge not holding","car not holding charge",
+       "voltage issue","voltage low","low voltage","alternator sign","alternator light on",
+       "alternator warning light","charging warning","battery charging warning",
+       "alternator or battery","battery or alternator","belt and alternator",
+       "altenator","altinator","alternater","alternater issue","alternater fault",
+       "dynamo","dynamo belt","alternator belt issue","alternator belt broken",
+       "alternator belt snapped","charging belt issue","charging belt broken",
+       "car battery draining while on","car battery draining after charging")||
+     both("alternator","issue")||both("alternator","fault")||both("alternator","not")||
+     both("dynamo","issue")||both("dynamo","not")||both("charging","system")||
+     both("altenator","issue")||both("altenator","fault"))return"battery";
 
   // ── ENGINE BELT / ALTERNATOR BELT ─────────────────────────────────────
   if(a("belt broken","belt snapped","belt issue","alternator belt","ac belt","serpentine belt",
