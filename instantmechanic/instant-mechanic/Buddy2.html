@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>IM Field Tool — Mechanic Diagnosis Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#0F0D0B;--ink2:#3D3530;--ink3:#7A6E66;
+  --paper:#F7F3EE;--sur:#FFFFFF;--sur2:#F2EDE7;
+  --or:#E8480A;--ord:#C23507;--orl:#FFF0EA;--orm:#FDDDD2;
+  --gr:#16A34A;--grl:#DCFCE7;--grd:#166534;
+  --am:#D97706;--aml:#FEF3C7;--amd:#92400E;
+  --rd:#DC2626;--rdl:#FEE2E2;--rdd:#991B1B;
+  --brd:#E5DDD5;
+  --sh0:0 1px 2px rgba(0,0,0,.06);
+  --sh1:0 2px 8px rgba(0,0,0,.08);
+  --sh2:0 8px 24px rgba(0,0,0,.10);
+  --r:14px;--r2:10px
+}
+html,body{min-height:100%;font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);-webkit-font-smoothing:antialiased;font-size:15px}
+
+/* NAV */
+.top{background:var(--ink);height:54px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;position:sticky;top:0;z-index:200}
+.tb{display:flex;align-items:center;gap:9px}
+.tl{width:34px;height:34px;background:var(--or);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px}
+.tn{font-size:13px;font-weight:700;color:#fff;line-height:1.1}
+.tn em{color:var(--or);font-style:normal}
+.ts{font-size:9px;color:rgba(255,255,255,.4);letter-spacing:.05em;margin-top:2px}
+.tc{display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:4px 10px;font-size:10px;font-weight:600;color:rgba(255,255,255,.55)}
+.td{width:6px;height:6px;background:#22C55E;border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* SCREENS */
+.screen{display:none;padding:14px 14px 80px;max-width:560px;margin:0 auto;animation:fu .2s ease}
+.screen.active{display:block}
+@keyframes fu{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+
+/* PROGRESS */
+.prg{background:var(--ink);padding:10px 16px 14px}
+.pgl{display:flex;justify-content:space-between;margin-bottom:7px}
+.pll{font-size:10px;font-weight:700;color:rgba(255,255,255,.3);letter-spacing:.04em;text-transform:uppercase;transition:color .2s}
+.pll.ac{color:var(--or)}
+.pll.dn{color:#22C55E}
+.pgt{height:4px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden}
+.pgf{height:100%;background:var(--or);border-radius:2px;transition:width .3s ease}
+
+/* CARDS */
+.card{background:var(--sur);border-radius:var(--r);border:1px solid var(--brd);padding:16px;margin-bottom:12px;box-shadow:var(--sh0)}
+.chd{font-size:11px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;display:flex;align-items:center;gap:7px}
+.chi{width:24px;height:24px;border-radius:7px;background:var(--orl);display:flex;align-items:center;justify-content:center;font-size:12px}
+
+/* HERO */
+.hero{background:linear-gradient(135deg,var(--ink) 0%,#1E1612 100%);border-radius:var(--r);padding:20px 18px 18px;margin-bottom:12px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-30px;right:-30px;width:120px;height:120px;background:var(--or);border-radius:50%;opacity:.07}
+.htag{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--or);margin-bottom:8px}
+.htit{font-size:20px;font-weight:800;color:#fff;line-height:1.2;margin-bottom:6px}
+.hsub{font-size:12px;color:rgba(255,255,255,.45);line-height:1.5}
+.hbadge{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:4px 10px;font-size:10px;font-weight:700;color:#22C55E;margin-top:10px}
+
+/* FORM */
+.field{margin-bottom:12px}
+.field:last-child{margin-bottom:0}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+label{display:block;font-size:11px;font-weight:700;color:var(--ink2);margin-bottom:5px;letter-spacing:.02em}
+input,select,textarea{width:100%;background:var(--sur2);border:1.5px solid var(--brd);border-radius:var(--r2);padding:9px 12px;font-size:13px;font-family:'DM Sans',sans-serif;color:var(--ink);outline:none;transition:all .15s;-webkit-appearance:none}
+input:focus,select:focus,textarea:focus{border-color:var(--or);background:#fff;box-shadow:0 0 0 3px rgba(232,72,10,.1)}
+textarea{resize:vertical;min-height:72px;line-height:1.5}
+.iro{color:var(--ink3)}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238A7E76' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+
+/* CATEGORY GRID */
+.s2hd{background:linear-gradient(135deg,#1C1410,#2A1E17);border-radius:var(--r);padding:14px 16px;margin-bottom:12px}
+.s2ht{font-size:16px;font-weight:800;color:#fff;margin-bottom:3px}
+.s2hs{font-size:11px;color:rgba(255,255,255,.4)}
+.cgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.ccat{background:var(--sur);border:1.5px solid var(--brd);border-radius:var(--r2);padding:12px 8px;cursor:pointer;text-align:center;transition:all .15s;-webkit-tap-highlight-color:transparent;font-family:inherit}
+.ccat:active{transform:scale(.97)}
+.ccat.sel{border-color:var(--or);background:var(--orl)}
+.cci{font-size:22px;display:block;margin-bottom:4px}
+.ccl{font-size:10px;font-weight:700;color:var(--ink2);line-height:1.3;display:block}
+.ccat.sel .ccl{color:var(--ord)}
+
+/* TIMER */
+.tmr{display:flex;align-items:center;justify-content:space-between;background:var(--ink);border-radius:var(--r2);padding:9px 14px;margin-bottom:12px}
+.tml{font-size:10px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:.05em;text-transform:uppercase}
+.tms{font-size:9px;color:rgba(255,255,255,.2);margin-top:1px}
+.tmc{font-family:'DM Mono',monospace;font-size:20px;font-weight:500;color:#fff}
+.tmc.warn{color:#FCD34D}
+.tmc.urgent{color:#F87171;animation:bltmr .5s infinite}
+@keyframes bltmr{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* CHECKLIST */
+.chklist{display:flex;flex-direction:column}
+.chi2{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--brd);cursor:pointer;-webkit-tap-highlight-color:transparent}
+.chi2:last-child{border-bottom:none;padding-bottom:0}
+.chi2:first-child{padding-top:0}
+.chkb{width:20px;height:20px;border-radius:6px;border:2px solid var(--brd);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s;margin-top:1px}
+.chi2.on .chkb{background:var(--gr);border-color:var(--gr)}
+.chi2.on .chkb::after{content:'\2713';font-size:11px;font-weight:800;color:#fff}
+.chkt{font-size:13px;color:var(--ink2);line-height:1.45;flex:1;padding-top:1px}
+.chi2.on .chkt{color:var(--grd);font-weight:500}
+
+/* SEVERITY */
+.sg{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px}
+.sb2{padding:10px 6px;border-radius:var(--r2);border:2px solid var(--brd);background:var(--sur2);font-family:inherit;cursor:pointer;text-align:center;transition:all .15s;-webkit-tap-highlight-color:transparent}
+.sb2:active{transform:scale(.97)}
+.sbi{font-size:18px;display:block;margin-bottom:3px}
+.sbl{font-size:10px;font-weight:700;display:block;color:var(--ink3)}
+.sbs{font-size:9px;color:var(--ink3);display:block;margin-top:1px}
+.sh2{border-color:var(--rd);background:var(--rdl)}.sh2 .sbl{color:var(--rdd)}
+.sm2{border-color:var(--am);background:var(--aml)}.sm2 .sbl{color:var(--amd)}
+.sl2{border-color:var(--gr);background:var(--grl)}.sl2 .sbl{color:var(--grd)}
+
+/* BUTTONS */
+.btn{width:100%;padding:13px;border-radius:var(--r2);border:none;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:8px}
+.bpr{background:var(--or);color:#fff;box-shadow:0 4px 14px rgba(232,72,10,.3)}
+.bpr:active{background:var(--ord);transform:scale(.98)}
+.bse{background:var(--sur);color:var(--ink2);border:1.5px solid var(--brd)}
+.bse:active{background:var(--sur2)}
+.bgr{background:var(--gr);color:#fff;box-shadow:0 4px 14px rgba(22,163,74,.25)}
+.bgr:active{transform:scale(.98)}
+.bdk{background:var(--ink);color:#fff}
+.bdk:active{transform:scale(.98)}
+.br{display:flex;gap:9px}
+
+/* REPORT */
+.rpt{background:var(--sur);border-radius:var(--r);border:1px solid var(--brd);overflow:hidden;margin-bottom:12px;box-shadow:var(--sh1)}
+.rh{background:linear-gradient(135deg,#0F0D0B,#201712);padding:18px}
+.rlr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px}
+.rln{font-size:15px;font-weight:800;color:#fff}
+.rln span{color:var(--or)}
+.rls{font-size:9px;color:rgba(255,255,255,.3);margin-top:1px;letter-spacing:.05em;text-transform:uppercase}
+.rm{font-size:9px;color:rgba(255,255,255,.35);font-family:'DM Mono',monospace;text-align:right;line-height:1.7}
+.rcr{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.rcb{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:9px;padding:10px}
+.rbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.3);margin-bottom:5px}
+.rbv{font-size:12px;color:#fff;line-height:1.55;font-weight:500;white-space:pre-line}
+.rb2{padding:16px}
+.rdb{background:var(--orl);border:1.5px solid var(--orm);border-radius:var(--r2);padding:12px 14px;margin-bottom:14px}
+.rdl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--or);margin-bottom:4px}
+.rdv{font-size:13px;font-weight:700;color:var(--ink);line-height:1.4}
+.rsb{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;margin-top:7px}
+.rsh{background:var(--rdl);color:var(--rdd)}
+.rsm{background:var(--aml);color:var(--amd)}
+.rsl{background:var(--grl);color:var(--grd)}
+.rs{margin-bottom:14px}
+.rst{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--ink3);margin-bottom:7px;padding-bottom:5px;border-bottom:1px solid var(--brd)}
+.rol{list-style:none;display:flex;flex-direction:column;gap:4px}
+.rol li{font-size:12px;color:var(--ink2);padding:5px 9px 5px 26px;background:var(--sur2);border-radius:7px;position:relative;line-height:1.4}
+.rol li::before{content:'\2713';position:absolute;left:8px;color:var(--gr);font-weight:800;font-size:10px;top:6px}
+.ral{list-style:none;counter-reset:ac;display:flex;flex-direction:column;gap:4px}
+.ral li{font-size:12px;color:var(--ink2);padding:5px 9px 5px 28px;border-bottom:1px solid var(--brd);position:relative;line-height:1.4;counter-increment:ac}
+.ral li::before{content:counter(ac);position:absolute;left:7px;width:15px;height:15px;background:var(--ink);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;top:6px}
+.ral li:last-child{border-bottom:none}
+.rsl2{list-style:none;display:flex;flex-direction:column;gap:3px}
+.rsl2 li{font-size:12px;color:var(--ink2);padding:3px 0 3px 14px;position:relative;line-height:1.4}
+.rsl2 li::before{content:'\25CF';position:absolute;left:0;color:var(--or);font-size:7px;top:7px}
+.rcta{background:linear-gradient(135deg,var(--orl),#FFEAE0);border:1.5px solid var(--orm);border-radius:var(--r2);padding:12px 14px;margin-bottom:10px}
+.rctat{font-size:11px;font-weight:800;color:var(--ord);margin-bottom:5px}
+.rcta p{font-size:11px;color:var(--ink2);line-height:1.55}
+.rcta strong{color:var(--ord)}
+.rnxt{background:var(--grl);border:1.5px solid #BBF7D0;border-radius:var(--r2);padding:12px 14px;margin-bottom:10px}
+.rnxt p{font-size:11px;color:var(--grd);line-height:1.55}
+.rpay{background:var(--sur2);border-radius:var(--r2);overflow:hidden;margin-bottom:12px;border:1px solid var(--brd)}
+.rpr{display:flex;justify-content:space-between;align-items:center;padding:9px 12px;border-bottom:1px solid var(--brd);font-size:12px;color:var(--ink2)}
+.rpr:last-child{border-bottom:none;font-weight:800;font-size:13px;background:var(--grl);color:var(--grd)}
+.rpr .pa{font-weight:700;color:var(--gr)}
+.rpr:last-child .pa{color:var(--grd)}
+.rft{text-align:center;padding:12px 16px 14px;border-top:1px solid var(--brd)}
+.rft p{font-size:9px;color:var(--ink3);line-height:1.6}
+.rft strong{color:var(--or)}
+
+/* TOAST */
+.tst{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--ink);color:#fff;padding:10px 18px;border-radius:25px;font-size:13px;font-weight:600;z-index:999;transition:transform .3s ease;white-space:nowrap;box-shadow:var(--sh2)}
+.tst.show{transform:translateX(-50%) translateY(0)}
+
+/* PRINT */
+@media print{
+  *{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important}
+  .top,.prg,.np,.btn,.br,.tmr,.tst{display:none !important}
+  body{background:#fff;font-size:12px;margin:0;padding:0}
+  html,body{height:auto;overflow:visible}
+  .screen{display:none !important;padding:0;max-width:100%;animation:none}
+  #s4{display:block !important}
+  .rpt{box-shadow:none;border:1px solid #ddd;margin:0;border-radius:0}
+  .rh,.rdb,.rcta,.rnxt,.rcb{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .rpt{page-break-inside:avoid}
+}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="tb">
+    <div class="tl">&#128296;</div>
+    <div>
+      <div class="tn">Instant<em>Mechanic</em></div>
+      <div class="ts">FIELD DIAGNOSIS PORTAL</div>
+    </div>
+  </div>
+  <div class="tc"><span class="td"></span>Mechanic Mode</div>
+</div>
+
+<div class="prg" id="progBar">
+  <div class="pgl">
+    <span class="pll ac" id="pl1">Job Details</span>
+    <span class="pll" id="pl2">Issue Type</span>
+    <span class="pll" id="pl3">Checklist</span>
+    <span class="pll" id="pl4">Report</span>
+  </div>
+  <div class="pgt"><div class="pgf" id="pgf" style="width:10%"></div></div>
+</div>
+
+<!-- S1: JOB DETAILS -->
+<div class="screen active" id="s1">
+  <div class="hero">
+    <div class="htag">&#9889; Instant Mechanic Field Tool</div>
+    <div class="htit">Report a Major Issue</div>
+    <div class="hsub">For problems that cannot be fixed on-spot. Diagnose, document and explain to the customer in under 10 minutes.</div>
+    <div class="hbadge">&#9201; Target: complete report in &lt;10 min</div>
+  </div>
+
+  <div class="card">
+    <div class="chd"><div class="chi">&#128100;</div>Customer Details</div>
+    <div class="field"><label>Customer Name *</label><input type="text" id="f_cn" placeholder="e.g. Rahul Sharma" autocomplete="name"></div>
+    <div class="fr">
+      <div class="field"><label>Phone Number</label><input type="tel" id="f_cp" placeholder="98765 43210"></div>
+      <div class="field"><label>Location / Area</label><input type="text" id="f_cl" placeholder="Sector 14, Gurugram"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="chd"><div class="chi">&#128663;</div>Vehicle Details</div>
+    <div class="fr">
+      <div class="field"><label>Car Brand *</label>
+        <select id="f_br" onchange="onBrand()">
+          <option value="">Select brand</option>
+          <option>Maruti / Suzuki</option><option>Hyundai</option><option>Kia</option>
+          <option>Honda</option><option>Tata</option><option>Mahindra</option>
+          <option>Toyota</option><option>Volkswagen</option><option>Skoda</option>
+          <option>Ford</option><option>Renault</option><option>Nissan</option>
+          <option>MG</option><option>Jeep</option><option>BMW</option>
+          <option>Mercedes-Benz</option><option>Audi</option><option>Other</option>
+        </select>
+      </div>
+      <div class="field"><label>Model *</label><input type="text" id="f_md" placeholder="e.g. Swift, Creta"></div>
+    </div>
+    <div class="fr">
+      <div class="field"><label>Year</label>
+        <select id="f_yr">
+          <option value="">Year</option>
+          <option>2024</option><option>2023</option><option>2022</option><option>2021</option>
+          <option>2020</option><option>2019</option><option>2018</option><option>2017</option>
+          <option>2016</option><option>2015</option><option>2014</option><option>2013</option>
+          <option>2012</option><option>2011</option><option>2010</option><option>Before 2010</option>
+        </select>
+      </div>
+      <div class="field"><label>Fuel Type</label>
+        <select id="f_fu">
+          <option value="">Select</option>
+          <option>Petrol</option><option>Diesel</option><option>CNG</option>
+          <option>Electric (EV)</option><option>Petrol + CNG</option><option>Hybrid</option>
+        </select>
+      </div>
+    </div>
+    <div class="field"><label>Registration Number</label><input type="text" id="f_rg" placeholder="e.g. HR26AB1234" oninput="this.value=this.value.toUpperCase()"></div>
+  </div>
+
+  <div class="card">
+    <div class="chd"><div class="chi">&#128296;</div>Technician Details</div>
+    <div class="fr">
+      <div class="field"><label>Your Name *</label><input type="text" id="f_mc" placeholder="Mechanic name"></div>
+      <div class="field"><label>Report ID</label><input type="text" id="f_ji" class="iro" readonly></div>
+    </div>
+  </div>
+
+  <button class="btn bpr" onclick="s1go()">Select Issue Category &#8594;</button>
+</div>
+
+<!-- S2: ISSUE CATEGORY -->
+<div class="screen" id="s2">
+  <div class="s2hd">
+    <div class="s2ht">What is the Issue?</div>
+    <div class="s2hs">Tap the category that matches what you observe on-site</div>
+  </div>
+  <div class="cgrid" id="cgrid"></div>
+  <div class="br"><button class="btn bse" style="flex:1" onclick="ss(1)">&#8592; Back</button></div>
+</div>
+
+<!-- S3: CHECKLIST -->
+<div class="screen" id="s3">
+  <div class="tmr">
+    <div><div class="tml">&#9201; Diagnosis Timer</div><div class="tms">10 minute target</div></div>
+    <div class="tmc" id="tmc">10:00</div>
+  </div>
+
+  <div class="card">
+    <div class="chd" id="chktit"><div class="chi">&#9989;</div>Mechanic Observations</div>
+    <div style="font-size:11px;color:var(--ink3);margin-bottom:12px">Tick everything confirmed on-site. More observations = stronger report = easier payment collection.</div>
+    <div class="chklist" id="chklist"></div>
+  </div>
+
+  <div class="card">
+    <div class="chd"><div class="chi">&#9888;&#65039;</div>Issue Severity</div>
+    <div style="font-size:11px;color:var(--ink3);margin-bottom:10px">Based on your findings, rate the severity:</div>
+    <div class="sg">
+      <button class="sb2" id="sv-high" onclick="setSv('high')"><span class="sbi">&#128308;</span><span class="sbl">Critical</span><span class="sbs">Do not drive</span></button>
+      <button class="sb2" id="sv-med" onclick="setSv('med')"><span class="sbi">&#128993;</span><span class="sbl">Moderate</span><span class="sbs">Workshop soon</span></button>
+      <button class="sb2" id="sv-low" onclick="setSv('low')"><span class="sbi">&#128994;</span><span class="sbl">Minor</span><span class="sbs">Monitor it</span></button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="chd"><div class="chi">&#128221;</div>Additional Notes</div>
+    <textarea id="f_nt" placeholder="Extra observations — sounds, smells, visible damage, what the customer described..."></textarea>
+  </div>
+
+  <div class="br">
+    <button class="btn bse" style="flex:1" onclick="ss(2)">&#8592; Back</button>
+    <button class="btn bpr" style="flex:2" onclick="s3go()">Generate Report &#10003;</button>
+  </div>
+</div>
+
+<!-- S4: REPORT -->
+<div class="screen" id="s4">
+  <div class="np" style="margin-bottom:14px">
+    <div style="font-size:20px;font-weight:800;color:var(--ink)">Diagnosis Complete &#10003;</div>
+    <div style="font-size:12px;color:var(--ink3);margin-top:3px">Show this report to the customer, then collect payment</div>
+  </div>
+
+  <div class="rpt" id="rptWrap">
+    <div class="rh">
+      <div class="rlr">
+        <div><div class="rln">Instant<span>Mechanic</span></div><div class="rls">Official Diagnosis Report</div></div>
+        <div class="rm"><div id="r_dt"></div><div id="r_ji" style="font-weight:600;color:rgba(255,255,255,.55)"></div></div>
+      </div>
+      <div class="rcr">
+        <div class="rcb"><div class="rbl">Customer</div><div class="rbv" id="r_cu"></div></div>
+        <div class="rcb"><div class="rbl">Vehicle</div><div class="rbv" id="r_vh"></div></div>
+      </div>
+    </div>
+
+    <div class="rb2">
+      <div class="rdb">
+        <div class="rdl">Diagnosis Result</div>
+        <div class="rdv" id="r_dg"></div>
+        <div id="r_sv"></div>
+      </div>
+
+      <div class="rs"><div class="rst">Mechanic On-Site Observations</div><ul class="rol" id="r_ob"></ul></div>
+      <div class="rs" id="r_nw" style="display:none"><div class="rst">Additional Mechanic Notes</div><div id="r_nt" style="font-size:12px;color:var(--ink2);background:var(--sur2);border-radius:8px;padding:9px 11px;line-height:1.5"></div></div>
+      <div class="rs"><div class="rst">Recommended Actions</div><ol class="ral" id="r_ac"></ol></div>
+      <div class="rs"><div class="rst">Common Symptoms for This Issue</div><ul class="rsl2" id="r_sy"></ul></div>
+      <div class="rs"><div class="rst">What This Repair Involves</div><ol class="ral" id="r_rp"></ol></div>
+
+      <div class="rcta">
+        <div class="rctat">&#128222; Book Repair at Instant Mechanic Partner Garage</div>
+        <p>Call <strong>8393990942</strong> to get a transparent repair quote. Drop your vehicle at our nearest partner garage. <strong>Written estimate before work begins</strong> — no surprise charges.</p>
+      </div>
+
+      <div class="rnxt">
+        <p>&#10003; <strong>Your clear next step:</strong> Take this report to any Instant Mechanic partner garage. The technician will read the diagnosis and start work without re-explaining from scratch.<br><strong>Call 8393990942</strong> to confirm the nearest garage address.</p>
+      </div>
+
+
+
+      <div class="rft">
+        <p>Report prepared by <strong id="r_mc"></strong>, certified Instant Mechanic field technician.<br>
+        Valid 7 days from date of issue &nbsp;&#183;&nbsp; <strong>instantmechanic.online &#183; 8393990942</strong></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="np">
+    <div class="br" style="margin-bottom:9px">
+      <button class="btn bdk" onclick="doPrint()" style="flex:1">&#128196; Save PDF</button>
+      <button class="btn bgr" onclick="doShare()" style="flex:1">&#128228; Share Report</button>
+    </div>
+    <button class="btn bse" onclick="newRpt()">+ New Diagnosis</button>
+  </div>
+</div>
+
+<div class="tst" id="tst"></div>
+
+<script>
+var CATS=[
+  {k:"battery",i:"🔋",l:"Battery / Not Starting"},
+  {k:"tyre",i:"🛸",l:"Tyre / Puncture"},
+  {k:"overheat",i:"🌡️",l:"Engine Overheating"},
+  {k:"brake",i:"🛑",l:"Brake Issue"},
+  {k:"ac",i:"❄️",l:"AC Not Cooling"},
+  {k:"clutch",i:"⚙️",l:"Clutch Issue"},
+  {k:"gear",i:"🔙",l:"Gear / Gearbox"},
+  {k:"smoke",i:"💨",l:"Smoke / Exhaust"},
+  {k:"leak",i:"💧",l:"Oil / Fluid Leak"},
+  {k:"noise",i:"🔊",l:"Unusual Noise"},
+  {k:"elec",i:"⚡",l:"Electrical / Fuse"},
+  {k:"tow",i:"🚙",l:"Towing Needed"},
+  {k:"fuel",i:"⛽",l:"Fuel Issue"},
+  {k:"steer",i:"🏑",l:"Steering Issue"},
+  {k:"lights",i:"💡",l:"Lights / Horn"},
+  {k:"susp",i:"🛸",l:"Suspension / Ride"},
+  {k:"ign",i:"🔑",l:"Key / Ignition"},
+  {k:"warn",i:"⚠️",l:"Warning Light"},
+  {k:"belt",i:"🔨",l:"Engine Belt"},
+  {k:"waterlog",i:"🌊",l:"Waterlogging / Stuck"},
+  {k:"ev",i:"⚡",l:"EV / Hybrid"},
+  {k:"silencer",i:"💨",l:"Silencer / Pipe"},
+  {k:"other",i:"🔍",l:"Other / Unknown"}
+];
+
+var CL={
+  battery:["Battery terminals corroded (white or blue powder visible)","Battery voltage measured — below 12.4V at rest","No crank, no sound when key is turned","Rapid clicking on key turn (solenoid clicking)","Dashboard lights dim, flickering, or off","Battery date sticker shows older than 3 years","Jump-start confirmed the fault — car started with cables","Alternator output measured — below 13.5V at 2000 RPM","Starter motor silent despite battery being charged","After-market accessories drawing power continuously"],
+  tyre:["Tyre visually flat or at critically low pressure","Foreign object in tread — nail, screw, or glass","Puncture in tread area — plug/patch repair feasible","Puncture in sidewall — tyre must be replaced","Valve stem leak confirmed with soapy water test","Bead leak at alloy rim — after pothole impact","Tyre burst or blowout — structural damage visible","Spare tyre checked — available and usable","All four tyre pressures checked and recorded","Tyre over 5 years old — cracking on sidewall"],
+  overheat:["Temperature gauge in red zone or warning light on","Coolant level low or empty in expansion tank","Visible coolant puddle under car — green, pink, or orange","Radiator hose cracked, softened, or leaking at clamp","Radiator fan not spinning with engine hot and AC on","Top hose hot, bottom hose stays cool — thermostat stuck","Steam or vapour rising from engine bay","Oil dipstick shows milky residue — coolant mixing with oil","White smoke from exhaust that does not clear","Water pump leaking at shaft seal"],
+  brake:["Grinding metal-on-metal sound confirmed when braking","Brake pads inspected — below 3mm thickness","Brake pedal soft or spongy — goes too far before biting","Brake pedal hard — very high force needed to stop","Brake fluid level low in reservoir","Visible brake fluid leak at wheel hub or dashboard","Car pulls to one side under braking","Handbrake seized or not fully releasing","ABS warning light on dashboard","Brake disc scored, cracked, or visibly warped","One wheel much hotter than others — seized caliper"],
+  ac:["AC compressor clutch not engaging — disc not spinning","Refrigerant pressure low — compressor cycling rapidly","Cabin air filter clogged — restricted airflow","Blower motor not working — no air from vents","AC blowing warm or ambient temperature air","Clicking or grinding from compressor belt area","Oily residue on AC lines — refrigerant leak","Musty or mouldy smell when AC is on","Cooling intermittent — cold then warm then cold","Wiring damage near compressor — rodent or chafing"],
+  clutch:["Clutch pedal falls to floor — cable or hydraulic failure","Clutch pedal extremely heavy — cable tight","Burning smell when using clutch on inclines","Engine RPM rises but car speed does not increase","Cannot engage any gear — completely locked","Clutch cable visibly broken or frayed","Hydraulic fluid leak near pedal or gearbox","Biting point very high on pedal — plate heavily worn","Squeaking when clutch pedal is pressed","Car stalls repeatedly when gently releasing clutch"],
+  gear:["Gear lever physically stuck — cannot move","Grinding noise confirmed when changing gears","Specific gears very difficult or impossible to engage","Automatic: 2+ second delay before car moves","Automatic: harsh jolting gear changes","Gearbox oil low or dark and burnt-smelling","Gear pops back to neutral while driving","Gear position indicator showing wrong gear","Gear linkage rod disconnected or loose","Car in limp mode — single gear and low power"],
+  smoke:["White smoke from exhaust — does not clear after warmup","Black smoke — overly rich fuel mixture","Blue or grey smoke — engine burning oil","Smoke from engine bay — not from exhaust","Burning rubber smell detected","Burning plastic or electrical smell — fire risk","Sweet coolant smell from engine bay","Smoke from single wheel — brake overheating"],
+  leak:["Dark brown or black fluid — engine oil","Red or pink fluid — automatic transmission or power steering","Green, yellow, or orange fluid — engine coolant","Petrol or diesel smell — fuel system leak","Leak from sump plug (bottom of engine)","Leak from valve cover gasket (top of engine)","Leak from radiator hose or hose clamp","Leak from power steering rack or pump","Leak from brake line, caliper, or master cylinder"],
+  noise:["Knocking from inside engine — low oil or bearing wear","Clicking when turning — CV joint failure","Grinding from wheels when braking — pads worn to metal","Humming that changes with vehicle speed — wheel bearing","Rattling from below car — exhaust heat shield","High-pitched squealing from engine — belt slipping","Clunking over speed bumps — suspension component","Ticking from engine — valve clearance or low oil","Whining when steering wheel turned — power steering","Scraping from under the car — dragging component"],
+  elec:["Fuse blown — visually confirmed in fuse box","Multiple electrical items stopped working at once","Burning plastic or wire smell — short circuit","After-market accessory identified as cause","Wiring damage visible — rodent bite or chafing","Relay failure suspected — circuit intermittent","BCM fault — erratic locks, windows, or lights","Alternator not charging — battery light on","Headlights or tail lights not working","Dashboard warning lights flickering"],
+  tow:["Wheels can roll freely — underlift tow feasible","Wheel jammed or bent — flatbed required","Accident damage — flatbed recommended","Luxury or EV car — flatbed only","Stuck in basement or ramp — winching needed","Stuck in mud, ditch, or floodwater — recovery service","Drivetrain damage — wheels must not rotate during tow"],
+  fuel:["Fuel tank confirmed empty by gauge and physical check","Wrong fuel filled — petrol in diesel or vice versa","Fuel smell detected — possible hose or injector leak","Fuel pump not priming — no whirring on key ON","Diesel ran dry — system bleeding may be needed","CNG cylinder empty or system not switching","Fuel filter suspected clogged — poor engine response"],
+  steer:["Steering very heavy — especially at parking speed","Power steering fluid reservoir level low","Whining or groaning when steering wheel is turned","Steering column lock engaged — wheel completely locked","EPS warning light on dashboard","Excessive play in steering wheel — loose feel","Car drifts to one side on straight road","Power steering fluid leaking from rack or pump"],
+  lights:["Headlight bulb blown — confirmed by inspection","Tail light or brake light not working","Indicator not working or stuck flashing","Horn not producing sound","Brake light stays on when not braking","Fuse for that circuit blown in fuse box","Relay fault — circuit works intermittently","Wiring corroded near that light assembly"],
+  susp:["Bouncing excessively after bumps — shock absorber worn","Clunking from one specific corner over rough road","Car sitting lower on one corner — coil spring collapsed","Steering vibration at certain speed range","Severe uneven tyre wear — alignment or suspension fault","Shock absorber leaking oil visually","Ball joint has play when wheel is rocked by hand","Tie rod loose — steering feels imprecise","Wheel bearing rough — uneven spin when rotated by hand"],
+  ign:["Key physically stuck inside ignition barrel","Push-button start: no response when pressed","Smart key dead — 'no key detected' on screen","Immobiliser triggered — anti-theft preventing start","Steering column lock engaged — locked solid","Ignition switch faulty — no response to key","Dashboard lights on but engine will not crank"],
+  warn:["Check engine light (amber or red)","EPC light — electronic power control (VW/Audi/Skoda)","ABS light — anti-lock braking fault","Airbag or SRS warning light","Oil pressure warning — engine must stop immediately","Temperature warning — overheating","Battery or charging system warning","Traction control or ESP stability light","Service due indicator light"],
+  belt:["Belt visibly broken or hanging off pulley","Alternator belt broken — battery warning light on","AC belt broken — AC not running","Squealing from engine belt — slipping","Belt slipped off a pulley but not broken","Tensioner pulley bearing seized or rough","Timing belt concern — ticking noise or timing fault"],
+  waterlog:["Car submerged or drove through deep floodwater","Water entered the passenger cabin","Car stopped after driving through water","Engine bay visually wet — water on air filter","Electrical systems not responding after water","Car stuck in mud — wheels spinning without grip","Car stuck in pit, manhole, or ditch — winch required"],
+  ev:["Battery at 0% — car will not move","Charging port not accepting charger connection","Charging started but percentage not increasing","High voltage system warning light on","Hybrid battery warning light on","Severe power reduction — limp mode","EV range dropping faster than normal"],
+  silencer:["Exhaust pipe visually hanging or dragging on ground","Silencer or muffler has fallen off completely","Loud roaring exhaust noise — baffles collapsed","Heat shield loose — metallic rattling under car","Exhaust manifold crack — ticking from engine top","Exhaust fumes entering passenger cabin","Catalytic converter damaged — rattling from below"],
+  other:["Major fault identified — cannot fix on-site","Multiple systems affected simultaneously","Intermittent fault — could not reproduce consistently","Requires workshop diagnostic equipment","Customer confirmed issue existed before today's visit"]
+};
+
+var DX={
+  battery:"Battery failure or charging system fault — vehicle requires battery replacement or alternator inspection",
+  tyre:"Tyre damage confirmed — on-site repair only viable for tread punctures; sidewall damage requires full tyre replacement",
+  overheat:"Engine cooling system failure — coolant leak, thermostat failure, radiator fan failure, or head gasket damage",
+  brake:"Brake system failure — vehicle must not be driven until professionally repaired; pads, fluid, or caliper fault identified",
+  ac:"AC system failure — refrigerant loss, compressor fault, blower motor failure, or electrical issue",
+  clutch:"Clutch system failure — clutch plate worn, cable or hydraulic line broken; gearbox removal required for repair",
+  gear:"Gearbox or transmission fault — synchromesh, gear linkage, or automatic valve body failure",
+  smoke:"Combustion or burning issue — oil burning, coolant burning (head gasket), or electrical fault generating heat",
+  leak:"Fluid leak identified — oil, coolant, or hydraulic fluid leaking; source confirmed before vehicle is driven",
+  noise:"Mechanical noise fault — internal engine, suspension, or drivetrain component failure identified",
+  elec:"Electrical system fault — short circuit, blown fuse, relay failure, or wiring damage",
+  tow:"Vehicle not safe to drive — towing required to Instant Mechanic partner garage",
+  fuel:"Fuel system fault — delivery failure, wrong fuel, contamination, or fuel leak",
+  steer:"Steering system fault — power steering failure, column lock, or rack and pinion issue",
+  lights:"Lighting or horn fault — bulb, fuse, relay, or wiring issue in that circuit",
+  susp:"Suspension or chassis fault — shock absorber, spring, bush, ball joint, or wheel bearing failure",
+  ign:"Ignition or immobiliser fault — key, barrel, push-button system, or anti-theft system issue",
+  warn:"Dashboard warning light active — OBD diagnostic scan required to read exact fault codes",
+  belt:"Engine belt failure — alternator, AC, or timing belt snapped or slipped; immediate replacement required",
+  waterlog:"Water damage — vehicle must not be started until full mechanical and electrical inspection is completed",
+  ev:"EV or hybrid system fault — high-voltage specialist technician required for safe diagnosis and repair",
+  silencer:"Exhaust system damage — silencer, pipe, or manifold requires welding or replacement",
+  other:"Major fault identified on-site — full workshop diagnostic required for accurate assessment"
+};
+
+var AC={
+  battery:["Do not keep trying to start — repeated cranking drains the battery and can damage the starter","Jump-start confirmed the battery is the issue — not the starter motor or ignition system","Battery replacement required — correct group size and cold cranking amps for this vehicle","Alternator output must be tested after new battery is fitted (should be 13.5–14.5V at 2000 RPM)","Book doorstep battery replacement or bring to Instant Mechanic partner garage — call 8393990942"],
+  tyre:["Tread puncture: plug or patch repair completed or attempted on-site","Sidewall damage: vehicle must not be driven — tyre needs full replacement immediately","Spare tyre fitted temporarily for safe movement to workshop","All tyre pressures set to correct specification after service","New tyre required — book at Instant Mechanic partner garage, call 8393990942"],
+  overheat:["Do NOT drive the vehicle — severe engine seizure risk if driven while overheating","Coolant topped up temporarily as emergency measure — this does not fix the underlying fault","Root cause must be identified at workshop: hose, thermostat, water pump, or head gasket","Tow vehicle to partner garage — do not attempt to drive even short distances","Call 8393990942 to arrange tow and workshop booking"],
+  brake:["Vehicle must not be driven until brake fault is professionally repaired","Brake pads require urgent replacement — metal-to-metal contact causes rotor damage","Brake fluid level must be restored and system bled to remove air","Full brake inspection required at workshop including caliper and disc condition","Book urgent workshop appointment — call 8393990942"],
+  ac:["AC system requires gas recharge — but only after identifying and fixing any refrigerant leak","Compressor clutch failure requires compressor replacement at workshop","Cabin air filter replacement is a simple on-spot fix if filter was available","Full AC diagnostic and service at workshop — call 8393990942"],
+  clutch:["Vehicle may not be driveable if clutch has completely failed — arrange tow","Full clutch kit replacement required: friction disc, pressure plate, and release bearing","Flywheel must be inspected for heat damage when clutch is replaced","4–8 hours of workshop labour required — gearbox must be removed","Book workshop appointment — call 8393990942 for tow if needed"],
+  gear:["Do not force the gear lever — forcing causes further internal gearbox damage","Gearbox oil level and condition must be checked at workshop","Full transmission inspection required — internal synchromesh or valve body fault","Vehicle may need towing if gears are completely locked","Call 8393990942 to arrange"],
+  smoke:["Stop vehicle immediately if smoke is from engine bay — fire risk","Source identified: white = coolant; blue = oil; black = fuel; smell = burning electrical","Do not drive until source is identified and repaired","Urgent workshop inspection required — call 8393990942"],
+  leak:["Fluid type and source identified before deciding whether car can be driven","Coolant or brake fluid leak = do not drive — safety risk","Engine oil leak: monitor level carefully if driving slowly and directly to workshop","Seal, gasket, or hose repair required at workshop — call 8393990942"],
+  noise:["Noise direction located: front/rear, left/right","Grinding from wheels = immediate safety risk — do not drive at speed","Suspension knock = can drive carefully and slowly to workshop","Engine knock = stop immediately — oil pressure or bearing failure risk","Workshop inspection and component replacement — call 8393990942"],
+  elec:["Blown fuses checked and replaced where identified","Suspect after-market accessories disconnected","Vehicle not started if burning smell — fire risk from electrical short","Auto electrician inspection required for complex wiring faults — call 8393990942"],
+  tow:["Vehicle not safe to drive in current condition","Appropriate tow arranged: flatbed / underlift / winch as required for this vehicle","Customer informed of tow type selection and reason","Towing to Instant Mechanic partner garage — call 8393990942"],
+  fuel:["Correct fuel added and system primed where possible","Wrong fuel: vehicle must NOT be started — fuel system drain required at workshop","Diesel air-lock: professional system bleeding needed","Workshop inspection required if vehicle will not restart — call 8393990942"],
+  steer:["Power steering fluid topped up as temporary measure if level was low","EPS fault: avoid driving — electric power steering could fail completely without warning","Full steering inspection and repair at workshop required","Alignment check required after any steering component repair — call 8393990942"],
+  lights:["Bulb replaced where part was accessible and available on-site","Fuse identified and replaced if blown","Relay checked and replaced where faulty","Wiring inspection required at workshop for complex faults — call 8393990942"],
+  susp:["Safe to drive slowly and carefully to workshop if sound only, no wheel play","Do not drive if car is leaning badly or a wheel has severe play","Shock absorber, spring, bush, or bearing replacement required at workshop","Wheel alignment required after any suspension repair — call 8393990942"],
+  ign:["Steering lock released and key extracted where possible","Smart key: emergency NFC start used or key fob battery replaced","Immobiliser reset attempted — may require dealer reprogramming","Workshop inspection required if issue persists — call 8393990942"],
+  warn:["OBD diagnostic scan must be done — warning lights cannot be accurately diagnosed without a scanner","Red warning lights: do NOT drive until cause is confirmed","Amber warning lights: drive carefully and directly to workshop","Book OBD diagnostic scan at Instant Mechanic — call 8393990942"],
+  belt:["Do not drive if timing belt has snapped — engine damage is immediate and severe","Alternator belt broken: battery will drain within 20–30 mins of driving — do not drive","Belt replacement with correct OEM specification part at workshop","Tensioner pulley should be replaced at same time as belt","Call 8393990942 — this is urgent"],
+  waterlog:["Vehicle NOT started — hydrolocking would destroy the engine immediately","Flatbed tow arranged to workshop — vehicle must not be driven","Full mechanical and electrical inspection required before any restart attempt","Air filter, spark plugs, and intake must be checked for water — call 8393990942"],
+  ev:["EV NOT jump-started — high voltage system is dangerous without specialist equipment","Flatbed tow arranged to nearest charging point or EV-specialist workshop","No repairs attempted on-site — high voltage specialist only","Call 8393990942 for EV tow"],
+  silencer:["Exhaust secured temporarily to prevent dragging on road","Vehicle should not be driven long distances with a cracked exhaust — CO fume risk","Exhaust welding, section replacement, or full system replacement at workshop","Call 8393990942"],
+  other:["On-site assessment completed — major fault confirmed, cannot fix at roadside","Workshop diagnostic required for complete identification and repair plan","OBD scan recommended as first step at workshop","Customer advised to book workshop appointment — call 8393990942"]
+};
+
+var SY={
+  battery:["Car gives no response or only a click when key is turned","Headlights very dim or won't turn on","Electrical accessories slow or unresponsive","Battery warning light on dashboard","Car started fine with jump cables","Battery terminals visibly corroded"],
+  tyre:["Tyre visibly flat or sitting on rim","Car pulling hard to one side while driving","Thumping sound from one wheel while driving","Tyre pressure warning light on dashboard","Foreign object embedded in tyre tread"],
+  overheat:["Temperature gauge in red or warning light on","Steam rising from under the bonnet","Coolant puddle found under the car","Heater inside car blowing cold air (thermostat issue)","Sweet coolant smell from engine bay"],
+  brake:["Grinding or metal scraping sound when braking","Brake pedal feels soft, spongy, or sinks","Car pulls to one side when braking","Brake warning light on dashboard","Visible scoring or damage on brake disc"],
+  ac:["AC blows air but at ambient temperature — not cold","Cooling starts then stops intermittently","No airflow from vents even on maximum setting","Clicking or grinding when AC is switched on","Musty smell from vents when AC is on"],
+  clutch:["RPM climbs sharply but car speed does not increase","Burning smell from clutch area on inclines or in traffic","Gears difficult or impossible to engage","Clutch pedal has unusual feel — too light or too heavy","Car stalls when gently releasing clutch"],
+  gear:["Grinding noise when shifting gears","Specific gears cannot be engaged","Gear slips back to neutral while driving","Long delay before automatic car moves from Park","Gear lever physically stuck or stiff"],
+  smoke:["Visible smoke from exhaust or engine bay","Burning smell inside or outside the car","Smoke colour indicates source: white=coolant, blue=oil, black=fuel","Smoke worst at startup then reduces","Smoke visible from one wheel area"],
+  leak:["Fluid puddle found under parked car","Drop in fluid level on dipstick or reservoir","Smell of burning fluid on hot engine surfaces","Fluid visible dripping from component","Wet patch on ground where car was parked"],
+  noise:["Noise clearly linked to one area of the car","Sound changes with speed or steering input","Grinding worse when braking is applied","Clicking sound on every wheel rotation when turning","Knocking sound from engine area"],
+  elec:["Multiple items stopped working at the same time","Fuse blows again immediately after replacement","Burning smell near fuse box or wiring","Accessories work sometimes but not reliably","Battery going flat despite alternator testing OK"],
+  tow:["Wheels jammed and will not rotate freely","Accident damage prevents safe driving","Car cannot be steered or braked safely","EV battery completely flat — car will not move","Car stranded in inaccessible location"],
+  fuel:["Car cranks normally but will not start or fire","Strong fuel smell from engine bay or outside","Engine runs rough and misfires badly","Fuel gauge showing empty or near empty","Wrong fuel smell after recent filling"],
+  steer:["Steering extremely heavy — especially when parking","Whining noise when turning the steering wheel","Steering wheel completely locked solid","Car drifts to one side on a straight road","EPS warning light on dashboard"],
+  lights:["Specific light not working despite bulb appearing intact","Indicator flashing too fast — bulb blown on that side","Multiple lights on same circuit all failed together","Fuse replacement does not resolve the issue","Lights work sometimes and fail unpredictably"],
+  susp:["Bouncing or wallowing excessively over bumps","Clunking sound from one corner of the car","Car leaning to one side when parked on flat ground","Steering vibration at certain speed ranges","Extremely uneven tyre wear patterns"],
+  ign:["Key will not turn in ignition barrel","Push-button start gives no response at all","No key detected message shown on dashboard","Steering wheel locked solid","Immobiliser light flashing and car won't start"],
+  warn:["Warning light on dashboard persists after restart","Multiple warning lights appearing together","Car enters limp mode with restricted power","Warning light appeared after recent service or battery work","Light comes on under specific driving conditions"],
+  belt:["Sudden loss of electrical power or AC","Squealing from engine that becomes louder","Battery warning light on while engine is running","Engine making abnormal noises after belt failure","AC stopped working alongside belt noise"],
+  waterlog:["Car stopped after driving through flooded road","Water visible inside the cabin","Electrical systems malfunctioning after water exposure","Car sinking into mud — no traction from any wheel","Strong musty smell after water exposure"],
+  ev:["Battery percentage at 0% — car stationary","Charging indicator not responding","High-voltage warning symbol on dashboard","Significant reduction in range within one trip","Car has entered automatic safety shutdown mode"],
+  silencer:["Dramatically louder exhaust noise than normal","Rattling from under the car on bumps","Exhaust pipe visible hanging or scraping on ground","Exhaust fumes detectable inside passenger cabin","Hissing sound from exhaust area"],
+  other:["Major fault confirmed but precise cause unclear","Issue present intermittently — not reproducible","Multiple symptoms pointing to different systems","Vehicle will not operate normally under any condition"]
+};
+
+var RP={
+  battery:"Battery replacement: 20-30 minutes on-site (doorstep service available). Alternator test: 10 minutes additional. Cost: Rs 3,500-10,000 depending on battery specification and car model.",
+  tyre:"On-site plug repair: 15-20 minutes. Full tyre replacement at workshop: 30-45 minutes. Sidewall damage requires new tyre: Rs 3,000-10,000 depending on tyre size and brand.",
+  overheat:"Hose replacement: 30-60 min. Thermostat: 1-2 hrs. Water pump: 2-4 hrs. Radiator: 2-3 hrs. Head gasket: 6-10 hrs (major job). Cost varies significantly — obtain quote before authorising.",
+  brake:"Brake pad replacement: 1-2 hrs. Caliper service: 2-3 hrs. Master cylinder: 2-3 hrs plus bleed. Full brake overhaul: 4-6 hrs. Cost: Rs 1,500-12,000 depending on extent of damage.",
+  ac:"Gas recharge: 45-60 min. Compressor replacement: 2-4 hrs. Full AC service: 2-4 hrs. Cost: Rs 1,500-18,000 depending on fault identified.",
+  clutch:"Clutch replacement requires gearbox removal: 4-8 hours at workshop. Includes new clutch plate, pressure plate, and release bearing. Flywheel may need resurfacing. Cost: Rs 4,000-20,000.",
+  gear:"Gearbox oil change: 45-60 min. Synchromesh repair: 6-10 hrs. Full gearbox rebuild: 8-15 hrs. Cost: Rs 2,000-50,000+ depending on fault.",
+  smoke:"Diagnosis and repair varies widely: valve stem seals 3-4 hrs, piston rings 8-12 hrs, head gasket 6-10 hrs. Always identify smoke source before beginning repair.",
+  leak:"Gasket: 1-4 hrs. Hose: 30-60 min. Seal: 2-5 hrs. Cost: Rs 500-15,000 depending on location and component involved.",
+  noise:"Wheel bearing: 2-4 hrs. Ball joint: 2-3 hrs. CV joint: 2-3 hrs. Suspension bush: 1-2 hrs. Cost: Rs 2,000-12,000. Alignment required after most suspension repairs.",
+  elec:"Fuse or relay: 30-60 min. Wiring repair: 1-4 hrs. Auto electrician diagnosis: 1-2 hrs. Cost: Rs 500-8,000 depending on complexity.",
+  tow:"Underlift tow up to 10km: Rs 800-1,200. Flatbed up to 10km: Rs 1,000-1,500. Winching: Rs 500-800 extra. Beyond 10km: Rs 80-100 per additional km.",
+  fuel:"Correct fuel refuelling: immediate. Wrong fuel drain and flush: 2-3 hrs at workshop. Fuel pump: 2-4 hrs. Cost: Rs 500-8,000.",
+  steer:"PS fluid top-up: immediate. PS pump: 1-2 hrs. Rack replacement: 3-5 hrs. EPS motor: 2-4 hrs. Cost: Rs 2,000-25,000.",
+  lights:"Bulb: 15-30 min. Fuse or relay: 15-30 min. Wiring repair: 1-3 hrs. Cost: Rs 200-5,000.",
+  susp:"Shock absorber pair: 1-2 hrs. Coil spring: 1-2 hrs. Ball joint: 2-3 hrs. Wheel bearing: 2-4 hrs. Cost: Rs 2,000-18,000. Always do alignment after.",
+  ign:"Key extraction: 30-60 min. Barrel replacement: 1-2 hrs. Smart key reprogramming: requires dealer software. Cost: Rs 500-8,000.",
+  warn:"OBD scan: 30-45 min. Repair depends entirely on fault code identified. Always scan before replacing any component. Scan cost: Rs 199-500.",
+  belt:"Alternator belt: 30-60 min. Timing belt: 3-5 hrs including water pump. Full belt kit: Rs 2,000-12,000.",
+  waterlog:"Full inspection: 2-4 hrs. Engine dry-out: 24+ hrs. Electrical diagnosis: 2-4 hrs. Cost highly variable — can be Rs 5,000 to Rs 1,00,000+ if engine or ECU is damaged.",
+  ev:"EV diagnosis requires specialist equipment and EV-certified technician. Charging system: 1-3 hrs. High voltage components: specialist workshop only. Cost highly variable.",
+  silencer:"Heat shield clip: 15-30 min. Exhaust welding: 30-60 min. Full exhaust replacement: 1-3 hrs. Cost: Rs 500-15,000.",
+  other:"Full workshop diagnostic: 1-3 hrs. OBD scan: 30-45 min. Repair time and cost depends on fault identified at workshop."
+};
+
+// STATE
+var ST={cn:'',cp:'',cl:'',br:'',md:'',yr:'',fu:'',rg:'',mc:'',ji:'',cat:null,sv:'med',ob:[],nt:''};
+var tmrI=null,tmrS=600;
+
+// INIT
+window.addEventListener('load',function(){
+  var d=new Date();
+  var ji='IM-'+String(d.getFullYear()).slice(2)+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0')+'-'+String(Math.floor(1000+Math.random()*9000));
+  document.getElementById('f_ji').value=ji;ST.ji=ji;
+
+  var g=document.getElementById('cgrid');
+  CATS.forEach(function(c){
+    var b=document.createElement('button');
+    b.className='ccat';
+    b.dataset.key=c.k;
+    b.innerHTML='<span class="cci">'+c.i+'</span><span class="ccl">'+c.l+'</span>';
+    b.addEventListener('click',function(){
+      document.querySelectorAll('.ccat').forEach(function(x){x.classList.remove('sel');});
+      b.classList.add('sel');ST.cat=c.k;
+      setTimeout(function(){loadCL(c);ss(3);},120);
+    });
+    g.appendChild(b);
+  });
+});
+
+function ss(n){
+  document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});
+  document.getElementById('s'+n).classList.add('active');
+  window.scrollTo(0,0);
+  var fw=[0,10,38,66,100];
+  document.getElementById('pgf').style.width=fw[n]+'%';
+  ['pl1','pl2','pl3','pl4'].forEach(function(id,i){
+    var el=document.getElementById(id);
+    el.classList.remove('ac','dn');
+    if(i+1===n)el.classList.add('ac');
+    else if(i+1<n)el.classList.add('dn');
+  });
+  document.getElementById('progBar').style.display=n===4?'none':'block';
+}
+
+function s1go(){
+  var n=document.getElementById('f_cn').value.trim();
+  var b=document.getElementById('f_br').value;
+  var m=document.getElementById('f_md').value.trim();
+  var mc=document.getElementById('f_mc').value.trim();
+  if(!n){toast('Enter customer name');return;}
+  if(!b){toast('Select car brand');return;}
+  if(!m){toast('Enter car model');return;}
+  if(!mc){toast('Enter your name');return;}
+  ST.cn=n;ST.cp=document.getElementById('f_cp').value.trim();
+  ST.cl=document.getElementById('f_cl').value.trim();
+  ST.br=b;ST.md=m;ST.yr=document.getElementById('f_yr').value;
+  ST.fu=document.getElementById('f_fu').value;
+  ST.rg=(document.getElementById('f_rg').value||'').toUpperCase().trim();
+  ST.mc=mc;ss(2);
+}
+
+function s3go(){
+  ST.ob=[];
+  document.querySelectorAll('.chi2.on .chkt').forEach(function(el){ST.ob.push(el.textContent.trim());});
+  if(!ST.sv){toast('Select severity level');return;}
+  ST.nt=document.getElementById('f_nt').value.trim();
+  stopTmr();buildRpt();ss(4);
+}
+
+function tchk(el){el.classList.toggle("on");}
+function loadCL(cat){
+  var lst=CL[cat.k]||CL.other;
+  document.getElementById('chktit').innerHTML='<div class="chi">✅</div>'+cat.i+' '+cat.l+' — Observations';
+  document.getElementById('chklist').innerHTML=lst.map(function(item){
+    return '<div class="chi2" onclick="tchk(this)"><div class="chkb"></div><div class="chkt">'+item+'</div></div>';
+  }).join('');
+  document.getElementById('f_nt').value='';
+  document.querySelectorAll('.sb2').forEach(function(b){b.className='sb2';});
+  ST.sv='med';startTmr();
+}
+
+function setSv(s){
+  ST.sv=s;
+  document.querySelectorAll('.sb2').forEach(function(b){b.className='sb2';});
+  document.getElementById('sv-'+s).classList.add({'high':'sh2','med':'sm2','low':'sl2'}[s]);
+}
+
+function startTmr(){
+  stopTmr();tmrS=600;updTmr();
+  tmrI=setInterval(function(){tmrS--;updTmr();if(tmrS<=0)stopTmr();},1000);
+}
+function stopTmr(){if(tmrI){clearInterval(tmrI);tmrI=null;}}
+function updTmr(){
+  var m=Math.floor(tmrS/60),s=tmrS%60;
+  var el=document.getElementById('tmc');
+  el.textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+  el.className='tmc'+(tmrS<=120?' warn':'')+(tmrS<=60?' urgent':'');
+}
+
+function buildRpt(){
+  var cat=CATS.find(function(c){return c.k===ST.cat;})||{i:'🔨',l:'Vehicle Issue'};
+  var car=[ST.br,ST.md,ST.yr].filter(Boolean).join(' ')||'Vehicle';
+  var now=new Date();
+  var ds=now.toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'})+' · '+now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+  document.getElementById('r_dt').textContent=ds;
+  document.getElementById('r_ji').textContent='Report: '+ST.ji;
+  var cv=ST.cn+(ST.cp?'\n'+ST.cp:'')+(ST.cl?'\n'+ST.cl:'');
+  document.getElementById('r_cu').textContent=cv;
+  var vv=car+(ST.fu?'\n'+ST.fu:'')+(ST.rg?'\nReg: '+ST.rg:'');
+  document.getElementById('r_vh').textContent=vv;
+  document.getElementById('r_dg').textContent=DX[ST.cat]||'Fault identified — workshop diagnosis required';
+  var svt=ST.sv==='high'?'🔴 Critical — Do NOT Drive':ST.sv==='med'?'🟡 Moderate — Workshop Soon':'🟢 Minor — Monitor Closely';
+  var svc=ST.sv==='high'?'rsh':ST.sv==='med'?'rsm':'rsl';
+  document.getElementById('r_sv').innerHTML='<span class="rsb '+svc+'">'+svt+'</span>';
+  var obs=ST.ob.length>0?ST.ob:['On-site visual and functional inspection completed'];
+  document.getElementById('r_ob').innerHTML=obs.map(function(o){return'<li>'+o+'</li>';}).join('');
+  if(ST.nt){document.getElementById('r_nw').style.display='block';document.getElementById('r_nt').textContent=ST.nt;}
+  else{document.getElementById('r_nw').style.display='none';}
+  var acts=AC[ST.cat]||AC.other;
+  document.getElementById('r_ac').innerHTML=acts.map(function(a){return'<li>'+a+'</li>';}).join('');
+  var syms=SY[ST.cat]||['Fault pattern consistent with '+cat.l];
+  document.getElementById('r_sy').innerHTML=syms.map(function(s){return'<li>'+s+'</li>';}).join('');
+  var rep=RP[ST.cat]||'Workshop diagnostic required. Time and cost depend on fault found.';
+  document.getElementById('r_rp').innerHTML='<li>'+rep+'</li><li>All repairs at Instant Mechanic partner garages include a written quotation before work begins — no surprise charges.</li><li>Genuine or OEM-quality parts used. Parts warranty included on all repairs.</li>';
+  document.getElementById('r_mc').textContent=ST.mc;
+}
+
+function doShare(){
+  var cat=CATS.find(function(c){return c.k===ST.cat;})||{l:'Vehicle Issue'};
+  var car=[ST.br,ST.md,ST.yr].filter(Boolean).join(' ')||'vehicle';
+  var svt=ST.sv==='high'?'CRITICAL - Do not drive':ST.sv==='med'?'Moderate - Workshop soon':'Minor';
+  var vi=ST.sv==='high'?249:199;
+  var nl='\n';
+  var txt='*INSTANT MECHANIC - Diagnosis Report*'+nl
+    +'Report ID: '+ST.ji+nl+nl
+    +'*Customer:* '+ST.cn+(ST.cp?' - '+ST.cp:'')+nl
+    +'*Vehicle:* '+car+(ST.fu?' ('+ST.fu+')':'')+nl
+    +(ST.rg?'*Reg:* '+ST.rg+nl:'')
+    +'*Technician:* '+ST.mc+nl+nl
+    +'*Issue:* '+cat.l+nl
+    +'*Severity:* '+svt+nl+nl
+    +'*Diagnosis:*'+nl+(DX[ST.cat]||'Fault identified')+nl+nl
+    +'*Confirmed on-site:*'+nl
+    +(ST.ob.length>0?ST.ob.map(function(o){return'* '+o;}).join(nl):'Visual inspection completed')
+    +(ST.nt?nl+nl+'*Notes:* '+ST.nt:'')+nl+nl
+    +'*Next step:* '+(AC[ST.cat]||AC.other)[0]+nl+nl
+    +'*Service charge due: Rs '+(vi+100)+'*'+nl
+    +'(Visit Rs '+vi+' + Diagnosis Report Rs 100)'+nl+nl
+    +'*Contact:* 8393990942 | instantmechanic.online';
+  if(navigator.share){
+    navigator.share({title:'IM Diagnosis Report',text:txt}).catch(function(){cp(txt);toast('Copied - paste in WhatsApp');});
+  } else {
+    cp(txt);toast('Report copied - paste in WhatsApp');
+  }
+}
+
+function doPrint(){
+  var rpt=document.getElementById('rptWrap');
+  if(!rpt){alert('Report not found');return;}
+
+  // Build a standalone print page from the report HTML
+  var html='<!DOCTYPE html><html><head><meta charset="UTF-8">'
+    +'<meta name="viewport" content="width=device-width,initial-scale=1">'
+    +'<title>IM Diagnosis Report - '+ST.ji+'</title>'
+    +'<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">'
+    +'<style>'
+    +'*{box-sizing:border-box;margin:0;padding:0}'
+    +':root{--or:#E8480A;--orl:#FFF0EA;--orm:#FDDDD2;--gr:#16A34A;--grl:#DCFCE7;--grd:#166534;--am:#D97706;--aml:#FEF3C7;--amd:#92400E;--rd:#DC2626;--rdl:#FEE2E2;--rdd:#991B1B;--ink:#0F0D0B;--ink2:#3D3530;--ink3:#7A6E66;--sur2:#F2EDE7;--brd:#E5DDD5}'
+    +'body{font-family:"DM Sans",sans-serif;font-size:13px;color:#0F0D0B;background:#fff;padding:16px}'
+    +'.rh{background:linear-gradient(135deg,#0F0D0B,#201712);padding:18px;border-radius:12px 12px 0 0;-webkit-print-color-adjust:exact;print-color-adjust:exact}'
+    +'.rlr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px}'
+    +'.rln{font-size:15px;font-weight:800;color:#fff}.rln span{color:#E8480A}'
+    +'.rls{font-size:9px;color:rgba(255,255,255,.3);margin-top:1px;letter-spacing:.05em;text-transform:uppercase}'
+    +'.rm{font-size:9px;color:rgba(255,255,255,.35);font-family:"DM Mono",monospace;text-align:right;line-height:1.7}'
+    +'.rcr{display:grid;grid-template-columns:1fr 1fr;gap:10px}'
+    +'.rcb{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:9px;padding:10px;-webkit-print-color-adjust:exact;print-color-adjust:exact}'
+    +'.rbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.3);margin-bottom:5px}'
+    +'.rbv{font-size:12px;color:#fff;line-height:1.55;font-weight:500;white-space:pre-line}'
+    +'.rb2{padding:16px}'
+    +'.rdb{background:#FFF0EA;border:1.5px solid #FDDDD2;border-radius:10px;padding:12px 14px;margin-bottom:14px;-webkit-print-color-adjust:exact;print-color-adjust:exact}'
+    +'.rdl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#E8480A;margin-bottom:4px}'
+    +'.rdv{font-size:13px;font-weight:700;color:#0F0D0B;line-height:1.4}'
+    +'.rsb{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;margin-top:7px}'
+    +'.rsh{background:#FEE2E2;color:#991B1B;-webkit-print-color-adjust:exact;print-color-adjust:exact}'
+    +'.rsm{background:#FEF3C7;color:#92400E;-webkit-print-color-adjust:exact;print-color-adjust:exact}'
+    +'.rsl{background:#DCFCE7;color:#166534;-webkit-print-color-adjust:exact;print-color-adjust:exact}'
+    +'.rs{margin-bottom:14px}'
+    +'.rst{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#7A6E66;margin-bottom:7px;padding-bottom:5px;border-bottom:1px solid #E5DDD5}'
+    +'.rol{list-style:none;display:flex;flex-direction:column;gap:4px}'
+    +'.rol li{font-size:12px;color:#3D3530;padding:5px 9px 5px 26px;background:#F2EDE7;border-radius:7px;position:relative;line-height:1.4}'
+    +'.rol li::before{content:"\2713";position:absolute;left:8px;color:#16A34A;font-weight:800;font-size:10px;top:6px}'
+    +'.ral{list-style:none;counter-reset:ac;display:flex;flex-direction:column;gap:4px}'
+    +'.ral li{font-size:12px;color:#3D3530;padding:5px 9px 5px 28px;border-bottom:1px solid #E5DDD5;position:relative;line-height:1.4;counter-increment:ac}'
+    +'.ral li::before{content:counter(ac);position:absolute;left:7px;width:15px;height:15px;background:#0F0D0B;color:#fff;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;top:6px}'
+    +'.ral li:last-child{border-bottom:none}'
+    +'.rsl2{list-style:none;display:flex;flex-direction:column;gap:3px}'
+    +'.rsl2 li{font-size:12px;color:#3D3530;padding:3px 0 3px 14px;position:relative;line-height:1.4}'
+    +'.rsl2 li::before{content:"\25CF";position:absolute;left:0;color:#E8480A;font-size:7px;top:7px}'
+    +'.rcta{background:linear-gradient(135deg,#FFF0EA,#FFEAE0);border:1.5px solid #FDDDD2;border-radius:10px;padding:12px 14px;margin-bottom:10px;-webkit-print-color-adjust:exact;print-color-adjust:exact}'
+    +'.rctat{font-size:11px;font-weight:800;color:#C23507;margin-bottom:5px}'
+    +'.rcta p{font-size:11px;color:#3D3530;line-height:1.55}'
+    +'.rcta strong{color:#C23507}'
+    +'.rnxt{background:#DCFCE7;border:1.5px solid #BBF7D0;border-radius:10px;padding:12px 14px;margin-bottom:10px;-webkit-print-color-adjust:exact;print-color-adjust:exact}'
+    +'.rnxt p{font-size:11px;color:#166534;line-height:1.55}'
+    +'.rft{text-align:center;padding:12px 16px 14px;border-top:1px solid #E5DDD5}'
+    +'.rft p{font-size:9px;color:#7A6E66;line-height:1.6}'
+    +'.rft strong{color:#E8480A}'
+    +'@media print{*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}body{padding:0}}'
+    +'</style></head><body>'
+    +rpt.outerHTML
+    +'<script>window.onload=function(){window.print();window.onafterprint=function(){window.close();};};<\/script>'
+    +'</body></html>';
+
+  var blob=new Blob([html],{type:'text/html'});
+  var url=URL.createObjectURL(blob);
+  var win=window.open(url,'_blank');
+  if(!win){
+    // Popup blocked — fallback: download as HTML
+    var a=document.createElement('a');
+    a.href=url;
+    a.download='IM-Diagnosis-'+ST.ji+'.html';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function(){URL.revokeObjectURL(url);},2000);
+    alert('Report downloaded as HTML file. Open it and use Print > Save as PDF.');
+  } else {
+    setTimeout(function(){URL.revokeObjectURL(url);},10000);
+  }
+}
+
+function cp(t){var ta=document.createElement('textarea');ta.value=t;ta.style.cssText='position:fixed;opacity:0';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);}
+
+function newRpt(){
+  if(!confirm('Start a new report? Current data will be cleared.'))return;
+  stopTmr();
+  ['f_cn','f_cp','f_cl','f_md','f_rg','f_nt'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
+  ['f_br','f_yr','f_fu'].forEach(function(id){document.getElementById(id).value='';});
+  document.querySelectorAll('.ccat').forEach(function(b){b.classList.remove('sel');});
+  document.querySelectorAll('.sb2').forEach(function(b){b.className='sb2';});
+  ST={cn:'',cp:'',cl:'',br:'',md:'',yr:'',fu:'',rg:'',mc:'',ji:'',cat:null,sv:'med',ob:[],nt:''};
+  var d=new Date();
+  var ji='IM-'+String(d.getFullYear()).slice(2)+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0')+'-'+String(Math.floor(1000+Math.random()*9000));
+  document.getElementById('f_ji').value=ji;ST.ji=ji;ss(1);
+}
+
+function onBrand(){
+  var h={'Maruti / Suzuki':'Swift, Baleno, Dzire, WagonR, Brezza','Hyundai':'Creta, i20, Verna, Aura','Kia':'Seltos, Sonet, Carens','Honda':'City, Amaze, Elevate','Tata':'Nexon, Harrier, Punch, Tiago','Mahindra':'Scorpio, XUV700, Thar','Toyota':'Innova, Fortuner, Glanza'};
+  document.getElementById('f_md').placeholder=h[document.getElementById('f_br').value]||'Enter model';
+}
+
+function toast(msg){var t=document.getElementById('tst');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},2500);}
+</script>
+</body>
+</html>
