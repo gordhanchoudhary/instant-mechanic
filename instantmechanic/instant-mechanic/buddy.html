@@ -3088,6 +3088,20 @@ var carQA = [
       'Call <strong><a href="tel:8393990942" style="color:var(--p);text-decoration:none;">8393990942</a></strong> to book — tell us your location and we will send a mechanic to you.'
   },
   {
+    keys:["alternator cost","alternator price","alternator repair cost","alternator replacement cost",
+          "alternator kitna","alternator charge","dynamo cost","dynamo price","dynamo repair cost",
+          "altenator cost","altenator price","alternator kitne ka","dynamo kitna","alternator rate",
+          "how much alternator","alternator how much","cost of alternator","price of alternator"],
+    answer:'<b>Alternator repair / replacement prices in Delhi NCR:</b><br><br>'+
+      '<b>Alternator repair (rewinding / brush replacement):</b> <b>&#8377;1,500 &ndash; &#8377;3,000</b><br>'+
+      '<b>Alternator replacement &mdash; Hatchbacks</b> (Swift, i10, WagonR): <b>&#8377;4,000 &ndash; &#8377;7,000</b><br>'+
+      '<b>Alternator replacement &mdash; Sedans / Compact SUVs</b> (City, Creta, Verna): <b>&#8377;6,000 &ndash; &#8377;12,000</b><br>'+
+      '<b>Alternator replacement &mdash; SUVs / MUVs</b> (Innova, Fortuner, XUV700): <b>&#8377;9,000 &ndash; &#8377;18,000</b><br>'+
+      '<b>Alternator belt replacement only:</b> <b>&#8377;500 &ndash; &#8377;1,500</b><br><br>'+
+      '<b>Tip:</b> Always replace the alternator belt when replacing the alternator &mdash; saves a second labour visit.<br><br>'+
+      'Call <strong><a href="tel:8393990942" style="color:var(--p);text-decoration:none;">8393990942</a></strong> for an exact quote for your car model &mdash; mechanic comes to you.'
+  },
+  {
     keys:["book service","book mechanic","book appointment","book a mechanic","send mechanic",
           "mechanic bhejo","mechanic bhejdo","mechanic book karo","mechanic kab aayega",
           "how to book","booking kaise","service book karna","appointment kaise",
@@ -3118,6 +3132,8 @@ function checkCarQA(text){
 
 function isPriceQuery(text){
   var t=text.toLowerCase();
+  // Don't intercept alternator/dynamo price queries — handled by carQA
+  if(t.includes("alternator")||t.includes("altenator")||t.includes("dynamo")||t.includes("alternater"))return false;
   return t.includes("how much")||t.includes("kitna")||t.includes(" cost")||t.includes("costs")||
     t.includes("price")||t.includes("pricing")||t.includes("charge")||t.includes("charges")||
     t.includes("fees")||t.includes(" fee ")||t.includes("rate")||t.includes("rates")||
