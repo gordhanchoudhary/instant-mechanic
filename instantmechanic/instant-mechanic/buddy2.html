@@ -102,6 +102,8 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 .chi2.on .chkb::after{content:'\2713';font-size:11px;font-weight:800;color:#fff}
 .chkt{font-size:13px;color:var(--ink2);line-height:1.45;flex:1;padding-top:1px}
 .chi2.on .chkt{color:var(--grd);font-weight:500}
+.chkh{font-size:11px;color:var(--ink3);margin-top:2px;line-height:1.4;font-weight:400}
+.chi2.on .chkh{color:var(--gr)}
 
 /* SEVERITY */
 .sg{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px}
@@ -318,6 +320,20 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
     <textarea id="f_nt" placeholder="Extra observations — sounds, smells, visible damage, what the customer described..."></textarea>
   </div>
 
+  <div class="card" id="obd_card" style="border:1.5px solid var(--or);background:var(--orl)">
+    <div class="chd" style="margin-bottom:8px">
+      <div class="chi" style="background:#FDDDD2">&#128187;</div>
+      OBD Error Code
+      <span style="margin-left:auto;font-size:9px;font-weight:600;color:var(--or);background:var(--orm);padding:2px 8px;border-radius:10px;text-transform:none;letter-spacing:0">Optional</span>
+    </div>
+    <div style="font-size:11px;color:var(--ink3);margin-bottom:10px;line-height:1.5">If you scanned the car with an OBD reader, enter the fault code(s) below. CarBuddy will explain the code to the customer.</div>
+    <div class="field">
+      <label>Fault Code(s)</label>
+      <input type="text" id="f_obd" placeholder="e.g. P0420, P24C7, C0035" style="text-transform:uppercase;font-family:'DM Mono',monospace;font-size:14px;letter-spacing:.05em" oninput="this.value=this.value.toUpperCase();onObdInput()">
+    </div>
+    <div id="obd_result" style="display:none;margin-top:8px"></div>
+  </div>
+
   <div class="br">
     <button class="btn bse" style="flex:1" onclick="ss(2)">&#8592; Back</button>
     <button class="btn bpr" style="flex:2" onclick="s3go()">Generate Report &#10003;</button>
@@ -348,6 +364,11 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
         <div class="rdl">Diagnosis Result</div>
         <div class="rdv" id="r_dg"></div>
         <div id="r_sv"></div>
+      </div>
+
+      <div class="rs" id="r_obd_wrap" style="display:none">
+        <div class="rst">&#128187; OBD Fault Code Scan Result</div>
+        <div id="r_obd_content"></div>
       </div>
 
       <div class="rs"><div class="rst">Mechanic On-Site Observations</div><ul class="rol" id="r_ob"></ul></div>
@@ -413,29 +434,248 @@ var CATS=[
 ];
 
 var CL={
-  battery:["Battery terminals corroded (white or blue powder visible)","Battery voltage measured — below 12.4V at rest","No crank, no sound when key is turned","Rapid clicking on key turn (solenoid clicking)","Dashboard lights dim, flickering, or off","Battery date sticker shows older than 3 years","Jump-start confirmed the fault — car started with cables","Alternator output measured — below 13.5V at 2000 RPM","Starter motor silent despite battery being charged","After-market accessories drawing power continuously"],
-  tyre:["Tyre visually flat or at critically low pressure","Foreign object in tread — nail, screw, or glass","Puncture in tread area — plug/patch repair feasible","Puncture in sidewall — tyre must be replaced","Valve stem leak confirmed with soapy water test","Bead leak at alloy rim — after pothole impact","Tyre burst or blowout — structural damage visible","Spare tyre checked — available and usable","All four tyre pressures checked and recorded","Tyre over 5 years old — cracking on sidewall"],
-  overheat:["Temperature gauge in red zone or warning light on","Coolant level low or empty in expansion tank","Visible coolant puddle under car — green, pink, or orange","Radiator hose cracked, softened, or leaking at clamp","Radiator fan not spinning with engine hot and AC on","Top hose hot, bottom hose stays cool — thermostat stuck","Steam or vapour rising from engine bay","Oil dipstick shows milky residue — coolant mixing with oil","White smoke from exhaust that does not clear","Water pump leaking at shaft seal"],
-  brake:["Grinding metal-on-metal sound confirmed when braking","Brake pads inspected — below 3mm thickness","Brake pedal soft or spongy — goes too far before biting","Brake pedal hard — very high force needed to stop","Brake fluid level low in reservoir","Visible brake fluid leak at wheel hub or dashboard","Car pulls to one side under braking","Handbrake seized or not fully releasing","ABS warning light on dashboard","Brake disc scored, cracked, or visibly warped","One wheel much hotter than others — seized caliper"],
-  ac:["AC compressor clutch not engaging — disc not spinning","Refrigerant pressure low — compressor cycling rapidly","Cabin air filter clogged — restricted airflow","Blower motor not working — no air from vents","AC blowing warm or ambient temperature air","Clicking or grinding from compressor belt area","Oily residue on AC lines — refrigerant leak","Musty or mouldy smell when AC is on","Cooling intermittent — cold then warm then cold","Wiring damage near compressor — rodent or chafing"],
-  clutch:["Clutch pedal falls to floor — cable or hydraulic failure","Clutch pedal extremely heavy — cable tight","Burning smell when using clutch on inclines","Engine RPM rises but car speed does not increase","Cannot engage any gear — completely locked","Clutch cable visibly broken or frayed","Hydraulic fluid leak near pedal or gearbox","Biting point very high on pedal — plate heavily worn","Squeaking when clutch pedal is pressed","Car stalls repeatedly when gently releasing clutch"],
-  gear:["Gear lever physically stuck — cannot move","Grinding noise confirmed when changing gears","Specific gears very difficult or impossible to engage","Automatic: 2+ second delay before car moves","Automatic: harsh jolting gear changes","Gearbox oil low or dark and burnt-smelling","Gear pops back to neutral while driving","Gear position indicator showing wrong gear","Gear linkage rod disconnected or loose","Car in limp mode — single gear and low power"],
-  smoke:["White smoke from exhaust — does not clear after warmup","Black smoke — overly rich fuel mixture","Blue or grey smoke — engine burning oil","Smoke from engine bay — not from exhaust","Burning rubber smell detected","Burning plastic or electrical smell — fire risk","Sweet coolant smell from engine bay","Smoke from single wheel — brake overheating"],
-  leak:["Dark brown or black fluid — engine oil","Red or pink fluid — automatic transmission or power steering","Green, yellow, or orange fluid — engine coolant","Petrol or diesel smell — fuel system leak","Leak from sump plug (bottom of engine)","Leak from valve cover gasket (top of engine)","Leak from radiator hose or hose clamp","Leak from power steering rack or pump","Leak from brake line, caliper, or master cylinder"],
-  noise:["Knocking from inside engine — low oil or bearing wear","Clicking when turning — CV joint failure","Grinding from wheels when braking — pads worn to metal","Humming that changes with vehicle speed — wheel bearing","Rattling from below car — exhaust heat shield","High-pitched squealing from engine — belt slipping","Clunking over speed bumps — suspension component","Ticking from engine — valve clearance or low oil","Whining when steering wheel turned — power steering","Scraping from under the car — dragging component"],
-  elec:["Fuse blown — visually confirmed in fuse box","Multiple electrical items stopped working at once","Burning plastic or wire smell — short circuit","After-market accessory identified as cause","Wiring damage visible — rodent bite or chafing","Relay failure suspected — circuit intermittent","BCM fault — erratic locks, windows, or lights","Alternator not charging — battery light on","Headlights or tail lights not working","Dashboard warning lights flickering"],
-  tow:["Wheels can roll freely — underlift tow feasible","Wheel jammed or bent — flatbed required","Accident damage — flatbed recommended","Luxury or EV car — flatbed only","Stuck in basement or ramp — winching needed","Stuck in mud, ditch, or floodwater — recovery service","Drivetrain damage — wheels must not rotate during tow"],
-  fuel:["Fuel tank confirmed empty by gauge and physical check","Wrong fuel filled — petrol in diesel or vice versa","Fuel smell detected — possible hose or injector leak","Fuel pump not priming — no whirring on key ON","Diesel ran dry — system bleeding may be needed","CNG cylinder empty or system not switching","Fuel filter suspected clogged — poor engine response"],
-  steer:["Steering very heavy — especially at parking speed","Power steering fluid reservoir level low","Whining or groaning when steering wheel is turned","Steering column lock engaged — wheel completely locked","EPS warning light on dashboard","Excessive play in steering wheel — loose feel","Car drifts to one side on straight road","Power steering fluid leaking from rack or pump"],
-  lights:["Headlight bulb blown — confirmed by inspection","Tail light or brake light not working","Indicator not working or stuck flashing","Horn not producing sound","Brake light stays on when not braking","Fuse for that circuit blown in fuse box","Relay fault — circuit works intermittently","Wiring corroded near that light assembly"],
-  susp:["Bouncing excessively after bumps — shock absorber worn","Clunking from one specific corner over rough road","Car sitting lower on one corner — coil spring collapsed","Steering vibration at certain speed range","Severe uneven tyre wear — alignment or suspension fault","Shock absorber leaking oil visually","Ball joint has play when wheel is rocked by hand","Tie rod loose — steering feels imprecise","Wheel bearing rough — uneven spin when rotated by hand"],
-  ign:["Key physically stuck inside ignition barrel","Push-button start: no response when pressed","Smart key dead — 'no key detected' on screen","Immobiliser triggered — anti-theft preventing start","Steering column lock engaged — locked solid","Ignition switch faulty — no response to key","Dashboard lights on but engine will not crank"],
-  warn:["Check engine light (amber or red)","EPC light — electronic power control (VW/Audi/Skoda)","ABS light — anti-lock braking fault","Airbag or SRS warning light","Oil pressure warning — engine must stop immediately","Temperature warning — overheating","Battery or charging system warning","Traction control or ESP stability light","Service due indicator light"],
-  belt:["Belt visibly broken or hanging off pulley","Alternator belt broken — battery warning light on","AC belt broken — AC not running","Squealing from engine belt — slipping","Belt slipped off a pulley but not broken","Tensioner pulley bearing seized or rough","Timing belt concern — ticking noise or timing fault"],
-  waterlog:["Car submerged or drove through deep floodwater","Water entered the passenger cabin","Car stopped after driving through water","Engine bay visually wet — water on air filter","Electrical systems not responding after water","Car stuck in mud — wheels spinning without grip","Car stuck in pit, manhole, or ditch — winch required"],
-  ev:["Battery at 0% — car will not move","Charging port not accepting charger connection","Charging started but percentage not increasing","High voltage system warning light on","Hybrid battery warning light on","Severe power reduction — limp mode","EV range dropping faster than normal"],
-  silencer:["Exhaust pipe visually hanging or dragging on ground","Silencer or muffler has fallen off completely","Loud roaring exhaust noise — baffles collapsed","Heat shield loose — metallic rattling under car","Exhaust manifold crack — ticking from engine top","Exhaust fumes entering passenger cabin","Catalytic converter damaged — rattling from below"],
-  other:["Major fault identified — cannot fix on-site","Multiple systems affected simultaneously","Intermittent fault — could not reproduce consistently","Requires workshop diagnostic equipment","Customer confirmed issue existed before today's visit"]
+  battery:[
+    {e:"Battery terminals corroded (white or blue powder visible)",h:"बैटरी टर्मिनल पर सफेद/नीला पाउडर जमा है"},
+    {e:"Battery voltage measured — below 12.4V at rest",h:"बैटरी का वोल्टेज 12.4V से कम है"},
+    {e:"No crank, no sound when key is turned",h:"चाबी घुमाने पर कोई आवाज़ नहीं, इंजन नहीं चला"},
+    {e:"Rapid clicking on key turn (solenoid clicking)",h:"चाबी घुमाने पर तेज़ क्लिक-क्लिक की आवाज़"},
+    {e:"Dashboard lights dim, flickering, or off",h:"डैशबोर्ड की लाइटें धीमी या बंद हैं"},
+    {e:"Battery date sticker shows older than 3 years",h:"बैटरी 3 साल से पुरानी है"},
+    {e:"Jump-start confirmed the fault — car started with cables",h:"जम्प स्टार्ट से गाड़ी चली — बैटरी खराब है"},
+    {e:"Alternator output measured — below 13.5V at 2000 RPM",h:"अल्टरनेटर का आउटपुट 13.5V से कम है"},
+    {e:"Starter motor silent despite battery being charged",h:"बैटरी ठीक है पर स्टार्टर मोटर काम नहीं कर रही"},
+    {e:"After-market accessories drawing power continuously",h:"बाद में लगाए गए सामान (डैशकैम, alarm) पावर खींच रहे हैं"},
+  ],
+  tyre:[
+    {e:"Tyre visually flat or at critically low pressure",h:"टायर पूरी तरह फ्लैट या बहुत कम हवा है"},
+    {e:"Foreign object in tread — nail, screw, or glass",h:"टायर में कील, पेंच या काँच घुसा हुआ है"},
+    {e:"Puncture in tread area — plug/patch repair feasible",h:"पंक्चर ट्रेड में है — प्लग/पैच से ठीक हो सकता है"},
+    {e:"Puncture in sidewall — tyre must be replaced",h:"पंक्चर साइडवॉल में है — टायर बदलना होगा"},
+    {e:"Valve stem leak confirmed with soapy water test",h:"वाल्व से हवा लीक हो रही है — साबुन से जाँचा"},
+    {e:"Bead leak at alloy rim — after pothole impact",h:"अलॉय रिम के किनारे से हवा जा रही है"},
+    {e:"Tyre burst or blowout — structural damage visible",h:"टायर फट गया है — बड़ा नुकसान दिखता है"},
+    {e:"Spare tyre checked — available and usable",h:"स्टेपनी जाँची — उपलब्ध और काम की है"},
+    {e:"All four tyre pressures checked and recorded",h:"चारों टायरों की हवा जाँची और नोट की"},
+    {e:"Tyre over 5 years old — cracking on sidewall",h:"टायर 5 साल से पुराना है — साइड में दरारें हैं"},
+  ],
+  overheat:[
+    {e:"Temperature gauge in red zone or warning light on",h:"तापमान गेज लाल ज़ोन में है या वार्निंग लाइट जल रही है"},
+    {e:"Coolant level low or empty in expansion tank",h:"कूलेंट टैंक में पानी कम या खाली है"},
+    {e:"Visible coolant puddle under car — green, pink, or orange",h:"गाड़ी के नीचे हरा/गुलाबी/नारंगी पानी गिरा है"},
+    {e:"Radiator hose cracked, softened, or leaking at clamp",h:"रेडिएटर पाइप फटा हुआ या क्लैम्प से लीक हो रहा है"},
+    {e:"Radiator fan not spinning with engine hot and AC on",h:"इंजन गरम होने पर भी रेडिएटर फैन नहीं चल रहा"},
+    {e:"Top hose hot, bottom hose stays cool — thermostat stuck",h:"ऊपरी पाइप गरम, नीचे वाला ठंडा — थर्मोस्टेट फँसा है"},
+    {e:"Steam or vapour rising from engine bay",h:"इंजन से भाप या धुआँ उठ रहा है"},
+    {e:"Oil dipstick shows milky residue — coolant mixing with oil",h:"ऑयल डिपस्टिक पर सफेद/दूधिया तेल है — कूलेंट मिल रहा है"},
+    {e:"White smoke from exhaust that does not clear",h:"एग्जॉस्ट से सफेद धुआँ निकल रहा है जो बंद नहीं होता"},
+    {e:"Water pump leaking at shaft seal",h:"वाटर पम्प की शाफ्ट सील से पानी टपक रहा है"},
+  ],
+  brake:[
+    {e:"Grinding metal-on-metal sound confirmed when braking",h:"ब्रेक लगाने पर लोहे से लोहे की पीसने की आवाज़"},
+    {e:"Brake pads inspected — below 3mm thickness",h:"ब्रेक पैड जाँचे — 3mm से कम बचे हैं"},
+    {e:"Brake pedal soft or spongy — goes too far before biting",h:"ब्रेक पैडल नरम है, बहुत नीचे तक जाता है"},
+    {e:"Brake pedal hard — very high force needed to stop",h:"ब्रेक पैडल बहुत सख्त है, दबाना मुश्किल है"},
+    {e:"Brake fluid level low in reservoir",h:"ब्रेक फ्लूइड का लेवल कम है"},
+    {e:"Visible brake fluid leak at wheel hub or dashboard",h:"पहिये या डैशबोर्ड के नीचे ब्रेक फ्लूइड लीक है"},
+    {e:"Car pulls to one side under braking",h:"ब्रेक लगाने पर गाड़ी एक तरफ खिंचती है"},
+    {e:"Handbrake seized or not fully releasing",h:"हैंडब्रेक फँसा है या पूरी तरह खुल नहीं रहा"},
+    {e:"ABS warning light on dashboard",h:"डैशबोर्ड पर ABS वार्निंग लाइट जल रही है"},
+    {e:"Brake disc scored, cracked, or visibly warped",h:"ब्रेक डिस्क पर खरोंचें हैं, टूटी है या मुड़ी है"},
+    {e:"One wheel much hotter than others — seized caliper",h:"एक पहिया बाकियों से बहुत ज़्यादा गरम — कैलिपर फँसा है"},
+  ],
+  ac:[
+    {e:"AC compressor clutch not engaging — disc not spinning",h:"AC कम्प्रेसर क्लच नहीं पकड़ रहा — डिस्क नहीं घूम रही"},
+    {e:"Refrigerant pressure low — compressor cycling rapidly",h:"रेफ्रिजरेंट (गैस) का प्रेशर कम है — कम्प्रेसर बार-बार बंद/चालू हो रहा"},
+    {e:"Cabin air filter clogged — restricted airflow",h:"केबिन फिल्टर बंद है — हवा कम आ रही है"},
+    {e:"Blower motor not working — no air from vents",h:"ब्लोअर मोटर काम नहीं कर रही — वेंट से हवा नहीं आ रही"},
+    {e:"AC blowing warm or ambient temperature air",h:"AC से ठंडी हवा नहीं, सामान्य या गरम हवा आ रही है"},
+    {e:"Clicking or grinding from compressor belt area",h:"कम्प्रेसर बेल्ट की तरफ से क्लिक या पीसने की आवाज़"},
+    {e:"Oily residue on AC lines — refrigerant leak",h:"AC पाइप पर तेलीय निशान — गैस लीक हो रही है"},
+    {e:"Musty or mouldy smell when AC is on",h:"AC चालू करने पर बासी/फफूँदी जैसी बदबू आती है"},
+    {e:"Cooling intermittent — cold then warm then cold",h:"ठंडक कभी आती कभी नहीं — बीच-बीच में बंद हो जाती है"},
+    {e:"Wiring damage near compressor — rodent or chafing",h:"कम्प्रेसर के पास तार कटे हैं — चूहे या रगड़ से"},
+  ],
+  clutch:[
+    {e:"Clutch pedal falls to floor — cable or hydraulic failure",h:"क्लच पैडल बिना रुके ज़मीन तक चला जाता है"},
+    {e:"Clutch pedal extremely heavy — cable tight",h:"क्लच पैडल बहुत भारी और सख्त है"},
+    {e:"Burning smell when using clutch on inclines",h:"चढ़ाई पर क्लच इस्तेमाल करने पर जलने की बदबू"},
+    {e:"Engine RPM rises but car speed does not increase",h:"इंजन की RPM बढ़ती है पर गाड़ी की स्पीड नहीं बढ़ती — क्लच स्लिप"},
+    {e:"Cannot engage any gear — completely locked",h:"कोई भी गियर नहीं लग रहा — पूरी तरह जाम है"},
+    {e:"Clutch cable visibly broken or frayed",h:"क्लच की तार टूटी हुई या बिखरी हुई दिख रही है"},
+    {e:"Hydraulic fluid leak near pedal or gearbox",h:"पैडल या गियरबॉक्स के पास हाइड्रॉलिक फ्लूइड लीक है"},
+    {e:"Biting point very high on pedal — plate heavily worn",h:"क्लच बहुत ऊपर पकड़ता है — प्लेट बहुत घिस गई है"},
+    {e:"Squeaking when clutch pedal is pressed",h:"क्लच पैडल दबाने पर चिचिहाने की आवाज़"},
+    {e:"Car stalls repeatedly when gently releasing clutch",h:"धीरे-धीरे क्लच छोड़ने पर भी गाड़ी बार-बार बंद हो जाती है"},
+  ],
+  gear:[
+    {e:"Gear lever physically stuck — cannot move",h:"गियर लीवर पूरी तरह जाम है — हिलती नहीं"},
+    {e:"Grinding noise confirmed when changing gears",h:"गियर बदलते समय पीसने की आवाज़ आती है"},
+    {e:"Specific gears very difficult or impossible to engage",h:"कुछ खास गियर लगाना बहुत मुश्किल या नामुमकिन है"},
+    {e:"Automatic: 2+ second delay before car moves",h:"ऑटोमैटिक: Drive में डालने पर 2 सेकंड से ज़्यादा देरी"},
+    {e:"Automatic: harsh jolting gear changes",h:"ऑटोमैटिक: गियर बदलते समय झटके लगते हैं"},
+    {e:"Gearbox oil low or dark and burnt-smelling",h:"गियरबॉक्स का तेल कम है या काला और जला हुआ गंध वाला"},
+    {e:"Gear pops back to neutral while driving",h:"चलते समय गियर अपने आप न्यूट्रल में आ जाता है"},
+    {e:"Gear position indicator showing wrong gear",h:"डैशबोर्ड पर गलत गियर दिख रहा है"},
+    {e:"Gear linkage rod disconnected or loose",h:"गियर रॉड टूटी हुई या ढीली है"},
+    {e:"Car in limp mode — single gear and low power",h:"गाड़ी लिम्प मोड में है — एक ही गियर, बहुत कम पावर"},
+  ],
+  smoke:[
+    {e:"White smoke from exhaust — does not clear after warmup",h:"एग्जॉस्ट से सफेद धुआँ निकलता है जो गरम होने पर भी बंद नहीं होता"},
+    {e:"Black smoke — overly rich fuel mixture",h:"काला धुआँ — ज़्यादा ईंधन जल रहा है"},
+    {e:"Blue or grey smoke — engine burning oil",h:"नीला/स्लेटी धुआँ — इंजन में तेल जल रहा है"},
+    {e:"Smoke from engine bay — not from exhaust",h:"इंजन के आसपास से धुआँ — एग्जॉस्ट से नहीं"},
+    {e:"Burning rubber smell detected",h:"जलते रबर की बदबू आ रही है"},
+    {e:"Burning plastic or electrical smell — fire risk",h:"जलते प्लास्टिक या तार की बदबू — आग का खतरा"},
+    {e:"Sweet coolant smell from engine bay",h:"इंजन से मीठी-सी कूलेंट की गंध आ रही है"},
+    {e:"Smoke from single wheel — brake overheating",h:"एक पहिये से धुआँ — ब्रेक बहुत ज़्यादा गरम है"},
+  ],
+  leak:[
+    {e:"Dark brown or black fluid — engine oil",h:"गाढ़ा भूरा/काला तरल — इंजन का तेल"},
+    {e:"Red or pink fluid — automatic transmission or power steering",h:"लाल/गुलाबी तरल — ऑटोमैटिक गियरबॉक्स या पावर स्टीयरिंग का तेल"},
+    {e:"Green, yellow, or orange fluid — engine coolant",h:"हरा/पीला/नारंगी तरल — इंजन कूलेंट (पानी)"},
+    {e:"Petrol or diesel smell — fuel system leak",h:"पेट्रोल/डीज़ल की गंध — ईंधन लीक हो रहा है"},
+    {e:"Leak from sump plug (bottom of engine)",h:"इंजन के नीचे सम्प प्लग से तेल टपक रहा है"},
+    {e:"Leak from valve cover gasket (top of engine)",h:"इंजन के ऊपर वाल्व कवर गैस्केट से तेल रिस रहा है"},
+    {e:"Leak from radiator hose or hose clamp",h:"रेडिएटर पाइप या क्लैम्प से कूलेंट लीक है"},
+    {e:"Leak from power steering rack or pump",h:"पावर स्टीयरिंग रैक या पम्प से तेल टपक रहा है"},
+    {e:"Leak from brake line, caliper, or master cylinder",h:"ब्रेक लाइन, कैलिपर या मास्टर सिलिंडर से ब्रेक फ्लूइड लीक है"},
+  ],
+  noise:[
+    {e:"Knocking from inside engine — low oil or bearing wear",h:"इंजन के अंदर से ठक-ठक — कम तेल या बेयरिंग घिसी"},
+    {e:"Clicking when turning — CV joint failure",h:"स्टीयरिंग घुमाने पर क्लिक — CV जॉइंट खराब"},
+    {e:"Grinding from wheels when braking — pads worn to metal",h:"ब्रेक लगाने पर पहियों से पीसने की आवाज़ — पैड खत्म"},
+    {e:"Humming that changes with vehicle speed — wheel bearing",h:"स्पीड के साथ बदलने वाली गुनगुनाहट — व्हील बेयरिंग"},
+    {e:"Rattling from below car — exhaust heat shield",h:"गाड़ी के नीचे से खड़खड़ाहट — एग्जॉस्ट हीट शील्ड"},
+    {e:"High-pitched squealing from engine — belt slipping",h:"इंजन से तेज़ चीखने की आवाज़ — बेल्ट फिसल रही है"},
+    {e:"Clunking over speed bumps — suspension component",h:"स्पीड ब्रेकर पर धड़ाम की आवाज़ — सस्पेंशन"},
+    {e:"Ticking from engine — valve clearance or low oil",h:"इंजन से टिक-टिक — वाल्व क्लीयरेंस या कम तेल"},
+    {e:"Whining when steering wheel turned — power steering",h:"स्टीयरिंग घुमाने पर घरघराहट — पावर स्टीयरिंग"},
+    {e:"Scraping from under the car — dragging component",h:"गाड़ी के नीचे से रगड़ने की आवाज़ — कुछ घिसट रहा है"},
+  ],
+  elec:[
+    {e:"Fuse blown — visually confirmed in fuse box",h:"फ्यूज़ उड़ा हुआ है — फ्यूज़ बॉक्स में देखकर पक्का किया"},
+    {e:"Multiple electrical items stopped working at once",h:"एक साथ कई इलेक्ट्रिकल चीज़ें बंद हो गई हैं"},
+    {e:"Burning plastic or wire smell — short circuit",h:"जलते प्लास्टिक या तार की बदबू — शॉर्ट सर्किट"},
+    {e:"After-market accessory identified as cause",h:"बाद में लगाई गई चीज़ (accessory) समस्या का कारण है"},
+    {e:"Wiring damage visible — rodent bite or chafing",h:"तार कटे या घिसे दिख रहे हैं — चूहे या रगड़ से"},
+    {e:"Relay failure suspected — circuit intermittent",h:"रिले खराब लगती है — कभी काम करता है कभी नहीं"},
+    {e:"BCM fault — erratic locks, windows, or lights",h:"BCM खराब — लॉक, खिड़कियाँ या लाइटें अजीब तरह काम कर रही हैं"},
+    {e:"Alternator not charging — battery light on",h:"अल्टरनेटर चार्ज नहीं कर रहा — बैटरी लाइट जल रही है"},
+    {e:"Headlights or tail lights not working",h:"हेडलाइट या टेललाइट काम नहीं कर रही"},
+    {e:"Dashboard warning lights flickering",h:"डैशबोर्ड की लाइटें टिमटिमा रही हैं"},
+  ],
+  tow:[
+    {e:"Wheels can roll freely — underlift tow feasible",h:"पहिये आज़ादी से घूम सकते हैं — अंडरलिफ्ट टो हो सकती है"},
+    {e:"Wheel jammed or bent — flatbed required",h:"पहिया जाम या मुड़ा हुआ — फ्लैटबेड ज़रूरी है"},
+    {e:"Accident damage — flatbed recommended",h:"दुर्घटना से नुकसान — फ्लैटबेड से ले जाना बेहतर"},
+    {e:"Luxury or EV car — flatbed only",h:"लग्जरी या इलेक्ट्रिक गाड़ी — केवल फ्लैटबेड"},
+    {e:"Stuck in basement or ramp — winching needed",h:"बेसमेंट या रैम्प में फँसी — विंचिंग करनी होगी"},
+    {e:"Stuck in mud, ditch, or floodwater — recovery service",h:"कीचड़, गड्ढे या बाढ़ में फँसी — रिकवरी सर्विस"},
+    {e:"Drivetrain damage — wheels must not rotate during tow",h:"ड्राइवट्रेन में नुकसान — टो के दौरान पहिये नहीं घूमने चाहिए"},
+  ],
+  fuel:[
+    {e:"Fuel tank confirmed empty by gauge and physical check",h:"गेज और जाँच से पक्का — ईंधन खत्म है"},
+    {e:"Wrong fuel filled — petrol in diesel or vice versa",h:"गलत ईंधन भरा — डीज़ल में पेट्रोल या पेट्रोल में डीज़ल"},
+    {e:"Fuel smell detected — possible hose or injector leak",h:"पेट्रोल/डीज़ल की गंध आ रही है — पाइप या इंजेक्टर लीक"},
+    {e:"Fuel pump not priming — no whirring on key ON",h:"चाबी ON करने पर फ्यूल पम्प की गुनगुनाहट नहीं — पम्प खराब"},
+    {e:"Diesel ran dry — system bleeding may be needed",h:"डीज़ल गाड़ी खाली चली — सिस्टम ब्लीड करना पड़ सकता है"},
+    {e:"CNG cylinder empty or system not switching",h:"CNG सिलिंडर खाली है या सिस्टम switch नहीं हो रहा"},
+    {e:"Fuel filter suspected clogged — poor engine response",h:"फ्यूल फिल्टर बंद लग रहा है — इंजन की प्रतिक्रिया खराब"},
+  ],
+  steer:[
+    {e:"Steering very heavy — especially at parking speed",h:"स्टीयरिंग बहुत भारी है — खासकर धीमी गति या पार्किंग में"},
+    {e:"Power steering fluid reservoir level low",h:"पावर स्टीयरिंग फ्लूइड का लेवल कम है"},
+    {e:"Whining or groaning when steering wheel is turned",h:"स्टीयरिंग घुमाने पर घरघराहट या कराहट की आवाज़"},
+    {e:"Steering column lock engaged — wheel completely locked",h:"स्टीयरिंग लॉक हो गई है — बिल्कुल नहीं हिल रही"},
+    {e:"EPS warning light on dashboard",h:"डैशबोर्ड पर EPS/पावर स्टीयरिंग वार्निंग लाइट जल रही है"},
+    {e:"Excessive play in steering wheel — loose feel",h:"स्टीयरिंग में बहुत ज़्यादा खेल है — ढीली लगती है"},
+    {e:"Car drifts to one side on straight road",h:"सीधी सड़क पर भी गाड़ी एक तरफ खिंचती है"},
+    {e:"Power steering fluid leaking from rack or pump",h:"पावर स्टीयरिंग रैक या पम्प से तेल लीक हो रहा है"},
+  ],
+  lights:[
+    {e:"Headlight bulb blown — confirmed by inspection",h:"हेडलाइट का बल्ब फ्यूज़ हो गया है — देखकर पक्का किया"},
+    {e:"Tail light or brake light not working",h:"टेललाइट या ब्रेक लाइट काम नहीं कर रही"},
+    {e:"Indicator not working or stuck flashing",h:"इंडिकेटर काम नहीं कर रहा या लगातार जल रहा है"},
+    {e:"Horn not producing sound",h:"हॉर्न आवाज़ नहीं दे रहा"},
+    {e:"Brake light stays on when not braking",h:"ब्रेक न लगाने पर भी ब्रेक लाइट जली रहती है"},
+    {e:"Fuse for that circuit blown in fuse box",h:"उस सर्किट का फ्यूज़ उड़ा हुआ है"},
+    {e:"Relay fault — circuit works intermittently",h:"रिले खराब — कभी काम करता है कभी नहीं"},
+    {e:"Wiring corroded near that light assembly",h:"उस लाइट के पास तार जंग लगे या खराब हैं"},
+  ],
+  susp:[
+    {e:"Bouncing excessively after bumps — shock absorber worn",h:"गड्ढे पर ज़्यादा उछाल आती है — शॉक अब्सॉर्बर घिसा है"},
+    {e:"Clunking from one specific corner over rough road",h:"खराब सड़क पर एक कोने से धड़ाम की आवाज़"},
+    {e:"Car sitting lower on one corner — coil spring collapsed",h:"गाड़ी एक तरफ से नीचे बैठी है — कॉइल स्प्रिंग टूटी है"},
+    {e:"Steering vibration at certain speed range",h:"एक खास स्पीड पर स्टीयरिंग काँपती है"},
+    {e:"Severe uneven tyre wear — alignment or suspension fault",h:"टायर एक तरफ से ज़्यादा घिसे — अलाइनमेंट या सस्पेंशन गड़बड़"},
+    {e:"Shock absorber leaking oil visually",h:"शॉक अब्सॉर्बर से तेल रिसता दिख रहा है"},
+    {e:"Ball joint has play when wheel is rocked by hand",h:"पहिये को हिलाने पर बॉल जॉइंट में खेल महसूस होती है"},
+    {e:"Tie rod loose — steering feels imprecise",h:"टाई रॉड ढीली है — स्टीयरिंग अनिश्चित लगती है"},
+    {e:"Wheel bearing rough — uneven spin when rotated by hand",h:"व्हील बेयरिंग खुरदरी — हाथ से घुमाने पर ठीक नहीं घूमता"},
+  ],
+  ign:[
+    {e:"Key physically stuck inside ignition barrel",h:"चाबी इग्निशन में फँसी हुई है — निकल नहीं रही"},
+    {e:"Push-button start: no response when pressed",h:"पुश बटन दबाने पर कोई प्रतिक्रिया नहीं"},
+    {e:"Smart key dead — 'no key detected' on screen",h:"स्मार्ट चाबी की बैटरी खत्म — स्क्रीन पर 'key not detected'"},
+    {e:"Immobiliser triggered — anti-theft preventing start",h:"इम्मोबिलाइज़र चालू है — एंटी-थेफ्ट सिस्टम गाड़ी स्टार्ट नहीं होने दे रहा"},
+    {e:"Steering column lock engaged — locked solid",h:"स्टीयरिंग कॉलम लॉक है — बिल्कुल नहीं हिलती"},
+    {e:"Ignition switch faulty — no response to key",h:"इग्निशन स्विच खराब — चाबी से कोई असर नहीं"},
+    {e:"Dashboard lights on but engine will not crank",h:"डैशबोर्ड की लाइटें जल रही हैं पर इंजन नहीं क्रैंक हो रहा"},
+  ],
+  warn:[
+    {e:"Check engine light (amber or red)",h:"चेक इंजन लाइट जल रही है (पीली या लाल)"},
+    {e:"EPC light — electronic power control (VW/Audi/Skoda)",h:"EPC लाइट — थ्रॉटल सिस्टम गड़बड़ (VW/Audi/Skoda में)"},
+    {e:"ABS light — anti-lock braking fault",h:"ABS लाइट — ABS सिस्टम में खराबी"},
+    {e:"Airbag or SRS warning light",h:"एयरबैग/SRS वार्निंग लाइट जल रही है"},
+    {e:"Oil pressure warning — engine must stop immediately",h:"ऑयल प्रेशर वार्निंग — इंजन तुरंत बंद करें"},
+    {e:"Temperature warning — overheating",h:"तापमान वार्निंग — इंजन ओवरहीट हो रहा है"},
+    {e:"Battery or charging system warning",h:"बैटरी/चार्जिंग सिस्टम वार्निंग लाइट"},
+    {e:"Traction control or ESP stability light",h:"ट्रैक्शन कंट्रोल / ESP स्टेबिलिटी लाइट"},
+    {e:"Service due indicator light",h:"सर्विस का समय आ गया है — लाइट जल रही है"},
+  ],
+  belt:[
+    {e:"Belt visibly broken or hanging off pulley",h:"बेल्ट टूटी हुई या पुली से उतरी हुई दिख रही है"},
+    {e:"Alternator belt broken — battery warning light on",h:"अल्टरनेटर बेल्ट टूटी — बैटरी लाइट जल रही है"},
+    {e:"AC belt broken — AC not running",h:"AC बेल्ट टूटी — AC काम नहीं कर रहा"},
+    {e:"Squealing from engine belt — slipping",h:"इंजन बेल्ट से चीखने की आवाज़ — बेल्ट फिसल रही है"},
+    {e:"Belt slipped off a pulley but not broken",h:"बेल्ट पुली से निकल गई है लेकिन टूटी नहीं है"},
+    {e:"Tensioner pulley bearing seized or rough",h:"टेंशनर पुली की बेयरिंग जाम या खुरदरी है"},
+    {e:"Timing belt concern — ticking noise or timing fault",h:"टाइमिंग बेल्ट की चिंता — टिक-टिक या टाइमिंग गड़बड़"},
+  ],
+  waterlog:[
+    {e:"Car submerged or drove through deep floodwater",h:"गाड़ी गहरे पानी में डूबी या गहरे पानी से गुज़री"},
+    {e:"Water entered the passenger cabin",h:"पानी केबिन के अंदर आ गया है"},
+    {e:"Car stopped after driving through water",h:"पानी से गुज़रने के बाद गाड़ी बंद हो गई"},
+    {e:"Engine bay visually wet — water on air filter",h:"इंजन बे में पानी दिख रहा है — एयर फिल्टर भीगा है"},
+    {e:"Electrical systems not responding after water",h:"पानी के बाद इलेक्ट्रिकल सिस्टम काम नहीं कर रहे"},
+    {e:"Car stuck in mud — wheels spinning without grip",h:"गाड़ी कीचड़ में फँसी — पहिये घूम रहे हैं पर पकड़ नहीं"},
+    {e:"Car stuck in pit, manhole, or ditch — winch required",h:"गाड़ी गड्ढे, मैनहोल या खाई में फँसी — विंच चाहिए"},
+  ],
+  ev:[
+    {e:"Battery at 0% — car will not move",h:"बैटरी 0% — गाड़ी बिल्कुल नहीं चलेगी"},
+    {e:"Charging port not accepting charger connection",h:"चार्जिंग पोर्ट में चार्जर नहीं लग रहा"},
+    {e:"Charging started but percentage not increasing",h:"चार्जिंग शुरू हुई पर प्रतिशत नहीं बढ़ रहा"},
+    {e:"High voltage system warning light on",h:"हाई वोल्टेज सिस्टम की वार्निंग लाइट जल रही है"},
+    {e:"Hybrid battery warning light on",h:"हाइब्रिड बैटरी वार्निंग लाइट जल रही है"},
+    {e:"Severe power reduction — limp mode",h:"पावर बहुत कम हो गई है — लिम्प मोड में है"},
+    {e:"EV range dropping faster than normal",h:"EV की रेंज बहुत जल्दी कम हो रही है"},
+  ],
+  silencer:[
+    {e:"Exhaust pipe visually hanging or dragging on ground",h:"एग्जॉस्ट पाइप लटकी हुई या ज़मीन पर घिसट रही है"},
+    {e:"Silencer or muffler has fallen off completely",h:"साइलेंसर/मफ्लर पूरी तरह गिर गया है"},
+    {e:"Loud roaring exhaust noise — baffles collapsed",h:"बहुत तेज़ गर्जना — साइलेंसर के अंदर का हिस्सा टूट गया"},
+    {e:"Heat shield loose — metallic rattling under car",h:"हीट शील्ड ढीली है — नीचे से खड़खड़ाहट"},
+    {e:"Exhaust manifold crack — ticking from engine top",h:"एग्जॉस्ट मेनिफोल्ड में दरार — इंजन के ऊपर से टिक-टिक"},
+    {e:"Exhaust fumes entering passenger cabin",h:"एग्जॉस्ट धुआँ केबिन के अंदर आ रहा है"},
+    {e:"Catalytic converter damaged — rattling from below",h:"कैटेलिटिक कन्वर्टर खराब — नीचे से खड़खड़ाहट"},
+  ],
+  other:[
+    {e:"Major fault identified — cannot fix on-site",h:"बड़ी खराबी मिली — मौके पर ठीक नहीं हो सकती"},
+    {e:"Multiple systems affected simultaneously",h:"एक साथ कई सिस्टम प्रभावित हैं"},
+    {e:"Intermittent fault — could not reproduce consistently",h:"रुक-रुक कर आने वाली खराबी — हर बार नहीं होती"},
+    {e:"Requires workshop diagnostic equipment",h:"वर्कशॉप के डायग्नोस्टिक उपकरण चाहिए"},
+    {e:"Customer confirmed issue existed before today's visit",h:"ग्राहक ने बताया — खराबी आज से पहले से है"},
+  ],
 };
 
 var DX={
@@ -542,8 +782,638 @@ var RP={
   other:"Full workshop diagnostic: 1-3 hrs. OBD scan: 30-45 min. Repair time and cost depends on fault identified at workshop."
 };
 
+// ── OBD CODE DATABASE ────────────────────────────────────────────────────────
+var OBD_DB={
+  // P0 - Powertrain generic
+  "P0010":["Intake Camshaft Position Actuator Circuit","Timing advance stuck — poor idle and acceleration","VVT actuator oil sludge or wiring fault"],
+  "P0011":["Intake Camshaft Timing Over-Advanced","Engine runs rough, poor fuel economy","VVT solenoid stuck open or oil pressure low"],
+  "P0016":["Crankshaft/Camshaft Position Correlation","Hard start, rough running, possible engine damage risk","Stretched timing chain or VVT phaser worn"],
+  "P0030":["O2 Sensor Heater Circuit (Bank 1 Sen 1)","Increased emissions, poor fuel economy in cold start","O2 sensor heater element failed — replace sensor"],
+  "P0087":["Fuel Rail/System Pressure Too Low","Engine hesitation, stalling, poor performance","Weak fuel pump, clogged fuel filter, or pressure regulator"],
+  "P0089":["Fuel Pressure Regulator Performance","Rough idle, black smoke, poor fuel economy","Fuel pressure regulator stuck — fuel system inspection"],
+  "P0097":["Intake Air Temperature Sensor Low","ECU running wrong fuel map, poor response","IAT sensor short circuit or damaged wiring"],
+  "P0100":["Mass Air Flow Sensor Circuit","Rough idle, poor acceleration, black smoke","Dirty or failed MAF sensor — clean or replace"],
+  "P0101":["MAF Sensor Range/Performance","Hesitation, rough idle, poor fuel economy","MAF sensor contaminated or air leak before sensor"],
+  "P0102":["MAF Sensor Circuit Low Input","Rich running, black smoke, poor power","MAF sensor failed or wiring short to ground"],
+  "P0103":["MAF Sensor Circuit High Input","Lean running, misfire, engine hesitation","MAF sensor open circuit or wiring fault"],
+  "P0110":["Intake Air Temperature Sensor Circuit","Poor cold start, incorrect fuel trim","IAT sensor open or short circuit"],
+  "P0116":["Engine Coolant Temperature Sensor Range","Poor fuel economy, overrich mixture, no fan operation","ECT sensor stuck reading incorrect temperature"],
+  "P0117":["Engine Coolant Temperature Sensor Low","Rich running, electric fan not working","ECT sensor short to ground — replace sensor"],
+  "P0118":["Engine Coolant Temperature Sensor High","Fan running constantly, lean mixture, hard start","ECT sensor open circuit — replace sensor"],
+  "P0120":["Throttle Position Sensor A Circuit","Hesitation, surging, poor throttle response","TPS wiring fault or sensor failure"],
+  "P0121":["TPS Range/Performance","Hesitation or surging at specific throttle positions","TPS out of calibration or worn — replace throttle body"],
+  "P0122":["Throttle Position Sensor A Low","Poor acceleration, stalling at idle","TPS short to ground or wiring fault"],
+  "P0123":["Throttle Position Sensor A High","Engine stalls or surges, limp mode","TPS open circuit — replace throttle body assembly"],
+  "P0128":["Coolant Temperature Below Thermostat Regulating","Heater blows cold, poor fuel economy in cold","Thermostat stuck open — replace thermostat"],
+  "P0130":["O2 Sensor Circuit Bank 1 Sensor 1","Poor fuel economy, failed emission test","Upstream O2 sensor failed or wiring fault"],
+  "P0131":["O2 Sensor Circuit Low Voltage B1S1","Lean mixture, poor performance","O2 sensor failed or exhaust leak before sensor"],
+  "P0132":["O2 Sensor Circuit High Voltage B1S1","Rich running, black smoke, poor economy","O2 sensor contaminated or fuel pressure too high"],
+  "P0133":["O2 Sensor Slow Response B1S1","Poor fuel economy, fails emissions test","O2 sensor worn — replace upstream O2 sensor"],
+  "P0134":["O2 Sensor No Activity B1S1","Rough idle, poor economy, runs on open loop","O2 sensor heater failed or sensor dead"],
+  "P0135":["O2 Sensor Heater Circuit B1S1","Poor cold start economy and emissions","O2 sensor heater element failed — replace sensor"],
+  "P0138":["O2 Sensor Circuit High B1S2","ECU not trimming fuel properly — rich running","Downstream O2 sensor failed or short circuit"],
+  "P0140":["O2 Sensor No Activity B1S2","Catalytic converter efficiency not monitored","Downstream O2 sensor failed — replace sensor"],
+  "P0141":["O2 Sensor Heater Circuit B1S2","Emissions monitoring impaired","Downstream O2 sensor heater failed"],
+  "P0171":["System Too Lean Bank 1","Rough idle, hesitation, poor performance","Vacuum leak, dirty MAF, weak fuel pump, clogged injectors"],
+  "P0172":["System Too Rich Bank 1","Black smoke, poor economy, smell of fuel","Fuel pressure too high, leaking injector, faulty O2 sensor"],
+  "P0174":["System Too Lean Bank 2","Same as P0171 on right bank of V-engine","Same causes — vacuum leak or fuel delivery fault"],
+  "P0175":["System Too Rich Bank 2","Same as P0172 on right bank","Same causes — fuel pressure or injector fault"],
+  "P0190":["Fuel Rail Pressure Sensor Circuit","Poor performance, engine management fault","Fuel rail pressure sensor wiring or sensor failure"],
+  "P0191":["Fuel Rail Pressure Sensor Range","Hesitation, stalling under load","Fuel pressure sensor out of range — check pump and sensor"],
+  "P0192":["Fuel Rail Pressure Sensor Low","Stalling, hard start","Fuel rail pressure sensor short circuit"],
+  "P0193":["Fuel Rail Pressure Sensor High","Engine stalls, runs on low power","Fuel rail pressure sensor open circuit"],
+  "P0200":["Injector Circuit Malfunction","Rough idle, misfire on affected cylinder","Injector wiring or injector coil fault"],
+  "P0201":["Injector Circuit Cylinder 1","Misfire on cylinder 1, rough idle","Injector 1 wiring fault or injector failed"],
+  "P0202":["Injector Circuit Cylinder 2","Misfire on cylinder 2","Injector 2 fault or wiring"],
+  "P0203":["Injector Circuit Cylinder 3","Misfire on cylinder 3","Injector 3 fault or wiring"],
+  "P0204":["Injector Circuit Cylinder 4","Misfire on cylinder 4","Injector 4 fault or wiring"],
+  "P0217":["Engine Overtemperature","Engine overheating — possible damage risk","Cooling system failure — stop driving immediately"],
+  "P0230":["Fuel Pump Primary Circuit","Engine cranks but won't start","Fuel pump circuit fault — relay, wiring, or pump"],
+  "P0261":["Cylinder 1 Injector Circuit Low","Misfire cylinder 1, rough idle","Injector 1 open circuit or wiring fault"],
+  "P0300":["Random/Multiple Cylinder Misfire","Rough running, poor power, catalyst damage risk","Multiple causes — plugs, coils, injectors, compression"],
+  "P0301":["Cylinder 1 Misfire Detected","Rough idle/running on cylinder 1","Spark plug, ignition coil, or injector on cylinder 1"],
+  "P0302":["Cylinder 2 Misfire Detected","Rough running on cylinder 2","Spark plug, coil, or injector on cylinder 2"],
+  "P0303":["Cylinder 3 Misfire Detected","Rough running on cylinder 3","Spark plug, coil, or injector on cylinder 3"],
+  "P0304":["Cylinder 4 Misfire Detected","Rough running on cylinder 4","Spark plug, coil, or injector on cylinder 4"],
+  "P0316":["Misfire Detected on Startup","Hard start, rough running when cold","Cold-start injector, spark plugs, or compression loss"],
+  "P0320":["Ignition/Distributor Engine Speed Input","Engine stalls, no start intermittently","Crankshaft position sensor or reluctor ring fault"],
+  "P0325":["Knock Sensor 1 Circuit","Reduced performance, engine protection mode active","Knock sensor wiring or sensor failed"],
+  "P0335":["Crankshaft Position Sensor A Circuit","Engine stalls without warning, hard restart","CKP sensor failed or reluctor ring damaged"],
+  "P0336":["Crankshaft Position Sensor Range","Intermittent stalling, rough idle","CKP sensor gap incorrect or signal dropout"],
+  "P0340":["Camshaft Position Sensor A Circuit","Engine cranks but won't start, stalls","Cam sensor wiring or sensor failed"],
+  "P0341":["Camshaft Position Sensor Range","Hard start, rough idle, VVT fault","Cam sensor signal incorrect — check timing chain stretch"],
+  "P0351":["Ignition Coil A Primary Circuit","Misfire on coil A cylinder(s)","Ignition coil A failed or wiring fault"],
+  "P0352":["Ignition Coil B Primary Circuit","Misfire on coil B cylinder(s)","Ignition coil B failed or wiring fault"],
+  "P0353":["Ignition Coil C Primary Circuit","Misfire on coil C cylinder(s)","Ignition coil C failed"],
+  "P0354":["Ignition Coil D Primary Circuit","Misfire on coil D cylinder(s)","Ignition coil D failed"],
+  "P0380":["Glow Plug Circuit A (Diesel)","Hard diesel cold start, white smoke when cold","Glow plug(s) failed or glow plug relay fault"],
+  "P0381":["Glow Plug Indicator Circuit","Warning light not working but glow plugs may be faulty","Glow plug indicator circuit fault"],
+  "P0401":["EGR Insufficient Flow","Rough idle, failed emissions test","EGR valve clogged with carbon — clean or replace"],
+  "P0402":["EGR Excessive Flow","Rough idle, black smoke, poor performance","EGR valve stuck open — clean or replace"],
+  "P0404":["EGR Control Circuit Range","EGR not controlling correctly","EGR position sensor fault or stuck valve"],
+  "P0405":["EGR Sensor A Circuit Low","EGR flow reporting incorrectly","EGR sensor short circuit or wiring fault"],
+  "P0406":["EGR Sensor A Circuit High","EGR flow sensor reading too high","EGR sensor open circuit or carbon buildup on sensor"],
+  "P0420":["Catalyst System Efficiency Below Threshold B1","Increased emissions, may cause smell from exhaust","Catalytic converter worn or damaged — replace CAT"],
+  "P0421":["Warm Up Catalyst Efficiency Below Threshold B1","Poor cold-start emissions","Catalytic converter or upstream O2 sensor fault"],
+  "P0430":["Catalyst System Efficiency Below Threshold B2","Same as P0420 on Bank 2","Catalytic converter on Bank 2 worn"],
+  "P0440":["Evaporative Emission System","Fuel smell, EVAP system leak","Fuel cap loose, EVAP hose leak, or purge valve fault"],
+  "P0441":["EVAP System Incorrect Purge Flow","Fuel smell when driving, rough idle","EVAP purge solenoid stuck or vacuum hose leak"],
+  "P0442":["EVAP System Small Leak","Very minor fuel smell","Fuel cap seal worn or small EVAP hose crack"],
+  "P0443":["EVAP Purge Control Valve Circuit","Poor idle, fuel smell","EVAP purge valve wiring or valve failed"],
+  "P0446":["EVAP Vent Control Circuit","EVAP system not venting correctly","EVAP vent valve clogged or failed"],
+  "P0448":["EVAP Vent Control Circuit Open","EVAP vent valve not operating","Vent valve open circuit — replace valve"],
+  "P0449":["EVAP Vent Valve/Solenoid Circuit","EVAP system fault","Vent solenoid wiring or solenoid failed"],
+  "P0450":["EVAP Pressure Sensor","EVAP diagnosis impaired","Pressure sensor wiring or sensor fault"],
+  "P0455":["EVAP System Large Leak","Strong fuel smell, EVAP fault","Missing or loose fuel cap, split EVAP hose, or canister crack"],
+  "P0456":["EVAP System Very Small Leak","Faint fuel smell","Micro-crack in EVAP hose or fuel cap seal"],
+  "P0460":["Fuel Level Sensor Circuit","Inaccurate fuel gauge reading","Fuel level sensor in tank failed or wiring fault"],
+  "P0461":["Fuel Level Sensor Range","Fuel gauge erratic or stuck","Fuel level sensor dirty or worn — replace sensor"],
+  "P0480":["Cooling Fan 1 Control Circuit","Fan not running — overheating risk","Fan relay or fan motor wiring fault"],
+  "P0481":["Cooling Fan 2 Control Circuit","Secondary fan not running","Fan 2 relay or motor fault"],
+  "P0500":["Vehicle Speed Sensor A","Speedometer not working, ABS faults","VSS wiring or sensor failed"],
+  "P0501":["VSS Range/Performance","Speedometer erratic, wrong gear shifts","VSS signal incorrect — check wheel bearing area"],
+  "P0505":["Idle Control System","Rough or high idle, stalling at traffic lights","IAC valve dirty or failed — clean or replace"],
+  "P0506":["Idle Air Control System RPM Low","Idle too low — stalls at lights","IAC valve stuck closed or dirty throttle body"],
+  "P0507":["Idle Air Control System RPM High","Idle too high — car revs at standstill","IAC valve stuck open or vacuum leak"],
+  "P0524":["Engine Oil Pressure Too Low","Oil pressure warning active — stop immediately","Low oil level, failed oil pump, or blocked oil pickup"],
+  "P0562":["System Voltage Low","Electrical accessories cutting out, poor start","Alternator undercharging or battery failing"],
+  "P0563":["System Voltage High","Battery warning, potential electrical damage","Alternator overcharging — replace voltage regulator"],
+  "P0597":["Thermostat Heater Control Circuit","Engine not reaching temperature, heater cold","Thermostat heater element or wiring fault"],
+  "P0598":["Thermostat Heater Control Circuit Low","Coolant staying cold, heater cold","Thermostat heater short circuit — replace thermostat"],
+  "P0599":["Thermostat Heater Control Circuit High","Thermostat stuck — overheating or overcooling","Thermostat heater open circuit — replace thermostat"],
+  "P0600":["Serial Communication Link","Multiple systems not communicating","CAN bus fault — wiring or ECU communication issue"],
+  "P0601":["Internal Control Module Memory Check Sum","ECU memory fault — engine management error","ECU failure or corruption — ECU replacement may be needed"],
+  "P0603":["Internal Control Module KAM Error","ECU lost keep-alive memory","Battery disconnected, or ECU fault"],
+  "P0604":["Internal Control Module RAM Error","ECU malfunction","ECU internal failure — replacement needed"],
+  "P0606":["PCM/ECM Processor","Engine management fault","ECU processor failed — specialist required"],
+  "P0685":["ECM/PCM Power Relay Control Circuit","Engine management system not powering","ECU power relay or wiring fault"],
+  "P0700":["Transmission Control System MIL Request","Transmission fault stored in TCM","TCM requesting engine management light — scan transmission codes"],
+  "P0705":["Transmission Range Sensor Circuit","Wrong gear display, shift problems","Gear selector position sensor wiring or sensor fault"],
+  "P0710":["Transmission Fluid Temperature Sensor","Incorrect ATF temperature reading","ATF temperature sensor wiring or sensor fault"],
+  "P0720":["Output Speed Sensor Circuit","Speedometer fault, incorrect gear shifts","Output shaft speed sensor wiring or sensor failure"],
+  "P0730":["Incorrect Gear Ratio","Wrong gear engaged, transmission slipping","Slipping clutch packs or mechanical transmission fault"],
+  "P0740":["Torque Converter Clutch Circuit","Shudder at motorway speed, poor fuel economy","TCC solenoid wiring or torque converter fault"],
+  "P0741":["Torque Converter Clutch Stuck Off","Shudder, poor fuel economy, transmission hot","TCC mechanical failure or ATF contaminated"],
+  "P0748":["Pressure Control Solenoid A","Harsh shifts, slipping","Pressure solenoid wiring or ATF quality issue"],
+  "P0750":["Shift Solenoid A","Delayed shifts, stuck in gear","Shift solenoid A electrical fault — ATF or solenoid"],
+  "P0755":["Shift Solenoid B","Harsh or delayed shifts","Shift solenoid B fault"],
+  "P0760":["Shift Solenoid C","Transmission shift fault","Shift solenoid C failed"],
+  "P0765":["Shift Solenoid D","Transmission shift fault","Shift solenoid D failed"],
+  "P0770":["Shift Solenoid E","Transmission fault","Shift solenoid E wiring or solenoid failed"],
+  "P0780":["Shift Malfunction","Transmission not shifting correctly","Hydraulic pressure fault, solenoid, or valve body"],
+  "P0800":["Transfer Case Control System","4WD/AWD not engaging","Transfer case control module or actuator fault"],
+  "P0840":["Transmission Fluid Pressure Sensor","ATF pressure monitoring fault","Pressure sensor wiring or sensor failed"],
+  // C codes - Chassis
+  "C0031":["Left Front Wheel Speed Sensor","ABS not functioning on left front","Wheel speed sensor dirty, damaged, or wiring fault"],
+  "C0034":["Left Front Toned Wheel","ABS signal fault left front","Reluctor ring damaged or sensor gap incorrect"],
+  "C0035":["Left Front Wheel Speed Sensor","ABS fault left front wheel","Speed sensor or tone ring fault — left front"],
+  "C0036":["Left Front Wheel Speed Sensor Signal","ABS inactive, traction control inactive","Wheel speed sensor signal dropout — left front"],
+  "C0040":["Right Front Wheel Speed Sensor","ABS not working on right front","Right front wheel speed sensor failed"],
+  "C0041":["Right Front Wheel Speed Sensor Performance","ABS signal intermittent right front","Sensor or tone ring fault — right front"],
+  "C0045":["Left Rear Wheel Speed Sensor","ABS fault left rear","Left rear wheel speed sensor wiring or sensor failed"],
+  "C0050":["Right Rear Wheel Speed Sensor","ABS fault right rear","Right rear wheel speed sensor failed"],
+  "C0051":["Right Rear Wheel Speed Sensor Performance","ABS signal fault right rear","Sensor or tone ring fault — right rear"],
+  "C0060":["Left Front ABS Solenoid","ABS not releasing on left front wheel","ABS solenoid valve fault in hydraulic unit"],
+  "C0065":["Left Front ABS Solenoid Performance","ABS performance fault left front","ABS modulator solenoid — HCU replacement may be needed"],
+  "C0070":["Right Front ABS Solenoid","ABS not releasing right front","ABS solenoid valve fault"],
+  "C0121":["ABS Valve Relay Circuit","ABS completely inactive","ABS relay or HCU power circuit fault"],
+  "C0131":["ABS System Pressure Differential","ABS hydraulic fault","ABS hydraulic control unit fault"],
+  "C0161":["ABS/TCS Brake Switch","ABS and traction control fault","Brake light switch wiring or switch failed"],
+  "C0265":["ABS Actuator Relay Circuit","ABS not functioning","ABS pump relay failed or wiring fault"],
+  "C0267":["Pump Motor Circuit Open/Shorted","ABS pump not operating","ABS pump motor wiring or motor failed"],
+  "C0550":["Electronic Control Unit Performance","Stability system fault","ECU for stability system has internal fault"],
+  // B codes - Body
+  "B0001":["Airbag Deployment Loop","SRS fault — airbag may not deploy in crash","Airbag squib circuit fault — SRS specialist required"],
+  "B0005":["Driver Frontal Stage 1","SRS system fault","Driver airbag inflator circuit — SRS workshop required"],
+  "B0010":["Driver Frontal Stage 2","SRS fault","SRS specialist required — do not ignore"],
+  "B0020":["Passenger Frontal Stage 1","Passenger airbag circuit fault","SRS workshop required"],
+  "B0051":["Side Impact Sensor Fault","Side airbag system impaired","Side impact sensor or wiring fault"],
+  "B0080":["Passenger Seat Belt Pretensioner","Seatbelt may not retract in crash","Pretensioner circuit fault — SRS workshop"],
+  "B0081":["Driver Seat Belt Pretensioner","Safety belt system fault","Pretensioner circuit fault — SRS workshop"],
+  "B1000":["SRS System Fault","Airbag system has fault — may not deploy","SRS control module fault — specialist required"],
+  "B1001":["SRS Control Module","Airbag ECU internal fault","SRS module replacement required"],
+  "B1325":["Control Module Power Circuit Low","Body control module power issue","BCM power supply or wiring fault"],
+  "B2000":["BCM Power Mode Master","Body control fault","BCM fault — locks, windows, lights affected"],
+  // U codes - Network
+  "U0001":["High Speed CAN Bus Off","Multiple systems not responding","CAN bus wiring fault or faulty module causing bus off"],
+  "U0010":["Medium Speed CAN Bus","Communication fault between modules","CAN bus wiring or module dragging bus down"],
+  "U0100":["Lost Comm with ECM/PCM","Engine module not responding to other systems","CAN bus wiring to ECU or ECU power fault"],
+  "U0101":["Lost Comm with TCM","Transmission module not communicating","CAN wiring to transmission controller or TCM fault"],
+  "U0121":["Lost Comm with ABS","ABS module not responding on CAN bus","CAN wiring to ABS or ABS module fault"],
+  "U0140":["Lost Comm with Body Control Module","BCM not responding — multiple body systems affected","CAN wiring to BCM or BCM fault"],
+  "U0155":["Lost Comm with Instrument Panel","Cluster not responding","CAN wiring to instrument cluster or cluster fault"],
+  "U0401":["Invalid Data from ECM","Another module receiving bad data from ECU","ECU sending incorrect CAN data — ECU or wiring fault"],
+  // Manufacturer specific
+  "P24C7":["EGR Cooler Bypass Control Stuck","Airflow mismatch causing improper exhaust gas recirculation","EGR carbon buildup or stuck bypass valve — clean or replace EGR system"],
+  "P0BD0":["HV Battery Pack Current Sensor (EV)","Hybrid/EV battery management fault","HV battery current sensor — EV specialist required"],
+  "P3000":["HV Battery Malfunction","Hybrid battery system fault","HV battery inspection — EV specialist required"],
+  "P3190":["Engine Does Not Start","Engine start fault in hybrid system","Hybrid starter or engine fault"],
+
+  // ── ADDITIONAL P CODES ────────────────────────────────────────────────────
+  "P0115":["Engine Coolant Temp Sensor Circuit","Fan not working, wrong fuel mixture, poor heating","ECT sensor wiring open or short — replace sensor"],
+  "P0118":["ECT Sensor High Input","Engine fan running constantly, lean mixture","ECT sensor open circuit — replace coolant temp sensor"],
+  "P0119":["ECT Sensor Intermittent","Intermittent cooling fan issues, poor fuel trim","ECT sensor loose connection or wiring intermittent fault"],
+  "P0124":["Throttle Position Sensor Intermittent","Hesitation, random stalling, erratic idle","TPS connector loose or wiring intermittent — check connector first"],
+  "P0125":["Coolant Temp Insufficient for Closed Loop","Poor fuel economy, rich running in cold","Thermostat stuck open or ECT sensor fault"],
+  "P0141":["O2 Sensor Heater Circuit B1S2","Emissions monitoring impaired","Downstream O2 sensor heater failed — replace sensor"],
+  "P0151":["O2 Sensor Circuit Low B2S1","Rich/lean trim fault on Bank 2","O2 sensor failed or exhaust leak — Bank 2 upstream"],
+  "P0154":["O2 Sensor No Activity B2S1","Bank 2 running open loop","Upstream O2 sensor B2 dead — replace sensor"],
+  "P0155":["O2 Sensor Heater Circuit B2S1","Emissions and cold-start performance","O2 heater failed B2S1 — replace sensor"],
+  "P0161":["O2 Sensor Heater Circuit B2S2","Downstream monitoring impaired","Downstream O2 sensor heater B2 — replace sensor"],
+  "P0215":["Engine Shutoff Solenoid","Engine won't shut off or won't start (diesel)","Engine shutoff solenoid wiring or solenoid fault"],
+  "P0216":["Injection Timing Control","Hard start, rough running on diesel","Injection timing solenoid or pump fault"],
+  "P0219":["Engine Over Speed","Rev limiter triggered — possible mechanical issue","Check for stuck throttle or transmission downshift fault"],
+  "P0234":["Turbocharger Overboost Condition","Engine enters limp mode under hard acceleration","Boost control solenoid stuck, wastegate fault, or boost leak"],
+  "P0235":["Turbocharger Boost Sensor A Circuit","Poor turbo performance, limp mode","Boost pressure sensor wiring or sensor failure"],
+  "P0236":["Turbocharger Boost Sensor Range","Incorrect boost reading — limp mode","MAP/boost sensor out of calibration"],
+  "P0237":["Turbocharger Boost Sensor Low","Engine running low power, limp mode","Boost sensor short to ground or hose disconnected from sensor"],
+  "P0238":["Turbocharger Boost Sensor High","Limp mode, poor acceleration","Boost sensor open circuit or MAP sensor fault"],
+  "P0243":["Turbocharger Wastegate Solenoid A","Turbo not controlling boost correctly","Wastegate solenoid electrical fault — turbo overboosts or underboosts"],
+  "P0244":["Turbocharger Wastegate Solenoid Performance","Boost fluctuating, poor power","Wastegate solenoid stuck or vacuum hose split"],
+  "P0245":["Turbocharger Wastegate Solenoid Low","Turbo overboost — limp mode","Wastegate solenoid short circuit"],
+  "P0246":["Turbocharger Wastegate Solenoid High","Turbo underboost — poor power","Wastegate solenoid open circuit"],
+  "P0251":["Injection Pump Fuel Metering A","Hard diesel start, poor performance","Fuel injection pump metering valve or wiring fault"],
+  "P0252":["Injection Pump Fuel Metering Performance","Rough diesel idle, smoke","Injection pump metering valve out of range"],
+  "P0261":["Cylinder 1 Injector Circuit Low","Misfire cylinder 1","Injector 1 open circuit — check wiring and injector"],
+  "P0264":["Cylinder 2 Injector Circuit Low","Misfire cylinder 2","Injector 2 open circuit"],
+  "P0267":["Cylinder 3 Injector Circuit Low","Misfire cylinder 3","Injector 3 open circuit"],
+  "P0270":["Cylinder 4 Injector Circuit Low","Misfire cylinder 4","Injector 4 open circuit"],
+  "P0400":["EGR Flow Malfunction","Rough idle, failed emissions","EGR system fault — clean EGR valve and passages"],
+  "P0403":["EGR Control Circuit","EGR not operating","EGR solenoid wiring or solenoid failed"],
+  "P0407":["EGR Sensor B Circuit Low","EGR not controlling correctly","EGR position sensor B short circuit"],
+  "P0408":["EGR Sensor B Circuit High","EGR control fault","EGR sensor B open circuit"],
+  "P0409":["EGR Sensor A Circuit","EGR flow not measured correctly","EGR sensor A wiring or sensor failure"],
+  "P0470":["Exhaust Pressure Sensor","DPF regeneration issues (diesel)","Exhaust pressure sensor or differential pressure sensor fault"],
+  "P0471":["Exhaust Pressure Sensor Range","DPF not regenerating correctly","Exhaust pressure sensor reading incorrect — check pipes for blockage"],
+  "P0472":["Exhaust Pressure Sensor Low","DPF management impaired","Pressure sensor short circuit or pipe blocked"],
+  "P0473":["Exhaust Pressure Sensor High","DPF fault — possible blockage","Pressure sensor open circuit or DPF completely blocked"],
+  "P0478":["Exhaust Pressure Control Valve High","Exhaust back pressure too high","Exhaust pressure control valve stuck closed"],
+  "P0489":["EGR Control Circuit Low","EGR valve not operating","EGR solenoid short to ground"],
+  "P0490":["EGR Control Circuit High","EGR valve not operating","EGR solenoid open circuit"],
+  "P0491":["Secondary Air Injection System Bank 1","Emissions fault on cold start","Air injection pump or check valve fault"],
+  "P0492":["Secondary Air Injection System Bank 2","Emissions fault cold start Bank 2","Air injection pump fault Bank 2"],
+  "P0521":["Engine Oil Pressure Sensor Range","Oil pressure warning may be inaccurate","Oil pressure sensor out of range — verify oil level first"],
+  "P0522":["Engine Oil Pressure Sensor Low","False low oil pressure warning","Oil pressure sensor short circuit or genuinely low oil pressure — check oil level urgently"],
+  "P0523":["Engine Oil Pressure Sensor High","False high oil pressure reading","Oil pressure sensor open circuit"],
+  "P0530":["A/C Refrigerant Pressure Sensor Circuit","AC not working or working incorrectly","AC pressure sensor wiring or sensor failed"],
+  "P0532":["A/C Refrigerant Pressure Sensor Low","AC system fault — possible low refrigerant","AC pressure sensor short circuit or refrigerant severely low"],
+  "P0533":["A/C Refrigerant Pressure Sensor High","AC not engaging","AC pressure sensor open circuit or system overpressure"],
+  "P0544":["Exhaust Gas Temperature Sensor","EGT monitoring impaired — DPF issues possible","Exhaust gas temperature sensor wiring or sensor failed"],
+  "P0545":["Exhaust Gas Temperature Sensor Low","Incorrect EGT reading","EGT sensor short circuit"],
+  "P0546":["Exhaust Gas Temperature Sensor High","Incorrect EGT reading","EGT sensor open circuit"],
+  "P0571":["Brake Switch A Circuit","Cruise control fault, ABS issues, brake lights always on","Brake light switch wiring or switch failed"],
+  "P0572":["Brake Switch A Circuit Low","Brake lights always on or ABS fault","Brake switch short circuit"],
+  "P0573":["Brake Switch A Circuit High","Brake lights not working, cruise won't disengage","Brake switch open circuit — replace brake light switch"],
+  "P0606":["PCM Processor Fault","Engine management system error","ECU processor failed — ECU replacement typically required"],
+  "P0607":["Control Module Performance","ECU internal fault","ECU replacement may be required"],
+  "P0615":["Starter Relay Circuit","Engine won't crank","Starter relay wiring or relay failed"],
+  "P0616":["Starter Relay Circuit Low","No start — starter relay not engaging","Starter relay short circuit"],
+  "P0617":["Starter Relay Circuit High","Starter motor running on continuously","Starter relay stuck closed — disconnect immediately"],
+  "P0627":["Fuel Pump Control Circuit","Engine won't start — no fuel pressure","Fuel pump relay or PCM fuel pump output fault"],
+  "P0628":["Fuel Pump Control Circuit Low","Engine won't start","Fuel pump control circuit short to ground"],
+  "P0629":["Fuel Pump Control Circuit High","Fuel pump running continuously","Fuel pump control circuit open or short to power"],
+  "P0643":["Sensor Reference Voltage A Circuit High","Multiple sensor faults simultaneously","5V reference circuit from ECU short to voltage — ECU or wiring fault"],
+  "P0650":["Malfunction Indicator Lamp Circuit","Check engine light not working","MIL bulb or circuit fault"],
+  "P0670":["Glow Plug Control Module","Diesel cold start problems","Glow plug control module wiring or module failed"],
+  "P0671":["Cylinder 1 Glow Plug Circuit","Diesel hard cold start on cylinder 1","Glow plug 1 failed or wiring fault"],
+  "P0672":["Cylinder 2 Glow Plug Circuit","Diesel hard cold start cylinder 2","Glow plug 2 failed"],
+  "P0673":["Cylinder 3 Glow Plug Circuit","Diesel hard cold start cylinder 3","Glow plug 3 failed"],
+  "P0674":["Cylinder 4 Glow Plug Circuit","Diesel hard cold start cylinder 4","Glow plug 4 failed"],
+  "P0675":["Cylinder 5 Glow Plug Circuit","Diesel hard cold start cylinder 5","Glow plug 5 failed"],
+  "P0676":["Cylinder 6 Glow Plug Circuit","Diesel hard cold start cylinder 6","Glow plug 6 failed"],
+  "P0683":["Glow Plug Control Module to PCM Communication","Glow plug system not communicating","CAN communication fault between glow plug module and ECU"],
+  "P0684":["Glow Plug Control Module to PCM Communication Range","Intermittent glow plug control issue","Communication fault — check CAN wiring to glow plug module"],
+  "P0690":["Relay 4 Control Circuit High","Electrical relay fault","Relay 4 open circuit — identify relay function from wiring diagram"],
+  "P0691":["Cooling Fan 1 Control Circuit Low","Radiator fan not working — overheating risk","Fan relay short circuit or fan motor wiring fault"],
+  "P0692":["Cooling Fan 1 Control Circuit High","Fan relay circuit issue","Fan relay open circuit"],
+  "P0693":["Cooling Fan 2 Control Circuit Low","Second cooling fan not working","Fan 2 relay or motor wiring fault"],
+  "P0694":["Cooling Fan 2 Control Circuit High","Fan 2 circuit fault","Fan 2 relay open circuit"],
+  "P0726":["Engine Speed Sensor Range","Transmission not shifting correctly","Engine speed sensor in transmission incorrect reading"],
+  "P0727":["Engine Speed Sensor No Signal","Transmission management fault","Engine speed sensor failed or wiring fault in transmission"],
+  "P0731":["Gear 1 Incorrect Ratio","Car won't go in first gear or slips","Mechanical fault in first gear clutch pack"],
+  "P0732":["Gear 2 Incorrect Ratio","Transmission slipping in second","Second gear clutch pack or solenoid fault"],
+  "P0733":["Gear 3 Incorrect Ratio","Third gear slipping","Third gear mechanical fault"],
+  "P0734":["Gear 4 Incorrect Ratio","Fourth gear slipping","Fourth gear clutch pack fault"],
+  "P0735":["Gear 5 Incorrect Ratio","Fifth gear slipping (5-speed auto)","Fifth gear mechanical fault"],
+  "P0736":["Reverse Gear Incorrect Ratio","Reverse slipping or not engaging","Reverse gear clutch pack or mechanical fault"],
+  "P0751":["Shift Solenoid A Performance","Delayed or incorrect gear shifts","Shift solenoid A stuck open or closed — ATF quality issue"],
+  "P0756":["Shift Solenoid B Performance","Shift quality poor","Shift solenoid B stuck — ATF change may help"],
+  "P0761":["Shift Solenoid C Performance","Transmission shift fault","Solenoid C mechanical failure — ATF or solenoid replacement"],
+  "P0771":["Shift Solenoid E Performance","Transmission fault","Solenoid E stuck — valve body inspection needed"],
+  "P0776":["Pressure Control Solenoid B Performance","Harsh shifts, slipping","Pressure solenoid B stuck — ATF contamination or solenoid fault"],
+  "P0826":["Up and Down Shift Switch Circuit","Paddle shift not working (if fitted)","Paddle shift switch or wiring fault"],
+  "P0850":["Park/Neutral Position Switch","Transmission range detection fault","Park/Neutral switch or wiring fault — affects start inhibit"],
+  "P0851":["Park/Neutral Switch Input Circuit Low","Car may not start in Park","Park/Neutral switch short circuit"],
+  "P0852":["Park/Neutral Switch Input Circuit High","Transmission range fault","Park/Neutral switch open circuit"],
+  "P0882":["TCM Power Input Signal Low","Transmission control fault","TCM power supply circuit fault"],
+  "P0883":["TCM Power Input Signal High","TCM receiving incorrect voltage","TCM power supply overvoltage — check charging system"],
+  "P0884":["TCM Power Input Signal Intermittent","Intermittent transmission faults","TCM power supply connection issue"],
+  "P1000":["OBD Readiness Monitors Not Complete","Car not ready for emissions test","Drive cycle not completed after battery disconnect — drive normally for 50-100km"],
+
+  // ── C CODES — CHASSIS / ABS / BRAKE / STEERING ────────────────────────────
+  "C0000":["No ABS System Fault","ABS system functioning normally","No fault — code is informational"],
+  "C0101":["ABS Sensor Rear Axle","ABS inactive on rear axle","Rear axle speed sensor or wiring fault"],
+  "C0102":["ABS Sensor Rear Axle Range","ABS rear signal intermittent","Rear tone ring dirty or sensor gap incorrect"],
+  "C0103":["ABS Sensor Rear Axle Intermittent","ABS rear signal dropout","Rear axle sensor wiring loose connection"],
+  "C0104":["ABS Solenoid Valve Fault","ABS pressure control failure — braking may be uneven","ABS solenoid valve in hydraulic control unit — HCU inspection or replacement needed"],
+  "C0105":["ABS Pump Motor Voltage","ABS pump not getting correct voltage","ABS pump power supply fuse or wiring fault"],
+  "C0106":["ABS Pump Motor Circuit Open","ABS pump not running","ABS pump motor wiring open circuit"],
+  "C0107":["ABS Pump Motor Circuit Short","ABS pump short circuit","ABS pump motor wiring short — check HCU connector"],
+  "C0108":["ABS Pump Motor Stalled","ABS pump motor seized","ABS hydraulic pump motor mechanically failed — HCU replacement"],
+  "C0109":["ABS Pump Motor Direction","ABS pump running in wrong direction","ABS pump wiring polarity fault"],
+  "C0112":["ABS Solenoid Valve Supply Voltage High","ABS solenoid overvoltage","Alternator overcharging — check charging system voltage"],
+  "C0117":["ABS Pressure Switch Low","ABS hydraulic pressure fault","ABS pressure switch short circuit or HCU fault"],
+  "C0118":["ABS Pressure Switch High","ABS pressure reading too high","ABS pressure switch open circuit"],
+  "C0119":["ABS Pressure Switch Intermittent","ABS hydraulic pressure intermittent","ABS pressure switch or HCU intermittent fault"],
+  "C0120":["ABS Enable Relay Output Circuit","ABS relay not operating","ABS enable relay coil or wiring fault"],
+  "C0122":["ABS Enable Relay Output Low","ABS relay short circuit","ABS enable relay short to ground"],
+  "C0123":["ABS Enable Relay Output High","ABS relay circuit fault","ABS enable relay open circuit"],
+  "C0124":["ABS Enable Relay Sticking","ABS relay stuck on or off","ABS enable relay contacts welded — replace relay"],
+  "C0125":["ABS Solenoid 1 Fault","ABS pressure modulation fault","ABS solenoid 1 in HCU — solenoid or HCU fault"],
+  "C0126":["ABS Solenoid 1 Low","ABS solenoid 1 short circuit","ABS solenoid 1 wiring short to ground"],
+  "C0127":["ABS Solenoid 1 High","ABS solenoid 1 open circuit","ABS solenoid 1 wiring fault — HCU inspection"],
+  "C0128":["ABS Solenoid 2 Fault","ABS pressure modulation fault","ABS solenoid 2 in HCU fault"],
+  "C0129":["ABS Solenoid 2 Low","ABS solenoid 2 short circuit","HCU solenoid 2 wiring short"],
+  "C0130":["ABS Solenoid 2 High","ABS solenoid 2 open","ABS solenoid 2 open circuit — HCU fault"],
+  "C0132":["ABS Solenoid 3 Fault","ABS modulation fault solenoid 3","ABS solenoid 3 in HCU fault"],
+  "C0133":["ABS Solenoid 3 Low","Solenoid 3 short circuit","ABS HCU solenoid 3 short"],
+  "C0134":["ABS Solenoid 3 High","Solenoid 3 open circuit","ABS HCU solenoid 3 open"],
+  "C0135":["ABS Solenoid 4 Fault","ABS modulation fault solenoid 4","ABS solenoid 4 in HCU fault"],
+  "C0136":["ABS Solenoid 4 Low","Solenoid 4 short","ABS HCU solenoid 4 short circuit"],
+  "C0137":["ABS Solenoid 4 High","Solenoid 4 open","ABS HCU solenoid 4 open circuit"],
+  "C0138":["ABS Solenoid 5 Fault","ABS modulation fault","ABS solenoid 5 fault — HCU"],
+  "C0139":["ABS Solenoid 5 Low","Solenoid 5 short","ABS HCU solenoid 5 short"],
+  "C0140":["ABS Solenoid 5 High","Solenoid 5 open","ABS HCU solenoid 5 open"],
+  "C0143":["ABS Solenoid 6 Fault","ABS modulation fault solenoid 6","ABS HCU solenoid 6 fault"],
+  "C0144":["ABS Solenoid 6 Low","Solenoid 6 short","ABS HCU solenoid 6 short circuit"],
+  "C0145":["ABS Solenoid 6 High","Solenoid 6 open","ABS HCU solenoid 6 open circuit"],
+  "C0146":["ABS Solenoid 7 Fault","ABS modulation fault","ABS solenoid 7 fault — HCU"],
+  "C0147":["ABS Solenoid 7 Low","Solenoid 7 short","ABS HCU solenoid 7 short"],
+  "C0148":["ABS Solenoid 7 High","Solenoid 7 open","ABS HCU solenoid 7 open"],
+  "C0149":["ABS Solenoid 8 Fault","ABS modulation fault","ABS solenoid 8 fault — HCU inspection needed"],
+  "C0151":["ABS Solenoid 8 Low","Solenoid 8 short","ABS solenoid 8 short circuit"],
+  "C0152":["ABS Solenoid 8 High","Solenoid 8 open","ABS solenoid 8 open circuit"],
+  "C0153":["TCS Solenoid 1 Fault","Traction control modulation fault","TCS solenoid 1 in HCU fault"],
+  "C0154":["TCS Solenoid 1 Low","TCS solenoid 1 short","TCS solenoid 1 short circuit"],
+  "C0155":["TCS Solenoid 1 High","TCS solenoid 1 open","TCS solenoid 1 open circuit"],
+  "C0156":["TCS Solenoid 2 Fault","Traction control fault","TCS solenoid 2 fault"],
+  "C0157":["TCS Solenoid 2 Low","TCS solenoid 2 short","TCS solenoid 2 short circuit in HCU"],
+  "C0158":["TCS Solenoid 2 High","TCS solenoid 2 open","TCS solenoid 2 open circuit"],
+  "C0159":["TCS Solenoid 3 Fault","Traction control modulation fault","TCS solenoid 3 fault in HCU"],
+  "C0160":["TCS Solenoid 3 Low","TCS solenoid 3 short","TCS solenoid 3 short circuit"],
+  "C0162":["Isolation Solenoid Fault","ABS isolation fault","Isolation solenoid in HCU fault"],
+  "C0163":["Isolation Solenoid Low","Isolation solenoid short","Isolation solenoid short circuit"],
+  "C0164":["Isolation Solenoid High","Isolation solenoid open","Isolation solenoid open circuit"],
+  "C0165":["ABS Accumulator Low Pressure","ABS hydraulic pressure insufficient","ABS accumulator or pump not building pressure"],
+  "C0166":["ABS Accumulator High Pressure","ABS hydraulic overpressure","ABS pressure relief fault — HCU specialist"],
+  "C0167":["ABS Accumulator Pressure Switch","ABS pressure monitoring fault","Accumulator pressure switch wiring or switch fault"],
+  "C0168":["ABS Accumulator Motor Relay","ABS pump relay fault","ABS accumulator pump relay wiring or relay fault"],
+  "C0169":["ABS Accumulator Motor Relay Low","Relay short circuit","ABS pump relay short to ground"],
+  "C0170":["ABS Accumulator Motor Relay High","Relay open circuit","ABS pump relay open circuit"],
+  "C0171":["ABS Accumulator Leak","ABS system pressure loss","ABS hydraulic accumulator leaking — HCU replacement"],
+  "C0172":["Brake Fluid Level Low","Brake fluid warning — ABS affected","Brake fluid reservoir low — check for leaks immediately"],
+  "C0173":["Brake Fluid Temperature","Brake fluid overheating","Extended heavy braking — allow brakes to cool"],
+  "C0174":["Brake Fluid Temperature High","Brake fluid boiling risk","Brake fluid needs changing — moisture absorbed, boiling point reduced"],
+  "C0177":["Park Brake Applied","Electronic parking brake fault","Electric parking brake not releasing — actuator or switch fault"],
+  "C0178":["Park Brake Circuit","Electric parking brake wiring fault","EPB actuator motor wiring or actuator fault"],
+  "C0179":["Park Brake Switch Circuit","EPB switch fault","Electric parking brake switch wiring or switch fault"],
+  "C0180":["Park Brake Actuator Fault","EPB actuator not operating","Electric parking brake actuator motor failed"],
+  "C0181":["Park Brake Actuator Range","EPB actuator not reaching position","EPB actuator worn or mechanically jammed"],
+  "C0182":["Park Brake Actuator Low","EPB actuator short circuit","EPB motor wiring short to ground"],
+  "C0183":["Park Brake Actuator High","EPB actuator open circuit","EPB motor wiring open circuit"],
+  "C0184":["Park Brake Release Fault","EPB not releasing","EPB actuator seized or caliper mechanically stuck"],
+  "C0185":["Park Brake Apply Fault","EPB not applying","EPB actuator not applying — motor or mechanism fault"],
+  "C0188":["Steering Assist Torque Fault","Power steering torque sensor fault","EPS torque sensor or wiring fault — steering effort affected"],
+  "C0189":["Steering Assist Torque Low","EPS torque sensor low signal","Torque sensor short circuit or wiring fault"],
+  "C0190":["Steering Assist Torque High","EPS torque sensor high signal","Torque sensor open circuit"],
+  "C0191":["Steering Assist Motor Fault","EPS motor not operating","EPS motor winding fault or wiring fault"],
+  "C0192":["Steering Assist Motor Low","EPS motor short circuit","EPS motor wiring short to ground"],
+  "C0193":["Steering Assist Motor High","EPS motor open circuit","EPS motor wiring open circuit"],
+  "C0194":["Steering Assist Motor Temperature","EPS motor overheating","EPS motor has been overloaded — allow to cool, check for binding"],
+  "C0195":["Steering Assist Control Fault","EPS control module fault","EPS ECU internal fault — replacement may be needed"],
+  "C0198":["Steering Torque Sensor Supply","EPS sensor supply voltage fault","EPS torque sensor reference voltage fault"],
+  "C0199":["Steering Torque Sensor Ground","EPS sensor ground fault","EPS torque sensor ground circuit fault"],
+  "C0010F":["ABS Pump Motor Circuit","ABS not functioning — no electronic braking","ABS pump motor or relay fault in hydraulic control unit"],
+  "C010F":["ABS Pump Motor Circuit","ABS not functioning — wheels may lock under hard braking","ABS hydraulic pump motor or relay fault — HCU inspection needed"],
+  "C0020":["Right Front Wheel Speed Sensor","ABS inactive on RF wheel","RF wheel speed sensor wiring or sensor failure"],
+  "C0025":["Right Rear Wheel Speed Sensor","ABS inactive on RR wheel","RR wheel speed sensor failed or wiring fault"],
+  "C0030":["Left Front Wheel Speed Sensor Circuit","ABS inactive LF","LF wheel speed sensor or tone ring fault"],
+  "C0055":["Right Rear Wheel Speed Sensor Circuit","ABS inactive RR","RR wheel speed sensor fault"],
+  "C0060":["Left Front ABS Solenoid Circuit","ABS pressure control fault LF","ABS solenoid valve in HCU — specialist required"],
+  "C0100":["ABS System Fault","ABS completely disabled","ABS module or HCU internal fault — replacement needed"],
+  "C0110":["ABS Pump Motor Circuit","ABS pump not running","ABS pump motor failed or relay fault"],
+  "C0111":["ABS Pump Motor Circuit Stalled","ABS pump seized","ABS pump motor mechanically failed — HCU replacement"],
+  "C0113":["ABS Pump Motor High","ABS pump running continuously","ABS pump relay stuck closed"],
+  "C0114":["ABS Pump Motor Phase Missing","ABS pump not operating fully","ABS pump motor winding fault"],
+  "C0115":["ABS Pump Motor Open","ABS pump circuit open","ABS pump motor wiring open circuit"],
+  "C0116":["ABS Pump Motor Short to Ground","ABS pump short circuit","ABS pump motor wiring short to ground"],
+  "C0121":["ABS Valve Relay Circuit","ABS completely inactive","ABS valve relay or power circuit fault"],
+  "C0131":["ABS System Differential Pressure","ABS hydraulic fault","ABS HCU internal fault — specialist required"],
+  "C0141":["Left Front ABS Apply Solenoid","ABS apply fault LF","ABS solenoid coil resistance incorrect — HCU or solenoid"],
+  "C0142":["Left Front ABS Apply Solenoid Shorted","ABS solenoid short LF","ABS solenoid short circuit — HCU replacement may be needed"],
+  "C0150":["Right Front ABS Apply Solenoid","ABS apply fault RF","RF ABS solenoid fault"],
+  "C0161":["ABS/TCS Brake Light Switch","ABS and traction control system fault","Brake light switch failed or wiring fault — check brake lights"],
+  "C0175":["System Voltage High","ABS/ESC getting high voltage","Alternator overcharging — check charging system"],
+  "C0176":["System Voltage Low","ABS/ESC not operating due to low voltage","Battery or alternator fault affecting ABS system"],
+  "C0186":["Lateral Accelerometer Signal","Stability control fault","Lateral G-sensor wiring or sensor failed"],
+  "C0187":["Lateral Accelerometer Signal Range","ESP/ESC fault","Lateral accelerometer out of calibration"],
+  "C0196":["Yaw Rate Circuit","Stability control fault — ESC disabled","Yaw rate sensor wiring or sensor failed — vehicle stability affected"],
+  "C0197":["Yaw Rate Circuit Range","ESP performance fault","Yaw rate sensor out of calibration or intermittent fault"],
+  "C0200":["Right Front Wheel Speed Circuit","ABS fault RF","RF wheel speed sensor or tone ring fault"],
+  "C0205":["Right Front Wheel Speed Circuit Open","ABS inactive RF — signal absent","RF wheel speed sensor wiring open circuit"],
+  "C0210":["Right Rear Wheel Speed Circuit","ABS fault RR","RR wheel speed sensor or wiring fault"],
+  "C0215":["Right Rear Wheel Speed Signal Erratic","ABS signal dropout RR","Reluctor ring damaged or sensor air gap incorrect RR"],
+  "C0220":["Left Front Wheel Speed Circuit","ABS fault LF","LF wheel speed sensor or wiring fault"],
+  "C0221":["Left Front Wheel Speed Signal Missing","ABS inactive LF — no speed signal","LF sensor wiring broken or sensor failed"],
+  "C0225":["Left Front Wheel Speed Signal Erratic","ABS intermittent LF","Reluctor ring dirty or damaged — LF"],
+  "C0230":["Left Rear Wheel Speed Circuit","ABS fault LR","LR wheel speed sensor or wiring fault"],
+  "C0235":["Left Rear Wheel Speed Signal Missing","ABS inactive LR","LR sensor wiring open or sensor failed"],
+  "C0240":["EBCM Power Circuit","ABS module not powering up","ABS module power supply fuse or wiring fault"],
+  "C0244":["PWM Delivered Torque Signal","Traction control not communicating with engine","CAN communication fault between ABS and ECU"],
+  "C0245":["Wheel Speed Sensor Frequency Error","ABS getting incorrect wheel speed signal","Wheel speed sensor or reluctor ring fault — check all four wheels"],
+  "C0254":["EBCM Internal Fault","ABS module internal failure","ABS ECU replacement required"],
+  "C0265":["EBCM Relay Circuit","ABS completely inactive","ABS relay failed or wiring fault"],
+  "C0267":["Pump Motor Open/Shorted","ABS pump not running","ABS pump motor open or short circuit — HCU fault"],
+  "C0268":["Pump Motor Circuit","ABS pump circuit fault","ABS pump relay or motor wiring fault"],
+  "C0271":["EBCM Fault","ABS module internal","ABS module replacement"],
+  "C0272":["EBCM Fault","ABS fault","ABS module internal fault"],
+  "C0273":["EBCM Fault","ABS inactive","ABS ECU internal fault — replacement"],
+  "C0274":["Excessive Dump/Isolation Time","ABS pressure fault","ABS hydraulic system pressure issue"],
+  "C0278":["Solenoid Valve 1","ABS solenoid valve fault","ABS solenoid 1 in HCU — replacement needed"],
+  "C0279":["Solenoid Valve 2","ABS pressure control fault","ABS solenoid 2 fault"],
+  "C0281":["Brake Switch Circuit","ABS and traction control fault","Brake light switch — check brake lights and replace switch"],
+  "C0283":["Traction Control Request Circuit","TCS not communicating","TCS switch or wiring fault"],
+  "C0284":["EBCM Requested Torque","TCS and engine not communicating","CAN bus fault between ABS module and ECU"],
+  "C0290":["Lost Communications with PCM","ABS not receiving engine data","CAN bus fault — ABS to ECU communication lost"],
+  "C0291":["Lost Communications with BCM","ABS not receiving body data","CAN bus fault — ABS to BCM communication"],
+  "C0292":["Lost Communications with Steering","ABS/ESP not receiving steering angle","Steering angle sensor or CAN bus fault"],
+  "C0297":["Powertrain Torque Request Circuit","TCS cannot reduce engine torque","CAN communication fault between ABS and ECU"],
+  "C0300":["Rear Drive Module Engagement","4WD/AWD rear axle not engaging","Rear drive module solenoid or actuator fault"],
+  "C0305":["Front Axle Actuator Circuit","4WD front axle not engaging","Front axle actuator or shift fork fault"],
+  "C0315":["Rear Drive Module Engagement","AWD not engaging correctly","Rear drive module clutch or solenoid fault"],
+  "C0327":["Encoder Circuit Malfunction","Transfer case not reading position","Transfer case encoder or wiring fault"],
+  "C0359":["Security","Immobiliser or security system fault","Security module or transponder communication fault"],
+  "C0369":["Security Circuit","Anti-theft system issue","Security system wiring or module fault"],
+  "C0374":["Security Circuit Low","Security system voltage fault","Security module power circuit issue"],
+  "C0379":["Front Axle System","4WD front axle fault","Front axle engagement system fault"],
+  "C0383":["Right Rear Brake Lamp","Brake lamp circuit fault RR","Brake light bulb or wiring fault — rear right"],
+  "C0387":["Brake Lamp Circuit","Brake lights fault","Brake light switch or wiring — affects ABS"],
+  "C0396":["Transfer Case Module Communication","4WD system communication fault","Transfer case module CAN bus fault"],
+  "C0400":["Left Front Solenoid Valve","ABS solenoid fault LF","LF ABS solenoid in HCU"],
+  "C0410":["Right Front Solenoid Valve","ABS solenoid fault RF","RF ABS solenoid fault in HCU"],
+  "C0420":["Left Rear Solenoid Valve","ABS solenoid fault LR","LR ABS solenoid fault"],
+  "C0430":["Right Rear Solenoid Valve","ABS solenoid fault RR","RR ABS solenoid fault"],
+  "C0440":["Active Brake Control System","Electronic brake distribution fault","ABD/EBD system fault — ABS module or hydraulic unit"],
+  "C0450":["Electronic Brake Distribution","EBD fault — braking distribution uneven","EBD system in ABS module fault"],
+  "C0460":["Steering System","Power steering fault","EPS or hydraulic power steering system fault"],
+  "C0470":["Steering Sensor Circuit","Stability control fault — no steering angle","Steering angle sensor wiring or sensor failed"],
+  "C0475":["Steering Sensor Range","ESP calibration fault","Steering angle sensor out of calibration — recalibration needed"],
+  "C0476":["Steering Sensor Trim Not Performed","ESP not calibrated","Steering angle sensor needs zero-point calibration after alignment"],
+  "C0479":["Steering Sensor Trim Fault","Steering sensor calibration error","Steering angle sensor recalibration required"],
+  "C0480":["Stability Control System","ESP/ESC fault — stability control disabled","ESP module or sensor fault — stability control inactive"],
+  "C0481":["Stability Control Indicator Circuit","ESP warning light circuit fault","ESP indicator wiring or bulb fault"],
+  "C0485":["Steering Sensor Calibration Fault","ESP not functioning correctly","Steering sensor needs recalibration — usually after wheel alignment"],
+  "C0495":["EBC Requested Torque","Electronic brake control and engine not communicating","CAN bus communication fault"],
+  "C0500":["Rear Propshaft Speed","4WD propshaft speed fault","Rear propshaft speed sensor wiring or sensor fault"],
+  "C0503":["Rear Axle Speed Signal","AWD rear speed signal fault","Rear axle speed sensor fault"],
+  "C0506":["Front Axle Speed Circuit","4WD front speed signal fault","Front axle speed sensor wiring or sensor fault"],
+  "C0532":["Battery Voltage High","ABS system overvoltage","Charging system overvoltage — check alternator"],
+  "C0535":["Battery Voltage Low","ABS not operating — low voltage","Battery weak or alternator not charging"],
+  "C0550":["ECU Performance","Stability control ECU fault","ABS/ESP ECU internal fault — replacement may be required"],
+  "C0557":["ECU Memory Checksum","ABS module memory fault","ABS ECU internal memory fault — replacement needed"],
+  "C0561":["System Disabled Information Stored","Stability system has been disabled","ABS/ESP system deactivated due to previous fault — clear and retest"],
+  "C0563":["Calibration ROM Checksum","ABS module calibration fault","ABS ECU calibration data corrupted — module replacement"],
+  "C0567":["ABS Braking Desired Torque","ABS and engine torque management fault","CAN bus fault between ABS and powertrain modules"],
+  "C0569":["Stability Control — Driver Request","ESC system not reading driver input","Steering sensor or yaw rate sensor fault"],
+  "C0571":["Traction Control Disabled","TCS disabled due to fault","TCS system fault — ABS module or sensor issue"],
+  "C0585":["Stability System Performance","ESC not performing correctly","Sensor calibration or ABS module fault"],
+  "C0590":["Yaw Rate Sensor Bias Calibration","ESP using incorrect yaw values","Yaw rate sensor recalibration needed"],
+  "C0710":["Steering Position Signal","Electric power steering fault","Steering position sensor wiring or EPS module fault"],
+  "C0750":["Lateral Accelerometer","ESP lateral G-sensor fault","Lateral accelerometer wiring or sensor failed"],
+  "C0760":["Steering Angle Sensor","Stability control fault — no steering input data","Steering angle sensor failed or not calibrated"],
+  "C0800":["Device Voltage Reference","Multiple sensor faults from reference voltage","5V reference circuit fault in ABS module"],
+  "C0894":["Device Power Feed Circuit","ABS not powering up","ABS module power supply fuse or wiring fault"],
+  "C0896":["Device Voltage Out of Range","ABS system voltage fault","Check battery and charging system"],
+  "C0899":["Device Voltage Low","ABS module voltage low","Battery weak — charge or replace battery"],
+
+  // ── ADDITIONAL B CODES ─────────────────────────────────────────────────────
+  "B0025":["Front End Sensor Deployment Loop","Frontal crash sensor fault","Front impact sensor wiring or sensor fault — SRS specialist"],
+  "B0026":["Front End Sensor Range","Crash sensor performance fault","Front impact sensor calibration or wiring fault"],
+  "B0030":["Side Deployment Loop","Side airbag circuit fault","Side impact sensor or airbag squib circuit — SRS specialist"],
+  "B0050":["Side Curtain Deployment Loop","Curtain airbag circuit fault","Curtain airbag squib circuit — SRS workshop required"],
+  "B0053":["Seat Belt Retractor Deployment Loop","Seatbelt pretensioner fault","Seat belt pretensioner squib circuit — SRS specialist"],
+  "B0057":["Passenger Presence System","Passenger airbag suppression fault","Passenger seat weight sensor or OCS fault"],
+  "B0060":["Driver Knee Bolster","Knee airbag circuit fault","Knee airbag squib circuit — SRS specialist required"],
+  "B0070":["Frontal Sensor Discriminating","Crash discriminating sensor fault","Impact discriminating sensor wiring or sensor fault"],
+  "B0090":["Right Side Satellite","Right side impact sensor fault","Right side impact sensor or wiring — SRS specialist"],
+  "B0100":["Left Side Satellite","Left side impact sensor fault","Left side impact sensor wiring or sensor — SRS specialist"],
+  "B1015":["Driver Airbag Squib 1 Fault","Driver airbag deployment fault","Driver airbag inflator circuit — SRS workshop required"],
+  "B1016":["Driver Airbag Squib 2 Fault","Dual-stage airbag fault","Driver airbag stage 2 circuit — SRS specialist"],
+  "B1017":["Passenger Airbag Squib 1 Fault","Passenger airbag fault","Passenger airbag circuit — SRS specialist required"],
+  "B1018":["Passenger Airbag Squib 2 Fault","Dual-stage passenger airbag fault","Passenger airbag stage 2 — SRS workshop"],
+  "B1019":["Seat Belt Pretensioner","Seat belt safety system fault","Seat belt pretensioner squib — SRS specialist"],
+  "B1024":["Side Airbag Squib","Side airbag deployment fault","Side airbag squib circuit — SRS workshop required"],
+  "B1051":["Clock Spring Circuit","Steering wheel airbag and controls fault","Clock spring (rotary connector) worn or wiring fault — replace clock spring"],
+  "B1300":["Door Ajar Circuit Fault","Door ajar warning incorrect or always on","Door ajar switch wiring or switch failed"],
+  "B1311":["Battery Voltage Low","BCM detecting low voltage","Battery condition or charging system fault"],
+  "B1315":["Battery Voltage High","BCM overvoltage","Alternator overcharging — check voltage regulator"],
+  "B1317":["Battery Voltage Low (BCM)","BCM power supply low","Battery or BCM power circuit fault"],
+  "B1318":["Battery Voltage Low (Remote Keyless)","Key fob battery low","Replace key fob battery (CR2032)"],
+  "B1342":["ECU Faulty","Body control module internal fault","BCM replacement required"],
+  "B1352":["Ignition Key-In Circuit","Key switch circuit fault","Ignition key sense switch wiring fault"],
+  "B1356":["Ignition Run Circuit Open","Ignition circuit fault","Ignition run circuit wiring or fuse fault"],
+  "B1365":["Ignition Start Circuit Open","Start circuit fault","Starter relay or ignition start wiring fault"],
+  "B1370":["Ignition Voltage (battery saver)","BCM power management fault","BCM battery saver relay circuit fault"],
+  "B1376":["Battery Saver Relay Circuit","BCM not cutting parasitic drain","Battery saver relay coil or wiring fault"],
+  "B1380":["Retained Accessory Power Relay Circuit","RAP system fault — accessories staying on","RAP relay wiring or relay fault"],
+  "B1385":["RAP Relay Circuit","Accessories not staying on or shutting off","RAP relay fault"],
+  "B1399":["Park/Neutral Position Switch","Security or start inhibit fault","Park/neutral switch wiring or BCM communication fault"],
+  "B1400":["Hazard Switch Fault","Hazard lights not working from switch","Hazard switch circuit fault"],
+  "B1410":["Turn Signal Switch Circuit","Indicator not working from stalk","Turn signal switch wiring or switch fault"],
+  "B1414":["Window Motor Circuit Fault","Power window not working","Window motor wiring or motor fault — check fuse first"],
+  "B1432":["Heated Rear Window Circuit","Rear demister not working","Rear heated glass element broken or relay fault"],
+  "B1446":["Power Mirror Control Circuit","Mirror adjustment not working","Mirror control switch wiring or motor fault"],
+  "B1462":["Seat Memory Circuit","Seat memory not saving","Seat memory module or motor feedback fault"],
+  "B1482":["Interior Lamp Circuit","Interior lights not working","Interior light fuse or wiring fault"],
+  "B1504":["Air Inlet Door Motor Circuit","Climate control blend door not moving","Blend door actuator motor wiring or motor fault"],
+  "B1508":["Air Inlet Door Motor Stalled","Blend door jammed","Blend door physically obstructed or motor seized"],
+  "B1512":["Air Temperature Sensor Fault","Climate control temperature reading incorrect","Interior air temperature sensor wiring or sensor fault"],
+  "B1528":["Recirculate Door Motor","Recirculation door not operating","Recirculation actuator motor fault"],
+  "B1548":["Blower Motor Circuit High","Blower always on maximum","Blower motor control circuit or transistor fault"],
+  "B1566":["Door Lock Circuit","Central locking not working","Door lock actuator wiring or actuator fault"],
+  "B1568":["Door Unlock Circuit","Door unlock not working","Door unlock actuator or wiring fault"],
+  "B1582":["Ignition Run/Start Signal Missing","Multiple BCM faults","Ignition signal to BCM missing — wiring or ignition switch"],
+  "B1600":["PATS Key Transponder Signal Not Received","Immobiliser active — car won't start","Key transponder dead or PATS antenna wiring fault"],
+  "B1601":["PATS Key Transponder Invalid","Wrong key or transponder programming lost","Key transponder not programmed or failed"],
+  "B1602":["PATS Received Incorrect Key","Security system blocking start","Wrong key used or transponder damaged — reprogramming needed"],
+  "B1606":["PATS Transceiver Signal Low","PATS system can't read key","PATS antenna coil or wiring fault around ignition barrel"],
+  "B1681":["PATS Receiver Module Missing","Anti-theft module not communicating","PATS module wiring or module fault"],
+  "B2100":["Key In Ignition Switch Circuit","Key presence not sensed","Key presence switch fault"],
+  "B2103":["Antenna Not Connected","Immobiliser antenna fault","Immobiliser transponder antenna disconnected or broken"],
+  "B2139":["BCM / PCM Not Matched","Security system — car won't start","BCM and ECU have different VINs — need to be matched by dealer"],
+  "B2141":["NVM Config Fault","BCM memory error","BCM non-volatile memory fault — BCM replacement or reprogramming"],
+  "B2142":["NVM Memory Fault","BCM memory corrupt","BCM replacement required"],
+  "B2143":["NVM Memory Checksum","BCM memory fault","BCM internal memory error — replacement needed"],
+  "B2145":["BCM Configuration","BCM not configured correctly","BCM programming fault — dealer or specialist required"],
+  "B2148":["Fuel Economy Mode Switch","Economy switch circuit fault","Economy switch wiring fault"],
+  "B2200":["Windshield Wiper Motor Speed Low","Wipers not working properly","Wiper motor winding fault or mechanical obstruction"],
+  "B2204":["Wiper Motor Thermal Protection","Wiper motor overheating","Wiper arm linkage jammed or motor thermal protection tripped"],
+
+  // ── ADDITIONAL U CODES ─────────────────────────────────────────────────────
+  "U0002":["High Speed CAN Bus Performance","Intermittent CAN communication fault","CAN bus wiring resistance too high or module pulling bus low intermittently"],
+  "U0003":["High Speed CAN Bus Open","Complete CAN bus failure","CAN bus wire broken — all modules affected"],
+  "U0004":["High Speed CAN Bus Short","CAN bus shorted — multiple module faults","CAN bus short circuit — trace all modules on that bus"],
+  "U0005":["High Speed CAN Bus Ground","CAN bus grounding fault","CAN bus ground reference fault"],
+  "U0006":["High Speed CAN Bus Supply Voltage","CAN bus power supply fault","CAN bus power rail fault"],
+  "U0007":["High Speed CAN Bus Plus Terminal","CAN H wire fault","CAN H wire open or short circuit"],
+  "U0008":["High Speed CAN Bus Minus Terminal","CAN L wire fault","CAN L wire open or short circuit"],
+  "U0020":["Medium Speed CAN Bus Off","Medium speed CAN bus failure","Medium speed CAN bus wiring or module fault"],
+  "U0028":["Vehicle Communication Bus A Off","Communication bus failure","VCB A wiring or module fault"],
+  "U0073":["Control Module Comm Bus Off","Bus shutdown due to fault","Faulty module causing bus to shut down — disconnect modules to isolate"],
+  "U0074":["Control Module Comm Bus Off","Another bus shutdown","Isolate faulty module by disconnecting one at a time"],
+  "U0076":["Control Module Comm Bus A Off","CAN bus A shutdown","CAN bus A fault — check all modules on this bus"],
+  "U0109":["Lost Comm with Fuel Pump Control Module","Fuel pump module not responding","Fuel pump module wiring or module fault"],
+  "U0110":["Lost Comm with Drive Motor Control Module","Hybrid drive motor not communicating","Hybrid drive motor controller CAN fault"],
+  "U0111":["Lost Comm with HV Battery Control","HV battery module not responding","HV battery ECU CAN fault — EV specialist required"],
+  "U0113":["Lost Comm with Emissions System Module","Emissions module not responding","Emissions control module CAN fault"],
+  "U0114":["Lost Comm with 4WD Module","4WD system not communicating","Transfer case module CAN fault"],
+  "U0122":["Lost Comm with Vehicle Dynamics Module","Stability control not receiving data","Stability control module CAN fault"],
+  "U0123":["Lost Comm with Yaw Sensor Module","ESP no yaw data","Yaw rate sensor module CAN fault"],
+  "U0124":["Lost Comm with Lateral Accelerometer","ESP no G-force data","Lateral accelerometer CAN fault"],
+  "U0126":["Lost Comm with Steering Angle Sensor","Stability control no steering data","Steering angle sensor CAN communication fault"],
+  "U0127":["Lost Comm with Tire Pressure Monitor","TPMS not communicating","TPMS receiver or module CAN fault"],
+  "U0131":["Lost Comm with Power Steering Control","EPS not communicating","EPS module CAN fault — steering may be heavy"],
+  "U0132":["Lost Comm with Ride Level Control","Air suspension module not responding","Air suspension ECU CAN fault"],
+  "U0141":["Lost Comm with Front Sensor Module","Front impact sensor not communicating","Front sensor module CAN fault"],
+  "U0142":["Lost Comm with Rear Sensor Module","Rear impact sensor not communicating","Rear sensor module CAN fault"],
+  "U0151":["Lost Comm with Restraints Control","Airbag module not communicating","SRS module CAN communication fault"],
+  "U0151":["Lost Comm with Restraints System","Airbag/SRS module not on CAN bus","SRS module CAN fault — specialist required"],
+  "U0154":["Lost Comm with Occupant Detection","Passenger airbag suppression not working","OCS/passenger detection module CAN fault"],
+  "U0159":["Lost Comm with Parking Assist","Parking sensors not communicating","Parking sensor ECU CAN fault"],
+  "U0163":["Lost Comm with Navigation Module","Navigation not communicating with other modules","Navigation module CAN fault"],
+  "U0164":["Lost Comm with HVAC Control","Climate control not communicating","HVAC module CAN fault"],
+  "U0168":["Lost Comm with Vehicle Security Module","Immobiliser not communicating","Security module CAN fault — may prevent start"],
+  "U0169":["Lost Comm with Sunroof Module","Sunroof not communicating","Sunroof module CAN fault"],
+  "U0184":["Lost Comm with Radio","Head unit not communicating","Radio/head unit CAN fault"],
+  "U0196":["Lost Comm with Remote Climate Control","Remote start climate not working","Remote climate control module CAN fault"],
+  "U0199":["Lost Comm with Door Control Module","Door module not communicating","Door ECU CAN fault — affects windows/locks"],
+  "U0212":["Lost Comm with Steering Column Control","Steering column controls not working","SCCM module CAN fault — cruise, audio controls affected"],
+  "U0300":["Internal Control Module Software Incompatibility","Module software mismatch","Module with wrong software version — reprogramming needed"],
+  "U0301":["Software Incompatibility","Software version conflict between modules","Module needs software update to match network"],
+  "U0302":["Software Incompatibility with Gateway","Gateway module software mismatch","Gateway module programming fault"],
+  "U0402":["Invalid Data from TCM","Engine receiving bad transmission data","TCM sending incorrect CAN data — TCM or wiring fault"],
+  "U0416":["Invalid Data from Vehicle Dynamics","ESC receiving corrupt data","Vehicle dynamics module sending bad CAN data"],
+  "U0422":["Invalid Data from Body Control Module","BCM sending corrupt CAN data","BCM fault — multiple systems may be affected"],
+  "U0424":["Invalid Data from HVAC","Climate control sending bad data","HVAC module fault"],
+  "U0452":["Invalid Data from Occupant Detection","Airbag system receiving bad data","OCS module fault — passenger airbag system affected"],
+  "U0453":["Invalid Data from Tire Pressure Monitor","TPMS data corrupt","TPMS module fault"],
+  "U1000":["Class 2 Communication Malfunction","Communication protocol fault","Class 2 / CAN bus communication error"],
+  "U1010":["Loss of Communication","Module communication lost","CAN bus or wiring fault — isolate modules"],
+  "U1041":["Lost Comm with Engine Control Module","ECU not communicating","ECU CAN fault or wiring"],
+  "U1064":["Lost Comm with Body Control Module","BCM not communicating","BCM CAN fault"],
+  "U1088":["Lost Comm with Suspension Control","Active suspension not communicating","Suspension module CAN fault"],
+  "U1262":["SCP Comm Malfunction","SCP bus communication fault (Ford)","SCP bus fault — Ford/Mazda specific"],
+  "U2000":["Manufacturer Specific Communication","Manufacturer CAN network fault","Manufacturer-specific network fault — dealer diagnosis"],
+  "U2100":["Initial Config Not Complete","Module not configured after replacement","New module needs programming or initialisation"],
+  "U2101":["Module Config Fault","Module configuration error","Module needs programming to vehicle VIN and options"],
+  "U2104":["CAN Bus Reset","CAN bus restarted due to fault","CAN bus fault causing repeated resets — isolate faulty module"],
+  "U2106":["Lost Comm with PCM (short trip)","ECU communication lost intermittently","Intermittent CAN bus fault — check wiring connections"],
+  "U3000":["Control Module","Module internal fault","Module internal fault — replacement or reprogramming"],
+  "U3003":["Battery Voltage","Network module voltage fault","Module power supply fault"],
+};
+
+// Lookup OBD code(s) - handles comma separated, with/without space
+function lookupOBD(raw){
+  var codes=raw.toUpperCase().replace(/[^A-Z0-9,\s]/g,'').split(/[\s,]+/).filter(function(c){return c.length>=4;});
+  if(codes.length===0)return null;
+  var results=[];
+  codes.forEach(function(code){
+    var entry=OBD_DB[code];
+    if(!entry){
+      // Try partial match — first 5 chars
+      var keys=Object.keys(OBD_DB);
+      for(var i=0;i<keys.length;i++){
+        if(keys[i].startsWith(code.substring(0,5))){entry=OBD_DB[keys[i]];break;}
+      }
+    }
+    if(entry){
+      results.push({code:code,name:entry[0],effect:entry[1],cause:entry[2]});
+    } else {
+      results.push({code:code,name:null,effect:null,cause:null});
+    }
+  });
+  return results.length>0?results:null;
+}
+
+function onObdInput(){
+  var val=document.getElementById('f_obd').value.trim();
+  var res=document.getElementById('obd_result');
+  if(!val){res.style.display='none';return;}
+  var results=lookupOBD(val);
+  if(!results||results.length===0){res.style.display='none';return;}
+  var html='';
+  results.forEach(function(r){
+    if(r.name){
+      html+='<div style="background:#fff;border:1px solid var(--brd);border-radius:8px;padding:10px;margin-bottom:6px">'
+        +'<div style="display:flex;align-items:center;gap:6px;margin-bottom:5px">'
+        +'<span style="font-family:monospace;font-size:12px;font-weight:700;background:var(--ink);color:#fff;padding:2px 8px;border-radius:5px">'+r.code+'</span>'
+        +'<span style="font-size:12px;font-weight:700;color:var(--ink)">'+r.name+'</span>'
+        +'</div>'
+        +'<div style="font-size:11px;color:#7A6E66;margin-bottom:3px">&#9889; <strong>Effect:</strong> '+r.effect+'</div>'
+        +'<div style="font-size:11px;color:var(--ord)">&#128295; <strong>Root cause:</strong> '+r.cause+'</div>'
+        +'</div>';
+    } else {
+      html+='<div style="background:#fff;border:1px solid var(--brd);border-radius:8px;padding:8px 10px;margin-bottom:6px;font-size:11px;color:var(--ink3)">'
+        +'<span style="font-family:monospace;font-weight:700;color:var(--ink)">'+r.code+'</span>'
+        +' — Code not in local database. It will still appear in the report for the customer.</div>';
+    }
+  });
+  res.innerHTML=html;
+  res.style.display='block';
+}
+
 // STATE
-var ST={cn:'',cp:'',cl:'',br:'',md:'',yr:'',fu:'',rg:'',mc:'',ji:'',cat:null,sv:'med',ob:[],nt:''};
+var ST={cn:'',cp:'',cl:'',br:'',md:'',yr:'',fu:'',rg:'',mc:'',ji:'',cat:null,sv:'med',ob:[],nt:'',obd:''};
 var tmrI=null,tmrS=600;
 
 // INIT
@@ -604,6 +1474,7 @@ function s3go(){
   document.querySelectorAll('.chi2.on .chkt').forEach(function(el){ST.ob.push(el.textContent.trim());});
   if(!ST.sv){toast('Select severity level');return;}
   ST.nt=document.getElementById('f_nt').value.trim();
+  ST.obd=document.getElementById('f_obd').value.trim().toUpperCase();
   stopTmr();buildRpt();ss(4);
 }
 
@@ -612,9 +1483,16 @@ function loadCL(cat){
   var lst=CL[cat.k]||CL.other;
   document.getElementById('chktit').innerHTML='<div class="chi">✅</div>'+cat.i+' '+cat.l+' — Observations';
   document.getElementById('chklist').innerHTML=lst.map(function(item){
-    return '<div class="chi2" onclick="tchk(this)"><div class="chkb"></div><div class="chkt">'+item+'</div></div>';
+    var eng=typeof item==='object'?item.e:item;
+    var hin=typeof item==='object'?item.h:'';
+    return '<div class="chi2" onclick="tchk(this)">'
+      +'<div class="chkb"></div>'
+      +'<div class="chkt">'+eng+(hin?'<div class="chkh">'+hin+'</div>':'')+'</div>'
+      +'</div>';
   }).join('');
   document.getElementById('f_nt').value='';
+  document.getElementById('f_obd').value='';
+  var od=document.getElementById('obd_result');if(od)od.style.display='none';
   document.querySelectorAll('.sb2').forEach(function(b){b.className='sb2';});
   ST.sv='med';startTmr();
 }
@@ -656,6 +1534,32 @@ function buildRpt(){
   document.getElementById('r_ob').innerHTML=obs.map(function(o){return'<li>'+o+'</li>';}).join('');
   if(ST.nt){document.getElementById('r_nw').style.display='block';document.getElementById('r_nt').textContent=ST.nt;}
   else{document.getElementById('r_nw').style.display='none';}
+  // OBD section
+  var obdWrap=document.getElementById('r_obd_wrap');
+  var obdContent=document.getElementById('r_obd_content');
+  if(ST.obd&&obdWrap&&obdContent){
+    var obdResults=lookupOBD(ST.obd);
+    if(obdResults&&obdResults.length>0){
+      var obdHtml='';
+      obdResults.forEach(function(r){
+        obdHtml+='<div style="background:#F2EDE7;border:1px solid #E5DDD5;border-radius:8px;padding:10px 12px;margin-bottom:7px">';
+        obdHtml+='<div style="display:flex;align-items:center;gap:7px;margin-bottom:6px">';
+        obdHtml+='<span style="font-family:monospace;font-size:12px;font-weight:700;background:#0F0D0B;color:#fff;padding:2px 8px;border-radius:5px">'+r.code+'</span>';
+        if(r.name) obdHtml+='<span style="font-size:12px;font-weight:700;color:#0F0D0B">'+r.name+'</span>';
+        obdHtml+='</div>';
+        if(r.effect) obdHtml+='<div style="font-size:11px;color:#3D3530;margin-bottom:3px"><strong>Side effect:</strong> '+r.effect+'</div>';
+        if(r.cause) obdHtml+='<div style="font-size:11px;color:#C23507"><strong>Most likely root issue:</strong> '+r.cause+'</div>';
+        if(!r.name) obdHtml+='<div style="font-size:11px;color:#7A6E66">Code '+r.code+' — recorded for workshop reference</div>';
+        obdHtml+='</div>';
+      });
+      obdContent.innerHTML=obdHtml;
+      obdWrap.style.display='block';
+    } else {
+      obdWrap.style.display='none';
+    }
+  } else if(obdWrap){
+    obdWrap.style.display='none';
+  }
   var acts=AC[ST.cat]||AC.other;
   document.getElementById('r_ac').innerHTML=acts.map(function(a){return'<li>'+a+'</li>';}).join('');
   var syms=SY[ST.cat]||['Fault pattern consistent with '+cat.l];
@@ -772,16 +1676,35 @@ function doPrint(){
 function cp(t){var ta=document.createElement('textarea');ta.value=t;ta.style.cssText='position:fixed;opacity:0';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);}
 
 function newRpt(){
-  if(!confirm('Start a new report? Current data will be cleared.'))return;
   stopTmr();
-  ['f_cn','f_cp','f_cl','f_md','f_rg','f_nt'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
-  ['f_br','f_yr','f_fu'].forEach(function(id){document.getElementById(id).value='';});
+
+  // Clear all form fields
+  ['f_cn','f_cp','f_cl','f_md','f_rg','f_nt','f_obd'].forEach(function(id){
+    var el=document.getElementById(id);if(el)el.value='';
+  });
+  ['f_br','f_yr','f_fu'].forEach(function(id){
+    var el=document.getElementById(id);if(el)el.value='';
+  });
+  // f_mc (mechanic name) is intentionally kept — mechanic stays the same between jobs
+  // Clear checklist selections
   document.querySelectorAll('.ccat').forEach(function(b){b.classList.remove('sel');});
   document.querySelectorAll('.sb2').forEach(function(b){b.className='sb2';});
-  ST={cn:'',cp:'',cl:'',br:'',md:'',yr:'',fu:'',rg:'',mc:'',ji:'',cat:null,sv:'med',ob:[],nt:''};
+  // Clear checklist ticks
+  document.querySelectorAll('.chi2').forEach(function(b){b.classList.remove('on');});
+  // Clear OBD result preview
+  var obdr=document.getElementById('obd_result');if(obdr){obdr.style.display='none';obdr.innerHTML='';}
+  // Reset state — keep mechanic name
+  var mechName=document.getElementById('f_mc')?document.getElementById('f_mc').value:'';
+  ST={cn:'',cp:'',cl:'',br:'',md:'',yr:'',fu:'',rg:'',mc:mechName,ji:'',cat:null,sv:'med',ob:[],nt:'',obd:''};
+  // New report ID
   var d=new Date();
   var ji='IM-'+String(d.getFullYear()).slice(2)+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0')+'-'+String(Math.floor(1000+Math.random()*9000));
-  document.getElementById('f_ji').value=ji;ST.ji=ji;ss(1);
+  document.getElementById('f_ji').value=ji;
+  ST.ji=ji;
+  // Show progress bar and go to step 1
+  document.getElementById('progBar').style.display='block';
+  ss(1);
+  toast('New report started — enter customer details');
 }
 
 function onBrand(){
