@@ -391,6 +391,8 @@ function generatePDF() {
 @media print{
   .print-btn{display:none!important}
   body{padding:20px!important}
+  /* Force background colors & images to print */
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important}
   /* Row-level breaks */
   tr{page-break-inside:avoid;break-inside:avoid}
   td{page-break-inside:avoid;break-inside:avoid}
@@ -464,7 +466,7 @@ table + .sub-label{margin-top:14px}
 .trust-section tbody td:first-child{color:#333;font-weight:500;font-size:12px}
 .trust-section tbody td:nth-child(2){color:#555;font-size:11.5px}
 .trust-section tbody td:nth-child(3){color:#999;font-size:11px;text-align:right;font-style:italic}
-.optional-divider td{background:#3a2800;color:#ffb347;padding:6px 12px;font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase}
+.optional-divider td{background:#fff4ec;color:#c45000;padding:7px 14px;font-size:9.5px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;border-top:1px solid #ffd9c0;border-bottom:1px solid #ffd9c0}
 </style></head><body>
 
 <button class="print-btn" onclick="window.print()">&#128424;&nbsp; Print or Save as PDF &nbsp;&middot;&nbsp; Ctrl+P / Cmd+P</button>
@@ -557,7 +559,7 @@ ${notes ? `<div class="note-box">&#128161; <strong>Note:</strong> ${notes}</div>
     <table>
       <thead><tr><th style="width:28%">Service Item</th><th style="width:50%">Why It's Needed</th><th style="width:22%;text-align:right">When</th></tr></thead>
       <tbody>
-        <tr style="background:#111;color:#e8ff47"><td colspan="3" style="padding:6px 12px;font-size:10px;font-weight:700;letter-spacing:0.1em">&#128308; MANDATORY — EVERY SERVICE</td></tr>
+        <tr style="background:#fff4ec;color:#c45000;border-top:1px solid #ffd9c0;border-bottom:1px solid #ffd9c0"><td colspan="3" style="padding:7px 14px;font-size:9.5px;font-weight:700;letter-spacing:0.1em">&#128308; MANDATORY — EVERY SERVICE</td></tr>
         <tr><td>Engine Oil</td><td>Lubricates engine parts — prevents wear, overheating & seizure</td><td style="color:#888;font-size:0.85em;text-align:right">Every service</td></tr>
 <tr><td>Coolant Top-Up</td><td>Prevents engine overheating — low coolant risks head gasket damage</td><td style="color:#888;font-size:0.85em;text-align:right">Every service</td></tr>
 <tr><td>Wiper Fluid Replacement</td><td>Ensures clear visibility in rain — old fluid clogs washer jets</td><td style="color:#888;font-size:0.85em;text-align:right">Every service</td></tr>
@@ -579,7 +581,7 @@ ${notes ? `<div class="note-box">&#128161; <strong>Note:</strong> ${notes}</div>
     <table>
       <thead><tr><th style="width:28%">Service Item</th><th style="width:50%">Why It's Needed</th><th style="width:22%;text-align:right">When</th></tr></thead>
       <tbody>
-        <tr class="optional-divider"><td colspan="3">&#128993; OPTIONAL — ONLY IF DUE</td></tr>
+        <tr style="background:#fff4ec;color:#c45000;border-top:1px solid #ffd9c0;border-bottom:1px solid #ffd9c0"><td colspan="3" style="padding:7px 14px;font-size:9.5px;font-weight:700;letter-spacing:0.1em">&#128993; OPTIONAL — ONLY IF DUE</td></tr>
         <tr><td>Coolant Full Flush</td><td>Removes acidic old coolant — prevents radiator corrosion & overheating</td><td style="color:#888;font-size:0.85em;text-align:right">Due every 40,000 km or 2 years</td></tr>
 <tr><td>Brake Fluid Full Change</td><td>Prevents brake fade — old fluid absorbs moisture & boils under hard braking</td><td style="color:#888;font-size:0.85em;text-align:right">Due every 2 years regardless of mileage</td></tr>
 <tr><td>AC Gas Top-Up</td><td>Restores cooling performance — low refrigerant means weak or no AC</td><td style="color:#888;font-size:0.85em;text-align:right">When AC cooling is noticeably weak</td></tr>
