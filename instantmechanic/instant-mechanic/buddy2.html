@@ -430,27 +430,28 @@ var CATS=[
   {k:"waterlog",i:"🌊",l:"Waterlogging / Stuck"},
   {k:"ev",i:"⚡",l:"EV / Hybrid"},
   {k:"silencer",i:"💨",l:"Silencer / Pipe"},
+  {k:"misfire",i:"⚡",l:"Engine Misfire / Shaking"},
   {k:"other",i:"🔍",l:"Other / Unknown"}
 ];
 
 var CL={
   battery:[
-    {e:"Battery terminals corroded (white or blue powder visible)",h:"बैटरी टर्मिनल पर सफेद/नीला पाउडर जमा है"},
-    {e:"Battery voltage measured — below 12.4V at rest",h:"बैटरी का वोल्टेज 12.4V से कम है"},
-    {e:"No crank, no sound when key is turned",h:"चाबी घुमाने पर कोई आवाज़ नहीं, इंजन नहीं चला"},
-    {e:"Rapid clicking on key turn (solenoid clicking)",h:"चाबी घुमाने पर तेज़ क्लिक-क्लिक की आवाज़"},
+    {e:"Battery terminals corroded (white or blue powder visible)",h:"बैटरी टर्मिनल पर सफेद/नीला पाउडर जमा है",m:"Corrosion blocks current flow — battery may be dead even if it shows voltage"},
+    {e:"Battery voltage measured — below 12.4V at rest",h:"बैटरी का वोल्टेज 12.4V से कम है",m:"Battery is discharged or failing — below 12.4V means it cannot start the engine reliably"},
+    {e:"No crank, no sound when key is turned",h:"चाबी घुमाने पर कोई आवाज़ नहीं, इंजन नहीं चला",m:"Complete electrical failure — battery, starter, or ignition circuit fault"},
+    {e:"Rapid clicking on key turn (solenoid clicking)",h:"चाबी घुमाने पर तेज़ क्लिक-क्लिक की आवाज़",m:"Battery has power but insufficient to crank — solenoid engaging, motor cannot turn. Confirmed battery fault"},
     {e:"Dashboard lights dim, flickering, or off",h:"डैशबोर्ड की लाइटें धीमी या बंद हैं"},
     {e:"Battery date sticker shows older than 3 years",h:"बैटरी 3 साल से पुरानी है"},
-    {e:"Jump-start confirmed the fault — car started with cables",h:"जम्प स्टार्ट से गाड़ी चली — बैटरी खराब है"},
-    {e:"Alternator output measured — below 13.5V at 2000 RPM",h:"अल्टरनेटर का आउटपुट 13.5V से कम है"},
+    {e:"Jump-start confirmed the fault — car started with cables",h:"जम्प स्टार्ट से गाड़ी चली — बैटरी खराब है",m:"Definitive confirmation — battery is dead. Alternator may be fine. Battery replacement needed"},
+    {e:"Alternator output measured — below 13.5V at 2000 RPM",h:"अल्टरनेटर का आउटपुट 13.5V से कम है",m:"Alternator not charging — battery will drain while driving. Could be failed alternator, broken belt, or wiring fault"},
     {e:"Starter motor silent despite battery being charged",h:"बैटरी ठीक है पर स्टार्टर मोटर काम नहीं कर रही"},
     {e:"After-market accessories drawing power continuously",h:"बाद में लगाए गए सामान (डैशकैम, alarm) पावर खींच रहे हैं"},
   ],
   tyre:[
     {e:"Tyre visually flat or at critically low pressure",h:"टायर पूरी तरह फ्लैट या बहुत कम हवा है"},
     {e:"Foreign object in tread — nail, screw, or glass",h:"टायर में कील, पेंच या काँच घुसा हुआ है"},
-    {e:"Puncture in tread area — plug/patch repair feasible",h:"पंक्चर ट्रेड में है — प्लग/पैच से ठीक हो सकता है"},
-    {e:"Puncture in sidewall — tyre must be replaced",h:"पंक्चर साइडवॉल में है — टायर बदलना होगा"},
+    {e:"Puncture in tread area — plug/patch repair feasible",h:"पंक्चर ट्रेड में है — प्लग/पैच से ठीक हो सकता है",m:"Repairable on-site. Do not remove object before plugging — it is holding remaining air in"},
+    {e:"Puncture in sidewall — tyre must be replaced",h:"पंक्चर साइडवॉल में है — टायर बदलना होगा",m:"Sidewall cannot be repaired safely — structural integrity compromised. New tyre required"},
     {e:"Valve stem leak confirmed with soapy water test",h:"वाल्व से हवा लीक हो रही है — साबुन से जाँचा"},
     {e:"Bead leak at alloy rim — after pothole impact",h:"अलॉय रिम के किनारे से हवा जा रही है"},
     {e:"Tyre burst or blowout — structural damage visible",h:"टायर फट गया है — बड़ा नुकसान दिखता है"},
@@ -464,16 +465,16 @@ var CL={
     {e:"Visible coolant puddle under car — green, pink, or orange",h:"गाड़ी के नीचे हरा/गुलाबी/नारंगी पानी गिरा है"},
     {e:"Radiator hose cracked, softened, or leaking at clamp",h:"रेडिएटर पाइप फटा हुआ या क्लैम्प से लीक हो रहा है"},
     {e:"Radiator fan not spinning with engine hot and AC on",h:"इंजन गरम होने पर भी रेडिएटर फैन नहीं चल रहा"},
-    {e:"Top hose hot, bottom hose stays cool — thermostat stuck",h:"ऊपरी पाइप गरम, नीचे वाला ठंडा — थर्मोस्टेट फँसा है"},
+    {e:"Top hose hot, bottom hose stays cool — thermostat stuck",h:"ऊपरी पाइप गरम, नीचे वाला ठंडा — थर्मोस्टेट फँसा है",m:"Thermostat stuck closed — coolant not circulating. Engine will continue overheating until thermostat is replaced"},
     {e:"Steam or vapour rising from engine bay",h:"इंजन से भाप या धुआँ उठ रहा है"},
-    {e:"Oil dipstick shows milky residue — coolant mixing with oil",h:"ऑयल डिपस्टिक पर सफेद/दूधिया तेल है — कूलेंट मिल रहा है"},
+    {e:"Oil dipstick shows milky residue — coolant mixing with oil",h:"ऑयल डिपस्टिक पर सफेद/दूधिया तेल है — कूलेंट मिल रहा है",m:"Head gasket failure — coolant entering engine oil. Critical: do NOT drive. Engine damage will worsen rapidly"},
     {e:"White smoke from exhaust that does not clear",h:"एग्जॉस्ट से सफेद धुआँ निकल रहा है जो बंद नहीं होता"},
     {e:"Water pump leaking at shaft seal",h:"वाटर पम्प की शाफ्ट सील से पानी टपक रहा है"},
   ],
   brake:[
-    {e:"Grinding metal-on-metal sound confirmed when braking",h:"ब्रेक लगाने पर लोहे से लोहे की पीसने की आवाज़"},
+    {e:"Grinding metal-on-metal sound confirmed when braking",h:"ब्रेक लगाने पर लोहे से लोहे की पीसने की आवाज़",m:"Brake pads completely worn — metal backing plate grinding disc. Urgent: every km driven causes more rotor damage and higher repair cost"},
     {e:"Brake pads inspected — below 3mm thickness",h:"ब्रेक पैड जाँचे — 3mm से कम बचे हैं"},
-    {e:"Brake pedal soft or spongy — goes too far before biting",h:"ब्रेक पैडल नरम है, बहुत नीचे तक जाता है"},
+    {e:"Brake pedal soft or spongy — goes too far before biting",h:"ब्रेक पैडल नरम है, बहुत नीचे तक जाता है",m:"Air in brake lines or brake fluid leak — braking effectiveness reduced. Safety critical: do not drive at speed"},
     {e:"Brake pedal hard — very high force needed to stop",h:"ब्रेक पैडल बहुत सख्त है, दबाना मुश्किल है"},
     {e:"Brake fluid level low in reservoir",h:"ब्रेक फ्लूइड का लेवल कम है"},
     {e:"Visible brake fluid leak at wheel hub or dashboard",h:"पहिये या डैशबोर्ड के नीचे ब्रेक फ्लूइड लीक है"},
@@ -481,7 +482,7 @@ var CL={
     {e:"Handbrake seized or not fully releasing",h:"हैंडब्रेक फँसा है या पूरी तरह खुल नहीं रहा"},
     {e:"ABS warning light on dashboard",h:"डैशबोर्ड पर ABS वार्निंग लाइट जल रही है"},
     {e:"Brake disc scored, cracked, or visibly warped",h:"ब्रेक डिस्क पर खरोंचें हैं, टूटी है या मुड़ी है"},
-    {e:"One wheel much hotter than others — seized caliper",h:"एक पहिया बाकियों से बहुत ज़्यादा गरम — कैलिपर फँसा है"},
+    {e:"One wheel much hotter than others — seized caliper",h:"एक पहिया बाकियों से बहुत ज़्यादा गरम — कैलिपर फँसा है",m:"Brake caliper piston seized — pad dragging on disc continuously. Causes brake fade, tyre damage, and fire risk if ignored"},
   ],
   ac:[
     {e:"AC compressor clutch not engaging — disc not spinning",h:"AC कम्प्रेसर क्लच नहीं पकड़ रहा — डिस्क नहीं घूम रही"},
@@ -496,55 +497,58 @@ var CL={
     {e:"Wiring damage near compressor — rodent or chafing",h:"कम्प्रेसर के पास तार कटे हैं — चूहे या रगड़ से"},
   ],
   clutch:[
-    {e:"Clutch pedal falls to floor — cable or hydraulic failure",h:"क्लच पैडल बिना रुके ज़मीन तक चला जाता है"},
+    {e:"Clutch pedal falls to floor — cable or hydraulic failure",h:"क्लच पैडल बिना रुके ज़मीन तक चला जाता है",m:"Complete clutch cable or hydraulic line failure — cannot change gears. Vehicle cannot be driven safely"},
     {e:"Clutch pedal extremely heavy — cable tight",h:"क्लच पैडल बहुत भारी और सख्त है"},
     {e:"Burning smell when using clutch on inclines",h:"चढ़ाई पर क्लच इस्तेमाल करने पर जलने की बदबू"},
-    {e:"Engine RPM rises but car speed does not increase",h:"इंजन की RPM बढ़ती है पर गाड़ी की स्पीड नहीं बढ़ती — क्लच स्लिप"},
+    {e:"Engine RPM rises but car speed does not increase",h:"इंजन की RPM बढ़ती है पर गाड़ी की स्पीड नहीं बढ़ती — क्लच स्लिप",m:"Clutch plate is slipping — friction material worn out. Cannot transfer engine power to wheels. Full clutch replacement needed"},
     {e:"Cannot engage any gear — completely locked",h:"कोई भी गियर नहीं लग रहा — पूरी तरह जाम है"},
     {e:"Clutch cable visibly broken or frayed",h:"क्लच की तार टूटी हुई या बिखरी हुई दिख रही है"},
     {e:"Hydraulic fluid leak near pedal or gearbox",h:"पैडल या गियरबॉक्स के पास हाइड्रॉलिक फ्लूइड लीक है"},
-    {e:"Biting point very high on pedal — plate heavily worn",h:"क्लच बहुत ऊपर पकड़ता है — प्लेट बहुत घिस गई है"},
+    {e:"Biting point very high on pedal — plate heavily worn",h:"क्लच बहुत ऊपर पकड़ता है — प्लेट बहुत घिस गई है",m:"Clutch plate severely worn — biting point rising means plate is nearly finished. Will fail completely soon"},
     {e:"Squeaking when clutch pedal is pressed",h:"क्लच पैडल दबाने पर चिचिहाने की आवाज़"},
     {e:"Car stalls repeatedly when gently releasing clutch",h:"धीरे-धीरे क्लच छोड़ने पर भी गाड़ी बार-बार बंद हो जाती है"},
+    {e:"Clutch pedal not returning to original position after pressing",h:"क्लच पैडल दबाने के बाद वापस ऊपर नहीं आता — अपनी जगह पर नहीं लौटता",m:"Return spring broken or pedal pivot worn — clutch stays partially engaged causing slipping and premature plate wear"},
+    {e:"Clutch pedal slowly sinking to floor on its own",h:"क्लच पैडल खुद ही धीरे-धीरे नीचे चला जाता है — बिना दबाए",m:"Hydraulic master or slave cylinder seal leaking internally — losing pressure slowly. Cylinder replacement needed"},
+    {e:"Clutch pedal stiff only when cold — eases after warmup",h:"ठंड में क्लच पैडल बहुत सख्त, गाड़ी गरम होने पर ठीक हो जाता है",m:"Cable stiffening in cold weather or hydraulic fluid degraded — cable lubrication or hydraulic fluid change needed"},
   ],
   gear:[
     {e:"Gear lever physically stuck — cannot move",h:"गियर लीवर पूरी तरह जाम है — हिलती नहीं"},
     {e:"Grinding noise confirmed when changing gears",h:"गियर बदलते समय पीसने की आवाज़ आती है"},
     {e:"Specific gears very difficult or impossible to engage",h:"कुछ खास गियर लगाना बहुत मुश्किल या नामुमकिन है"},
     {e:"Automatic: 2+ second delay before car moves",h:"ऑटोमैटिक: Drive में डालने पर 2 सेकंड से ज़्यादा देरी"},
-    {e:"Automatic: harsh jolting gear changes",h:"ऑटोमैटिक: गियर बदलते समय झटके लगते हैं"},
+    {e:"Automatic: harsh jolting gear changes",h:"ऑटोमैटिक: गियर बदलते समय झटके लगते हैं",m:"Transmission shift quality poor — dirty ATF, worn shift solenoids, or valve body fault. Delaying repair damages clutch packs"},
     {e:"Gearbox oil low or dark and burnt-smelling",h:"गियरबॉक्स का तेल कम है या काला और जला हुआ गंध वाला"},
     {e:"Gear pops back to neutral while driving",h:"चलते समय गियर अपने आप न्यूट्रल में आ जाता है"},
     {e:"Gear position indicator showing wrong gear",h:"डैशबोर्ड पर गलत गियर दिख रहा है"},
     {e:"Gear linkage rod disconnected or loose",h:"गियर रॉड टूटी हुई या ढीली है"},
-    {e:"Car in limp mode — single gear and low power",h:"गाड़ी लिम्प मोड में है — एक ही गियर, बहुत कम पावर"},
+    {e:"Car in limp mode — single gear and low power",h:"गाड़ी लिम्प मोड में है — एक ही गियर, बहुत कम पावर",m:"ECU protecting transmission from damage by limiting gears and power. OBD scan essential — do not ignore fault codes"},
   ],
   smoke:[
-    {e:"White smoke from exhaust — does not clear after warmup",h:"एग्जॉस्ट से सफेद धुआँ निकलता है जो गरम होने पर भी बंद नहीं होता"},
-    {e:"Black smoke — overly rich fuel mixture",h:"काला धुआँ — ज़्यादा ईंधन जल रहा है"},
-    {e:"Blue or grey smoke — engine burning oil",h:"नीला/स्लेटी धुआँ — इंजन में तेल जल रहा है"},
+    {e:"White smoke from exhaust — does not clear after warmup",h:"एग्जॉस्ट से सफेद धुआँ निकलता है जो गरम होने पर भी बंद नहीं होता",m:"Coolant entering combustion — head gasket failure. Do not drive — will cause catastrophic engine damage"},
+    {e:"Black smoke — overly rich fuel mixture",h:"काला धुआँ — ज़्यादा ईंधन जल रहा है",m:"Too much fuel / not enough air. Possible causes: faulty injectors (leaking/stuck open), bad MAF or O2 sensor, ECU miscalculation, clogged air filter"},
+    {e:"Blue or grey smoke — engine burning oil",h:"नीला/स्लेटी धुआँ — इंजन में तेल जल रहा है",m:"Oil entering combustion chamber — worn piston rings, valve stem seals, or turbo oil seal. Engine needs major service"},
     {e:"Smoke from engine bay — not from exhaust",h:"इंजन के आसपास से धुआँ — एग्जॉस्ट से नहीं"},
     {e:"Burning rubber smell detected",h:"जलते रबर की बदबू आ रही है"},
-    {e:"Burning plastic or electrical smell — fire risk",h:"जलते प्लास्टिक या तार की बदबू — आग का खतरा"},
+    {e:"Burning plastic or electrical smell — fire risk",h:"जलते प्लास्टिक या तार की बदबू — आग का खतरा",m:"Electrical short circuit or wiring touching hot surface. Immediate risk of fire — do not start vehicle until wiring is inspected"},
     {e:"Sweet coolant smell from engine bay",h:"इंजन से मीठी-सी कूलेंट की गंध आ रही है"},
     {e:"Smoke from single wheel — brake overheating",h:"एक पहिये से धुआँ — ब्रेक बहुत ज़्यादा गरम है"},
   ],
   leak:[
-    {e:"Dark brown or black fluid — engine oil",h:"गाढ़ा भूरा/काला तरल — इंजन का तेल"},
+    {e:"Dark brown or black fluid — engine oil",h:"गाढ़ा भूरा/काला तरल — इंजन का तेल",m:"Engine oil leak — if oil level drops too low, engine will seize. Check oil level immediately and advise customer not to drive far"},
     {e:"Red or pink fluid — automatic transmission or power steering",h:"लाल/गुलाबी तरल — ऑटोमैटिक गियरबॉक्स या पावर स्टीयरिंग का तेल"},
-    {e:"Green, yellow, or orange fluid — engine coolant",h:"हरा/पीला/नारंगी तरल — इंजन कूलेंट (पानी)"},
-    {e:"Petrol or diesel smell — fuel system leak",h:"पेट्रोल/डीज़ल की गंध — ईंधन लीक हो रहा है"},
+    {e:"Green, yellow, or orange fluid — engine coolant",h:"हरा/पीला/नारंगी तरल — इंजन कूलेंट (पानी)",m:"Coolant leak — engine will overheat if coolant level drops. Risk of head gasket failure if driven. Do not drive"},
+    {e:"Petrol or diesel smell — fuel system leak",h:"पेट्रोल/डीज़ल की गंध — ईंधन लीक हो रहा है",m:"Fuel leak is a fire hazard — do not start or drive. Keep away from sources of ignition. Tow to workshop immediately"},
     {e:"Leak from sump plug (bottom of engine)",h:"इंजन के नीचे सम्प प्लग से तेल टपक रहा है"},
     {e:"Leak from valve cover gasket (top of engine)",h:"इंजन के ऊपर वाल्व कवर गैस्केट से तेल रिस रहा है"},
     {e:"Leak from radiator hose or hose clamp",h:"रेडिएटर पाइप या क्लैम्प से कूलेंट लीक है"},
     {e:"Leak from power steering rack or pump",h:"पावर स्टीयरिंग रैक या पम्प से तेल टपक रहा है"},
-    {e:"Leak from brake line, caliper, or master cylinder",h:"ब्रेक लाइन, कैलिपर या मास्टर सिलिंडर से ब्रेक फ्लूइड लीक है"},
+    {e:"Leak from brake line, caliper, or master cylinder",h:"ब्रेक लाइन, कैलिपर या मास्टर सिलिंडर से ब्रेक फ्लूइड लीक है",m:"Brake fluid leak = brakes will fail. Do NOT drive under any circumstances — tow to workshop immediately"},
   ],
   noise:[
-    {e:"Knocking from inside engine — low oil or bearing wear",h:"इंजन के अंदर से ठक-ठक — कम तेल या बेयरिंग घिसी"},
-    {e:"Clicking when turning — CV joint failure",h:"स्टीयरिंग घुमाने पर क्लिक — CV जॉइंट खराब"},
+    {e:"Knocking from inside engine — low oil or bearing wear",h:"इंजन के अंदर से ठक-ठक — कम तेल या बेयरिंग घिसी",m:"Engine bearing failure or low oil pressure — if driven, can lead to complete engine seizure. Check oil level now"},
+    {e:"Clicking when turning — CV joint failure",h:"स्टीयरिंग घुमाने पर क्लिक — CV जॉइंट खराब",m:"CV joint failing — clicking increases as joint wears. If driven until complete failure, car loses drive to that wheel unexpectedly"},
     {e:"Grinding from wheels when braking — pads worn to metal",h:"ब्रेक लगाने पर पहियों से पीसने की आवाज़ — पैड खत्म"},
-    {e:"Humming that changes with vehicle speed — wheel bearing",h:"स्पीड के साथ बदलने वाली गुनगुनाहट — व्हील बेयरिंग"},
+    {e:"Humming that changes with vehicle speed — wheel bearing",h:"स्पीड के साथ बदलने वाली गुनगुनाहट — व्हील बेयरिंग",m:"Wheel bearing failing — if completely collapses while driving, wheel can seize or detach. Safety critical at high speed"},
     {e:"Rattling from below car — exhaust heat shield",h:"गाड़ी के नीचे से खड़खड़ाहट — एग्जॉस्ट हीट शील्ड"},
     {e:"High-pitched squealing from engine — belt slipping",h:"इंजन से तेज़ चीखने की आवाज़ — बेल्ट फिसल रही है"},
     {e:"Clunking over speed bumps — suspension component",h:"स्पीड ब्रेकर पर धड़ाम की आवाज़ — सस्पेंशन"},
@@ -626,8 +630,8 @@ var CL={
     {e:"Check engine light (amber or red)",h:"चेक इंजन लाइट जल रही है (पीली या लाल)"},
     {e:"EPC light — electronic power control (VW/Audi/Skoda)",h:"EPC लाइट — थ्रॉटल सिस्टम गड़बड़ (VW/Audi/Skoda में)"},
     {e:"ABS light — anti-lock braking fault",h:"ABS लाइट — ABS सिस्टम में खराबी"},
-    {e:"Airbag or SRS warning light",h:"एयरबैग/SRS वार्निंग लाइट जल रही है"},
-    {e:"Oil pressure warning — engine must stop immediately",h:"ऑयल प्रेशर वार्निंग — इंजन तुरंत बंद करें"},
+    {e:"Airbag or SRS warning light",h:"एयरबैग/SRS वार्निंग लाइट जल रही है",m:"Airbag system fault — airbags may NOT deploy in a crash, or may deploy unexpectedly. Safety system is compromised"},
+    {e:"Oil pressure warning — engine must stop immediately",h:"ऑयल प्रेशर वार्निंग — इंजन तुरंत बंद करें",m:"Critical: low oil pressure means engine bearings are running dry. Every second running causes severe internal damage. Stop engine NOW"},
     {e:"Temperature warning — overheating",h:"तापमान वार्निंग — इंजन ओवरहीट हो रहा है"},
     {e:"Battery or charging system warning",h:"बैटरी/चार्जिंग सिस्टम वार्निंग लाइट"},
     {e:"Traction control or ESP stability light",h:"ट्रैक्शन कंट्रोल / ESP स्टेबिलिटी लाइट"},
@@ -652,10 +656,10 @@ var CL={
     {e:"Car stuck in pit, manhole, or ditch — winch required",h:"गाड़ी गड्ढे, मैनहोल या खाई में फँसी — विंच चाहिए"},
   ],
   ev:[
-    {e:"Battery at 0% — car will not move",h:"बैटरी 0% — गाड़ी बिल्कुल नहीं चलेगी"},
+    {e:"Battery at 0% — car will not move",h:"बैटरी 0% — गाड़ी बिल्कुल नहीं चलेगी",m:"EV battery fully depleted — do NOT jump-start (damages HV system). Flatbed tow to nearest charging station only"},
     {e:"Charging port not accepting charger connection",h:"चार्जिंग पोर्ट में चार्जर नहीं लग रहा"},
     {e:"Charging started but percentage not increasing",h:"चार्जिंग शुरू हुई पर प्रतिशत नहीं बढ़ रहा"},
-    {e:"High voltage system warning light on",h:"हाई वोल्टेज सिस्टम की वार्निंग लाइट जल रही है"},
+    {e:"High voltage system warning light on",h:"हाई वोल्टेज सिस्टम की वार्निंग लाइट जल रही है",m:"High voltage (400V+) system fault — do NOT attempt any repair. Risk of electrocution. EV specialist only"},
     {e:"Hybrid battery warning light on",h:"हाइब्रिड बैटरी वार्निंग लाइट जल रही है"},
     {e:"Severe power reduction — limp mode",h:"पावर बहुत कम हो गई है — लिम्प मोड में है"},
     {e:"EV range dropping faster than normal",h:"EV की रेंज बहुत जल्दी कम हो रही है"},
@@ -668,6 +672,20 @@ var CL={
     {e:"Exhaust manifold crack — ticking from engine top",h:"एग्जॉस्ट मेनिफोल्ड में दरार — इंजन के ऊपर से टिक-टिक"},
     {e:"Exhaust fumes entering passenger cabin",h:"एग्जॉस्ट धुआँ केबिन के अंदर आ रहा है"},
     {e:"Catalytic converter damaged — rattling from below",h:"कैटेलिटिक कन्वर्टर खराब — नीचे से खड़खड़ाहट"},
+  ],
+  misfire:[
+    {e:"Engine shaking or vibrating at idle",h:"इंजन बेकार में काँप रहा है या हिल रहा है",m:"Rough idle — one or more cylinders not firing. Confirmed misfire"},
+    {e:"Shaking felt through steering wheel and floor",h:"स्टीयरिंग और फर्श से कंपन महसूस होती है",m:"Strong vibration in chassis — multiple cylinders misfiring or severe single-cylinder misfire"},
+    {e:"Black smoke from exhaust — thick and persistent",h:"एग्जॉस्ट से काला धुआँ — गाढ़ा और लगातार",m:"Too much fuel entering combustion — injector stuck open or leaking, or faulty MAF/O2 sensor causing over-fuelling. Classic injector fault sign"},
+    {e:"Poor fuel economy — filling up much more frequently",h:"माइलेज बहुत कम हो गई है — ज़्यादा पेट्रोल/डीज़ल लग रहा है",m:"Leaking or stuck-open injector wasting fuel. Also: misfiring cylinder not converting fuel to power. Injector or sensor fault"},
+    {e:"Check engine light on — P030X or P020X codes present",h:"चेक इंजन लाइट जल रही है — P030X या P020X कोड है",m:"P030X = misfire codes. P020X = injector circuit codes. Both point to injector or ignition fault on specific cylinder"},
+    {e:"Car hesitates or jerks during acceleration",h:"एक्सेलरेट करते समय गाड़ी रुकती या झटकती है",m:"Injector delivering wrong amount of fuel under load — partially blocked or stuck injector is most common cause"},
+    {e:"Strong petrol smell from exhaust or engine bay",h:"एग्जॉस्ट या इंजन से तेज़ पेट्रोल की गंध",m:"Unburnt fuel from over-fuelling injector or failed injector O-ring leaking fuel. Fire risk if near hot surfaces"},
+    {e:"Spark plugs inspected — wet with fuel or black carbon deposits",h:"स्पार्क प्लग देखे — पेट्रोल से भीगे या काले जमाव हैं",m:"Fuel-wet plugs = injector stuck open flooding cylinder. Black carbon = chronic rich running from faulty injector or sensor"},
+    {e:"One ignition coil swap test done — misfire did NOT move",h:"इग्निशन कॉइल स्वैप किया — मिसफायर नहीं बदला",m:"Coil is not the fault — injector on that cylinder is the suspect. Next step: swap injector or do injector balance test"},
+    {e:"Engine runs rough only when cold — clears after warmup",h:"ठंडे में गाड़ी खराब चलती है — गरम होने पर ठीक हो जाती है",m:"Cold-start injector fault or worn spark plugs. Injectors can stick when cold and free up as fuel warms them"},
+    {e:"Loss of power on highway — stumbles under load",h:"हाईवे पर पावर कम — लोड में इंजन लड़खड़ाता है",m:"Partially blocked injector cannot supply enough fuel under load — symptoms worsen at highway speed and high RPM"},
+    {e:"Backfiring or popping sound from exhaust",h:"एग्जॉस्ट से पट-पट या धमाके की आवाज़",m:"Unburnt fuel igniting in exhaust — over-fuelling injector or ignition misfire. Can damage catalytic converter"},
   ],
   other:[
     {e:"Major fault identified — cannot fix on-site",h:"बड़ी खराबी मिली — मौके पर ठीक नहीं हो सकती"},
@@ -701,6 +719,7 @@ var DX={
   waterlog:"Water damage — vehicle must not be started until full mechanical and electrical inspection is completed",
   ev:"EV or hybrid system fault — high-voltage specialist technician required for safe diagnosis and repair",
   silencer:"Exhaust system damage — silencer, pipe, or manifold requires welding or replacement",
+  misfire:"Engine misfire confirmed — one or more cylinders not firing correctly. Fuel injector fault, ignition coil failure, or spark plug wear identified as likely cause. Black smoke and poor fuel economy point strongly to injector fault",
   other:"Major fault identified on-site — full workshop diagnostic required for accurate assessment"
 };
 
@@ -727,6 +746,7 @@ var AC={
   waterlog:["Vehicle NOT started — hydrolocking would destroy the engine immediately","Flatbed tow arranged to workshop — vehicle must not be driven","Full mechanical and electrical inspection required before any restart attempt","Air filter, spark plugs, and intake must be checked for water — call 8393990942"],
   ev:["EV NOT jump-started — high voltage system is dangerous without specialist equipment","Flatbed tow arranged to nearest charging point or EV-specialist workshop","No repairs attempted on-site — high voltage specialist only","Call 8393990942 for EV tow"],
   silencer:["Exhaust secured temporarily to prevent dragging on road","Vehicle should not be driven long distances with a cracked exhaust — CO fume risk","Exhaust welding, section replacement, or full system replacement at workshop","Call 8393990942"],
+  misfire:["OBD scan done — P030X codes identify misfiring cylinder, P020X codes point to injector circuit fault","Ignition coil swap test: if misfire moved cylinders, coil is faulty — replace that coil","If coil swap did NOT move misfire: injector on that cylinder is the most likely fault","Injector cleaning (ultrasonic) recommended first — often resolves partial blockage without full replacement","Black smoke and poor fuel economy together = strong indicator of leaking or stuck-open injector","Engine must not be driven hard — catalytic converter damage risk from unburnt fuel. Book workshop urgently — call 8393990942"],
   other:["On-site assessment completed — major fault confirmed, cannot fix at roadside","Workshop diagnostic required for complete identification and repair plan","OBD scan recommended as first step at workshop","Customer advised to book workshop appointment — call 8393990942"]
 };
 
@@ -753,6 +773,7 @@ var SY={
   waterlog:["Car stopped after driving through flooded road","Water visible inside the cabin","Electrical systems malfunctioning after water exposure","Car sinking into mud — no traction from any wheel","Strong musty smell after water exposure"],
   ev:["Battery percentage at 0% — car stationary","Charging indicator not responding","High-voltage warning symbol on dashboard","Significant reduction in range within one trip","Car has entered automatic safety shutdown mode"],
   silencer:["Dramatically louder exhaust noise than normal","Rattling from under the car on bumps","Exhaust pipe visible hanging or scraping on ground","Exhaust fumes detectable inside passenger cabin","Hissing sound from exhaust area"],
+  misfire:["Engine vibration felt through steering wheel, floor, and gear lever at idle","Rough idle — uneven engine note, shaking at standstill or low RPM","Black smoke from exhaust — persistent, especially on acceleration","Noticeably poor fuel economy — filling up more than usual","Check engine light on — P0300-P0312 misfire codes or P020X injector codes","Reduced power and hesitation under acceleration","Strong petrol smell from exhaust or engine bay","Popping or backfiring sound from exhaust pipe","Spark plugs fouled, black, or wet with fuel"],
   other:["Major fault confirmed but precise cause unclear","Issue present intermittently — not reproducible","Multiple symptoms pointing to different systems","Vehicle will not operate normally under any condition"]
 };
 
@@ -779,10 +800,58 @@ var RP={
   waterlog:"Full inspection: 2-4 hrs. Engine dry-out: 24+ hrs. Electrical diagnosis: 2-4 hrs. Cost highly variable — can be Rs 5,000 to Rs 1,00,000+ if engine or ECU is damaged.",
   ev:"EV diagnosis requires specialist equipment and EV-certified technician. Charging system: 1-3 hrs. High voltage components: specialist workshop only. Cost highly variable.",
   silencer:"Heat shield clip: 15-30 min. Exhaust welding: 30-60 min. Full exhaust replacement: 1-3 hrs. Cost: Rs 500-15,000.",
+  misfire:"Step 1: OBD scan to identify misfiring cylinder (P030X codes). Step 2: Swap ignition coil — if misfire moves, coil is faulty (Rs 800-3,000). Step 3: If coil swap does NOT move misfire, injector is suspect. Injector cleaning: 1-2 hrs (Rs 1,500-3,000). Injector replacement: 2-3 hrs per injector (Rs 2,000-8,000). Spark plug replacement: 30-60 min for full set (Rs 800-2,500). MAF/O2 sensor if codes present: 30-45 min (Rs 1,500-4,000). Always do OBD scan first — identifies exact cylinder and fault type before replacing parts.",
   other:"Full workshop diagnostic: 1-3 hrs. OBD scan: 30-45 min. Repair time and cost depends on fault identified at workshop."
 };
 
 // ── OBD CODE DATABASE ────────────────────────────────────────────────────────
+// ── OBD CAUSES DATABASE ──────────────────────────────────────────────────────
+var OBD_CAUSES={
+  "SHIFT_SOL_OPEN":["Faulty shift solenoid — internal coil failure (most common)","Broken wire or open circuit in transmission wiring harness","Loose or corroded connector at transmission plug","Dirty or burnt ATF — contaminated fluid can cause solenoid to malfunction even with good wiring","TCM/ECU output circuit fault (rare)"],
+  "SHIFT_SOL_SHORT":["Wiring short to ground in transmission harness (most common)","Internal short circuit in solenoid coil","Moisture or fluid ingress causing corrosion in connector socket","Pinched or damaged wire near transmission case"],
+  "SHIFT_SOL_RANGE":["Dirty or burnt ATF causing solenoid to stick (most common — try ATF change first)","Faulty solenoid — worn or stuck mechanically","Transmission harness connector corroded or loose","TCM sending incorrect control signal (rare)"],
+  "P0087":["Fuel pump weakening — insufficient pressure under load (most common)","Clogged fuel filter restricting flow","Fuel pressure regulator failed — not holding pressure","Blocked fuel strainer inside tank","Fuel pump relay fault — intermittent power"],
+  "P0100":["MAF sensor contaminated — cleaning often fixes it (most common)","Air leak between MAF and throttle body","MAF sensor failed internally","Air filter severely clogged reducing airflow"],
+  "P0101":["MAF sensor contaminated or dirty","Air leak after MAF sensor — hose cracked or disconnected","MAF sensor failing","Air filter clogged"],
+  "P0128":["Thermostat stuck open — coolant never reaches temperature (most common)","Coolant temperature sensor faulty — reading too cold","Thermostat seal failure allowing bypass"],
+  "P0171":["Vacuum/air leak after MAF sensor — most common cause","Dirty or faulty MAF sensor — under-reading","Weak fuel pump — low fuel pressure","Clogged fuel filter","Faulty or lazy O2 sensor"],
+  "P0172":["Fuel injector leaking or stuck open — over-fuelling","Faulty MAF sensor — over-reading airflow","High fuel pressure — regulator fault","Faulty coolant temp sensor — ECU over-fuelling when cold","O2 sensor failed — ECU running rich open-loop"],
+  "P0300":["Multiple spark plugs worn — replace full set","Multiple ignition coils failing — coil swap test each","Fuel delivery issue — low pressure affecting all cylinders","Vacuum leak causing lean misfire across all cylinders","Low compression on multiple cylinders — engine wear"],
+  "P0301":["Spark plug on cylinder 1 worn, fouled, or cracked","Ignition coil on cylinder 1 failed — swap to confirm","Fuel injector on cylinder 1 clogged or stuck","Low compression cylinder 1 — valve or ring issue"],
+  "P0302":["Spark plug on cylinder 2 worn or fouled","Ignition coil on cylinder 2 failed","Fuel injector on cylinder 2 fault","Low compression cylinder 2"],
+  "P0303":["Spark plug on cylinder 3 worn or fouled","Ignition coil on cylinder 3 failed","Fuel injector on cylinder 3 fault","Low compression cylinder 3"],
+  "P0304":["Spark plug on cylinder 4 worn or fouled","Ignition coil on cylinder 4 failed","Fuel injector on cylinder 4 fault","Low compression cylinder 4"],
+  "P0335":["Crankshaft position sensor failed (most common)","Reluctor ring damaged or dirty — interrupting signal","Sensor wiring broken or connector corroded","Sensor gap too large after bearing or flywheel work"],
+  "P0340":["Camshaft position sensor failed","Sensor wiring open circuit or corroded connector","Timing chain stretched — cam/crank signals out of sync","VVT phaser fault affecting camshaft signal"],
+  "P0401":["EGR valve clogged with carbon deposits (most common)","EGR passages blocked — carbon buildup restricting flow","EGR position sensor faulty","EGR solenoid wiring fault"],
+  "P0420":["Catalytic converter worn out or poisoned (most common cause)","Upstream O2 sensor failed — false feedback to ECU","Engine oil burning entering exhaust — fouling catalyst","Coolant entering exhaust (head gasket) — poisoning catalyst","Rich running condition damaging converter over time"],
+  "P0440":["Fuel cap loose or seal worn — check this first (free fix)","EVAP hose cracked or disconnected","EVAP purge solenoid stuck open or closed","Charcoal canister damaged"],
+  "P0455":["Fuel cap missing, loose, or seal worn — most common (check first)","Large EVAP hose split or disconnected","Charcoal canister cracked","EVAP vent valve stuck open"],
+  "P0505":["IAC valve clogged with carbon deposits (most common)","Throttle body dirty — carbon restricting airflow at idle","Vacuum leak bypassing throttle","IAC valve electrical failure"],
+  "P0562":["Alternator not charging properly (most common)","Alternator belt slipping or broken","Battery failing internally — high internal resistance","Wiring fault in charging circuit"],
+  "C010F":["ABS pump motor failed internally (most common)","ABS pump relay failed — no power reaching motor","Wiring fault in ABS pump circuit","ABS hydraulic control unit (HCU) fault"],
+  "C0035":["Left front wheel speed sensor failed (most common)","Reluctor ring (tone ring) damaged or dirty","Sensor wiring broken or corroded","Sensor air gap too large after hub or bearing work"],
+  "C0040":["Right front wheel speed sensor failed","Tone ring damaged or dirty","Sensor wiring broken","Sensor gap incorrect after brake or hub work"],
+  "C0045":["Left rear wheel speed sensor failed","Tone ring damage or contamination","Sensor wiring fault","Bearing play causing gap to vary"],
+  "C0050":["Right rear wheel speed sensor failed","Tone ring dirty or damaged","Wiring fault to that sensor","Sensor gap too large"],
+};
+
+function getOBDCauses(code){
+  code=code.toUpperCase().trim();
+  if(OBD_CAUSES[code])return OBD_CAUSES[code];
+  if(code.match(/P097[2-9]|P098[0-6]/)){
+    var last=code.slice(-1);
+    if(last==='3'||last==='6'||last==='9')return OBD_CAUSES.SHIFT_SOL_SHORT;
+    if(last==='4'||last==='7'||last==='0')return OBD_CAUSES.SHIFT_SOL_OPEN;
+    return OBD_CAUSES.SHIFT_SOL_RANGE;
+  }
+  if(code.match(/^P030[1-9]$/))return OBD_CAUSES[code]||OBD_CAUSES.P0301;
+  if(code.match(/^C003[1-9]$/))return OBD_CAUSES.C0035;
+  if(code.match(/^C004[0-9]$/))return OBD_CAUSES.C0040;
+  if(code.match(/^C005[0-9]$/))return OBD_CAUSES.C0050;
+  return null;
+}
+
 var OBD_DB={
   // P0 - Powertrain generic
   "P0010":["Intake Camshaft Position Actuator Circuit","Timing advance stuck — poor idle and acceleration","VVT actuator oil sludge or wiring fault"],
@@ -1048,6 +1117,108 @@ var OBD_DB={
   "P0882":["TCM Power Input Signal Low","Transmission control fault","TCM power supply circuit fault"],
   "P0883":["TCM Power Input Signal High","TCM receiving incorrect voltage","TCM power supply overvoltage — check charging system"],
   "P0884":["TCM Power Input Signal Intermittent","Intermittent transmission faults","TCM power supply connection issue"],
+  // ── P09xx — TRANSMISSION SHIFT SOLENOIDS & PRESSURE CONTROL ─────────────
+  "P0900":["Clutch Actuator Circuit Open","Automatic clutch (DCT/AMT) not engaging","Clutch actuator motor wiring open circuit — check actuator connector"],
+  "P0901":["Clutch Actuator Circuit Range","Clutch actuator performance fault","Clutch actuator motor out of range — actuator or wiring fault"],
+  "P0902":["Clutch Actuator Circuit Low","Clutch actuator short to ground","Clutch actuator motor circuit short — check wiring"],
+  "P0903":["Clutch Actuator Circuit High","Clutch actuator open circuit","Clutch actuator motor circuit open — check connector"],
+  "P0904":["Gate Select Position Circuit","AMT/DCT gear select fault","Gate select actuator position sensor wiring or sensor fault"],
+  "P0905":["Gate Select Position Circuit Range","Gear select position incorrect","Gate select actuator out of calibration or sensor fault"],
+  "P0906":["Gate Select Position Circuit Low","Gate select sensor short","Gate select position sensor short circuit"],
+  "P0907":["Gate Select Position Circuit High","Gate select sensor open","Gate select position sensor open circuit"],
+  "P0908":["Gate Select Position Circuit Intermittent","Intermittent gear select fault","Gate select position sensor loose connection"],
+  "P0909":["Gate Select Control Error","AMT/DCT cannot select gear correctly","Gate select actuator or sensor calibration fault"],
+  "P0910":["Gate Select Actuator Circuit Open","Gear select actuator not operating","Gate select actuator wiring open circuit"],
+  "P0911":["Gate Select Actuator Circuit Range","Gear select actuator performance fault","Gate select actuator out of range — actuator fault"],
+  "P0912":["Gate Select Actuator Circuit Low","Gate select actuator short","Gate select actuator short to ground"],
+  "P0913":["Gate Select Actuator Circuit High","Gate select actuator open","Gate select actuator open circuit"],
+  "P0914":["Gear Shift Position Circuit","AMT/DCT shift position fault","Shift position sensor wiring or sensor fault"],
+  "P0915":["Gear Shift Position Circuit Range","Shift position out of range","Shift position sensor out of calibration"],
+  "P0916":["Gear Shift Position Circuit Low","Shift position sensor short","Shift sensor short circuit"],
+  "P0917":["Gear Shift Position Circuit High","Shift position sensor open","Shift sensor open circuit"],
+  "P0918":["Gear Shift Position Circuit Intermittent","Intermittent shift position fault","Shift position sensor loose connection"],
+  "P0919":["Gear Shift Position Control Error","AMT/DCT cannot shift correctly","Shift actuator or sensor calibration fault"],
+  "P0920":["Gear Shift Forward Actuator Circuit Open","Forward shift actuator not operating","Forward shift actuator wiring open circuit"],
+  "P0921":["Gear Shift Forward Actuator Circuit Range","Forward shift actuator out of range","Forward actuator fault — AMT/DCT system"],
+  "P0922":["Gear Shift Forward Actuator Circuit Low","Forward actuator short circuit","Forward shift actuator wiring short"],
+  "P0923":["Gear Shift Forward Actuator Circuit High","Forward actuator open circuit","Forward shift actuator open circuit"],
+  "P0924":["Gear Shift Reverse Actuator Circuit Open","Reverse gear actuator not operating","Reverse shift actuator wiring open"],
+  "P0925":["Gear Shift Reverse Actuator Circuit Range","Reverse actuator out of range","Reverse shift actuator fault"],
+  "P0926":["Gear Shift Reverse Actuator Circuit Low","Reverse actuator short","Reverse shift actuator short circuit"],
+  "P0927":["Gear Shift Reverse Actuator Circuit High","Reverse actuator open","Reverse shift actuator open circuit"],
+  "P0928":["Gear Shift Lock Solenoid Circuit Open","Gear shift lock not operating","Shift lock solenoid wiring open circuit"],
+  "P0929":["Gear Shift Lock Solenoid Circuit Range","Shift lock solenoid fault","Shift lock solenoid out of range"],
+  "P0930":["Gear Shift Lock Solenoid Circuit Low","Shift lock solenoid short","Shift lock solenoid short to ground"],
+  "P0931":["Gear Shift Lock Solenoid Circuit High","Shift lock solenoid open","Shift lock solenoid open circuit"],
+  "P0932":["Hydraulic Pressure Sensor Circuit","Transmission hydraulic pressure fault","Hydraulic pressure sensor wiring or sensor failure"],
+  "P0933":["Hydraulic Pressure Sensor Range","Pressure sensor out of range","Hydraulic pressure sensor out of calibration"],
+  "P0934":["Hydraulic Pressure Sensor Low","Pressure sensor short circuit","Hydraulic pressure sensor short to ground or low ATF"],
+  "P0935":["Hydraulic Pressure Sensor High","Pressure sensor open circuit","Hydraulic pressure sensor open or ATF overpressure"],
+  "P0936":["Hydraulic Pressure Sensor Intermittent","Intermittent pressure signal","Hydraulic pressure sensor loose connection"],
+  "P0937":["Hydraulic Fluid Temperature Sensor Circuit","ATF temperature monitoring fault","ATF temperature sensor wiring or sensor fault"],
+  "P0938":["Hydraulic Fluid Temperature Sensor Range","ATF temperature reading incorrect","ATF temperature sensor out of range — check ATF level"],
+  "P0939":["Hydraulic Fluid Temperature Sensor Low","ATF temp sensor short","ATF temperature sensor short circuit"],
+  "P0940":["Hydraulic Fluid Temperature Sensor High","ATF temp sensor open","ATF temperature sensor open circuit"],
+  "P0941":["Hydraulic Pressure Control Circuit High","Transmission overpressure fault","Hydraulic pressure control circuit open or solenoid stuck"],
+  "P0942":["Hydraulic Pressure Unit","Transmission hydraulic unit fault","ATF pump or hydraulic control unit fault"],
+  "P0943":["Hydraulic Pressure Unit Cycling","Hydraulic pressure cycling fault","Pressure relief valve stuck or ATF pump fault"],
+  "P0944":["Hydraulic Pressure Unit Loss of Pressure","Transmission pressure loss","ATF leak, pump failure, or pressure regulator fault"],
+  "P0945":["Hydraulic Pump Relay Circuit Open","Transmission hydraulic pump relay fault","Hydraulic pump relay wiring open circuit"],
+  "P0946":["Hydraulic Pump Relay Circuit Range","Pump relay performance fault","Hydraulic pump relay out of range"],
+  "P0947":["Hydraulic Pump Relay Circuit Low","Pump relay short circuit","Hydraulic pump relay short to ground"],
+  "P0948":["Hydraulic Pump Relay Circuit High","Pump relay open circuit","Hydraulic pump relay open circuit"],
+  "P0949":["Adaptive Control Unit","Automatic transmission adaptive learning fault","TCM adaptive learning fault — ATF change may help, or TCM reset"],
+  "P0950":["AWD Control Module","AWD system control module fault","AWD control module internal fault or CAN communication issue"],
+  "P0951":["AWD Control Module Range","AWD module out of range","AWD module receiving incorrect input signals"],
+  "P0952":["AWD Control Module Low","AWD module input low","AWD module input signal short to ground"],
+  "P0953":["AWD Control Module High","AWD module input high","AWD module input signal open circuit"],
+  "P0954":["AWD Control Module Intermittent","Intermittent AWD control fault","AWD module loose connection or intermittent CAN fault"],
+  "P0955":["AWD Mode Control Circuit","AWD mode selection fault","AWD mode switch or actuator wiring fault"],
+  "P0956":["AWD Mode Control Circuit Range","AWD mode out of range","AWD mode actuator out of calibration"],
+  "P0957":["AWD Mode Control Circuit Low","AWD mode circuit short","AWD mode control short to ground"],
+  "P0958":["AWD Mode Control Circuit High","AWD mode circuit open","AWD mode control open circuit"],
+  "P0959":["AWD Mode Control Circuit Intermittent","Intermittent AWD mode fault","AWD mode switch loose connection"],
+  "P0960":["Pressure Control Solenoid A Control Circuit Open","Transmission pressure solenoid A not operating","PC solenoid A wiring open circuit — check transmission harness"],
+  "P0961":["Pressure Control Solenoid A Control Circuit Range","PC solenoid A out of range","PC solenoid A stuck or ATF contaminated"],
+  "P0962":["Pressure Control Solenoid A Control Circuit Low","PC solenoid A short to ground","Pressure control solenoid A wiring short — transmission harness check"],
+  "P0963":["Pressure Control Solenoid A Control Circuit High","PC solenoid A open circuit","Pressure control solenoid A open circuit — solenoid or wiring"],
+  "P0964":["Pressure Control Solenoid B Control Circuit Open","Transmission pressure solenoid B not operating","PC solenoid B wiring open circuit"],
+  "P0965":["Pressure Control Solenoid B Control Circuit Range","PC solenoid B out of range","PC solenoid B performance fault — ATF quality or solenoid"],
+  "P0966":["Pressure Control Solenoid B Control Circuit Low","PC solenoid B short circuit","PC solenoid B wiring short to ground"],
+  "P0967":["Pressure Control Solenoid B Control Circuit High","PC solenoid B open circuit","PC solenoid B open — solenoid or wiring fault"],
+  "P0968":["Pressure Control Solenoid C Control Circuit Open","Transmission pressure solenoid C not operating","PC solenoid C wiring open circuit"],
+  "P0969":["Pressure Control Solenoid C Control Circuit Range","PC solenoid C out of range","PC solenoid C stuck or ATF fault"],
+  "P0970":["Pressure Control Solenoid C Control Circuit Low","PC solenoid C short to ground","PC solenoid C wiring short circuit"],
+  "P0971":["Pressure Control Solenoid C Control Circuit High","PC solenoid C open circuit","PC solenoid C open — solenoid or wiring"],
+  "P0972":["Shift Solenoid A Control Circuit Range","Shift solenoid A stuck or performance fault","Shift solenoid A stuck or ATF contaminated — ATF change recommended"],
+  "P0973":["Shift Solenoid A Control Circuit Low","Shift solenoid A short to ground","Shift solenoid A wiring short circuit — transmission harness check"],
+  "P0974":["Shift Solenoid A Control Circuit High","Shift solenoid A open circuit — gear shifts affected","Shift solenoid A open circuit — solenoid failure or wiring fault. ATF change or solenoid replacement needed"],
+  "P0975":["Shift Solenoid B Control Circuit Range","Shift solenoid B stuck or performance fault","Shift solenoid B stuck — ATF change or solenoid replacement"],
+  "P0976":["Shift Solenoid B Control Circuit Low","Shift solenoid B short to ground","Shift solenoid B wiring short circuit — check transmission connector"],
+  "P0977":["Shift Solenoid B Control Circuit High","Shift solenoid B open circuit — shifting affected","Shift solenoid B open — solenoid or wiring fault"],
+  "P0978":["Shift Solenoid C Control Circuit Range","Shift solenoid C stuck or performance fault","Shift solenoid C stuck — ATF quality check or solenoid replacement"],
+  "P0979":["Shift Solenoid C Control Circuit Low","Shift solenoid C short to ground","Shift solenoid C wiring short circuit"],
+  "P0980":["Shift Solenoid C Control Circuit High","Shift solenoid C open circuit","Shift solenoid C open — solenoid or wiring fault"],
+  "P0981":["Shift Solenoid D Control Circuit Range","Shift solenoid D stuck","Shift solenoid D performance fault — ATF or solenoid"],
+  "P0982":["Shift Solenoid D Control Circuit Low","Shift solenoid D short circuit","Shift solenoid D wiring short to ground"],
+  "P0983":["Shift Solenoid D Control Circuit High","Shift solenoid D open circuit","Shift solenoid D open — solenoid or wiring fault"],
+  "P0984":["Shift Solenoid E Control Circuit Range","Shift solenoid E stuck","Shift solenoid E performance fault"],
+  "P0985":["Shift Solenoid E Control Circuit Low","Shift solenoid E short circuit","Shift solenoid E wiring short to ground"],
+  "P0986":["Shift Solenoid E Control Circuit High","Shift solenoid E open circuit","Shift solenoid E open — solenoid or wiring fault"],
+  "P0987":["Transmission Fluid Pressure Sensor E Circuit","ATF pressure sensor E fault","ATF pressure sensor E wiring or sensor failure"],
+  "P0988":["Transmission Fluid Pressure Sensor E Range","ATF pressure sensor E out of range","ATF pressure sensor E out of calibration"],
+  "P0989":["Transmission Fluid Pressure Sensor E Low","ATF pressure sensor E short","ATF pressure sensor E short circuit"],
+  "P0990":["Transmission Fluid Pressure Sensor E High","ATF pressure sensor E open","ATF pressure sensor E open circuit"],
+  "P0991":["Transmission Fluid Pressure Sensor E Intermittent","Intermittent ATF pressure E fault","ATF pressure sensor E loose connection"],
+  "P0992":["Transmission Fluid Pressure Sensor F Circuit","ATF pressure sensor F fault","ATF pressure sensor F wiring or sensor failure"],
+  "P0993":["Transmission Fluid Pressure Sensor F Range","ATF pressure sensor F out of range","ATF pressure sensor F performance fault"],
+  "P0994":["Transmission Fluid Pressure Sensor F Low","ATF pressure sensor F short","ATF pressure sensor F short circuit"],
+  "P0995":["Transmission Fluid Pressure Sensor F High","ATF pressure sensor F open","ATF pressure sensor F open circuit"],
+  "P0996":["Transmission Fluid Pressure Sensor F Intermittent","Intermittent ATF pressure F signal","ATF pressure sensor F loose connection"],
+  "P0997":["Shift Solenoid F Control Circuit Range","Shift solenoid F stuck","Shift solenoid F performance fault — ATF or solenoid"],
+  "P0998":["Shift Solenoid F Control Circuit Low","Shift solenoid F short circuit","Shift solenoid F wiring short to ground"],
+  "P0999":["Shift Solenoid F Control Circuit High","Shift solenoid F open circuit","Shift solenoid F open — solenoid or wiring fault"],
+
   "P1000":["OBD Readiness Monitors Not Complete","Car not ready for emissions test","Drive cycle not completed after battery disconnect — drive normally for 50-100km"],
 
   // ── C CODES — CHASSIS / ABS / BRAKE / STEERING ────────────────────────────
@@ -1385,6 +1556,28 @@ function lookupOBD(raw){
   return results.length>0?results:null;
 }
 
+function buildCausesHtml(code, forReport){
+  var causes=getOBDCauses(code);
+  if(!causes||!causes.length)return '';
+  var fs=forReport?'11px':'11px';
+  var html='<div style="margin-top:7px;padding-top:7px;border-top:1px solid '+(forReport?'#E5DDD5':'var(--brd)')+';">';
+  html+='<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:'+(forReport?'#7A6E66':'var(--ink3)')+';margin-bottom:6px">Why it happens (most common causes)</div>';
+  causes.forEach(function(c,i){
+    // Each cause is "Main cause — sub details" or just "Main cause"
+    var parts=c.split(' — ');
+    var main=parts[0];
+    var sub=parts.slice(1).join(' — ');
+    html+='<div style="display:flex;gap:7px;margin-bottom:5px;align-items:flex-start">';
+    html+='<span style="min-width:18px;height:18px;border-radius:50%;background:'+(forReport?'#0F0D0B':'var(--ink)')+';color:#fff;font-size:9px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">'+(i+1)+'</span>';
+    html+='<div>';
+    html+='<div style="font-size:'+fs+';font-weight:600;color:'+(forReport?'#0F0D0B':'var(--ink)')+'">'+main+'</div>';
+    if(sub) html+='<div style="font-size:10px;color:'+(forReport?'#7A6E66':'var(--ink3)')+';margin-top:2px">'+sub+'</div>';
+    html+='</div></div>';
+  });
+  html+='</div>';
+  return html;
+}
+
 function onObdInput(){
   var val=document.getElementById('f_obd').value.trim();
   var res=document.getElementById('obd_result');
@@ -1400,7 +1593,8 @@ function onObdInput(){
         +'<span style="font-size:12px;font-weight:700;color:var(--ink)">'+r.name+'</span>'
         +'</div>'
         +'<div style="font-size:11px;color:#7A6E66;margin-bottom:3px">&#9889; <strong>Effect:</strong> '+r.effect+'</div>'
-        +'<div style="font-size:11px;color:var(--ord)">&#128295; <strong>Root cause:</strong> '+r.cause+'</div>'
+        +'<div style="font-size:11px;color:var(--ord);margin-bottom:2px">&#128295; <strong>Most likely root issue:</strong> '+r.cause+'</div>'
+        +buildCausesHtml(r.code, false)
         +'</div>';
     } else {
       html+='<div style="background:#fff;border:1px solid var(--brd);border-radius:8px;padding:8px 10px;margin-bottom:6px;font-size:11px;color:var(--ink3)">'
@@ -1471,7 +1665,15 @@ function s1go(){
 
 function s3go(){
   ST.ob=[];
-  document.querySelectorAll('.chi2.on .chkt').forEach(function(el){ST.ob.push(el.textContent.trim());});
+  ST.ob=[];
+  document.querySelectorAll('.chi2.on').forEach(function(el){
+    var txt=el.querySelector('.chkt');
+    // Get only the first text node (English) - not the Hindi child div
+    var engNode=txt?txt.firstChild:null;
+    var eng=engNode&&engNode.nodeType===3?engNode.textContent.trim():(txt?txt.textContent.split('\n')[0].trim():'');
+    var mean=el.dataset.meaning||'';
+    ST.ob.push({e:eng,m:mean});
+  });
   if(!ST.sv){toast('Select severity level');return;}
   ST.nt=document.getElementById('f_nt').value.trim();
   ST.obd=document.getElementById('f_obd').value.trim().toUpperCase();
@@ -1485,7 +1687,8 @@ function loadCL(cat){
   document.getElementById('chklist').innerHTML=lst.map(function(item){
     var eng=typeof item==='object'?item.e:item;
     var hin=typeof item==='object'?item.h:'';
-    return '<div class="chi2" onclick="tchk(this)">'
+    var mean=typeof item==='object'&&item.m?item.m:'';
+    return '<div class="chi2" onclick="tchk(this)" data-meaning="'+mean.replace(/"/g,"'")+'">'
       +'<div class="chkb"></div>'
       +'<div class="chkt">'+eng+(hin?'<div class="chkh">'+hin+'</div>':'')+'</div>'
       +'</div>';
@@ -1515,6 +1718,333 @@ function updTmr(){
   el.className='tmc'+(tmrS<=120?' warn':'')+(tmrS<=60?' urgent':'');
 }
 
+// ── EXACT DIAGNOSIS ENGINE ────────────────────────────────────────────────
+// Reads checked observations + OBD codes to return precise sub-diagnosis
+function exactDiag(cat, obs, obdCodes){
+  var o=obs.map(function(x){return (typeof x==='object'?x.e:x).toLowerCase();});
+  var has=function(kw){return o.some(function(x){return x.includes(kw);});};
+  var hasAny=function(arr){return arr.some(function(k){return has(k);});};
+  var obd=obdCodes?obdCodes.toUpperCase():'';
+
+  if(cat==='ac'){
+    if(hasAny(['clicking','grinding','compressor belt','compressor clutch not engaging']))
+      return{dx:"AC Compressor Failure — compressor clutch not engaging or compressor seized",
+        ac:["AC compressor clutch confirmed not engaging or making mechanical noise","Compressor replacement required — do not run AC as it will damage the system further","Check if AC belt is intact before replacing compressor","Full AC recharge required after compressor replacement"],
+        sy:["Loud clicking or grinding when AC is switched on","AC works briefly then stops — clutch slipping","No cold air despite compressor spinning","Belt squealing from AC compressor area"],
+        rp:"AC compressor replacement: 2-4 hrs. Includes compressor, receiver drier, and recharge. Cost: Rs 8,000-25,000 depending on car model. Do not run AC until repaired — seized compressor will damage the entire system."};
+
+    if(hasAny(['refrigerant pressure low','gas','oily residue','refrigerant leak']))
+      return{dx:"AC Refrigerant Leak — gas loss causing warm air",
+        ac:["AC refrigerant (gas) has leaked out — system needs leak detection first","Repair the leak source before recharging — recharging without fixing leak is a temporary fix","Common leak points: Schrader valves, condenser fins, evaporator, hose connections","Recharge with correct refrigerant type (R134a or R1234yf) after repair"],
+        sy:["AC gradually lost cooling over weeks or months","Cooling works in the morning but fails by afternoon","AC compressor cycling on/off rapidly","Oily residue visible on AC pipes or condenser"],
+        rp:"Leak detection: 30-45 min. Leak repair (O-ring/hose): 30-60 min. Recharge: 30-45 min. Cost: Rs 1,500-5,000 for recharge. If evaporator or condenser leaking: Rs 5,000-15,000."};
+
+    if(hasAny(['blower motor','no air from vents','no airflow']))
+      return{dx:"Blower Motor Failure — no airflow from AC vents",
+        ac:["Blower motor has failed — fan not spinning so no air reaches the cabin","Check blower motor fuse first (cheap and fast)","If fuse is fine: blower motor resistor fault (fan only works on max speed) or full motor failure","Blower motor replacement required if resistor is not the cause"],
+        sy:["No air from vents on any speed setting","Air only comes on maximum speed (resistor fault)","Burning smell from vents when trying to run AC","Dashboard controls work but no airflow"],
+        rp:"Blower resistor replacement: 30-45 min, Rs 500-1,500. Blower motor replacement: 1-2 hrs, Rs 1,500-5,000. Fuse check: 5 min, free."};
+
+    if(hasAny(['cabin air filter','clogged','restricted airflow']))
+      return{dx:"Cabin Air Filter Blocked — restricted airflow causing poor cooling",
+        ac:["Cabin air filter completely clogged — blocking airflow through the evaporator","Filter replacement is a simple 10-minute job — no workshop needed","Recommend replacement every 15,000 km or annually","After filter replacement, run AC for 10 minutes to confirm cooling improves"],
+        sy:["Very weak airflow from vents even on maximum fan speed","AC works but takes very long to cool the cabin","Dust or musty smell from vents","Cooling was fine before — gradual decline"],
+        rp:"Cabin air filter replacement: 10-15 min. Cost: Rs 300-800 for filter. Can be done on-site immediately if filter is available."};
+
+    if(hasAny(['musty','mouldy smell','bad smell']))
+      return{dx:"AC Evaporator Mould/Bacterial Growth — causing bad smell from vents",
+        ac:["Bacterial or mould growth on evaporator surface causing musty/foul smell","Anti-bacterial AC treatment required — spray into evaporator via intake vent","Cabin air filter replacement strongly recommended at same time","Run AC on fresh air (not recirculate) at high fan for 10 min after treatment"],
+        sy:["Foul or musty smell immediately when AC is turned on","Smell worse at startup, improves after a few minutes","No cooling issue — just odour","Smell like gym socks or wet towels from vents"],
+        rp:"Evaporator antibacterial treatment: 30-45 min, Rs 800-2,000. Cabin filter replacement: Rs 300-800. Both recommended together."};
+
+    if(hasAny(['cooling intermittent','cold then warm','cuts out']))
+      return{dx:"AC Cooling Intermittent — evaporator icing or compressor cycling fault",
+        ac:["AC cooling stopping intermittently — evaporator icing up or pressure cycling fault","Evaporator ice: if cabin air filter is very dirty, restricted airflow causes ice. Replace filter first","If filter is clean: refrigerant overcharge or expansion valve fault causing icing","Compressor cycling fault: pressure too low — refrigerant leak suspected"],
+        sy:["AC blows cold for 20-30 minutes then goes warm","Cooling returns after AC is off for a while","Ice visible on AC pipes near firewall","Airflow reduces as icing builds up"],
+        rp:"Evaporator inspection: 1-2 hrs. Expansion valve replacement: 2-3 hrs, Rs 2,000-6,000. Refrigerant level check and adjustment: 30-45 min, Rs 500-1,500."};
+
+    return{dx:"AC System Fault — full diagnostic required to identify exact component",
+      ac:AC.ac, sy:SY.ac, rp:RP.ac};
+  }
+
+  if(cat==='clutch'){
+    if(hasAny(['not returning','sinking to floor','slowly sinking','pedal sinking']))
+      return{dx:"Hydraulic Clutch Cylinder Failure — master or slave cylinder leaking internally",
+        ac:["Clutch hydraulic circuit losing pressure — master or slave cylinder seal has failed internally","Check hydraulic fluid reservoir near pedal — dropping level confirms internal leak","Pedal sinking alone with no external leak = internal bypass in master cylinder","Full hydraulic bleed required after cylinder replacement to remove air from system"],
+        sy:["Clutch pedal slowly sinks to floor on its own without being pressed","Biting point getting progressively lower over days","Pedal returns slowly or stays partially depressed","No visible fluid leak externally on ground"],
+        rp:"Master cylinder replacement: 1-2 hrs, Rs 1,500-4,000. Slave cylinder: 1-2 hrs, Rs 1,000-3,000. System bleed after replacement: 30-45 min. Both cylinders often replaced together on high mileage cars."};
+
+    if(hasAny(['not returning to original','pedal not returning','return spring','stiff only when cold','stiff only in cold']))
+      return{dx:"Clutch Pedal Return Fault — return spring broken or cable/pivot restricting pedal return",
+        ac:["Clutch pedal return spring has weakened or broken — pedal stays partially depressed after releasing","Partially engaged clutch keeps friction plate in slight contact — causing slipping and premature plate wear","Inspect return spring at pedal pivot — often visible without removing trim panels","Cable clutch: check cable outer sleeve for kinking which prevents free return","Hydraulic clutch: check for swollen seals restricting fluid return"],
+        sy:["Clutch pedal does not spring back fully to original position after releasing","Pedal sits lower than normal at rest","Clutch slipping because plate never fully engages","Clutch drag — gears hard to select because plate never fully disengages from flywheel"],
+        rp:"Return spring replacement: 30-60 min, Rs 200-800. Pedal pivot bushing: 30-60 min, Rs 300-1,000. Cable replacement if kinked: 45-60 min, Rs 500-1,500. Hydraulic seal kit if seals swollen: Rs 500-1,500."};
+
+    if(hasAny(['falls to floor','zero resistance','hydraulic failure','cable broken','cable visibly broken']))
+      return{dx:"Clutch Cable or Hydraulic Line Complete Failure — cannot change gears",
+        ac:["Clutch cable has snapped or hydraulic line has failed completely — no resistance in pedal","Vehicle cannot be driven — gears cannot be engaged or disengaged safely","Confirm: cable clutch (look under bonnet for broken cable) or hydraulic (check fluid reservoir — empty = leak)","Tow vehicle to workshop — do not attempt to drive"],
+        sy:["Clutch pedal falls to floor with zero resistance","Cannot engage any gear at all","No biting point anywhere in pedal travel","Gear lever may move but clutch plate not disengaging"],
+        rp:"Cable replacement: 45-60 min, Rs 500-1,500. Hydraulic line replacement: 1-2 hrs, Rs 800-2,500. Full system bleed after hydraulic repair."};
+
+    if(hasAny(['rpm rises','slipping','biting point very high','plate heavily worn','burning smell']))
+      return{dx:"Clutch Plate Worn Out — plate slipping and cannot transfer engine power to wheels",
+        ac:["Clutch plate friction material worn through — plate slipping under load","RPM rising without speed increase is definitive confirmation of clutch slip","Full clutch kit replacement required: friction disc + pressure plate + release bearing","Flywheel must be inspected when clutch is removed — resurface or replace if scored/blued from heat"],
+        sy:["Engine RPM rises sharply under acceleration but car speed does not match","Burning smell from clutch area especially on inclines or in heavy traffic","Biting point very high on pedal — almost at top of travel","Car struggles to climb hills despite engine revving"],
+        rp:"Full clutch kit replacement (requires gearbox removal): 4-8 hrs, Rs 5,000-20,000 depending on car model. Flywheel resurfacing: Rs 1,500-4,000 additional. Doorstep diagnosis available — tow to workshop for repair."};
+
+    return{dx:"Clutch System Fault — requires inspection to identify specific component failure",
+      ac:AC.clutch, sy:SY.clutch, rp:RP.clutch};
+  }
+
+  if(cat==='brake'){
+    if(hasAny(['grinding metal','grinding sound','pads below 3mm','pads worn']))
+      return{dx:"Brake Pads Completely Worn — metal-on-metal contact with disc",
+        ac:["Brake pads have worn through to the metal backing plate — immediate replacement required","Every km driven in this state causes deeper scoring on the brake disc — increasing repair cost","Both front or both rear pads must be replaced together — never one side only","Inspect brake disc for scoring — if disc is scored beyond minimum thickness, replacement also required"],
+        sy:["Loud metal-on-metal grinding when braking","Reduced braking effectiveness","Vibration felt through brake pedal","Brake dust visible on wheel — metallic not normal dark dust"],
+        rp:"Brake pad replacement: 1-2 hrs per axle. Cost: Rs 1,500-6,000 for pads. If discs are scored: Rs 3,000-12,000 for pads + discs. Do not drive until repaired."};
+
+    if(hasAny(['soft','spongy','goes too far','pedal low']))
+      return{dx:"Air in Brake Lines or Brake Fluid Leak — spongy pedal causing reduced braking",
+        ac:["Air in brake hydraulic circuit — pedal travel increased, braking force reduced","Brake system must be bled (air removed) before driving","Check brake fluid reservoir level — low level confirms a leak somewhere in the system","Inspect all four wheel hubs and brake master cylinder for fluid leaks"],
+        sy:["Brake pedal sinks further than normal before biting","Pedal feels spongy or springy — not solid","Braking is noticeably weaker than before","May need to pump pedal to get firm braking"],
+        rp:"Brake system bleed: 45-60 min, Rs 500-1,000. If leak found: hose, caliper, or master cylinder repair before bleed. Cost: Rs 1,500-8,000 depending on source."};
+
+    if(hasAny(['seized caliper','one wheel hot','caliper']))
+      return{dx:"Brake Caliper Seized — constant brake drag on one wheel",
+        ac:["Brake caliper piston or slide pins seized — pads dragging on disc continuously","This wheel will run significantly hotter than others and will wear pads extremely fast","Caliper rebuild (new seals and pistons) or full caliper replacement required","Do not drive long distances — heat build-up can cause brake fluid to boil and brakes to fade completely"],
+        sy:["One wheel noticeably hotter than others after short drive","Car pulls to one side during braking","Fuel economy reduced — constant drag","Burning smell from one specific wheel area"],
+        rp:"Caliper rebuild: 1-2 hrs, Rs 1,000-2,500 (rebuild kit). Full caliper replacement: 1-2 hrs, Rs 2,500-8,000. Replace pads on that axle at same time."};
+
+    if(hasAny(['brake fluid leak','fluid leak','master cylinder']))
+      return{dx:"Brake Fluid Leak — DO NOT DRIVE — total brake failure risk",
+        ac:["Brake fluid leaking — do NOT drive under any circumstances","Identify leak source: master cylinder, brake line, or wheel caliper","Brake fluid loss = gradual brake failure — pedal will go to floor","Tow vehicle to workshop immediately — zero driving"],
+        sy:["Brake pedal slowly sinking to the floor when held","Fluid pooling under car near wheel or dashboard","Brake fluid reservoir empty or nearly empty","Soft pedal worsening over time"],
+        rp:"Master cylinder replacement: 2-3 hrs, Rs 2,000-6,000. Brake hose replacement: 30-60 min, Rs 500-1,500. Full system bleed required after any brake fluid leak repair."};
+
+    if(hasAny(['pulls to one side','pulling']))
+      return{dx:"Brake Imbalance — car pulling to one side under braking",
+        ac:["Car pulling under braking indicates unequal braking force between left and right","Most common cause: seized caliper on pulling side, or worn pads unevenly","Check tyre pressures first — unequal pressure also causes pulling","Inspect both front calipers for sticking slides or seized pistons"],
+        sy:["Car veers left or right when brakes are applied","Worse under harder braking","No pulling when not braking","Uneven tyre wear on the pulling side"],
+        rp:"Caliper inspection and service: 1-2 hrs, Rs 1,000-4,000. Brake pad replacement on affected axle: 1-2 hrs, Rs 1,500-4,000. Wheel alignment check recommended after."};
+
+    return{dx:"Brake System Fault — full brake inspection required",
+      ac:AC.brake, sy:SY.brake, rp:RP.brake};
+  }
+
+  if(cat==='battery'){
+    if(hasAny(['alternator','below 13.5','not charging']))
+      return{dx:"Alternator Failure — battery not charging while driving",
+        ac:["Alternator confirmed not charging — battery will drain while driving","Battery will go completely flat within 30-60 minutes of driving without charging","Do not drive more than necessary — reach nearest workshop","Test alternator belt condition — broken belt also stops charging (check first)"],
+        sy:["Battery warning light on while engine is running","Lights dimming while driving","Radio or electronics cutting out at low revs","Battery fine after charging but drains within a day of driving"],
+        rp:"Alternator belt check: 5 min. Belt replacement: 30-60 min, Rs 500-1,500. Alternator replacement: 1-2 hrs, Rs 3,000-12,000. Test output after fitting: should be 13.5-14.5V at 2000 RPM."};
+
+    if(hasAny(['jump-start confirmed','started with cables']))
+      return{dx:"Battery Dead — confirmed by successful jump-start",
+        ac:["Battery failure confirmed — jump-start proves battery cannot hold charge","Battery must be replaced — cannot be recharged back to reliable service","Test alternator output after fitting new battery (13.5-14.5V at 2000 RPM)","Check for parasitic drain if battery is less than 2 years old — something may be draining it"],
+        sy:["No start before jump — started immediately after jump cables","Rapid clicking before jump","Dashboard lights dim before jump","Battery older than 3 years"],
+        rp:"Battery replacement: 20-30 min, doorstep service available. Cost: Rs 3,500-10,000 depending on battery spec and car. Alternator test included. 2-year warranty on Instant Mechanic batteries."};
+
+    if(hasAny(['parasitic','accessories drawing','dashcam']))
+      return{dx:"Parasitic Battery Drain — accessory draining battery when car is off",
+        ac:["After-market accessory (dashcam, alarm, stereo) drawing power when car is off","Identify drain: connect ammeter to battery negative — should be below 50mA","Pull fuses one by one with ammeter connected — when current drops, that circuit is the culprit","Common causes: always-on dashcam, faulty alarm ECU, interior light switch stuck on"],
+        sy:["Battery flat after 1-2 days without driving","New battery dies within weeks","Battery fine after disconnecting a specific accessory","Problem started after fitting an accessory"],
+        rp:"Parasitic drain diagnosis: 30-60 min, Rs 300-500. Timer relay for dashcam: Rs 300-600 fitted. Alarm ECU replacement if faulty: Rs 1,500-4,000."};
+
+    return{dx:"Battery or Charging System Failure — replacement or alternator repair required",
+      ac:AC.battery, sy:SY.battery, rp:RP.battery};
+  }
+
+  if(cat==='misfire'){
+    var hasBlackSmoke=hasAny(['black smoke','poor fuel economy','filling up','oily residue on injector']);
+    var coilMoved=has('misfire moved') || has('misfire did move');
+    var coilDidNotMove=has('did not move') || has('coil swap did not');
+    var plugsFouledWithFuel=has('wet with fuel') || has('fuel-wet');
+    var plugsBlackCarbon=has('black carbon deposits') || has('fouled');
+
+    if(coilDidNotMove || hasAny(['injector','p020'])){
+      return{dx:"Fuel Injector Fault — injector stuck open, blocked, or leaking on affected cylinder",
+        ac:["Coil swap test confirmed: misfire did NOT move — ignition coil is NOT the fault","Injector on the misfiring cylinder is stuck open, partially blocked, or leaking","Step 1: Injector cleaning (ultrasonic) — often resolves partial blockage, cost Rs 1,500-3,000","Step 2: If cleaning does not resolve — injector replacement required (Rs 2,000-8,000 per injector)","Black smoke and poor fuel economy = over-fuelling from stuck-open or leaking injector"],
+        sy:["Black smoke from exhaust — thick and persistent especially on acceleration","Poor fuel economy — filling up more frequently than before","Fuel smell from engine bay or exhaust","Spark plug on that cylinder wet with fuel or heavily carbon-fouled","Misfire code P030X on specific cylinder"],
+        rp:"Injector cleaning (ultrasonic off-car): 1-2 hrs, Rs 400-800 per injector (cleaning only). Full injector replacement: 2-3 hrs, Rs 2,000-8,000 per injector (parts + labour). OBD scan to confirm specific cylinder. Always replace injector O-rings when removing injectors."};
+    }
+
+    if(coilMoved || hasAny(['coil swap','coil hotter','coil fault'])){
+      return{dx:"Ignition Coil Failure — coil on cylinder " + (obd.match(/P030(\d)/)?obd.match(/P030(\d)/)[1]:'identified') + " confirmed faulty by swap test",
+        ac:["Ignition coil swap test confirmed — misfire moved to the swapped cylinder","Replace the specific faulty coil — do not replace all coils unless other coils also test bad","Inspect spark plug on that cylinder — replace if fouled or worn beyond spec","Clear OBD codes after repair and road test to confirm misfire is resolved"],
+        sy:["Misfire on specific cylinder — confirmed by OBD code","Rough idle and vibration at low RPM","Check engine light on — P030X code","Symptoms improve at higher RPM (coils work better when warm)"],
+        rp:"Ignition coil replacement: 15-30 min per coil. Cost: Rs 800-3,000 per coil (OEM quality). Spark plug replacement on same cylinder recommended: Rs 150-500 per plug. Full plug set replacement if car is high mileage."};
+    }
+
+    if(plugsFouledWithFuel || hasAny(['wet with fuel','fuel-wet plug'])){
+      return{dx:"Injector Over-Fuelling — cylinder flooded with fuel causing misfire",
+        ac:["Cylinder is being flooded with fuel from a leaking or stuck-open injector","Remove and dry the fouled spark plug — or replace it","Injector on that cylinder must be tested and cleaned or replaced","Do not crank engine repeatedly — excess fuel can wash oil off cylinder walls"],
+        sy:["Strong fuel smell from exhaust","Spark plug soaked in petrol","Black smoke on startup","Engine stumbles immediately on startup"],
+        rp:"Spark plug replacement: Rs 150-500 per plug. Injector cleaning: Rs 400-800 per injector. Injector replacement if leaking: Rs 2,000-8,000."};
+    }
+
+    if(hasBlackSmoke){
+      return{dx:"Rich Fuel Mixture / Injector Fault — too much fuel, not enough air",
+        ac:["Black smoke confirms rich running — too much fuel relative to air","Most common cause: faulty fuel injector (leaking or stuck open)","Other causes: bad MAF sensor, blocked air filter, faulty O2 sensor, ECU over-fuelling","Check air filter first (free) — if clogged, replace and retest before condemning injectors","OBD scan for MAF (P0100-P0103) or O2 sensor codes (P0131-P0138) before replacing injectors"],
+        sy:["Black thick smoke from exhaust especially under acceleration","Poor fuel economy","Petrol smell from exhaust","Engine feels sluggish despite revving"],
+        rp:"Air filter: Rs 300-800, 15 min. MAF sensor: Rs 1,500-5,000, 30-45 min. O2 sensor: Rs 1,500-4,000, 30-60 min. Injector cleaning: Rs 400-800 per injector. OBD scan to identify specific fault code first."};
+    }
+
+    return{dx:"Engine Misfire — spark plug, coil, or injector fault on affected cylinder",
+      ac:AC.misfire, sy:SY.misfire, rp:RP.misfire};
+  }
+
+  if(cat==='noise'){
+    if(hasAny(['clicking when turning','cv joint']))
+      return{dx:"CV Joint Failure — clicking when turning confirms worn constant velocity joint",
+        ac:["CV joint clicking on turns is a definitive sign of CV joint wear","The louder and more frequent the click, the more advanced the wear","CV joint boot may have split, allowing grease to escape and grit to enter — inspect visually","If boot is split but joint is not yet clicking badly, boot replacement alone may be sufficient"],
+        sy:["Clicking sound matching wheel rotation speed when turning","Clicking worse on full lock turns","Grease splattered inside wheel arch (split CV boot)","Sound disappears when driving straight"],
+        rp:"CV boot replacement (early stage): 1-2 hrs, Rs 800-2,000. Full CV joint replacement: 2-3 hrs, Rs 2,000-8,000. Driveshaft replacement if joint is damaged: Rs 4,000-15,000."};
+
+    if(hasAny(['humming','wheel bearing','speed-related hum']))
+      return{dx:"Wheel Bearing Failure — humming/droning noise that changes with speed",
+        ac:["Wheel bearing failure confirmed — humming changes with speed, not engine RPM","Safety critical: failed bearing can cause wheel to seize or wobble at high speed","Identify which wheel: hum louder when turning away from the bad bearing (weight off it)","Replace immediately — do not drive long distances at speed"],
+        sy:["Humming or droning noise that increases with vehicle speed","Noise changes when changing lanes (weight shifts onto/off that wheel)","Rough feeling when spinning that wheel by hand (jacked up)","Sometimes a grinding sound as bearing worsens"],
+        rp:"Wheel bearing replacement: 2-4 hrs, Rs 2,000-8,000. Hub assembly replacement if bearing is integrated: Rs 3,000-12,000. Always do wheel alignment after."};
+
+    if(hasAny(['knocking inside engine','engine knock','bearing wear','low oil']))
+      return{dx:"Engine Bearing Knock — internal engine noise indicating oil starvation or bearing wear",
+        ac:["Engine knocking is a serious warning — indicates bearing failure or severe low oil","Check oil level immediately — if low, top up and recheck noise","If oil is fine: bearing wear has begun — engine internal damage","Do NOT drive — further running will cause catastrophic engine seizure","OBD scan for oil pressure codes (P0524)"],
+        sy:["Deep knocking or thudding from inside engine at idle","Knock increases with RPM","Oil pressure warning light on or intermittent","Knock worse when engine is cold, may reduce when warm"],
+        rp:"Oil top-up: immediate, Rs 300-800. If bearing damage: engine rebuild required. 4-cylinder engine rebuild: Rs 25,000-80,000+. Replacement engine: Rs 40,000-1,50,000. Prevention: do not ignore oil change intervals."};
+
+    if(hasAny(['rattling below','heat shield','exhaust rattle']))
+      return{dx:"Exhaust Heat Shield Loose — metallic rattling from under the car",
+        ac:["Heat shield has come loose from exhaust pipe or catalytic converter area","Common and inexpensive fix — heat shield can be re-clamped or removed if damaged","Rattle is worse when cold (metal expands and may quieten when hot)","Check catalytic converter is still secure — rattle inside cat converter means it has broken internally"],
+        sy:["Metallic rattling from under the car, especially over bumps","Rattle changes with engine RPM at idle","Noise worse when cold, quietens when hot","No effect on performance"],
+        rp:"Heat shield re-clamp or removal: 15-30 min, Rs 200-500. New heat shield if damaged: Rs 500-2,000. If catalytic converter rattling internally: replacement required Rs 5,000-20,000."};
+
+    if(hasAny(['squealing','belt','belt squeal']))
+      return{dx:"Drive Belt Slipping — high-pitched squealing from engine belt",
+        ac:["Belt is slipping on a pulley — likely the alternator/serpentine belt","If AC belt: AC will not cool properly when belt slips","Inspect belt condition: cracked, glazed, or incorrect tension","Tensioner pulley bearing may be seized — causing belt to run against it and squeal"],
+        sy:["High-pitched squealing from front of engine","Worse in wet weather (water on belt causes slip)","Squealing on acceleration or when AC is turned on","Battery warning light if alternator belt slipping"],
+        rp:"Belt replacement: 30-60 min, Rs 500-1,500. Tensioner pulley replacement: 30-60 min additional, Rs 800-2,500. Replace belt and tensioner together as a set."};
+
+    return{dx:"Mechanical Noise — further diagnosis required to identify component",
+      ac:AC.noise, sy:SY.noise, rp:RP.noise};
+  }
+
+  if(cat==='leak'){
+    if(hasAny(['dark brown','black fluid','engine oil','sump plug','valve cover']))
+      return{dx:"Engine Oil Leak — oil escaping from gasket, seal, or sump plug",
+        ac:["Engine oil leak confirmed — identify exact source before repair","Clean the leak area with brake cleaner, run engine, identify exact wet point","Common sources: valve cover gasket (top), sump plug (bottom), crankshaft seal (front/rear)","Check oil level and top up if low — running with low oil will damage engine"],
+        sy:["Dark brown or black puddle under front of car","Oil burning smell from engine bay — oil dripping on hot exhaust","Oil level dropping on dipstick","Smoke from engine bay"],
+        rp:"Sump plug washer replacement: 15 min, Rs 50-200. Valve cover gasket: 1-2 hrs, Rs 800-3,000. Crankshaft oil seal: 2-4 hrs, Rs 1,500-5,000. Rear main seal (major): 4-8 hrs, Rs 4,000-12,000."};
+
+    if(hasAny(['green','pink','orange','coolant','radiator hose']))
+      return{dx:"Coolant Leak — engine cooling system losing coolant",
+        ac:["Coolant leak confirmed — identify source before driving","Do NOT drive — overheating risk is severe if coolant level drops further","Top up coolant temporarily to monitor rate of loss","Common sources: radiator hose, radiator itself, water pump seal, heater matrix"],
+        sy:["Coloured fluid (green/pink/orange) under front of car","Temperature gauge rising above normal","Sweet smell from engine bay","Low coolant warning light"],
+        rp:"Hose replacement: 30-60 min, Rs 300-1,500. Radiator replacement: 2-3 hrs, Rs 4,000-12,000. Water pump: 2-4 hrs, Rs 2,000-6,000. Heater matrix: 4-8 hrs, Rs 5,000-15,000."};
+
+    if(hasAny(['brake fluid','brake line','master cylinder']))
+      return{dx:"Brake Fluid Leak — CRITICAL — brake failure risk — do NOT drive",
+        ac:["Brake fluid leak = progressive brake failure — vehicle must be towed","Identify leak point: master cylinder under bonnet, brake lines, or wheel calipers","Brake fluid reservoir level will be dropping — confirm by checking level","Zero tolerance — do not allow customer to drive this vehicle"],
+        sy:["Clear or light yellow fluid near wheel or under dashboard","Spongy or sinking brake pedal","Brake warning light on"],
+        rp:"Master cylinder: 2-3 hrs, Rs 2,000-6,000. Brake hose: 30-60 min, Rs 500-1,500. Caliper: 1-2 hrs, Rs 2,500-8,000. Full system bleed after any repair."};
+
+    if(hasAny(['petrol','diesel','fuel smell','fuel leak']))
+      return{dx:"Fuel Leak — FIRE HAZARD — do NOT start vehicle",
+        ac:["Fuel leak is an immediate fire hazard — do NOT start or run the engine","Move vehicle away from ignition sources if possible — push or tow only","Identify source: fuel hose, injector O-ring, or fuel tank","Workshop repair required before vehicle can be used"],
+        sy:["Strong petrol or diesel smell","Visible fuel dripping or pooling","Fuel gauge dropping faster than normal"],
+        rp:"Fuel hose replacement: 30-60 min, Rs 300-1,500. Injector O-ring: Rs 50-200 per injector. Fuel tank repair: specialist required. Do not attempt DIY repair on fuel system."};
+
+    return{dx:"Fluid Leak Identified — source and fluid type requires workshop inspection",
+      ac:AC.leak, sy:SY.leak, rp:RP.leak};
+  }
+
+  if(cat==='gear'){
+    // OBD code takes priority for gear/transmission
+    if(obd.match(/P097[2-9]|P098[0-6]/)){
+      var sol=obd.match(/P097[2-9]|P098[0-6]/)[0];
+      var solName={'P0972':'A Range','P0973':'A Low (Short)','P0974':'A High (Open)',
+        'P0975':'B Range','P0976':'B Low (Short)','P0977':'B High (Open)',
+        'P0978':'C Range','P0979':'C Low (Short)','P0980':'C High (Open)',
+        'P0981':'D Range','P0982':'D Low (Short)','P0983':'D High (Open)',
+        'P0984':'E Range','P0985':'E Low (Short)','P0986':'E High (Open)'}[sol]||'Fault';
+      var isShort=sol.endsWith('3')||sol.endsWith('6')||sol.endsWith('9')||sol.endsWith('2')||sol.endsWith('5')||sol.endsWith('8');
+      var isOpen=sol.endsWith('4')||sol.endsWith('7')||sol.endsWith('0');
+      var rootCause=isOpen?'Solenoid coil open circuit (internal failure) or broken wire in transmission harness':
+        isShort?'Wire short to ground in transmission harness or internal solenoid short':'ATF contamination causing solenoid to stick mechanically';
+      return{dx:"Shift Solenoid "+solName.charAt(0)+" Fault ("+sol+") — "+
+        (isOpen?'solenoid open circuit — electrical failure':isShort?'short circuit — wiring fault':'solenoid stuck — ATF or mechanical fault'),
+        ac:["OBD code "+sol+" confirmed: Shift Solenoid "+solName.charAt(0)+" circuit fault",
+          rootCause+" — transmission harness inspection required",
+          "Step 1: Check ATF condition — if dark/burnt, ATF change may resolve if solenoid is stuck (not electrical fault)",
+          "Step 2: Check transmission harness connector for corrosion, broken pins, or damaged wiring",
+          "Step 3: If wiring is good — solenoid replacement required (valve body removal needed)",
+          "Do not ignore — delaying repair damages clutch packs and increases repair cost significantly"],
+        sy:["Harsh or delayed gear shifts — especially the gear controlled by solenoid "+solName.charAt(0),
+          "Transmission slipping or hunting between gears",
+          "Check engine or transmission warning light on",
+          "OBD code "+sol+" stored — confirmed by scan"],
+        rp:"ATF change (first step): 45-60 min, Rs 2,000-4,000. Transmission harness inspection: 30-45 min. Solenoid replacement (requires valve body removal): 2-4 hrs, Rs 3,000-12,000. Clear codes and road test after repair. If multiple solenoid codes — full valve body replacement may be more economical: Rs 8,000-25,000."};
+    }
+
+    if(obd.match(/P073[0-9]|P074[0-9]|P075[0-9]|P076[0-9]|P077[0-9]/)){
+      return{dx:"Automatic Transmission Internal Fault — gear ratio or solenoid fault confirmed by OBD code "+obd.match(/P07\d\d/)[0],
+        ac:["OBD code confirms internal transmission fault — not a wiring issue","ATF change is the first step — dirty fluid causes most solenoid and clutch pack failures","If ATF is clean and correct level: valve body inspection or rebuild required","Workshop diagnosis required — transmission specialist recommended"],
+        sy:["Incorrect gear ratio — transmission slipping in specific gear","Harsh or delayed gear changes","Transmission overheating warning"],
+        rp:"ATF and filter service: 1-2 hrs, Rs 2,000-5,000. Valve body rebuild: 4-6 hrs, Rs 8,000-20,000. Full transmission rebuild: Rs 30,000-80,000+."};
+    }
+
+    if(hasAny(['physically stuck','cannot move','linkage']))
+      return{dx:"Gear Linkage Disconnected or Broken — gear lever not connected to gearbox",
+        ac:["Gear linkage rod has disconnected or snapped — mechanical fault, not electrical","Inspect linkage beneath car — may be visible without lifting","Linkage reconnection or replacement is often a simple fix","Do not force gear lever — can cause further damage"],
+        sy:["Gear lever moves freely but no gear engages","Scraping sound from under car when lever is moved","No resistance in lever movement","Neutral regardless of lever position"],
+        rp:"Gear linkage reattachment: 30-60 min, Rs 500-1,500. Linkage rod replacement: 1-2 hrs, Rs 1,000-3,000."};
+
+    if(hasAny(['gearbox oil low','dark','burnt-smelling','burnt atf']))
+      return{dx:"ATF Contamination or Low Level — dirty or burnt transmission fluid causing shift faults",
+        ac:["Transmission fluid is dark, burnt-smelling, or low — this is the most common and cheapest fix first","ATF service required: drain, filter replacement (if applicable), and refill with correct fluid","Correct ATF specification is critical — wrong fluid causes immediate damage","After ATF change, drive 50-100 km and recheck shift quality before condemning any solenoid"],
+        sy:["Harsh shifts that started gradually over time","Transmission jerking worse when fluid is cold","Burnt smell from transmission area","Gear changes smoother when fluid is warm"],
+        rp:"ATF drain and fill: 45-60 min, Rs 1,500-3,500. ATF with filter change: 1-2 hrs, Rs 2,500-5,000. Always use manufacturer-specified ATF — wrong grade causes immediate damage."};
+
+    if(hasAny(['harsh','jolting','automatic','delay']))
+      return{dx:"Automatic Transmission Shift Quality Fault — solenoid or valve body issue",
+        ac:["Harsh or delayed shifts indicate shift solenoid or valve body fault","ATF service is the first and cheapest step — dirty fluid causes 60% of shift quality issues","OBD scan essential — solenoid fault codes (P0750-P0986) identify the specific solenoid","If ATF is clean and codes are present: solenoid replacement required"],
+        sy:["Harsh jolting when changing gears","Long delay before car moves from Park/Drive","Hunting between gears at steady speed","Worse when fluid is cold, improves when warm"],
+        rp:"ATF service: Rs 2,000-5,000. OBD scan: Rs 200-500. Solenoid replacement: Rs 3,000-12,000. Valve body replacement: Rs 8,000-25,000."};
+
+    if(hasAny(['grinding noise','specific gear','synchromesh']))
+      return{dx:"Gearbox Synchromesh Failure — grinding confirms worn synchro rings on affected gear",
+        ac:["Grinding when engaging a specific gear confirms synchromesh wear on that gear","Synchromesh replacement requires full gearbox disassembly — major job","As a temporary measure: match revs before changing into that gear to reduce grinding","Gearbox oil change recommended as first step if not recently done"],
+        sy:["Grinding specifically when engaging one or two gears","Other gears change smoothly — problem is gear-specific","Grinding worse when cold, slightly better when warm","Gear eventually engages after grinding if forced"],
+        rp:"Gearbox oil change (first step): 45-60 min, Rs 1,000-2,500. Synchromesh replacement (full gearbox strip): 8-15 hrs, Rs 15,000-50,000+."};
+
+    if(hasAny(['limp mode','single gear','low power']))
+      return{dx:"Transmission Limp Mode — ECU limiting gears to prevent further damage",
+        ac:["Transmission is in limp mode — ECU has detected a fault and limited gears for protection","OBD scan is mandatory — limp mode is a symptom, the fault code reveals the actual cause","Common triggers: solenoid fault, temperature sensor, or pressure sensor code","Do not reset and drive without fixing — limp mode will return and underlying damage worsens"],
+        sy:["Car stuck in one gear — usually 3rd or 4th","Very limited power and performance","Check engine or transmission warning light on","Car moves but cannot accelerate normally"],
+        rp:"OBD scan to identify trigger code: Rs 200-500. Repair depends on code: solenoid Rs 3,000-12,000, sensor Rs 1,000-4,000, ATF service Rs 2,000-5,000."};
+
+    return{dx:DX.gear, ac:AC.gear, sy:SY.gear, rp:RP.gear};
+  }
+
+  // OBD code primary lookup for any category
+  if(ST&&ST.obd&&ST.obd.length>=4){
+    var obdEntry=OBD_DB[ST.obd.trim().split(/[\s,]+/)[0]];
+    if(obdEntry){
+      return{dx:"Fault code "+ST.obd.trim().split(/[\s,]+/)[0]+": "+obdEntry[0]+" — "+obdEntry[2],
+        ac:["OBD fault code confirmed: "+obdEntry[0],
+          "Side effect: "+obdEntry[1],
+          "Root cause: "+obdEntry[2],
+          "Repair the underlying fault — do not just clear the code or it will return",
+          "Call 8393990942 to book workshop appointment with OBD scan report"],
+        sy:[obdEntry[1],"Check engine or warning light on","Code present: "+ST.obd.trim()],
+        rp:"Repair depends on specific fault identified by code "+ST.obd.trim()+". Workshop diagnostic required. OBD scan report provided to workshop."};
+    }
+  }
+
+  // Default: use category-level data
+  return{dx:DX[cat]||'Fault identified — workshop diagnostic required',
+    ac:AC[cat]||AC.other, sy:SY[cat]||SY.other, rp:RP[cat]||RP.other};
+}
+
 function buildRpt(){
   var cat=CATS.find(function(c){return c.k===ST.cat;})||{i:'🔨',l:'Vehicle Issue'};
   var car=[ST.br,ST.md,ST.yr].filter(Boolean).join(' ')||'Vehicle';
@@ -1526,12 +2056,18 @@ function buildRpt(){
   document.getElementById('r_cu').textContent=cv;
   var vv=car+(ST.fu?'\n'+ST.fu:'')+(ST.rg?'\nReg: '+ST.rg:'');
   document.getElementById('r_vh').textContent=vv;
-  document.getElementById('r_dg').textContent=DX[ST.cat]||'Fault identified — workshop diagnosis required';
+  // Run exact diagnosis engine — uses observations + OBD to pinpoint sub-issue
+  var exact=exactDiag(ST.cat, ST.ob, ST.obd);
+  document.getElementById('r_dg').textContent=exact.dx||DX[ST.cat]||'Fault identified — workshop diagnosis required';
   var svt=ST.sv==='high'?'🔴 Critical — Do NOT Drive':ST.sv==='med'?'🟡 Moderate — Workshop Soon':'🟢 Minor — Monitor Closely';
   var svc=ST.sv==='high'?'rsh':ST.sv==='med'?'rsm':'rsl';
   document.getElementById('r_sv').innerHTML='<span class="rsb '+svc+'">'+svt+'</span>';
-  var obs=ST.ob.length>0?ST.ob:['On-site visual and functional inspection completed'];
-  document.getElementById('r_ob').innerHTML=obs.map(function(o){return'<li>'+o+'</li>';}).join('');
+  var obs=ST.ob.length>0?ST.ob:[{e:'On-site visual and functional inspection completed',m:''}];
+  document.getElementById('r_ob').innerHTML=obs.map(function(o){
+    var txt=typeof o==='object'?o.e:o;
+    var meaning=typeof o==='object'?o.m:'';
+    return '<li>'+txt+(meaning?'<div style="font-size:10px;color:#C23507;margin-top:4px;font-weight:600">&#128073; '+meaning+'</div>':'')+'</li>';
+  }).join('');
   if(ST.nt){document.getElementById('r_nw').style.display='block';document.getElementById('r_nt').textContent=ST.nt;}
   else{document.getElementById('r_nw').style.display='none';}
   // OBD section
@@ -1547,8 +2083,9 @@ function buildRpt(){
         obdHtml+='<span style="font-family:monospace;font-size:12px;font-weight:700;background:#0F0D0B;color:#fff;padding:2px 8px;border-radius:5px">'+r.code+'</span>';
         if(r.name) obdHtml+='<span style="font-size:12px;font-weight:700;color:#0F0D0B">'+r.name+'</span>';
         obdHtml+='</div>';
-        if(r.effect) obdHtml+='<div style="font-size:11px;color:#3D3530;margin-bottom:3px"><strong>Side effect:</strong> '+r.effect+'</div>';
-        if(r.cause) obdHtml+='<div style="font-size:11px;color:#C23507"><strong>Most likely root issue:</strong> '+r.cause+'</div>';
+        if(r.effect) obdHtml+='<div style="font-size:11px;color:#3D3530;margin-bottom:4px"><strong>Side effect:</strong> '+r.effect+'</div>';
+        if(r.cause) obdHtml+='<div style="font-size:11px;color:#C23507;margin-bottom:2px"><strong>Most likely root issue:</strong> '+r.cause+'</div>';
+        obdHtml+=buildCausesHtml(r.code, true);
         if(!r.name) obdHtml+='<div style="font-size:11px;color:#7A6E66">Code '+r.code+' — recorded for workshop reference</div>';
         obdHtml+='</div>';
       });
@@ -1560,11 +2097,11 @@ function buildRpt(){
   } else if(obdWrap){
     obdWrap.style.display='none';
   }
-  var acts=AC[ST.cat]||AC.other;
+  var acts=exact.ac||(AC[ST.cat]||AC.other);
   document.getElementById('r_ac').innerHTML=acts.map(function(a){return'<li>'+a+'</li>';}).join('');
-  var syms=SY[ST.cat]||['Fault pattern consistent with '+cat.l];
+  var syms=exact.sy||(SY[ST.cat]||['Fault pattern consistent with '+cat.l]);
   document.getElementById('r_sy').innerHTML=syms.map(function(s){return'<li>'+s+'</li>';}).join('');
-  var rep=RP[ST.cat]||'Workshop diagnostic required. Time and cost depend on fault found.';
+  var rep=exact.rp||(RP[ST.cat]||'Workshop diagnostic required. Time and cost depend on fault found.');
   document.getElementById('r_rp').innerHTML='<li>'+rep+'</li><li>All repairs at Instant Mechanic partner garages include a written quotation before work begins — no surprise charges.</li><li>Genuine or OEM-quality parts used. Parts warranty included on all repairs.</li>';
   document.getElementById('r_mc').textContent=ST.mc;
 }
