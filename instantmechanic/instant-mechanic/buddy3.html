@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quote Builder — Instant Mechanic</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0a0a; --surface: #111; --surface2: #181818; --border: #252525;
+  --accent: #e8ff47; --accent2: #ff6b2b; --text: #f0f0f0; --muted: #666; --success: #4ade80;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh}
+
+/* ── Header ── */
+header{display:flex;align-items:center;justify-content:space-between;padding:18px 32px;border-bottom:1px solid var(--border);background:rgba(10,10,10,0.95);backdrop-filter:blur(12px);position:sticky;top:0;z-index:100}
+.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;letter-spacing:-0.03em;display:flex;align-items:center;gap:8px}
+.logo-dot{width:9px;height:9px;background:var(--accent);border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(0.85)}}
+.badge{font-family:'DM Mono',monospace;font-size:0.65rem;background:var(--accent);color:#000;padding:3px 9px;border-radius:20px;font-weight:600;letter-spacing:0.04em}
+
+/* ── Layout ── */
+.page{max-width:1000px;margin:0 auto;padding:40px 24px 80px}
+.page-title{font-family:'Syne',sans-serif;font-weight:800;font-size:2rem;letter-spacing:-0.03em;margin-bottom:6px}
+.page-title span{color:var(--accent)}
+.page-sub{color:var(--muted);font-size:0.9rem;margin-bottom:36px}
+
+/* ── Card ── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:20px}
+.card-hdr{padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.card-hdr-title{font-family:'Syne',sans-serif;font-weight:700;font-size:0.9rem;display:flex;align-items:center;gap:8px}
+.card-icon{width:28px;height:28px;background:var(--surface2);border:1px solid var(--border);border-radius:7px;display:grid;place-items:center;font-size:0.85rem}
+
+/* ── Form fields ── */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:16px 20px}
+.form-grid.three{grid-template-columns:1fr 1fr 1fr}
+.form-grid.single{grid-template-columns:1fr}
+@media(max-width:600px){.form-grid,.form-grid.three{grid-template-columns:1fr}}
+.field{display:flex;flex-direction:column;gap:5px}
+.field label{font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.09em;text-transform:uppercase;color:var(--muted)}
+.field input,.field select,.field textarea{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.88rem;color:var(--text);outline:none;transition:border-color 0.15s;width:100%}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent)}
+.field input::placeholder,.field textarea::placeholder{color:var(--muted)}
+.field select option{background:var(--surface2);color:var(--text)}
+.field textarea{resize:vertical;min-height:60px;line-height:1.5}
+
+/* ── Section label ── */
+.sec-label{padding:8px 20px;font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);background:var(--surface2);border-bottom:1px solid var(--border)}
+
+/* ── Item rows ── */
+.item-row{display:grid;grid-template-columns:2.5fr 2.5fr 1fr 1fr 1fr auto;gap:8px;padding:10px 16px;border-bottom:1px solid var(--border);align-items:center}
+.item-row:last-of-type{border-bottom:none}
+.item-row input{background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:7px 10px;font-family:'DM Sans',sans-serif;font-size:0.82rem;color:var(--text);outline:none;transition:border-color 0.15s;width:100%}
+.item-row input:focus{border-color:var(--accent)}
+.item-row input::placeholder{color:var(--muted)}
+.item-row input[type=number]{-moz-appearance:textfield}
+.item-row input[type=number]::-webkit-inner-spin-button{display:none}
+.item-row .total-cell{font-family:'DM Mono',monospace;font-size:0.82rem;color:var(--accent);text-align:right;padding-right:4px;white-space:nowrap}
+.item-row .del-btn{background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--muted);cursor:pointer;width:28px;height:28px;display:grid;place-items:center;font-size:0.85rem;transition:all 0.15s;flex-shrink:0}
+.item-row .del-btn:hover{border-color:var(--accent2);color:var(--accent2)}
+.col-headers{display:grid;grid-template-columns:2.5fr 2.5fr 1fr 1fr 1fr auto;gap:8px;padding:6px 16px;border-bottom:1px solid var(--border);background:#141414}
+.col-hdr{font-family:'DM Mono',monospace;font-size:0.62rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted)}
+.col-hdr.right{text-align:right}
+
+/* Labor rows (task + spec + price only) */
+.labor-row{display:grid;grid-template-columns:3fr 3fr 1.2fr auto;gap:8px;padding:10px 16px;border-bottom:1px solid var(--border);align-items:center}
+.labor-row:last-of-type{border-bottom:none}
+.labor-row input{background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:7px 10px;font-family:'DM Sans',sans-serif;font-size:0.82rem;color:var(--text);outline:none;transition:border-color 0.15s;width:100%}
+.labor-row input:focus{border-color:var(--accent)}
+.labor-row input::placeholder{color:var(--muted)}
+.labor-row input[type=number]{-moz-appearance:textfield}
+.labor-row input[type=number]::-webkit-inner-spin-button{display:none}
+.labor-row .del-btn{background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--muted);cursor:pointer;width:28px;height:28px;display:grid;place-items:center;font-size:0.85rem;transition:all 0.15s}
+.labor-row .del-btn:hover{border-color:var(--accent2);color:var(--accent2)}
+.labor-col-headers{display:grid;grid-template-columns:3fr 3fr 1.2fr auto;gap:8px;padding:6px 16px;border-bottom:1px solid var(--border);background:#141414}
+
+/* ── Add button ── */
+.add-btn{display:flex;align-items:center;gap:7px;padding:9px 16px;background:transparent;border:1px dashed var(--border);color:var(--muted);font-family:'DM Mono',monospace;font-size:0.72rem;letter-spacing:0.06em;cursor:pointer;width:100%;transition:all 0.15s}
+.add-btn:hover{border-color:var(--accent);color:var(--accent);background:rgba(232,255,71,0.03)}
+
+/* ── Summary bar ── */
+.summary-bar{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:20px}
+.sum-item{text-align:center}
+.sum-val{font-family:'DM Mono',monospace;font-size:0.85rem;color:var(--accent);font-weight:600}
+.sum-label{font-size:0.7rem;color:var(--muted);margin-top:2px;font-family:'DM Mono',monospace;letter-spacing:0.04em}
+.sum-total-val{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;color:var(--accent);letter-spacing:-0.03em}
+
+/* ── Generate button ── */
+.gen-btn{width:100%;background:var(--accent);color:#000;border:none;border-radius:12px;padding:16px 24px;font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;cursor:pointer;transition:opacity 0.15s,transform 0.1s;display:flex;align-items:center;justify-content:center;gap:10px;letter-spacing:-0.01em}
+.gen-btn:hover{opacity:0.9;transform:translateY(-1px)}
+.gen-btn:active{transform:translateY(0)}
+
+/* ── Optional section tags ── */
+.tag{font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:0.07em;text-transform:uppercase;padding:2px 7px;border-radius:4px;border:1px solid;display:inline-block;vertical-align:middle;margin-left:6px}
+.tag-mand{background:rgba(232,255,71,0.1);color:var(--accent);border-color:rgba(232,255,71,0.2)}
+.tag-opt{background:rgba(255,107,43,0.1);color:var(--accent2);border-color:rgba(255,107,43,0.2)}
+
+/* Labor sub-items textarea */
+.labor-subitems{font-size:0.75rem;color:var(--muted);padding:6px 16px 10px;font-family:'DM Mono',monospace}
+.labor-subitems textarea{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:7px 10px;font-family:'DM Mono',monospace;font-size:0.72rem;color:var(--muted);outline:none;resize:none;height:54px;line-height:1.5}
+.labor-subitems textarea:focus{border-color:var(--accent)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo"><div class="logo-dot"></div>CarCare Pro</div>
+  <div class="badge">Manual Quote Builder</div>
+</header>
+
+<div class="page">
+  <div class="page-title">Build a <span>Service Quote</span></div>
+  <p class="page-sub">Fill in car details, add items manually — generate a print-ready PDF quote instantly.</p>
+
+  <!-- ── Car Details ── -->
+  <div class="card">
+    <div class="card-hdr">
+      <div class="card-hdr-title"><span class="card-icon">🚗</span> Vehicle Details</div>
+    </div>
+    <div class="form-grid three">
+      <div class="field"><label>Car Name / Model <span style="color:var(--accent);font-size:0.6rem">*required</span></label><input id="carName" placeholder="e.g. Maruti Suzuki Baleno 2022 Facelift" /></div>
+      <div class="field"><label>Engine Type</label><input id="engineType" placeholder="e.g. 1.2L Petrol BSVI / 1.5L Diesel" /></div>
+      <div class="field"><label>Service Interval</label><input id="interval" value="Every 10,000 km or 1 Year, whichever is earlier" /></div>
+    </div>
+    <div class="form-grid three">
+      <div class="field"><label>Quote Number (auto)</label><input id="quoteNo" placeholder="IM-XXXXXX" /><span style="font-size:0.65rem;color:var(--muted);font-family:'DM Mono',monospace;margin-top:3px">Auto-generated · editable</span></div>
+      <div class="field"><label>Date</label><input id="quoteDate" type="date" /></div>
+      <div class="field"><label>Package Name</label><input id="pkgName" value="Essential Car Care Package ⭐ (Recommended)" /></div>
+    </div>
+    <div class="form-grid single" style="padding-top:0">
+      <div class="field"><label>Notes (optional)</label><textarea id="notes" placeholder="Any car-specific notes, warnings or recommendations...">Prices are indicative for Delhi NCR / Gurugram independent workshops (2024–25). Always confirm final prices at the time of service.</textarea></div>
+    </div>
+  </div>
+
+  <!-- ── Oils & Fluids ── -->
+  <div class="card">
+    <div class="card-hdr">
+      <div class="card-hdr-title"><span class="card-icon">🛢</span> Oils & Fluids <span class="tag tag-mand">Mandatory</span></div>
+    </div>
+    <div class="col-headers">
+      <div class="col-hdr">Item</div>
+      <div class="col-hdr">Specification / Brand</div>
+      <div class="col-hdr">Qty</div>
+      <div class="col-hdr right">Unit Price</div>
+      <div class="col-hdr right">Total</div>
+      <div class="col-hdr"></div>
+    </div>
+    <div id="oilRows"></div>
+    <button class="add-btn" onclick="addRow('oil')">+ Add Oil / Fluid</button>
+  </div>
+
+  <!-- ── Replacement Parts ── -->
+  <div class="card">
+    <div class="card-hdr">
+      <div class="card-hdr-title"><span class="card-icon">🔩</span> Replacement Parts <span class="tag tag-mand">Mandatory</span></div>
+    </div>
+    <div class="col-headers">
+      <div class="col-hdr">Part Name</div>
+      <div class="col-hdr">Brand / Part No.</div>
+      <div class="col-hdr">Qty</div>
+      <div class="col-hdr right">Unit Price</div>
+      <div class="col-hdr right">Total</div>
+      <div class="col-hdr"></div>
+    </div>
+    <div id="partRows"></div>
+    <button class="add-btn" onclick="addRow('part')">+ Add Part</button>
+  </div>
+
+  <!-- ── Labor ── -->
+  <div class="card">
+    <div class="card-hdr">
+      <div class="card-hdr-title"><span class="card-icon">🔧</span> Labor Charges <span class="tag tag-mand">Mandatory</span></div>
+    </div>
+    <div class="labor-col-headers">
+      <div class="col-hdr">Task</div>
+      <div class="col-hdr">Specification / Detail</div>
+      <div class="col-hdr right">Charge</div>
+      <div class="col-hdr"></div>
+    </div>
+    <div id="laborRows"></div>
+    <button class="add-btn" onclick="addRow('labor')">+ Add Labor Task</button>
+  </div>
+
+  <!-- ── Summary ── -->
+  <div class="summary-bar" id="summaryBar">
+    <div class="sum-item"><div class="sum-val" id="s-oils">₹0</div><div class="sum-label">Oils & Fluids</div></div>
+    <div class="sum-item"><div class="sum-val" id="s-parts">₹0</div><div class="sum-label">Parts</div></div>
+    <div class="sum-item"><div class="sum-val" id="s-labor">₹0</div><div class="sum-label">Labor</div></div>
+    <div class="sum-item"><div class="sum-val" id="s-sub">₹0</div><div class="sum-label">Subtotal</div></div>
+    <div class="sum-item"><div class="sum-val" id="s-gst">₹0</div><div class="sum-label">GST 18%</div></div>
+    <div class="sum-item"><div class="sum-total-val" id="s-total">₹0</div><div class="sum-label">Total (incl. GST)</div></div>
+  </div>
+
+  <button class="gen-btn" onclick="generatePDF()">
+    📄 Generate & Download Quote PDF
+  </button>
+</div>
+
+<script>
+// ── State ──────────────────────────────────────────────────────────────────────
+let rows = { oil: [], part: [], labor: [] };
+let counters = { oil: 0, part: 0, labor: 0 };
+
+// ── Init ───────────────────────────────────────────────────────────────────────
+document.getElementById('quoteNo').value = 'IM-' + Date.now().toString().slice(-6);
+document.getElementById('quoteDate').value = new Date().toISOString().split('T')[0];
+document.getElementById('pkgName').value = 'Essential Car Care Package ⭐ (Recommended)';
+
+// Pre-populate with our standard items
+const defaultOils = [
+  { name: 'Engine Oil', spec: '5W-30 Fully Synthetic', qty: '3.5', unit: '420', total: '' },
+  { name: 'Coolant Top-Up', spec: 'OAT / HOAT Long Life Coolant', qty: '200 ml', unit: '80', total: '' },
+  { name: 'Wiper Fluid Replacement', spec: 'Windshield Washer Concentrate · 3M / Wavex', qty: '500 ml', unit: '60', total: '' },
+  { name: 'Brake Fluid Top-Up', spec: 'DOT 3 / DOT 4 Brake Fluid', qty: '50 ml top-up', unit: '50', total: '' },
+  { name: 'Battery Distilled Water', spec: 'Distilled water for battery cells', qty: 'As needed', unit: '20', total: '' },
+];
+const defaultParts = [
+  { name: 'Oil Filter', spec: 'OEM Compatible', qty: '1 Pc', unit: '280', total: '' },
+  { name: 'Air Filter', spec: 'OEM Paper Filter', qty: '1 Pc', unit: '350', total: '' },
+  { name: 'Cabin / Pollen Filter', spec: 'OEM Compatible', qty: '1 Pc', unit: '400', total: '' },
+];
+const defaultLabor = [
+  { task: 'Periodic Maintenance Service', spec: 'Includes 11 tasks — see list', price: '999',
+    subitems: 'Engine Oil Drain & Refill with Oil Filter Replacement\nAir Filter Replacement & Housing Cleaning\nCabin / Pollen Filter Replacement\nMulti-Point Vehicle Inspection (MPVI)\nTyre Rotation & Pressure Check\nBrake Inspection (Pads, Discs, Fluid Level)\nBattery Health Check & Terminal Cleaning\nAC Performance Check & Cabin Filter Service\nWasher Fluid Top-Up\nUnderbody Inspection & Fluid Leak Check\nFuel Filter Checking' },
+  { task: 'Car Wash', spec: 'Exterior hand wash', price: '199', subitems: '' },
+  { task: 'Interior Vacuuming', spec: 'Carpet & seats vacuuming', price: '250', subitems: '' },
+  { task: 'Vehicle Scanning (OBD)', spec: 'OBD-II diagnostic scan', price: '250', subitems: '' },
+];
+
+defaultOils.forEach(o => addRow('oil', o));
+defaultParts.forEach(p => addRow('part', p));
+defaultLabor.forEach(l => addRow('labor', l));
+
+// ── Add Row ────────────────────────────────────────────────────────────────────
+function addRow(type, data = {}) {
+  const id = ++counters[type];
+  rows[type].push(id);
+
+  if (type === 'labor') {
+    const container = document.getElementById('laborRows');
+    const div = document.createElement('div');
+    div.id = `labor-${id}`;
+    div.innerHTML = `
+      <div class="labor-row">
+        <input placeholder="Task name" value="${data.task||''}" oninput="recalc()" data-id="${id}" data-type="labor" data-field="task" />
+        <input placeholder="Spec / detail" value="${data.spec||''}" data-id="${id}" data-type="labor" data-field="spec" />
+        <input type="number" placeholder="₹0" value="${data.price||''}" oninput="recalc()" data-id="${id}" data-type="labor" data-field="price" min="0" style="text-align:right" />
+        <button class="del-btn" onclick="delRow('labor',${id})">✕</button>
+      </div>
+      ${data.subitems !== undefined ? `<div class="labor-subitems"><textarea placeholder="Sub-tasks (one per line, optional)" data-id="${id}" data-type="labor" data-field="subitems">${data.subitems||''}</textarea></div>` : ''}`;
+    container.appendChild(div);
+  } else {
+    const container = document.getElementById(type === 'oil' ? 'oilRows' : 'partRows');
+    const div = document.createElement('div');
+    div.id = `${type}-${id}`;
+    div.className = 'item-row';
+    div.innerHTML = `
+      <input placeholder="${type==='oil'?'Item name':'Part name'}" value="${data.name||''}" oninput="recalc()" data-id="${id}" data-type="${type}" data-field="name" />
+      <input placeholder="${type==='oil'?'Spec / Brand':'Brand / Part No.'}" value="${data.spec||''}" data-id="${id}" data-type="${type}" data-field="spec" />
+      <input placeholder="—" value="${data.qty||''}" data-id="${id}" data-type="${type}" data-field="qty" />
+      <input type="number" placeholder="₹0" value="${data.unit||''}" oninput="recalc()" data-id="${id}" data-type="${type}" data-field="unit" min="0" style="text-align:right" />
+      <div class="total-cell" id="${type}-total-${id}">—</div>
+      <button class="del-btn" onclick="delRow('${type}',${id})">✕</button>`;
+    container.appendChild(div);
+  }
+  recalc();
+}
+
+function delRow(type, id) {
+  document.getElementById(`${type}-${id}`)?.remove();
+  rows[type] = rows[type].filter(r => r !== id);
+  recalc();
+}
+
+// ── Calculate ──────────────────────────────────────────────────────────────────
+function recalc() {
+  let oilsTotal = 0, partsTotal = 0, laborTotal = 0;
+
+  ['oil','part'].forEach(type => {
+    rows[type].forEach(id => {
+      const el = document.getElementById(`${type}-${id}`);
+      if (!el) return;
+      const unitInput = el.querySelector('[data-field="unit"]');
+      const qtyInput  = el.querySelector('[data-field="qty"]');
+      const totalCell = document.getElementById(`${type}-total-${id}`);
+      const unit = parseFloat(unitInput?.value) || 0;
+      const qtyRaw = qtyInput?.value || '';
+      const qtyNum = parseFloat(qtyRaw) || 1; // if qty is text like "200 ml", parseFloat gives 200 — wrong for fluids
+      // Only multiply if qty is a pure number (e.g. 3.5 for engine oil litres)
+      // If qty contains letters (e.g. "200 ml", "1 Pc", "As needed"), treat as qty=1
+      const isPureNum = qtyRaw.trim() !== '' && !isNaN(Number(qtyRaw.trim()));
+      const multiplier = isPureNum ? Number(qtyRaw.trim()) : 1;
+      const total = unit > 0 ? Math.round(unit * multiplier) : 0;
+      if (totalCell) totalCell.textContent = total > 0 ? fmt(total) : '—';
+      if (type === 'oil') oilsTotal += total;
+      else partsTotal += total;
+    });
+  });
+
+  rows.labor.forEach(id => {
+    const el = document.getElementById(`labor-${id}`);
+    if (!el) return;
+    const priceInput = el.querySelector('[data-field="price"]');
+    laborTotal += parseFloat(priceInput?.value) || 0;
+  });
+
+  const subtotal = oilsTotal + partsTotal + laborTotal;
+  const gst = Math.round(subtotal * 0.18);
+  const total = subtotal + gst;
+
+  document.getElementById('s-oils').textContent  = fmt(oilsTotal);
+  document.getElementById('s-parts').textContent = fmt(partsTotal);
+  document.getElementById('s-labor').textContent = fmt(laborTotal);
+  document.getElementById('s-sub').textContent   = fmt(subtotal);
+  document.getElementById('s-gst').textContent   = fmt(gst);
+  document.getElementById('s-total').textContent = fmt(total);
+
+  window._totals = { oilsTotal, partsTotal, laborTotal, subtotal, gst, total };
+}
+
+function fmt(n) { return '₹' + Number(n).toLocaleString('en-IN'); }
+function fmtR(n) { return '&#8377;' + Number(n).toLocaleString('en-IN'); }
+
+// ── Collect data ───────────────────────────────────────────────────────────────
+function collectRows(type) {
+  return rows[type].map(id => {
+    const el = document.getElementById(`${type}-${id}`);
+    if (!el) return null;
+    const get = f => el.querySelector(`[data-field="${f}"]`)?.value?.trim() || '';
+    if (type === 'labor') {
+      return { task: get('task'), spec: get('spec'), price: parseFloat(get('price')) || 0, subitems: get('subitems') };
+    }
+    const unit = parseFloat(get('unit')) || 0;
+    const qtyRaw = get('qty');
+    const isPureNum = qtyRaw.trim() !== '' && !isNaN(Number(qtyRaw.trim()));
+    const multiplier = isPureNum ? Number(qtyRaw.trim()) : 1;
+    const total = unit > 0 ? Math.round(unit * multiplier) : 0;
+    return { name: get('name'), spec: get('spec'), qty: qtyRaw || '—', unit, total };
+  }).filter(Boolean);
+}
+
+// ── Generate PDF ───────────────────────────────────────────────────────────────
+function generatePDF() {
+  const carName = document.getElementById('carName').value.trim();
+  if (!carName) { alert('Please enter the car name.'); return; }
+
+  const oils   = collectRows('oil');
+  const parts  = collectRows('part');
+  const labors = collectRows('labor');
+  const t      = window._totals || {};
+  const today  = new Date(document.getElementById('quoteDate').value).toLocaleDateString('en-IN', {day:'2-digit',month:'long',year:'numeric'});
+  const quoteNo   = document.getElementById('quoteNo').value;
+  const engineType= document.getElementById('engineType').value.trim();
+  const interval  = document.getElementById('interval').value.trim();
+  const pkgName   = document.getElementById('pkgName').value.trim();
+  const notes     = document.getElementById('notes').value.trim();
+
+  const oilRows = oils.map(o => `<tr>
+    <td>${o.name}</td>
+    <td style="color:#555">${o.spec}</td>
+    <td style="text-align:center;color:#777">${o.qty}</td>
+    <td style="text-align:right">${o.unit ? fmtR(o.unit) : '—'}</td>
+    <td style="text-align:right;font-weight:600">${o.total ? fmtR(o.total) : o.unit===0?'Included':'—'}</td>
+  </tr>`).join('');
+
+  const partRows = parts.map(p => `<tr>
+    <td>${p.name}</td>
+    <td style="color:#555">${p.spec}</td>
+    <td style="text-align:center;color:#777">${p.qty}</td>
+    <td style="text-align:right">${p.unit ? fmtR(p.unit) : '—'}</td>
+    <td style="text-align:right;font-weight:600">${p.total ? fmtR(p.total) : 'Included'}</td>
+  </tr>`).join('');
+
+  const laborRows = labors.map(l => {
+    const subList = l.subitems
+      ? '<ul>' + l.subitems.split('\n').filter(s=>s.trim()).map(s=>`<li>${s.trim()}</li>`).join('') + '</ul>'
+      : '';
+    return `<tr>
+      <td colspan="4">${l.task}${l.spec ? ` <span style="color:#999;font-size:0.85em">${l.spec}</span>` : ''}${subList}</td>
+      <td style="text-align:right;font-weight:600;vertical-align:top">${l.price ? fmtR(l.price) : 'Included'}</td>
+    </tr>`;
+  }).join('');
+
+  const html = `<!DOCTYPE html>
+<html><head><meta charset="UTF-8">
+<title>Service Quote - ${carName} - ${quoteNo}</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+@page{margin:14mm 12mm;size:A4}
+@media print{
+  .print-btn{display:none!important}
+  body{padding:20px!important}
+  /* Row-level breaks */
+  tr{page-break-inside:avoid;break-inside:avoid}
+  td{page-break-inside:avoid;break-inside:avoid}
+  /* Section wrappers — keep heading glued to first row of content */
+  .labor-wrap{page-break-inside:avoid;break-inside:avoid}
+  .mand-block{page-break-inside:avoid;break-inside:avoid}
+  .opt-block{page-break-inside:avoid;break-inside:avoid}
+  .trust-wrap{page-break-inside:avoid;break-inside:avoid}
+  /* Sub-label & section header always followed by content */
+  .sub-label{page-break-after:avoid;break-after:avoid}
+  .sec-hdr{page-break-after:avoid;break-after:avoid}
+  /* Estimate block stays together */
+  .est-block{page-break-inside:avoid;break-inside:avoid}
+  .est-row{page-break-inside:avoid;break-inside:avoid}
+  .est-total{page-break-inside:avoid;break-inside:avoid;page-break-before:avoid;break-before:avoid}
+  /* Subtotal rows stay attached to table body */
+  .subtotal-row{page-break-inside:avoid;break-inside:avoid;page-break-before:avoid;break-before:avoid}
+  /* Note box */
+  .note-box{page-break-inside:avoid;break-inside:avoid}
+  /* thead repeats on new pages if table spans */
+  thead{display:table-header-group}
+  tfoot{display:table-footer-group}
+  /* Bullet lists stay with parent cell */
+  tbody td ul{page-break-inside:avoid;break-inside:avoid}
+}
+body{font-family:Arial,sans-serif;color:#111;background:#fff;padding:36px;max-width:920px;margin:0 auto;font-size:13px;line-height:1.5}
+a,a:visited,a:hover{color:inherit;text-decoration:none}
+.print-btn{display:block;width:100%;background:#111;color:#e8ff47;border:none;border-radius:8px;padding:13px;font-weight:700;font-size:14px;cursor:pointer;margin-bottom:26px;text-align:center;letter-spacing:0.02em}
+.header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:22px;padding-bottom:16px;border-bottom:2px solid #111}
+.brand{font-weight:900;font-size:21px}
+.brand span{background:#e8ff47;padding:2px 8px;border-radius:4px}
+.brand-sub{font-size:11px;color:#888;margin-top:4px}
+.quote-meta{text-align:right;font-size:11px;color:#555;line-height:1.9}
+.quote-meta strong{font-size:13px;color:#111}
+.car-block{background:#f5f5f5;border-radius:8px;padding:14px 18px;margin-bottom:20px}
+.car-block h2{font-size:16px;font-weight:800}
+.car-block .sub{font-size:11px;color:#666;margin-top:3px;line-height:1.5}
+.pills{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.pill{display:inline-block;background:#fff;border:1px solid #ddd;border-radius:20px;padding:2px 10px;font-size:10px;color:#555;font-weight:600}
+.pill.highlight{background:#111;color:#e8ff47;border-color:#111}
+.sec-hdr{padding:9px 14px;border-radius:6px;font-size:12px;font-weight:800;letter-spacing:0.05em;margin:22px 0 0;background:#111;color:#e8ff47;display:block}
+.sub-label{padding:6px 12px;font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#888;background:#f8f8f8;border-bottom:1px solid #e5e5e5;margin-top:0}
+table{width:100%;border-collapse:collapse;page-break-inside:auto}
+thead tr{background:#111;color:#fff}
+thead th{padding:7px 12px;text-align:left;font-size:10px;letter-spacing:0.05em;font-weight:600}
+thead th:last-child{text-align:right}
+tbody tr:nth-child(even):not([style]){background:#fafafa}
+tbody tr{page-break-inside:avoid}
+tbody td{padding:8px 12px;border-bottom:1px solid #eee;vertical-align:top;color:#111;page-break-inside:avoid}
+tbody td:last-child{text-align:right;font-weight:600}
+tbody td ul{margin:4px 0 2px 14px;padding:0;color:#888;font-size:10.5px;line-height:1.7}
+.subtotal-row td{background:#f0f0f0;font-weight:700;font-size:11.5px;border-top:1.5px solid #ddd;color:#111}
+.subtotal-row td:last-child{text-align:right}
+.est-block{margin-top:24px;border:1.5px solid #ddd;border-radius:8px;overflow:hidden}
+.est-row{display:flex;justify-content:space-between;padding:8px 18px;border-bottom:1px solid #eee;font-size:12px;color:#444}
+.est-row span:last-child{font-weight:600;color:#111}
+.est-sub{background:#f5f5f5}
+.est-sub span{font-weight:700!important;color:#111!important}
+.est-total{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;font-weight:900;background:#e8ff47;color:#111;font-size:17px}
+.note-box{background:#fffbe6;border:1px solid #ffe066;border-radius:6px;padding:10px 14px;margin-top:18px;font-size:11px;color:#7a6000;line-height:1.6}
+.trust-section{margin-top:28px;padding-top:20px;border-top:1px solid #eee}
+.trust-section h3{font-size:13px;font-weight:800;margin-bottom:12px}
+.optional-divider td{background:#3a2800;color:#ffb347;padding:6px 12px;font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase}
+</style></head><body>
+
+<button class="print-btn" onclick="window.print()">&#128424;&nbsp; Print or Save as PDF &nbsp;&middot;&nbsp; Ctrl+P / Cmd+P</button>
+
+<div class="header">
+  <div>
+    <div class="brand">CarCare <span>Pro</span></div>
+    <div class="brand-sub">Instant Mechanic &middot; Gurugram, Delhi NCR</div>
+  </div>
+  <div class="quote-meta">
+    <strong>SERVICE ESTIMATE</strong><br>
+    Quote No: ${quoteNo}<br>
+    Date: ${today}<br>
+    Valid: 7 days
+  </div>
+</div>
+
+<div class="car-block">
+  <h2>${carName}</h2>
+  <div class="sub">${engineType}${engineType && interval ? ' &middot; ' : ''}${interval}</div>
+  <div class="pills">
+    <span class="pill highlight">${pkgName}</span>
+    <span class="pill">&#128203; OBD Scan Included</span>
+  </div>
+</div>
+
+<h3 class="sec-hdr">&#128308; Mandatory — Done Every Service</h3>
+
+<div class="sub-label">Oils &amp; Fluids</div>
+<table>
+  <thead><tr>
+    <th style="width:28%">Item</th>
+    <th style="width:32%">Specification</th>
+    <th style="width:10%;text-align:center">Qty</th>
+    <th style="width:15%;text-align:right">Unit Price</th>
+    <th style="width:15%;text-align:right">Total</th>
+  </tr></thead>
+  <tbody>
+    ${oilRows || '<tr><td colspan="5" style="color:#aaa;text-align:center;padding:12px">No oils added</td></tr>'}
+    <tr class="subtotal-row"><td colspan="4">Subtotal — Oils &amp; Fluids</td><td>${fmtR(t.oilsTotal||0)}</td></tr>
+  </tbody>
+</table>
+
+<div class="sub-label">Replacement Parts</div>
+<table>
+  <thead><tr>
+    <th style="width:28%">Part</th>
+    <th style="width:32%">Brand / Part No.</th>
+    <th style="width:10%;text-align:center">Qty</th>
+    <th style="width:15%;text-align:right">Unit Price</th>
+    <th style="width:15%;text-align:right">Total</th>
+  </tr></thead>
+  <tbody>
+    ${partRows || '<tr><td colspan="5" style="color:#aaa;text-align:center;padding:12px">No parts added</td></tr>'}
+    <tr class="subtotal-row"><td colspan="4">Subtotal — Replacement Parts</td><td>${fmtR(t.partsTotal||0)}</td></tr>
+  </tbody>
+</table>
+
+<div class="labor-wrap">
+<div class="sub-label">Labor Charges</div>
+<table>
+  <thead><tr>
+    <th colspan="4">Task</th>
+    <th style="text-align:right">Charge</th>
+  </tr></thead>
+  <tbody>
+    ${laborRows || '<tr><td colspan="5" style="color:#aaa;text-align:center;padding:12px">No labor added</td></tr>'}
+    <tr class="subtotal-row"><td colspan="4">Subtotal — Labor</td><td>${fmtR(t.laborTotal||0)}</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="est-block">
+  <div class="est-row"><span>Oils &amp; Fluids</span><span>${fmtR(t.oilsTotal||0)}</span></div>
+  <div class="est-row"><span>Replacement Parts</span><span>${fmtR(t.partsTotal||0)}</span></div>
+  <div class="est-row"><span>Labor Charges</span><span>${fmtR(t.laborTotal||0)}</span></div>
+  <div class="est-row est-sub"><span>Subtotal</span><span>${fmtR(t.subtotal||0)}</span></div>
+  <div class="est-row"><span>GST @ 18%</span><span>${fmtR(t.gst||0)}</span></div>
+  <div class="est-total"><span>Total Estimate (incl. GST)</span><span>${fmtR(t.total||0)}</span></div>
+</div>
+
+${notes ? `<div class="note-box">&#128161; <strong>Note:</strong> ${notes}</div>` : ''}
+
+
+<div class="trust-section">
+  <div class="trust-wrap">
+  <h3>&#128161; Why Each Service Is Needed</h3>
+
+  <div class="mand-block">
+    <table>
+      <thead><tr><th style="width:28%">Service Item</th><th style="width:50%">Why It's Needed</th><th style="width:22%;text-align:right">When</th></tr></thead>
+      <tbody>
+        <tr style="background:#111;color:#e8ff47"><td colspan="3" style="padding:6px 12px;font-size:10px;font-weight:700;letter-spacing:0.1em">&#128308; MANDATORY — EVERY SERVICE</td></tr>
+        <tr><td>Engine Oil</td><td>Lubricates engine parts — prevents wear, overheating & seizure</td><td style="color:#888;font-size:0.85em;text-align:right">Every service</td></tr>
+<tr><td>Coolant Top-Up</td><td>Prevents engine overheating — low coolant risks head gasket damage</td><td style="color:#888;font-size:0.85em;text-align:right">Every service</td></tr>
+<tr><td>Wiper Fluid Replacement</td><td>Ensures clear visibility in rain — old fluid clogs washer jets</td><td style="color:#888;font-size:0.85em;text-align:right">Every service</td></tr>
+<tr><td>Brake Fluid Top-Up</td><td>Maintains hydraulic braking pressure — low fluid reduces stopping power</td><td style="color:#888;font-size:0.85em;text-align:right">Every service</td></tr>
+<tr><td>Battery Distilled Water</td><td>Extends battery life — dry cells cause hard starts & early battery death</td><td style="color:#888;font-size:0.85em;text-align:right">Every service</td></tr>
+<tr><td>Oil Filter</td><td>Traps metal shavings & sludge — keeps oil clean for longer engine life</td><td style="color:#888;font-size:0.85em;text-align:right">Every service</td></tr>
+<tr><td>Air Filter</td><td>Improves mileage & pickup — dirty filter starves engine of air</td><td style="color:#888;font-size:0.85em;text-align:right">Every service</td></tr>
+<tr><td>Cabin / Pollen Filter</td><td>Removes dust & allergens — better AC cooling & healthier cabin air</td><td style="color:#888;font-size:0.85em;text-align:right">Every service</td></tr>
+<tr><td>Periodic Maintenance Service</td><td>Covers all routine checks — oil drain, filter swap, MPVI, tyre pressure, brake & battery inspection, AC check, fluid top-up, underbody & fuel filter check</td><td style="color:#888;font-size:0.85em;text-align:right">Every service</td></tr>
+<tr><td>Car Wash</td><td>Removes road grime & salt — prevents rust & paint degradation</td><td style="color:#888;font-size:0.85em;text-align:right">Every service</td></tr>
+<tr><td>Interior Vacuuming</td><td>Removes dust & debris from carpet & seats — prevents mould & fabric wear</td><td style="color:#888;font-size:0.85em;text-align:right">Every service</td></tr>
+<tr><td>Vehicle Scanning (OBD)</td><td>Reads hidden error codes — catches problems before they become expensive</td><td style="color:#888;font-size:0.85em;text-align:right">Every service</td></tr>
+      </tbody>
+    </table>
+  </div>
+  </div><!-- end trust-wrap -->
+
+  <div class="opt-block" style="margin-top:16px">
+    <table>
+      <thead><tr><th style="width:28%">Service Item</th><th style="width:50%">Why It's Needed</th><th style="width:22%;text-align:right">When</th></tr></thead>
+      <tbody>
+        <tr class="optional-divider"><td colspan="3">&#128993; OPTIONAL — ONLY IF DUE</td></tr>
+        <tr><td>Coolant Full Flush</td><td>Removes acidic old coolant — prevents radiator corrosion & overheating</td><td style="color:#888;font-size:0.85em;text-align:right">Due every 40,000 km or 2 years</td></tr>
+<tr><td>Brake Fluid Full Change</td><td>Prevents brake fade — old fluid absorbs moisture & boils under hard braking</td><td style="color:#888;font-size:0.85em;text-align:right">Due every 2 years regardless of mileage</td></tr>
+<tr><td>AC Gas Top-Up</td><td>Restores cooling performance — low refrigerant means weak or no AC</td><td style="color:#888;font-size:0.85em;text-align:right">When AC cooling is noticeably weak</td></tr>
+<tr><td>Spark Plugs</td><td>Restores engine power & fuel efficiency — worn plugs cause misfires & poor mileage</td><td style="color:#888;font-size:0.85em;text-align:right">Due every 30,000–40,000 km (petrol)</td></tr>
+<tr><td>Fuel Filter</td><td>Ensures clean fuel flow — clogged filter causes poor pickup & hard starting</td><td style="color:#888;font-size:0.85em;text-align:right">Replace if flow check shows restriction (every 40,000 km)</td></tr>
+<tr><td>Fuel System Cleaner</td><td>Cleans injectors & combustion deposits — improves mileage & throttle response</td><td style="color:#888;font-size:0.85em;text-align:right">Every 20,000–30,000 km or as needed</td></tr>
+<tr><td>Wiper Blades</td><td>Ensures streak-free visibility in rain — worn blades smear & reduce visibility</td><td style="color:#888;font-size:0.85em;text-align:right">Every 12 months or when streaking is noticed</td></tr>
+<tr><td>Spark Plug Replacement</td><td>Restores engine power & efficiency — worn plugs cause misfires & poor mileage</td><td style="color:#888;font-size:0.85em;text-align:right">Due every 30,000–40,000 km (petrol)</td></tr>
+<tr><td>AC Deep Cleaning & Service</td><td>Restores cooling & removes bad odour — dirty evaporator causes weak cooling & smell</td><td style="color:#888;font-size:0.85em;text-align:right">Every summer or annually</td></tr>
+<tr><td>Wiper Blade Replacement</td><td>Quick swap ensures clear rain visibility — included with wiper blade purchase</td><td style="color:#888;font-size:0.85em;text-align:right">When replacing wiper blades</td></tr>
+<tr><td>Tyre Rotation & Balancing</td><td>Evens tyre wear — extends tyre life by up to 30% & improves ride comfort</td><td style="color:#888;font-size:0.85em;text-align:right">Due every 10,000 km</td></tr>
+<tr><td>Wheel Alignment</td><td>Prevents pulling & uneven wear — misalignment reduces tyre life by 50%</td><td style="color:#888;font-size:0.85em;text-align:right">Every 10,000 km or after a pothole hit</td></tr>
+<tr><td>Engine Flushing</td><td>Removes sludge & deposits from engine internals — improves oil circulation & longevity</td><td style="color:#888;font-size:0.85em;text-align:right">Every 40,000 km or before major oil type change</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div></body></html>`;
+
+  const blob = new Blob([html], { type: 'text/html' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `Quote-${carName.replace(/\s+/g,'-')}-${quoteNo}.html`;
+  document.body.appendChild(a); a.click();
+  setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(a.href); }, 1000);
+}
+</script>
+</body>
+</html>
