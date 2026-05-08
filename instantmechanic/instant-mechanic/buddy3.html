@@ -7,28 +7,28 @@
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #0a0a0a; --surface: #111; --surface2: #181818; --border: #252525;
-  --accent: #e8ff47; --accent2: #ff6b2b; --text: #f0f0f0; --muted: #666; --success: #4ade80;
+  --bg: #f5f6f8; --surface: #ffffff; --surface2: #f0f1f3; --border: #e0e2e7;
+  --accent: #e65c00; --accent2: #ff6b2b; --text: #1a1a1a; --muted: #888; --success: #16a34a;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh}
 
 /* ── Header ── */
-header{display:flex;align-items:center;justify-content:space-between;padding:18px 32px;border-bottom:1px solid var(--border);background:rgba(10,10,10,0.95);backdrop-filter:blur(12px);position:sticky;top:0;z-index:100}
-.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;letter-spacing:-0.03em;display:flex;align-items:center;gap:8px}
+header{display:flex;align-items:center;justify-content:space-between;padding:18px 32px;border-bottom:1px solid var(--border);background:#ffffff;box-shadow:0 1px 4px rgba(0,0,0,0.06);position:sticky;top:0;z-index:100}
+.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;letter-spacing:-0.03em;display:flex;align-items:center;gap:8px;color:#111}
 .logo-dot{width:9px;height:9px;background:var(--accent);border-radius:50%;animation:pulse 2s infinite}
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(0.85)}}
-.badge{font-family:'DM Mono',monospace;font-size:0.65rem;background:var(--accent);color:#000;padding:3px 9px;border-radius:20px;font-weight:600;letter-spacing:0.04em}
+.badge{font-family:'DM Mono',monospace;font-size:0.65rem;background:#e65c00;color:#fff;padding:3px 9px;border-radius:20px;font-weight:600;letter-spacing:0.04em}
 
 /* ── Layout ── */
 .page{max-width:1000px;margin:0 auto;padding:40px 24px 80px;overflow-x:hidden}
-.page-title{font-family:'Syne',sans-serif;font-weight:800;font-size:2rem;letter-spacing:-0.03em;margin-bottom:6px}
-.page-title span{color:var(--accent)}
+.page-title{font-family:'Syne',sans-serif;font-weight:800;font-size:2rem;letter-spacing:-0.03em;margin-bottom:6px;color:#111}
+.page-title span{color:#e65c00}
 .page-sub{color:var(--muted);font-size:0.9rem;margin-bottom:36px}
 
 /* ── Card ── */
 .card{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:20px}
-.card-hdr{padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.card-hdr{padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:#fafbfc}
 .card-hdr-title{font-family:'Syne',sans-serif;font-weight:700;font-size:0.9rem;display:flex;align-items:center;gap:8px}
 .card-icon{width:28px;height:28px;background:var(--surface2);border:1px solid var(--border);border-radius:7px;display:grid;place-items:center;font-size:0.85rem}
 
@@ -39,62 +39,62 @@ header{display:flex;align-items:center;justify-content:space-between;padding:18p
 @media(max-width:600px){.form-grid,.form-grid.three{grid-template-columns:1fr}}
 .field{display:flex;flex-direction:column;gap:5px}
 .field label{font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.09em;text-transform:uppercase;color:var(--muted)}
-.field input,.field select,.field textarea{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.88rem;color:var(--text);outline:none;transition:border-color 0.15s;width:100%}
-.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent)}
+.field input,.field select,.field textarea{background:#fff;border:1.5px solid var(--border);border-radius:8px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.88rem;color:var(--text);outline:none;transition:border-color 0.15s;width:100%}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:#e65c00}
 .field input::placeholder,.field textarea::placeholder{color:var(--muted)}
 .field select option{background:var(--surface2);color:var(--text)}
 .field textarea{resize:vertical;min-height:60px;line-height:1.5}
 
 /* ── Section label ── */
-.sec-label{padding:8px 20px;font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);background:var(--surface2);border-bottom:1px solid var(--border)}
+.sec-label{padding:8px 20px;font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:#888;background:#f5f6f8;border-bottom:1px solid var(--border)}
 
 /* ── Item rows ── */
 .item-row{display:grid;grid-template-columns:minmax(120px,2.2fr) minmax(110px,2.2fr) minmax(55px,0.8fr) minmax(65px,0.9fr) minmax(90px,1.3fr) 52px;gap:6px;padding:10px 14px;border-bottom:1px solid var(--border);align-items:start}
 .item-row:last-of-type{border-bottom:none}
-.item-row input{background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:7px 8px;font-family:'DM Sans',sans-serif;font-size:0.82rem;color:var(--text);outline:none;transition:border-color 0.15s;width:100%;min-width:0}
+.item-row input{background:#fff;border:1.5px solid var(--border);border-radius:7px;padding:7px 8px;font-family:'DM Sans',sans-serif;font-size:0.82rem;color:var(--text);outline:none;transition:border-color 0.15s;width:100%;min-width:0}
 .item-row input:focus{border-color:var(--accent)}
 .item-row input::placeholder{color:var(--muted)}
 .item-row input[type=number]{-moz-appearance:textfield}
 .item-row input[type=number]::-webkit-inner-spin-button{display:none}
 .item-row .total-cell{font-family:'DM Mono',monospace;font-size:0.82rem;color:var(--accent);text-align:right;padding-right:4px;white-space:nowrap}
-.item-row .del-btn{background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--muted);cursor:pointer;width:24px;height:24px;display:grid;place-items:center;font-size:0.75rem;transition:all 0.15s;flex-shrink:0}
+.item-row .del-btn{background:transparent;border:1px solid #ddd;border-radius:6px;color:#bbb;cursor:pointer;width:24px;height:24px;display:grid;place-items:center;font-size:0.75rem;transition:all 0.15s;flex-shrink:0}
 .item-row .del-btn:hover{border-color:var(--accent2);color:var(--accent2)}
-.col-headers{display:grid;grid-template-columns:minmax(120px,2.2fr) minmax(110px,2.2fr) minmax(55px,0.8fr) minmax(65px,0.9fr) minmax(90px,1.3fr) 52px;gap:6px;padding:6px 14px;border-bottom:1px solid var(--border);background:#141414}
+.col-headers{display:grid;grid-template-columns:minmax(120px,2.2fr) minmax(110px,2.2fr) minmax(55px,0.8fr) minmax(65px,0.9fr) minmax(90px,1.3fr) 52px;gap:6px;padding:6px 14px;border-bottom:1px solid var(--border);background:#2b2d35}
 .col-hdr{font-family:'DM Mono',monospace;font-size:0.62rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted)}
 .col-hdr.right{text-align:right}
 
 /* Labor rows (task + spec + price only) */
 .labor-row{display:grid;grid-template-columns:minmax(140px,3fr) minmax(120px,3fr) minmax(90px,1.4fr) 52px;gap:6px;padding:10px 14px;border-bottom:1px solid var(--border);align-items:start}
 .labor-row:last-of-type{border-bottom:none}
-.labor-row input{background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:7px 8px;font-family:'DM Sans',sans-serif;font-size:0.82rem;color:var(--text);outline:none;transition:border-color 0.15s;width:100%;min-width:0}
+.labor-row input{background:#fff;border:1.5px solid var(--border);border-radius:7px;padding:7px 8px;font-family:'DM Sans',sans-serif;font-size:0.82rem;color:var(--text);outline:none;transition:border-color 0.15s;width:100%;min-width:0}
 .labor-row input:focus{border-color:var(--accent)}
 .labor-row input::placeholder{color:var(--muted)}
 .labor-row input[type=number]{-moz-appearance:textfield}
 .labor-row input[type=number]::-webkit-inner-spin-button{display:none}
 .labor-row .del-btn{background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--muted);cursor:pointer;width:28px;height:28px;display:grid;place-items:center;font-size:0.85rem;transition:all 0.15s}
 .labor-row .del-btn:hover{border-color:var(--accent2);color:var(--accent2)}
-.labor-col-headers{display:grid;grid-template-columns:minmax(140px,3fr) minmax(120px,3fr) minmax(90px,1.4fr) 52px;gap:6px;padding:6px 14px;border-bottom:1px solid var(--border);background:#141414}
+.labor-col-headers{display:grid;grid-template-columns:minmax(140px,3fr) minmax(120px,3fr) minmax(90px,1.4fr) 52px;gap:6px;padding:6px 14px;border-bottom:1px solid var(--border);background:#2b2d35}
 
 /* ── Add button ── */
-.add-btn{display:flex;align-items:center;gap:7px;padding:9px 16px;background:transparent;border:1px dashed var(--border);color:var(--muted);font-family:'DM Mono',monospace;font-size:0.72rem;letter-spacing:0.06em;cursor:pointer;width:100%;transition:all 0.15s}
-.add-btn:hover{border-color:var(--accent);color:var(--accent);background:rgba(232,255,71,0.03)}
+.add-btn{display:flex;align-items:center;gap:7px;padding:9px 16px;background:transparent;border:1px dashed #ccc;color:#aaa;font-family:'DM Mono',monospace;font-size:0.72rem;letter-spacing:0.06em;cursor:pointer;width:100%;transition:all 0.15s}
+.add-btn:hover{border-color:#e65c00;color:#e65c00;background:rgba(230,92,0,0.04)}
 
 /* ── Summary bar ── */
-.summary-bar{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:20px}
+.summary-bar{background:#fff;border:1.5px solid var(--border);border-radius:14px;padding:20px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:20px}
 .sum-item{text-align:center}
-.sum-val{font-family:'DM Mono',monospace;font-size:0.85rem;color:var(--accent);font-weight:600}
+.sum-val{font-family:'DM Mono',monospace;font-size:0.85rem;color:#e65c00;font-weight:600}
 .sum-label{font-size:0.7rem;color:var(--muted);margin-top:2px;font-family:'DM Mono',monospace;letter-spacing:0.04em}
-.sum-total-val{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;color:var(--accent);letter-spacing:-0.03em}
+.sum-total-val{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;color:#e65c00;letter-spacing:-0.03em}
 
 /* ── Generate button ── */
-.gen-btn{width:100%;background:var(--accent);color:#000;border:none;border-radius:12px;padding:16px 24px;font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;cursor:pointer;transition:opacity 0.15s,transform 0.1s;display:flex;align-items:center;justify-content:center;gap:10px;letter-spacing:-0.01em}
+.gen-btn{width:100%;background:#e65c00;color:#fff;border:none;border-radius:12px;padding:16px 24px;font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;cursor:pointer;transition:opacity 0.15s,transform 0.1s;display:flex;align-items:center;justify-content:center;gap:10px;letter-spacing:-0.01em}
 .gen-btn:hover{opacity:0.9;transform:translateY(-1px)}
 .gen-btn:active{transform:translateY(0)}
 
 /* ── Optional section tags ── */
 .tag{font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:0.07em;text-transform:uppercase;padding:2px 7px;border-radius:4px;border:1px solid;display:inline-block;vertical-align:middle;margin-left:6px}
-.tag-mand{background:rgba(232,255,71,0.1);color:var(--accent);border-color:rgba(232,255,71,0.2)}
-.tag-opt{background:rgba(255,107,43,0.1);color:var(--accent2);border-color:rgba(255,107,43,0.2)}
+.tag-mand{background:rgba(230,92,0,0.1);color:#e65c00;border-color:rgba(230,92,0,0.25)}
+.tag-opt{background:rgba(255,107,43,0.1);color:#e65c00;border-color:rgba(255,107,43,0.25)}
 
 /* Labor sub-items textarea */
 .labor-subitems{font-size:0.75rem;color:var(--muted);padding:6px 16px 10px;font-family:'DM Mono',monospace}
@@ -102,14 +102,14 @@ header{display:flex;align-items:center;justify-content:space-between;padding:18p
 .labor-subitems textarea:focus{border-color:var(--accent)}
 
 /* ── Discount button & input ── */
-.disc-btn{background:transparent;border:1px dashed var(--border);border-radius:5px;color:var(--muted);font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.04em;padding:2px 5px;cursor:pointer;transition:all 0.15s;white-space:nowrap;width:24px;text-align:center}
+.disc-btn{background:transparent;border:1px dashed #ccc;border-radius:5px;color:#bbb;font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.04em;padding:2px 5px;cursor:pointer;transition:all 0.15s;white-space:nowrap;width:24px;text-align:center}
 .disc-btn:hover{border-color:#f97316;color:#f97316}
 .disc-btn.active{border-color:#f97316;color:#f97316;background:rgba(249,115,22,0.08)}
 .disc-input-wrap{display:flex;align-items:center;gap:4px;margin-top:4px}
 .disc-input{background:rgba(249,115,22,0.08);border:1px solid #f97316;border-radius:5px;padding:3px 7px;font-family:'DM Mono',monospace;font-size:0.72rem;color:#f97316;width:80px;outline:none;-moz-appearance:textfield}
 .disc-input::-webkit-inner-spin-button{display:none}
 .disc-label{font-size:0.65rem;color:#f97316;font-family:'DM Mono',monospace}
-.total-cell{position:relative}
+.total-cell{position:relative;color:#111;font-family:'DM Mono',monospace;font-size:0.85rem}
 .total-original{text-decoration:line-through;color:var(--muted);font-size:0.75rem;display:block}
 .total-discounted{color:#f97316;font-weight:600}
 .total-free{color:#4ade80;font-weight:700;font-family:'Syne',sans-serif;font-size:0.85rem}
@@ -667,7 +667,7 @@ table + .sub-label{margin-top:14px}
   <div class="est-row"><span>Replacement Parts</span><span>${fmtR(t.partsTotal||0)}</span></div>
   <div class="est-row"><span>Labor Charges</span><span>${fmtR(t.laborTotal||0)}</span></div>
   <div class="est-row est-sub"><span>Subtotal (before discount)</span><span>${fmtR(t.subtotalGross||t.subtotal||0)}</span></div>
-  ${(t.totalDiscount||0) > 0 ? `<div class="est-row" style="color:#e65c00"><span>Total Discount (Car Care Membership &#127881;)</span><span style="font-weight:700">&#8722;${fmtR(t.totalDiscount)}</span></div>
+  ${(t.totalDiscount||0) > 0 ? `<div class="est-row" style="background:linear-gradient(135deg,#fff4ec,#fff8f3);border-left:3px solid #e65c00;color:#e65c00;padding:10px 18px 10px 15px;margin:4px 0"><span style="font-weight:600">🎉 Total Discount (Car Care Membership)</span><span style="font-weight:800;font-size:14px">&#8722;${fmtR(t.totalDiscount)}</span></div>
   <div class="est-row est-sub"><span>Subtotal (after discount)</span><span>${fmtR(t.subtotal||0)}</span></div>` : ''}
   <div class="est-row"><span>GST @ 18%</span><span>${fmtR(t.gst||0)}</span></div>
   <div class="est-total"><span>Total Estimate (incl. GST)</span><span>${fmtR(t.total||0)}</span></div>
