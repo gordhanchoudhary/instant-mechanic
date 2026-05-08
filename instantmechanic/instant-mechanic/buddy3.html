@@ -100,12 +100,151 @@ header{display:flex;align-items:center;justify-content:space-between;padding:18p
 .labor-subitems{font-size:0.75rem;color:var(--muted);padding:6px 16px 10px;font-family:'DM Mono',monospace}
 .labor-subitems textarea{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:7px 10px;font-family:'DM Mono',monospace;font-size:0.72rem;color:var(--muted);outline:none;resize:none;height:54px;line-height:1.5}
 .labor-subitems textarea:focus{border-color:var(--accent)}
+
+/* ── Discount button & input ── */
+.disc-btn{background:transparent;border:1px dashed var(--border);border-radius:5px;color:var(--muted);font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.04em;padding:3px 8px;cursor:pointer;transition:all 0.15s;white-space:nowrap}
+.disc-btn:hover{border-color:#f97316;color:#f97316}
+.disc-btn.active{border-color:#f97316;color:#f97316;background:rgba(249,115,22,0.08)}
+.disc-input-wrap{display:flex;align-items:center;gap:4px;margin-top:4px}
+.disc-input{background:rgba(249,115,22,0.08);border:1px solid #f97316;border-radius:5px;padding:3px 7px;font-family:'DM Mono',monospace;font-size:0.72rem;color:#f97316;width:80px;outline:none;-moz-appearance:textfield}
+.disc-input::-webkit-inner-spin-button{display:none}
+.disc-label{font-size:0.65rem;color:#f97316;font-family:'DM Mono',monospace}
+.total-cell{position:relative}
+.total-original{text-decoration:line-through;color:var(--muted);font-size:0.75rem;display:block}
+.total-discounted{color:#f97316;font-weight:600}
+.total-free{color:#4ade80;font-weight:700;font-family:'Syne',sans-serif;font-size:0.85rem}
+/* Summary discount row */
+.sum-discount{color:#f97316}
 </style>
 </head>
 <body>
 
 <header>
-  <div class="logo"><div class="logo-dot"></div>CarCare Pro</div>
+  <div class="logo">CarCare Pro</div>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quote Builder — Instant Mechanic</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0a0a; --surface: #111; --surface2: #181818; --border: #252525;
+  --accent: #e8ff47; --accent2: #ff6b2b; --text: #f0f0f0; --muted: #666; --success: #4ade80;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh}
+
+/* ── Header ── */
+header{display:flex;align-items:center;justify-content:space-between;padding:18px 32px;border-bottom:1px solid var(--border);background:rgba(10,10,10,0.95);backdrop-filter:blur(12px);position:sticky;top:0;z-index:100}
+.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;letter-spacing:-0.03em;display:flex;align-items:center;gap:8px}
+.logo-dot{width:9px;height:9px;background:var(--accent);border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(0.85)}}
+.badge{font-family:'DM Mono',monospace;font-size:0.65rem;background:var(--accent);color:#000;padding:3px 9px;border-radius:20px;font-weight:600;letter-spacing:0.04em}
+
+/* ── Layout ── */
+.page{max-width:1000px;margin:0 auto;padding:40px 24px 80px}
+.page-title{font-family:'Syne',sans-serif;font-weight:800;font-size:2rem;letter-spacing:-0.03em;margin-bottom:6px}
+.page-title span{color:var(--accent)}
+.page-sub{color:var(--muted);font-size:0.9rem;margin-bottom:36px}
+
+/* ── Card ── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:20px}
+.card-hdr{padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.card-hdr-title{font-family:'Syne',sans-serif;font-weight:700;font-size:0.9rem;display:flex;align-items:center;gap:8px}
+.card-icon{width:28px;height:28px;background:var(--surface2);border:1px solid var(--border);border-radius:7px;display:grid;place-items:center;font-size:0.85rem}
+
+/* ── Form fields ── */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:16px 20px}
+.form-grid.three{grid-template-columns:1fr 1fr 1fr}
+.form-grid.single{grid-template-columns:1fr}
+@media(max-width:600px){.form-grid,.form-grid.three{grid-template-columns:1fr}}
+.field{display:flex;flex-direction:column;gap:5px}
+.field label{font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.09em;text-transform:uppercase;color:var(--muted)}
+.field input,.field select,.field textarea{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.88rem;color:var(--text);outline:none;transition:border-color 0.15s;width:100%}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent)}
+.field input::placeholder,.field textarea::placeholder{color:var(--muted)}
+.field select option{background:var(--surface2);color:var(--text)}
+.field textarea{resize:vertical;min-height:60px;line-height:1.5}
+
+/* ── Section label ── */
+.sec-label{padding:8px 20px;font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);background:var(--surface2);border-bottom:1px solid var(--border)}
+
+/* ── Item rows ── */
+.item-row{display:grid;grid-template-columns:2.5fr 2.5fr 1fr 1fr 1fr auto;gap:8px;padding:10px 16px;border-bottom:1px solid var(--border);align-items:center}
+.item-row:last-of-type{border-bottom:none}
+.item-row input{background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:7px 10px;font-family:'DM Sans',sans-serif;font-size:0.82rem;color:var(--text);outline:none;transition:border-color 0.15s;width:100%}
+.item-row input:focus{border-color:var(--accent)}
+.item-row input::placeholder{color:var(--muted)}
+.item-row input[type=number]{-moz-appearance:textfield}
+.item-row input[type=number]::-webkit-inner-spin-button{display:none}
+.item-row .total-cell{font-family:'DM Mono',monospace;font-size:0.82rem;color:var(--accent);text-align:right;padding-right:4px;white-space:nowrap}
+.item-row .del-btn{background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--muted);cursor:pointer;width:28px;height:28px;display:grid;place-items:center;font-size:0.85rem;transition:all 0.15s;flex-shrink:0}
+.item-row .del-btn:hover{border-color:var(--accent2);color:var(--accent2)}
+.col-headers{display:grid;grid-template-columns:2.5fr 2.5fr 1fr 1fr 1fr auto;gap:8px;padding:6px 16px;border-bottom:1px solid var(--border);background:#141414}
+.col-hdr{font-family:'DM Mono',monospace;font-size:0.62rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted)}
+.col-hdr.right{text-align:right}
+
+/* Labor rows (task + spec + price only) */
+.labor-row{display:grid;grid-template-columns:3fr 3fr 1.2fr auto;gap:8px;padding:10px 16px;border-bottom:1px solid var(--border);align-items:center}
+.labor-row:last-of-type{border-bottom:none}
+.labor-row input{background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:7px 10px;font-family:'DM Sans',sans-serif;font-size:0.82rem;color:var(--text);outline:none;transition:border-color 0.15s;width:100%}
+.labor-row input:focus{border-color:var(--accent)}
+.labor-row input::placeholder{color:var(--muted)}
+.labor-row input[type=number]{-moz-appearance:textfield}
+.labor-row input[type=number]::-webkit-inner-spin-button{display:none}
+.labor-row .del-btn{background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--muted);cursor:pointer;width:28px;height:28px;display:grid;place-items:center;font-size:0.85rem;transition:all 0.15s}
+.labor-row .del-btn:hover{border-color:var(--accent2);color:var(--accent2)}
+.labor-col-headers{display:grid;grid-template-columns:3fr 3fr 1.2fr auto;gap:8px;padding:6px 16px;border-bottom:1px solid var(--border);background:#141414}
+
+/* ── Add button ── */
+.add-btn{display:flex;align-items:center;gap:7px;padding:9px 16px;background:transparent;border:1px dashed var(--border);color:var(--muted);font-family:'DM Mono',monospace;font-size:0.72rem;letter-spacing:0.06em;cursor:pointer;width:100%;transition:all 0.15s}
+.add-btn:hover{border-color:var(--accent);color:var(--accent);background:rgba(232,255,71,0.03)}
+
+/* ── Summary bar ── */
+.summary-bar{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:20px}
+.sum-item{text-align:center}
+.sum-val{font-family:'DM Mono',monospace;font-size:0.85rem;color:var(--accent);font-weight:600}
+.sum-label{font-size:0.7rem;color:var(--muted);margin-top:2px;font-family:'DM Mono',monospace;letter-spacing:0.04em}
+.sum-total-val{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;color:var(--accent);letter-spacing:-0.03em}
+
+/* ── Generate button ── */
+.gen-btn{width:100%;background:var(--accent);color:#000;border:none;border-radius:12px;padding:16px 24px;font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;cursor:pointer;transition:opacity 0.15s,transform 0.1s;display:flex;align-items:center;justify-content:center;gap:10px;letter-spacing:-0.01em}
+.gen-btn:hover{opacity:0.9;transform:translateY(-1px)}
+.gen-btn:active{transform:translateY(0)}
+
+/* ── Optional section tags ── */
+.tag{font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:0.07em;text-transform:uppercase;padding:2px 7px;border-radius:4px;border:1px solid;display:inline-block;vertical-align:middle;margin-left:6px}
+.tag-mand{background:rgba(232,255,71,0.1);color:var(--accent);border-color:rgba(232,255,71,0.2)}
+.tag-opt{background:rgba(255,107,43,0.1);color:var(--accent2);border-color:rgba(255,107,43,0.2)}
+
+/* Labor sub-items textarea */
+.labor-subitems{font-size:0.75rem;color:var(--muted);padding:6px 16px 10px;font-family:'DM Mono',monospace}
+.labor-subitems textarea{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:7px 10px;font-family:'DM Mono',monospace;font-size:0.72rem;color:var(--muted);outline:none;resize:none;height:54px;line-height:1.5}
+.labor-subitems textarea:focus{border-color:var(--accent)}
+
+/* ── Discount button & input ── */
+.disc-btn{background:transparent;border:1px dashed var(--border);border-radius:5px;color:var(--muted);font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.04em;padding:3px 8px;cursor:pointer;transition:all 0.15s;white-space:nowrap}
+.disc-btn:hover{border-color:#f97316;color:#f97316}
+.disc-btn.active{border-color:#f97316;color:#f97316;background:rgba(249,115,22,0.08)}
+.disc-input-wrap{display:flex;align-items:center;gap:4px;margin-top:4px}
+.disc-input{background:rgba(249,115,22,0.08);border:1px solid #f97316;border-radius:5px;padding:3px 7px;font-family:'DM Mono',monospace;font-size:0.72rem;color:#f97316;width:80px;outline:none;-moz-appearance:textfield}
+.disc-input::-webkit-inner-spin-button{display:none}
+.disc-label{font-size:0.65rem;color:#f97316;font-family:'DM Mono',monospace}
+.total-cell{position:relative}
+.total-original{text-decoration:line-through;color:var(--muted);font-size:0.75rem;display:block}
+.total-discounted{color:#f97316;font-weight:600}
+.total-free{color:#4ade80;font-weight:700;font-family:'Syne',sans-serif;font-size:0.85rem}
+/* Summary discount row */
+.sum-discount{color:#f97316}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">CarCare Pro</div></div>
   <div class="badge">Manual Quote Builder</div>
 </header>
 
@@ -138,12 +277,12 @@ header{display:flex;align-items:center;justify-content:space-between;padding:18p
     <div class="card-hdr">
       <div class="card-hdr-title"><span class="card-icon">🛢</span> Oils & Fluids <span class="tag tag-mand">Mandatory</span></div>
     </div>
-    <div class="col-headers">
+    <div class="col-headers" style="grid-template-columns:2.5fr 2.5fr 1fr 1fr 1.4fr auto">
       <div class="col-hdr">Item</div>
       <div class="col-hdr">Specification / Brand</div>
       <div class="col-hdr">Qty</div>
       <div class="col-hdr right">Unit Price</div>
-      <div class="col-hdr right">Total</div>
+      <div class="col-hdr right">Total / Discount</div>
       <div class="col-hdr"></div>
     </div>
     <div id="oilRows"></div>
@@ -155,12 +294,12 @@ header{display:flex;align-items:center;justify-content:space-between;padding:18p
     <div class="card-hdr">
       <div class="card-hdr-title"><span class="card-icon">🔩</span> Replacement Parts <span class="tag tag-mand">Mandatory</span></div>
     </div>
-    <div class="col-headers">
+    <div class="col-headers" style="grid-template-columns:2.5fr 2.5fr 1fr 1fr 1.4fr auto">
       <div class="col-hdr">Part Name</div>
       <div class="col-hdr">Brand / Part No.</div>
       <div class="col-hdr">Qty</div>
       <div class="col-hdr right">Unit Price</div>
-      <div class="col-hdr right">Total</div>
+      <div class="col-hdr right">Total / Discount</div>
       <div class="col-hdr"></div>
     </div>
     <div id="partRows"></div>
@@ -172,10 +311,10 @@ header{display:flex;align-items:center;justify-content:space-between;padding:18p
     <div class="card-hdr">
       <div class="card-hdr-title"><span class="card-icon">🔧</span> Labor Charges <span class="tag tag-mand">Mandatory</span></div>
     </div>
-    <div class="labor-col-headers">
+    <div class="labor-col-headers" style="grid-template-columns:3fr 3fr 1.4fr auto">
       <div class="col-hdr">Task</div>
       <div class="col-hdr">Specification / Detail</div>
-      <div class="col-hdr right">Charge</div>
+      <div class="col-hdr right">Charge / Discount</div>
       <div class="col-hdr"></div>
     </div>
     <div id="laborRows"></div>
@@ -188,6 +327,8 @@ header{display:flex;align-items:center;justify-content:space-between;padding:18p
     <div class="sum-item"><div class="sum-val" id="s-parts">₹0</div><div class="sum-label">Parts</div></div>
     <div class="sum-item"><div class="sum-val" id="s-labor">₹0</div><div class="sum-label">Labor</div></div>
     <div class="sum-item"><div class="sum-val" id="s-sub">₹0</div><div class="sum-label">Subtotal</div></div>
+    <div class="sum-item" id="s-disc-row" style="display:none"><div class="sum-val sum-discount" id="s-disc">₹0</div><div class="sum-label">Discount</div></div>
+    <div class="sum-item" id="s-sub-after-row" style="display:none"><div class="sum-val" id="s-sub-after">₹0</div><div class="sum-label">After Discount</div></div>
     <div class="sum-item"><div class="sum-val" id="s-gst">₹0</div><div class="sum-label">GST 18%</div></div>
     <div class="sum-item"><div class="sum-total-val" id="s-total">₹0</div><div class="sum-label">Total (incl. GST)</div></div>
   </div>
@@ -241,12 +382,26 @@ function addRow(type, data = {}) {
     const container = document.getElementById('laborRows');
     const div = document.createElement('div');
     div.id = `labor-${id}`;
+    div.style.cssText = 'border-bottom:1px solid var(--border)';
     div.innerHTML = `
-      <div class="labor-row">
+      <div class="labor-row" style="grid-template-columns:3fr 3fr 1.4fr auto;align-items:start">
         <input placeholder="Task name" value="${data.task||''}" oninput="recalc()" data-id="${id}" data-type="labor" data-field="task" />
         <input placeholder="Spec / detail" value="${data.spec||''}" data-id="${id}" data-type="labor" data-field="spec" />
-        <input type="number" placeholder="₹0" value="${data.price||''}" oninput="recalc()" data-id="${id}" data-type="labor" data-field="price" min="0" style="text-align:right" />
-        <button class="del-btn" onclick="delRow('labor',${id})">✕</button>
+        <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end">
+          <input type="number" placeholder="₹0" value="${data.price||''}" oninput="recalc()" data-id="${id}" data-type="labor" data-field="price" min="0" style="text-align:right;width:100%" />
+          <div id="labor-disc-wrap-${id}" style="display:none;flex-direction:column;gap:3px;align-items:flex-end;width:100%">
+            <div style="display:flex;gap:4px;align-items:center">
+              <span class="disc-label">Discount ₹</span>
+              <input type="number" class="disc-input" placeholder="0" min="0" oninput="recalc()" data-id="${id}" data-type="labor" data-field="discount" style="width:72px" />
+            </div>
+            <div id="labor-total-${id}" style="font-family:'DM Mono',monospace;font-size:0.78rem;text-align:right"></div>
+          </div>
+          <div id="labor-total-nodis-${id}" style="font-family:'DM Mono',monospace;font-size:0.78rem;color:var(--muted);text-align:right"></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px;align-items:center">
+          <button class="del-btn" onclick="delRow('labor',${id})">✕</button>
+          <button class="disc-btn" id="labor-disc-btn-${id}" onclick="toggleDiscount('labor',${id})" title="Add discount">%</button>
+        </div>
       </div>
       ${data.subitems !== undefined ? `<div class="labor-subitems"><textarea placeholder="Sub-tasks (one per line, optional)" data-id="${id}" data-type="labor" data-field="subitems">${data.subitems||''}</textarea></div>` : ''}`;
     container.appendChild(div);
@@ -255,13 +410,26 @@ function addRow(type, data = {}) {
     const div = document.createElement('div');
     div.id = `${type}-${id}`;
     div.className = 'item-row';
+    div.style.cssText = 'grid-template-columns:2.5fr 2.5fr 1fr 1fr 1.4fr auto;align-items:start';
     div.innerHTML = `
       <input placeholder="${type==='oil'?'Item name':'Part name'}" value="${data.name||''}" oninput="recalc()" data-id="${id}" data-type="${type}" data-field="name" />
       <input placeholder="${type==='oil'?'Spec / Brand':'Brand / Part No.'}" value="${data.spec||''}" data-id="${id}" data-type="${type}" data-field="spec" />
       <input placeholder="—" value="${data.qty||''}" data-id="${id}" data-type="${type}" data-field="qty" />
       <input type="number" placeholder="₹0" value="${data.unit||''}" oninput="recalc()" data-id="${id}" data-type="${type}" data-field="unit" min="0" style="text-align:right" />
-      <div class="total-cell" id="${type}-total-${id}">—</div>
-      <button class="del-btn" onclick="delRow('${type}',${id})">✕</button>`;
+      <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end">
+        <div class="total-cell" id="${type}-total-${id}">—</div>
+        <div id="${type}-disc-wrap-${id}" style="display:none;flex-direction:column;gap:3px;align-items:flex-end">
+          <div style="display:flex;gap:4px;align-items:center">
+            <span class="disc-label">Discount ₹</span>
+            <input type="number" class="disc-input" placeholder="0" min="0" oninput="recalc()" data-id="${id}" data-type="${type}" data-field="discount" style="width:72px" />
+          </div>
+          <div id="${type}-disc-result-${id}" style="font-size:0.78rem;text-align:right"></div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:4px;align-items:center">
+        <button class="del-btn" onclick="delRow('${type}',${id})">✕</button>
+        <button class="disc-btn" id="${type}-disc-btn-${id}" onclick="toggleDiscount('${type}',${id})" title="Add discount">%</button>
+      </div>`;
     container.appendChild(div);
   }
   recalc();
@@ -275,7 +443,7 @@ function delRow(type, id) {
 
 // ── Calculate ──────────────────────────────────────────────────────────────────
 function recalc() {
-  let oilsTotal = 0, partsTotal = 0, laborTotal = 0;
+  let oilsTotal = 0, partsTotal = 0, laborTotal = 0, totalDiscount = 0;
 
   ['oil','part'].forEach(type => {
     rows[type].forEach(id => {
@@ -283,18 +451,34 @@ function recalc() {
       if (!el) return;
       const unitInput = el.querySelector('[data-field="unit"]');
       const qtyInput  = el.querySelector('[data-field="qty"]');
+      const discInput = el.querySelector('[data-field="discount"]');
       const totalCell = document.getElementById(`${type}-total-${id}`);
+      const discResult= document.getElementById(`${type}-disc-result-${id}`);
+
       const unit = parseFloat(unitInput?.value) || 0;
       const qtyRaw = qtyInput?.value || '';
-      const qtyNum = parseFloat(qtyRaw) || 1; // if qty is text like "200 ml", parseFloat gives 200 — wrong for fluids
-      // Only multiply if qty is a pure number (e.g. 3.5 for engine oil litres)
-      // If qty contains letters (e.g. "200 ml", "1 Pc", "As needed"), treat as qty=1
       const isPureNum = qtyRaw.trim() !== '' && !isNaN(Number(qtyRaw.trim()));
       const multiplier = isPureNum ? Number(qtyRaw.trim()) : 1;
-      const total = unit > 0 ? Math.round(unit * multiplier) : 0;
-      if (totalCell) totalCell.textContent = total > 0 ? fmt(total) : '—';
-      if (type === 'oil') oilsTotal += total;
-      else partsTotal += total;
+      const gross = unit > 0 ? Math.round(unit * multiplier) : 0;
+      const disc  = Math.min(parseFloat(discInput?.value) || 0, gross);
+      const net   = gross - disc;
+
+      // Update total cell display
+      if (totalCell) {
+        if (disc > 0) {
+          totalCell.innerHTML = `<span class="total-original">${gross > 0 ? fmt(gross) : '—'}</span>`;
+          if (discResult) discResult.innerHTML = net === 0
+            ? `<span class="total-free">FREE</span>`
+            : `<span class="total-discounted">${fmt(net)}</span><span style="color:#f97316;font-size:0.7rem;font-family:'DM Mono',monospace"> (−${fmt(disc)})</span>`;
+        } else {
+          totalCell.textContent = gross > 0 ? fmt(gross) : '—';
+          if (discResult) discResult.innerHTML = '';
+        }
+      }
+
+      if (type === 'oil') oilsTotal += net;
+      else partsTotal += net;
+      totalDiscount += disc;
     });
   });
 
@@ -302,21 +486,74 @@ function recalc() {
     const el = document.getElementById(`labor-${id}`);
     if (!el) return;
     const priceInput = el.querySelector('[data-field="price"]');
-    laborTotal += parseFloat(priceInput?.value) || 0;
+    const discInput  = el.querySelector('[data-field="discount"]');
+    const totalEl    = document.getElementById(`labor-total-${id}`);
+    const noDis      = document.getElementById(`labor-total-nodis-${id}`);
+
+    const price = parseFloat(priceInput?.value) || 0;
+    const disc  = Math.min(parseFloat(discInput?.value) || 0, price);
+    const net   = price - disc;
+
+    if (disc > 0) {
+      if (noDis) noDis.innerHTML = `<span class="total-original">${fmt(price)}</span>`;
+      if (totalEl) {
+        const wrap = document.getElementById(`labor-disc-wrap-${id}`);
+        if (wrap) wrap.style.display = 'flex';
+        totalEl.innerHTML = net === 0
+          ? `<span class="total-free">FREE</span>`
+          : `<span class="total-discounted">${fmt(net)}</span><span style="color:#f97316;font-size:0.7rem;font-family:'DM Mono',monospace"> (−${fmt(disc)})</span>`;
+      }
+    } else {
+      if (noDis) noDis.textContent = price > 0 ? fmt(price) : '';
+      if (totalEl) totalEl.innerHTML = '';
+    }
+
+    laborTotal   += net;
+    totalDiscount += disc;
   });
 
-  const subtotal = oilsTotal + partsTotal + laborTotal;
-  const gst = Math.round(subtotal * 0.18);
-  const total = subtotal + gst;
+  const subtotalGross = (oilsTotal + partsTotal + laborTotal) + totalDiscount; // before disc
+  const subtotal = oilsTotal + partsTotal + laborTotal; // after disc
+  const gst      = Math.round(subtotal * 0.18);
+  const total    = subtotal + gst;
 
-  document.getElementById('s-oils').textContent  = fmt(oilsTotal);
-  document.getElementById('s-parts').textContent = fmt(partsTotal);
-  document.getElementById('s-labor').textContent = fmt(laborTotal);
-  document.getElementById('s-sub').textContent   = fmt(subtotal);
-  document.getElementById('s-gst').textContent   = fmt(gst);
-  document.getElementById('s-total').textContent = fmt(total);
+  document.getElementById('s-oils').textContent     = fmt(oilsTotal);
+  document.getElementById('s-parts').textContent    = fmt(partsTotal);
+  document.getElementById('s-labor').textContent    = fmt(laborTotal);
+  document.getElementById('s-sub').textContent      = fmt(subtotalGross);
 
-  window._totals = { oilsTotal, partsTotal, laborTotal, subtotal, gst, total };
+  // Show/hide discount row in summary
+  const discRow = document.getElementById('s-disc-row');
+  if (totalDiscount > 0) {
+    discRow.style.display = 'flex';
+    document.getElementById('s-disc').textContent = '−' + fmt(totalDiscount);
+    document.getElementById('s-sub-after').textContent = fmt(subtotal);
+    document.getElementById('s-sub-after-row').style.display = 'flex';
+  } else {
+    discRow.style.display = 'none';
+    document.getElementById('s-sub-after-row').style.display = 'none';
+  }
+
+  document.getElementById('s-gst').textContent      = fmt(gst);
+  document.getElementById('s-total').textContent    = fmt(total);
+
+  window._totals = { oilsTotal, partsTotal, laborTotal, subtotalGross, totalDiscount, subtotal, gst, total };
+}
+
+function toggleDiscount(type, id) {
+  const wrap = document.getElementById(`${type}-disc-wrap-${id}`);
+  const btn  = document.getElementById(`${type}-disc-btn-${id}`);
+  if (!wrap) return;
+  const isOpen = wrap.style.display !== 'none';
+  wrap.style.display = isOpen ? 'none' : 'flex';
+  btn.classList.toggle('active', !isOpen);
+  if (isOpen) {
+    // clear discount when hiding
+    const discInput = document.getElementById(`${type}-${id}`)?.querySelector('[data-field="discount"]')
+      || document.getElementById(`labor-${id}`)?.querySelector('[data-field="discount"]');
+    if (discInput) discInput.value = '';
+    recalc();
+  }
 }
 
 function fmt(n) { return '₹' + Number(n).toLocaleString('en-IN'); }
@@ -329,14 +566,17 @@ function collectRows(type) {
     if (!el) return null;
     const get = f => el.querySelector(`[data-field="${f}"]`)?.value?.trim() || '';
     if (type === 'labor') {
-      return { task: get('task'), spec: get('spec'), price: parseFloat(get('price')) || 0, subitems: get('subitems') };
+      const price = parseFloat(get('price')) || 0;
+      const disc  = Math.min(parseFloat(get('discount')) || 0, price);
+      return { task: get('task'), spec: get('spec'), price, discount: disc, net: price - disc, subitems: get('subitems') };
     }
     const unit = parseFloat(get('unit')) || 0;
     const qtyRaw = get('qty');
     const isPureNum = qtyRaw.trim() !== '' && !isNaN(Number(qtyRaw.trim()));
     const multiplier = isPureNum ? Number(qtyRaw.trim()) : 1;
-    const total = unit > 0 ? Math.round(unit * multiplier) : 0;
-    return { name: get('name'), spec: get('spec'), qty: qtyRaw || '—', unit, total };
+    const gross = unit > 0 ? Math.round(unit * multiplier) : 0;
+    const disc  = Math.min(parseFloat(get('discount')) || 0, gross);
+    return { name: get('name'), spec: get('spec'), qty: qtyRaw || '—', unit, total: gross, discount: disc, net: gross - disc };
   }).filter(Boolean);
 }
 
@@ -356,30 +596,37 @@ function generatePDF() {
   const pkgName   = document.getElementById('pkgName').value.trim();
   const notes     = document.getElementById('notes').value.trim();
 
-  const oilRows = oils.map(o => `<tr>
-    <td>${o.name}</td>
-    <td style="color:#555">${o.spec}</td>
-    <td style="text-align:center;color:#777">${o.qty}</td>
-    <td style="text-align:right">${o.unit ? fmtR(o.unit) : '—'}</td>
-    <td style="text-align:right">${o.total ? fmtR(o.total) : o.unit===0?'Included':'—'}</td>
-  </tr>`).join('');
+  const oilRows = oils.map(o => {
+    const hasDisc = o.discount > 0;
+    const priceCell = hasDisc
+      ? (o.net === 0
+          ? `<span style="text-decoration:line-through;color:#999">${o.total ? fmtR(o.total) : '—'}</span>&nbsp;<span style="color:#e65c00;font-weight:600">FREE</span>`
+          : `<span style="text-decoration:line-through;color:#999">${fmtR(o.total)}</span>&nbsp;<span style="color:#e65c00;font-weight:600">${fmtR(o.net)}</span>`)
+      : (o.total ? fmtR(o.total) : o.unit===0 ? 'Included' : '—');
+    return `<tr><td>${o.name}</td><td style="color:#555">${o.spec}</td><td style="text-align:center;color:#777">${o.qty}</td><td style="text-align:right">${o.unit ? fmtR(o.unit) : '—'}</td><td style="text-align:right">${priceCell}</td></tr>`;
+  }).join('');
 
-  const partRows = parts.map(p => `<tr>
-    <td>${p.name}</td>
-    <td style="color:#555">${p.spec}</td>
-    <td style="text-align:center;color:#777">${p.qty}</td>
-    <td style="text-align:right">${p.unit ? fmtR(p.unit) : '—'}</td>
-    <td style="text-align:right">${p.total ? fmtR(p.total) : 'Included'}</td>
-  </tr>`).join('');
+  const partRows = parts.map(p => {
+    const hasDisc = p.discount > 0;
+    const priceCell = hasDisc
+      ? (p.net === 0
+          ? `<span style="text-decoration:line-through;color:#999">${p.total ? fmtR(p.total) : '—'}</span>&nbsp;<span style="color:#e65c00;font-weight:600">FREE</span>`
+          : `<span style="text-decoration:line-through;color:#999">${fmtR(p.total)}</span>&nbsp;<span style="color:#e65c00;font-weight:600">${fmtR(p.net)}</span>`)
+      : (p.total ? fmtR(p.total) : 'Included');
+    return `<tr><td>${p.name}</td><td style="color:#555">${p.spec}</td><td style="text-align:center;color:#777">${p.qty}</td><td style="text-align:right">${p.unit ? fmtR(p.unit) : '—'}</td><td style="text-align:right">${priceCell}</td></tr>`;
+  }).join('');
 
   const laborRows = labors.map(l => {
     const subList = l.subitems
       ? '<ul>' + l.subitems.split('\n').filter(s=>s.trim()).map(s=>`<li>${s.trim()}</li>`).join('') + '</ul>'
       : '';
-    return `<tr>
-      <td colspan="4">${l.task}${l.spec ? ` <span style="color:#999;font-size:0.85em">${l.spec}</span>` : ''}${subList}</td>
-      <td style="text-align:right;vertical-align:top">${l.price ? fmtR(l.price) : 'Included'}</td>
-    </tr>`;
+    const hasDisc = l.discount > 0;
+    const priceCell = hasDisc
+      ? (l.net === 0
+          ? `<span style="text-decoration:line-through;color:#999">${fmtR(l.price)}</span>&nbsp;<span style="color:#e65c00;font-weight:600">FREE</span>`
+          : `<span style="text-decoration:line-through;color:#999">${fmtR(l.price)}</span>&nbsp;<span style="color:#e65c00;font-weight:600">${fmtR(l.net)}</span>`)
+      : (l.price ? fmtR(l.price) : 'Included');
+    return `<tr><td colspan="4">${l.task}${l.spec ? ` <span style="color:#999;font-size:0.85em">${l.spec}</span>` : ''}${subList}</td><td style="text-align:right;vertical-align:top">${priceCell}</td></tr>`;
   }).join('');
 
   const html = `<!DOCTYPE html>
@@ -474,7 +721,7 @@ table + .sub-label{margin-top:14px}
 <div class="header">
   <div>
     <div class="brand">CarCare <span>Pro</span></div>
-    <div class="brand-sub">Instant Mechanic &middot; Gurugram, Delhi NCR</div>
+    <div class="brand-sub" style="color:#e65c00;font-weight:700;text-transform:uppercase;font-size:11px;letter-spacing:0.04em">Instant Mechanic &middot; Gurugram, Delhi NCR</div>
   </div>
   <div class="quote-meta">
     <strong>SERVICE ESTIMATE</strong><br>
@@ -543,7 +790,9 @@ table + .sub-label{margin-top:14px}
   <div class="est-row"><span>Oils &amp; Fluids</span><span>${fmtR(t.oilsTotal||0)}</span></div>
   <div class="est-row"><span>Replacement Parts</span><span>${fmtR(t.partsTotal||0)}</span></div>
   <div class="est-row"><span>Labor Charges</span><span>${fmtR(t.laborTotal||0)}</span></div>
-  <div class="est-row est-sub"><span>Subtotal</span><span>${fmtR(t.subtotal||0)}</span></div>
+  <div class="est-row est-sub"><span>Subtotal (before discount)</span><span>${fmtR(t.subtotalGross||t.subtotal||0)}</span></div>
+  ${(t.totalDiscount||0) > 0 ? `<div class="est-row" style="color:#e65c00"><span>Total Discount (Car Care Membership &#127881;)</span><span style="font-weight:700">&#8722;${fmtR(t.totalDiscount)}</span></div>
+  <div class="est-row est-sub"><span>Subtotal (after discount)</span><span>${fmtR(t.subtotal||0)}</span></div>` : ''}
   <div class="est-row"><span>GST @ 18%</span><span>${fmtR(t.gst||0)}</span></div>
   <div class="est-total"><span>Total Estimate (incl. GST)</span><span>${fmtR(t.total||0)}</span></div>
 </div>
