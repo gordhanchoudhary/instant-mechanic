@@ -21,7 +21,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:18p
 .badge{font-family:'DM Mono',monospace;font-size:0.65rem;background:var(--accent);color:#000;padding:3px 9px;border-radius:20px;font-weight:600;letter-spacing:0.04em}
 
 /* ── Layout ── */
-.page{max-width:1000px;margin:0 auto;padding:40px 24px 80px}
+.page{max-width:1000px;margin:0 auto;padding:40px 24px 80px;overflow-x:hidden}
 .page-title{font-family:'Syne',sans-serif;font-weight:800;font-size:2rem;letter-spacing:-0.03em;margin-bottom:6px}
 .page-title span{color:var(--accent)}
 .page-sub{color:var(--muted);font-size:0.9rem;margin-bottom:36px}
@@ -49,31 +49,31 @@ header{display:flex;align-items:center;justify-content:space-between;padding:18p
 .sec-label{padding:8px 20px;font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);background:var(--surface2);border-bottom:1px solid var(--border)}
 
 /* ── Item rows ── */
-.item-row{display:grid;grid-template-columns:2.5fr 2.5fr 1fr 1fr 1fr auto;gap:8px;padding:10px 16px;border-bottom:1px solid var(--border);align-items:center}
+.item-row{display:grid;grid-template-columns:minmax(120px,2.2fr) minmax(110px,2.2fr) minmax(55px,0.8fr) minmax(65px,0.9fr) minmax(90px,1.3fr) 52px;gap:6px;padding:10px 14px;border-bottom:1px solid var(--border);align-items:start}
 .item-row:last-of-type{border-bottom:none}
-.item-row input{background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:7px 10px;font-family:'DM Sans',sans-serif;font-size:0.82rem;color:var(--text);outline:none;transition:border-color 0.15s;width:100%}
+.item-row input{background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:7px 8px;font-family:'DM Sans',sans-serif;font-size:0.82rem;color:var(--text);outline:none;transition:border-color 0.15s;width:100%;min-width:0}
 .item-row input:focus{border-color:var(--accent)}
 .item-row input::placeholder{color:var(--muted)}
 .item-row input[type=number]{-moz-appearance:textfield}
 .item-row input[type=number]::-webkit-inner-spin-button{display:none}
 .item-row .total-cell{font-family:'DM Mono',monospace;font-size:0.82rem;color:var(--accent);text-align:right;padding-right:4px;white-space:nowrap}
-.item-row .del-btn{background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--muted);cursor:pointer;width:28px;height:28px;display:grid;place-items:center;font-size:0.85rem;transition:all 0.15s;flex-shrink:0}
+.item-row .del-btn{background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--muted);cursor:pointer;width:24px;height:24px;display:grid;place-items:center;font-size:0.75rem;transition:all 0.15s;flex-shrink:0}
 .item-row .del-btn:hover{border-color:var(--accent2);color:var(--accent2)}
-.col-headers{display:grid;grid-template-columns:2.5fr 2.5fr 1fr 1fr 1fr auto;gap:8px;padding:6px 16px;border-bottom:1px solid var(--border);background:#141414}
+.col-headers{display:grid;grid-template-columns:minmax(120px,2.2fr) minmax(110px,2.2fr) minmax(55px,0.8fr) minmax(65px,0.9fr) minmax(90px,1.3fr) 52px;gap:6px;padding:6px 14px;border-bottom:1px solid var(--border);background:#141414}
 .col-hdr{font-family:'DM Mono',monospace;font-size:0.62rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted)}
 .col-hdr.right{text-align:right}
 
 /* Labor rows (task + spec + price only) */
-.labor-row{display:grid;grid-template-columns:3fr 3fr 1.2fr auto;gap:8px;padding:10px 16px;border-bottom:1px solid var(--border);align-items:center}
+.labor-row{display:grid;grid-template-columns:minmax(140px,3fr) minmax(120px,3fr) minmax(90px,1.4fr) 52px;gap:6px;padding:10px 14px;border-bottom:1px solid var(--border);align-items:start}
 .labor-row:last-of-type{border-bottom:none}
-.labor-row input{background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:7px 10px;font-family:'DM Sans',sans-serif;font-size:0.82rem;color:var(--text);outline:none;transition:border-color 0.15s;width:100%}
+.labor-row input{background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:7px 8px;font-family:'DM Sans',sans-serif;font-size:0.82rem;color:var(--text);outline:none;transition:border-color 0.15s;width:100%;min-width:0}
 .labor-row input:focus{border-color:var(--accent)}
 .labor-row input::placeholder{color:var(--muted)}
 .labor-row input[type=number]{-moz-appearance:textfield}
 .labor-row input[type=number]::-webkit-inner-spin-button{display:none}
 .labor-row .del-btn{background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--muted);cursor:pointer;width:28px;height:28px;display:grid;place-items:center;font-size:0.85rem;transition:all 0.15s}
 .labor-row .del-btn:hover{border-color:var(--accent2);color:var(--accent2)}
-.labor-col-headers{display:grid;grid-template-columns:3fr 3fr 1.2fr auto;gap:8px;padding:6px 16px;border-bottom:1px solid var(--border);background:#141414}
+.labor-col-headers{display:grid;grid-template-columns:minmax(140px,3fr) minmax(120px,3fr) minmax(90px,1.4fr) 52px;gap:6px;padding:6px 14px;border-bottom:1px solid var(--border);background:#141414}
 
 /* ── Add button ── */
 .add-btn{display:flex;align-items:center;gap:7px;padding:9px 16px;background:transparent;border:1px dashed var(--border);color:var(--muted);font-family:'DM Mono',monospace;font-size:0.72rem;letter-spacing:0.06em;cursor:pointer;width:100%;transition:all 0.15s}
@@ -102,7 +102,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:18p
 .labor-subitems textarea:focus{border-color:var(--accent)}
 
 /* ── Discount button & input ── */
-.disc-btn{background:transparent;border:1px dashed var(--border);border-radius:5px;color:var(--muted);font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.04em;padding:3px 8px;cursor:pointer;transition:all 0.15s;white-space:nowrap}
+.disc-btn{background:transparent;border:1px dashed var(--border);border-radius:5px;color:var(--muted);font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.04em;padding:2px 5px;cursor:pointer;transition:all 0.15s;white-space:nowrap;width:24px;text-align:center}
 .disc-btn:hover{border-color:#f97316;color:#f97316}
 .disc-btn.active{border-color:#f97316;color:#f97316;background:rgba(249,115,22,0.08)}
 .disc-input-wrap{display:flex;align-items:center;gap:4px;margin-top:4px}
@@ -121,130 +121,6 @@ header{display:flex;align-items:center;justify-content:space-between;padding:18p
 
 <header>
   <div class="logo">CarCare Pro</div>
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Quote Builder — Instant Mechanic</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<style>
-:root {
-  --bg: #0a0a0a; --surface: #111; --surface2: #181818; --border: #252525;
-  --accent: #e8ff47; --accent2: #ff6b2b; --text: #f0f0f0; --muted: #666; --success: #4ade80;
-}
-*{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh}
-
-/* ── Header ── */
-header{display:flex;align-items:center;justify-content:space-between;padding:18px 32px;border-bottom:1px solid var(--border);background:rgba(10,10,10,0.95);backdrop-filter:blur(12px);position:sticky;top:0;z-index:100}
-.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;letter-spacing:-0.03em;display:flex;align-items:center;gap:8px}
-.logo-dot{width:9px;height:9px;background:var(--accent);border-radius:50%;animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(0.85)}}
-.badge{font-family:'DM Mono',monospace;font-size:0.65rem;background:var(--accent);color:#000;padding:3px 9px;border-radius:20px;font-weight:600;letter-spacing:0.04em}
-
-/* ── Layout ── */
-.page{max-width:1000px;margin:0 auto;padding:40px 24px 80px}
-.page-title{font-family:'Syne',sans-serif;font-weight:800;font-size:2rem;letter-spacing:-0.03em;margin-bottom:6px}
-.page-title span{color:var(--accent)}
-.page-sub{color:var(--muted);font-size:0.9rem;margin-bottom:36px}
-
-/* ── Card ── */
-.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:20px}
-.card-hdr{padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
-.card-hdr-title{font-family:'Syne',sans-serif;font-weight:700;font-size:0.9rem;display:flex;align-items:center;gap:8px}
-.card-icon{width:28px;height:28px;background:var(--surface2);border:1px solid var(--border);border-radius:7px;display:grid;place-items:center;font-size:0.85rem}
-
-/* ── Form fields ── */
-.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:16px 20px}
-.form-grid.three{grid-template-columns:1fr 1fr 1fr}
-.form-grid.single{grid-template-columns:1fr}
-@media(max-width:600px){.form-grid,.form-grid.three{grid-template-columns:1fr}}
-.field{display:flex;flex-direction:column;gap:5px}
-.field label{font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.09em;text-transform:uppercase;color:var(--muted)}
-.field input,.field select,.field textarea{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.88rem;color:var(--text);outline:none;transition:border-color 0.15s;width:100%}
-.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent)}
-.field input::placeholder,.field textarea::placeholder{color:var(--muted)}
-.field select option{background:var(--surface2);color:var(--text)}
-.field textarea{resize:vertical;min-height:60px;line-height:1.5}
-
-/* ── Section label ── */
-.sec-label{padding:8px 20px;font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);background:var(--surface2);border-bottom:1px solid var(--border)}
-
-/* ── Item rows ── */
-.item-row{display:grid;grid-template-columns:2.5fr 2.5fr 1fr 1fr 1fr auto;gap:8px;padding:10px 16px;border-bottom:1px solid var(--border);align-items:center}
-.item-row:last-of-type{border-bottom:none}
-.item-row input{background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:7px 10px;font-family:'DM Sans',sans-serif;font-size:0.82rem;color:var(--text);outline:none;transition:border-color 0.15s;width:100%}
-.item-row input:focus{border-color:var(--accent)}
-.item-row input::placeholder{color:var(--muted)}
-.item-row input[type=number]{-moz-appearance:textfield}
-.item-row input[type=number]::-webkit-inner-spin-button{display:none}
-.item-row .total-cell{font-family:'DM Mono',monospace;font-size:0.82rem;color:var(--accent);text-align:right;padding-right:4px;white-space:nowrap}
-.item-row .del-btn{background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--muted);cursor:pointer;width:28px;height:28px;display:grid;place-items:center;font-size:0.85rem;transition:all 0.15s;flex-shrink:0}
-.item-row .del-btn:hover{border-color:var(--accent2);color:var(--accent2)}
-.col-headers{display:grid;grid-template-columns:2.5fr 2.5fr 1fr 1fr 1fr auto;gap:8px;padding:6px 16px;border-bottom:1px solid var(--border);background:#141414}
-.col-hdr{font-family:'DM Mono',monospace;font-size:0.62rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted)}
-.col-hdr.right{text-align:right}
-
-/* Labor rows (task + spec + price only) */
-.labor-row{display:grid;grid-template-columns:3fr 3fr 1.2fr auto;gap:8px;padding:10px 16px;border-bottom:1px solid var(--border);align-items:center}
-.labor-row:last-of-type{border-bottom:none}
-.labor-row input{background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:7px 10px;font-family:'DM Sans',sans-serif;font-size:0.82rem;color:var(--text);outline:none;transition:border-color 0.15s;width:100%}
-.labor-row input:focus{border-color:var(--accent)}
-.labor-row input::placeholder{color:var(--muted)}
-.labor-row input[type=number]{-moz-appearance:textfield}
-.labor-row input[type=number]::-webkit-inner-spin-button{display:none}
-.labor-row .del-btn{background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--muted);cursor:pointer;width:28px;height:28px;display:grid;place-items:center;font-size:0.85rem;transition:all 0.15s}
-.labor-row .del-btn:hover{border-color:var(--accent2);color:var(--accent2)}
-.labor-col-headers{display:grid;grid-template-columns:3fr 3fr 1.2fr auto;gap:8px;padding:6px 16px;border-bottom:1px solid var(--border);background:#141414}
-
-/* ── Add button ── */
-.add-btn{display:flex;align-items:center;gap:7px;padding:9px 16px;background:transparent;border:1px dashed var(--border);color:var(--muted);font-family:'DM Mono',monospace;font-size:0.72rem;letter-spacing:0.06em;cursor:pointer;width:100%;transition:all 0.15s}
-.add-btn:hover{border-color:var(--accent);color:var(--accent);background:rgba(232,255,71,0.03)}
-
-/* ── Summary bar ── */
-.summary-bar{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:20px}
-.sum-item{text-align:center}
-.sum-val{font-family:'DM Mono',monospace;font-size:0.85rem;color:var(--accent);font-weight:600}
-.sum-label{font-size:0.7rem;color:var(--muted);margin-top:2px;font-family:'DM Mono',monospace;letter-spacing:0.04em}
-.sum-total-val{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;color:var(--accent);letter-spacing:-0.03em}
-
-/* ── Generate button ── */
-.gen-btn{width:100%;background:var(--accent);color:#000;border:none;border-radius:12px;padding:16px 24px;font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;cursor:pointer;transition:opacity 0.15s,transform 0.1s;display:flex;align-items:center;justify-content:center;gap:10px;letter-spacing:-0.01em}
-.gen-btn:hover{opacity:0.9;transform:translateY(-1px)}
-.gen-btn:active{transform:translateY(0)}
-
-/* ── Optional section tags ── */
-.tag{font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:0.07em;text-transform:uppercase;padding:2px 7px;border-radius:4px;border:1px solid;display:inline-block;vertical-align:middle;margin-left:6px}
-.tag-mand{background:rgba(232,255,71,0.1);color:var(--accent);border-color:rgba(232,255,71,0.2)}
-.tag-opt{background:rgba(255,107,43,0.1);color:var(--accent2);border-color:rgba(255,107,43,0.2)}
-
-/* Labor sub-items textarea */
-.labor-subitems{font-size:0.75rem;color:var(--muted);padding:6px 16px 10px;font-family:'DM Mono',monospace}
-.labor-subitems textarea{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:7px 10px;font-family:'DM Mono',monospace;font-size:0.72rem;color:var(--muted);outline:none;resize:none;height:54px;line-height:1.5}
-.labor-subitems textarea:focus{border-color:var(--accent)}
-
-/* ── Discount button & input ── */
-.disc-btn{background:transparent;border:1px dashed var(--border);border-radius:5px;color:var(--muted);font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.04em;padding:3px 8px;cursor:pointer;transition:all 0.15s;white-space:nowrap}
-.disc-btn:hover{border-color:#f97316;color:#f97316}
-.disc-btn.active{border-color:#f97316;color:#f97316;background:rgba(249,115,22,0.08)}
-.disc-input-wrap{display:flex;align-items:center;gap:4px;margin-top:4px}
-.disc-input{background:rgba(249,115,22,0.08);border:1px solid #f97316;border-radius:5px;padding:3px 7px;font-family:'DM Mono',monospace;font-size:0.72rem;color:#f97316;width:80px;outline:none;-moz-appearance:textfield}
-.disc-input::-webkit-inner-spin-button{display:none}
-.disc-label{font-size:0.65rem;color:#f97316;font-family:'DM Mono',monospace}
-.total-cell{position:relative}
-.total-original{text-decoration:line-through;color:var(--muted);font-size:0.75rem;display:block}
-.total-discounted{color:#f97316;font-weight:600}
-.total-free{color:#4ade80;font-weight:700;font-family:'Syne',sans-serif;font-size:0.85rem}
-/* Summary discount row */
-.sum-discount{color:#f97316}
-</style>
-</head>
-<body>
-
-<header>
-  <div class="logo">CarCare Pro</div></div>
   <div class="badge">Manual Quote Builder</div>
 </header>
 
@@ -285,7 +161,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:18p
       <div class="col-hdr right">Total / Discount</div>
       <div class="col-hdr"></div>
     </div>
-    <div id="oilRows"></div>
+    <div style="overflow-x:auto"><div id="oilRows"></div></div>
     <button class="add-btn" onclick="addRow('oil')">+ Add Oil / Fluid</button>
   </div>
 
@@ -302,7 +178,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:18p
       <div class="col-hdr right">Total / Discount</div>
       <div class="col-hdr"></div>
     </div>
-    <div id="partRows"></div>
+    <div style="overflow-x:auto"><div id="partRows"></div></div>
     <button class="add-btn" onclick="addRow('part')">+ Add Part</button>
   </div>
 
@@ -317,7 +193,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:18p
       <div class="col-hdr right">Charge / Discount</div>
       <div class="col-hdr"></div>
     </div>
-    <div id="laborRows"></div>
+    <div style="overflow-x:auto"><div id="laborRows"></div></div>
     <button class="add-btn" onclick="addRow('labor')">+ Add Labor Task</button>
   </div>
 
@@ -384,7 +260,7 @@ function addRow(type, data = {}) {
     div.id = `labor-${id}`;
     div.style.cssText = 'border-bottom:1px solid var(--border)';
     div.innerHTML = `
-      <div class="labor-row" style="grid-template-columns:3fr 3fr 1.4fr auto;align-items:start">
+      <div class="labor-row" >
         <input placeholder="Task name" value="${data.task||''}" oninput="recalc()" data-id="${id}" data-type="labor" data-field="task" />
         <input placeholder="Spec / detail" value="${data.spec||''}" data-id="${id}" data-type="labor" data-field="spec" />
         <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end">
@@ -410,7 +286,7 @@ function addRow(type, data = {}) {
     const div = document.createElement('div');
     div.id = `${type}-${id}`;
     div.className = 'item-row';
-    div.style.cssText = 'grid-template-columns:2.5fr 2.5fr 1fr 1fr 1.4fr auto;align-items:start';
+    div.style.cssText = '';
     div.innerHTML = `
       <input placeholder="${type==='oil'?'Item name':'Part name'}" value="${data.name||''}" oninput="recalc()" data-id="${id}" data-type="${type}" data-field="name" />
       <input placeholder="${type==='oil'?'Spec / Brand':'Brand / Part No.'}" value="${data.spec||''}" data-id="${id}" data-type="${type}" data-field="spec" />
