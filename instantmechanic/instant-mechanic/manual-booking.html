@@ -796,6 +796,18 @@
                     </div>
                 </div>
 
+                <!-- Membership Toggle -->
+<div class="form-group" id="membershipGroup">
+    <div class="toggle-group">
+        <span class="toggle-label">Is Membership?</span>
+        <div class="toggle-switch" id="membershipToggle">
+            <div class="toggle-slider"></div>
+        </div>
+    </div>
+</div>
+
+<!-- NEW: Payment Collection Toggle (hidden by default) -->
+
                 <!-- NEW: Payment Collection Toggle (hidden by default) -->
                 <div class="form-group hidden" id="paymentCollectionGroup">
                     <div class="toggle-group">
@@ -1847,6 +1859,11 @@
                 togglePaymentCollectionVisibility(isGoMechanic);
             });
 
+            const membershipToggle = document.getElementById('membershipToggle');
+            membershipToggle.addEventListener('click', function() {
+                this.classList.toggle('active');
+            });
+
             // Toggle functionality for Payment Collection
             const paymentCollectionToggle = document.getElementById('paymentCollectionToggle');
             paymentCollectionToggle.addEventListener('click', function() {
@@ -1975,6 +1992,7 @@
                     location: location,
                     securityAmount: mechanicPayout || null,
                     isGoMechanicCall: isGoMechanic,
+                    is_membership: document.getElementById('membershipToggle').classList.contains('active'),
                     need_to_collect_payment_on_gomech: isGoMechanic ? needToCollectPayment : false, // NEW FIELD
                     amount_to_collect_on_gomech: (isGoMechanic && needToCollectPayment && amountToCollect > 0) ? amountToCollect : null, // NEW FIELD
                     timestamp: new Date().toISOString(),
@@ -2008,6 +2026,7 @@
                     // Reset toggles to default state and restore default values
                     document.getElementById('goMechanicToggle').classList.remove('active');
                     document.getElementById('paymentCollectionToggle').classList.remove('active');
+                    document.getElementById('membershipToggle').classList.remove('active');
                     togglePriceAndSecurityVisibility(false); // Show price and security fields
                     togglePaymentCollectionVisibility(false); // Hide payment collection toggle
                     toggleAmountToCollectVisibility(false); // Hide amount to collect field
@@ -2043,6 +2062,7 @@
                         
                         document.getElementById('bookingForm').reset();
                         document.getElementById('goMechanicToggle').classList.remove('active');
+                        document.getElementById('membershipToggle').classList.remove('active');
                         document.getElementById('paymentCollectionToggle').classList.remove('active');
                         togglePriceAndSecurityVisibility(false); // Show price and security fields
                         togglePaymentCollectionVisibility(false); // Hide payment collection toggle
