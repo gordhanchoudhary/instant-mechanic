@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Squad Files — Classified</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --surface: #111111;
+    --surface2: #181818;
+    --border: #222;
+    --accent: #ff6b00;
+    --accent2: #ffb347;
+    --text: #f0ede6;
+    --muted: #666;
+    --danger: #e63946;
+    --gold: #f4c430;
+    --silver: #aaa;
+    --bronze: #cd7f32;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; }
+
+  /* ===== LOCK SCREEN ===== */
+  #lockScreen {
+    position: fixed; inset: 0; background: var(--bg);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    z-index: 9999; transition: opacity 0.5s;
+  }
+  #lockScreen.hide { opacity: 0; pointer-events: none; }
+  .lock-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(40px, 8vw, 72px);
+    letter-spacing: 6px;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+  .lock-sub {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 3px;
+    margin-bottom: 48px;
+  }
+  .pin-display {
+    display: flex; gap: 16px; margin-bottom: 32px;
+  }
+  .pin-dot {
+    width: 16px; height: 16px; border-radius: 50%;
+    border: 2px solid var(--accent);
+    background: transparent;
+    transition: background 0.15s;
+  }
+  .pin-dot.filled { background: var(--accent); }
+  .numpad {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+    width: 220px;
+  }
+  .num-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'Space Mono', monospace;
+    font-size: 20px;
+    padding: 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.1s;
+    text-align: center;
+  }
+  .num-btn:hover { background: var(--surface2); border-color: var(--accent); }
+  .num-btn:active { transform: scale(0.95); background: var(--accent); color: #000; }
+  .num-btn.del { font-size: 14px; color: var(--muted); }
+  .num-btn.empty { visibility: hidden; }
+  .lock-err {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--danger);
+    margin-top: 16px;
+    height: 16px;
+    letter-spacing: 2px;
+  }
+  .shake { animation: shake 0.4s; }
+  @keyframes shake {
+    0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)} 40%{transform:translateX(8px)} 60%{transform:translateX(-6px)} 80%{transform:translateX(6px)}
+  }
+
+  /* ===== MAIN DASHBOARD ===== */
+  #dashboard { display: none; }
+  #dashboard.show { display: block; }
+
+  .top-bar {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(10,10,10,0.95);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 56px;
+  }
+  .top-bar-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 24px; letter-spacing: 4px; color: var(--accent);
+  }
+  .top-bar-right {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px; color: var(--muted); letter-spacing: 2px;
+  }
+
+  .hero {
+    padding: 60px 24px 40px;
+    max-width: 1100px; margin: 0 auto;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center;
+  }
+  .hero-left h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(48px, 7vw, 90px);
+    line-height: 0.95;
+    color: var(--text);
+    letter-spacing: 2px;
+  }
+  .hero-left h1 span { color: var(--accent); }
+  .hero-left p {
+    margin-top: 16px;
+    font-size: 14px; color: var(--muted); line-height: 1.7;
+    font-family: 'Space Mono', monospace;
+  }
+  .hero-stats {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+  }
+  .hero-stat {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+  }
+  .hero-stat-val {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 40px; color: var(--accent);
+  }
+  .hero-stat-label {
+    font-size: 11px; color: var(--muted); margin-top: 4px;
+    font-family: 'Space Mono', monospace; letter-spacing: 1px;
+  }
+
+  /* ===== PODIUM ===== */
+  .section { max-width: 1100px; margin: 0 auto; padding: 0 24px 48px; }
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 32px; letter-spacing: 3px; color: var(--text);
+    border-left: 4px solid var(--accent);
+    padding-left: 16px; margin-bottom: 24px;
+  }
+
+  .podium-wrap {
+    display: flex; justify-content: center; align-items: flex-end;
+    gap: 8px; margin-bottom: 32px;
+  }
+  .pod {
+    text-align: center; display: flex; flex-direction: column; align-items: center;
+    position: relative;
+  }
+  .pod-avatar {
+    width: 64px; height: 64px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Bebas Neue', sans-serif; font-size: 22px;
+    border: 2px solid; margin-bottom: 8px;
+  }
+  .pod-1 .pod-avatar { background: rgba(244,196,48,0.15); border-color: var(--gold); color: var(--gold); }
+  .pod-2 .pod-avatar { background: rgba(170,170,170,0.1); border-color: var(--silver); color: var(--silver); }
+  .pod-3 .pod-avatar { background: rgba(205,127,50,0.1); border-color: var(--bronze); color: var(--bronze); }
+  .pod-codename { font-size: 11px; color: var(--muted); font-family: 'Space Mono', monospace; letter-spacing: 1px; }
+  .pod-score { font-family: 'Bebas Neue', sans-serif; font-size: 28px; margin-top: 4px; }
+  .pod-1 .pod-score { color: var(--gold); }
+  .pod-2 .pod-score { color: var(--silver); }
+  .pod-3 .pod-score { color: var(--bronze); }
+  .pod-base {
+    width: 100px; display: flex; align-items: center; justify-content: center;
+    font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 2px;
+    border-radius: 4px 4px 0 0; margin-top: 10px;
+  }
+  .pod-1 .pod-base { height: 80px; background: rgba(244,196,48,0.15); border: 1px solid rgba(244,196,48,0.3); color: var(--gold); }
+  .pod-2 .pod-base { height: 60px; background: rgba(170,170,170,0.08); border: 1px solid rgba(170,170,170,0.2); color: var(--silver); }
+  .pod-3 .pod-base { height: 44px; background: rgba(205,127,50,0.08); border: 1px solid rgba(205,127,50,0.2); color: var(--bronze); }
+
+  /* ===== LEADERBOARD TABLE ===== */
+  .lb-table { width: 100%; border-collapse: collapse; }
+  .lb-table thead th {
+    font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 2px;
+    color: var(--muted); text-align: left; padding: 12px 16px;
+    border-bottom: 1px solid var(--border); text-transform: uppercase;
+  }
+  .lb-table tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s; cursor: pointer;
+  }
+  .lb-table tbody tr:hover { background: var(--surface); }
+  .lb-table td { padding: 16px; vertical-align: middle; }
+  .lb-rank { font-family: 'Bebas Neue', sans-serif; font-size: 24px; color: var(--muted); }
+  .lb-name { font-size: 15px; font-weight: 600; }
+  .lb-alias { font-size: 11px; color: var(--muted); font-family: 'Space Mono', monospace; margin-top: 2px; }
+  .lb-role { font-size: 12px; color: var(--muted); }
+  .lb-title-badge {
+    font-size: 10px; padding: 3px 10px; border-radius: 20px;
+    font-family: 'Space Mono', monospace; letter-spacing: 1px;
+    border: 1px solid;
+  }
+  .lb-bar-wrap { display: flex; align-items: center; gap: 10px; }
+  .lb-bar-bg { flex: 1; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+  .lb-bar-fill { height: 100%; border-radius: 3px; transition: width 1s ease; }
+  .lb-pts { font-family: 'Bebas Neue', sans-serif; font-size: 22px; min-width: 48px; text-align: right; }
+
+  /* ===== FILTER TABS ===== */
+  .filter-wrap { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; }
+  .filter-tab {
+    font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: 1px;
+    padding: 8px 16px; border-radius: 4px; cursor: pointer;
+    border: 1px solid var(--border); background: var(--surface); color: var(--muted);
+    transition: all 0.15s; text-transform: uppercase;
+  }
+  .filter-tab:hover { border-color: var(--accent); color: var(--accent); }
+  .filter-tab.active { background: var(--accent); color: #000; border-color: var(--accent); font-weight: 700; }
+
+  /* ===== KAAND CARDS ===== */
+  .kaand-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+  .kaand-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform 0.2s, border-color 0.2s;
+    cursor: pointer;
+  }
+  .kaand-card:hover { transform: translateY(-2px); }
+  .kaand-card-header {
+    padding: 14px 16px 10px;
+    border-bottom: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;
+  }
+  .kaand-card-title { font-size: 13px; font-weight: 600; color: var(--text); flex: 1; }
+  .kaand-pts-tag {
+    font-family: 'Bebas Neue', sans-serif; font-size: 18px;
+    padding: 2px 10px; border-radius: 4px; flex-shrink: 0;
+  }
+  .kaand-card-body { padding: 14px 16px; }
+  .kaand-player-tag {
+    font-size: 10px; font-family: 'Space Mono', monospace; letter-spacing: 1px;
+    padding: 3px 8px; border-radius: 20px; border: 1px solid;
+    display: inline-block; margin-bottom: 10px;
+  }
+  .kaand-desc { font-size: 13px; color: var(--muted); line-height: 1.7; }
+  .kaand-meta {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border);
+  }
+  .kaand-time { font-size: 10px; color: var(--muted); font-family: 'Space Mono', monospace; }
+  .kaand-severity {
+    display: flex; gap: 3px;
+  }
+  .sev-dot { width: 6px; height: 6px; border-radius: 50%; }
+  .sev-dot.on { background: var(--accent); }
+  .sev-dot.off { background: var(--border); }
+
+  /* ===== RADAR CHART ===== */
+  .chart-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px; }
+  .chart-legend { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 16px; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; font-family: 'Space Mono', monospace; color: var(--muted); }
+  .legend-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+
+  /* ===== MODAL ===== */
+  #modal {
+    display: none; position: fixed; inset: 0; z-index: 999;
+    background: rgba(0,0,0,0.85); backdrop-filter: blur(6px);
+    align-items: center; justify-content: center; padding: 24px;
+  }
+  #modal.show { display: flex; }
+  .modal-box {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 16px; max-width: 560px; width: 100%; max-height: 90vh;
+    overflow-y: auto; position: relative;
+  }
+  .modal-header {
+    padding: 24px 24px 16px;
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; background: var(--surface);
+  }
+  .modal-title { font-size: 18px; font-weight: 600; }
+  .modal-close {
+    position: absolute; top: 20px; right: 20px;
+    background: none; border: 1px solid var(--border); color: var(--muted);
+    width: 32px; height: 32px; border-radius: 6px; cursor: pointer;
+    font-size: 16px; display: flex; align-items: center; justify-content: center;
+  }
+  .modal-close:hover { border-color: var(--danger); color: var(--danger); }
+  .modal-body { padding: 20px 24px 24px; }
+  .modal-player { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+  .modal-avatar {
+    width: 48px; height: 48px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Bebas Neue', sans-serif; font-size: 20px; border: 2px solid;
+  }
+  .modal-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 20px 0; }
+  .modal-meta-item { background: var(--surface2); border-radius: 8px; padding: 12px; }
+  .modal-meta-label { font-size: 10px; color: var(--muted); font-family: 'Space Mono', monospace; letter-spacing: 1px; margin-bottom: 4px; }
+  .modal-meta-val { font-size: 14px; font-weight: 600; }
+  .modal-story { font-size: 14px; color: #bbb; line-height: 1.8; }
+  .modal-verdict {
+    margin-top: 20px; background: rgba(255,107,0,0.08); border: 1px solid rgba(255,107,0,0.3);
+    border-radius: 8px; padding: 14px 16px;
+  }
+  .modal-verdict-label { font-size: 10px; color: var(--accent); font-family: 'Space Mono', monospace; letter-spacing: 2px; margin-bottom: 6px; }
+  .modal-verdict-text { font-size: 13px; color: var(--accent2); font-style: italic; }
+
+  /* responsive */
+  @media (max-width: 700px) {
+    .hero { grid-template-columns: 1fr; gap: 24px; }
+    .hero-stats { grid-template-columns: 1fr 1fr; }
+    .kaand-grid { grid-template-columns: 1fr; }
+  }
+
+  .fade-in { animation: fadeIn 0.6s both; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+  .stagger-1 { animation-delay: 0.05s; }
+  .stagger-2 { animation-delay: 0.1s; }
+  .stagger-3 { animation-delay: 0.15s; }
+
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<!-- LOCK SCREEN -->
+<div id="lockScreen">
+  <div class="lock-logo">SQUAD FILES</div>
+  <div class="lock-sub">// CLASSIFIED — ENTER PIN //</div>
+  <div class="pin-display">
+    <div class="pin-dot" id="d0"></div>
+    <div class="pin-dot" id="d1"></div>
+    <div class="pin-dot" id="d2"></div>
+    <div class="pin-dot" id="d3"></div>
+  </div>
+  <div class="numpad" id="numpad">
+    <button class="num-btn" onclick="pressKey('1')">1</button>
+    <button class="num-btn" onclick="pressKey('2')">2</button>
+    <button class="num-btn" onclick="pressKey('3')">3</button>
+    <button class="num-btn" onclick="pressKey('4')">4</button>
+    <button class="num-btn" onclick="pressKey('5')">5</button>
+    <button class="num-btn" onclick="pressKey('6')">6</button>
+    <button class="num-btn" onclick="pressKey('7')">7</button>
+    <button class="num-btn" onclick="pressKey('8')">8</button>
+    <button class="num-btn" onclick="pressKey('9')">9</button>
+    <button class="num-btn empty"></button>
+    <button class="num-btn" onclick="pressKey('0')">0</button>
+    <button class="num-btn del" onclick="pressKey('del')">⌫</button>
+  </div>
+  <div class="lock-err" id="lockErr"></div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard">
+  <div class="top-bar">
+    <div class="top-bar-title">SQUAD FILES</div>
+    <div class="top-bar-right">// CLASSIFIED // EYES ONLY //</div>
+  </div>
+
+  <div class="hero fade-in">
+    <div class="hero-left">
+      <h1>KAAND<br><span>RANKINGS</span><br>2019–2026</h1>
+      <p>// official chaos archive //<br>6 players. 20+ incidents.<br>zero remorse.</p>
+    </div>
+    <div class="hero-stats fade-in stagger-1">
+      <div class="hero-stat"><div class="hero-stat-val">21</div><div class="hero-stat-label">Total Kaands Logged</div></div>
+      <div class="hero-stat"><div class="hero-stat-val">6</div><div class="hero-stat-label">Active Players</div></div>
+      <div class="hero-stat"><div class="hero-stat-val">360</div><div class="hero-stat-label">Top Score</div></div>
+      <div class="hero-stat"><div class="hero-stat-val">7yr</div><div class="hero-stat-label">Archive Span</div></div>
+    </div>
+  </div>
+
+  <!-- PODIUM -->
+  <div class="section fade-in stagger-2">
+    <div class="section-title">Hall of Shame</div>
+    <div class="podium-wrap" id="podiumWrap"></div>
+  </div>
+
+  <!-- LEADERBOARD -->
+  <div class="section fade-in stagger-3">
+    <div class="section-title">Full Leaderboard</div>
+    <div style="overflow-x:auto;">
+      <table class="lb-table">
+        <thead>
+          <tr>
+            <th>#</th><th>Code Name</th><th>Role</th><th>Title</th><th>Points</th>
+          </tr>
+        </thead>
+        <tbody id="lbBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- KAAND ARCHIVE -->
+  <div class="section">
+    <div class="section-title">Kaand Archive</div>
+    <div class="filter-wrap" id="filterWrap"></div>
+    <div class="kaand-grid" id="kaandGrid"></div>
+  </div>
+
+  <!-- RADAR CHART -->
+  <div class="section">
+    <div class="section-title">Chaos Radar</div>
+    <div class="chart-wrap">
+      <div style="position:relative;width:100%;height:360px;">
+        <canvas id="radarChart" role="img" aria-label="Radar chart comparing all players on chaos level, boldness, frequency, collateral damage and survival rate"></canvas>
+      </div>
+      <div class="chart-legend" id="chartLegend"></div>
+    </div>
+  </div>
+
+  <div style="padding:32px 24px;text-align:center;font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:2px;">
+    // WHAT HAPPENS IN THE GROUP STAYS IN THE GROUP // SQUAD FILES v1.0 //
+  </div>
+</div>
+
+<!-- MODAL -->
+<div id="modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle"></div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+// ===== PIN LOCK =====
+const CORRECT_PIN = '1001';
+let pinEntry = '';
+
+function pressKey(k) {
+  if (k === 'del') {
+    pinEntry = pinEntry.slice(0, -1);
+  } else if (pinEntry.length < 4) {
+    pinEntry += k;
+  }
+  updateDots();
+  if (pinEntry.length === 4) {
+    setTimeout(checkPin, 150);
+  }
+}
+
+document.addEventListener('keydown', e => {
+  if (document.getElementById('lockScreen').classList.contains('hide')) return;
+  if (e.key >= '0' && e.key <= '9') pressKey(e.key);
+  if (e.key === 'Backspace') pressKey('del');
+});
+
+function updateDots() {
+  for (let i = 0; i < 4; i++) {
+    document.getElementById('d' + i).classList.toggle('filled', i < pinEntry.length);
+  }
+}
+
+function checkPin() {
+  if (pinEntry === CORRECT_PIN) {
+    const ls = document.getElementById('lockScreen');
+    ls.classList.add('hide');
+    document.getElementById('dashboard').classList.add('show');
+    setTimeout(() => ls.style.display = 'none', 600);
+    setTimeout(initCharts, 700);
+  } else {
+    document.getElementById('lockErr').textContent = 'WRONG PIN — TRY AGAIN';
+    document.getElementById('numpad').classList.add('shake');
+    setTimeout(() => {
+      document.getElementById('numpad').classList.remove('shake');
+      document.getElementById('lockErr').textContent = '';
+    }, 500);
+    pinEntry = '';
+    updateDots();
+  }
+}
+
+// ===== DATA =====
+const players = [
+  {
+    id: 'ani', codename: 'The Sleepwalker', alias: 'ANI', initials: 'SW',
+    pts: 360, role: 'Resident Ghost', title: 'Neighborhood Terror',
+    color: '#e63946', bg: 'rgba(230,57,70,0.15)', borderColor: '#e63946',
+    radar: [95, 70, 80, 90, 85]
+  },
+  {
+    id: 'c2', codename: 'The Chemist', alias: 'C2', initials: 'CH',
+    pts: 310, role: 'Lab Rat', title: 'Self-Destructive Genius',
+    color: '#7c6af7', bg: 'rgba(124,106,247,0.15)', borderColor: '#7c6af7',
+    radar: [90, 75, 85, 95, 55]
+  },
+  {
+    id: 'sahil', codename: 'The Enabler', alias: 'SAH', initials: 'EN',
+    pts: 250, role: 'Chief Supply Officer', title: 'Chaos Architect',
+    color: '#f4c430', bg: 'rgba(244,196,48,0.15)', borderColor: '#f4c430',
+    radar: [80, 85, 72, 75, 70]
+  },
+  {
+    id: 'gd', codename: 'The Petrol Head', alias: 'GD', initials: 'PH',
+    pts: 180, role: 'Head of Transport', title: 'Licensed Disaster',
+    color: '#2dc653', bg: 'rgba(45,198,83,0.15)', borderColor: '#2dc653',
+    radar: [55, 82, 75, 40, 96]
+  },
+  {
+    id: 'paaji', codename: 'The Sidekick', alias: 'PAA', initials: 'SK',
+    pts: 140, role: 'Co-Pilot / Tawa Medic', title: 'Rare But Lethal',
+    color: '#00b4d8', bg: 'rgba(0,180,216,0.15)', borderColor: '#00b4d8',
+    radar: [42, 28, 90, 45, 97]
+  },
+  {
+    id: 'harshit', codename: 'The Romantic', alias: 'HAR', initials: 'RM',
+    pts: 100, role: 'Emotional Support Unit', title: 'Farmhouse Philosopher',
+    color: '#ff9f1c', bg: 'rgba(255,159,28,0.15)', borderColor: '#ff9f1c',
+    radar: [30, 38, 50, 32, 82]
+  }
+];
+
+const kaands = [
+  // ANI
+  {
+    player: 'ani', pts: 80, time: 'This week (May 2026)',
+    title: 'Wrong Floor, Wrong Life',
+    severity: 5,
+    short: 'Knocked on a family\'s door at 3am demanding "paise". Entire family froze.',
+    full: 'Ani, GD, Paaji, and Sahil were having a party at the flat. Everyone else stepped out at some point. Ani, absolutely blacked out, woke up and apparently decided he needed to collect money — so he went upstairs to the floor where a family lives. He banged on the door hard enough that it swung open on its own. Inside: two ladies, one man, a child named Laddu, and absolute silence. Ani walked in, straight to Amira (one of the women), and told her calmly: "aap log so jaao, mai paise lene aaya huaa hu." The family nearly called the police. They only held back when they realized Ani was GD\'s friend. They walked him back to the flat. Everyone was out when he got back, so he just went to sleep. Zero memory of any of it. Found out when the flat owner called the next morning furious. Ani apologized to the entire family individually.',
+    verdict: 'Walked into a stranger\'s home at 3am to collect imaginary debt. Laddu is probably still traumatized.'
+  },
+  {
+    player: 'ani', pts: 70, time: '3.5 years ago',
+    title: '6 vs 40 — Hockey Stick Edition',
+    severity: 5,
+    short: 'Group of 6 vs 40+ people with hockey sticks at a BYOB in Gurugram. Ani got hit on the head.',
+    full: 'At a BYOB (Bring Your Own Booze) in Gurugram, one of the friends got into an argument with the club staff. Things escalated fast. The opposite group numbered 40+ and had hockey sticks. The squad was just 6-7 people. Ani and Sahil got triggered and went in — both took serious beatings. Ani got a significant hit to the head and was genuinely injured. Sahil was also hurt. GD and Paaji got minor hits but were primarily trying to de-escalate and physically stop the fight. Classic case of heart bigger than the odds. Everyone made it out alive, barely.',
+    verdict: 'Against 40 people. With hockey sticks. Still charged. Questionable decision, maximum respect.'
+  },
+  {
+    player: 'ani', pts: 60, time: '6 years ago (college)',
+    title: 'Kabootar Alarm Clock',
+    severity: 2,
+    short: 'After a party, Ani ended up sleeping outside the bathroom. Woke up when the pigeons started.',
+    full: 'Post a heavy college party, everyone either left or passed out inside. Ani somehow ended up outside the room, lying on the floor next to the bathroom corridor. He slept the entire night there, completely unbothered. The wake-up call? Not an alarm, not a person — pigeons cooing in the morning. That\'s when he opened his eyes, assessed his situation, and presumably accepted his life choices.',
+    verdict: 'Chose the bathroom corridor over a bed. Pigeons had to do the welfare check.'
+  },
+  {
+    player: 'ani', pts: 55, time: 'Recurring (last 6 months)',
+    title: 'The Hug & Sleep Protocol',
+    severity: 3,
+    short: 'Every time a party winds down and a Russian guest is present, Ani hugs her and falls asleep. Every time.',
+    full: 'This has happened more than 6-7 times. The pattern is identical every single time: party gets going, things happen, when it\'s all winding down and the last lady is present, Ani wraps his arms around her and goes fully to sleep. While everyone else is wrapping up and the guest is waiting to leave, Ani is dead asleep, clinging on. It is not intentional. It is not a move. It is simply the Ani protocol. No one can explain it. No one has been able to stop it.',
+    verdict: 'Has successfully slept on a professional guest multiple times without a single conscious memory of it.'
+  },
+  // C2
+  {
+    player: 'c2', pts: 90, time: '5 months ago (New Year)',
+    title: 'New Year, New Tawa Therapy',
+    severity: 5,
+    short: 'C2 went off the deep end at New Year. The prescribed cure was a hot tawa applied 20 times.',
+    full: 'C2 was extremely drunk at New Year celebrations and got into a dark headspace while talking to their mutual friend Garima at the flat. He started attempting to harm himself — trying to cut his wrists and neck with a knife. When Paaji and Sahil found out (they were also drunk), rather than calling for help in a conventional way, they devised a punishment-as-cure strategy. They lit the gas, heated the tawa, pulled his pants down, and pressed it against his backside approximately 20 times. His hair was also briefly set alight. This genuinely ended the situation. C2 survived. The squad considers this a successful medical intervention.',
+    verdict: 'Got a 20-round tawa treatment from two drunk people as crisis management. Technically it worked.'
+  },
+  {
+    player: 'c2', pts: 80, time: '4 years ago',
+    title: 'The ₹1 Lakh Lesson',
+    severity: 5,
+    short: 'A bite in the wrong place. ₹1 lakh doctor bill. Swelling confirmed. No further questions.',
+    full: 'After a night involving a hired Russian companion, C2 discovered the next day that something was very wrong. There was severe swelling in a sensitive area. He went to the doctor. The diagnosis: bite wound. The bill: ₹1 lakh. The rumour going around the group is that she bit C2 and additionally engaged with Ani before this. Neither party has confirmed the full story. C2 paid the bill quietly. The medical certificate exists somewhere in this universe.',
+    verdict: 'Paid ₹1 lakh out of pocket and refused to explain the full context. Respect the privacy.'
+  },
+  {
+    player: 'c2', pts: 70, time: '8 months ago',
+    title: 'Zero Audience Awareness',
+    severity: 4,
+    short: 'C2 started performing in front of the entire group. Nobody asked. Nobody left either.',
+    full: 'At a group party, two Nigerian companions were called. C2 was completely out of it. Without any hesitation or awareness of the full audience present in the room, C2 began with both of them simultaneously in front of everyone present. The group — Ani, GD, Paaji, Sahil, Harshit — were reportedly stunned into silence. It was described as shocking. Nobody moved. Nobody said anything. It simply happened and then it was over and they all went home.',
+    verdict: 'Treated the gathering like a private suite. The gathering was not a private suite.'
+  },
+  {
+    player: 'c2', pts: 70, time: '5 months ago (New Year)',
+    title: 'Drunk Doctors, Hot Tawa',
+    severity: 4,
+    short: 'The two people who responded to C2\'s crisis were also drunk. Their solution was a heated tawa.',
+    full: 'Context from The New Year Tawa Therapy kaand — it\'s worth noting separately that Paaji and Sahil, the responders, were themselves heavily drunk when they discovered C2. Their decision-making tree led them directly to: gas stove → tawa → gand. They heated the tawa, coordinated the restraint, and executed the 20-round treatment. Medical professionals were not consulted at any point. The methodology was entirely their own invention. Whether this was brave, chaotic, or genius is still debated in the group.',
+    verdict: 'Two drunk men decided that thermal treatment was the correct medical intervention. Nobody disagreed.'
+  },
+  // SAHIL
+  {
+    player: 'sahil', pts: 80, time: '4 years ago',
+    title: 'Emergency Pants Change — Girlfriend Edition',
+    severity: 4,
+    short: 'Sahil crossed a personal limit at a party. GD handled the pants situation. In front of Sahil\'s girlfriend.',
+    full: 'At a party, Sahil drank well past his limit as he often does. At some point he soiled himself. GD, being the one who noticed and being the practical one in the room, proceeded to change Sahil\'s pants. This happened in front of Sahil\'s girlfriend at the time. She witnessed the full operation. Sahil was unconscious for all of it. He found out later. There is no record of how that conversation with the girlfriend went.',
+    verdict: 'GD changed Sahil\'s pants in front of Sahil\'s girlfriend. Sahil owes GD at minimum 3 favours, no expiry.'
+  },
+  {
+    player: 'sahil', pts: 70, time: '6 years ago (college)',
+    title: 'Operation Betrayal',
+    severity: 5,
+    short: 'GD liked a girl. Sahil helped arrange alone time. Then personally moved in on her that same night.',
+    full: 'GD had feelings for a girl named Yachna. Sahil knew this. The three of them made a plan to go out — then Sahil left early so GD could get personal time with her. She felt uncomfortable alone with GD and quietly called Sahil at 2am. When Sahil arrived "to protect her," he began fingering her and kissing her — despite knowing GD liked her, and despite having a girlfriend of his own at the time. The two of them subsequently got together. GD found out. This remains the most documented act of squad betrayal on record.',
+    verdict: 'Played protector and romantic rival simultaneously. Having an active girlfriend did not slow him down.'
+  },
+  {
+    player: 'sahil', pts: 55, time: '3 years ago + 1.5 years ago',
+    title: 'The GD Slap Collection (x2)',
+    severity: 3,
+    short: 'Sahil slapped GD twice on separate occasions mid-bakchodi. No serious provocation. No formal apology.',
+    full: 'On two separate occasions — once three years ago and once one and a half years ago — when GD was doing some form of harmless bakchodi, Sahil crossed the line and slapped him. Both times it was unplanned. Both times GD apparently accepted it and moved on. The exact trigger on both occasions is unclear; Sahil was drunk both times. The slaps were not playful. They were proper slaps. This is now a documented pattern.',
+    verdict: 'Two slaps across two years. GD is either very forgiving or has very good emotional regulation.'
+  },
+  {
+    player: 'sahil', pts: 45, time: 'Ongoing (since college)',
+    title: 'Chief Enabler — Last Man Drinking',
+    severity: 2,
+    short: 'Every party: Sahil pushes everyone past their limit, then outlasts them all.',
+    full: 'This is Sahil\'s long-running operating mode across every party — college era through the present. He consistently pushes whoever he\'s with to drink more than they should, more than they want, and more than their body can handle. He then continues drinking after everyone else has passed out, vomited, or called it a night. He is consistently the last person still drinking at any gathering. He never fully loses control himself (relative to others), which is what makes him so effective as an enabler.',
+    verdict: 'Holds the record for last man standing at every party in recorded squad history.'
+  },
+  // GD
+  {
+    player: 'gd', pts: 65, time: 'December 2025',
+    title: 'Blind Driving — Verbal GPS Mode',
+    severity: 4,
+    short: 'Paaji closed GD\'s eyes. GD drove. Paaji gave directions. This was on a public road.',
+    full: 'On a trip, GD and Paaji decided to test the limits of trust and traffic laws simultaneously. Paaji covered or closed GD\'s eyes and GD continued driving the car while Paaji verbally guided him — left, right, straight — in real time. This was not in a parking lot or a closed area. This was on an actual road. They completed a stretch this way. Both survived. No cars were hit. GD considers this a successful experiment. Law enforcement was not informed.',
+    verdict: 'Drove blind on a public road with audio navigation only. Both gave this a thumbs up afterward.'
+  },
+  {
+    player: 'gd', pts: 60, time: 'December 2025',
+    title: 'Jaisalmer Camel Heist',
+    severity: 4,
+    short: 'GD and Paaji drove to Jaisalmer in separate cars, broke two toll booths, then stole a camel.',
+    full: 'On a trip to Jaisalmer in December 2025, GD and Paaji drove in separate cars. At adjacent toll booths, GD broke his without paying — Paaji immediately did the same at the next one, completely unprompted, in solidarity. Same day, at 11am, both went into the desert where camels were present. The owner was absent. They found a camel tied up, untied it, and walked it away from the spot. They strolled through the desert with a camel that didn\'t belong to them. No owner arrived. They eventually left it somewhere. This all happened in the same day.',
+    verdict: 'Toll fraud in the morning, camel theft by noon. Normal Jaisalmer Tuesday for GD and Paaji.'
+  },
+  {
+    player: 'gd', pts: 40, time: '3 years ago',
+    title: 'Whiskey Facial — Dared Edition',
+    severity: 2,
+    short: 'C2 dared GD to throw whiskey on Hitesh\'s face. GD did it immediately. C2 was shocked.',
+    full: 'At a party (the same night as Sahil\'s farmhouse birthday incident), C2 dared GD to throw his glass of whiskey directly on Hitesh\'s face — likely expecting GD to hesitate or refuse. GD did it without pausing. C2 had added "mai terko dekhta hu baad me" as a threat, implying consequences. No consequences came. GD remained unbothered. Hitesh had whiskey on his face. The evening continued. Nobody addressed it for the rest of the night.',
+    verdict: 'Called the bluff, executed the dare, faced zero consequences. C2 learned not to dare GD.'
+  },
+  {
+    player: 'gd', pts: 35, time: 'General / recurring',
+    title: 'Standard Petrol Head Protocol',
+    severity: 2,
+    short: 'After 2 pegs: fast driving, bottle breaking, 500m in reverse, general car-related bakchodi.',
+    full: 'GD\'s baseline drunk behavior is automotive in nature. After two pegs he enters what the group calls Petrol Head mode: driving noticeably faster than is legal or safe, breaking a glass bottle for the sound of it, reversing the car for 500 meters on a stretch just because, and generally treating the road like a personal playground. These happen consistently and regularly. None of these have resulted in injury or arrest so far. The group treats these as mild warm-up activities compared to the actual kaands.',
+    verdict: 'The squad\'s designated chaos driver. Insurance company has no idea what is happening.'
+  },
+  // PAAJI
+  {
+    player: 'paaji', pts: 70, time: 'December 2025',
+    title: 'Toll Booth Solidarity Run',
+    severity: 3,
+    short: 'GD broke his toll. Paaji was in the next car at the next toll. Immediately did the same. No hesitation.',
+    full: 'On the Jaisalmer trip, GD and Paaji were driving separately in adjacent lanes approaching two different toll booths. GD, for reasons known only to himself, drove through without paying. Paaji, in the car behind or beside him at the next booth, watched this happen. His response was instant and unprompted: he drove through his toll without paying as well. This was a purely voluntary act of solidarity. Nobody told him to do it. He saw it and matched it. They drove off into Rajasthan together, ₹0 poorer for the booths, presumably ₹0 richer in conscience.',
+    verdict: 'Supreme co-conspirator energy. Requires zero planning. Operates on pure instinct and friendship.'
+  },
+  {
+    player: 'paaji', pts: 70, time: '5 months ago (New Year)',
+    title: 'Tawa Medic on Duty',
+    severity: 4,
+    short: 'Paaji co-designed and co-executed the tawa treatment on C2. Was drunk throughout.',
+    full: 'When C2 went into crisis on New Year\'s, Paaji was one of the two responders. He was also drunk at the time. Along with Sahil, he devised the intervention strategy: gas on, tawa heated, pants down, 20 applications. Paaji was involved in physically coordinating the process — whether holding, heating, or both. He also participated in briefly lighting C2\'s hair. The fact that this was conceived, planned, and executed by two drunk people makes it significantly more impressive that C2 survived without additional injury. Paaji considers this a resolved situation.',
+    verdict: 'Improvised emergency tawa therapy while personally intoxicated. Zero formal training. 100% effectiveness.'
+  },
+  // HARSHIT
+  {
+    player: 'harshit', pts: 60, time: '1 year ago',
+    title: 'Grand Naked Exit',
+    severity: 3,
+    short: 'Harshit walked out of the room completely naked into the common area where GD was sleeping.',
+    full: 'Harshit had arranged for a Russian companion and the evening ended. At some point after, Harshit exited the room entirely naked and walked directly into the common area where GD was asleep on the floor. No explanation was given. GD woke up to this. Harshit said nothing, apparently went back in, and the night continued. The context for the exit is unknown — whether he was sleepwalking, confused, or making a statement. GD has confirmed this happened.',
+    verdict: 'Walked naked into a room with another person present. No statement. No apology. Pure confidence.'
+  },
+  {
+    player: 'harshit', pts: 40, time: '2 years ago',
+    title: '100x Loyalty Vow + Vomit',
+    severity: 2,
+    short: 'Harshit booked a farmhouse for his birthday, kissed his girlfriend publicly, then spent the night repeating one sentence 100+ times before vomiting and sleeping.',
+    full: 'Harshit booked a farmhouse for his birthday and invited all friends. During the party he kissed his girlfriend openly in front of everyone — repeatedly. Then, as the night progressed and he got increasingly high, he latched onto one specific sentence: "Jis din GD job chhod dega, us din mai bhi chhod dunga." He said this over 100 times. Estimates range from 100 to 200. Each time with full sincerity and minor variations. At some point between declarations he vomited, then fell asleep. He did not remember any of this the next morning.',
+    verdict: 'Repeated a loyalty vow 100+ times to an unconscious audience. Filed as a binding verbal contract.'
+  },
+];
+
+// ===== RENDER PODIUM =====
+function renderPodium() {
+  const top3 = players.slice(0, 3);
+  const order = [top3[1], top3[0], top3[2]];
+  const classes = ['pod-2', 'pod-1', 'pod-3'];
+  const medals = ['🥈', '🥇', '🥉'];
+  const heights = ['stagger-1', '', 'stagger-2'];
+  const wrap = document.getElementById('podiumWrap');
+  wrap.innerHTML = order.map((p, i) => `
+    <div class="pod ${classes[i]} fade-in ${heights[i]}">
+      <div style="font-size:24px;margin-bottom:6px;">${medals[i]}</div>
+      <div class="pod-avatar" style="border-color:${p.color};background:${p.bg};color:${p.color};">${p.initials}</div>
+      <div style="font-size:12px;font-weight:600;color:${p.color};">${p.codename}</div>
+      <div class="pod-codename">${p.alias}</div>
+      <div class="pod-score">${p.pts}</div>
+      <div class="pod-base" style="background:${p.bg};border-color:${p.color}22;color:${p.color};">
+        ${i === 1 ? '#1' : i === 0 ? '#2' : '#3'}
+      </div>
+    </div>
+  `).join('');
+}
+
+// ===== RENDER LEADERBOARD =====
+function renderLeaderboard() {
+  const maxPts = players[0].pts;
+  document.getElementById('lbBody').innerHTML = players.map((p, i) => {
+    const pct = Math.round((p.pts / maxPts) * 100);
+    return `<tr onclick="openPlayerModal('${p.id}')">
+      <td><span class="lb-rank">${i + 1}</span></td>
+      <td>
+        <div class="lb-name" style="color:${p.color};">${p.codename}</div>
+        <div class="lb-alias">${p.alias}</div>
+      </td>
+      <td><div class="lb-role">${p.role}</div></td>
+      <td>
+        <span class="lb-title-badge" style="color:${p.color};border-color:${p.color}44;background:${p.bg};">
+          ${p.title}
+        </span>
+      </td>
+      <td>
+        <div class="lb-bar-wrap">
+          <div class="lb-bar-bg">
+            <div class="lb-bar-fill" style="width:${pct}%;background:${p.color};"></div>
+          </div>
+          <span class="lb-pts" style="color:${p.color};">${p.pts}</span>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+// ===== RENDER FILTERS =====
+let activeFilter = 'all';
+function renderFilters() {
+  const wrap = document.getElementById('filterWrap');
+  const allPlayers = [{ id: 'all', codename: 'All Kaands', color: '#ff6b00' }, ...players];
+  wrap.innerHTML = allPlayers.map(p => `
+    <button class="filter-tab ${p.id === 'all' ? 'active' : ''}"
+      onclick="setFilter('${p.id}')" style="${p.id !== 'all' ? `color:${p.color};` : ''}">
+      ${p.codename}
+    </button>
+  `).join('');
+}
+
+function setFilter(id) {
+  activeFilter = id;
+  document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.filter-tab').forEach(b => {
+    if (b.getAttribute('onclick').includes(`'${id}'`)) b.classList.add('active');
+  });
+  renderKaands();
+}
+
+// ===== RENDER KAAND CARDS =====
+function renderKaands() {
+  const filtered = activeFilter === 'all' ? kaands : kaands.filter(k => k.player === activeFilter);
+  const sorted = [...filtered].sort((a, b) => b.pts - a.pts);
+  document.getElementById('kaandGrid').innerHTML = sorted.map(k => {
+    const p = players.find(x => x.id === k.player);
+    const dots = [1,2,3,4,5].map(n =>
+      `<div class="sev-dot ${n <= k.severity ? 'on' : 'off'}" style="${n <= k.severity ? `background:${p.color}` : ''}"></div>`
+    ).join('');
+    return `<div class="kaand-card" onclick="openKaandModal('${k.player}','${encodeURIComponent(k.title)}')"
+        style="border-top:3px solid ${p.color};">
+      <div class="kaand-card-header">
+        <div class="kaand-card-title">${k.title}</div>
+        <div class="kaand-pts-tag" style="background:${p.bg};color:${p.color};">+${k.pts}</div>
+      </div>
+      <div class="kaand-card-body">
+        <span class="kaand-player-tag" style="color:${p.color};border-color:${p.color}44;background:${p.bg};">
+          ${p.codename}
+        </span>
+        <div class="kaand-desc">${k.short}</div>
+        <div class="kaand-meta">
+          <div class="kaand-time">${k.time}</div>
+          <div class="kaand-severity">${dots}</div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ===== MODALS =====
+function openKaandModal(playerId, encodedTitle) {
+  const title = decodeURIComponent(encodedTitle);
+  const kaand = kaands.find(k => k.player === playerId && k.title === title);
+  const p = players.find(x => x.id === playerId);
+  if (!kaand || !p) return;
+
+  document.getElementById('modalTitle').textContent = kaand.title;
+  document.getElementById('modalBody').innerHTML = `
+    <div class="modal-player">
+      <div class="modal-avatar" style="background:${p.bg};border-color:${p.color};color:${p.color};">${p.initials}</div>
+      <div>
+        <div style="font-size:14px;font-weight:600;color:${p.color};">${p.codename}</div>
+        <div style="font-size:12px;color:var(--muted);font-family:'Space Mono',monospace;">${p.alias} · ${p.role}</div>
+      </div>
+    </div>
+    <div class="modal-meta">
+      <div class="modal-meta-item">
+        <div class="modal-meta-label">Kaand Points</div>
+        <div class="modal-meta-val" style="color:${p.color};">+${kaand.pts}</div>
+      </div>
+      <div class="modal-meta-item">
+        <div class="modal-meta-label">When</div>
+        <div class="modal-meta-val" style="font-size:12px;">${kaand.time}</div>
+      </div>
+      <div class="modal-meta-item">
+        <div class="modal-meta-label">Severity</div>
+        <div class="modal-meta-val" style="color:${p.color};">${kaand.severity} / 5</div>
+      </div>
+      <div class="modal-meta-item">
+        <div class="modal-meta-label">Player Rank</div>
+        <div class="modal-meta-val">#${players.findIndex(x=>x.id===playerId)+1}</div>
+      </div>
+    </div>
+    <div class="modal-story">${kaand.full}</div>
+    <div class="modal-verdict">
+      <div class="modal-verdict-label">// SQUAD VERDICT //</div>
+      <div class="modal-verdict-text">${kaand.verdict}</div>
+    </div>
+  `;
+  document.getElementById('modal').classList.add('show');
+}
+
+function openPlayerModal(playerId) {
+  const p = players.find(x => x.id === playerId);
+  if (!p) return;
+  const playerKaands = kaands.filter(k => k.player === playerId).sort((a,b) => b.pts - a.pts);
+  document.getElementById('modalTitle').textContent = p.codename + ' — Full File';
+  document.getElementById('modalBody').innerHTML = `
+    <div class="modal-player">
+      <div class="modal-avatar" style="background:${p.bg};border-color:${p.color};color:${p.color};font-size:24px;">${p.initials}</div>
+      <div>
+        <div style="font-size:16px;font-weight:600;color:${p.color};">${p.codename}</div>
+        <div style="font-size:12px;color:var(--muted);font-family:'Space Mono',monospace;">${p.role}</div>
+      </div>
+    </div>
+    <div class="modal-meta">
+      <div class="modal-meta-item">
+        <div class="modal-meta-label">Total Points</div>
+        <div class="modal-meta-val" style="color:${p.color};">${p.pts}</div>
+      </div>
+      <div class="modal-meta-item">
+        <div class="modal-meta-label">Rank</div>
+        <div class="modal-meta-val">#${players.findIndex(x=>x.id===playerId)+1} of 6</div>
+      </div>
+      <div class="modal-meta-item">
+        <div class="modal-meta-label">Title</div>
+        <div class="modal-meta-val" style="font-size:12px;">${p.title}</div>
+      </div>
+      <div class="modal-meta-item">
+        <div class="modal-meta-label">Filed Kaands</div>
+        <div class="modal-meta-val">${playerKaands.length}</div>
+      </div>
+    </div>
+    <div style="font-size:12px;color:var(--muted);font-family:'Space Mono',monospace;margin-bottom:12px;">// ALL KAANDS //</div>
+    ${playerKaands.map(k => `
+      <div onclick="closeModal();setTimeout(()=>openKaandModal('${k.player}','${encodeURIComponent(k.title)}'),200)"
+        style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:8px;cursor:pointer;transition:border-color 0.15s;"
+        onmouseover="this.style.borderColor='${p.color}'" onmouseout="this.style.borderColor='var(--border)'">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div style="font-size:13px;font-weight:600;">${k.title}</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:${p.color};">+${k.pts}</div>
+        </div>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px;">${k.time}</div>
+      </div>
+    `).join('')}
+  `;
+  document.getElementById('modal').classList.add('show');
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('show');
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeModal();
+});
+
+// ===== RADAR CHART =====
+function initCharts() {
+  const labels = ['Chaos Level', 'Frequency', 'Boldness', 'Collateral Damage', 'Survival Rate'];
+  new Chart(document.getElementById('radarChart'), {
+    type: 'radar',
+    data: {
+      labels,
+      datasets: players.map(p => ({
+        label: p.codename,
+        data: p.radar,
+        borderColor: p.color,
+        backgroundColor: p.color + '18',
+        pointBackgroundColor: p.color,
+        pointBorderColor: p.color,
+        borderWidth: 1.5,
+        pointRadius: 4,
+      }))
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        r: {
+          min: 0, max: 100,
+          ticks: { stepSize: 25, font: { size: 9 }, backdropColor: 'transparent', color: '#555' },
+          grid: { color: 'rgba(255,255,255,0.06)' },
+          angleLines: { color: 'rgba(255,255,255,0.06)' },
+          pointLabels: { font: { size: 11 }, color: '#888' }
+        }
+      }
+    }
+  });
+  const legend = document.getElementById('chartLegend');
+  legend.innerHTML = players.map(p =>
+    `<div class="legend-item"><div class="legend-dot" style="background:${p.color};"></div>${p.codename}</div>`
+  ).join('');
+}
+
+// ===== INIT =====
+renderPodium();
+renderLeaderboard();
+renderFilters();
+renderKaands();
+</script>
+</body>
+</html>
