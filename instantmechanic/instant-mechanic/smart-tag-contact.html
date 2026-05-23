@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Contact Vehicle Owner</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --black: #0d0d0d;
+    --white: #ffffff;
+    --surface: #f5f4f0;
+    --border: #e2e1dc;
+    --muted: #7a7870;
+    --accent: #1a1a1a;
+    --gold: #c9a84c;
+    --gold-light: #f5edda;
+    --red: #c0392b;
+    --red-light: #fdf0ef;
+    --green: #1a6b3c;
+    --green-light: #edf6f1;
+    --wa-green: #25D366;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--surface);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 0;
+  }
+
+  .page {
+    width: 100%;
+    max-width: 420px;
+    min-height: 100vh;
+    background: var(--white);
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Header */
+  .header {
+    background: var(--black);
+    padding: 20px 24px 16px;
+  }
+  .header-brand {
+    font-family: 'Syne', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .header-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--white);
+    line-height: 1.2;
+  }
+  .header-sub {
+    font-size: 13px;
+    color: #888;
+    margin-top: 4px;
+  }
+
+  /* Step indicator */
+  .steps {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .step-tab {
+    flex: 1;
+    padding: 10px 0 8px;
+    text-align: center;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+  }
+  .step-tab.active {
+    color: var(--black);
+    border-bottom-color: var(--black);
+  }
+  .step-tab.done {
+    color: var(--green);
+    border-bottom-color: var(--green);
+  }
+
+  /* Content */
+  .content {
+    flex: 1;
+    padding: 28px 24px;
+  }
+
+  .section-label {
+    font-family: 'Syne', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+
+  /* Car number input */
+  .plate-input-wrap {
+    position: relative;
+    margin-bottom: 8px;
+  }
+  .plate-flag {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 18px;
+    pointer-events: none;
+  }
+  #plateInput {
+    width: 100%;
+    padding: 14px 14px 14px 46px;
+    font-family: 'Syne', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    color: var(--black);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  #plateInput:focus {
+    border-color: var(--black);
+    background: var(--white);
+  }
+  #plateInput.valid {
+    border-color: var(--green);
+    background: var(--green-light);
+  }
+  #plateInput.invalid-shake {
+    border-color: var(--red);
+    animation: shake 0.4s ease;
+  }
+  .plate-hint {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 20px;
+    padding-left: 2px;
+  }
+
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    20% { transform: translateX(-6px); }
+    40% { transform: translateX(6px); }
+    60% { transform: translateX(-4px); }
+    80% { transform: translateX(4px); }
+  }
+
+  .btn-verify {
+    width: 100%;
+    padding: 14px;
+    background: var(--black);
+    color: var(--white);
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .btn-verify:active { opacity: 0.75; transform: scale(0.99); }
+
+  /* Verified state */
+  .verified-badge {
+    display: none;
+    align-items: center;
+    gap: 10px;
+    background: var(--green-light);
+    border: 1px solid #a8d5be;
+    border-radius: 10px;
+    padding: 12px 16px;
+    margin-bottom: 24px;
+  }
+  .verified-badge .v-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--green);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .v-icon svg { width: 16px; height: 16px; }
+  .v-plate {
+    font-family: 'Syne', sans-serif;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--green);
+    letter-spacing: 0.08em;
+  }
+  .v-label { font-size: 12px; color: #3a8a5a; }
+
+  /* Divider */
+  .divider { height: 1px; background: var(--border); margin: 24px 0; }
+
+  /* Reasons */
+  .reasons-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 28px; }
+  .reason-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.15s;
+    background: var(--white);
+  }
+  .reason-item:hover { border-color: #bbb; background: var(--surface); }
+  .reason-item.selected {
+    border-color: var(--black);
+    background: var(--black);
+  }
+  .reason-item.selected .reason-text { color: var(--white); }
+  .reason-item.selected .reason-icon { background: rgba(255,255,255,0.15); color: var(--white); }
+  .reason-item.selected .reason-radio { border-color: var(--white); }
+  .reason-item.selected .reason-radio::after { background: var(--white); transform: scale(1); }
+
+  .reason-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: var(--surface);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 17px;
+    flex-shrink: 0;
+    transition: all 0.15s;
+  }
+  .reason-text {
+    flex: 1;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--black);
+    transition: color 0.15s;
+    line-height: 1.3;
+  }
+  .reason-radio {
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--border);
+    border-radius: 50%;
+    flex-shrink: 0;
+    position: relative;
+    transition: all 0.15s;
+  }
+  .reason-radio::after {
+    content: '';
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--black);
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    transition: transform 0.15s;
+  }
+  .reason-item.selected .reason-radio::after { transform: translate(-50%, -50%) scale(1); }
+
+  /* Step 2 — Contact panel */
+  #step2 { display: none; }
+
+  .car-summary-card {
+    background: var(--black);
+    border-radius: 12px;
+    padding: 16px 18px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .car-icon {
+    font-size: 28px;
+  }
+  .car-info-plate {
+    font-family: 'Syne', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--white);
+    letter-spacing: 0.1em;
+  }
+  .car-info-reason {
+    font-size: 12px;
+    color: #aaa;
+    margin-top: 2px;
+  }
+
+  /* Contact buttons */
+  .contact-grid { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+
+  .btn-wa {
+    width: 100%;
+    padding: 16px 20px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: all 0.15s;
+    text-decoration: none;
+    color: inherit;
+  }
+  .btn-wa:active { transform: scale(0.98); opacity: 0.85; }
+
+  .btn-primary {
+    background: var(--wa-green);
+    color: white;
+  }
+  .btn-secondary {
+    background: var(--surface);
+    color: var(--black);
+    border: 1.5px solid var(--border);
+  }
+  .btn-danger {
+    background: var(--red-light);
+    color: var(--red);
+    border: 1.5px solid #eab4b0;
+  }
+
+  .btn-wa-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 18px;
+  }
+  .btn-secondary .btn-wa-icon,
+  .btn-danger .btn-wa-icon {
+    background: var(--border);
+  }
+  .btn-danger .btn-wa-icon { background: #f5ccc8; }
+
+  .btn-wa-text { flex: 1; text-align: left; }
+  .btn-wa-title { font-weight: 600; font-size: 14px; display: block; }
+  .btn-wa-sub { font-size: 12px; opacity: 0.75; display: block; margin-top: 1px; }
+
+  .btn-arrow {
+    font-size: 18px;
+    opacity: 0.5;
+  }
+
+  /* Warning */
+  .spam-note {
+    font-size: 11px;
+    color: var(--muted);
+    text-align: center;
+    line-height: 1.6;
+    padding: 0 8px;
+    margin-bottom: 20px;
+  }
+
+  /* Back button */
+  .btn-back {
+    background: none;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 20px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    color: var(--muted);
+    cursor: pointer;
+    width: 100%;
+    margin-bottom: 20px;
+    transition: all 0.15s;
+  }
+  .btn-back:hover { border-color: #bbb; color: var(--black); }
+
+  /* Footer */
+  .footer {
+    padding: 16px 24px 24px;
+    border-top: 1px solid var(--border);
+    text-align: center;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+  }
+  .footer strong {
+    color: var(--black);
+    font-weight: 600;
+  }
+
+  .wa-logo {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+  }
+
+  /* Disabled state */
+  .reasons-section { opacity: 0.4; pointer-events: none; transition: opacity 0.3s; }
+  .reasons-section.enabled { opacity: 1; pointer-events: all; }
+  #proceedBtn { opacity: 0.4; pointer-events: none; transition: opacity 0.3s; }
+  #proceedBtn.enabled { opacity: 1; pointer-events: all; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-brand">🚗 Instant Mechanic · RSA Tag</div>
+    <div class="header-title">Contact Vehicle Owner</div>
+    <div class="header-sub">Scan-to-contact · Secure &amp; Anonymous</div>
+  </div>
+
+  <!-- Step tabs -->
+  <div class="steps" id="stepTabs">
+    <div class="step-tab active" id="tab1">1 · Verify Car</div>
+    <div class="step-tab" id="tab2">2 · Select Reason</div>
+    <div class="step-tab" id="tab3">3 · Contact</div>
+  </div>
+
+  <!-- Step 1 + Step 2 content -->
+  <div class="content">
+
+    <div id="step1">
+      <div class="section-label">Confirm the car number</div>
+      <div class="plate-input-wrap">
+        <span class="plate-flag">🇮🇳</span>
+        <input type="text" id="plateInput" placeholder="e.g. UP85BF1234" maxlength="12" autocomplete="off" autocorrect="off" spellcheck="false" />
+      </div>
+      <div class="plate-hint">Type the number plate shown on the vehicle</div>
+
+      <button class="btn-verify" id="verifyBtn" onclick="verifyPlate()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        Verify Car Number
+      </button>
+
+      <div class="divider"></div>
+
+      <!-- Verified badge -->
+      <div class="verified-badge" id="verifiedBadge">
+        <div class="v-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div>
+          <div class="v-plate" id="verifiedPlateDisplay"></div>
+          <div class="v-label">Car number confirmed</div>
+        </div>
+      </div>
+
+      <!-- Reasons -->
+      <div class="reasons-section" id="reasonsSection">
+        <div class="section-label">Why do you want to contact?</div>
+        <div class="reasons-list" id="reasonsList">
+          <div class="reason-item" onclick="selectReason(this, 'The lights of this car are on')">
+            <div class="reason-icon">💡</div>
+            <div class="reason-text">The lights of this car are on</div>
+            <div class="reason-radio"></div>
+          </div>
+          <div class="reason-item" onclick="selectReason(this, 'The car is in no parking zone')">
+            <div class="reason-icon">🚫</div>
+            <div class="reason-text">The car is in a no-parking zone</div>
+            <div class="reason-radio"></div>
+          </div>
+          <div class="reason-item" onclick="selectReason(this, 'The car is getting towed')">
+            <div class="reason-icon">🚛</div>
+            <div class="reason-text">The car is getting towed</div>
+            <div class="reason-radio"></div>
+          </div>
+          <div class="reason-item" onclick="selectReason(this, 'The window or car door is open')">
+            <div class="reason-icon">🪟</div>
+            <div class="reason-text">The window or car door is open</div>
+            <div class="reason-radio"></div>
+          </div>
+          <div class="reason-item" onclick="selectReason(this, 'Something is wrong with this car')">
+            <div class="reason-icon">⚠️</div>
+            <div class="reason-text">Something is wrong with this car</div>
+            <div class="reason-radio"></div>
+          </div>
+        </div>
+
+        <button class="btn-verify" id="proceedBtn" onclick="proceed()">
+          Proceed to Contact &nbsp;→
+        </button>
+      </div>
+    </div>
+
+    <!-- Step 3: Contact -->
+    <div id="step2">
+      <div class="car-summary-card">
+        <div class="car-icon">🚗</div>
+        <div>
+          <div class="car-info-plate" id="summaryPlate"></div>
+          <div class="car-info-reason" id="summaryReason"></div>
+        </div>
+      </div>
+
+      <div class="section-label">Choose how to reach the owner</div>
+      <div class="contact-grid">
+
+        <a class="btn-wa btn-primary" id="btnCall" href="#">
+          <div class="btn-wa-icon">📞</div>
+          <div class="btn-wa-text">
+            <span class="btn-wa-title">Private Call</span>
+            <span class="btn-wa-sub">Via WhatsApp · Your number stays hidden</span>
+          </div>
+          <span class="btn-arrow">›</span>
+        </a>
+
+        <a class="btn-wa btn-secondary" id="btnMessage" href="#">
+          <div class="btn-wa-icon">💬</div>
+          <div class="btn-wa-text">
+            <span class="btn-wa-title">Send Message</span>
+            <span class="btn-wa-sub">WhatsApp message to owner</span>
+          </div>
+          <span class="btn-arrow">›</span>
+        </a>
+
+        <a class="btn-wa btn-danger" id="btnEmergency" href="#">
+          <div class="btn-wa-icon">🚨</div>
+          <div class="btn-wa-text">
+            <span class="btn-wa-title">Emergency</span>
+            <span class="btn-wa-sub">Urgent issue · Priority response</span>
+          </div>
+          <span class="btn-arrow">›</span>
+        </a>
+
+      </div>
+
+      <div class="spam-note">
+        ⚠️ Any misuse or spam will result in your number and IP being blocked for up to 6 months.
+      </div>
+
+      <button class="btn-back" onclick="goBack()">← Change car number or reason</button>
+    </div>
+
+  </div><!-- /content -->
+
+  <div class="footer">
+    Powered by <strong>Instant Mechanic</strong> · RSA Tag System<br>
+    Secure · Anonymous · Instant
+  </div>
+
+</div>
+
+<script>
+  const WHATSAPP_NUMBER = '918130377099';
+  let verifiedPlate = '';
+  let selectedReason = '';
+
+  const plateInput = document.getElementById('plateInput');
+
+  plateInput.addEventListener('input', function () {
+    this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+    if (this.classList.contains('valid')) {
+      this.classList.remove('valid');
+      document.getElementById('verifiedBadge').style.display = 'none';
+      document.getElementById('reasonsSection').classList.remove('enabled');
+      verifiedPlate = '';
+      clearSelection();
+    }
+  });
+
+  function isValidPlate(val) {
+    return val.length >= 6;
+  }
+
+  function verifyPlate() {
+    const val = plateInput.value.trim();
+    if (!isValidPlate(val)) {
+      plateInput.classList.add('invalid-shake');
+      setTimeout(() => plateInput.classList.remove('invalid-shake'), 500);
+      return;
+    }
+    plateInput.classList.add('valid');
+    verifiedPlate = val;
+
+    const badge = document.getElementById('verifiedBadge');
+    document.getElementById('verifiedPlateDisplay').textContent = val;
+    badge.style.display = 'flex';
+
+    document.getElementById('reasonsSection').classList.add('enabled');
+
+    document.getElementById('tab1').classList.remove('active');
+    document.getElementById('tab1').classList.add('done');
+    document.getElementById('tab2').classList.add('active');
+  }
+
+  function selectReason(el, reason) {
+    document.querySelectorAll('.reason-item').forEach(r => r.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedReason = reason;
+    document.getElementById('proceedBtn').classList.add('enabled');
+    document.getElementById('tab2').classList.remove('active');
+    document.getElementById('tab2').classList.add('done');
+    document.getElementById('tab3').classList.add('active');
+  }
+
+  function clearSelection() {
+    document.querySelectorAll('.reason-item').forEach(r => r.classList.remove('selected'));
+    selectedReason = '';
+    document.getElementById('proceedBtn').classList.remove('enabled');
+  }
+
+  function buildWaUrl(type) {
+    const plate = verifiedPlate;
+    const reason = selectedReason;
+    let msg = '';
+    if (type === 'call') {
+      msg = `Hello, I need to reach the owner of vehicle *${plate}*.\n\nReason: ${reason}\n\nI would like a *private call* via this number. Please connect me anonymously.`;
+    } else if (type === 'message') {
+      msg = `Hello, I want to contact the owner of vehicle *${plate}*.\n\nReason: ${reason}\n\nPlease pass this message to the owner.`;
+    } else if (type === 'emergency') {
+      msg = `🚨 *EMERGENCY* — Vehicle *${plate}*\n\nReason: ${reason}\n\nThis is urgent. Please connect me to the owner immediately.`;
+    }
+    return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
+  }
+
+  function proceed() {
+    if (!verifiedPlate || !selectedReason) return;
+
+    document.getElementById('summaryPlate').textContent = verifiedPlate;
+    document.getElementById('summaryReason').textContent = '📌 ' + selectedReason;
+
+    document.getElementById('btnCall').href = buildWaUrl('call');
+    document.getElementById('btnMessage').href = buildWaUrl('message');
+    document.getElementById('btnEmergency').href = buildWaUrl('emergency');
+
+    document.getElementById('step1').style.display = 'none';
+    document.getElementById('step2').style.display = 'block';
+
+    document.getElementById('tab2').classList.remove('active');
+    document.getElementById('tab2').classList.add('done');
+    document.getElementById('tab3').classList.add('active');
+  }
+
+  function goBack() {
+    document.getElementById('step1').style.display = 'block';
+    document.getElementById('step2').style.display = 'none';
+    document.getElementById('tab3').classList.remove('active');
+    document.getElementById('tab2').classList.add('active');
+    document.getElementById('tab2').classList.remove('done');
+  }
+</script>
+</body>
+</html>
