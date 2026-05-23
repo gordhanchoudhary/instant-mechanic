@@ -1,0 +1,1668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>IM Garage Inspection</title>
+<style>
+:root {
+  --bg: #f5f5f0;
+  --surface: #ffffff;
+  --surface2: #f8f8f5;
+  --border: rgba(0,0,0,0.08);
+  --border2: rgba(0,0,0,0.14);
+  --text: #111;
+  --muted: #777;
+  --accent: #ea6c00;
+  --accent-bg: #fff4ec;
+  --green: #16a34a;
+  --green-bg: #f0fdf4;
+  --red: #dc2626;
+  --red-bg: #fef2f2;
+  --yellow: #b45309;
+  --yellow-bg: #fffbeb;
+  --blue: #1d4ed8;
+  --radius: 12px;
+  --radius-sm: 8px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, 'SF Pro Text', 'Segoe UI', sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+  min-height: 100vh;
+}
+
+/* ===== VIEWS ===== */
+.view { display: none; }
+.view.active { display: block; }
+
+/* ===== HOME SCREEN ===== */
+#homeView { padding-bottom: 32px; }
+
+.home-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 18px 16px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.home-logo {
+  width: 36px; height: 36px;
+  background: var(--accent);
+  border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px; font-weight: 800; color: #fff; flex-shrink: 0;
+}
+.home-title { font-size: 17px; font-weight: 700; letter-spacing: -0.02em; }
+.home-sub { font-size: 12px; color: var(--muted); }
+
+.stats-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+  padding: 16px;
+}
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 12px;
+  text-align: center;
+}
+.stat-val { font-size: 26px; font-weight: 800; letter-spacing: -0.04em; color: var(--accent); }
+.stat-lbl { font-size: 11px; color: var(--muted); margin-top: 2px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; }
+
+.section-heading {
+  font-size: 11px; font-weight: 600; color: var(--muted);
+  text-transform: uppercase; letter-spacing: 0.08em;
+  padding: 0 16px 8px;
+}
+
+.add-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 16px 16px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  width: calc(100% - 32px);
+}
+.add-btn-icon { font-size: 20px; }
+
+/* GARAGE LIST */
+.garage-list { padding: 0 16px; display: flex; flex-direction: column; gap: 10px; }
+
+.garage-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: border-color 0.15s;
+  position: relative;
+}
+.garage-card:active { border-color: var(--accent); }
+
+.gc-row1 { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
+.gc-name { font-size: 15px; font-weight: 600; flex: 1; }
+.gc-score {
+  font-size: 13px; font-weight: 700;
+  padding: 3px 8px; border-radius: 20px;
+  flex-shrink: 0;
+}
+.gc-score.s-great { background: var(--green-bg); color: var(--green); }
+.gc-score.s-good { background: #eff6ff; color: var(--blue); }
+.gc-score.s-avg { background: var(--yellow-bg); color: var(--yellow); }
+.gc-score.s-low { background: var(--red-bg); color: var(--red); }
+.gc-score.s-none { background: var(--surface2); color: var(--muted); }
+
+.gc-row2 { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.gc-meta { font-size: 12px; color: var(--muted); }
+.gc-pill {
+  font-size: 11px; font-weight: 500;
+  padding: 2px 8px; border-radius: 20px;
+  background: var(--surface2); color: var(--muted);
+}
+.gc-pill.partner { background: var(--green-bg); color: var(--green); }
+.gc-pill.maybe { background: var(--yellow-bg); color: var(--yellow); }
+.gc-pill.no { background: var(--red-bg); color: var(--red); }
+
+.gc-actions { display: flex; gap: 8px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
+.gc-btn {
+  flex: 1; font-size: 12px; font-weight: 600;
+  padding: 7px; border-radius: 7px; cursor: pointer;
+  border: 1px solid var(--border2); background: var(--surface2); color: var(--muted);
+}
+.gc-btn.edit { background: var(--accent-bg); color: var(--accent); border-color: var(--accent); }
+.gc-btn.del { background: var(--red-bg); color: var(--red); border-color: var(--red); }
+.gc-btn.exp { background: var(--green-bg); color: var(--green); border-color: var(--green); }
+
+.empty-state {
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--muted);
+}
+.empty-icon { font-size: 40px; margin-bottom: 10px; }
+.empty-text { font-size: 15px; font-weight: 500; color: #999; }
+.empty-sub { font-size: 13px; margin-top: 4px; }
+
+/* ===== FORM VIEW ===== */
+#formView { padding-bottom: 90px; }
+
+.form-header {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(245,245,240,0.97);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 16px 10px;
+  display: flex; align-items: center; gap: 10px;
+}
+.back-btn {
+  background: var(--surface); border: 1px solid var(--border2);
+  border-radius: 8px; padding: 7px 12px;
+  font-size: 13px; font-weight: 600; color: var(--text);
+  cursor: pointer; flex-shrink: 0;
+}
+.form-header-info { flex: 1; min-width: 0; }
+.form-header-title { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.form-header-sub { font-size: 11px; color: var(--muted); }
+.save-garage-btn {
+  background: var(--accent); color: #fff;
+  border: none; border-radius: 8px;
+  padding: 8px 14px; font-size: 13px; font-weight: 600;
+  cursor: pointer; flex-shrink: 0;
+}
+
+.progress-bar { height: 3px; background: #e5e5e0; }
+.progress-fill { height: 100%; background: var(--accent); transition: width 0.3s ease; }
+
+.nav-tabs {
+  display: flex; overflow-x: auto; gap: 4px;
+  padding: 10px 12px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  scrollbar-width: none;
+}
+.nav-tabs::-webkit-scrollbar { display: none; }
+.tab-btn {
+  flex-shrink: 0;
+  background: transparent; border: 1px solid var(--border2);
+  border-radius: 20px; color: var(--muted);
+  font-size: 12px; padding: 5px 12px; cursor: pointer;
+  white-space: nowrap; transition: all 0.15s;
+}
+.tab-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+
+.section { display: none; padding: 16px; animation: fadeIn 0.18s ease; }
+.section.active { display: block; }
+@keyframes fadeIn { from { opacity:0; transform:translateY(4px); } to { opacity:1; transform:translateY(0); } }
+
+.section-header { margin-bottom: 20px; }
+.section-number { font-size: 11px; color: var(--accent); font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 4px; }
+.section-title { font-size: 20px; font-weight: 700; letter-spacing: -0.02em; }
+
+.field-group { margin-bottom: 16px; }
+.field-label { font-size: 11px; font-weight: 600; color: var(--muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.06em; }
+
+input[type="text"],input[type="tel"],input[type="email"],input[type="url"],input[type="number"],input[type="time"],select,textarea {
+  width: 100%; background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-sm);
+  color: var(--text); font-size: 15px;
+  padding: 11px 14px; outline: none;
+  appearance: none; transition: border-color 0.15s;
+  font-family: inherit;
+}
+input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+select { cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23999' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; }
+textarea { min-height: 80px; resize: vertical; }
+input[type="time"] { padding: 10px 14px; }
+
+.rating-row { display: flex; gap: 6px; }
+.rating-btn {
+  flex: 1; background: var(--surface2);
+  border: 1px solid var(--border2); border-radius: 8px;
+  color: var(--muted); font-size: 13px; font-weight: 500;
+  padding: 9px 4px; cursor: pointer; text-align: center; transition: all 0.15s;
+}
+.rating-btn.r1.active { background: #fef2f2; border-color: #dc2626; color: #dc2626; font-weight: 700; }
+.rating-btn.r2.active { background: #fff7ed; border-color: #ea580c; color: #ea580c; font-weight: 700; }
+.rating-btn.r3.active { background: #fffbeb; border-color: #d97706; color: #b45309; font-weight: 700; }
+.rating-btn.r4.active { background: #f0fdf4; border-color: #16a34a; color: #16a34a; font-weight: 700; }
+.rating-btn.r5.active { background: #dcfce7; border-color: #15803d; color: #15803d; font-weight: 700; }
+
+.yn-row { display: flex; gap: 6px; }
+.yn-btn {
+  flex: 1; background: var(--surface2);
+  border: 1px solid var(--border2); border-radius: 8px;
+  color: var(--muted); font-size: 13px; font-weight: 500;
+  padding: 9px; cursor: pointer; text-align: center; transition: all 0.15s;
+}
+.yn-btn.yes.active { background: var(--green-bg); border-color: var(--green); color: var(--green); font-weight: 700; }
+.yn-btn.no.active { background: var(--red-bg); border-color: var(--red); color: var(--red); font-weight: 700; }
+.yn-btn.na.active { background: #f1f5f9; border-color: #94a3b8; color: #475569; font-weight: 700; }
+
+.check-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.check-item {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--surface2); border: 1px solid var(--border2);
+  border-radius: 8px; padding: 10px 10px; cursor: pointer;
+  transition: all 0.15s; user-select: none;
+}
+.check-item.checked { background: var(--green-bg); border-color: #86efac; }
+.check-icon {
+  width: 18px; height: 18px; border: 1.5px solid #ccc;
+  border-radius: 4px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; transition: all 0.15s; color: transparent;
+}
+.check-item.checked .check-icon { background: var(--green); border-color: var(--green); color: #fff; }
+.check-label { font-size: 13px; color: var(--muted); }
+.check-item.checked .check-label { color: var(--green); }
+
+.divider { height: 1px; background: var(--border); margin: 20px 0; }
+
+.area-heading {
+  font-size: 11px; font-weight: 700; color: var(--accent);
+  text-transform: uppercase; letter-spacing: 0.1em;
+  margin-bottom: 10px;
+  padding: 6px 10px;
+  background: var(--accent-bg);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 6px 6px 0;
+}
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+.score-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+.score-card { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; text-align: center; }
+.score-name { font-size: 11px; color: var(--muted); margin-bottom: 6px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+.score-val { font-size: 26px; font-weight: 800; letter-spacing: -0.04em; color: var(--text); }
+.score-out { font-size: 12px; color: var(--muted); }
+
+.overall-score {
+  background: var(--surface); border: 2px solid var(--accent);
+  border-radius: var(--radius); padding: 20px; text-align: center; margin-bottom: 20px;
+}
+.overall-label { font-size: 11px; color: var(--accent); font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; }
+.overall-number { font-size: 56px; font-weight: 800; letter-spacing: -0.05em; line-height: 1; margin: 8px 0 4px; color: var(--accent); }
+.overall-grade { font-size: 15px; color: var(--muted); font-weight: 500; }
+
+.bottom-nav {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: rgba(245,245,240,0.97); backdrop-filter: blur(8px);
+  border-top: 1px solid var(--border); padding: 12px 16px;
+  display: flex; gap: 10px;
+}
+.nav-prev, .nav-next {
+  flex: 1; border-radius: var(--radius-sm);
+  font-size: 14px; font-weight: 600; padding: 13px; cursor: pointer; text-align: center;
+}
+.nav-prev { background: var(--surface); color: var(--muted); border: 1px solid var(--border2); }
+.nav-next { background: var(--accent); color: #fff; border: none; }
+.nav-prev:disabled, .nav-next:disabled { opacity: 0.3; pointer-events: none; }
+
+.export-btn {
+  width: 100%; background: var(--green); color: #fff;
+  border: none; border-radius: var(--radius-sm);
+  font-size: 15px; font-weight: 700; padding: 15px; cursor: pointer; margin-top: 10px;
+}
+.secondary-btn {
+  width: 100%; background: var(--surface); color: var(--blue);
+  border: 1px solid #bfdbfe; border-radius: var(--radius-sm);
+  font-size: 14px; font-weight: 600; padding: 12px; cursor: pointer; margin-top: 8px;
+}
+.clear-btn {
+  width: 100%; background: transparent; color: var(--red);
+  border: 1px solid #fca5a5; border-radius: var(--radius-sm);
+  font-size: 13px; font-weight: 600; padding: 12px; cursor: pointer; margin-top: 8px;
+}
+
+.toast {
+  position: fixed; bottom: 90px; left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: #111; color: #fff; font-size: 13px; font-weight: 600;
+  padding: 10px 20px; border-radius: 20px; opacity: 0;
+  transition: all 0.2s ease; z-index: 300; white-space: nowrap; pointer-events: none;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<!-- ========== HOME VIEW ========== -->
+<div id="homeView" class="view active">
+  <div class="home-header">
+    <div class="home-logo">IM</div>
+    <div>
+      <div class="home-title">Garage Inspections</div>
+      <div class="home-sub">Delhi NCR Field Survey</div>
+    </div>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-val" id="statTotal">0</div>
+      <div class="stat-lbl">Inspected</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val" id="statPartner" style="color:var(--green)">0</div>
+      <div class="stat-lbl">Good Fit</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val" id="statFollowup" style="color:var(--blue)">0</div>
+      <div class="stat-lbl">Follow-up</div>
+    </div>
+  </div>
+
+  <div style="padding: 0 16px 12px;">
+    <button class="add-btn" onclick="startNewGarage()">
+      <span class="add-btn-icon">+</span>
+      <span>Inspect New Garage</span>
+    </button>
+  </div>
+
+  <div class="section-heading" id="listHeading" style="display:none">GARAGE LIST</div>
+  <div class="garage-list" id="garageList"></div>
+  <div class="empty-state" id="emptyState">
+    <div class="empty-icon">🏪</div>
+    <div class="empty-text">No garages yet</div>
+    <div class="empty-sub">Tap the button above to start your first inspection</div>
+  </div>
+
+  <div style="padding:20px 16px 0; display:flex; gap:8px;" id="exportAllRow" style="display:none">
+    <button onclick="exportAllJSON()" style="flex:1;background:var(--green);color:#fff;border:none;border-radius:8px;padding:12px;font-size:13px;font-weight:600;cursor:pointer;">Export All JSON</button>
+    <button onclick="exportAllCSV()" style="flex:1;background:var(--surface);color:var(--blue);border:1px solid #bfdbfe;border-radius:8px;padding:12px;font-size:13px;font-weight:600;cursor:pointer;">Export CSV</button>
+  </div>
+</div>
+
+<!-- ========== FORM VIEW ========== -->
+<div id="formView" class="view">
+  <div class="form-header">
+    <button class="back-btn" onclick="goHome()">← Back</button>
+    <div class="form-header-info">
+      <div class="form-header-title" id="formHeaderTitle">New Garage</div>
+      <div class="form-header-sub" id="formHeaderSub">Section 1 of 11</div>
+    </div>
+    <button class="save-garage-btn" onclick="saveCurrentGarage()">Save</button>
+  </div>
+
+  <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:9%"></div></div>
+
+  <div class="nav-tabs" id="navTabs"></div>
+
+  <!-- S1: Basic Info -->
+  <div class="section active" id="s1">
+    <div class="section-header">
+      <div class="section-number">Section 01</div>
+      <div class="section-title">Basic Info</div>
+    </div>
+    <div class="row2">
+      <div class="field-group">
+        <div class="field-label">Garage Name *</div>
+        <input type="text" id="garageName" placeholder="e.g. Sharma Motors" oninput="updateFormTitle()">
+      </div>
+      <div class="field-group">
+        <div class="field-label">Garage Type</div>
+        <select id="garageType">
+          <option value="">Select</option>
+          <option>Multi-brand</option>
+          <option>OEM Authorised</option>
+          <option>Specialist</option>
+          <option>Body Shop</option>
+          <option>EV Specialist</option>
+        </select>
+      </div>
+    </div>
+    <div class="field-group">
+      <div class="field-label">Garage Size</div>
+      <div class="yn-row">
+        <button class="yn-btn yes" onclick="toggleYN(this,'garageSize','small')">Small</button>
+        <button class="yn-btn na" onclick="toggleYN(this,'garageSize','mid')">Mid Size</button>
+        <button class="yn-btn no" onclick="toggleYN(this,'garageSize','big')" style="background:var(--surface2);border-color:var(--border2);color:var(--muted)">Big</button>
+      </div>
+      <input type="hidden" id="garageSize">
+    </div>
+    <div class="row2">
+      <div class="field-group">
+        <div class="field-label">Owner Name</div>
+        <input type="text" id="ownerName" placeholder="Full name">
+      </div>
+      <div class="field-group">
+        <div class="field-label">Manager Name</div>
+        <input type="text" id="managerName" placeholder="If different">
+      </div>
+    </div>
+    <div class="field-group">
+      <div class="field-label">Owner Contact / WhatsApp</div>
+      <input type="tel" id="contactNumber" placeholder="+91 XXXXX XXXXX">
+    </div>
+    <div class="row2">
+      <div class="field-group">
+        <div class="field-label">Additional POC Name</div>
+        <input type="text" id="pocName" placeholder="e.g. Service Manager">
+      </div>
+      <div class="field-group">
+        <div class="field-label">Additional POC Number</div>
+        <input type="tel" id="pocNumber" placeholder="+91 XXXXX XXXXX">
+      </div>
+    </div>
+    <div class="field-group">
+      <div class="field-label">Email</div>
+      <input type="email" id="email" placeholder="optional">
+    </div>
+    <div class="field-group">
+      <div class="field-label">Full Address</div>
+      <textarea id="address" placeholder="Building, street, sector, Gurugram…" rows="2"></textarea>
+    </div>
+    <div class="field-group">
+      <div class="field-label">Google Maps Link</div>
+      <input type="url" id="mapsLink" placeholder="https://maps.app.goo.gl/...">
+    </div>
+    <div class="row2">
+      <div class="field-group">
+        <div class="field-label">Years in Business</div>
+        <input type="number" id="yearsInBusiness" placeholder="e.g. 8" min="0">
+      </div>
+      <div class="field-group">
+        <div class="field-label">GST Registered?</div>
+        <div class="yn-row">
+          <button class="yn-btn yes" onclick="toggleYN(this,'gstRegistered','yes')">Yes</button>
+          <button class="yn-btn no" onclick="toggleYN(this,'gstRegistered','no')">No</button>
+        </div>
+        <input type="hidden" id="gstRegistered">
+      </div>
+    </div>
+    <div class="row2">
+      <div class="field-group">
+        <div class="field-label">Website</div>
+        <input type="url" id="website" placeholder="optional">
+      </div>
+      <div class="field-group">
+        <div class="field-label">Social Media</div>
+        <input type="text" id="social" placeholder="IG / FB handle">
+      </div>
+    </div>
+  </div>
+
+  <!-- S2: Location & Ops -->
+  <div class="section" id="s2">
+    <div class="section-header">
+      <div class="section-number">Section 02</div>
+      <div class="section-title">Location & Ops</div>
+    </div>
+    <div class="field-group">
+      <div class="field-label">Main Road Visibility</div>
+      <div class="rating-row">
+        <button class="rating-btn r1" onclick="setRating(this,'visib',1)">1</button>
+        <button class="rating-btn r2" onclick="setRating(this,'visib',2)">2</button>
+        <button class="rating-btn r3" onclick="setRating(this,'visib',3)">3</button>
+        <button class="rating-btn r4" onclick="setRating(this,'visib',4)">4</button>
+        <button class="rating-btn r5" onclick="setRating(this,'visib',5)">5</button>
+      </div>
+      <input type="hidden" id="visib">
+    </div>
+    <div class="field-group">
+      <div class="field-label">Parking Availability</div>
+      <div class="rating-row">
+        <button class="rating-btn r1" onclick="setRating(this,'parking',1)">1</button>
+        <button class="rating-btn r2" onclick="setRating(this,'parking',2)">2</button>
+        <button class="rating-btn r3" onclick="setRating(this,'parking',3)">3</button>
+        <button class="rating-btn r4" onclick="setRating(this,'parking',4)">4</button>
+        <button class="rating-btn r5" onclick="setRating(this,'parking',5)">5</button>
+      </div>
+      <input type="hidden" id="parking">
+    </div>
+    <div class="field-group">
+      <div class="field-label">Pickup & Drop Available?</div>
+      <div class="yn-row">
+        <button class="yn-btn yes" onclick="toggleYN(this,'pickupDrop','yes')">Yes</button>
+        <button class="yn-btn no" onclick="toggleYN(this,'pickupDrop','no')">No</button>
+      </div>
+      <input type="hidden" id="pickupDrop">
+    </div>
+    <div class="divider"></div>
+    <div class="row2">
+      <div class="field-group">
+        <div class="field-label">Opening Time</div>
+        <input type="time" id="openTime">
+      </div>
+      <div class="field-group">
+        <div class="field-label">Closing Time</div>
+        <input type="time" id="closeTime">
+      </div>
+    </div>
+    <div class="row2">
+      <div class="field-group">
+        <div class="field-label">Open on Sundays?</div>
+        <div class="yn-row">
+          <button class="yn-btn yes" onclick="toggleYN(this,'sundayOpen','yes')">Yes</button>
+          <button class="yn-btn no" onclick="toggleYN(this,'sundayOpen','no')">No</button>
+          <button class="yn-btn na" onclick="toggleYN(this,'sundayOpen','half')">Half</button>
+        </div>
+        <input type="hidden" id="sundayOpen">
+      </div>
+      <div class="field-group">
+        <div class="field-label">Appointment System?</div>
+        <div class="yn-row">
+          <button class="yn-btn yes" onclick="toggleYN(this,'appointmentSys','yes')">Yes</button>
+          <button class="yn-btn no" onclick="toggleYN(this,'appointmentSys','no')">No</button>
+        </div>
+        <input type="hidden" id="appointmentSys">
+      </div>
+    </div>
+  </div>
+
+  <!-- S3: Infrastructure -->
+  <div class="section" id="s3">
+    <div class="section-header">
+      <div class="section-number">Section 03</div>
+      <div class="section-title">Infrastructure</div>
+    </div>
+
+    <!-- Overall ratings -->
+    <div class="field-group">
+      <div class="field-label">Exterior Appearance</div>
+      <div class="rating-row">
+        <button class="rating-btn r1" onclick="setRating(this,'exterior',1)">1</button>
+        <button class="rating-btn r2" onclick="setRating(this,'exterior',2)">2</button>
+        <button class="rating-btn r3" onclick="setRating(this,'exterior',3)">3</button>
+        <button class="rating-btn r4" onclick="setRating(this,'exterior',4)">4</button>
+        <button class="rating-btn r5" onclick="setRating(this,'exterior',5)">5</button>
+      </div>
+      <input type="hidden" id="exterior">
+    </div>
+    <div class="field-group">
+      <div class="field-label">Workshop Cleanliness</div>
+      <div class="rating-row">
+        <button class="rating-btn r1" onclick="setRating(this,'cleanliness',1)">1</button>
+        <button class="rating-btn r2" onclick="setRating(this,'cleanliness',2)">2</button>
+        <button class="rating-btn r3" onclick="setRating(this,'cleanliness',3)">3</button>
+        <button class="rating-btn r4" onclick="setRating(this,'cleanliness',4)">4</button>
+        <button class="rating-btn r5" onclick="setRating(this,'cleanliness',5)">5</button>
+      </div>
+      <input type="hidden" id="cleanliness">
+    </div>
+    <div class="field-group">
+      <div class="field-label">Workspace Organisation</div>
+      <div class="rating-row">
+        <button class="rating-btn r1" onclick="setRating(this,'organisation',1)">1</button>
+        <button class="rating-btn r2" onclick="setRating(this,'organisation',2)">2</button>
+        <button class="rating-btn r3" onclick="setRating(this,'organisation',3)">3</button>
+        <button class="rating-btn r4" onclick="setRating(this,'organisation',4)">4</button>
+        <button class="rating-btn r5" onclick="setRating(this,'organisation',5)">5</button>
+      </div>
+      <input type="hidden" id="organisation">
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Capacity numbers -->
+    <div class="row2">
+      <div class="field-group"><div class="field-label">No. of Bays</div><input type="number" id="numBays" placeholder="e.g. 4" min="0"></div>
+      <div class="field-group"><div class="field-label">Hydraulic Lifts</div><input type="number" id="numLifts" placeholder="e.g. 2" min="0"></div>
+    </div>
+    <div class="row2">
+      <div class="field-group"><div class="field-label">Total Technicians</div><input type="number" id="numTechs" placeholder="e.g. 8" min="0" oninput="calcTotalTechs()"></div>
+      <div class="field-group"><div class="field-label">Daily Capacity</div><input type="number" id="dailyCap" placeholder="cars/day" min="0"></div>
+    </div>
+
+    <div class="divider"></div>
+    <div class="area-heading" style="margin-bottom:12px">Technician Breakdown</div>
+    <div style="background:var(--accent-bg);border:1px solid #fcd9b6;border-radius:8px;padding:10px 12px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;">
+      <span style="font-size:12px;color:var(--muted)">Total entered above vs. breakdown sum</span>
+      <span style="font-size:14px;font-weight:700;color:var(--accent)" id="techBreakdownSum">0 / 0</span>
+    </div>
+    <div class="row2">
+      <div class="field-group"><div class="field-label">Mechanical Tx</div><input type="number" id="txMechanical" placeholder="0" min="0" oninput="calcTotalTechs()"></div>
+      <div class="field-group"><div class="field-label">Electrician</div><input type="number" id="txElectrician" placeholder="0" min="0" oninput="calcTotalTechs()"></div>
+    </div>
+    <div class="row2">
+      <div class="field-group"><div class="field-label">Bodyshop Tx</div><input type="number" id="txBodyshop" placeholder="0" min="0" oninput="calcTotalTechs()"></div>
+      <div class="field-group"><div class="field-label">Denter</div><input type="number" id="txDenter" placeholder="0" min="0" oninput="calcTotalTechs()"></div>
+    </div>
+    <div class="row2">
+      <div class="field-group"><div class="field-label">Painter</div><input type="number" id="txPainter" placeholder="0" min="0" oninput="calcTotalTechs()"></div>
+      <div class="field-group"><div class="field-label">AC Technician</div><input type="number" id="txAC" placeholder="0" min="0" oninput="calcTotalTechs()"></div>
+    </div>
+    <div class="row2">
+      <div class="field-group"><div class="field-label">Tyre / Alignment Tx</div><input type="number" id="txTyre" placeholder="0" min="0" oninput="calcTotalTechs()"></div>
+      <div class="field-group"><div class="field-label">Detailing / Wash Tx</div><input type="number" id="txDetailing" placeholder="0" min="0" oninput="calcTotalTechs()"></div>
+    </div>
+    <div class="row2">
+      <div class="field-group"><div class="field-label">Helper / Trainee</div><input type="number" id="txHelper" placeholder="0" min="0" oninput="calcTotalTechs()"></div>
+      <div class="field-group"><div class="field-label">Other</div><input type="number" id="txOther" placeholder="0" min="0" oninput="calcTotalTechs()"></div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- 1. CUSTOMER RECEPTION -->
+    <div class="area-heading">1. Customer Reception</div>
+    <div class="check-grid">
+      <div class="check-item" onclick="toggleCheck(this,'facWaiting')"><div class="check-icon">✓</div><div class="check-label">Waiting Lounge</div><input type="hidden" id="facWaiting" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'facWashroom')"><div class="check-icon">✓</div><div class="check-label">Clean Washroom</div><input type="hidden" id="facWashroom" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'facSignboard')"><div class="check-icon">✓</div><div class="check-label">Good Signboard</div><input type="hidden" id="facSignboard" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'facCCTV')"><div class="check-icon">✓</div><div class="check-label">CCTV Coverage</div><input type="hidden" id="facCCTV" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'facUniforms')"><div class="check-icon">✓</div><div class="check-label">Uniformed Staff</div><input type="hidden" id="facUniforms" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'facVentilation')"><div class="check-icon">✓</div><div class="check-label">Ventilation</div><input type="hidden" id="facVentilation" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'facReceptionDesk')"><div class="check-icon">✓</div><div class="check-label">Reception Desk</div><input type="hidden" id="facReceptionDesk" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'facPricingDisplay')"><div class="check-icon">✓</div><div class="check-label">Pricing Display</div><input type="hidden" id="facPricingDisplay" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'facDrinkingWater')"><div class="check-icon">✓</div><div class="check-label">Drinking Water</div><input type="hidden" id="facDrinkingWater" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'facTV')"><div class="check-icon">✓</div><div class="check-label">TV / Entertainment</div><input type="hidden" id="facTV" value="0"></div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- 2. VEHICLE PARKING AREA -->
+    <div class="area-heading">2. Vehicle Parking Area</div>
+    <div class="check-grid">
+      <div class="check-item" onclick="toggleCheck(this,'parkDedicated')"><div class="check-icon">✓</div><div class="check-label">Dedicated Parking</div><input type="hidden" id="parkDedicated" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'parkCovered')"><div class="check-icon">✓</div><div class="check-label">Covered Parking</div><input type="hidden" id="parkCovered" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'parkMarked')"><div class="check-icon">✓</div><div class="check-label">Marked Bays</div><input type="hidden" id="parkMarked" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'parkCCTV')"><div class="check-icon">✓</div><div class="check-label">CCTV on Parking</div><input type="hidden" id="parkCCTV" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'parkJobCard')"><div class="check-icon">✓</div><div class="check-label">Job Card on Vehicles</div><input type="hidden" id="parkJobCard" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'parkCapacity')"><div class="check-icon">✓</div><div class="check-label">Adequate Capacity</div><input type="hidden" id="parkCapacity" value="0"></div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- 3. GENERAL SERVICE AREA -->
+    <div class="area-heading">3. General Service Area</div>
+    <div class="check-grid">
+      <div class="check-item" onclick="toggleCheck(this,'gsaHydraulicLift')"><div class="check-icon">✓</div><div class="check-label">Hydraulic Lifts</div><input type="hidden" id="gsaHydraulicLift" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'gsaFloorDrain')"><div class="check-icon">✓</div><div class="check-label">Floor Drains</div><input type="hidden" id="gsaFloorDrain" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'gsaToolStorage')"><div class="check-icon">✓</div><div class="check-label">Organized Tool Storage</div><input type="hidden" id="gsaToolStorage" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'gsaLighting')"><div class="check-icon">✓</div><div class="check-label">Good Lighting</div><input type="hidden" id="gsaLighting" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'gsaVentilation')"><div class="check-icon">✓</div><div class="check-label">Proper Ventilation</div><input type="hidden" id="gsaVentilation" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'gsaAirLines')"><div class="check-icon">✓</div><div class="check-label">Air Lines / Compressor</div><input type="hidden" id="gsaAirLines" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'gsaClean')"><div class="check-icon">✓</div><div class="check-label">Clean Floor</div><input type="hidden" id="gsaClean" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'gsaWaste')"><div class="check-icon">✓</div><div class="check-label">Waste Oil Bins</div><input type="hidden" id="gsaWaste" value="0"></div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- 4. DENTING AREA / BODYSHOP -->
+    <div class="area-heading">4. Denting Area / Bodyshop</div>
+    <div class="check-grid">
+      <div class="check-item" onclick="toggleCheck(this,'dentSeparate')"><div class="check-icon">✓</div><div class="check-label">Separate Denting Bay</div><input type="hidden" id="dentSeparate" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'dentWelding')"><div class="check-icon">✓</div><div class="check-label">Welding Equipment</div><input type="hidden" id="dentWelding" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'dentGrinder')"><div class="check-icon">✓</div><div class="check-label">Grinder / Sander</div><input type="hidden" id="dentGrinder" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'dentPuller')"><div class="check-icon">✓</div><div class="check-label">Dent Puller</div><input type="hidden" id="dentPuller" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'dentPDR')"><div class="check-icon">✓</div><div class="check-label">PDR Tools</div><input type="hidden" id="dentPDR" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'dentSprayGun')"><div class="check-icon">✓</div><div class="check-label">Spray Gun / Primer</div><input type="hidden" id="dentSprayGun" value="0"></div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- 5. PAINT BOOTH / PAINT SHOP -->
+    <div class="area-heading">5. Paint Booth / Paint Shop</div>
+    <div class="check-grid">
+      <div class="check-item" onclick="toggleCheck(this,'paintBooth')"><div class="check-icon">✓</div><div class="check-label">Paint Booth Present</div><input type="hidden" id="paintBooth" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'paintInfrared')"><div class="check-icon">✓</div><div class="check-label">Infrared Curing Lamp</div><input type="hidden" id="paintInfrared" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'paintMixing')"><div class="check-icon">✓</div><div class="check-label">Paint Mixing System</div><input type="hidden" id="paintMixing" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'paintVentExhaust')"><div class="check-icon">✓</div><div class="check-label">Vent / Exhaust Fan</div><input type="hidden" id="paintVentExhaust" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'paintIsolated')"><div class="check-icon">✓</div><div class="check-label">Dust-free / Isolated</div><input type="hidden" id="paintIsolated" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'paintPPE')"><div class="check-icon">✓</div><div class="check-label">Painter PPE in Use</div><input type="hidden" id="paintPPE" value="0"></div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- 6. WASHING & DETAILING AREA -->
+    <div class="area-heading">6. Washing & Detailing Area</div>
+    <div class="check-grid">
+      <div class="check-item" onclick="toggleCheck(this,'washWaterSupply')"><div class="check-icon">✓</div><div class="check-label">Water Supply</div><input type="hidden" id="washWaterSupply" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'washPressureJet')"><div class="check-icon">✓</div><div class="check-label">Pressure Jet / Foam Gun</div><input type="hidden" id="washPressureJet" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'washVacuum')"><div class="check-icon">✓</div><div class="check-label">Vacuum Cleaner</div><input type="hidden" id="washVacuum" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'washPolisher')"><div class="check-icon">✓</div><div class="check-label">Polisher / Buffer</div><input type="hidden" id="washPolisher" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'washDrainPit')"><div class="check-icon">✓</div><div class="check-label">Drain Pit</div><input type="hidden" id="washDrainPit" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'washSteam')"><div class="check-icon">✓</div><div class="check-label">Steam Cleaner</div><input type="hidden" id="washSteam" value="0"></div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- 7. TYRE & ALIGNMENT SECTION -->
+    <div class="area-heading">7. Tyre & Alignment Section</div>
+    <div class="check-grid">
+      <div class="check-item" onclick="toggleCheck(this,'tyreAlignment')"><div class="check-icon">✓</div><div class="check-label">Wheel Alignment Machine</div><input type="hidden" id="tyreAlignment" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'tyreBalancing')"><div class="check-icon">✓</div><div class="check-label">Wheel Balancing Machine</div><input type="hidden" id="tyreBalancing" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'tyreTyreFit')"><div class="check-icon">✓</div><div class="check-label">Tyre Fitting Machine</div><input type="hidden" id="tyreTyreFit" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'tyrePressure')"><div class="check-icon">✓</div><div class="check-label">Tyre Pressure Gauge</div><input type="hidden" id="tyrePressure" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'tyreNitrogen')"><div class="check-icon">✓</div><div class="check-label">Nitrogen Filling</div><input type="hidden" id="tyreNitrogen" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'tyreStock')"><div class="check-icon">✓</div><div class="check-label">Tyre Stock Available</div><input type="hidden" id="tyreStock" value="0"></div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- 8. SPARE PARTS STORAGE / TOOL ROOM -->
+    <div class="area-heading">8. Spare Parts Storage / Tool Room</div>
+    <div class="check-grid">
+      <div class="check-item" onclick="toggleCheck(this,'storeOrganised')"><div class="check-icon">✓</div><div class="check-label">Organised Shelving</div><input type="hidden" id="storeOrganised" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'storeLabelled')"><div class="check-icon">✓</div><div class="check-label">Labelled Parts</div><input type="hidden" id="storeLabelled" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'storeGenParts')"><div class="check-icon">✓</div><div class="check-label">Genuine Parts Stock</div><input type="hidden" id="storeGenParts" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'storeToolBox')"><div class="check-icon">✓</div><div class="check-label">Toolboxes per Tech</div><input type="hidden" id="storeToolBox" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'storeLocked')"><div class="check-icon">✓</div><div class="check-label">Locked / Secured</div><input type="hidden" id="storeLocked" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'storeInventory')"><div class="check-icon">✓</div><div class="check-label">Inventory Register</div><input type="hidden" id="storeInventory" value="0"></div>
+    </div>
+
+  </div>
+
+  <!-- S4: Technical -->
+  <div class="section" id="s4">
+    <div class="section-header">
+      <div class="section-number">Section 04</div>
+      <div class="section-title">Technical Capability</div>
+    </div>
+    <div class="field-label" style="margin-bottom:10px">Equipment Available</div>
+    <div class="check-grid">
+      <div class="check-item" onclick="toggleCheck(this,'eqOBD')"><div class="check-icon">✓</div><div class="check-label">OBD Scanner</div><input type="hidden" id="eqOBD" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'eqAdv')"><div class="check-icon">✓</div><div class="check-label">Advanced Diag</div><input type="hidden" id="eqAdv" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'eqECU')"><div class="check-icon">✓</div><div class="check-label">ECU Programming</div><input type="hidden" id="eqECU" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'eqAlignment')"><div class="check-icon">✓</div><div class="check-label">Wheel Alignment</div><input type="hidden" id="eqAlignment" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'eqBalancing')"><div class="check-icon">✓</div><div class="check-label">Wheel Balancing</div><input type="hidden" id="eqBalancing" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'eqPaintBooth')"><div class="check-icon">✓</div><div class="check-label">Paint Booth</div><input type="hidden" id="eqPaintBooth" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'eqAirComp')"><div class="check-icon">✓</div><div class="check-label">Air Compressors</div><input type="hidden" id="eqAirComp" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'eqWelding')"><div class="check-icon">✓</div><div class="check-label">Welding Equip</div><input type="hidden" id="eqWelding" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'eqPowerBkp')"><div class="check-icon">✓</div><div class="check-label">Power Backup</div><input type="hidden" id="eqPowerBkp" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'eqEV')"><div class="check-icon">✓</div><div class="check-label">EV Diagnostics</div><input type="hidden" id="eqEV" value="0"></div>
+    </div>
+    <div class="divider"></div>
+    <div class="area-heading" style="margin-bottom:12px">Services Offered</div>
+
+    <div class="field-label" style="margin-bottom:8px">Mechanical & Engine</div>
+    <div class="check-grid">
+      <div class="check-item" onclick="toggleCheck(this,'svcEngine')"><div class="check-icon">✓</div><div class="check-label">Engine Repair</div><input type="hidden" id="svcEngine" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'svcSuspension')"><div class="check-icon">✓</div><div class="check-label">Suspension</div><input type="hidden" id="svcSuspension" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'svcBrakes')"><div class="check-icon">✓</div><div class="check-label">Brakes</div><input type="hidden" id="svcBrakes" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'svcGearbox')"><div class="check-icon">✓</div><div class="check-label">Gearbox / Transmission</div><input type="hidden" id="svcGearbox" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'svcClutch')"><div class="check-icon">✓</div><div class="check-label">Clutch Repair</div><input type="hidden" id="svcClutch" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'svcExhaust')"><div class="check-icon">✓</div><div class="check-label">Exhaust / Silencer</div><input type="hidden" id="svcExhaust" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'svcPMC')"><div class="check-icon">✓</div><div class="check-label">Periodic Service</div><input type="hidden" id="svcPMC" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'svcOilChange')"><div class="check-icon">✓</div><div class="check-label">Oil / Filter Change</div><input type="hidden" id="svcOilChange" value="0"></div>
+    </div>
+
+    <div class="divider"></div>
+    <div class="field-label" style="margin-bottom:8px">Electrical & Electronics</div>
+    <div class="check-grid">
+      <div class="check-item" onclick="toggleCheck(this,'svcAC')"><div class="check-icon">✓</div><div class="check-label">AC Repair</div><input type="hidden" id="svcAC" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'svcElectrical')"><div class="check-icon">✓</div><div class="check-label">Electrical Wiring</div><input type="hidden" id="svcElectrical" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'svcBattery')"><div class="check-icon">✓</div><div class="check-label">Battery Replacement</div><input type="hidden" id="svcBattery" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'svcDiagnostics')"><div class="check-icon">✓</div><div class="check-label">Computer Diagnostics</div><input type="hidden" id="svcDiagnostics" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'svcECU')"><div class="check-icon">✓</div><div class="check-label">ECU Repair / Tuning</div><input type="hidden" id="svcECU" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'svcEV')"><div class="check-icon">✓</div><div class="check-label">EV Service</div><input type="hidden" id="svcEV" value="0"></div>
+    </div>
+
+    <div class="divider"></div>
+    <div class="field-label" style="margin-bottom:8px">Body, Paint & Detailing</div>
+    <div class="check-grid">
+      <div class="check-item" onclick="toggleCheck(this,'svcPaint')"><div class="check-icon">✓</div><div class="check-label">Denting / Paint</div><input type="hidden" id="svcPaint" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'svcPDR')"><div class="check-icon">✓</div><div class="check-label">PDR (Paintless Dent)</div><input type="hidden" id="svcPDR" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'svcFullBodyRepaint')"><div class="check-icon">✓</div><div class="check-label">Full Body Repaint</div><input type="hidden" id="svcFullBodyRepaint" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'svcWash')"><div class="check-icon">✓</div><div class="check-label">Car Wash</div><input type="hidden" id="svcWash" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'svcDetailing')"><div class="check-icon">✓</div><div class="check-label">Detailing / Polishing</div><input type="hidden" id="svcDetailing" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'svcPPF')"><div class="check-icon">✓</div><div class="check-label">PPF / Ceramic Coat</div><input type="hidden" id="svcPPF" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'svcWrapping')"><div class="check-icon">✓</div><div class="check-label">Vinyl Wrapping</div><input type="hidden" id="svcWrapping" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'svcUnderbody')"><div class="check-icon">✓</div><div class="check-label">Underbody Coating</div><input type="hidden" id="svcUnderbody" value="0"></div>
+    </div>
+
+    <div class="divider"></div>
+    <div class="field-label" style="margin-bottom:8px">Tyres & Wheels</div>
+    <div class="check-grid">
+      <div class="check-item" onclick="toggleCheck(this,'svcTyreChange')"><div class="check-icon">✓</div><div class="check-label">Tyre Change</div><input type="hidden" id="svcTyreChange" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'svcWheelAlign')"><div class="check-icon">✓</div><div class="check-label">Wheel Alignment</div><input type="hidden" id="svcWheelAlign" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'svcWheelBalance')"><div class="check-icon">✓</div><div class="check-label">Wheel Balancing</div><input type="hidden" id="svcWheelBalance" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'svcPunctureRepair')"><div class="check-icon">✓</div><div class="check-label">Puncture Repair</div><input type="hidden" id="svcPunctureRepair" value="0"></div>
+    </div>
+
+    <div class="divider"></div>
+    <div class="field-label" style="margin-bottom:8px">Insurance & Other</div>
+    <div class="check-grid">
+      <div class="check-item" onclick="toggleCheck(this,'svcInsurance')"><div class="check-icon">✓</div><div class="check-label">Insurance Cashless Repair</div><input type="hidden" id="svcInsurance" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'svcRSA')"><div class="check-icon">✓</div><div class="check-label">Roadside Assistance</div><input type="hidden" id="svcRSA" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'svcPickupDrop')"><div class="check-icon">✓</div><div class="check-label">Pickup & Drop</div><input type="hidden" id="svcPickupDrop" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'svcModification')"><div class="check-icon">✓</div><div class="check-label">Car Modification</div><input type="hidden" id="svcModification" value="0"></div>
+    </div>
+    <div class="field-group" style="margin-top:14px">
+      <div class="field-label">Insurance Companies Tied Up With</div>
+      <input type="text" id="insuranceCompanies" placeholder="e.g. HDFC Ergo, New India, Bajaj Allianz…">
+    </div>
+
+  </div>
+
+  <!-- S5: Staff -->
+  <div class="section" id="s5">
+    <div class="section-header">
+      <div class="section-number">Section 05</div>
+      <div class="section-title">Staff & Management</div>
+    </div>
+    <div class="field-group">
+      <div class="field-label">Mechanic Experience</div>
+      <div class="rating-row">
+        <button class="rating-btn r1" onclick="setRating(this,'mechExp',1)">1</button>
+        <button class="rating-btn r2" onclick="setRating(this,'mechExp',2)">2</button>
+        <button class="rating-btn r3" onclick="setRating(this,'mechExp',3)">3</button>
+        <button class="rating-btn r4" onclick="setRating(this,'mechExp',4)">4</button>
+        <button class="rating-btn r5" onclick="setRating(this,'mechExp',5)">5</button>
+      </div>
+      <input type="hidden" id="mechExp">
+    </div>
+    <div class="field-group">
+      <div class="field-label">Staff Discipline</div>
+      <div class="rating-row">
+        <button class="rating-btn r1" onclick="setRating(this,'staffDisc',1)">1</button>
+        <button class="rating-btn r2" onclick="setRating(this,'staffDisc',2)">2</button>
+        <button class="rating-btn r3" onclick="setRating(this,'staffDisc',3)">3</button>
+        <button class="rating-btn r4" onclick="setRating(this,'staffDisc',4)">4</button>
+        <button class="rating-btn r5" onclick="setRating(this,'staffDisc',5)">5</button>
+      </div>
+      <input type="hidden" id="staffDisc">
+    </div>
+    <div class="field-group">
+      <div class="field-label">Certified Technicians?</div>
+      <div class="yn-row">
+        <button class="yn-btn yes" onclick="toggleYN(this,'certTechs','yes')">Yes</button>
+        <button class="yn-btn no" onclick="toggleYN(this,'certTechs','no')">No</button>
+        <button class="yn-btn na" onclick="toggleYN(this,'certTechs','some')">Some</button>
+      </div>
+      <input type="hidden" id="certTechs">
+    </div>
+    <div class="divider"></div>
+    <div class="field-group">
+      <div class="field-label">Owner Behavior</div>
+      <div class="rating-row">
+        <button class="rating-btn r1" onclick="setRating(this,'ownerBeh',1)">1</button>
+        <button class="rating-btn r2" onclick="setRating(this,'ownerBeh',2)">2</button>
+        <button class="rating-btn r3" onclick="setRating(this,'ownerBeh',3)">3</button>
+        <button class="rating-btn r4" onclick="setRating(this,'ownerBeh',4)">4</button>
+        <button class="rating-btn r5" onclick="setRating(this,'ownerBeh',5)">5</button>
+      </div>
+      <input type="hidden" id="ownerBeh">
+    </div>
+    <div class="field-group">
+      <div class="field-label">Transparency / Honesty</div>
+      <div class="rating-row">
+        <button class="rating-btn r1" onclick="setRating(this,'transparency',1)">1</button>
+        <button class="rating-btn r2" onclick="setRating(this,'transparency',2)">2</button>
+        <button class="rating-btn r3" onclick="setRating(this,'transparency',3)">3</button>
+        <button class="rating-btn r4" onclick="setRating(this,'transparency',4)">4</button>
+        <button class="rating-btn r5" onclick="setRating(this,'transparency',5)">5</button>
+      </div>
+      <input type="hidden" id="transparency">
+    </div>
+    <div class="field-group">
+      <div class="field-label">Communication Skills</div>
+      <div class="rating-row">
+        <button class="rating-btn r1" onclick="setRating(this,'commSkills',1)">1</button>
+        <button class="rating-btn r2" onclick="setRating(this,'commSkills',2)">2</button>
+        <button class="rating-btn r3" onclick="setRating(this,'commSkills',3)">3</button>
+        <button class="rating-btn r4" onclick="setRating(this,'commSkills',4)">4</button>
+        <button class="rating-btn r5" onclick="setRating(this,'commSkills',5)">5</button>
+      </div>
+      <input type="hidden" id="commSkills">
+    </div>
+  </div>
+
+  <!-- S7: Customer Experience -->
+  <div class="section" id="s7">
+    <div class="section-header">
+      <div class="section-number">Section 07</div>
+      <div class="section-title">Customer Experience</div>
+    </div>
+    <div class="field-group">
+      <div class="field-label">Greeting Experience</div>
+      <div class="rating-row">
+        <button class="rating-btn r1" onclick="setRating(this,'greeting',1)">1</button>
+        <button class="rating-btn r2" onclick="setRating(this,'greeting',2)">2</button>
+        <button class="rating-btn r3" onclick="setRating(this,'greeting',3)">3</button>
+        <button class="rating-btn r4" onclick="setRating(this,'greeting',4)">4</button>
+        <button class="rating-btn r5" onclick="setRating(this,'greeting',5)">5</button>
+      </div>
+      <input type="hidden" id="greeting">
+    </div>
+    <div class="field-group">
+      <div class="field-label">Estimate Transparency</div>
+      <div class="rating-row">
+        <button class="rating-btn r1" onclick="setRating(this,'estTransp',1)">1</button>
+        <button class="rating-btn r2" onclick="setRating(this,'estTransp',2)">2</button>
+        <button class="rating-btn r3" onclick="setRating(this,'estTransp',3)">3</button>
+        <button class="rating-btn r4" onclick="setRating(this,'estTransp',4)">4</button>
+        <button class="rating-btn r5" onclick="setRating(this,'estTransp',5)">5</button>
+      </div>
+      <input type="hidden" id="estTransp">
+    </div>
+    <div class="row2">
+      <div class="field-group">
+        <div class="field-label">Written Estimate?</div>
+        <div class="yn-row">
+          <button class="yn-btn yes" onclick="toggleYN(this,'writtenEst','yes')">Yes</button>
+          <button class="yn-btn no" onclick="toggleYN(this,'writtenEst','no')">No</button>
+          <button class="yn-btn na" onclick="toggleYN(this,'writtenEst','verbal')">Verbal</button>
+        </div>
+        <input type="hidden" id="writtenEst">
+      </div>
+      <div class="field-group">
+        <div class="field-label">Digital Payments?</div>
+        <div class="yn-row">
+          <button class="yn-btn yes" onclick="toggleYN(this,'digitalPay','yes')">Yes</button>
+          <button class="yn-btn no" onclick="toggleYN(this,'digitalPay','no')">No</button>
+        </div>
+        <input type="hidden" id="digitalPay">
+      </div>
+    </div>
+    <div class="row2">
+      <div class="field-group">
+        <div class="field-label">Digital Invoice?</div>
+        <div class="yn-row">
+          <button class="yn-btn yes" onclick="toggleYN(this,'digitalInv','yes')">Yes</button>
+          <button class="yn-btn no" onclick="toggleYN(this,'digitalInv','no')">No</button>
+        </div>
+        <input type="hidden" id="digitalInv">
+      </div>
+      <div class="field-group">
+        <div class="field-label">Follow-up Calls?</div>
+        <div class="yn-row">
+          <button class="yn-btn yes" onclick="toggleYN(this,'followUp','yes')">Yes</button>
+          <button class="yn-btn no" onclick="toggleYN(this,'followUp','no')">No</button>
+        </div>
+        <input type="hidden" id="followUp">
+      </div>
+    </div>
+  </div>
+
+  <!-- S8: Safety & Digital -->
+  <div class="section" id="s8">
+    <div class="section-header">
+      <div class="section-number">Section 08</div>
+      <div class="section-title">Safety & Digital</div>
+    </div>
+    <div class="field-label" style="margin-bottom:10px">Safety Compliance</div>
+    <div class="check-grid">
+      <div class="check-item" onclick="toggleCheck(this,'safetyFire')"><div class="check-icon">✓</div><div class="check-label">Fire Extinguishers</div><input type="hidden" id="safetyFire" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'safetyFirstAid')"><div class="check-icon">✓</div><div class="check-label">First Aid Kit</div><input type="hidden" id="safetyFirstAid" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'safetyPPE')"><div class="check-icon">✓</div><div class="check-label">PPE Usage</div><input type="hidden" id="safetyPPE" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'safetyElec')"><div class="check-icon">✓</div><div class="check-label">Electrical Safety</div><input type="hidden" id="safetyElec" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'safetyWaste')"><div class="check-icon">✓</div><div class="check-label">Waste Oil Disposal</div><input type="hidden" id="safetyWaste" value="0"></div>
+    </div>
+    <div class="divider"></div>
+    <div class="field-label" style="margin-bottom:10px">Digital Presence</div>
+    <div class="check-grid">
+      <div class="check-item" onclick="toggleCheck(this,'digOnlineBook')"><div class="check-icon">✓</div><div class="check-label">Online Booking</div><input type="hidden" id="digOnlineBook" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'digCRM');toggleCRMField(this)"><div class="check-icon">✓</div><div class="check-label">CRM Software</div><input type="hidden" id="digCRM" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'digWhatsApp')"><div class="check-icon">✓</div><div class="check-label">WhatsApp Support</div><input type="hidden" id="digWhatsApp" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'digGoogleMgmt')"><div class="check-icon">✓</div><div class="check-label">Google Reviews Mgmt</div><input type="hidden" id="digGoogleMgmt" value="0"></div>
+    </div>
+    <div id="crmNameField" style="display:none;margin-top:12px;">
+      <div class="field-label">CRM Software Name</div>
+      <input type="text" id="crmSoftwareName" placeholder="e.g. AutoMate, Torque, Teknoscape, DealerSocket…">
+    </div>
+  </div>
+
+  <!-- S9: Business -->
+  <div class="section" id="s9">
+    <div class="section-header">
+      <div class="section-number">Section 09</div>
+      <div class="section-title">Specialisation & Business</div>
+    </div>
+    <div class="field-label" style="margin-bottom:10px">Specialisations</div>
+    <div class="check-grid">
+      <div class="check-item" onclick="toggleCheck(this,'specLuxury')"><div class="check-icon">✓</div><div class="check-label">Luxury Cars</div><input type="hidden" id="specLuxury" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'specBMW')"><div class="check-icon">✓</div><div class="check-label">BMW Specialist</div><input type="hidden" id="specBMW" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'specMerc')"><div class="check-icon">✓</div><div class="check-label">Mercedes Specialist</div><input type="hidden" id="specMerc" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'specAudi')"><div class="check-icon">✓</div><div class="check-label">Audi Specialist</div><input type="hidden" id="specAudi" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'specEV')"><div class="check-icon">✓</div><div class="check-label">EV Specialist</div><input type="hidden" id="specEV" value="0"></div>
+      <div class="check-item" onclick="toggleCheck(this,'specInsurance')"><div class="check-icon">✓</div><div class="check-label">Insurance Claims</div><input type="hidden" id="specInsurance" value="0"></div>
+    </div>
+    <div class="divider"></div>
+    <div class="row2">
+      <div class="field-group"><div class="field-label">Monthly Footfall</div><input type="number" id="monthlyFootfall" placeholder="cars/month" min="0"></div>
+      <div class="field-group"><div class="field-label">Google Rating</div><input type="number" id="googleRating" placeholder="4.2" step="0.1" min="1" max="5"></div>
+    </div>
+    <div class="row2">
+      <div class="field-group"><div class="field-label">Google Reviews #</div><input type="number" id="googleReviews" placeholder="e.g. 340" min="0"></div>
+      <div class="field-group">
+        <div class="field-label">Fleet Clients?</div>
+        <div class="yn-row">
+          <button class="yn-btn yes" onclick="toggleYN(this,'fleetClients','yes')">Yes</button>
+          <button class="yn-btn no" onclick="toggleYN(this,'fleetClients','no')">No</button>
+        </div>
+        <input type="hidden" id="fleetClients">
+      </div>
+    </div>
+    <div class="field-group">
+      <div class="field-label">Insurance Tie-ups?</div>
+      <div class="yn-row">
+        <button class="yn-btn yes" onclick="toggleYN(this,'insuranceTieup','yes')">Yes</button>
+        <button class="yn-btn no" onclick="toggleYN(this,'insuranceTieup','no')">No</button>
+      </div>
+      <input type="hidden" id="insuranceTieup">
+    </div>
+  </div>
+
+  <!-- S10: IM Fit -->
+  <div class="section" id="s10">
+    <div class="section-header">
+      <div class="section-number">Section 10</div>
+      <div class="section-title">IM Partnership Fit</div>
+    </div>
+    <div class="field-group">
+      <div class="field-label">Owner aware of Instant Mechanic?</div>
+      <div class="yn-row">
+        <button class="yn-btn yes" onclick="toggleYN(this,'imAware','yes')">Yes</button>
+        <button class="yn-btn no" onclick="toggleYN(this,'imAware','no')">No</button>
+      </div>
+      <input type="hidden" id="imAware">
+    </div>
+    <div class="field-group">
+      <div class="field-label">Open to Partnership?</div>
+      <div class="yn-row">
+        <button class="yn-btn yes" onclick="toggleYN(this,'openPartnership','yes')">Yes</button>
+        <button class="yn-btn no" onclick="toggleYN(this,'openPartnership','no')">No</button>
+        <button class="yn-btn na" onclick="toggleYN(this,'openPartnership','maybe')">Maybe</button>
+      </div>
+      <input type="hidden" id="openPartnership">
+    </div>
+    <div class="field-group">
+      <div class="field-label">Willing to accept RSA jobs?</div>
+      <div class="yn-row">
+        <button class="yn-btn yes" onclick="toggleYN(this,'rsaWilling','yes')">Yes</button>
+        <button class="yn-btn no" onclick="toggleYN(this,'rsaWilling','no')">No</button>
+        <button class="yn-btn na" onclick="toggleYN(this,'rsaWilling','discuss')">Discuss</button>
+      </div>
+      <input type="hidden" id="rsaWilling">
+    </div>
+    <div class="field-group">
+      <div class="field-label">Willing to accept drop leads?</div>
+      <div class="yn-row">
+        <button class="yn-btn yes" onclick="toggleYN(this,'dropLeads','yes')">Yes</button>
+        <button class="yn-btn no" onclick="toggleYN(this,'dropLeads','no')">No</button>
+      </div>
+      <input type="hidden" id="dropLeads">
+    </div>
+    <div class="field-group">
+      <div class="field-label">Commission comfort</div>
+      <select id="commissionLevel">
+        <option value="">Select</option>
+        <option>Less than 5%</option>
+        <option>5–10%</option>
+        <option>10–15%</option>
+        <option>15–20%</option>
+        <option>Flexible / Not discussed</option>
+      </select>
+    </div>
+    <div class="field-group">
+      <div class="field-label">Competing platforms used</div>
+      <input type="text" id="competitors" placeholder="e.g. GoMechanic, Mahindra First Choice">
+    </div>
+    <div class="row2">
+      <div class="field-group">
+        <div class="field-label">Follow-up needed?</div>
+        <div class="yn-row">
+          <button class="yn-btn yes" onclick="toggleYN(this,'followUpNeeded','yes')">Yes</button>
+          <button class="yn-btn no" onclick="toggleYN(this,'followUpNeeded','no')">No</button>
+        </div>
+        <input type="hidden" id="followUpNeeded">
+      </div>
+      <div class="field-group">
+        <div class="field-label">Best time to call</div>
+        <input type="text" id="bestCallTime" placeholder="e.g. 11am–1pm">
+      </div>
+    </div>
+  </div>
+
+  <!-- S11: Final Score -->
+  <div class="section" id="s11">
+    <div class="section-header">
+      <div class="section-number">Section 11</div>
+      <div class="section-title">Final Evaluation</div>
+    </div>
+    <div class="score-grid" id="scoreGrid">
+      <div class="score-card"><div class="score-name">Infrastructure</div><div><span class="score-val" id="sc_infra">–</span><span class="score-out">/5</span></div></div>
+      <div class="score-card"><div class="score-name">Staff</div><div><span class="score-val" id="sc_staff">–</span><span class="score-out">/5</span></div></div>
+      <div class="score-card"><div class="score-name">Cx Exp.</div><div><span class="score-val" id="sc_cx">–</span><span class="score-out">/5</span></div></div>
+    </div>
+    <div class="overall-score">
+      <div class="overall-label">Overall Score</div>
+      <div class="overall-number" id="overallScore">–</div>
+      <div class="overall-grade" id="overallGrade">Fill in ratings to see score</div>
+    </div>
+    <div class="field-group">
+      <div class="field-label">IM Recommendation</div>
+      <select id="imRecommendation">
+        <option value="">Select</option>
+        <option>Priority Partner — onboard ASAP</option>
+        <option>Good Fit — follow up</option>
+        <option>Possible — needs improvement</option>
+        <option>Not Suitable</option>
+      </select>
+    </div>
+    <div class="field-group">
+      <div class="field-label">Major Strengths</div>
+      <textarea id="strengths" placeholder="What stood out positively…"></textarea>
+    </div>
+    <div class="field-group">
+      <div class="field-label">Major Weaknesses</div>
+      <textarea id="weaknesses" placeholder="Key gaps or concerns…"></textarea>
+    </div>
+    <div class="field-group">
+      <div class="field-label">Red Flags</div>
+      <textarea id="redFlags" placeholder="Anything that should disqualify or delay partnership…"></textarea>
+    </div>
+    <div class="field-group">
+      <div class="field-label">Inspector Notes</div>
+      <textarea id="inspectorNotes" placeholder="Anything else worth recording…" rows="3"></textarea>
+    </div>
+    <input type="hidden" id="inspectionDateTime">
+    <button class="export-btn" onclick="exportSingleJSON()">Export This Garage JSON</button>
+    <button class="secondary-btn" onclick="copyGarageText()">Copy as Text</button>
+  </div>
+
+  <div class="bottom-nav">
+    <button class="nav-prev" id="prevBtn" onclick="navigate(-1)" disabled>← Prev</button>
+    <button class="nav-next" id="nextBtn" onclick="navigate(1)">Next →</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const TABS = [
+  {id:'s1',label:'Basic Info'},
+  {id:'s2',label:'Location'},
+  {id:'s3',label:'Infrastructure'},
+  {id:'s4',label:'Technical'},
+  {id:'s5',label:'Staff'},
+  {id:'s7',label:'Customer'},
+  {id:'s8',label:'Safety'},
+  {id:'s9',label:'Business'},
+  {id:'s10',label:'IM Fit'},
+  {id:'s11',label:'Score'},
+];
+
+const ALL_IDS = ['garageName','garageType','garageSize','ownerName','managerName','contactNumber','pocName','pocNumber','email','address','mapsLink','yearsInBusiness','gstRegistered','website','social',
+  'visib','parking','pickupDrop','openTime','closeTime','sundayOpen','appointmentSys',
+  'exterior','cleanliness','organisation','numBays','numLifts','numTechs','dailyCap','txMechanical','txElectrician','txBodyshop','txDenter','txPainter','txAC','txTyre','txDetailing','txHelper','txOther',
+  'facWaiting','facWashroom','facSignboard','facCCTV','facUniforms','facVentilation','facReceptionDesk','facPricingDisplay','facDrinkingWater','facTV',
+  'parkDedicated','parkCovered','parkMarked','parkCCTV','parkJobCard','parkCapacity',
+  'gsaHydraulicLift','gsaFloorDrain','gsaToolStorage','gsaLighting','gsaVentilation','gsaAirLines','gsaClean','gsaWaste',
+  'dentSeparate','dentWelding','dentGrinder','dentPuller','dentPDR','dentSprayGun',
+  'paintBooth','paintInfrared','paintMixing','paintVentExhaust','paintIsolated','paintPPE',
+  'washWaterSupply','washPressureJet','washVacuum','washPolisher','washDrainPit','washSteam',
+  'tyreAlignment','tyreBalancing','tyreTyreFit','tyrePressure','tyreNitrogen','tyreStock',
+  'storeOrganised','storeLabelled','storeGenParts','storeToolBox','storeLocked','storeInventory',
+  'eqOBD','eqAdv','eqECU','eqAlignment','eqBalancing','eqPaintBooth','eqAirComp','eqWelding','eqPowerBkp','eqEV',
+  'svcEngine','svcSuspension','svcBrakes','svcGearbox','svcClutch','svcExhaust','svcPMC','svcOilChange','svcAC','svcElectrical','svcBattery','svcDiagnostics','svcECU','svcEV','svcPaint','svcPDR','svcFullBodyRepaint','svcWash','svcDetailing','svcPPF','svcWrapping','svcUnderbody','svcTyreChange','svcWheelAlign','svcWheelBalance','svcPunctureRepair','svcInsurance','svcRSA','svcPickupDrop','svcModification','insuranceCompanies',
+  'mechExp','staffDisc','certTechs','ownerBeh','transparency','commSkills',
+  'greeting','estTransp','writtenEst','digitalPay','digitalInv','followUp',
+  'safetyFire','safetyFirstAid','safetyPPE','safetyElec','safetyWaste',
+  'digOnlineBook','digCRM','digWhatsApp','digGoogleMgmt','crmSoftwareName',
+  'specLuxury','specBMW','specMerc','specAudi','specEV','specInsurance',
+  'monthlyFootfall','googleRating','googleReviews','fleetClients','insuranceTieup',
+  'imAware','openPartnership','rsaWilling','dropLeads','commissionLevel','competitors','followUpNeeded','bestCallTime',
+  'imRecommendation','strengths','weaknesses','redFlags','inspectorNotes','inspectionDateTime'
+];
+
+let current = 0;
+let editingId = null;
+
+// ====== STORAGE ======
+function loadGarages() {
+  try { return JSON.parse(localStorage.getItem('im_garages') || '[]'); } catch(e) { return []; }
+}
+function saveGarages(list) {
+  try { localStorage.setItem('im_garages', JSON.stringify(list)); } catch(e) {}
+}
+function saveDraft(data) {
+  try { localStorage.setItem('im_draft', JSON.stringify({editingId, data})); } catch(e) {}
+}
+function loadDraft() {
+  try { return JSON.parse(localStorage.getItem('im_draft') || 'null'); } catch(e) { return null; }
+}
+function clearDraft() {
+  try { localStorage.removeItem('im_draft'); } catch(e) {}
+}
+
+// ====== HOME ======
+function renderHome() {
+  const garages = loadGarages();
+  const total = garages.length;
+  const partner = garages.filter(g => g.openPartnership === 'yes').length;
+  const followup = garages.filter(g => g.followUpNeeded === 'yes').length;
+
+  document.getElementById('statTotal').textContent = total;
+  document.getElementById('statPartner').textContent = partner;
+  document.getElementById('statFollowup').textContent = followup;
+
+  const list = document.getElementById('garageList');
+  const empty = document.getElementById('emptyState');
+  const heading = document.getElementById('listHeading');
+  const exportRow = document.getElementById('exportAllRow');
+
+  list.innerHTML = '';
+
+  if(total === 0) {
+    empty.style.display = 'block';
+    heading.style.display = 'none';
+    exportRow.style.display = 'none';
+    return;
+  }
+  empty.style.display = 'none';
+  heading.style.display = 'block';
+  exportRow.style.display = 'flex';
+
+  garages.slice().reverse().forEach((g, revIdx) => {
+    const origIdx = garages.length - 1 - revIdx;
+    const score = calcGarageScore(g);
+    const scoreClass = score === null ? 's-none' : score >= 4.5 ? 's-great' : score >= 3.5 ? 's-good' : score >= 2.5 ? 's-avg' : 's-low';
+    const scoreText = score === null ? 'No score' : score.toFixed(1) + ' / 5';
+
+    let partnerPillClass = '', partnerPillText = '';
+    if(g.openPartnership === 'yes') { partnerPillClass = 'partner'; partnerPillText = 'Open to Partner'; }
+    else if(g.openPartnership === 'maybe') { partnerPillClass = 'maybe'; partnerPillText = 'Maybe'; }
+    else if(g.openPartnership === 'no') { partnerPillClass = 'no'; partnerPillText = 'Not Interested'; }
+
+    const recShort = g.imRecommendation ? g.imRecommendation.split('—')[0].trim() : '';
+
+    const card = document.createElement('div');
+    card.className = 'garage-card';
+    card.innerHTML = `
+      <div class="gc-row1">
+        <div class="gc-name">${g.garageName || 'Unnamed Garage'}</div>
+        <div class="gc-score ${scoreClass}">${scoreText}</div>
+      </div>
+      ${g.ownerName ? `<div style="font-size:13px;color:var(--text);margin-bottom:4px;"><span style="color:var(--muted);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;">Owner</span> &nbsp;${g.ownerName}${g.contactNumber ? ` &middot; ${g.contactNumber}` : ''}</div>` : g.contactNumber ? `<div style="font-size:13px;color:var(--muted);margin-bottom:4px;">${g.contactNumber}</div>` : ''}
+      ${g.address ? `<div style="font-size:12px;color:var(--muted);margin-bottom:6px;line-height:1.4;">${g.address.split('\n')[0]}</div>` : ''}
+      <div class="gc-row2">
+        ${g.garageSize ? `<span class="gc-pill">${g.garageSize.charAt(0).toUpperCase()+g.garageSize.slice(1)}</span>` : ''}
+        ${g.garageType ? `<span class="gc-pill">${g.garageType}</span>` : ''}
+        ${partnerPillText ? `<span class="gc-pill ${partnerPillClass}">${partnerPillText}</span>` : ''}
+        ${g.pocName && g.pocNumber ? `<span class="gc-meta">${g.pocName}: ${g.pocNumber}</span>` : ''}
+      </div>
+      ${recShort ? `<div style="font-size:12px;color:var(--accent);font-weight:600;margin-top:6px">${recShort}</div>` : ''}
+      <div class="gc-actions">
+        <button class="gc-btn edit" onclick="editGarage(${origIdx});event.stopPropagation()">Edit</button>
+        <button class="gc-btn exp" onclick="exportOneJSON(${origIdx});event.stopPropagation()">Export</button>
+      </div>
+    `;
+    list.appendChild(card);
+  });
+}
+
+function calcGarageScore(g) {
+  const ratingKeys = ['exterior','cleanliness','organisation','diagAcc','repairQ','delivery','mechExp','staffDisc','ownerBeh','transparency','commSkills','greeting','estTransp'];
+  const vals = ratingKeys.map(k => parseInt(g[k])||0).filter(v=>v>0);
+  if(!vals.length) return null;
+  return vals.reduce((a,b)=>a+b,0)/vals.length;
+}
+
+// ====== FORM SETUP ======
+function toggleCRMField(el) {
+  const field = document.getElementById('crmNameField');
+  if(field) field.style.display = el.classList.contains('checked') ? 'block' : 'none';
+}
+
+function calcTotalTechs() {
+  const ids = ['txMechanical','txElectrician','txBodyshop','txDenter','txPainter','txAC','txTyre','txDetailing','txHelper','txOther'];
+  const sum = ids.reduce((a,id) => a + (parseInt(document.getElementById(id)?.value)||0), 0);
+  const total = parseInt(document.getElementById('numTechs')?.value)||0;
+  const el = document.getElementById('techBreakdownSum');
+  if(el) {
+    el.textContent = sum + ' / ' + (total||'?');
+    el.style.color = total && sum === total ? 'var(--green)' : sum > total && total ? 'var(--red)' : 'var(--accent)';
+  }
+  autoSave();
+}
+
+function buildTabs() {
+  const nav = document.getElementById('navTabs');
+  nav.innerHTML = '';
+  TABS.forEach((t,i) => {
+    const btn = document.createElement('button');
+    btn.className = 'tab-btn' + (i===0?' active':'');
+    btn.textContent = (i+1)+'. '+t.label;
+    btn.onclick = () => goTo(i);
+    btn.id = 'tab_'+i;
+    nav.appendChild(btn);
+  });
+}
+
+function goTo(idx) {
+  document.querySelector('#formView .section.active')?.classList.remove('active');
+  document.querySelector('.tab-btn.active')?.classList.remove('active');
+  document.getElementById(TABS[idx].id).classList.add('active');
+  document.getElementById('tab_'+idx).classList.add('active');
+  document.getElementById('tab_'+idx).scrollIntoView({block:'nearest',inline:'center',behavior:'smooth'});
+  current = idx;
+  document.getElementById('prevBtn').disabled = current === 0;
+  document.getElementById('nextBtn').disabled = current === TABS.length - 1;
+  document.getElementById('formHeaderSub').textContent = 'Section '+(current+1)+' of '+TABS.length;
+  document.getElementById('progressFill').style.width = Math.round(((current+1)/TABS.length)*100)+'%';
+  if(idx === TABS.length-1) calcScores();
+  document.getElementById('formView').scrollTop = 0;
+  window.scrollTo(0,0);
+}
+
+function navigate(dir) { goTo(current+dir); }
+
+function startNewGarage() {
+  editingId = null;
+  resetForm();
+  showFormView();
+}
+
+function editGarage(idx) {
+  const garages = loadGarages();
+  editingId = idx;
+  resetForm();
+  restoreData(garages[idx]);
+  showFormView();
+}
+
+function showFormView() {
+  document.getElementById('homeView').classList.remove('active');
+  document.getElementById('formView').classList.add('active');
+  buildTabs();
+  goTo(0);
+  updateFormTitle();
+}
+
+function goHome() {
+  const data = collectData();
+  if(data.garageName) {
+    saveDraft(data);
+    showToast('Draft auto-saved');
+  }
+  document.getElementById('formView').classList.remove('active');
+  document.getElementById('homeView').classList.add('active');
+  renderHome();
+  window.scrollTo(0,0);
+}
+
+function updateFormTitle() {
+  const name = document.getElementById('garageName')?.value || '';
+  document.getElementById('formHeaderTitle').textContent = name || 'New Garage';
+}
+
+// ====== FORM HELPERS ======
+function setRating(btn, fieldId, val) {
+  btn.parentElement.querySelectorAll('.rating-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(fieldId).value = val;
+  autoSave();
+}
+
+function toggleYN(btn, fieldId, val) {
+  btn.parentElement.querySelectorAll('.yn-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(fieldId).value = val;
+  autoSave();
+}
+
+function toggleCheck(el, fieldId) {
+  el.classList.toggle('checked');
+  document.getElementById(fieldId).value = el.classList.contains('checked') ? '1' : '0';
+  autoSave();
+}
+
+function collectData() {
+  const data = {};
+  ALL_IDS.forEach(id => { const el = document.getElementById(id); if(el) data[id] = el.value; });
+  return data;
+}
+
+function resetForm() {
+  ALL_IDS.forEach(id => {
+    const el = document.getElementById(id);
+    if(!el) return;
+    if(el.type === 'hidden') el.value = '0';
+    else el.value = '';
+  });
+  document.querySelectorAll('#formView .rating-btn.active').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('#formView .yn-btn.active').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('#formView .check-item.checked').forEach(b => b.classList.remove('checked'));
+}
+
+const RATING_FIELDS = ['visib','parking','exterior','cleanliness','organisation','mechExp','staffDisc','ownerBeh','transparency','commSkills','greeting','estTransp'];
+const YN_FIELDS = ['gstRegistered','garageSize','pickupDrop','sundayOpen','appointmentSys','certTechs','writtenEst','digitalPay','digitalInv','followUp','fleetClients','insuranceTieup','imAware','openPartnership','rsaWilling','dropLeads','followUpNeeded'];
+const CHECK_FIELDS = [
+  'facWaiting','facWashroom','facSignboard','facCCTV','facUniforms','facVentilation','facReceptionDesk','facPricingDisplay','facDrinkingWater','facTV',
+  'parkDedicated','parkCovered','parkMarked','parkCCTV','parkJobCard','parkCapacity',
+  'gsaHydraulicLift','gsaFloorDrain','gsaToolStorage','gsaLighting','gsaVentilation','gsaAirLines','gsaClean','gsaWaste',
+  'dentSeparate','dentWelding','dentGrinder','dentPuller','dentPDR','dentSprayGun',
+  'paintBooth','paintInfrared','paintMixing','paintVentExhaust','paintIsolated','paintPPE',
+  'washWaterSupply','washPressureJet','washVacuum','washPolisher','washDrainPit','washSteam',
+  'tyreAlignment','tyreBalancing','tyreTyreFit','tyrePressure','tyreNitrogen','tyreStock',
+  'storeOrganised','storeLabelled','storeGenParts','storeToolBox','storeLocked','storeInventory',
+  'eqOBD','eqAdv','eqECU','eqAlignment','eqBalancing','eqPaintBooth','eqAirComp','eqWelding','eqPowerBkp','eqEV',
+  'svcEngine','svcSuspension','svcBrakes','svcGearbox','svcClutch','svcExhaust','svcPMC','svcOilChange','svcAC','svcElectrical','svcBattery','svcDiagnostics','svcECU','svcEV','svcPaint','svcPDR','svcFullBodyRepaint','svcWash','svcDetailing','svcPPF','svcWrapping','svcUnderbody','svcTyreChange','svcWheelAlign','svcWheelBalance','svcPunctureRepair','svcInsurance','svcRSA','svcPickupDrop','svcModification','insuranceCompanies',
+  'safetyFire','safetyFirstAid','safetyPPE','safetyElec','safetyWaste',
+  'digOnlineBook','digCRM','digWhatsApp','digGoogleMgmt',
+  'specLuxury','specBMW','specMerc','specAudi','specEV','specInsurance'];
+
+function restoreData(data) {
+  Object.entries(data).forEach(([id, val]) => {
+    const el = document.getElementById(id);
+    if(!el || val === undefined) return;
+    if(el.tagName === 'INPUT' || el.tagName === 'SELECT' || el.tagName === 'TEXTAREA') el.value = val;
+  });
+  RATING_FIELDS.forEach(fieldId => {
+    const val = data[fieldId]; if(!val) return;
+    const inp = document.getElementById(fieldId); if(!inp) return;
+    const row = inp.previousElementSibling; if(!row) return;
+    row.querySelector('.rating-btn.r'+val)?.classList.add('active');
+  });
+  YN_FIELDS.forEach(fieldId => {
+    const val = data[fieldId]; if(!val) return;
+    const inp = document.getElementById(fieldId); if(!inp) return;
+    const row = inp.previousElementSibling; if(!row) return;
+    row.querySelectorAll('.yn-btn').forEach(btn => {
+      const bval = btn.classList.contains('yes')?'yes': btn.classList.contains('no')?'no': btn.textContent.trim().toLowerCase().replace(/\s+/g,'');
+      if(bval === val || btn.textContent.trim().toLowerCase() === val) btn.classList.add('active');
+    });
+  });
+  CHECK_FIELDS.forEach(fieldId => {
+    if(data[fieldId]==='1') document.getElementById(fieldId)?.closest('.check-item')?.classList.add('checked');
+  });
+  if(data['digCRM']==='1') { const f=document.getElementById('crmNameField'); if(f) f.style.display='block'; }
+}
+
+function autoSave() { saveDraft(collectData()); }
+
+// ====== SAVE ======
+function saveCurrentGarage() {
+  const data = collectData();
+  if(!data.garageName) { showToast('⚠ Enter a garage name first'); return; }
+  data.inspectionDateTime = new Date().toLocaleString('en-IN',{timeZone:'Asia/Kolkata'});
+  document.getElementById('inspectionDateTime').value = data.inspectionDateTime;
+
+  const garages = loadGarages();
+  if(editingId !== null) {
+    garages[editingId] = data;
+    showToast('✓ Updated');
+  } else {
+    garages.push(data);
+    editingId = garages.length - 1;
+    showToast('✓ Garage saved');
+  }
+  saveGarages(garages);
+  clearDraft();
+}
+
+function calcScores() {
+  const avg = (...ids) => {
+    const vals = ids.map(id => parseInt(document.getElementById(id)?.value)||0).filter(v=>v>0);
+    return vals.length ? (vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(1) : '–';
+  };
+  const infra = avg('exterior','cleanliness','organisation');
+  const staff = avg('mechExp','staffDisc','ownerBeh','transparency','commSkills');
+  const cx = avg('greeting','estTransp');
+  document.getElementById('sc_infra').textContent = infra;
+  document.getElementById('sc_staff').textContent = staff;
+  document.getElementById('sc_cx').textContent = cx;
+  const nums = [infra,staff,cx].filter(v=>v!=='–').map(Number);
+  if(nums.length) {
+    const overall = nums.reduce((a,b)=>a+b,0)/nums.length;
+    document.getElementById('overallScore').textContent = overall.toFixed(1);
+    const g = Math.round(overall);
+    document.getElementById('overallGrade').textContent = {1:'Not suitable',2:'Weak candidate',3:'Average fit',4:'Good partner',5:'Excellent partner'}[g] || '';
+  }
+}
+
+// ====== EXPORT ======
+function exportSingleJSON() {
+  const data = collectData();
+  const json = JSON.stringify(data, null, 2);
+  const blob = new Blob([json],{type:'application/json'});
+  const url3 = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.style.display='none'; a.href=url3;
+  a.download = 'Garage_'+(data.garageName||'unnamed').replace(/\s+/g,'_')+'.json';
+  document.body.appendChild(a); a.click();
+  setTimeout(()=>{ document.body.removeChild(a); URL.revokeObjectURL(url3); },500);
+  showToast('📤 Exported');
+}
+
+function exportOneJSON(idx) {
+  const garages = loadGarages();
+  const g = garages[idx];
+  const json = JSON.stringify(g, null, 2);
+  const blob = new Blob([json],{type:'application/json'});
+  const url2 = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.style.display='none'; a.href=url2;
+  a.download = 'Garage_'+(g.garageName||'unnamed').replace(/\s+/g,'_')+'.json';
+  document.body.appendChild(a); a.click();
+  setTimeout(()=>{ document.body.removeChild(a); URL.revokeObjectURL(url2); },500);
+  showToast('📤 Exported');
+}
+
+function exportAllJSON() {
+  const garages = loadGarages();
+  if(!garages.length) return;
+  const blob = new Blob([JSON.stringify(garages, null, 2)],{type:'application/json'});
+  const url1 = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.style.display='none'; a.href=url1;
+  a.download = 'IM_Garages_All_'+new Date().toISOString().slice(0,10)+'.json';
+  document.body.appendChild(a); a.click();
+  setTimeout(()=>{ document.body.removeChild(a); URL.revokeObjectURL(url1); },500);
+  showToast('📤 All garages exported');
+}
+
+function exportAllCSV() {
+  const garages = loadGarages();
+  if(!garages.length) { showToast('No garages to export'); return; }
+  const cols = [
+    'garageName','garageSize','garageType','ownerName','managerName','contactNumber','pocName','pocNumber',
+    'email','address','mapsLink','yearsInBusiness','gstRegistered','website','social',
+    'openTime','closeTime','sundayOpen','appointmentSys','pickupDrop',
+    'numBays','numLifts','numTechs','dailyCap',
+    'txMechanical','txElectrician','txBodyshop','txDenter','txPainter','txAC','txTyre','txDetailing','txHelper','txOther',
+    'monthlyFootfall','googleRating','googleReviews','fleetClients','insuranceTieup','insuranceCompanies',
+    'digCRM','crmSoftwareName','digOnlineBook','digWhatsApp','digGoogleMgmt',
+    'svcInsurance','svcEngine','svcAC','svcPaint','svcEV','svcWheelAlign',
+    'specLuxury','specBMW','specMerc','specAudi','specEV','specInsurance',
+    'imAware','openPartnership','rsaWilling','dropLeads','commissionLevel','competitors','followUpNeeded','bestCallTime',
+    'imRecommendation','strengths','weaknesses','redFlags','inspectionDateTime'
+  ];
+  const headers = [
+    'Garage Name','Size','Type','Owner','Manager','Contact','POC Name','POC Number',
+    'Email','Address','Maps Link','Years in Business','GST','Website','Social',
+    'Opens','Closes','Sunday Open','Appointment System','Pickup & Drop',
+    'Bays','Lifts','Total Techs','Daily Capacity',
+    'Mechanical Tx','Electrician','Bodyshop Tx','Denter','Painter','AC Tech','Tyre Tx','Detailing Tx','Helper','Other',
+    'Monthly Footfall','Google Rating','Google Reviews','Fleet Clients','Insurance Tie-up','Insurance Companies',
+    'CRM','CRM Software Name','Online Booking','WhatsApp Support','Google Reviews Mgmt',
+    'Insurance Cashless','Engine Repair','AC Repair','Denting/Paint','EV Service','Wheel Alignment',
+    'Luxury Cars','BMW Specialist','Mercedes','Audi','EV Specialist','Insurance Specialist',
+    'Aware of IM','Open to Partner','RSA Jobs','Drop Leads','Commission','Competitors','Follow-up Needed','Best Call Time',
+    'IM Recommendation','Strengths','Weaknesses','Red Flags','Inspection Date'
+  ];
+  let csv = '\uFEFF'; // BOM for Excel UTF-8
+  csv += headers.map(h => '"'+h+'"').join(',') + '\n';
+  garages.forEach(g => {
+    csv += cols.map(c => '"'+(g[c]||'').toString().replace(/"/g,'""').replace(/\n/g,' ')+'"').join(',') + '\n';
+  });
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.style.display = 'none';
+  a.href = url;
+  a.download = 'IM_Garages_'+new Date().toISOString().slice(0,10)+'.csv';
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 500);
+  showToast('📊 CSV exported');
+}
+
+function copyGarageText() {
+  const data = collectData();
+  const labels = {garageName:'Garage',garageType:'Type',ownerName:'Owner',contactNumber:'Contact',address:'Address',yearsInBusiness:'Years',googleRating:'Google Rating',googleReviews:'Reviews',monthlyFootfall:'Monthly Footfall',openPartnership:'Open to Partner',rsaWilling:'RSA Jobs',imRecommendation:'Recommendation',strengths:'Strengths',weaknesses:'Weaknesses',redFlags:'Red Flags'};
+  let t = '=== IM Garage: '+(data.garageName||'?')+' ===\n';
+  Object.entries(labels).forEach(([k,l])=>{ if(data[k]) t+=l+': '+data[k]+'\n'; });
+  navigator.clipboard.writeText(t).then(()=>showToast('📋 Copied')).catch(()=>showToast('Could not copy'));
+}
+
+function deleteGarage(idx) {
+  if(!confirm('Delete this garage entry?')) return;
+  const garages = loadGarages();
+  garages.splice(idx, 1);
+  saveGarages(garages);
+  renderHome();
+  showToast('Deleted');
+}
+
+function discardCurrent() {
+  if(!confirm('Discard this entry and go back?')) return;
+  clearDraft();
+  document.getElementById('formView').classList.remove('active');
+  document.getElementById('homeView').classList.add('active');
+  renderHome();
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2200);
+}
+
+// ====== INIT ======
+document.addEventListener('input', e => {
+  if(document.getElementById('formView').classList.contains('active')) autoSave();
+});
+document.addEventListener('change', e => {
+  if(document.getElementById('formView').classList.contains('active')) autoSave();
+});
+
+renderHome();
+
+// Restore draft if any
+const draft = loadDraft();
+if(draft && draft.data && draft.data.garageName) {
+  const draftBanner = document.createElement('div');
+  draftBanner.style = 'margin:0 16px 12px;background:#fffbeb;border:1px solid #fcd34d;border-radius:8px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px;';
+  draftBanner.innerHTML = `<span style="font-size:13px;color:#92400e;font-weight:500;">Draft: <strong>${draft.data.garageName}</strong></span><button onclick="resumeDraft()" style="background:#ea6c00;color:#fff;border:none;border-radius:6px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer;">Resume</button>`;
+  document.getElementById('homeView').insertBefore(draftBanner, document.getElementById('homeView').children[2]);
+}
+
+function resumeDraft() {
+  const draft = loadDraft();
+  if(!draft) return;
+  editingId = draft.editingId;
+  resetForm();
+  restoreData(draft.data);
+  showFormView();
+}
+</script>
+</body>
+</html>
