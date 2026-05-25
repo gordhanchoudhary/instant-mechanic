@@ -1,0 +1,711 @@
+import { useState } from "react";
+
+const CAR_SEGMENTS = [
+  { id: "hatch_small", label: "WagonR / Alto / K10",     tag: "Hatchback — Chhoti", color: "#16a34a" },
+  { id: "hatch_mid",   label: "Swift / Dzire / Baleno",  tag: "Hatchback — Mid",    color: "#16a34a" },
+  { id: "sedan_mid",   label: "i20 / Grand i10 / Venue", tag: "Hyundai Mid",         color: "#d97706" },
+  { id: "suv",         label: "Creta / Seltos / Brezza", tag: "SUV / Diesel",        color: "#dc2626" },
+];
+
+const SYMPTOMS = [
+  { id: "burn_slip",    label: "Burning smell / RPM badhta hai par speed nahi",   hindi: "Jalne ki boo, engine tez par gaadi dheemi" },
+  { id: "pedal_floor",  label: "Pedal floor tak gir jaata hai — koi resistance nahi", hindi: "Clutch pedal bilkul neeche chala jaata hai" },
+  { id: "pedal_spongy", label: "Pedal spongy / dheere neeche jaata hai",           hindi: "Pedal dabane par rubber jaisa feel, ya khud neeche jaata hai" },
+  { id: "pedal_stiff",  label: "Pedal bahut tight / heavy press karna padta hai",  hindi: "Clutch pedal bahut sakht hai, pair dard karta hai" },
+  { id: "squeak",       label: "Squeaking / cheek awaaz — sirf pedal press pe",    hindi: "Clutch dabane par chichihaane ki awaaz" },
+  { id: "no_gear",      label: "Koi bhi gear nahi lag raha — gaadi bilkul stuck",  hindi: "Gaadi puri tarah jam ho gayi hai" },
+  { id: "high_bite",    label: "Clutch bahut upar se pakadta hai — pedal top pe",  hindi: "Clutch pedal seedha upar se pakad leta hai" },
+  { id: "not_return",   label: "Pedal press ke baad wapas nahi aata",              hindi: "Clutch dabane ke baad apni jagah pe nahi lauta" },
+  { id: "shudder",      label: "Vibration / kaampna jab clutch engage karo",       hindi: "Clutch chodne par gaadi kaampti / hilti hai" },
+];
+
+const PART_LABELS = {
+  disc:         { en: "Clutch disc",              hi: "Clutch disc (ghisi hui plate)" },
+  pressure:     { en: "Pressure plate",           hi: "Pressure plate (dabaane wali plate)" },
+  bearing:      { en: "Release bearing",          hi: "Release bearing (throw-out bearing)" },
+  cable:        { en: "Clutch cable",             hi: "Clutch cable / taar" },
+  master_slave: { en: "Master + Slave cylinder",  hi: "Master + Slave cylinder (hydraulic parts)" },
+};
+
+const PART_PRICES = {
+  hatch_small: { disc:"₹1,019", pressure:"₹930",   bearing:"₹400",  cable:"₹350", master_slave:"—",      flywheel_resurface:"₹1,500–2,000", flywheel_replace:"₹4,000–6,000",  labour_kit:"₹2,500", labour_cable:"₹600",  labour_hydro:"—",      total_kit:"₹4,850",  total_cable:"₹1,025", total_hydro:"—",      total_fly_add:"+₹1,500–2,000" },
+  hatch_mid:   { disc:"₹1,075", pressure:"₹745",   bearing:"₹475",  cable:"₹425", master_slave:"—",      flywheel_resurface:"₹1,500–2,000", flywheel_replace:"₹4,500–6,500",  labour_kit:"₹2,800", labour_cable:"₹600",  labour_hydro:"—",      total_kit:"₹5,095",  total_cable:"₹1,025", total_hydro:"—",      total_fly_add:"+₹1,500–2,000" },
+  sedan_mid:   { disc:"₹2,750", pressure:"₹2,400", bearing:"₹600",  cable:"—",    master_slave:"₹1,850", flywheel_resurface:"₹1,500–2,000", flywheel_replace:"₹5,500–8,000",  labour_kit:"₹2,800", labour_cable:"—",     labour_hydro:"₹1,500", total_kit:"₹8,550",  total_cable:"—",      total_hydro:"₹4,450", total_fly_add:"+₹1,500–2,000" },
+  suv:         { disc:"₹3,500", pressure:"₹3,000", bearing:"₹875",  cable:"—",    master_slave:"₹2,850", flywheel_resurface:"₹2,000–3,000", flywheel_replace:"₹7,000–11,000", labour_kit:"₹4,000", labour_cable:"—",     labour_hydro:"₹1,800", total_kit:"₹11,375", total_cable:"—",      total_hydro:"₹4,650", total_fly_add:"+₹2,000–3,000" },
+};
+
+const RESULTS = {
+  burn_slip: {
+    part:    "Clutch disc — worn / slipping. No grip left on friction lining.",
+    partHi:  "Clutch disc (plate) ghis gayi hai — bilkul pakad nahi rahi. Friction material khatam.",
+    repair:  "Full clutch kit replacement (disc + pressure plate + release bearing)",
+    repairHi:"Poora clutch kit badalna hoga — disc + pressure plate + release bearing teeno.",
+    time: { hatch_small:"4–6 ghante", hatch_mid:"4–6 ghante", sedan_mid:"5–6 ghante", suv:"6–8 ghante" },
+    sameday: { hatch_small:true, hatch_mid:true, sedan_mid:true, suv:"maybe" },
+    samedaynote: { hatch_small:"Subah 10–11 baje de do", hatch_mid:"Subah 10–11 baje de do", sedan_mid:"Subah 9–10 baje de do", suv:"Bahut subah chahiye — safe bet kal booking karo" },
+    flywheel_risk: true,
+    parts_needed: ["disc","pressure","bearing"],
+    labour_key:"labour_kit", total_key:"total_kit",
+    upsells: [
+      { risk:"HIGH", item:"Flywheel replace vs resurface", itemHi:"Flywheel badal do — zarurat nahi",
+        detail:"Mechanic kahega 'flywheel bilkul gaya sir' — replace push karega (₹4k–12k). 90% cases mein sirf resurfacing (₹1.5k–2k) kaafi hai.",
+        detailHi:"Flywheel sirf ghisi ho toh machine shop mein polish ho sakti hai — naya lagne ki zarurat nahi jab tak crack na ho." },
+      { risk:"HIGH", item:"Spurious kit billed as LuK/Valeo", itemHi:"Local kit lagake branded ka paisa",
+        detail:"Local ₹500 kit install, OEM price bill. 6 mahine mein dobara fail.",
+        detailHi:"LuK ya Valeo bolke sasta kit lagate hain. Box photo lo pehle — hologram check karo." },
+      { risk:"MED",  item:"Gearbox oil flush upsell", itemHi:"Gearbox ka tel change karna padega",
+        detail:"'Gearbox khola toh oil change karna padta hai' — completely false. ₹800–1,500 waste.",
+        detailHi:"Gearbox kholne se andar ka tel kharab nahi hota. Yeh ek bahana hai extra paisa lene ka." },
+      { risk:"MED",  item:"Fork + pivot billed as standard", itemHi:"Fork aur pivot bhi ghis gaya",
+        detail:"Metal parts — 2–3 kit cycles chalte hain. Replace tabhi karo jab photo mein bend/crack dikhe.",
+        detailHi:"Yeh lohe ke parts hain, jaldi nahi ghiste. Photo dikhao tabhi maano." },
+      { risk:"LOW",  item:"Wheel alignment after job", itemHi:"Alignment bhi bigad jaati hai",
+        detail:"Gearbox removal has zero effect on wheel alignment. Pure upsell.",
+        detailHi:"Gearbox nikalane se alignment pe koi asar nahi padta. Seedha upsell hai." },
+    ],
+    fraud: [
+      { check:"Old disc returned in bag?", checkHi:"Purani disc bag mein mili?",
+        detail:"Worn disc = thin, metal showing at edges, friction lining nearly gone. Thick disc = kit wasn't needed.",
+        detailHi:"Ghisi disc patli hoti hai, kinare pe metal dikhta hai. Agar moti disc wapas aayi toh kit ki zarurat nahi thi." },
+      { check:"Flywheel photo before decision?", checkHi:"Flywheel ki photo aayi kholne ke baad?",
+        detail:"Deep grooves (finger catches) = replace. Light scoring = resurface. No photo = red flag.",
+        detailHi:"Ungli chalao flywheel pe — gehri lakeerein replace, halki khurach = polish kaafi. Photo nahi = doubt karo." },
+      { check:"Branded box photo before opening?", checkHi:"Part ka box photo liya kholne se pehle?",
+        detail:"LuK = orange/yellow box with hologram. Valeo = blue box. No box / wrong part number = spurious.",
+        detailHi:"LuK ka dabba orange/yellow hota hai hologram ke saath. Valeo blue. Dabba nahi dikha = local part ho sakta hai." },
+      { check:"No gearbox oil on original bill?", checkHi:"Bill mein gearbox oil toh nahi?",
+        detail:"Cross-check invoice. Remove if present without cx approval.",
+        detailHi:"Invoice dekho — gearbox oil line item hai toh customer ki permission ke bina nahi honi chahiye. Hatao." },
+    ],
+    agent_line:"Sir aapki gaadi mein clutch slip ho raha hai — disc ghis gayi hai, engine revv hota hai par speed nahi badhti. Poora clutch kit lagega — disc, pressure plate, bearing teeno. [Car] mein parts aur labour milake ₹X–Y lagega. Subah de do toh shaam tak ready ho jaayegi. Flywheel bhi check hogi — agar theek nikli toh same cost, kuch issue nikla toh ₹1,500–2,000 extra — pehle aapko call karenge.",
+  },
+
+  pedal_floor: {
+    part:    "Clutch cable snapped — cable-type cars (WagonR, older Alto, Swift pre-2012).",
+    partHi:  "Clutch ki taar toot gayi hai — cable wali gaadiyaan (WagonR, purana Alto, Swift 2012 se pehle).",
+    repair:  "Cable replacement only — NO gearbox removal needed",
+    repairHi:"Sirf cable badalni hai — gearbox kholne ki koi zarurat nahi.",
+    time: { hatch_small:"45–90 minute", hatch_mid:"45–90 minute", sedan_mid:"N/A (hydraulic)", suv:"N/A (hydraulic)" },
+    sameday: { hatch_small:true, hatch_mid:true, sedan_mid:"check", suv:"check" },
+    samedaynote: { hatch_small:"Bahut fast — usi ghante ho sakta hai", hatch_mid:"Bahut fast — usi ghante ho sakta hai", sedan_mid:"Modern gaadiyaan hydraulic hoti hain — spongy pedal symptom check karo", suv:"Modern gaadiyaan hydraulic hain — spongy pedal symptom check karo" },
+    flywheel_risk:false,
+    parts_needed:["cable"],
+    labour_key:"labour_cable", total_key:"total_cable",
+    upsells: [
+      { risk:"HIGH", item:"Full kit upsell on cable job", itemHi:"Taar ke kaam pe poori kit ka bill",
+        detail:"Mechanic says 'disc bhi ghisi hai' — impossible without opening gearbox. Cable job = gearbox never opened = disc never seen.",
+        detailHi:"Gearbox khola hi nahi toh disc dekha kaise? Jo nahi dekha uska bill nahi banega." },
+      { risk:"MED",  item:"Labour inflation", itemHi:"Zyada ghante ka labour bill",
+        detail:"Cable job = 45–90 min. Billing for 3–4 hrs labour is fraud.",
+        detailHi:"Cable 45–90 minute ka kaam hai. 3–4 ghante ka labour bill aaya toh sawaal karo." },
+    ],
+    fraud: [
+      { check:"No old disc returned?", checkHi:"Purani disc nahi mili bag mein?",
+        detail:"Cable job doesn't open gearbox. No old disc = kit definitely not replaced.",
+        detailHi:"Cable kaam mein gearbox khulta hi nahi. Purani disc nahi aayi + kit bill aayi = fraud." },
+      { check:"Time check: under 2 hours?", checkHi:"Kaam 2 ghante se kam mein hua?",
+        detail:"Cable = 45–90 min. Car-in vs car-out confirms. Over 2 hrs = something's off.",
+        detailHi:"Car andar gaya time aur nikla time compare karo. 2 ghante se zyada = kuch gadbad hai." },
+      { check:"Car is cable type confirmed?", checkHi:"Gaadi cable wali hai — confirm kiya?",
+        detail:"WagonR, old Alto, Swift pre-2012 = cable. Post-2015 = hydraulic.",
+        detailHi:"Purani gaadiyaan cable se chalti hain. 2015 ke baad bani gaadiyaan hydraulic hoti hain." },
+    ],
+    agent_line:"Sir pedal bilkul neeche chala gaya, koi resistance nahi? Clutch cable toot gayi lagti hai. Yeh chhoti problem hai — ₹1,000 ke andar ek ghante mein ho jaayega. Mechanic cable check karega pehle — agar disc mein bhi kuch issue mila toh alag se aapko batayenge aur permission lenge tabhi kaam karenge.",
+  },
+
+  pedal_spongy: {
+    part:    "Master cylinder or slave cylinder failed — hydraulic fluid leak / seal worn.",
+    partHi:  "Master cylinder ya slave cylinder kharab ho gayi — hydraulic fluid leak ya seal ghis gayi.",
+    repair:  "Master + slave cylinder replacement + hydraulic system bleed",
+    repairHi:"Master + slave cylinder dono badlo + hydraulic line se hawa nikalo (bleed karo).",
+    time: { hatch_small:"2–3 ghante", hatch_mid:"2–3 ghante", sedan_mid:"2–3 ghante", suv:"2–3 ghante" },
+    sameday: { hatch_small:true, hatch_mid:true, sedan_mid:true, suv:true },
+    samedaynote: { hatch_small:"Gearbox nahi kholna — hamesha same day", hatch_mid:"Gearbox nahi kholna — hamesha same day", sedan_mid:"Gearbox nahi kholna — hamesha same day", suv:"Gearbox nahi kholna — hamesha same day" },
+    flywheel_risk:false,
+    parts_needed:["master_slave"],
+    labour_key:"labour_hydro", total_key:"total_hydro",
+    upsells: [
+      { risk:"MED", item:"Full kit push on hydraulic job", itemHi:"Hydraulic kaam pe clutch kit bhi",
+        detail:"Mechanic may say disc is also worn — gearbox not opened so impossible to verify. Don't authorise.",
+        detailHi:"Gearbox khola nahi, disc dekha nahi, toh disc ghisi hai kaise pata? Bill mat do." },
+      { risk:"LOW", item:"Clutch fluid billed separately", itemHi:"Clutch fluid alag se charge",
+        detail:"Fluid is part of the bleed process — not a separate charge.",
+        detailHi:"Bleed karne mein fluid andar hota hai — alag se nahi likhna chahiye bill mein." },
+    ],
+    fraud: [
+      { check:"Gearbox opened unnecessarily?", checkHi:"Gearbox bekar mein khola?",
+        detail:"Hydraulic job needs no gearbox removal. If opened, ask why before paying.",
+        detailHi:"Is kaam mein gearbox kholne ki zarurat nahi. Khula toh payment rokke sawaal karo." },
+      { check:"Old cylinders returned?", checkHi:"Purane cylinder wapas mile?",
+        detail:"Small metal/plastic parts — must be returned. No return = not replaced.",
+        detailHi:"Chote metal/plastic parts hain — bag mein wapas milne chahiye. Nahi mile = badla nahi." },
+      { check:"Air bleed done properly?", checkHi:"Hawa theek se nikali line se?",
+        detail:"Spongy pedal after repair = air in system = incomplete job.",
+        detailHi:"Kaam ke baad bhi pedal spongy hai toh matlab hawa andar reh gayi — incomplete kaam." },
+    ],
+    agent_line:"Sir clutch pedal rubber jaisa feel ho raha hai, ya dheere dheere neeche ja raha hai? Yeh hydraulic system ki problem hai — master ya slave cylinder fail ho gayi hai. Gearbox kholne ki koi zarurat nahi, ₹4,000–5,000 mein 2–3 ghante ka kaam hai, aaj hi ho jaayega.",
+  },
+
+  pedal_stiff: {
+    part:    "Clutch cable frayed / dry (cable cars) OR pressure plate spring worn (rare).",
+    partHi:  "Clutch cable sukh gayi / ghis gayi (cable wali gaadi) — ya pressure plate spring tight (rare).",
+    repair:  "Step 1: Cable lube + adjust. No fix → cable replace → still stiff → full kit.",
+    repairHi:"Pehle cable mein tel dalo aur adjust karo. Theek na ho toh cable badlo. Phir bhi nahi toh full kit.",
+    time: { hatch_small:"30–45 min (lube) / 4–6 hrs (kit)", hatch_mid:"30–45 min (lube) / 4–6 hrs (kit)", sedan_mid:"2–3 ghante (hydraulic check)", suv:"2–3 ghante (hydraulic check)" },
+    sameday: { hatch_small:true, hatch_mid:true, sedan_mid:true, suv:true },
+    samedaynote: { hatch_small:"Lube = 30 minute. Kit chahiye toh subah 10 baje lao", hatch_mid:"Lube = 30 minute. Kit chahiye toh subah 10 baje lao", sedan_mid:"Hydraulic pressure check pehle", suv:"Hydraulic pressure check pehle" },
+    flywheel_risk:false,
+    parts_needed:["cable"],
+    labour_key:"labour_cable", total_key:"total_cable",
+    upsells: [
+      { risk:"MED", item:"Skip lube — straight to full kit", itemHi:"Tel lagane ki jagah seedha kit",
+        detail:"Stiff cable = ₹250 fix. Mechanic may jump to ₹5,000 kit. Insist lube+adjust first.",
+        detailHi:"Aksar cable sukhi hoti hai, tel lagao aur ₹300 mein theek. Kit ki zarurat nahi." },
+      { risk:"LOW", item:"Pressure plate without evidence", itemHi:"Pressure plate bhi kharab hai",
+        detail:"Pressure plate spring issue needs 100k+ km. Very rare without clear evidence.",
+        detailHi:"Pressure plate ka spring 1 lakh km ke baad ghista hai. Proof ke bina mat maano." },
+    ],
+    fraud: [
+      { check:"Lube + adjust tried first?", checkHi:"Pehle tel dala aur adjust kiya?",
+        detail:"Job card should show lube attempt before kit is recommended.",
+        detailHi:"Job card mein likhna chahiye ki cable lube kiya — seedha kit aayi toh puchho kyun." },
+      { check:"Pedal tested after lube?", checkHi:"Tel ke baad pedal test kiya?",
+        detail:"Problem resolves after lube = done at ₹300. If kit recommended after lube failed — fair.",
+        detailHi:"Tel ke baad pedal check karo. Theek hua toh kaam khatam ₹300 mein. Theek nahi hua tabhi aage badhna." },
+    ],
+    agent_line:"Sir pedal bahut sakht aur heavy ho gaya hai? Pehle mechanic clutch cable check karega — aksar cable sukh jaati hai ya adjust chahiye. ₹300 mein 30 minute ka kaam hota hai. Agar theek na hua toh cable badlenge, usse bhi na hua toh mechanic aur check karega — aapko step by step batate rahenge.",
+  },
+
+  squeak: {
+    part:    "Release bearing (throw-out bearing) — early failure. Dry / worn.",
+    partHi:  "Release bearing (throw-out bearing) — shuru mein kharaab ho raha hai. Sukha ya ghisa hua.",
+    repair:  "Full clutch kit — bearing is never replaced alone (same labour as full kit)",
+    repairHi:"Poora clutch kit — bearing akele nahi lagta, gearbox kholna padta hai toh kit ek saath.",
+    time: { hatch_small:"4–6 ghante", hatch_mid:"4–6 ghante", sedan_mid:"5–6 ghante", suv:"6–8 ghante" },
+    sameday: { hatch_small:true, hatch_mid:true, sedan_mid:true, suv:"maybe" },
+    samedaynote: { hatch_small:"Subah 10–11 baje de do", hatch_mid:"Subah 10–11 baje de do", sedan_mid:"Subah 9–10 baje de do", suv:"Bahut subah chahiye — safe kal book karo" },
+    flywheel_risk:true,
+    parts_needed:["disc","pressure","bearing"],
+    labour_key:"labour_kit", total_key:"total_kit",
+    upsells: [
+      { risk:"HIGH", item:"Sirf bearing badlo — disc chodo", itemHi:"Bearing fix, disc nahi dekhi",
+        detail:"Gearbox removal for bearing = same effort as full kit. Always do full kit.",
+        detailHi:"Gearbox kholna padega bearing ke liye bhi — toh full kit ek saath laga do, warna 6 mahine mein dobara kholna padega." },
+      { risk:"HIGH", item:"Spurious bearing billed as SKF/FAG", itemHi:"Local bearing, branded ka paisa",
+        detail:"SKF genuine = ₹400–700. Local = ₹80–150. Both look same. Demand box.",
+        detailHi:"Dono ek jaisi dikhti hain. SKF ka peela dabba maango — bina dabbe ke nahi chalega." },
+      { risk:"MED",  item:"Flywheel decision rushed", itemHi:"Flywheel bhi badal dete hain",
+        detail:"Gearbox is open so mechanic will push flywheel decision. Enforce photo first.",
+        detailHi:"Gearbox khula hai toh mechanic flywheel dikhayega — photo aane se pehle haan mat karo." },
+    ],
+    fraud: [
+      { check:"All 3 old parts in bag?", checkHi:"Teeno purane parts bag mein mile?",
+        detail:"Kit = disc + pressure plate + bearing. All 3 must return. Only bearing = ghost bill.",
+        detailHi:"Teeno parts wapas aane chahiye. Sirf bearing aayi toh disc aur pressure plate ka paisa mat do." },
+      { check:"Bearing brand box checked?", checkHi:"Bearing ka brand box dekha?",
+        detail:"SKF = yellow box. FAG = green box. No box / loose = local part.",
+        detailHi:"SKF peela dabba, FAG hara dabba. Loose bearing without box = local hai." },
+      { check:"Squeak gone after repair?", checkHi:"Awaaz gayi kaam ke baad?",
+        detail:"Press pedal with engine on. No sound = bearing correctly replaced.",
+        detailHi:"Engine on karke clutch dabao — awaaz nahi aayi toh kaam sahi hua." },
+    ],
+    agent_line:"Sir jab clutch pedal dabate ho tab cheek cheek ki awaaz aati hai? Yeh release bearing ki problem hai — shuru mein hai, abhi solve kar lo warna disc bhi ghis jaayegi. Bearing akele nahi lagta — gearbox kholna padta hai toh poora clutch kit ek saath lagana smart hai. [Car] mein teeno milake ₹X lagega, aaj shaam tak ho jaayega.",
+  },
+
+  no_gear: {
+    part:    "Clutch not releasing — disc dragging / warped or hydraulic total failure.",
+    partHi:  "Clutch release nahi ho raha — disc atak gayi ya hydraulic bilkul fail ho gayi.",
+    repair:  "Full clutch kit + flywheel inspect + fork check. Towing to garage required.",
+    repairHi:"Poora clutch kit + flywheel check + fork check. Gaadi tow karni padegi.",
+    time: { hatch_small:"5–8 ghante + tow", hatch_mid:"5–8 ghante + tow", sedan_mid:"6–8 ghante + tow", suv:"7–10 ghante + tow" },
+    sameday: { hatch_small:"maybe", hatch_mid:"maybe", sedan_mid:false, suv:false },
+    samedaynote: { hatch_small:"Tow time pe depend karta hai. Subah tow = same day possible", hatch_mid:"Subah tow = same day possible", sedan_mid:"Kal subah book karo", suv:"Kal subah book karo" },
+    flywheel_risk:true,
+    parts_needed:["disc","pressure","bearing"],
+    labour_key:"labour_kit", total_key:"total_kit",
+    upsells: [
+      { risk:"HIGH", item:"Gearbox overhaul push", itemHi:"Gearbox ke andar bhi kuch hai",
+        detail:"Emergency + stressed cx = easy upsell. Don't authorise internal gearbox work without second opinion.",
+        detailHi:"Emergency mein cx ghabra jaata hai — mechanic gearbox overhaul push karega. Second opinion lo pehle." },
+      { risk:"HIGH", item:"Flywheel replace (rushed decision)", itemHi:"Flywheel bhi gaya — jaldi badlo",
+        detail:"Stressed cx agrees quickly. Enforce photo protocol before any flywheel call.",
+        detailHi:"Emergency mein photo rule strict karo. Photo nahi aayi toh flywheel replace approve mat karo." },
+      { risk:"MED",  item:"Inflated towing charge", itemHi:"Towing zyada mehnga lagaya",
+        detail:"Garage arranges own tow at inflated rate. Always book towing through IM.",
+        detailHi:"Garage khud tow truck bheji toh rate control nahi hoga. IM ka towing use karo hamesha." },
+    ],
+    fraud: [
+      { check:"Towing via IM only?", checkHi:"Towing IM se book ki?",
+        detail:"Stranded car = garage may tow at double rate. IM fixed-rate towing mandatory.",
+        detailHi:"Gaadi atki hai toh garage khud zyada rate pe tow karega. IM se book karo fixed rate pe." },
+      { check:"All 3 old parts returned?", checkHi:"Teeno purane parts bag mein?",
+        detail:"High-value job — strictly enforce old parts return + photo of all removed parts.",
+        detailHi:"Bada kaam hai — teeno parts ka photo lo aur bag mein lao. Ek bhi missing = question karo." },
+      { check:"Fork + pivot charged?", checkHi:"Fork aur pivot ka extra charge?",
+        detail:"Fork lasts 2–3 kit cycles. Photo of worn fork required before paying.",
+        detailHi:"Fork lohe ka hai, jaldi nahi ghista. Bill mein aaya toh photo maango." },
+    ],
+    agent_line:"Sir gaadi bilkul nahi chal rahi — koi bhi gear nahi lag raha? Clutch jam ho gaya hai. Tow karni padegi garage tak — hum tow arrange karenge, ₹X lagega. Wahan poori check hogi, full kit most likely lagegi. Subah tow ho gayi toh shaam tak dekhenge, warna kal ke liye plan karo. Koi bhi extra kaam hoga toh pehle aapko call karenge.",
+  },
+
+  high_bite: {
+    part:    "Clutch disc heavily worn — bite point has shifted to top of pedal.",
+    partHi:  "Clutch disc bahut ghis gayi hai — plate itni patli ki pedal ke bilkul upar se pakad rahi hai.",
+    repair:  "Step 1: Free-play adjustment (15 min). No fix → full clutch kit.",
+    repairHi:"Pehle pedal ka free-play adjust karo (15 minute). Theek na hua toh full clutch kit.",
+    time: { hatch_small:"15 min (adjust) / 4–6 hrs (kit)", hatch_mid:"15 min (adjust) / 4–6 hrs (kit)", sedan_mid:"15 min / 5–6 hrs", suv:"15 min / 6–8 hrs" },
+    sameday: { hatch_small:true, hatch_mid:true, sedan_mid:true, suv:true },
+    samedaynote: { hatch_small:"Adjust = 15 minute. Kit ho toh subah 10 baje lao", hatch_mid:"Adjust = 15 minute. Kit ho toh subah 10 baje lao", sedan_mid:"Adjust = 15 min. Kit ho toh subah 9 baje", suv:"Kit = kal subah safe rehta hai" },
+    flywheel_risk:false,
+    parts_needed:["disc","pressure","bearing"],
+    labour_key:"labour_kit", total_key:"total_kit",
+    upsells: [
+      { risk:"MED", item:"Skip adjustment — straight to kit", itemHi:"Adjust skip karke kit push",
+        detail:"Free-play adjust = ₹200–300. Mechanic may jump to kit. Insist on adjust+test first.",
+        detailHi:"Pedal adjust ₹200 mein ho sakta hai. Mechanic seedha kit bolega — pehle adjust test karo." },
+    ],
+    fraud: [
+      { check:"Adjustment done and test driven?", checkHi:"Adjust ke baad test drive hua?",
+        detail:"If bite point normalises after adjust = ₹300 job done. Kit only if adjust fails.",
+        detailHi:"Adjust ke baad gaadi chalao — agar bite point normal ho gayi = ₹300 mein kaam khatam." },
+      { check:"Old disc thickness checked?", checkHi:"Purani disc ki mota check ki?",
+        detail:"If friction lining >3mm visible = adjust may have been enough.",
+        detailHi:"Purani disc aayi toh dekho — friction material thick hai toh kit ki zarurat nahi thi." },
+    ],
+    agent_line:"Sir clutch pedal bilkul upar se pakad raha hai — press hi nahi kiya aur gear ja raha hai? Pehle mechanic pedal ka free-play adjust karega, 15 minute aur ₹200–300 ka kaam. Agar adjust se theek ho gaya toh khatam. Agar disc sach mein ghis gayi toh full kit lagegi — tab batayenge.",
+  },
+
+  not_return: {
+    part:    "Master cylinder seal worn — fluid bypassing piston. Pedal won't return.",
+    partHi:  "Master cylinder ki seal ghis gayi — fluid andar se bypass ho raha hai. Pedal wapas nahi aata.",
+    repair:  "Master cylinder replace + hydraulic bleed (slave checked simultaneously)",
+    repairHi:"Master cylinder badlo + hydraulic line se hawa nikalo (slave bhi saath check hoti hai).",
+    time: { hatch_small:"1.5–2.5 ghante", hatch_mid:"1.5–2.5 ghante", sedan_mid:"2–3 ghante", suv:"2–3 ghante" },
+    sameday: { hatch_small:true, hatch_mid:true, sedan_mid:true, suv:true },
+    samedaynote: { hatch_small:"Hamesha same day — gearbox involve nahi", hatch_mid:"Hamesha same day", sedan_mid:"Hamesha same day", suv:"Hamesha same day" },
+    flywheel_risk:false,
+    parts_needed:["master_slave"],
+    labour_key:"labour_hydro", total_key:"total_hydro",
+    upsells: [
+      { risk:"MED", item:"Full kit push", itemHi:"Kit bhi lagao saath mein",
+        detail:"Gearbox not opened on this job = disc never seen = unverifiable claim.",
+        detailHi:"Is kaam mein gearbox nahi khula — disc ki condition kaise pata? Unverified claim ko bill mat do." },
+      { risk:"LOW", item:"Both cylinders when one is fine", itemHi:"Dono badal dete hain ek saath",
+        detail:"Best practice is to replace both — but confirm it's IM standard not upsell.",
+        detailHi:"Dono badalna common practice hai — lekin zarur confirm karo ki yeh IM ka rule hai, upsell nahi." },
+    ],
+    fraud: [
+      { check:"Old master cylinder returned?", checkHi:"Purana master cylinder wapas mila?",
+        detail:"Small metal/rubber part — must come back. No return = was it replaced at all?",
+        detailHi:"Chota sa metal/rubber ka tukda hai — bag mein aana chahiye. Nahi aaya toh replace hua ya nahi?" },
+      { check:"Pedal returns fully after repair?", checkHi:"Kaam ke baad pedal poora upar aata hai?",
+        detail:"Press and release test. Full return = done. Still sinking = incomplete or disc issue too.",
+        detailHi:"Dabao aur chodo — pedal poora upar aana chahiye. Nahi aaya toh kaam adhura hai." },
+    ],
+    agent_line:"Sir clutch pedal dabane ke baad wapas nahi aa raha ya khud neeche ja raha hai? Yeh master cylinder ki problem hai — andar ki seal ghis gayi. Gearbox kholne ki zarurat nahi, ₹4,000–5,000 mein 2 ghante ka kaam hai, aaj hi ho jaayega.",
+  },
+
+  shudder: {
+    part:    "Flywheel scored / grooved from long clutch slip. Disc also worn.",
+    partHi:  "Flywheel ghis gayi / lakeerein pad gayi hain lamba time clutch slip se. Disc bhi kharab.",
+    repair:  "Full clutch kit + flywheel resurface or replace. Most complex clutch job.",
+    repairHi:"Poora clutch kit + flywheel ko machine se polish (ya replace). Sabse bada clutch kaam.",
+    time: { hatch_small:"7–10 ghante", hatch_mid:"7–10 ghante", sedan_mid:"8–10 ghante", suv:"9–12 ghante" },
+    sameday: { hatch_small:false, hatch_mid:false, sedan_mid:false, suv:false },
+    samedaynote: { hatch_small:"Kal subah book karo — flywheel machine shop jaati hai", hatch_mid:"Kal subah — flywheel machine shop", sedan_mid:"Kal subah", suv:"2 din bhi lag sakte hain agar flywheel replace ho" },
+    flywheel_risk:true,
+    parts_needed:["disc","pressure","bearing"],
+    labour_key:"labour_kit", total_key:"total_kit",
+    upsells: [
+      { risk:"HIGH", item:"Flywheel replace vs resurface", itemHi:"Naya flywheel lagao — zarurat nahi",
+        detail:"Resurface = ₹1.5k–2k. New flywheel = ₹4k–11k. Mechanic margin 3–4×. Always resurface first.",
+        detailHi:"Machine shop mein polish hoti hai ₹1,500–2,000 mein. Naya ₹4,000–11,000 ka. Photo dekhe bina haan mat karo." },
+      { risk:"HIGH", item:"Rushed flywheel call (cx anxious)", itemHi:"Jaldi mein flywheel decide",
+        detail:"Frustrated cx = mechanic exploits urgency. Photo protocol is non-negotiable.",
+        detailHi:"Gaadi kaamp rahi hai toh cx ghabra jaata hai — mechanic yahi mauka use karta hai. Photo rule follow karo." },
+      { risk:"MED",  item:"Spurious kit on long unsupervised job", itemHi:"Lambe kaam mein local kit",
+        detail:"Long job = cx not watching. Spurious parts risk is higher.",
+        detailHi:"Zyada ghante ka kaam hai — cx dhyan nahi deta. Box photo aur old parts wapas lena aur bhi zaroori." },
+    ],
+    fraud: [
+      { check:"Flywheel surface photo received?", checkHi:"Flywheel ki photo aayi kholne ke baad?",
+        detail:"Finger test: light lines = resurface, deep grooves = replace, cracks = replace. No photo = no auth.",
+        detailHi:"Ungli chalao — halki khurach = polish, gehri lakeer = replace, crack = replace. Photo nahi = kaam band." },
+      { check:"Machine shop receipt for resurface?", checkHi:"Machine shop ki receipt aayi polish ke liye?",
+        detail:"If resurfaced, mechanic should have a machine shop slip. Ask for it.",
+        detailHi:"Flywheel polish karvaayi toh machine shop ka receipt hoga — maango." },
+      { check:"Shudder gone after repair?", checkHi:"Kaampna band hua kaam ke baad?",
+        detail:"Test drive after job. Still shuddering = resurface was incomplete or new flywheel needed.",
+        detailHi:"Kaam ke baad test drive zaroor karo. Abhi bhi kaamp rahi hai toh kaam adhoora hai." },
+    ],
+    agent_line:"Sir clutch chodne par gaadi kaampti hai, hilti hai? Yeh flywheel ki problem hai — disc lamba time slip karti rahi toh flywheel ko bhi damage ho gayi. Full clutch kit aur flywheel polish ek saath hogi. Yeh thoda bada kaam hai — aaj de do toh kal tak tayaar hogi. Cost ₹X–Y ke beech rahegi depending on flywheel — kholne ke baad confirm karenge.",
+  },
+};
+
+const RISK_COLOR  = { HIGH:"#dc2626", MED:"#d97706", LOW:"#16a34a" };
+const RISK_BG     = { HIGH:"#fef2f2", MED:"#fffbeb", LOW:"#f0fdf4" };
+const RISK_BORDER = { HIGH:"#fecaca", MED:"#fde68a", LOW:"#bbf7d0" };
+
+export default function App() {
+  const [carSeg, setCarSeg]       = useState(null);
+  const [symptom, setSymptom]     = useState(null);
+  const [activeTab, setActiveTab] = useState("overview");
+
+  const result      = symptom ? RESULTS[symptom] : null;
+  const prices      = carSeg  ? PART_PRICES[carSeg] : null;
+  const canShow     = result && prices;
+  const sameday     = canShow ? result.sameday[carSeg] : null;
+  const samedayNote = canShow ? result.samedaynote[carSeg] : null;
+  const repairTime  = canShow ? result.time[carSeg] : null;
+  const totalEst    = canShow ? prices[result.total_key] : null;
+  const flyAdd      = canShow && result.flywheel_risk ? prices.total_fly_add : null;
+  const TABS        = ["overview","pricing","upsell","fraud","agent"];
+  const sdClass     = sameday===true?"sd-yes":sameday===false?"sd-no":"sd-maybe";
+
+  return (
+    <div style={{minHeight:"100vh",background:"#f8fafc",color:"#0f172a",fontFamily:"'DM Sans','Helvetica Neue',sans-serif"}}>
+      <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+      <style>{`
+        *{box-sizing:border-box;margin:0;padding:0;}
+        ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:#f1f5f9}::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:2px}
+        .seg-btn{background:#fff;border:1.5px solid #e2e8f0;border-radius:10px;padding:10px 14px;cursor:pointer;transition:all .15s;text-align:left;width:100%}
+        .seg-btn:hover{border-color:#94a3b8;background:#f8fafc}
+        .seg-btn.active{border-color:#3b82f6;background:#eff6ff}
+        .sym-btn{background:#fff;border:1.5px solid #e2e8f0;border-radius:8px;padding:9px 12px;cursor:pointer;transition:all .15s;text-align:left;display:flex;align-items:flex-start;gap:9px;width:100%}
+        .sym-btn:hover{border-color:#94a3b8;background:#f8fafc}
+        .sym-btn.active{border-color:#6366f1;background:#eef2ff}
+        .tab-btn{background:none;border:none;padding:9px 14px;cursor:pointer;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;transition:all .15s;border-bottom:2px solid transparent;color:#94a3b8;font-family:'JetBrains Mono',monospace;white-space:nowrap}
+        .tab-btn:hover{color:#475569}
+        .tab-btn.active{color:#4f46e5;border-bottom-color:#4f46e5}
+        .card{background:#fff;border:1.5px solid #e2e8f0;border-radius:12px;padding:16px}
+        .badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:10.5px;font-weight:700;letter-spacing:.05em;font-family:'JetBrains Mono',monospace}
+        .bi-row{background:#fff;border:1.5px solid #e2e8f0;border-radius:10px;padding:13px 15px;margin-bottom:8px}
+        .fraud-row{background:#fff;border:1.5px solid #e2e8f0;border-radius:10px;padding:13px 15px;margin-bottom:8px;display:flex;gap:12px;align-items:flex-start}
+        .check-icon{width:22px;height:22px;border-radius:6px;background:#eef2ff;border:1.5px solid #c7d2fe;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+        .mono{font-family:'JetBrains Mono',monospace}
+        .price-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #f1f5f9;font-size:13px}
+        .price-row:last-of-type{border-bottom:none}
+        .agent-box{background:#fafafa;border:1.5px solid #e2e8f0;border-radius:12px;padding:18px;font-size:14px;line-height:2;color:#1e293b;border-left:4px solid #6366f1}
+        @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+        .fade-in{animation:fadeIn .18s ease-out}
+        .sd-yes{color:#16a34a;font-weight:700}
+        .sd-maybe{color:#d97706;font-weight:700}
+        .sd-no{color:#dc2626;font-weight:700}
+        .reset-btn{background:#fff;border:1.5px solid #e2e8f0;border-radius:7px;padding:5px 13px;color:#64748b;font-size:12px;cursor:pointer;transition:all .15s}
+        .reset-btn:hover{border-color:#94a3b8;color:#334155}
+        .total-card{background:linear-gradient(135deg,#eef2ff 0%,#f0f9ff 100%);border:1.5px solid #c7d2fe;border-radius:12px;padding:16px}
+        .pill-card{background:#fff;border:1.5px solid #e2e8f0;border-radius:10px;padding:10px 14px;display:flex;align-items:center;gap:10px}
+        .fly-warn{background:#fffbeb;border:1.5px solid #fde68a;border-radius:8px;padding:9px 12px;font-size:12px;color:#92400e;margin-top:10px}
+        .master-rule{background:#fef2f2;border:1.5px solid #fecaca;border-radius:10px;padding:12px 14px;font-size:12.5px;color:#991b1b;line-height:1.6;margin-top:14px}
+        .pre-card{background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:10px;padding:13px 14px}
+        .empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:14px;padding:48px;text-align:center}
+        .hi-text{color:#7c3aed;font-size:12px;margin-top:3px;line-height:1.4}
+        .en-text{font-size:13px;font-weight:600;color:#0f172a}
+        .detail-en{font-size:12.5px;color:#374151;line-height:1.6}
+        .detail-hi{font-size:12px;color:#7c3aed;line-height:1.5;margin-top:4px;font-style:italic}
+        .section-label{font-size:10px;font-weight:700;letter-spacing:.12em;color:#94a3b8;font-family:'JetBrains Mono',monospace;text-transform:uppercase;margin-bottom:10px}
+      `}</style>
+
+      {/* HEADER */}
+      <div style={{borderBottom:"1.5px solid #e2e8f0",padding:"12px 24px",display:"flex",alignItems:"center",gap:"12px",background:"#fff",position:"sticky",top:0,zIndex:100,boxShadow:"0 1px 3px rgba(0,0,0,.04)"}}>
+        <div style={{width:9,height:9,borderRadius:"50%",background:"#ef4444"}}/>
+        <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:12,color:"#64748b",letterSpacing:".1em",fontWeight:700}}>INSTANT MECHANIC</span>
+        <span style={{color:"#e2e8f0",fontSize:18}}>|</span>
+        <span style={{fontSize:13,color:"#475569",fontWeight:500}}>Clutch Diagnostic Tool</span>
+        <span style={{fontSize:11,color:"#94a3b8"}}>— Agent Reference / एजेंट गाइड</span>
+        {(carSeg||symptom)&&(
+          <button className="reset-btn" style={{marginLeft:"auto"}} onClick={()=>{setCarSeg(null);setSymptom(null);setActiveTab("overview")}}>↺ Reset</button>
+        )}
+      </div>
+
+      <div style={{display:"grid",gridTemplateColumns:"280px 1fr",minHeight:"calc(100vh - 49px)"}}>
+
+        {/* SIDEBAR */}
+        <div style={{borderRight:"1.5px solid #e2e8f0",padding:"18px 14px",overflowY:"auto",background:"#f8fafc"}}>
+
+          <div style={{marginBottom:"22px"}}>
+            <div className="section-label">01 — Gaadi ka Type</div>
+            <div style={{display:"flex",flexDirection:"column",gap:6}}>
+              {CAR_SEGMENTS.map(s=>(
+                <button key={s.id} className={`seg-btn${carSeg===s.id?" active":""}`} onClick={()=>setCarSeg(s.id)}>
+                  <div style={{fontSize:13,fontWeight:600,color:carSeg===s.id?"#1e40af":"#334155",marginBottom:1}}>{s.label}</div>
+                  <div style={{fontSize:11,color:s.color,fontFamily:"'JetBrains Mono',monospace",fontWeight:600}}>{s.tag}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <div className="section-label">02 — Customer ki Problem (Symptom)</div>
+            <div style={{display:"flex",flexDirection:"column",gap:5}}>
+              {SYMPTOMS.map(s=>(
+                <button key={s.id} className={`sym-btn${symptom===s.id?" active":""}`} onClick={()=>{setSymptom(s.id);setActiveTab("overview")}}>
+                  <div style={{width:6,height:6,borderRadius:"50%",background:symptom===s.id?"#6366f1":"#cbd5e1",flexShrink:0,marginTop:6}}/>
+                  <div>
+                    <div style={{fontSize:12,color:symptom===s.id?"#4338ca":"#475569",lineHeight:1.4,fontWeight:symptom===s.id?600:400}}>{s.label}</div>
+                    <div style={{fontSize:11,color:symptom===s.id?"#7c3aed":"#94a3b8",lineHeight:1.4,marginTop:2}}>{s.hindi}</div>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* MAIN PANEL */}
+        <div style={{overflowY:"auto",background:"#f8fafc"}}>
+
+          {!symptom&&(
+            <div className="empty-state">
+              <div style={{width:52,height:52,borderRadius:"50%",border:"2px solid #e2e8f0",background:"#fff",display:"flex",alignItems:"center",justifyContent:"center",fontSize:24}}>⚙</div>
+              <div style={{fontSize:17,fontWeight:600,color:"#64748b"}}>Gaadi type + symptom select karo</div>
+              <div style={{fontSize:13,color:"#94a3b8",maxWidth:320,lineHeight:1.7}}>Left side se car type aur customer ki problem choose karo — poora diagnosis, pricing, aur fraud checks yahan dikhega.</div>
+            </div>
+          )}
+
+          {symptom&&!canShow&&(
+            <div className="empty-state">
+              <div style={{fontSize:14,color:"#d97706",fontWeight:500}}>← Gaadi ka type bhi choose karo pricing dekhne ke liye</div>
+            </div>
+          )}
+
+          {canShow&&(
+            <div className="fade-in">
+
+              {/* RESULT HEADER */}
+              <div style={{padding:"20px 24px 0",borderBottom:"1.5px solid #e2e8f0",background:"#fff"}}>
+                <div style={{display:"flex",gap:12,alignItems:"flex-start",marginBottom:14}}>
+                  <div style={{flex:1}}>
+                    <div style={{fontSize:11,color:"#94a3b8",fontFamily:"'JetBrains Mono',monospace",letterSpacing:".08em",marginBottom:5,fontWeight:600}}>
+                      {CAR_SEGMENTS.find(c=>c.id===carSeg)?.label} · {SYMPTOMS.find(s=>s.id===symptom)?.label.split("—")[0].trim()}
+                    </div>
+                    <div style={{fontSize:15,fontWeight:700,color:"#0f172a",lineHeight:1.4,marginBottom:3}}>{result.part}</div>
+                    <div style={{fontSize:13,color:"#7c3aed",lineHeight:1.5,marginBottom:8,fontStyle:"italic"}}>{result.partHi}</div>
+                    <div style={{fontSize:13,color:"#475569",lineHeight:1.5}}>{result.repair}</div>
+                    <div style={{fontSize:12,color:"#7c3aed",lineHeight:1.5,marginTop:2,fontStyle:"italic"}}>{result.repairHi}</div>
+                  </div>
+
+                  <div style={{display:"flex",flexDirection:"column",gap:6,flexShrink:0}}>
+                    <div className="pill-card">
+                      <span style={{fontSize:10,color:"#94a3b8",fontFamily:"'JetBrains Mono',monospace",fontWeight:700,letterSpacing:".06em"}}>TIME</span>
+                      <span style={{fontSize:13,fontWeight:700,color:"#d97706",fontFamily:"'JetBrains Mono',monospace"}}>{repairTime}</span>
+                    </div>
+                    <div className="pill-card">
+                      <span style={{fontSize:10,color:"#94a3b8",fontFamily:"'JetBrains Mono',monospace",fontWeight:700,letterSpacing:".06em"}}>SAME DAY</span>
+                      <span className={`mono ${sdClass}`} style={{fontSize:13}}>
+                        {sameday===true?"✓ HAA":sameday===false?"✗ NAHI":"⚠ SHAYAD"}
+                      </span>
+                    </div>
+                    {totalEst&&(
+                      <div style={{background:"#eef2ff",border:"1.5px solid #c7d2fe",borderRadius:10,padding:"10px 14px",display:"flex",alignItems:"center",gap:10}}>
+                        <span style={{fontSize:10,color:"#818cf8",fontFamily:"'JetBrains Mono',monospace",fontWeight:700,letterSpacing:".06em"}}>TOTAL</span>
+                        <span style={{fontSize:14,fontWeight:800,color:"#4f46e5",fontFamily:"'JetBrains Mono',monospace"}}>{totalEst}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {samedayNote&&(
+                  <div style={{fontSize:12,color:"#64748b",padding:"7px 11px",background:"#f8fafc",borderRadius:7,marginBottom:12,border:"1px solid #e2e8f0"}}>
+                    ℹ {samedayNote}
+                  </div>
+                )}
+
+                <div style={{display:"flex",gap:0,marginTop:4,overflowX:"auto"}}>
+                  {TABS.map(t=>(
+                    <button key={t} className={`tab-btn${activeTab===t?" active":""}`} onClick={()=>setActiveTab(t)}>
+                      {t==="overview"?"Overview":t==="pricing"?"Pricing / दाम":t==="upsell"?`Upsell (${result.upsells.length})`:t==="fraud"?`Fraud Check (${result.fraud.length})`:"Agent Script"}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* TAB CONTENT */}
+              <div style={{padding:"20px 24px"}}>
+
+                {/* OVERVIEW */}
+                {activeTab==="overview"&&(
+                  <div className="fade-in" style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14}}>
+                    <div className="card">
+                      <div className="section-label">Kharab Parts / Parts at Fault</div>
+                      {result.parts_needed.map(p=>(
+                        <div key={p} style={{padding:"8px 0",borderBottom:"1px solid #f1f5f9"}}>
+                          <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
+                            <div>
+                              <div style={{fontSize:13,fontWeight:600,color:"#0f172a"}}>{PART_LABELS[p].en}</div>
+                              <div style={{fontSize:11.5,color:"#7c3aed",fontStyle:"italic"}}>{PART_LABELS[p].hi}</div>
+                            </div>
+                            <span style={{fontSize:13,fontFamily:"'JetBrains Mono',monospace",fontWeight:700,color:"#0f172a",flexShrink:0,marginLeft:8}}>{prices[p]||"—"}</span>
+                          </div>
+                        </div>
+                      ))}
+                      {result.flywheel_risk&&(
+                        <div className="fly-warn">⚠ Flywheel bhi check hogi kholne ke baad — photo se decide hoga</div>
+                      )}
+                    </div>
+
+                    <div className="card">
+                      <div className="section-label">Repair / Kaam</div>
+                      <div style={{fontSize:13,color:"#374151",lineHeight:1.6}}>{result.repair}</div>
+                      <div style={{fontSize:12,color:"#7c3aed",lineHeight:1.5,marginTop:4,fontStyle:"italic"}}>{result.repairHi}</div>
+                      <div style={{marginTop:12,padding:"10px 12px",background:"#fffbeb",border:"1.5px solid #fde68a",borderRadius:8}}>
+                        <div style={{fontSize:10,color:"#92400e",fontFamily:"'JetBrains Mono',monospace",fontWeight:700,marginBottom:4}}>TIME / KITNA WAQT</div>
+                        <div style={{fontSize:20,fontWeight:700,color:"#d97706",fontFamily:"'JetBrains Mono',monospace"}}>{repairTime}</div>
+                      </div>
+                    </div>
+
+                    <div className="card" style={{gridColumn:"1 / -1"}}>
+                      <div className="section-label">Upsell Risk — Quick View (Drop-off se pehle cx ko batao)</div>
+                      <div style={{display:"flex",flexWrap:"wrap",gap:8}}>
+                        {result.upsells.map((u,i)=>(
+                          <div key={i} style={{padding:"5px 12px",borderRadius:20,background:RISK_BG[u.risk],border:`1.5px solid ${RISK_BORDER[u.risk]}`,fontSize:12,color:RISK_COLOR[u.risk],fontWeight:600}}>
+                            {u.risk} — {u.itemHi||u.item}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* PRICING */}
+                {activeTab==="pricing"&&(
+                  <div className="fade-in" style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14}}>
+                    <div className="card">
+                      <div className="section-label">Parts ka Daam — OEM Brands (LuK / Valeo / SKF)</div>
+                      {result.parts_needed.map(p=>(
+                        <div key={p} className="price-row">
+                          <div>
+                            <div style={{fontSize:13,color:"#374151",fontWeight:500}}>{PART_LABELS[p].en}</div>
+                            <div style={{fontSize:11,color:"#7c3aed",fontStyle:"italic"}}>{PART_LABELS[p].hi}</div>
+                          </div>
+                          <span style={{color:"#0f172a",fontFamily:"'JetBrains Mono',monospace",fontSize:13,fontWeight:700,flexShrink:0,marginLeft:8}}>{prices[p]||"—"}</span>
+                        </div>
+                      ))}
+                      <div className="price-row">
+                        <div>
+                          <div style={{fontSize:13,color:"#374151",fontWeight:500}}>Labour / Mechanic ka kaam</div>
+                          <div style={{fontSize:11,color:"#7c3aed",fontStyle:"italic"}}>Mechanic ki mehnat ka paisa</div>
+                        </div>
+                        <span style={{color:"#d97706",fontFamily:"'JetBrains Mono',monospace",fontSize:13,fontWeight:700,flexShrink:0,marginLeft:8}}>{prices[result.labour_key]||"—"}</span>
+                      </div>
+                    </div>
+
+                    <div style={{display:"flex",flexDirection:"column",gap:12}}>
+                      <div className="total-card">
+                        <div style={{fontSize:10,fontWeight:700,letterSpacing:".1em",color:"#818cf8",fontFamily:"'JetBrains Mono',monospace",marginBottom:4}}>ALL-IN ESTIMATE — IM RATE</div>
+                        <div style={{fontSize:11,color:"#7c3aed",fontStyle:"italic",marginBottom:8}}>Parts + labour sab milake</div>
+                        <div style={{fontSize:34,fontWeight:800,color:"#4f46e5",fontFamily:"'JetBrains Mono',monospace"}}>{totalEst||"—"}</div>
+                        {flyAdd&&<div style={{fontSize:12,color:"#d97706",marginTop:6,fontWeight:500}}>{flyAdd} agar flywheel polish/replace hogi</div>}
+                      </div>
+
+                      {result.flywheel_risk&&(
+                        <div className="card">
+                          <div className="section-label">Flywheel — Agar Zarurat Padi</div>
+                          <div className="price-row">
+                            <div>
+                              <div style={{fontSize:13,color:"#374151"}}>Resurface (Machine shop polish)</div>
+                              <div style={{fontSize:11,color:"#7c3aed",fontStyle:"italic"}}>Machine se ghisaai saaf karna</div>
+                            </div>
+                            <span style={{color:"#16a34a",fontFamily:"'JetBrains Mono',monospace",fontSize:12,fontWeight:700,flexShrink:0}}>{prices.flywheel_resurface}</span>
+                          </div>
+                          <div className="price-row">
+                            <div>
+                              <div style={{fontSize:13,color:"#374151"}}>Replace — naya flywheel</div>
+                              <div style={{fontSize:11,color:"#7c3aed",fontStyle:"italic"}}>Naya lagana — sirf crack ho tabhi</div>
+                            </div>
+                            <span style={{color:"#dc2626",fontFamily:"'JetBrains Mono',monospace",fontSize:12,fontWeight:700,flexShrink:0}}>{prices.flywheel_replace}</span>
+                          </div>
+                          <div style={{marginTop:8,fontSize:11.5,color:"#64748b",lineHeight:1.5}}>Pehle polish karo. Replace tabhi jab crack ho photo mein.</div>
+                        </div>
+                      )}
+
+                      <div className="card">
+                        <div className="section-label">Agent Quote Rule / Kaise bolein</div>
+                        <div style={{fontSize:12.5,color:"#374151",lineHeight:1.6}}>Kit jobs pe ek exact number mat bolo. Kaho: <span style={{color:"#4f46e5",fontWeight:600}}>"Parts + labour milake approx ₹X–Y — flywheel theek nikli toh lower end pe rahega, aapko confirm karenge."</span></div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* UPSELL */}
+                {activeTab==="upsell"&&(
+                  <div className="fade-in">
+                    <div style={{fontSize:12.5,color:"#64748b",marginBottom:16,lineHeight:1.6,padding:"10px 14px",background:"#fff",border:"1.5px solid #e2e8f0",borderRadius:8}}>
+                      Inn upsells ke baare mein cx ko <strong style={{color:"#0f172a"}}>drop-off se PEHLE</strong> batao — gaadi kholne ke baad cx ke paas bargain ka mauka nahi rehta.
+                    </div>
+                    {result.upsells.map((u,i)=>(
+                      <div key={i} className="bi-row">
+                        <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:6}}>
+                          <span className="badge" style={{background:RISK_BG[u.risk],color:RISK_COLOR[u.risk],border:`1.5px solid ${RISK_BORDER[u.risk]}`}}>{u.risk} RISK</span>
+                          <div>
+                            <div className="en-text">{u.item}</div>
+                            <div className="hi-text">{u.itemHi}</div>
+                          </div>
+                        </div>
+                        <div className="detail-en">{u.detail}</div>
+                        <div className="detail-hi">{u.detailHi}</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* FRAUD */}
+                {activeTab==="fraud"&&(
+                  <div className="fade-in">
+                    <div style={{fontSize:12.5,color:"#64748b",marginBottom:16,lineHeight:1.6,padding:"10px 14px",background:"#fff",border:"1.5px solid #e2e8f0",borderRadius:8}}>
+                      Garage payment release karne se pehle <strong style={{color:"#0f172a"}}>har check complete karo</strong>. Ek bhi miss nahi hona chahiye.
+                    </div>
+                    {result.fraud.map((f,i)=>(
+                      <div key={i} className="fraud-row">
+                        <div className="check-icon">
+                          <svg width="10" height="10" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2" fill="none" stroke="#6366f1" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                        </div>
+                        <div style={{flex:1}}>
+                          <div className="en-text" style={{marginBottom:2}}>{f.check}</div>
+                          <div className="hi-text" style={{marginBottom:6}}>{f.checkHi}</div>
+                          <div className="detail-en">{f.detail}</div>
+                          <div className="detail-hi">{f.detailHi}</div>
+                        </div>
+                      </div>
+                    ))}
+                    <div className="master-rule">
+                      <strong>Master Rule / Sabse zaroori baat:</strong> Jitne parts ka bill aaya, utne purane parts bag mein wapas aane chahiye cx ko. Purana part nahi aaya = part badla nahi = bill se hatao.
+                    </div>
+                  </div>
+                )}
+
+                {/* AGENT SCRIPT */}
+                {activeTab==="agent"&&(
+                  <div className="fade-in">
+                    <div className="section-label" style={{marginBottom:10}}>Suggested Opening Line — CX se kaise shuru karo</div>
+                    <div className="agent-box">{result.agent_line}</div>
+                    <div style={{marginTop:16,display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
+                      <div className="pre-card">
+                        <div className="section-label">Drop-off se pehle CX ko zaroor batao</div>
+                        <div style={{fontSize:12.5,color:"#374151",lineHeight:2}}>
+                          ✓ Approximate cost range batao<br/>
+                          ✓ Time + aaj hoga ya kal — confirm<br/>
+                          ✓ Flywheel extra lag sakti hai — warn karo<br/>
+                          ✓ Koi bhi extra kaam hoga toh pehle call<br/>
+                          ✓ Purane parts bag mein wapas milenge<br/>
+                          ✓ Part ka box kholne se pehle dikhayenge
+                        </div>
+                      </div>
+                      <div className="pre-card">
+                        <div className="section-label">Garage ne add-on recommend kiya toh</div>
+                        <div style={{fontSize:12.5,color:"#374151",lineHeight:2}}>
+                          "Sir garage bol rahe hain [item] bhi chahiye — ₹X extra. Photo / reason aaya hai. Aapko proceed karna hai?"<br/>
+                          <span style={{color:"#dc2626",fontWeight:600}}>Kabhi bhi khud approve mat karo. CX ka WhatsApp confirmation pehle, kaam baad mein.</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
