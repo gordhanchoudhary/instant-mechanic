@@ -548,8 +548,9 @@
           document.getElementById("markCancelled").checked = data.is_cancelled;
           document.getElementById("cancelReason").value = data.cancellation_reason || "";
 
-          // Reset membership toggle on refresh
-          document.getElementById("upgradeMembership").checked = false;
+          // Sync membership toggle with backend value
+          const isMember = data.agent_convert_into_member === true;
+          document.getElementById("upgradeMembership").checked = isMember;
           updateMembershipBadge();
 
           // Hide membership toggle if customer is already a member
