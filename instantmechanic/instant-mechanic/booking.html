@@ -551,6 +551,14 @@
           // Reset membership toggle on refresh
           document.getElementById("upgradeMembership").checked = false;
           updateMembershipBadge();
+
+          // Hide membership toggle if customer is already a member
+          const priceStr = (data.price || "").toString().toLowerCase();
+          const isAlreadyMember = priceStr.includes("annual membership") || priceStr.includes("membership");
+          const membershipSection = document.querySelector(".membership-toggle-container");
+          if (membershipSection) {
+            membershipSection.style.display = isAlreadyMember ? "none" : "flex";
+          }
           
           fetchMechanics();
           fetchChat();
