@@ -25,7 +25,6 @@
     .status-pending { background-color: red; }
     .status-partial { background-color: green; }
 
-    /* Chat styles */
     #chatContainer {
       max-height: 400px;
       overflow-y: auto;
@@ -45,15 +44,8 @@
       box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
 
-    .chat-customer {
-      background-color: #e0f7fa;
-      align-self: flex-start;
-    }
-
-    .chat-agent {
-      background-color: #dcedc8;
-      align-self: flex-end;
-    }
+    .chat-customer { background-color: #e0f7fa; align-self: flex-start; }
+    .chat-agent { background-color: #dcedc8; align-self: flex-end; }
 
     .chat-time {
       font-size: 0.75rem;
@@ -62,29 +54,14 @@
       text-align: right;
     }
 
-    .chat-wrapper {
-      display: flex;
-      flex-direction: column;
-    }
+    .chat-wrapper { display: flex; flex-direction: column; }
 
-    #mechanicDropdown div {
-      padding: 10px;
-      cursor: pointer;
-    }
-    #mechanicDropdown div:hover {
-      background-color: #f0f0f0;
-    }
-    #mechanicDropdown .selected {
-      background-color: #dcedc8;
-    }
+    #mechanicDropdown div { padding: 10px; cursor: pointer; }
+    #mechanicDropdown div:hover { background-color: #f0f0f0; }
+    #mechanicDropdown .selected { background-color: #dcedc8; }
 
-    .payment-input {
-      width: 100px;
-      display: inline-block;
-      margin-left: 10px;
-    }
+    .payment-input { width: 100px; display: inline-block; margin-left: 10px; }
 
-    /* Custom checkbox styles */
     .checkbox-container {
       display: flex;
       align-items: center;
@@ -101,15 +78,9 @@
       cursor: pointer;
     }
 
-    .checkbox-label {
-      font-weight: 500;
-      color: #333;
-      cursor: pointer;
-    }
+    .checkbox-label { font-weight: 500; color: #333; cursor: pointer; }
 
-    .form-group {
-      margin-bottom: 15px;
-    }
+    .form-group { margin-bottom: 15px; }
 
     .form-group label {
       display: block;
@@ -118,7 +89,6 @@
       color: #333;
     }
 
-    /* Security amount specific styles */
     .security-amount-container {
       background-color: #f8f9fa;
       padding: 15px;
@@ -146,16 +116,9 @@
       margin: 0;
     }
 
-    .security-amount-button:hover {
-      background-color: #0056b3;
-    }
+    .security-amount-button:hover { background-color: #0056b3; }
+    .security-amount-button:disabled { background-color: #6c757d; cursor: not-allowed; }
 
-    .security-amount-button:disabled {
-      background-color: #6c757d;
-      cursor: not-allowed;
-    }
-
-    /* Pending from mechanic side highlight */
     .pending-mechanic-highlight {
       background-color: #fff3cd;
       padding: 8px;
@@ -164,10 +127,9 @@
       margin: 5px 0;
     }
 
-    /* Debug section styles */
     .debug-section {
       margin-top: 20px;
-      display:hidden;
+      display: hidden;
       padding: 15px;
       background-color: #f8f9fa;
       border-radius: 8px;
@@ -185,7 +147,6 @@
       width: auto;
     }
 
-    /* Search Mechanic Button Styles */
     .search-mechanic-btn {
       background-color: #007bff !important;
       color: white !important;
@@ -200,9 +161,7 @@
       transition: background-color 0.3s !important;
     }
 
-    .search-mechanic-btn:hover {
-      background-color: #0056b3 !important;
-    }
+    .search-mechanic-btn:hover { background-color: #0056b3 !important; }
 
     .booking-header {
       display: flex;
@@ -213,10 +172,94 @@
       gap: 10px;
     }
 
-    .booking-title {
-      flex: 1;
+    .booking-title { flex: 1; margin: 0; min-width: 200px; }
+
+    /* ── Membership Toggle Styles ── */
+    .membership-toggle-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: linear-gradient(135deg, #fff8e1, #fff3cd);
+      border: 1.5px solid #ffc107;
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin: 15px 0;
+    }
+
+    .membership-toggle-label {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .membership-toggle-label strong {
+      font-size: 15px;
+      color: #333;
+    }
+
+    .membership-toggle-label small {
+      font-size: 12px;
+      color: #888;
+      margin-top: 2px;
+    }
+
+    .toggle-switch {
+      position: relative;
+      width: 52px;
+      height: 28px;
+      flex-shrink: 0;
+    }
+
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
       margin: 0;
-      min-width: 200px;
+      padding: 0;
+      position: absolute;
+    }
+
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #ccc;
+      border-radius: 28px;
+      transition: 0.3s;
+    }
+
+    .toggle-slider:before {
+      position: absolute;
+      content: "";
+      height: 20px;
+      width: 20px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      border-radius: 50%;
+      transition: 0.3s;
+    }
+
+    .toggle-switch input:checked + .toggle-slider {
+      background-color: #4CAF50;
+    }
+
+    .toggle-switch input:checked + .toggle-slider:before {
+      transform: translateX(24px);
+    }
+
+    .membership-badge {
+      display: inline-block;
+      margin-left: 8px;
+      background-color: #4CAF50;
+      color: white;
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 12px;
+      vertical-align: middle;
+    }
+
+    .membership-badge.off {
+      background-color: #aaa;
     }
   </style>
 </head>
@@ -239,7 +282,7 @@
     <div id="bookingDetails"></div>
 
     <h3>Update Booking</h3>
-    
+
     <div class="form-group">
       <label for="mechanicInput">Select Mechanic:</label>
       <div class="select-container" style="position:relative;">
@@ -258,14 +301,28 @@
       <input type="number" id="paymentOnQr" placeholder="Enter payment on QR amount" min="0" step="1">
     </div>
 
+    <!-- ── Membership Upgrade Toggle ── -->
+    <div class="membership-toggle-container">
+      <div class="membership-toggle-label">
+        <strong>
+          ⭐ Upgrade to Membership
+          <span id="membershipBadge" class="membership-badge off">OFF</span>
+        </strong>
+      </div>
+      <label class="toggle-switch">
+        <input type="checkbox" id="upgradeMembership" onchange="updateMembershipBadge()">
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+
     <div class="checkbox-container">
       <input type="checkbox" id="markCancelled">
       <label for="markCancelled" class="checkbox-label">Mark booking as cancelled</label>
     </div>
-    
+
     <div class="form-group">
       <label for="cancelReason">Add Remarks or Cancellation Reason:</label>
-      <textarea id="cancelReason" placeholder="Enter remarks or cancellation reason  (optional)"></textarea>
+      <textarea id="cancelReason" placeholder="Enter remarks or cancellation reason (optional)"></textarea>
     </div>
 
     <button onclick="updateBooking()">Update Booking</button>
@@ -275,19 +332,13 @@
     <div id="chatContainer">
       <div id="chatMessages"></div>
     </div>
-
-    <!-- Debug Section -->
-
   </div>
 
   <!-- Mixpanel -->
   <script type="text/javascript">
     (function(c,a){if(!a.__SV){var b=window;try{var d,m,j,k=b.location,f=k.hash;d=function(a,b){return(m=a.match(RegExp(b+"=([^&]*)")))?m[1]:null};f&&d(f,"state")&&(j=JSON.parse(decodeURIComponent(d(f,"state"))),"mpeditor"===j.action&&(b.sessionStorage.setItem("_mpcehash",f),history.replaceState(j.desiredHash||"",c.title,k.pathname+k.search)))}catch(n){}var l,h;window.mixpanel=a;a._i=[];a.init=function(b,d,g){function c(b,i){var a=i.split(".");2==a.length&&(b=b[a[0]],i=a[1]);b[i]=function(){b.push([i].concat(Array.prototype.slice.call(arguments,0)))}}var e=a;"undefined"!==typeof g?e=a[g]=[]:g="mixpanel";e.people=e.people||[];e.toString=function(b){var a="mixpanel";"mixpanel"!==g&&(a+="."+g);b||(a+=" (stub)");return a};e.people.toString=function(){return e.toString(1)+".people (stub)"};l="disable time_event track track_pageview track_links track_forms track_with_groups add_group set_group remove_group register register_once alias unregister identify name_tag set_config reset opt_in_tracking opt_out_tracking has_opted_in_tracking has_opted_out_tracking clear_opt_in_out_tracking start_batch_senders people.set people.set_once people.unset people.increment people.append people.union people.track_charge people.clear_charges people.delete_user people.remove".split(" ");for(h=0;h<l.length;h++)c(e,l[h]);var f="set set_once union unset remove delete".split(" ");e.get_group=function(){function a(c){b[c]=function(){call2_args=arguments;call2=[c].concat(Array.prototype.slice.call(call2_args,0));e.push([d,call2])}}for(var b={},d=["get_group"].concat(Array.prototype.slice.call(arguments,0)),c=0;c<f.length;c++)a(f[c]);return b};a._i.push([b,d,g])};a.__SV=1.2;b=c.createElement("script");b.type="text/javascript";b.async=!0;b.src="undefined"!==typeof MIXPANEL_CUSTOM_LIB_URL?MIXPANEL_CUSTOM_LIB_URL:"file:"===c.location.protocol&&"//cdn.mxpnl.com/libs/mixpanel-2-latest.min.js".match(/^\/\//)?"https://cdn.mxpnl.com/libs/mixpanel-2-latest.min.js":"//cdn.mxpnl.com/libs/mixpanel-2-latest.min.js";d=c.getElementsByTagName("script")[0];d.parentNode.insertBefore(b,d)}})(document,window.mixpanel||[]);
     
-    // Initialize Mixpanel
-    console.log('Initializing Mixpanel...');
     mixpanel.init("afeb927e0d7ee7ddfa033985ab2fe603");
-    console.log('Mixpanel initialized');
   </script>
 
   <script>
@@ -302,7 +353,6 @@
     let customerMobile = null;
     let mixpanelReady = false;
 
-    // Debug output function
     function debugLog(message) {
       console.log(message);
       const debugOutput = document.getElementById("debugOutput");
@@ -312,105 +362,55 @@
       }
     }
 
-    // Wait for Mixpanel to be ready
     function waitForMixpanel(callback, maxAttempts = 50, attempt = 1) {
       if (window.mixpanel && typeof window.mixpanel.track === 'function' && !window.mixpanel.toString().includes('stub')) {
         mixpanelReady = true;
-        debugLog('✅ Mixpanel is ready');
         callback();
       } else if (attempt < maxAttempts) {
-        debugLog(`⏳ Waiting for Mixpanel... (attempt ${attempt})`);
         setTimeout(() => waitForMixpanel(callback, maxAttempts, attempt + 1), 100);
-      } else {
-        debugLog('❌ Mixpanel failed to load after ' + maxAttempts + ' attempts');
-        console.error('Mixpanel failed to load');
       }
     }
 
-    // Helper function to safely track Mixpanel events
     function trackMixpanelEvent(eventName, properties) {
-      debugLog(`🔄 Attempting to track event: ${eventName}`);
-      
       if (!mixpanelReady) {
-        debugLog('❌ Mixpanel not ready, queuing event');
         waitForMixpanel(() => trackMixpanelEvent(eventName, properties));
         return;
       }
-
       try {
         if (window.mixpanel && typeof window.mixpanel.track === 'function') {
-          debugLog(`✅ Tracking event: ${eventName} with properties: ${JSON.stringify(properties)}`);
           mixpanel.track(eventName, properties);
-          debugLog('✅ Event tracked successfully');
-        } else {
-          debugLog('❌ Mixpanel track function not available');
         }
       } catch (error) {
-        debugLog('❌ Error tracking event: ' + error.message);
         console.error('Error tracking Mixpanel event:', error);
       }
     }
 
-    // Helper function to identify user in Mixpanel
     function identifyMixpanelUser(userId) {
-      debugLog(`🔄 Attempting to identify user: ${userId}`);
-      
       if (!mixpanelReady) {
-        debugLog('❌ Mixpanel not ready, queuing identify');
         waitForMixpanel(() => identifyMixpanelUser(userId));
         return;
       }
-
       try {
         if (window.mixpanel && typeof window.mixpanel.identify === 'function') {
-          debugLog(`✅ Identifying user: ${userId}`);
           mixpanel.identify(userId);
-          debugLog('✅ User identified successfully');
-        } else {
-          debugLog('❌ Mixpanel identify function not available');
         }
       } catch (error) {
-        debugLog('❌ Error identifying user: ' + error.message);
         console.error('Error identifying Mixpanel user:', error);
       }
     }
 
-    // Debug functions
-    function checkMixpanelStatus() {
-      debugLog('=== MIXPANEL STATUS CHECK ===');
-      debugLog('window.mixpanel exists: ' + (!!window.mixpanel));
-      debugLog('mixpanel.track exists: ' + (window.mixpanel && typeof window.mixpanel.track === 'function'));
-      debugLog('mixpanel toString: ' + (window.mixpanel ? window.mixpanel.toString() : 'undefined'));
-      debugLog('mixpanelReady flag: ' + mixpanelReady);
-      debugLog('customerMobile: ' + (customerMobile || 'not set'));
-      debugLog('==============================');
+    // ── Membership badge updater ──
+    function updateMembershipBadge() {
+      const isOn = document.getElementById("upgradeMembership").checked;
+      const badge = document.getElementById("membershipBadge");
+      badge.textContent = isOn ? "ON" : "OFF";
+      badge.className = "membership-badge" + (isOn ? "" : " off");
     }
 
-    function debugMixpanel() {
-      debugLog('🔧 Manual debug test triggered');
-      checkMixpanelStatus();
-      
-      // Use customer mobile if available, otherwise use a fallback
-      const userId = customerMobile || 'debug_user';
-      identifyMixpanelUser(userId);
-      
-      trackMixpanelEvent("Debug Test Event", {
-        "test": "manual_debug",
-        "timestamp": new Date().toISOString(),
-        "booking_id": bookingId || "no_booking_id",
-        "user_id": userId
-      });
-    }
-
-    // Initialize Mixpanel when page loads
     window.addEventListener('load', function() {
-      debugLog('🚀 Page loaded, initializing Mixpanel...');
-      waitForMixpanel(() => {
-        debugLog('🎉 Mixpanel is now ready for use');
-      });
+      waitForMixpanel(() => {});
     });
 
-    // Search Mechanic Function
     function searchMechanic() {
       if (!bookingData || !bookingData.location) {
         alert("No location data available");
@@ -421,42 +421,25 @@
       let searchUrl = "https://instantmechanic.online/mechanic-search.html?q=";
       
       try {
-        // Check if it's a Google Maps URL
         if (location.includes("google.com/maps")) {
-          // Extract coordinates from Google Maps URL
           const coordMatch = location.match(/q=([0-9.-]+),([0-9.-]+)/);
           if (coordMatch) {
-            const lat = coordMatch[1];
-            const lng = coordMatch[2];
-            searchUrl += `${lat},${lng}`;
+            searchUrl += `${coordMatch[1]},${coordMatch[2]}`;
           } else {
-            // Fallback: use the entire location
             searchUrl += encodeURIComponent(location);
           }
-        }
-        // Check if it's already an instantmechanic.online URL with query
-        else if (location.includes("instantmechanic.online") && location.includes("q=")) {
-          // Extract the query parameter
+        } else if (location.includes("instantmechanic.online") && location.includes("q=")) {
           const queryMatch = location.match(/q=([^&]*)/);
-          if (queryMatch) {
-            searchUrl += queryMatch[1]; // Already URL encoded
-          } else {
-            searchUrl += encodeURIComponent(location);
-          }
-        }
-        // For any other format, encode the entire location
-        else {
+          searchUrl += queryMatch ? queryMatch[1] : encodeURIComponent(location);
+        } else {
           searchUrl += encodeURIComponent(location);
         }
         
-        // Open in new tab
         window.open(searchUrl, "_blank");
         
-        // Track the mechanic search action in Mixpanel
         if (customerMobile) {
           waitForMixpanel(() => {
             identifyMixpanelUser(customerMobile);
-            debugLog('🔍 Mechanic Search Initiated event triggered');
             trackMixpanelEvent("Mechanic Search Initiated", {
               "agent_name": localStorage.getItem("agent_name"),
               "booking_id": bookingId,
@@ -467,19 +450,15 @@
             });
           });
         }
-        
       } catch (error) {
         console.error("Error processing location for mechanic search:", error);
-        // Fallback: use original location
         window.open("https://instantmechanic.online/mechanic-search.html?q=" + encodeURIComponent(location), "_blank");
       }
     }
 
-
     document.getElementById("loginBox").classList.add("hidden");
     document.getElementById("bookingBox").classList.remove("hidden");
     fetchBooking();
-
 
     function handleLogin() {
       const mobile = document.getElementById("mobile").value;
@@ -490,10 +469,6 @@
         localStorage.setItem("agent_login", "Yes");
         localStorage.setItem("agent_name", agentName);
         localStorage.setItem("mobile_number", mobile);
-        
-        // Track agent login - but wait for customer mobile to be available for user identification
-        // We'll identify the customer after booking data is loaded
-        
         document.getElementById("loginBox").classList.add("hidden");
         document.getElementById("bookingBox").classList.remove("hidden");
         fetchBooking();
@@ -506,14 +481,9 @@
       const companyPayment = data.company_profit || 0;
       const advancePayment = data.advance_payment_amount || 0;
       const paymentStatus = data.payment_status;
-
-      if (paymentStatus === 'pending') {
-        return companyPayment;
-      } else if (paymentStatus === 'partially-paid') {
-        return Math.max(0, companyPayment - advancePayment);
-      } else {
-        return 0;
-      }
+      if (paymentStatus === 'pending') return companyPayment;
+      if (paymentStatus === 'partially-paid') return Math.max(0, companyPayment - advancePayment);
+      return 0;
     }
 
     function fetchBooking() {
@@ -527,25 +497,15 @@
           currentExtraPayment = data.mechanic_extra_payment || 0;
           currentPaymentOnQr = data.payment_on_qr || 0;
           
-          // Set customer mobile from booking data - THIS IS THE KEY CHANGE
           customerMobile = data.customer_mobile || data.mobile || null;
-          debugLog('📱 Customer mobile set to: ' + customerMobile);
 
-          // Now identify the customer in Mixpanel using their mobile number
           if (customerMobile) {
-            waitForMixpanel(() => {
-              identifyMixpanelUser(customerMobile);
-              debugLog('👤 Customer identified in Mixpanel: ' + customerMobile);
-            });
+            waitForMixpanel(() => identifyMixpanelUser(customerMobile));
           }
 
-          // Show the Search Mechanic button now that we have booking data
           const searchBtn = document.getElementById("searchMechanicBtn");
-          if (searchBtn && data.location) {
-            searchBtn.style.display = "block";
-          }
+          if (searchBtn && data.location) searchBtn.style.display = "block";
 
-          // Calculate pending from mechanic side
           const pendingFromMechanic = calculatePendingFromMechanicSide(data);
 
           let details = `
@@ -556,10 +516,7 @@
             <p><strong>Is Cancelled:</strong> ${data.is_cancelled ? 'Yes' : 'No'}</p>
             <p><strong>Cancellation Reason:</strong> ${data.cancellation_reason || '-'}</p>
             <p><strong>Agent:</strong> ${data.agent_name || '-'}</p>
-          `;
-
-          details += `
-          <p><strong>Total Company Payment:</strong> ₹${data.company_profit || 0}</p>
+            <p><strong>Total Company Payment:</strong> ₹${data.company_profit || 0}</p>
             <p><strong>Advance Payment:</strong> ₹${data.advance_payment_amount}
               <span class="status-pill ${data.payment_status === 'partially-paid' ? 'status-partial' : 'status-pending'}">
                 ${data.payment_status.replace('_', ' ')}
@@ -567,17 +524,10 @@
             </p>
           `;
 
-          // Add the new "Pending from mechanic side" field
           if (pendingFromMechanic > 0) {
-            details += `
-              <div class="pending-mechanic-highlight">
-                <p><strong>Pending from Mechanic Side:</strong> ₹${pendingFromMechanic}</p>
-              </div>
-            `;
+            details += `<div class="pending-mechanic-highlight"><p><strong>Pending from Mechanic Side:</strong> ₹${pendingFromMechanic}</p></div>`;
           } else {
-            details += `
-              <p><strong>Pending from Mechanic Side:</strong> ₹${pendingFromMechanic}</p>
-            `;
+            details += `<p><strong>Pending from Mechanic Side:</strong> ₹${pendingFromMechanic}</p>`;
           }
 
           details += `
@@ -590,19 +540,17 @@
             <p><strong>Payment on QR:</strong> ₹${data.payment_on_qr || 0}</p>
           `;
 
-          // Add security amount section
-          const securityAmountHtml = createSecurityAmountSection(data);
-          details += securityAmountHtml;
-
+          details += createSecurityAmountSection(data);
           document.getElementById("bookingDetails").innerHTML = details;
           
-          // Set the input field values
           document.getElementById("mechanicExtraPayment").value = data.mechanic_extra_payment || 0;
           document.getElementById("paymentOnQr").value = data.payment_on_qr || 0;
-          
-          // Set cancellation checkbox and reason based on current booking status
           document.getElementById("markCancelled").checked = data.is_cancelled;
           document.getElementById("cancelReason").value = data.cancellation_reason || "";
+
+          // Reset membership toggle on refresh
+          document.getElementById("upgradeMembership").checked = false;
+          updateMembershipBadge();
           
           fetchMechanics();
           fetchChat();
@@ -615,12 +563,11 @@
 
     function createSecurityAmountSection(data) {
       if (data.advance_payment_amount > 200) {
-        // Check if payment status is partially-paid
         if (data.payment_status === 'partially-paid') {
           return `
             <div class="security-amount-container">
               <div class="security-amount-row">
-                <span><strong>Security Amount:</strong> : ₹${data.advance_payment_amount}</span>
+                <span><strong>Security Amount:</strong> ₹${data.advance_payment_amount}</span>
               </div>
               <small style="color: #ff6b6b;">Cannot update security amount - payment is partially paid</small>
             </div>
@@ -629,40 +576,29 @@
           return `
             <div class="security-amount-container">
               <div class="security-amount-row">
-                <span><strong>Security Amount:</strong>  ₹${data.advance_payment_amount}</span>
+                <span><strong>Security Amount:</strong> ₹${data.advance_payment_amount}</span>
                 <button class="security-amount-button" onclick="updateSecurityAmount()">Set to ₹100</button>
               </div>
               <small style="color: #666;">Click button to update security amount to ₹100</small>
             </div>
           `;
         }
-      } else {
-        return ``;
       }
+      return '';
     }
 
     function updateSecurityAmount() {
       const agentName = localStorage.getItem("agent_name");
-      
-      const updateData = {
-        agent: agentName,
-        advance_payment_amount: 100
-      };
-
       fetch(`https://ai.instantmechanic.online/bot/api/booking/security-update/${bookingId}/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updateData)
+        body: JSON.stringify({ agent: agentName, advance_payment_amount: 100 })
       })
         .then(res => res.json())
         .then(data => {
-          debugLog('=== SECURITY UPDATE API RESPONSE ===');
-          
-          // Mixpanel event for security amount update - using customer mobile as user ID
           if (customerMobile) {
             waitForMixpanel(() => {
               identifyMixpanelUser(customerMobile);
-              debugLog('🔒 Booking Security Changed event triggered');
               trackMixpanelEvent("Booking Security Changed", {
                 "agent_name": agentName,
                 "booking_id": bookingId,
@@ -672,9 +608,8 @@
               });
             });
           }
-          
           alert("Security amount updated to ₹100 successfully.");
-          fetchBooking(); // Refresh the booking details
+          fetchBooking();
         })
         .catch(error => {
           console.error('Error updating security amount:', error);
@@ -689,9 +624,7 @@
           mechanicList = data;
           populateMechanicDropdown(data);
         })
-        .catch(error => {
-          console.error('Error fetching mechanics:', error);
-        });
+        .catch(error => console.error('Error fetching mechanics:', error));
     }
 
     function populateMechanicDropdown(list) {
@@ -739,7 +672,6 @@
       }
     });
 
-    // Helper function to get mechanic name by ID
     function getMechanicNameById(mechanicId) {
       if (!mechanicId) return null;
       const mechanic = mechanicList.find(m => m.id === mechanicId);
@@ -752,16 +684,20 @@
       const agentName = localStorage.getItem("agent_name");
       const extraPayment = document.getElementById("mechanicExtraPayment").value;
       const paymentOnQr = document.getElementById("paymentOnQr").value;
+      const upgradeMembership = document.getElementById("upgradeMembership").checked;
 
       const updateData = {
         agent: agentName,
         mechanic_extra_payment: extraPayment || 0,
-        payment_on_qr: paymentOnQr || 0
+        payment_on_qr: paymentOnQr || 0,
+        is_cancelled: isCancelled,
+        cancellation_reason: cancelReason
       };
 
-      // Only include cancellation fields if the checkbox state has been explicitly set
-      updateData.is_cancelled = isCancelled;
-      updateData.cancellation_reason = cancelReason;
+      // ── Add membership field only if toggled ON ──
+      if (upgradeMembership) {
+        updateData.agent_convert_into_member = true;
+      }
 
       if (assignedMechanicId) updateData.mechanic = assignedMechanicId;
 
@@ -772,37 +708,27 @@
       })
         .then(res => res.json())
         .then(data => {
-          debugLog('=== BOOKING UPDATE API RESPONSE ===');
-          
-          // Mixpanel tracking - CHANGED: Now using customerMobile as userId instead of agent mobile
           if (customerMobile) {
             waitForMixpanel(() => {
               identifyMixpanelUser(customerMobile);
               
-              // 1. Track if mechanic was assigned (new assignment)
               if (assignedMechanicId && !originalMechanicId) {
-                const mechanicName = getMechanicNameById(assignedMechanicId);
-                debugLog('👨‍🔧 Mechanic Assigned event triggered');
                 trackMixpanelEvent("Mechanic Assigned", {
                   "agent_name": agentName,
                   "booking_id": bookingId,
-                  "mechanic_name": mechanicName,
+                  "mechanic_name": getMechanicNameById(assignedMechanicId),
                   "mechanic_id": assignedMechanicId,
                   "customer_mobile": customerMobile,
                   "timestamp": new Date().toISOString()
                 });
               }
               
-              // 2. Track if mechanic was reassigned (change from one mechanic to another)
               if (assignedMechanicId && originalMechanicId && assignedMechanicId !== originalMechanicId) {
-                const oldMechanicName = getMechanicNameById(originalMechanicId);
-                const newMechanicName = getMechanicNameById(assignedMechanicId);
-                debugLog('🔄 Mechanic Reassigned event triggered');
                 trackMixpanelEvent("Mechanic Reassigned", {
                   "agent_name": agentName,
                   "booking_id": bookingId,
-                  "old_mechanic_name": oldMechanicName,
-                  "new_mechanic_name": newMechanicName,
+                  "old_mechanic_name": getMechanicNameById(originalMechanicId),
+                  "new_mechanic_name": getMechanicNameById(assignedMechanicId),
                   "old_mechanic_id": originalMechanicId,
                   "new_mechanic_id": assignedMechanicId,
                   "customer_mobile": customerMobile,
@@ -810,9 +736,7 @@
                 });
               }
               
-              // 3. Track if booking was cancelled
               if (isCancelled && (!bookingData || !bookingData.is_cancelled)) {
-                debugLog('❌ Booking Cancelled event triggered');
                 trackMixpanelEvent("Booking Cancelled", {
                   "agent_name": agentName,
                   "booking_id": bookingId,
@@ -821,9 +745,17 @@
                   "timestamp": new Date().toISOString()
                 });
               }
+
+              // ── Track membership conversion ──
+              if (upgradeMembership) {
+                trackMixpanelEvent("Agent Converted to Member", {
+                  "agent_name": agentName,
+                  "booking_id": bookingId,
+                  "customer_mobile": customerMobile,
+                  "timestamp": new Date().toISOString()
+                });
+              }
             });
-          } else {
-            debugLog('⚠️ Customer mobile not available, cannot track Mixpanel events');
           }
           
           alert("Booking updated successfully.");
@@ -863,15 +795,8 @@
             });
           }
         })
-        .catch(error => {
-          console.error('Error fetching chat:', error);
-        });
+        .catch(error => console.error('Error fetching chat:', error));
     }
-
-    // Make debug functions globally available
-    window.debugMixpanel = debugMixpanel;
-    window.checkMixpanelStatus = checkMixpanelStatus;
   </script>
-  
 </body>
 </html>
