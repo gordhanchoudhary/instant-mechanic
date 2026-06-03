@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script src="https://instantmechanic.online/login.js"></script>
+  <meta charset="UTF-8">
+  <title>Membership Dashboard | Instant Mechanic</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen p-6">
+  <div class="max-w-7xl mx-auto">
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-3xl font-bold">Instant Mechanic - Memberships</h1>
+      <div class="space-x-2">
+        <a href="https://instantmechanic.online/index.html" target="_blank"
+           class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded text-sm shadow">
+          Booking Dashboard
+        </a>
+        <a href="https://instantmechanic.online/chat.html" target="_blank"
+           class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm shadow">
+          View Chat Dashboard
+        </a>
+        <a href="https://instantmechanic.online/agent.html" target="_blank"
+           class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded text-sm shadow">
+          View Agent Dashboard
+        </a>
+      </div>
+    </div>
+
+    <!-- Date and Filters -->
+    <div class="flex justify-between items-center gap-2 mb-4 flex-wrap">
+      <div class="flex items-center gap-2">
+        <button id="exportCsvBtn" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded text-sm shadow">
+          📊 Export CSV
+        </button>
+      </div>
+
+      <div class="flex items-center gap-2 flex-wrap">
+        <!-- Date Type Toggle -->
+        <select id="dateType" class="border rounded px-4 py-2 text-sm shadow">
+          <option value="single">Single Date</option>
+          <option value="range">Date Range</option>
+        </select>
+
+        <!-- Single Date Picker -->
+        <input id="datePicker" type="date" class="border rounded px-4 py-2 text-sm shadow" />
+
+        <!-- Date Range Pickers (hidden by default) -->
+        <div id="dateRangeContainer" class="flex items-center gap-2" style="display: none;">
+          <input id="startDate" type="date" class="border rounded px-4 py-2 text-sm shadow" />
+          <span class="text-gray-500">to</span>
+          <input id="endDate" type="date" class="border rounded px-4 py-2 text-sm shadow" />
+        </div>
+
+        <!-- Agent Filter -->
+        <select id="agentFilter" class="border rounded px-4 py-2 text-sm shadow">
+          <option value="">All Agents</option>
+        </select>
+
+        <!-- Plan Filter -->
+        <select id="planFilter" class="border rounded px-4 py-2 text-sm shadow">
+          <option value="">All Plans</option>
+        </select>
+
+        <!-- Membership Status Filter -->
+        <select id="membershipStatusFilter" class="border rounded px-4 py-2 text-sm shadow">
+          <option value="">All Membership Statuses</option>
+        </select>
+
+        <!-- Cancellation Filter -->
+        <select id="cancellationFilter" class="border rounded px-4 py-2 text-sm shadow">
+          <option value="all">All Calls</option>
+          <option value="active">Without Cancelled</option>
+          <option value="cancelled">Cancelled Only</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="grid grid-cols-2 md:grid-cols-6 gap-4 mb-6">
+      <div class="bg-white shadow p-4 rounded-lg text-center">
+        <p class="text-gray-500 text-sm">Total Memberships</p>
+        <p id="totalMemberships" class="text-2xl font-bold text-indigo-700">0</p>
+      </div>
+      <div class="bg-white shadow p-4 rounded-lg text-center">
+        <p class="text-gray-500 text-sm">Active</p>
+        <p id="totalActive" class="text-2xl font-bold text-green-600">0</p>
+      </div>
+      <div class="bg-white shadow p-4 rounded-lg text-center">
+        <p class="text-gray-500 text-sm">Total Revenue</p>
+        <p id="totalRevenue" class="text-xl font-bold text-yellow-600">₹0</p>
+      </div>
+      <div class="bg-white shadow p-4 rounded-lg text-center">
+        <p class="text-gray-500 text-sm">Total Collected</p>
+        <p id="totalCollected" class="text-xl font-bold text-green-600">₹0</p>
+      </div>
+      <div class="bg-white shadow p-4 rounded-lg text-center">
+        <p class="text-gray-500 text-sm">Total Pending</p>
+        <p id="totalPending" class="text-xl font-bold text-yellow-600">₹0</p>
+      </div>
+      <div class="bg-white shadow p-4 rounded-lg text-center">
+        <p class="text-gray-500 text-sm">Total Cancelled</p>
+        <p id="totalCancelled" class="text-xl font-bold text-red-600">0</p>
+      </div>
+    </div>
+
+    <!-- Membership Table -->
+    <div class="bg-white shadow rounded-lg overflow-auto">
+      <table class="min-w-full text-sm text-left">
+        <thead class="bg-gray-200 text-gray-600">
+          <tr>
+            <th class="p-3" id="timeHeader">Time</th>
+            <th class="p-3">Customer</th>
+            <th class="p-3">Car</th>
+            <th class="p-3">Mobile</th>
+            <th class="p-3">Price</th>
+            <th class="p-3">Paid</th>
+            <th class="p-3">Pending</th>
+            <th class="p-3">Agent</th>
+            <th class="p-3">Cancelled</th>
+            <th class="p-3">Reason</th>
+            <th class="p-3">Action</th>
+          </tr>
+        </thead>
+        <tbody id="membershipTableBody" class="bg-white divide-y divide-gray-200"></tbody>
+      </table>
+    </div>
+  </div>
+
+<script>
+  const dateInput              = document.getElementById("datePicker");
+  const dateType               = document.getElementById("dateType");
+  const dateRangeContainer     = document.getElementById("dateRangeContainer");
+  const startDate              = document.getElementById("startDate");
+  const endDate                = document.getElementById("endDate");
+  const agentFilter            = document.getElementById("agentFilter");
+  const planFilter             = document.getElementById("planFilter");
+  const membershipStatusFilter = document.getElementById("membershipStatusFilter");
+  const cancellationFilter     = document.getElementById("cancellationFilter");
+  const tableBody              = document.getElementById("membershipTableBody");
+  const exportCsvBtn           = document.getElementById("exportCsvBtn");
+  const timeHeader             = document.getElementById("timeHeader");
+
+  let allFetchedData = [];
+  let currentData    = [];
+
+  const formatCurrency = v => '₹' + (parseInt(v) || 0).toLocaleString('en-IN');
+
+  const formatDateTime = dt => {
+    const d = new Date(dt);
+    return dateType.value === "range"
+      ? d.toLocaleString('en-IN', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit', hour12:true })
+      : d.toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit', hour12:true });
+  };
+
+  const formatDate = dt => dt ? new Date(dt).toLocaleDateString('en-IN', { day:'2-digit', month:'2-digit', year:'numeric' }) : '-';
+
+  const updateTimeHeader = () => {
+    timeHeader.textContent = dateType.value === "range" ? "Date & Time" : "Time";
+  };
+
+  const applyFrontendFilters = data => {
+    let d = [...data];
+
+    const plan = planFilter.value;
+    if (plan) d = d.filter(i => (i.membership_plan || '') === plan);
+
+    const mStatus = membershipStatusFilter.value;
+    if (mStatus) d = d.filter(i => (i.membership_status || '') === mStatus);
+
+    const canc = cancellationFilter.value;
+    if (canc === 'cancelled') d = d.filter(i => i.is_cancelled);
+    else if (canc === 'active') d = d.filter(i => !i.is_cancelled);
+
+    return d;
+  };
+
+  const updateDisplay = data => {
+    const filtered = applyFrontendFilters(data);
+    const sorted = [...filtered].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    currentData = [...sorted];
+    tableBody.innerHTML = '';
+
+    let total = 0, active = 0, cancelled = 0, rev = 0, collected = 0, pending = 0;
+
+    sorted.forEach(item => {
+      total++;
+      const advance = parseInt(item.advance_payment_amount) || 0;
+      const profit  = parseInt(item.company_profit) || 0;
+      let paid = 0, pendingAmt = 0;
+
+      if (item.is_cancelled) {
+        paid = item.payment_status !== 'pending' ? advance : 0;
+        pendingAmt = 0;
+        cancelled++;
+      } else {
+        if (item.payment_status === 'pending') { paid = 0; pendingAmt = profit; }
+        else { paid = advance; pendingAmt = profit - advance; }
+        if ((item.membership_status || '').toLowerCase().includes('active')) active++;
+      }
+
+      rev       += profit;
+      collected += paid;
+      pending   += pendingAmt;
+
+      // Row colour based on is_membership_user
+      let rowClass = 'hover:bg-gray-50';
+      if (item.is_membership_user === true) {
+        rowClass = 'bg-green-50 hover:bg-green-100';
+      } else if (item.is_membership_user === false) {
+        rowClass = 'bg-red-50 hover:bg-red-100';
+      }
+
+      // Approve button
+      const approveBtn = item.is_membership_user
+        ? `<span class="inline-block px-3 py-1 text-xs font-medium bg-green-100 text-green-700 rounded">Approved ✓</span>`
+        : `<button onclick="approveMember(${item.customer}, this)"
+             class="bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-1 rounded text-xs">
+             Approve
+           </button>`;
+
+      tableBody.innerHTML += `
+        <tr class="${rowClass}">
+          <td class="p-3 text-gray-600">${formatDateTime(item.created_at)}</td>
+          <td class="p-3">${item.problem || '-'}</td>
+          <td class="p-3">${item.car || '-'}</td>
+          <td class="p-3">
+            ${item.customer_mobile
+              ? `<a href="https://wa.me/91${item.customer_mobile.replace(/^91/, '')}" target="_blank" class="text-blue-600 hover:text-blue-800 hover:underline">
+                  ${item.customer_mobile.replace(/^91/, '')}
+                </a>`
+              : '-'}
+          </td>
+          <td class="p-3">${item.price}</td>
+          <td class="p-3 text-green-600">${formatCurrency(paid)}</td>
+          <td class="p-3 text-yellow-600">${formatCurrency(pendingAmt)}</td>
+          <td class="p-3">${item.agent_name ?? '-'}</td>
+          <td class="p-3 ${item.is_cancelled ? 'text-red-500' : 'text-green-500'} font-bold">
+            ${item.is_cancelled ? 'Yes' : 'No'}
+          </td>
+          <td class="p-3 text-xs">${item.cancellation_reason || '-'}</td>
+          <td class="p-3 flex items-center gap-2 flex-wrap">
+            <a href="https://instantmechanic.online/booking.html?id=${item.id}" target="_blank"
+               class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs">
+              View
+            </a>
+            ${approveBtn}
+          </td>
+        </tr>`;
+    });
+
+    document.getElementById('totalMemberships').textContent = total;
+    document.getElementById('totalActive').textContent      = active;
+    document.getElementById('totalRevenue').textContent     = formatCurrency(rev);
+    document.getElementById('totalCollected').textContent   = formatCurrency(collected);
+    document.getElementById('totalPending').textContent     = formatCurrency(pending);
+    document.getElementById('totalCancelled').textContent   = cancelled;
+  };
+
+  async function fetchMemberships() {
+    tableBody.innerHTML = '<tr><td colspan="11" class="p-6 text-center text-gray-400">Loading…</td></tr>';
+
+    const agentParam = agentFilter.value ? `&agent=${encodeURIComponent(agentFilter.value)}` : '';
+
+    let dateParams = '';
+    if (dateType.value === "range") {
+      if (!startDate.value || !endDate.value) return;
+      dateParams = `start_date=${startDate.value}&end_date=${endDate.value}`;
+    } else {
+      if (!dateInput.value) return;
+      dateParams = `date=${dateInput.value}`;
+    }
+
+    try {
+      const url = `https://ai.instantmechanic.online/bot/api/booking/by-date/?${dateParams}${agentParam}&memberships=True`;
+      const res  = await fetch(url);
+      const data = await res.json();
+
+      // Populate agent dropdown
+      const curAgent = agentFilter.value;
+      while (agentFilter.options.length > 1) agentFilter.removeChild(agentFilter.lastChild);
+      const agents = [...new Set(data.map(b => b.agent_name).filter(Boolean))];
+      agents.forEach(a => {
+        const o = document.createElement('option');
+        o.value = o.textContent = a;
+        agentFilter.appendChild(o);
+      });
+      if (curAgent && agents.includes(curAgent)) agentFilter.value = curAgent;
+
+      // Populate plan dropdown
+      const curPlan = planFilter.value;
+      while (planFilter.options.length > 1) planFilter.removeChild(planFilter.lastChild);
+      const plans = [...new Set(data.map(b => b.membership_plan).filter(Boolean))];
+      plans.forEach(p => {
+        const o = document.createElement('option');
+        o.value = o.textContent = p;
+        planFilter.appendChild(o);
+      });
+      if (curPlan && plans.includes(curPlan)) planFilter.value = curPlan;
+
+      // Populate membership status dropdown
+      const curStatus = membershipStatusFilter.value;
+      while (membershipStatusFilter.options.length > 1) membershipStatusFilter.removeChild(membershipStatusFilter.lastChild);
+      const statuses = [...new Set(data.map(b => b.membership_status).filter(Boolean))];
+      statuses.forEach(s => {
+        const o = document.createElement('option');
+        o.value = o.textContent = s;
+        membershipStatusFilter.appendChild(o);
+      });
+      if (curStatus && statuses.includes(curStatus)) membershipStatusFilter.value = curStatus;
+
+      allFetchedData = [...data];
+      updateDisplay(data);
+    } catch (err) {
+      tableBody.innerHTML = `<tr><td colspan="11" class="p-6 text-center text-red-400">Failed to load data: ${err.message}</td></tr>`;
+    }
+  }
+
+  // CSV Export
+  exportCsvBtn.addEventListener('click', () => {
+    if (!currentData.length) { alert('No data to export'); return; }
+    const headers = ['Date & Time','Customer','Car','Mobile','Plan','Membership Status','Start Date','End Date','Price','Paid','Pending','Agent','Cancelled','Cancellation Reason'];
+    const rows = currentData.map(item => {
+      const advance = parseInt(item.advance_payment_amount) || 0;
+      const profit  = parseInt(item.company_profit) || 0;
+      let paid = 0, pendingAmt = 0;
+      if (item.is_cancelled) { paid = item.payment_status !== 'pending' ? advance : 0; }
+      else if (item.payment_status === 'pending') { paid = 0; pendingAmt = profit; }
+      else { paid = advance; pendingAmt = profit - advance; }
+      return [
+        new Date(item.created_at).toLocaleString('en-IN'),
+        item.customer_name || '',
+        item.car || '',
+        item.customer_mobile ? item.customer_mobile.replace(/^91/, '') : '',
+        item.membership_plan || '',
+        item.membership_status || '',
+        formatDate(item.membership_start_date),
+        formatDate(item.membership_end_date),
+        profit, paid, pendingAmt,
+        item.agent_name || '',
+        item.is_cancelled ? 'Yes' : 'No',
+        item.cancellation_reason || ''
+      ];
+    });
+    const csv = [headers, ...rows].map(r => r.map(c => `"${c}"`).join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    let fname = 'membership-data';
+    if (dateType.value === 'range' && startDate.value && endDate.value) fname += `_${startDate.value}_to_${endDate.value}`;
+    else if (dateInput.value) fname += `_${dateInput.value}`;
+    a.download = fname + '.csv';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  });
+
+  // Date type toggle
+  dateType.addEventListener("change", () => {
+    updateTimeHeader();
+    if (dateType.value === "range") {
+      dateInput.style.display = "none";
+      dateRangeContainer.style.display = "flex";
+      const today = new Date().toISOString().split('T')[0];
+      if (!startDate.value) startDate.value = today;
+      if (!endDate.value)   endDate.value   = today;
+    } else {
+      dateInput.style.display = "block";
+      dateRangeContainer.style.display = "none";
+    }
+    fetchMemberships();
+  });
+
+  // Frontend-only filters
+  planFilter.addEventListener("change",             () => updateDisplay(allFetchedData));
+  membershipStatusFilter.addEventListener("change", () => updateDisplay(allFetchedData));
+  cancellationFilter.addEventListener("change",     () => updateDisplay(allFetchedData));
+
+  // API re-fetch filters
+  agentFilter.addEventListener("change", fetchMemberships);
+  dateInput.addEventListener("change",   fetchMemberships);
+  startDate.addEventListener("change",   fetchMemberships);
+  endDate.addEventListener("change",     fetchMemberships);
+
+  // Approve member
+  async function approveMember(customerId, btn) {
+    if (!customerId) { alert('Customer ID not found'); return; }
+    btn.disabled = true;
+    btn.textContent = 'Approving…';
+    btn.classList.add('opacity-60', 'cursor-not-allowed');
+    try {
+      const res = await fetch(`https://ai.instantmechanic.online/bot/api/member/${customerId}/`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ is_membership_user: true })
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      // Replace button with approved badge and green row
+      const td  = btn.closest('td');
+      const row = btn.closest('tr');
+      td.innerHTML = td.innerHTML.replace(
+        btn.outerHTML,
+        `<span class="inline-block px-3 py-1 text-xs font-medium bg-green-100 text-green-700 rounded">Approved ✓</span>`
+      );
+      row.className = 'bg-green-50 hover:bg-green-100';
+    } catch (err) {
+      btn.disabled = false;
+      btn.textContent = 'Approve';
+      btn.classList.remove('opacity-60', 'cursor-not-allowed');
+      alert('Failed to approve: ' + err.message);
+    }
+  }
+
+  // Init
+  const today = new Date().toISOString().split('T')[0];
+  dateInput.value = today;
+  startDate.value = today;
+  endDate.value   = today;
+  updateTimeHeader();
+  fetchMemberships();
+</script>
+</body>
+</html>
