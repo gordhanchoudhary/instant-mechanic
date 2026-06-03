@@ -26,8 +26,36 @@
       </div>
     </div>
 
+    <!-- Mobile Search Bar -->
+    <div class="bg-white shadow rounded-lg p-4 mb-4 flex items-center gap-3 flex-wrap">
+      <span class="text-sm font-medium text-gray-600 whitespace-nowrap">🔍 Search by Mobile:</span>
+      <div class="flex items-center gap-2">
+        <span class="text-sm text-gray-400 border border-r-0 border-gray-300 rounded-l px-3 py-2 bg-gray-50">+91</span>
+        <input
+          id="mobileSearch"
+          type="tel"
+          maxlength="10"
+          placeholder="Enter 10-digit number"
+          class="border border-l-0 border-gray-300 rounded-r px-3 py-2 text-sm w-44 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          onkeydown="if(event.key==='Enter') searchByMobile()"
+        />
+      </div>
+      <button onclick="searchByMobile()"
+        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm shadow font-medium">
+        Search
+      </button>
+      <button id="clearMobileBtn" onclick="clearMobileSearch()" style="display:none"
+        class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded text-sm shadow">
+        ✕ Clear
+      </button>
+      <span id="mobileSearchBadge" style="display:none"
+        class="text-xs bg-blue-100 text-blue-700 px-3 py-1 rounded-full font-medium">
+        Showing results for mobile search
+      </span>
+    </div>
+
     <!-- Date and Filters -->
-    <div class="flex justify-between items-center gap-2 mb-4 flex-wrap">
+    <div id="dateFilterSection" class="flex justify-between items-center gap-2 mb-4 flex-wrap">
       <div class="flex items-center gap-2">
         <button id="exportCsvBtn" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded text-sm shadow">
           📊 Export CSV
@@ -139,15 +167,20 @@
   const tableBody              = document.getElementById("membershipTableBody");
   const exportCsvBtn           = document.getElementById("exportCsvBtn");
   const timeHeader             = document.getElementById("timeHeader");
+  const mobileSearchInput      = document.getElementById("mobileSearch");
+  const clearMobileBtn         = document.getElementById("clearMobileBtn");
+  const mobileSearchBadge      = document.getElementById("mobileSearchBadge");
+  const dateFilterSection      = document.getElementById("dateFilterSection");
 
-  let allFetchedData = [];
-  let currentData    = [];
+  let allFetchedData   = [];
+  let currentData      = [];
+  let isMobileSearch   = false;
 
   const formatCurrency = v => '₹' + (parseInt(v) || 0).toLocaleString('en-IN');
 
   const formatDateTime = dt => {
     const d = new Date(dt);
-    return dateType.value === "range"
+    return (dateType.value === "range" || isMobileSearch)
       ? d.toLocaleString('en-IN', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit', hour12:true })
       : d.toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit', hour12:true });
   };
@@ -155,12 +188,14 @@
   const formatDate = dt => dt ? new Date(dt).toLocaleDateString('en-IN', { day:'2-digit', month:'2-digit', year:'numeric' }) : '-';
 
   const updateTimeHeader = () => {
-    timeHeader.textContent = dateType.value === "range" ? "Date & Time" : "Time";
+    timeHeader.textContent = (dateType.value === "range" || isMobileSearch) ? "Date & Time" : "Time";
   };
 
   const applyFrontendFilters = data => {
-    let d = [...data];
+    // When in mobile search mode, skip all dropdown filters
+    if (isMobileSearch) return [...data];
 
+    let d = [...data];
     const plan = planFilter.value;
     if (plan) d = d.filter(i => (i.membership_plan || '') === plan);
 
@@ -202,7 +237,6 @@
       collected += paid;
       pending   += pendingAmt;
 
-      // Row colour based on is_membership_user
       let rowClass = 'hover:bg-gray-50';
       if (item.is_membership_user === true) {
         rowClass = 'bg-green-50 hover:bg-green-100';
@@ -210,7 +244,6 @@
         rowClass = 'bg-red-50 hover:bg-red-100';
       }
 
-      // Approve button
       const approveBtn = item.is_membership_user
         ? `<span class="inline-block px-3 py-1 text-xs font-medium bg-green-100 text-green-700 rounded">Approved ✓</span>`
         : `<button onclick="approveMember(${item.customer}, this)"
@@ -256,7 +289,53 @@
     document.getElementById('totalCancelled').textContent   = cancelled;
   };
 
+  // ── Mobile Search ──────────────────────────────────────────────
+  async function searchByMobile() {
+    const raw = mobileSearchInput.value.trim();
+    if (!/^\d{10}$/.test(raw)) {
+      alert('Please enter a valid 10-digit mobile number.');
+      mobileSearchInput.focus();
+      return;
+    }
+
+    const mobile = '91' + raw;
+    isMobileSearch = true;
+    updateTimeHeader();
+
+    // Hide date/filter section, show badge + clear button
+    dateFilterSection.style.opacity = '0.4';
+    dateFilterSection.style.pointerEvents = 'none';
+    clearMobileBtn.style.display = 'inline-flex';
+    mobileSearchBadge.style.display = 'inline-flex';
+    mobileSearchBadge.textContent = `Showing results for +91 ${raw}`;
+
+    tableBody.innerHTML = '<tr><td colspan="11" class="p-6 text-center text-gray-400">Searching…</td></tr>';
+
+    try {
+      const url = `https://ai.instantmechanic.online/bot/api/booking/by-date/?mobile=${encodeURIComponent(mobile)}&memberships=True`;
+      const res  = await fetch(url);
+      const data = await res.json();
+      allFetchedData = [...data];
+      updateDisplay(data);
+    } catch (err) {
+      tableBody.innerHTML = `<tr><td colspan="11" class="p-6 text-center text-red-400">Failed to load data: ${err.message}</td></tr>`;
+    }
+  }
+
+  function clearMobileSearch() {
+    isMobileSearch = false;
+    mobileSearchInput.value = '';
+    clearMobileBtn.style.display = 'none';
+    mobileSearchBadge.style.display = 'none';
+    dateFilterSection.style.opacity = '1';
+    dateFilterSection.style.pointerEvents = 'auto';
+    updateTimeHeader();
+    fetchMemberships();
+  }
+  // ──────────────────────────────────────────────────────────────
+
   async function fetchMemberships() {
+    if (isMobileSearch) return; // don't overwrite mobile search results
     tableBody.innerHTML = '<tr><td colspan="11" class="p-6 text-center text-gray-400">Loading…</td></tr>';
 
     const agentParam = agentFilter.value ? `&agent=${encodeURIComponent(agentFilter.value)}` : '';
@@ -346,7 +425,8 @@
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
     let fname = 'membership-data';
-    if (dateType.value === 'range' && startDate.value && endDate.value) fname += `_${startDate.value}_to_${endDate.value}`;
+    if (isMobileSearch) fname += `_mobile_${mobileSearchInput.value}`;
+    else if (dateType.value === 'range' && startDate.value && endDate.value) fname += `_${startDate.value}_to_${endDate.value}`;
     else if (dateInput.value) fname += `_${dateInput.value}`;
     a.download = fname + '.csv';
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
@@ -392,7 +472,6 @@
         body: JSON.stringify({ is_membership_user: true })
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      // Replace button with approved badge and green row
       const td  = btn.closest('td');
       const row = btn.closest('tr');
       td.innerHTML = td.innerHTML.replace(
