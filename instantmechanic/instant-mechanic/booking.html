@@ -315,6 +315,15 @@
       </label>
     </div>
 
+    <!-- ── Membership Price (visible only when toggle is ON) ── -->
+    <div id="membershipPriceSection" style="display:none;">
+      <div class="form-group">
+        <label for="membershipPrice">Membership Price (₹) <span style="color:red;">*</span></label>
+        <input type="number" id="membershipPrice" placeholder="Enter membership price" min="0" step="1">
+        <small id="membershipPriceError" style="color:red; display:none;">Membership price is required when upgrade is ON.</small>
+      </div>
+    </div>
+
     <div class="checkbox-container">
       <input type="checkbox" id="markCancelled">
       <label for="markCancelled" class="checkbox-label">Mark booking as cancelled</label>
@@ -405,6 +414,14 @@
       const badge = document.getElementById("membershipBadge");
       badge.textContent = isOn ? "ON" : "OFF";
       badge.className = "membership-badge" + (isOn ? "" : " off");
+      // Show/hide membership price field
+      const priceSection = document.getElementById("membershipPriceSection");
+      priceSection.style.display = isOn ? "block" : "none";
+      // Clear error when toggled off
+      if (!isOn) {
+        document.getElementById("membershipPriceError").style.display = "none";
+        document.getElementById("membershipPrice").style.borderColor = "";
+      }
     }
 
     window.addEventListener('load', function() {
@@ -552,6 +569,8 @@
           const isMember = data.agent_convert_into_member === true;
           document.getElementById("upgradeMembership").checked = isMember;
           updateMembershipBadge();
+          // Sync membership price from backend
+          document.getElementById("membershipPrice").value = data.agent_mebership_price || "";
 
           // Hide membership toggle if customer is already a member
           const priceStr = (data.price || "").toString().toLowerCase();
@@ -705,6 +724,19 @@
 
       // ── Always send explicitly so backend never defaults to true ──
       updateData.agent_convert_into_member = upgradeMembership === true;
+
+      // ── Membership price: required if toggle is ON ──
+      const membershipPrice = document.getElementById("membershipPrice").value;
+      if (upgradeMembership) {
+        if (!membershipPrice || membershipPrice <= 0) {
+          document.getElementById("membershipPriceError").style.display = "block";
+          document.getElementById("membershipPrice").style.borderColor = "red";
+          return;
+        }
+        updateData.agent_mebership_price = parseFloat(membershipPrice);
+      } else {
+        updateData.agent_mebership_price = null;
+      }
 
       if (assignedMechanicId) updateData.mechanic = assignedMechanicId;
 
