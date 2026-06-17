@@ -22,11 +22,7 @@
       --surface-variant: #f8fafc;
     }
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
       font-family: 'Poppins', sans-serif;
@@ -36,758 +32,341 @@
       line-height: 1.6;
     }
 
-    .container {
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 16px;
-      min-height: 100vh;
-    }
+    .container { max-width: 600px; margin: 0 auto; padding: 16px; min-height: 100vh; }
 
     .loading-spinner {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 50vh;
-      color: white;
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; min-height: 50vh; color: white;
     }
 
     .spinner {
-      width: 40px;
-      height: 40px;
-      border: 3px solid rgba(255, 255, 255, 0.3);
+      width: 40px; height: 40px;
+      border: 3px solid rgba(255,255,255,0.3);
       border-top: 3px solid white;
       border-radius: 50%;
       animation: spin 1s linear infinite;
       margin-bottom: 20px;
     }
 
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-    .header {
-      background: var(--surface);
-      border-radius: var(--border-radius);
-      padding: 20px;
-      margin-bottom: 16px;
-      box-shadow: var(--card-shadow);
-      text-align: center;
-      position: relative;
-      overflow: hidden;
+    /* IVR Popup */
+    @keyframes pulse-ring {
+      0% { transform: scale(1); opacity: 0.8; }
+      100% { transform: scale(1.6); opacity: 0; }
     }
+    .pulse-ring { animation: pulse-ring 1.2s ease-out infinite; }
 
-    .header::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 4px;
-      background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    #ivrPopup {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 9999;
+      display: flex; align-items: center; justify-content: center;
     }
+    #ivrPopup.hidden { display: none; }
 
-    .header h1 {
-      font-size: clamp(1.3rem, 4vw, 1.8rem);
-      font-weight: 700;
-      color: var(--primary-color);
-      margin-bottom: 8px;
-    }
-
-    .timer-card {
-      background: var(--warning-color);
-      color: white;
-      padding: 16px;
-      border-radius: var(--border-radius);
-      margin-bottom: 16px;
-      box-shadow: var(--card-shadow);
-      text-align: center;
-    }
-
-    .timer-card h3 {
-      font-size: clamp(1rem, 3vw, 1.2rem);
-      margin-bottom: 8px;
-    }
-
-    .timer-display {
-      font-size: clamp(1.8rem, 5vw, 2.4rem);
-      font-weight: 700;
-      font-family: 'JetBrains Mono', monospace;
-    }
-
-    .advance-status {
-      background: var(--surface);
-      border-radius: var(--border-radius);
-      padding: 16px;
-      margin-bottom: 16px;
-      box-shadow: var(--card-shadow);
-      text-align: center;
-      border-left: 4px solid var(--secondary-color);
-    }
-
-    .advance-status h3 {
-      font-size: clamp(1rem, 3vw, 1.2rem);
-      font-weight: 600;
-      color: var(--text-primary);
-      margin-bottom: 8px;
-    }
-
-    .advance-amount {
-      font-size: clamp(1.4rem, 4vw, 1.8rem);
-      font-weight: 700;
-      font-family: 'JetBrains Mono', monospace;
-      color: var(--secondary-color);
-    }
-
-    .collect-amount {
-      background: var(--surface);
-      border-radius: var(--border-radius);
-      padding: 16px;
-      margin-bottom: 16px;
-      box-shadow: var(--card-shadow);
-      text-align: center;
-      border-left: 4px solid var(--primary-color);
-      position: relative;
-    }
-
-    .collect-amount.completed {
-      border-left: 4px solid var(--secondary-color);
-    }
-
-    .collect-amount h3 {
-      font-size: clamp(1rem, 3vw, 1.2rem);
-      font-weight: 600;
-      color: var(--text-primary);
-      margin-bottom: 8px;
-    }
-
-    .collect-display {
-      font-size: clamp(1.6rem, 5vw, 2.2rem);
-      font-weight: 700;
-      font-family: 'JetBrains Mono', monospace;
-      color: var(--primary-color);
-    }
-
-    .collected-stamp {
-      position: absolute;
-      top: 64%;
-      right: 20px;
-      transform: translateY(-50%);
-      background: var(--success-color);
-      color: white;
-      padding: 8px 12px;
-      border-radius: 8px;
-      font-size: clamp(0.7rem, 2vw, 0.85rem);
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      box-shadow: 0 2px 8px rgba(19, 115, 51, 0.3);
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-
-    .collected-stamp i {
-      font-size: clamp(0.8rem, 2.2vw, 1rem);
-    }
-
-    .main-card {
-      background: var(--surface);
-      border-radius: var(--border-radius);
-      box-shadow: var(--card-shadow);
-      overflow: hidden;
-      margin-bottom: 16px;
-    }
-
-    .car-section {
-      padding: 20px;
-      background: linear-gradient(135deg, var(--surface-variant) 0%, var(--surface) 100%);
-      text-align: center;
-    }
-
-    .car-image {
+    .ivr-box {
+      background: white;
+      border-radius: 24px;
+      padding: 32px 24px;
+      margin: 16px;
       width: 100%;
-      max-width: 200px;
-      height: auto;
-      border-radius: 12px;
-      margin: 0 auto 12px;
-      display: block;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-    }
-
-    .car-details h2 {
-      font-size: clamp(1.2rem, 3.5vw, 1.6rem);
-      font-weight: 600;
-      color: var(--text-primary);
-      margin-bottom: 8px;
-    }
-
-    .problem-badge {
-      background: linear-gradient(135deg, var(--warning-color), #ff8c00);
-      color: white;
-      padding: 10px 16px;
-      border-radius: 12px;
-      font-size: clamp(0.85rem, 2.5vw, 1rem);
-      font-weight: 500;
-      margin: 12px 0;
-      box-shadow: 0 4px 12px rgba(249, 171, 0, 0.3);
-    }
-
-    .info-grid {
-      padding: 20px;
-    }
-
-    .info-item {
-      margin-bottom: 16px;
-      padding: 16px;
-      background: var(--surface-variant);
-      border-radius: 12px;
-      border-left: 4px solid var(--primary-color);
-    }
-
-    .info-item.completed {
-      opacity: 0.6;
-      pointer-events: none;
-    }
-
-    .info-label {
-      font-size: clamp(0.75rem, 2vw, 0.9rem);
-      font-weight: 500;
-      color: var(--text-secondary);
-      margin-bottom: 6px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .info-value {
-      font-size: clamp(0.95rem, 2.8vw, 1.2rem);
-      font-weight: 600;
-      color: var(--text-primary);
-    }
-
-    .contact-buttons {
-      display: flex;
-      gap: 8px;
-      margin-top: 8px;
-    }
-
-    .contact-btn {
-      padding: 8px 16px;
-      border: none;
-      border-radius: 8px;
-      font-size: clamp(0.8rem, 2vw, 0.9rem);
-      font-weight: 500;
-      color: white;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      text-decoration: none;
-      transition: all 0.3s ease;
-      flex: 1;
-      justify-content: center;
-    }
-
-    .contact-btn.call {
-      background: var(--secondary-color);
-    }
-
-    .contact-btn.whatsapp {
-      background: #25d366;
-    }
-
-    .contact-btn:active {
-      transform: scale(0.95);
-    }
-
-    .highlight-card {
-      background: linear-gradient(135deg, var(--secondary-color), #28a745);
-      color: white;
-      padding: 20px;
-      border-radius: var(--border-radius);
-      margin: 16px 0;
-      box-shadow: 0 8px 24px rgba(52, 168, 83, 0.3);
+      max-width: 320px;
       text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
     }
 
-    .highlight-card h3 {
-      font-size: clamp(1rem, 3vw, 1.3rem);
-      font-weight: 600;
-      margin-bottom: 8px;
+    .ivr-phone-wrap {
+      position: relative;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 24px; height: 80px;
     }
 
-    .amount {
-      font-size: clamp(1.6rem, 5vw, 2.2rem);
+    .ivr-pulse {
+      position: absolute;
+      width: 64px; height: 64px;
+      border-radius: 50%;
+      background: #7c3aed33;
+    }
+
+    .ivr-icon {
+      width: 64px; height: 64px;
+      border-radius: 50%;
+      background: #7c3aed;
+      display: flex; align-items: center; justify-content: center;
+      z-index: 1;
+    }
+
+    .ivr-icon svg { width: 32px; height: 32px; color: white; }
+
+    .ivr-countdown-num {
+      font-size: 64px;
       font-weight: 700;
-      font-family: 'JetBrains Mono', monospace;
+      color: #7c3aed;
+      line-height: 1;
+      margin-bottom: 4px;
     }
 
-    .agent-info {
-      background: var(--surface);
-      border-radius: var(--border-radius);
-      padding: 16px;
-      margin: 16px 0;
-      box-shadow: var(--card-shadow);
-      border-left: 4px solid var(--warning-color);
-    }
+    .ivr-label { font-size: 13px; color: #6b7280; margin-bottom: 4px; }
+    .ivr-sublabel { font-size: 11px; color: #9ca3af; }
 
-    .agent-info h3 {
-      font-size: clamp(1rem, 3vw, 1.2rem);
-      font-weight: 600;
-      color: var(--text-primary);
-      margin-bottom: 8px;
-    }
+    .ivr-connecting-title { font-size: 18px; font-weight: 600; color: #1f2937; margin-bottom: 6px; }
+    .ivr-connecting-sub { font-size: 13px; color: #6b7280; }
 
-    .agent-info p {
-      font-size: clamp(0.9rem, 2.5vw, 1rem);
-      color: var(--text-secondary);
-      margin: 4px 0;
-    }
-
-    /* Image Upload Styles - Gallery Only */
-    .completion-section {
-      background: var(--surface);
-      border-radius: var(--border-radius);
-      padding: 20px;
-      margin: 20px 0;
-      box-shadow: var(--card-shadow);
-    }
-
-    .completion-section h3 {
-      font-size: clamp(1.1rem, 3vw, 1.3rem);
-      font-weight: 600;
-      color: var(--text-primary);
-      margin-bottom: 20px;
-      text-align: center;
-    }
-
-    .image-upload-container {
-      border: 3px dashed #a4b0be;
-      border-radius: 12px;
-      padding: 20px;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      margin-bottom: 20px;
-      min-height: 200px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .image-upload-container:hover {
-      border-color: var(--primary-color);
-      background: #f8f9ff;
-    }
-
-    .image-upload-container.has-image {
-      border-color: var(--success-color);
-      background: #f0f9f0;
-      padding: 10px;
-    }
-
-    .upload-icon {
-      font-size: 3rem;
-      color: var(--text-secondary);
-      margin-bottom: 12px;
-    }
-
-    .upload-text {
-      font-size: clamp(1rem, 3vw, 1.2rem);
-      color: var(--text-primary);
-      font-weight: 500;
-      margin-bottom: 8px;
-    }
-
-    .upload-subtext {
-      font-size: clamp(0.8rem, 2.5vw, 0.95rem);
-      color: var(--text-secondary);
-    }
-
-    .hidden-file-input {
-      display: none;
-    }
-
-    .image-preview {
-      max-width: 100%;
-      max-height: 300px;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      object-fit: cover;
-    }
-
-    /* Uploaded Image Display - Fixed for S3 */
-    .uploaded-image-display {
-      margin-bottom: 20px;
-      text-align: center;
-    }
-
-    .uploaded-image-title {
-      font-size: clamp(0.9rem, 2.5vw, 1rem);
-      color: var(--success-color);
-      font-weight: 600;
-      margin-bottom: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-    }
-
-    .uploaded-image-container {
-      background: var(--surface-variant);
-      border-radius: 12px;
-      padding: 15px;
-      border: 2px solid var(--success-color);
-    }
-
-    .uploaded-image {
-      max-width: 100%;
-      max-height: 250px;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      object-fit: cover;
-      margin-bottom: 10px;
-    }
-
-    .uploaded-image-url {
-      font-size: clamp(0.7rem, 2vw, 0.8rem);
-      color: var(--text-secondary);
-      word-break: break-all;
-      background: rgba(255, 255, 255, 0.8);
-      padding: 8px;
-      border-radius: 6px;
-      margin-top: 8px;
-    }
-
-    .change-image-btn {
-      background: var(--warning-color);
-      color: white;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 6px;
-      font-size: 0.85rem;
-      cursor: pointer;
-      margin-top: 10px;
-      transition: all 0.3s ease;
-    }
-
-    .change-image-btn:hover {
-      background: #d69e2e;
-      transform: translateY(-1px);
-    }
-
-    .upload-actions {
-      display: flex;
-      gap: 12px;
-      margin-top: 20px;
-      justify-content: center;
-    }
-
-    .upload-btn {
-      padding: 14px 24px;
-      border: none;
-      border-radius: 12px;
-      font-size: clamp(0.95rem, 2.8vw, 1.1rem);
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      min-width: 200px;
-    }
-
-    .btn-gallery {
-      background: linear-gradient(135deg, var(--secondary-color), #28a745);
-      color: white;
-      box-shadow: 0 4px 16px rgba(52, 168, 83, 0.3);
-    }
-
-    .btn-complete {
-      background: linear-gradient(135deg, var(--warning-color), #d69e2e);
-      color: white;
-      box-shadow: 0 4px 16px rgba(249, 171, 0, 0.3);
-      width: 100%;
+    .ivr-btn {
+      width: 100%; padding: 14px;
+      border: none; border-radius: 14px;
+      font-size: 14px; font-weight: 600;
+      cursor: pointer; transition: all 0.2s;
       margin-top: 12px;
     }
+    .ivr-btn-primary { background: #7c3aed; color: white; }
+    .ivr-btn-primary:hover { background: #6d28d9; }
+    .ivr-btn-secondary { background: #f3f4f6; color: #4b5563; }
+    .ivr-btn-secondary:hover { background: #e5e7eb; }
+    .ivr-btn:active { transform: scale(0.97); }
 
-    .btn-complete:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-
-    .upload-btn:active:not(:disabled) {
-      transform: scale(0.98);
-    }
-
-    .upload-status {
-      margin-top: 15px;
-      padding: 12px;
-      border-radius: 8px;
-      text-align: center;
-      font-weight: 500;
-    }
-
-    .upload-status.uploading {
-      background: #fff3cd;
-      color: #856404;
-    }
-
-    .upload-status.success {
-      background: #d4edda;
-      color: #155724;
-    }
-
-    .upload-status.error {
-      background: #f8d7da;
-      color: #721c24;
-    }
-
-    .completed-message {
-      background: var(--success-color);
-      color: white;
-      padding: 20px;
-      border-radius: 12px;
-      text-align: center;
-      font-size: clamp(1rem, 3vw, 1.2rem);
-      font-weight: 600;
-    }
-
-    .completed-message i {
-      font-size: clamp(1.5rem, 4vw, 2rem);
-      margin-bottom: 10px;
-      display: block;
-    }
-
-    .status-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      padding: 4px 10px;
-      border-radius: 20px;
-      font-size: clamp(0.7rem, 1.8vw, 0.8rem);
-      font-weight: 500;
-      text-transform: uppercase;
-    }
-
-    .status-pending {
-      background: rgba(234, 67, 53, 0.1);
-      color: var(--danger-color);
-    }
-
-    .status-completed {
-      background: rgba(52, 168, 83, 0.1);
-      color: var(--secondary-color);
-    }
-
-    .status-call-done {
-      background: rgba(107, 114, 128, 0.1);
-      color: var(--text-secondary);
-    }
-
-    .error-state {
-      background: var(--surface);
-      border-radius: var(--border-radius);
-      padding: 30px 20px;
-      text-align: center;
-      box-shadow: var(--card-shadow);
-    }
-
-    .error-icon {
-      font-size: 40px;
-      color: var(--danger-color);
-      margin-bottom: 16px;
-    }
-
-    .cancelled-overlay::after {
-      content: 'कैंसिल किया गया';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%) rotate(-15deg);
-      background: var(--danger-color);
-      color: white;
-      padding: 8px 16px;
-      border-radius: 6px;
-      font-weight: 700;
-      font-size: clamp(1rem, 3.5vw, 1.4rem);
-      opacity: 0.9;
-      z-index: 10;
-    }
-
-    .disabled {
-      opacity: 0.6;
-      pointer-events: none;
-    }
-
-    .loading-inline {
-      display: inline-block;
-      width: 16px;
-      height: 16px;
-      border: 2px solid rgba(255,255,255,.3);
-      border-radius: 50%;
-      border-top-color: #fff;
-      animation: spin 1s ease-in-out infinite;
-    }
-
-    /* Sub-mechanic assignment styles */
-    .sub-mechanic-card {
-      background: var(--surface);
-      border-radius: var(--border-radius);
-      padding: 20px;
-      margin: 16px 0;
-      box-shadow: var(--card-shadow);
-      border-left: 4px solid var(--primary-color);
-    }
-
-    .sub-mechanic-card h3 {
-      font-size: clamp(1rem, 3vw, 1.2rem);
-      font-weight: 600;
-      color: var(--text-primary);
-      margin-bottom: 16px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .mechanic-list {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .mechanic-item {
-      background: var(--surface-variant);
+    /* Unlock banner */
+    .unlock-banner {
+      background: #fef3c7;
+      border: 1px solid #f59e0b;
       border-radius: 10px;
-      padding: 12px 16px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      border: 2px solid transparent;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+      padding: 10px 14px;
+      font-size: 12px;
+      color: #92400e;
+      margin-bottom: 12px;
+      text-align: left;
+    }
+    .unlock-banner i { margin-right: 6px; }
+
+    /* Main styles */
+    .header {
+      background: var(--surface); border-radius: var(--border-radius);
+      padding: 20px; margin-bottom: 16px;
+      box-shadow: var(--card-shadow); text-align: center;
+      position: relative; overflow: hidden;
+    }
+    .header::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+      background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    }
+    .header h1 { font-size: clamp(1.3rem,4vw,1.8rem); font-weight: 700; color: var(--primary-color); margin-bottom: 8px; }
+
+    .timer-card {
+      background: var(--warning-color); color: white;
+      padding: 16px; border-radius: var(--border-radius);
+      margin-bottom: 16px; box-shadow: var(--card-shadow); text-align: center;
+    }
+    .timer-card h3 { font-size: clamp(1rem,3vw,1.2rem); margin-bottom: 8px; }
+    .timer-display { font-size: clamp(1.8rem,5vw,2.4rem); font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+
+    .advance-status {
+      background: var(--surface); border-radius: var(--border-radius);
+      padding: 16px; margin-bottom: 16px; box-shadow: var(--card-shadow);
+      text-align: center; border-left: 4px solid var(--secondary-color);
+    }
+    .advance-status h3 { font-size: clamp(1rem,3vw,1.2rem); font-weight: 600; color: var(--text-primary); margin-bottom: 8px; }
+    .advance-amount { font-size: clamp(1.4rem,4vw,1.8rem); font-weight: 700; font-family: 'JetBrains Mono', monospace; color: var(--secondary-color); }
+
+    .collect-amount {
+      background: var(--surface); border-radius: var(--border-radius);
+      padding: 16px; margin-bottom: 16px; box-shadow: var(--card-shadow);
+      text-align: center; border-left: 4px solid var(--primary-color); position: relative;
+    }
+    .collect-amount.completed { border-left: 4px solid var(--secondary-color); }
+    .collect-amount h3 { font-size: clamp(1rem,3vw,1.2rem); font-weight: 600; color: var(--text-primary); margin-bottom: 8px; }
+    .collect-display { font-size: clamp(1.6rem,5vw,2.2rem); font-weight: 700; font-family: 'JetBrains Mono', monospace; color: var(--primary-color); }
+    .collected-stamp {
+      position: absolute; top: 64%; right: 20px; transform: translateY(-50%);
+      background: var(--success-color); color: white;
+      padding: 8px 12px; border-radius: 8px;
+      font-size: clamp(0.7rem,2vw,0.85rem); font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.5px;
+      box-shadow: 0 2px 8px rgba(19,115,51,0.3);
+      display: flex; align-items: center; gap: 4px;
     }
 
-    .mechanic-item:hover {
-      background: #e5f3ff;
-      border-color: var(--primary-color);
-    }
+    .main-card { background: var(--surface); border-radius: var(--border-radius); box-shadow: var(--card-shadow); overflow: hidden; margin-bottom: 16px; }
+    .car-section { padding: 20px; background: linear-gradient(135deg, var(--surface-variant) 0%, var(--surface) 100%); text-align: center; }
+    .car-image { width: 100%; max-width: 200px; height: auto; border-radius: 12px; margin: 0 auto 12px; display: block; box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
+    .car-details h2 { font-size: clamp(1.2rem,3.5vw,1.6rem); font-weight: 600; color: var(--text-primary); margin-bottom: 8px; }
+    .problem-badge { background: linear-gradient(135deg, var(--warning-color), #ff8c00); color: white; padding: 10px 16px; border-radius: 12px; font-size: clamp(0.85rem,2.5vw,1rem); font-weight: 500; margin: 12px 0; box-shadow: 0 4px 12px rgba(249,171,0,0.3); }
 
-    .mechanic-item:active {
-      transform: scale(0.98);
-    }
+    .info-grid { padding: 20px; }
+    .info-item { margin-bottom: 16px; padding: 16px; background: var(--surface-variant); border-radius: 12px; border-left: 4px solid var(--primary-color); }
+    .info-item.completed { opacity: 0.6; pointer-events: none; }
+    .info-label { font-size: clamp(0.75rem,2vw,0.9rem); font-weight: 500; color: var(--text-secondary); margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+    .info-value { font-size: clamp(0.95rem,2.8vw,1.2rem); font-weight: 600; color: var(--text-primary); }
 
-    .mechanic-name {
-      font-size: clamp(0.9rem, 2.5vw, 1rem);
-      font-weight: 500;
-      color: var(--text-primary);
+    .contact-buttons { display: flex; gap: 8px; margin-top: 8px; }
+    .contact-btn {
+      padding: 8px 16px; border: none; border-radius: 8px;
+      font-size: clamp(0.8rem,2vw,0.9rem); font-weight: 500; color: white;
+      cursor: pointer; display: flex; align-items: center; gap: 6px;
+      text-decoration: none; transition: all 0.3s ease; flex: 1; justify-content: center;
     }
+    .contact-btn.call { background: var(--secondary-color); }
+    .contact-btn.whatsapp { background: #25d366; }
+    .contact-btn.whatsapp.locked { background: #9ca3af; cursor: not-allowed; pointer-events: none; }
+    .contact-btn:active { transform: scale(0.95); }
 
-    .mechanic-select-icon {
-      color: var(--primary-color);
-      font-size: clamp(0.8rem, 2vw, 0.9rem);
+    .highlight-card {
+      background: linear-gradient(135deg, var(--secondary-color), #28a745); color: white;
+      padding: 20px; border-radius: var(--border-radius); margin: 16px 0;
+      box-shadow: 0 8px 24px rgba(52,168,83,0.3); text-align: center;
     }
+    .highlight-card h3 { font-size: clamp(1rem,3vw,1.3rem); font-weight: 600; margin-bottom: 8px; }
+    .amount { font-size: clamp(1.6rem,5vw,2.2rem); font-weight: 700; font-family: 'JetBrains Mono', monospace; }
 
-    .assigned-mechanic-card {
-      background: linear-gradient(135deg, var(--success-color), #28a745);
-      color: white;
-      border-left: 4px solid #1e7e34;
-    }
+    .agent-info { background: var(--surface); border-radius: var(--border-radius); padding: 16px; margin: 16px 0; box-shadow: var(--card-shadow); border-left: 4px solid var(--warning-color); }
+    .agent-info h3 { font-size: clamp(1rem,3vw,1.2rem); font-weight: 600; color: var(--text-primary); margin-bottom: 8px; }
+    .agent-info p { font-size: clamp(0.9rem,2.5vw,1rem); color: var(--text-secondary); margin: 4px 0; }
 
-    .assigned-mechanic-card h3 {
-      color: white;
-    }
+    .completion-section { background: var(--surface); border-radius: var(--border-radius); padding: 20px; margin: 20px 0; box-shadow: var(--card-shadow); }
+    .completion-section h3 { font-size: clamp(1.1rem,3vw,1.3rem); font-weight: 600; color: var(--text-primary); margin-bottom: 20px; text-align: center; }
 
-    .assigned-mechanic-info {
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 10px;
-      padding: 16px;
-      text-align: center;
+    .image-upload-container {
+      border: 3px dashed #a4b0be; border-radius: 12px; padding: 20px; text-align: center;
+      cursor: pointer; transition: all 0.3s ease; margin-bottom: 20px;
+      min-height: 200px; display: flex; flex-direction: column; justify-content: center; align-items: center;
     }
+    .image-upload-container:hover { border-color: var(--primary-color); background: #f8f9ff; }
+    .image-upload-container.has-image { border-color: var(--success-color); background: #f0f9f0; padding: 10px; }
+    .upload-icon { font-size: 3rem; color: var(--text-secondary); margin-bottom: 12px; }
+    .upload-text { font-size: clamp(1rem,3vw,1.2rem); color: var(--text-primary); font-weight: 500; margin-bottom: 8px; }
+    .upload-subtext { font-size: clamp(0.8rem,2.5vw,0.95rem); color: var(--text-secondary); }
+    .image-preview { max-width: 100%; max-height: 300px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); object-fit: cover; }
 
-    .assigned-mechanic-name {
-      font-size: clamp(1.1rem, 3.5vw, 1.4rem);
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
+    .uploaded-image-display { margin-bottom: 20px; text-align: center; }
+    .uploaded-image-title { font-size: clamp(0.9rem,2.5vw,1rem); color: var(--success-color); font-weight: 600; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .uploaded-image-container { background: var(--surface-variant); border-radius: 12px; padding: 15px; border: 2px solid var(--success-color); }
+    .uploaded-image { max-width: 100%; max-height: 250px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); object-fit: cover; margin-bottom: 10px; }
+    .change-image-btn { background: var(--warning-color); color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 0.85rem; cursor: pointer; margin-top: 10px; transition: all 0.3s ease; }
 
-    .assigned-mechanic-status {
-      font-size: clamp(0.9rem, 2.5vw, 1rem);
-      opacity: 0.9;
-    }
+    .upload-actions { display: flex; gap: 12px; margin-top: 20px; justify-content: center; }
+    .upload-btn { padding: 14px 24px; border: none; border-radius: 12px; font-size: clamp(0.95rem,2.8vw,1.1rem); font-weight: 600; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 8px; min-width: 200px; }
+    .btn-gallery { background: linear-gradient(135deg, var(--secondary-color), #28a745); color: white; box-shadow: 0 4px 16px rgba(52,168,83,0.3); }
+    .btn-complete { background: linear-gradient(135deg, var(--warning-color), #d69e2e); color: white; box-shadow: 0 4px 16px rgba(249,171,0,0.3); width: 100%; margin-top: 12px; }
+    .btn-complete:disabled { opacity: 0.6; cursor: not-allowed; }
+    .upload-btn:active:not(:disabled) { transform: scale(0.98); }
 
-    /* Image loading error handling */
-    .image-error {
-      background: var(--surface-variant);
-      color: var(--text-secondary);
-      padding: 20px;
-      border-radius: 8px;
-      text-align: center;
-      font-size: 0.9rem;
-    }
+    .upload-status { margin-top: 15px; padding: 12px; border-radius: 8px; text-align: center; font-weight: 500; }
+    .upload-status.uploading { background: #fff3cd; color: #856404; }
+    .upload-status.success { background: #d4edda; color: #155724; }
+    .upload-status.error { background: #f8d7da; color: #721c24; }
+
+    .completed-message { background: var(--success-color); color: white; padding: 20px; border-radius: 12px; text-align: center; font-size: clamp(1rem,3vw,1.2rem); font-weight: 600; }
+    .completed-message i { font-size: clamp(1.5rem,4vw,2rem); margin-bottom: 10px; display: block; }
+
+    .status-badge { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 20px; font-size: clamp(0.7rem,1.8vw,0.8rem); font-weight: 500; text-transform: uppercase; }
+    .status-pending { background: rgba(234,67,53,0.1); color: var(--danger-color); }
+    .status-completed { background: rgba(52,168,83,0.1); color: var(--secondary-color); }
+    .status-call-done { background: rgba(107,114,128,0.1); color: var(--text-secondary); }
+
+    .error-state { background: var(--surface); border-radius: var(--border-radius); padding: 30px 20px; text-align: center; box-shadow: var(--card-shadow); }
+    .error-icon { font-size: 40px; color: var(--danger-color); margin-bottom: 16px; }
+
+    .cancelled-overlay::after { content: 'कैंसिल किया गया'; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%) rotate(-15deg); background: var(--danger-color); color: white; padding: 8px 16px; border-radius: 6px; font-weight: 700; font-size: clamp(1rem,3.5vw,1.4rem); opacity: 0.9; z-index: 10; }
+
+    .disabled { opacity: 0.6; pointer-events: none; }
+    .loading-inline { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,.3); border-radius: 50%; border-top-color: #fff; animation: spin 1s ease-in-out infinite; }
+
+    .sub-mechanic-card { background: var(--surface); border-radius: var(--border-radius); padding: 20px; margin: 16px 0; box-shadow: var(--card-shadow); border-left: 4px solid var(--primary-color); }
+    .sub-mechanic-card h3 { font-size: clamp(1rem,3vw,1.2rem); font-weight: 600; color: var(--text-primary); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+    .mechanic-list { display: flex; flex-direction: column; gap: 10px; }
+    .mechanic-item { background: var(--surface-variant); border-radius: 10px; padding: 12px 16px; cursor: pointer; transition: all 0.3s ease; border: 2px solid transparent; display: flex; align-items: center; justify-content: space-between; }
+    .mechanic-item:hover { background: #e5f3ff; border-color: var(--primary-color); }
+    .mechanic-item:active { transform: scale(0.98); }
+    .mechanic-name { font-size: clamp(0.9rem,2.5vw,1rem); font-weight: 500; color: var(--text-primary); }
+    .mechanic-select-icon { color: var(--primary-color); font-size: clamp(0.8rem,2vw,0.9rem); }
+
+    .assigned-mechanic-card { background: linear-gradient(135deg, var(--success-color), #28a745); color: white; border-left: 4px solid #1e7e34; }
+    .assigned-mechanic-card h3 { color: white; }
+    .assigned-mechanic-info { background: rgba(255,255,255,0.1); border-radius: 10px; padding: 16px; text-align: center; }
+    .assigned-mechanic-name { font-size: clamp(1.1rem,3.5vw,1.4rem); font-weight: 700; margin-bottom: 8px; }
+    .assigned-mechanic-status { font-size: clamp(0.9rem,2.5vw,1rem); opacity: 0.9; }
+
+    .image-error { background: var(--surface-variant); color: var(--text-secondary); padding: 20px; border-radius: 8px; text-align: center; font-size: 0.9rem; }
 
     @media (max-width: 768px) {
-      .upload-actions {
-        flex-direction: column;
-      }
-      
-      .upload-btn {
-        width: 100%;
-      }
+      .upload-actions { flex-direction: column; }
+      .upload-btn { width: 100%; }
     }
   </style>
 </head>
 <body>
+
+  <!-- IVR Popup -->
+  <div id="ivrPopup" class="hidden">
+    <div class="ivr-box">
+      <div class="ivr-phone-wrap">
+        <span class="ivr-pulse pulse-ring"></span>
+        <div class="ivr-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 7V5z"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Countdown state -->
+      <div id="ivrCountdownState">
+        <div class="ivr-label">कॉल आने वाली है</div>
+        <div class="ivr-countdown-num" id="ivrCountdown">10</div>
+        <div class="ivr-sublabel">seconds में</div>
+      </div>
+
+      <!-- Connecting state -->
+      <div id="ivrConnectingState" style="display:none;">
+        <div class="ivr-connecting-title">कनेक्ट हो रहा है...</div>
+        <div class="ivr-connecting-sub">आपको जल्दी कॉल आएगी</div>
+      </div>
+
+      <div id="ivrUnlockNote" style="display:none;" class="unlock-banner">
+        <i class="fas fa-unlock-alt"></i>
+        कई बार try करने पर नंबर और WhatsApp unlock हो जाएगा
+      </div>
+
+      <button id="ivrRetryBtn" class="ivr-btn ivr-btn-primary" style="display:none;" onclick="handleRetry()">
+        📞 फिर से कॉल करें
+      </button>
+      <button class="ivr-btn ivr-btn-secondary" onclick="closeIVRPopup()">बंद करें</button>
+    </div>
+  </div>
+
   <div class="container">
-    <!-- Loading State -->
     <div id="loadingState" class="loading-spinner">
       <div class="spinner"></div>
       <p>बुकिंग विवरण लोड कर रहे हैं...</p>
     </div>
 
-    <!-- Error State -->
     <div id="errorState" class="error-state" style="display: none;">
-      <div class="error-icon">
-        <i class="fas fa-exclamation-triangle"></i>
-      </div>
+      <div class="error-icon"><i class="fas fa-exclamation-triangle"></i></div>
       <h2>बुकिंग लोड नहीं हो सकी</h2>
       <p>कृपया अपना इंटरनेट कनेक्शन चेक करें और फिर कोशिश करें</p>
-      <button class="btn btn-primary" onclick="location.reload()" style="margin-top: 16px; width: auto;">
-        <i class="fas fa-refresh"></i>
-        फिर कोशिश करें
+      <button onclick="location.reload()" style="margin-top:16px;padding:10px 20px;background:var(--primary-color);color:white;border:none;border-radius:8px;cursor:pointer;">
+        <i class="fas fa-refresh"></i> फिर कोशिश करें
       </button>
     </div>
 
-    <!-- Main Content -->
     <div id="mainContent" style="display: none;">
-
-      <!-- Timer Card -->
       <div class="timer-card" id="timerCard" style="display: none;">
         <h3><i class="fas fa-clock"></i> बुकिंग समय</h3>
         <div class="timer-display" id="timerDisplay">00:00</div>
       </div>
 
-      <!-- Advance Payment Status -->
       <div class="advance-status" id="advanceStatus">
-        <h3 id="advanceTitle"> कस्टमर का  एडवांस</h3>
+        <h3 id="advanceTitle">कस्टमर का एडवांस</h3>
         <div class="advance-amount" id="advanceAmount">लोड हो रहा है...</div>
       </div>
 
-      <!-- Total Collection Amount -->
       <div class="collect-amount" id="collectAmountSection">
-        <h3 id="collectTitle"> कस्टमर से आपको टोटल पैसे लेने है</h3>
+        <h3 id="collectTitle">कस्टमर से आपको टोटल पैसे लेने है</h3>
         <div class="collect-display" id="totalCollect">₹0</div>
         <div class="collected-stamp" id="collectedStamp" style="display: none;">
-          <i class="fas fa-check-circle"></i>
-          COLLECTED
+          <i class="fas fa-check-circle"></i> COLLECTED
         </div>
       </div>
 
-      <!-- Car Information Card -->
       <div class="main-card" id="carCard">
         <div class="car-section">
           <img id="carImage" class="car-image" src="" alt="गाड़ी की तस्वीर" style="display: none;">
@@ -798,144 +377,92 @@
         </div>
 
         <div class="info-grid">
-          <!-- Customer Information -->
           <div class="info-item" id="customerInfoItem">
-            <div class="info-label">
-              <i class="fas fa-user"></i>
-               कस्टमर का मोबाइल
-            </div>
-            <div class="info-value" id="customerMobile">लोड हो रहा है...</div>
+            <div class="info-label"><i class="fas fa-user"></i> कस्टमर का मोबाइल</div>
+            <div class="info-value" id="customerMobileDisplay">लोड हो रहा है...</div>
             <div class="contact-buttons" id="customerContactButtons">
-              <a href="tel:" id="callButton" class="contact-btn call">
-                <i class="fas fa-phone"></i>
-                कॉल करें
-              </a>
-              <a href="#" id="whatsappButton" target="_blank" class="contact-btn whatsapp">
-                <i class="fab fa-whatsapp"></i>
-                WhatsApp
+              <button id="callButton" class="contact-btn call" onclick="handleCallClick()">
+                <i class="fas fa-phone"></i> कॉल करें
+              </button>
+              <a href="#" id="whatsappButton" class="contact-btn whatsapp locked" onclick="return false;">
+                <i class="fab fa-whatsapp"></i> WhatsApp
               </a>
             </div>
           </div>
 
-          <!-- Location -->
           <div class="info-item" id="locationInfoItem">
-            <div class="info-label">
-              <i class="fas fa-map-marker-alt"></i>
-              सर्विस लोकेशन
-            </div>
+            <div class="info-label"><i class="fas fa-map-marker-alt"></i> सर्विस लोकेशन</div>
             <div class="info-value">
-              <button id="locationButton" onclick="openLocation()" style="background: var(--primary-color); color: white; border: none; padding: 8px 16px; border-radius: 8px; font-size: 0.9rem; width: 100%;">
-                <i class="fas fa-external-link-alt"></i>
-                मैप पर देखें
+              <button onclick="openLocation()" style="background:var(--primary-color);color:white;border:none;padding:8px 16px;border-radius:8px;font-size:0.9rem;width:100%;">
+                <i class="fas fa-external-link-alt"></i> मैप पर देखें
               </button>
             </div>
           </div>
 
-          <!-- Booking Status -->
           <div class="info-item">
-            <div class="info-label">
-              <i class="fas fa-info-circle"></i>
-              बुकिंग स्थिति
-            </div>
+            <div class="info-label"><i class="fas fa-info-circle"></i> बुकिंग स्थिति</div>
             <div class="info-value" id="bookingStatus">
               <span class="status-badge status-completed">सक्रिय</span>
             </div>
           </div>
 
-          <!-- Service Price -->
           <div class="info-item">
-            <div class="info-label">
-              <i class="fas fa-tag"></i>
-              सर्विस की कीमत
-            </div>
+            <div class="info-label"><i class="fas fa-tag"></i> सर्विस की कीमत</div>
             <div class="info-value" id="servicePrice">लोड हो रहा है...</div>
           </div>
         </div>
       </div>
 
-      <!-- Mechanic Payment Highlight -->
       <div class="highlight-card">
         <h3>आपकी कमाई</h3>
         <div class="amount" id="mechanicPayment">₹0</div>
-        <p style="margin-top: 6px; opacity: 0.9;">इस सर्विस के लिए आपको मिलने वाली राशि</p>
+        <p style="margin-top:6px;opacity:0.9;">इस सर्विस के लिए आपको मिलने वाली राशि</p>
       </div>
 
-      <!-- Image Upload Section - Gallery Only -->
       <div class="completion-section">
         <h3>📷 गाड़ी की फोटो अपलोड करके बुकिंग पूरी करें</h3>
-        
-        <div id="completedMessage" style="display: none;" class="completed-message">
-          <i class="fas fa-check-circle"></i>
-          ये बुकिंग आपने complete कर दी
+        <div id="completedMessage" style="display:none;" class="completed-message">
+          <i class="fas fa-check-circle"></i> ये बुकिंग आपने complete कर दी
         </div>
-        
-        <!-- Show previously uploaded image if exists -->
-        <div id="previousUploadedImage" style="display: none;" class="uploaded-image-display">
-          <div class="uploaded-image-title">
-            <i class="fas fa-check-circle"></i>
-            पहले से अपलोड की गई फोटो
-          </div>
+        <div id="previousUploadedImage" style="display:none;" class="uploaded-image-display">
+          <div class="uploaded-image-title"><i class="fas fa-check-circle"></i> पहले से अपलोड की गई फोटो</div>
           <div class="uploaded-image-container">
             <img id="previousImagePreview" class="uploaded-image" alt="Previously uploaded image" onerror="handleImageError(this)">
             <div class="uploaded-image-url" id="previousImageUrl"></div>
-            <button class="change-image-btn" onclick="changeUploadedImage()">
-              <i class="fas fa-edit"></i> फोटो बदलें
-            </button>
+            <button class="change-image-btn" onclick="changeUploadedImage()"><i class="fas fa-edit"></i> फोटो बदलें</button>
           </div>
         </div>
-        
         <div id="imageUploadContainer">
-          <!-- File Input (Hidden) -->
-          
-          <!-- Upload Area -->
           <div class="image-upload-container" id="uploadArea" onclick="triggerImageSelect()">
-            <div class="upload-icon" id="uploadIcon">
-              <i class="fas fa-images"></i>
-            </div>
+            <div class="upload-icon" id="uploadIcon"><i class="fas fa-images"></i></div>
             <div class="upload-text" id="uploadText">गैलरी से फोटो चुनें</div>
             <div class="upload-subtext" id="uploadSubtext">सर्विस की गई गाड़ी की तस्वीर गैलरी से चुनकर अपलोड करें</div>
-            <img id="imagePreview" class="image-preview" style="display: none;" alt="Selected Image">
+            <img id="imagePreview" class="image-preview" style="display:none;" alt="Selected Image">
           </div>
-
-          <!-- Upload Actions - Gallery Only -->
           <div class="upload-actions">
             <button class="upload-btn btn-gallery" onclick="openGallery()" id="galleryBtn">
-              <i class="fas fa-images"></i>
-              गैलरी खोलें
+              <i class="fas fa-images"></i> गैलरी खोलें
             </button>
           </div>
-
-          <!-- Upload Status -->
-          <div id="uploadStatus" class="upload-status" style="display: none;"></div>
-
-          <!-- Complete Button -->
+          <div id="uploadStatus" class="upload-status" style="display:none;"></div>
           <button id="completeBookingBtn" class="upload-btn btn-complete" onclick="completeBookingWithImage()" disabled>
-            <i class="fas fa-check-circle"></i>
-            बुकिंग पूरी करें
+            <i class="fas fa-check-circle"></i> बुकिंग पूरी करें
           </button>
         </div>
       </div>
 
-      <!-- Sub-Mechanic Assignment Card -->
-      <div class="sub-mechanic-card" id="subMechanicCard" style="display: none;">
-        <h3 id="subMechanicTitle">
-          <i class="fas fa-users"></i>
-          आपने किसी मैकेनिक को भेजे
-        </h3>
-        <div id="subMechanicContent">
-          <!-- Content will be populated by JavaScript -->
-        </div>
+      <div class="sub-mechanic-card" id="subMechanicCard" style="display:none;">
+        <h3 id="subMechanicTitle"><i class="fas fa-users"></i> आपने किसी मैकेनिक को भेजे</h3>
+        <div id="subMechanicContent"></div>
       </div>
 
-      <!-- Agent Information (at bottom) -->
       <div class="agent-info">
         <h3><i class="fas fa-headset"></i> एजेंट जानकारी</h3>
         <p><strong>नाम:</strong> <span id="agentName">लोड हो रहा है...</span></p>
         <p><strong>मोबाइल:</strong> <span id="agentMobile">लोड हो रहा है...</span></p>
-        <div class="contact-buttons" id="agentCallButton" style="display: none; margin-top: 12px;">
-          <a href="tel:" class="contact-btn call" style="width: auto;">
-            <i class="fas fa-phone"></i>
-            कंपनी में कॉल करें
+        <div class="contact-buttons" id="agentCallButton" style="display:none;margin-top:12px;">
+          <a href="tel:" class="contact-btn call" style="width:auto;">
+            <i class="fas fa-phone"></i> कंपनी में कॉल करें
           </a>
         </div>
       </div>
@@ -943,7 +470,6 @@
   </div>
 
   <script>
-    // Get booking ID from URL
     const urlParams = new URLSearchParams(window.location.search);
     const bookingId = urlParams.get('id');
     let bookingLocation = '';
@@ -953,25 +479,147 @@
     let assignedMechanic = null;
     let selectedImageFile = null;
     let uploadedImageUrl = null;
-
-    // Image Upload Variables
     let selectedFiles = [];
     let jsBridgeUris = [];
-
-    // localStorage keys for image persistence
     const imageStorageKey = `booking_image_${bookingId}`;
 
-    // Check if coming from mechanic-booking.html and prevent back navigation
+    // ─── IVR / Call state ───────────────────────────────────────────
+    const callAttemptsKey = `ivr_attempts_${bookingId}`;
+    const firstCallTimeKey = `ivr_first_call_time_${bookingId}`;
+
+    let rawCustomerMobile = ''; // full number from API e.g. 919395816672
+    let ivrCountdownTimer = null;
+
+    function getCallAttempts() {
+      return parseInt(localStorage.getItem(callAttemptsKey) || '0');
+    }
+
+    function incrementCallAttempts() {
+      const count = getCallAttempts() + 1;
+      localStorage.setItem(callAttemptsKey, count);
+      if (count === 1) {
+        localStorage.setItem(firstCallTimeKey, Date.now());
+      }
+      return count;
+    }
+
+    function getCustomerMobileClean() {
+      // Strip leading 91 if 12 digits
+      const cleaned = rawCustomerMobile.replace(/\D/g, '');
+      return cleaned.length === 12 && cleaned.startsWith('91') ? cleaned.slice(2) : cleaned.slice(-10);
+    }
+
+    function getMechanicName() {
+      return localStorage.getItem('mechanic') || '';
+    }
+
+    function triggerIVRCall() {
+      const customerMobile = getCustomerMobileClean();
+      const mechanic = getMechanicName();
+      const url = `https://ai.instantmechanic.online/bot/ivr_call?mobile1=null&mobile2=${customerMobile}&mechanic=${encodeURIComponent(mechanic)}`;
+      fetch(url).catch(err => console.error('IVR call failed:', err));
+    }
+
+    function handleCallClick() {
+      const attempts = incrementCallAttempts();
+      // Always hit IVR API immediately
+      triggerIVRCall();
+      showIVRPopup(attempts);
+    }
+
+    function handleRetry() {
+      const attempts = incrementCallAttempts();
+      const firstCallTime = parseInt(localStorage.getItem(firstCallTimeKey) || '0');
+      const elapsedMs = Date.now() - firstCallTime;
+      const withinOneMin = elapsedMs < 60 * 1000;
+
+      closeIVRPopup();
+
+      if (attempts >= 3) {
+        // Unlock WhatsApp and show full number
+        unlockCustomerContact();
+        // Also open dialer
+        const cleaned = rawCustomerMobile.replace(/\D/g, '');
+        window.location.href = `tel:+${cleaned.length === 10 ? '91' + cleaned : cleaned}`;
+        return;
+      }
+
+      if (withinOneMin) {
+        // Within 1 min → direct dialer
+        const cleaned = rawCustomerMobile.replace(/\D/g, '');
+        window.location.href = `tel:+${cleaned.length === 10 ? '91' + cleaned : cleaned}`;
+      } else {
+        // After 1 min → hit IVR API again and show popup
+        triggerIVRCall();
+        showIVRPopup(attempts);
+      }
+    }
+
+    function showIVRPopup(attempts) {
+      const popup = document.getElementById('ivrPopup');
+      const countdownState = document.getElementById('ivrCountdownState');
+      const connectingState = document.getElementById('ivrConnectingState');
+      const retryBtn = document.getElementById('ivrRetryBtn');
+      const unlockNote = document.getElementById('ivrUnlockNote');
+      const countdownEl = document.getElementById('ivrCountdown');
+
+      // Reset
+      countdownState.style.display = 'block';
+      connectingState.style.display = 'none';
+      retryBtn.style.display = 'none';
+      countdownEl.textContent = '10';
+
+      // Show unlock hint after 2nd attempt
+      unlockNote.style.display = attempts >= 2 ? 'block' : 'none';
+
+      popup.classList.remove('hidden');
+
+      if (ivrCountdownTimer) clearInterval(ivrCountdownTimer);
+      let count = 10;
+      ivrCountdownTimer = setInterval(() => {
+        count--;
+        countdownEl.textContent = count;
+        if (count <= 0) {
+          clearInterval(ivrCountdownTimer);
+          ivrCountdownTimer = null;
+          countdownState.style.display = 'none';
+          connectingState.style.display = 'block';
+          retryBtn.style.display = 'block';
+        }
+      }, 1000);
+    }
+
+    function closeIVRPopup() {
+      if (ivrCountdownTimer) { clearInterval(ivrCountdownTimer); ivrCountdownTimer = null; }
+      document.getElementById('ivrPopup').classList.add('hidden');
+    }
+
+    function unlockCustomerContact() {
+      // Show full number
+      const cleaned = rawCustomerMobile.replace(/\D/g, '');
+      const number = cleaned.length >= 10 ? cleaned.slice(-10) : cleaned;
+      document.getElementById('customerMobileDisplay').textContent = `+91 ${number.slice(0,5)} ${number.slice(5)}`;
+
+      // Unlock WhatsApp
+      const waBtn = document.getElementById('whatsappButton');
+      waBtn.classList.remove('locked');
+      if (window._whatsappHref) {
+        waBtn.href = window._whatsappHref;
+      } else {
+        const msg = encodeURIComponent(`नमस्ते! मैं आपकी गाड़ी की सर्विस के लिए आने वाला मैकेनिक हूँ।`);
+        waBtn.href = `https://wa.me/${cleaned.length === 10 ? '91' + cleaned : cleaned}?text=${msg}`;
+      }
+      waBtn.onclick = null;
+    }
+    // ────────────────────────────────────────────────────────────────
+
     const referrer = document.referrer;
     if (referrer.includes('mechanic-booking.html')) {
       history.replaceState(null, null, location.href);
-      window.addEventListener('popstate', function(event) {
-        history.pushState(null, null, location.href);
-      });
+      window.addEventListener('popstate', function() { history.pushState(null, null, location.href); });
       history.pushState(null, null, location.href);
     }
 
-    // Function to handle image loading errors
     function handleImageError(img) {
       console.error('Failed to load image:', img.src);
       const container = img.closest('.uploaded-image-container');
@@ -987,138 +635,74 @@
       }
     }
 
-    // Function to save uploaded image to localStorage
     function saveImageToStorage(imageUrl) {
-      if (bookingId && imageUrl) {
-        localStorage.setItem(imageStorageKey, JSON.stringify({
-          url: imageUrl,
-          timestamp: new Date().toISOString()
-        }));
-        console.log('Image saved to localStorage:', imageUrl);
-      }
+      if (bookingId && imageUrl) localStorage.setItem(imageStorageKey, JSON.stringify({ url: imageUrl, timestamp: new Date().toISOString() }));
     }
 
-    // Function to load previously uploaded image from localStorage or API - Fixed
     function loadSavedImage(apiImageUrl = null) {
-      // First priority: API image (user_car_image)
-      if (apiImageUrl) {
-        console.log('Loading image from API (user_car_image):', apiImageUrl);
-        displayPreviousUploadedImage(apiImageUrl);
-        uploadedImageUrl = apiImageUrl;
-        // Also save to localStorage for consistency
-        saveImageToStorage(apiImageUrl);
-        return true;
-      }
-      
-      // Second priority: localStorage
+      if (apiImageUrl) { displayPreviousUploadedImage(apiImageUrl); uploadedImageUrl = apiImageUrl; saveImageToStorage(apiImageUrl); return true; }
       if (bookingId) {
         const saved = localStorage.getItem(imageStorageKey);
         if (saved) {
           try {
             const imageData = JSON.parse(saved);
-            if (imageData.url) {
-              console.log('Loading saved image from localStorage:', imageData.url);
-              displayPreviousUploadedImage(imageData.url);
-              uploadedImageUrl = imageData.url;
-              return true;
-            }
-          } catch (e) {
-            console.error('Error loading saved image:', e);
-            // Clear corrupted data
-            localStorage.removeItem(imageStorageKey);
-          }
+            if (imageData.url) { displayPreviousUploadedImage(imageData.url); uploadedImageUrl = imageData.url; return true; }
+          } catch(e) { localStorage.removeItem(imageStorageKey); }
         }
       }
       return false;
     }
 
-    // Function to display previously uploaded image - Fixed for S3
     function displayPreviousUploadedImage(imageUrl) {
       const previousImageDiv = document.getElementById('previousUploadedImage');
       const previousImagePreview = document.getElementById('previousImagePreview');
       const previousImageUrlDiv = document.getElementById('previousImageUrl');
       const uploadContainer = document.getElementById('imageUploadContainer');
-      
-      console.log('Displaying previous image:', imageUrl);
-      
-      // Create a test image to verify URL is accessible
       const testImg = new Image();
       testImg.onload = function() {
-        console.log('S3 image loaded successfully');
         previousImagePreview.src = imageUrl;
         previousImageUrlDiv.textContent = imageUrl;
         previousImageDiv.style.display = 'block';
         uploadContainer.style.display = 'none';
         enableCompleteButton();
       };
-      
       testImg.onerror = function() {
-        console.error('Failed to load S3 image, showing upload interface');
-        // If S3 image fails to load, remove from storage and show upload interface
         localStorage.removeItem(imageStorageKey);
         uploadedImageUrl = null;
         uploadContainer.style.display = 'block';
         previousImageDiv.style.display = 'none';
         disableCompleteButton();
-        
         showUploadStatus('⚠️ पुरानी फोटो लोड नहीं हो सकी, नई फोटो अपलोड करें', 'error');
       };
-      
-      // Set crossOrigin to anonymous to handle CORS issues
       testImg.crossOrigin = 'anonymous';
       testImg.src = imageUrl;
     }
 
-    // Function to change uploaded image
     function changeUploadedImage() {
-      const previousImageDiv = document.getElementById('previousUploadedImage');
-      const uploadContainer = document.getElementById('imageUploadContainer');
-      
-      previousImageDiv.style.display = 'none';
-      uploadContainer.style.display = 'block';
-      
-      // Reset upload state
-      resetUploadState();
-      disableCompleteButton();
+      document.getElementById('previousUploadedImage').style.display = 'none';
+      document.getElementById('imageUploadContainer').style.display = 'block';
+      resetUploadState(); disableCompleteButton();
     }
 
-    // Function to reset upload state
     function resetUploadState() {
-      const uploadArea = document.getElementById('uploadArea');
-      const uploadIcon = document.getElementById('uploadIcon');
-      const uploadText = document.getElementById('uploadText');
-      const uploadSubtext = document.getElementById('uploadSubtext');
-      const imagePreview = document.getElementById('imagePreview');
-      const uploadStatus = document.getElementById('uploadStatus');
-      
-      uploadArea.classList.remove('has-image');
-      uploadIcon.innerHTML = '<i class="fas fa-images"></i>';
-      uploadText.textContent = 'गैलरी से फोटो चुनें';
-      uploadSubtext.textContent = 'सर्विस की गई गाड़ी की तस्वीर गैलरी से चुनकर अपलोड करें';
-      imagePreview.style.display = 'none';
-      uploadStatus.style.display = 'none';
-      
-      selectedImageFile = null;
-      selectedFiles = [];
-      jsBridgeUris = [];
+      document.getElementById('uploadArea').classList.remove('has-image');
+      document.getElementById('uploadIcon').innerHTML = '<i class="fas fa-images"></i>';
+      document.getElementById('uploadText').textContent = 'गैलरी से फोटो चुनें';
+      document.getElementById('uploadSubtext').textContent = 'सर्विस की गई गाड़ी की तस्वीर गैलरी से चुनकर अपलोड करें';
+      document.getElementById('imagePreview').style.display = 'none';
+      document.getElementById('uploadStatus').style.display = 'none';
+      selectedImageFile = null; selectedFiles = []; jsBridgeUris = [];
     }
 
-    // Function to open location
     function openLocation() {
-      if (bookingLocation) {
-        window.open(bookingLocation, '_blank');
-      } else {
-        alert('लोकेशन उपलब्ध नहीं है');
-      }
+      if (bookingLocation) window.open(bookingLocation, '_blank');
+      else alert('लोकेशन उपलब्ध नहीं है');
     }
 
-    // Timer functions
     function startTimer(createdAt) {
       bookingCreatedAt = new Date(createdAt);
       const now = new Date();
       const elapsedMinutes = Math.floor((now - bookingCreatedAt) / (1000 * 60));
-      
-      // Show timer only if booking is less than 30 minutes old
       if (elapsedMinutes < 30) {
         document.getElementById('timerCard').style.display = 'block';
         updateTimer();
@@ -1132,160 +716,79 @@
       const elapsedMinutes = Math.floor(elapsedMs / (1000 * 60));
       const remainingMinutes = Math.max(0, 30 - elapsedMinutes);
       const remainingSeconds = Math.max(0, 60 - Math.floor((elapsedMs % (1000 * 60)) / 1000));
-      
-      const display = `${remainingMinutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
-      document.getElementById('timerDisplay').textContent = display;
-      
-      if (remainingMinutes === 0 && remainingSeconds === 0) {
-        clearInterval(timerInterval);
-        document.getElementById('timerCard').style.display = 'none';
-      }
+      document.getElementById('timerDisplay').textContent = `${remainingMinutes.toString().padStart(2,'0')}:${remainingSeconds.toString().padStart(2,'0')}`;
+      if (remainingMinutes === 0 && remainingSeconds === 0) { clearInterval(timerInterval); document.getElementById('timerCard').style.display = 'none'; }
     }
 
-    // Function to handle completed bookings
     function handleCompletedBooking() {
-      // Replace upload section with completed message
       document.getElementById('imageUploadContainer').style.display = 'none';
       document.getElementById('previousUploadedImage').style.display = 'none';
       document.getElementById('completedMessage').style.display = 'block';
-      
-      // Update collection amount section for completed bookings
-      const collectTitle = document.getElementById('collectTitle');
-      const collectSection = document.getElementById('collectAmountSection');
-      const collectedStamp = document.getElementById('collectedStamp');
-      
-      collectTitle.textContent = ' कस्टमर से आपने पेमेंट कलेक्ट कर ली है';
-      collectSection.classList.add('completed');
-      collectedStamp.style.display = 'flex';
-      
-      // Gray out and disable customer contact
-      const customerItem = document.getElementById('customerInfoItem');
-      const contactButtons = document.getElementById('customerContactButtons');
-      customerItem.classList.add('completed');
-      contactButtons.style.display = 'none';
-      
-      // Gray out location
-      const locationItem = document.getElementById('locationInfoItem');
-      locationItem.classList.add('completed');
+      document.getElementById('collectTitle').textContent = 'कस्टमर से आपने पेमेंट कलेक्ट कर ली है';
+      document.getElementById('collectAmountSection').classList.add('completed');
+      document.getElementById('collectedStamp').style.display = 'flex';
+      document.getElementById('customerInfoItem').classList.add('completed');
+      document.getElementById('customerContactButtons').style.display = 'none';
+      document.getElementById('locationInfoItem').classList.add('completed');
     }
 
-    // Image Upload Functions - Gallery Only
     function triggerImageSelect() {
       if (document.querySelector('.completion-section').classList.contains('disabled')) return;
       openGallery();
     }
 
     function openGallery() {
-      console.log('Opening gallery via JSBridge...');
-      
-      // Clear any existing status messages
-      const uploadStatus = document.getElementById('uploadStatus');
-      uploadStatus.style.display = 'none';
-      
-      // Disable button temporarily
       const galleryBtn = document.getElementById('galleryBtn');
+      document.getElementById('uploadStatus').style.display = 'none';
       galleryBtn.disabled = true;
       galleryBtn.innerHTML = '<div class="loading-inline"></div> गैलरी खोली जा रही है...';
-      
       if (typeof AndroidBridge !== 'undefined' && AndroidBridge.openGallery) {
         AndroidBridge.openGallery();
-        
-        // Reset button after a delay
-        setTimeout(() => {
-          galleryBtn.disabled = false;
-          galleryBtn.innerHTML = '<i class="fas fa-images"></i> गैलरी खोलें';
-        }, 2000);
+        setTimeout(() => { galleryBtn.disabled = false; galleryBtn.innerHTML = '<i class="fas fa-images"></i> गैलरी खोलें'; }, 2000);
       } else {
-        // Fallback to file input
         galleryBtn.disabled = false;
         galleryBtn.innerHTML = '<i class="fas fa-images"></i> गैलरी खोलें';
-        triggerImageSelect();
       }
     }
 
-    // Global function to handle JSBridge file results - Gallery Only
     window.handleJSBridgeFileResult = function(uriArray) {
-      console.log('JSBridge file result received:', uriArray);
-      
-      // Reset button states
       resetButtonStates();
-      
       if (uriArray && uriArray.length > 0) {
-        const uri = uriArray[0]; // Take first image
-        jsBridgeUris = [uri];
-        selectedFiles = []; // Clear HTML file selections
-        selectedImageFile = null;
-        
-        console.log('Processing JSBridge URI:', uri);
-        
-        // Try to convert URI to base64 for preview
+        const uri = uriArray[0];
+        jsBridgeUris = [uri]; selectedFiles = []; selectedImageFile = null;
         if (typeof AndroidBridge !== 'undefined' && AndroidBridge.convertUriToBase64) {
           try {
             const base64Data = AndroidBridge.convertUriToBase64(uri);
-            console.log('Base64 conversion result:', base64Data ? 'Success' : 'Failed');
-            
-            if (base64Data) {
-              displayImagePreview(base64Data, 'JSBridge Gallery Image');
-            } else {
-              displayPlaceholderPreview('JSBridge Gallery Image');
-            }
-          } catch (e) {
-            console.warn('Could not convert URI to base64:', e);
-            displayPlaceholderPreview('JSBridge Gallery Image');
-          }
-        } else {
-          displayPlaceholderPreview('JSBridge Gallery Image');
-        }
-        
+            if (base64Data) displayImagePreview(base64Data, 'JSBridge Gallery Image');
+            else displayPlaceholderPreview('JSBridge Gallery Image');
+          } catch(e) { displayPlaceholderPreview('JSBridge Gallery Image'); }
+        } else { displayPlaceholderPreview('JSBridge Gallery Image'); }
         showUploadStatus('📷 फोटो सेलेक्ट हो गई! अब बुकिंग पूरी करें', 'success');
         enableCompleteButton();
-      } else {
-        showUploadStatus('❌ कोई फोटो सेलेक्ट नहीं हुई', 'error');
-      }
+      } else { showUploadStatus('❌ कोई फोटो सेलेक्ट नहीं हुई', 'error'); }
     };
 
-    // Function to reset button states
     function resetButtonStates() {
       const galleryBtn = document.getElementById('galleryBtn');
-      
       galleryBtn.disabled = false;
       galleryBtn.innerHTML = '<i class="fas fa-images"></i> गैलरी खोलें';
     }
 
-
-
     function displayImagePreview(src, name) {
       const preview = document.getElementById('imagePreview');
-      const uploadArea = document.getElementById('uploadArea');
-      const uploadIcon = document.getElementById('uploadIcon');
-      const uploadText = document.getElementById('uploadText');
-      const uploadSubtext = document.getElementById('uploadSubtext');
-      
-      preview.src = src;
-      preview.style.display = 'block';
-      uploadArea.classList.add('has-image');
-      uploadIcon.innerHTML = '<i class="fas fa-check-circle"></i>';
-      uploadText.textContent = '✅ फोटो सेलेक्ट हो गई';
-      uploadSubtext.textContent = name || 'Selected Image';
-      
-      console.log('Image preview displayed for:', name);
+      document.getElementById('uploadArea').classList.add('has-image');
+      document.getElementById('uploadIcon').innerHTML = '<i class="fas fa-check-circle"></i>';
+      document.getElementById('uploadText').textContent = '✅ फोटो सेलेक्ट हो गई';
+      document.getElementById('uploadSubtext').textContent = name || 'Selected Image';
+      preview.src = src; preview.style.display = 'block';
     }
 
     function displayPlaceholderPreview(name = 'JSBridge Image') {
-      const preview = document.getElementById('imagePreview');
-      const uploadArea = document.getElementById('uploadArea');
-      const uploadIcon = document.getElementById('uploadIcon');
-      const uploadText = document.getElementById('uploadText');
-      const uploadSubtext = document.getElementById('uploadSubtext');
-      
-      // Hide actual image preview and show success state
-      preview.style.display = 'none';
-      uploadArea.classList.add('has-image');
-      uploadIcon.innerHTML = '<i class="fas fa-check-circle"></i>';
-      uploadText.textContent = '✅ JSBridge फोटो सेलेक्ट हो गई';
-      uploadSubtext.textContent = name;
-      
-      console.log('Placeholder preview displayed for:', name);
+      document.getElementById('imagePreview').style.display = 'none';
+      document.getElementById('uploadArea').classList.add('has-image');
+      document.getElementById('uploadIcon').innerHTML = '<i class="fas fa-check-circle"></i>';
+      document.getElementById('uploadText').textContent = '✅ JSBridge फोटो सेलेक्ट हो गई';
+      document.getElementById('uploadSubtext').textContent = name;
     }
 
     function showUploadStatus(message, type) {
@@ -1293,143 +796,62 @@
       statusDiv.textContent = message;
       statusDiv.className = `upload-status ${type}`;
       statusDiv.style.display = 'block';
-      
-      console.log('Upload status:', message, type);
     }
 
-    function enableCompleteButton() {
-      const completeBtn = document.getElementById('completeBookingBtn');
-      completeBtn.disabled = false;
-      completeBtn.style.opacity = '1';
-    }
+    function enableCompleteButton() { const btn = document.getElementById('completeBookingBtn'); btn.disabled = false; btn.style.opacity = '1'; }
+    function disableCompleteButton() { const btn = document.getElementById('completeBookingBtn'); btn.disabled = true; btn.style.opacity = '0.6'; }
 
-    function disableCompleteButton() {
-      const completeBtn = document.getElementById('completeBookingBtn');
-      completeBtn.disabled = true;
-      completeBtn.style.opacity = '0.6';
-    }
-
-    // Complete Booking with Image Upload - Fixed
     async function completeBookingWithImage() {
       const completeBtn = document.getElementById('completeBookingBtn');
-      
-      // Check if image is selected or already uploaded
-      if (!selectedImageFile && jsBridgeUris.length === 0 && !uploadedImageUrl) {
-        alert('कृपया पहले गाड़ी की फोटो सेलेक्ट करें');
-        return;
-      }
-
-      // If image is already uploaded, just complete booking
-      if (uploadedImageUrl && !selectedImageFile && jsBridgeUris.length === 0) {
-        await completeBookingOnly();
-        return;
-      }
-
-      // Disable button and show loading
+      if (!selectedImageFile && jsBridgeUris.length === 0 && !uploadedImageUrl) { alert('कृपया पहले गाड़ी की फोटो सेलेक्ट करें'); return; }
+      if (uploadedImageUrl && !selectedImageFile && jsBridgeUris.length === 0) { await completeBookingOnly(); return; }
       completeBtn.disabled = true;
       completeBtn.innerHTML = '<div class="loading-inline"></div> अपलोड हो रहा है...';
       showUploadStatus('📤 फोटो अपलोड हो रही है...', 'uploading');
-
       try {
-        // Step 1: Upload Image
-        let imageUploadSuccess = false;
-        let newImageUrl = null;
-        
-        if (jsBridgeUris.length > 0) {
-          // Upload via JSBridge
-          const result = await uploadViaJSBridge();
-          imageUploadSuccess = result.success;
-          newImageUrl = result.url;
-        } else if (selectedImageFile) {
-          // Upload via HTML file input
-          const result = await uploadViaFileInput();
-          imageUploadSuccess = result.success;
-          newImageUrl = result.url;
-        }
-
-        if (!imageUploadSuccess || !newImageUrl) {
-          throw new Error('Image upload failed');
-        }
-
-        // Save uploaded image URL
-        uploadedImageUrl = newImageUrl;
-        saveImageToStorage(newImageUrl);
-
-        // Step 2: Complete Booking
+        let imageUploadSuccess = false, newImageUrl = null;
+        if (jsBridgeUris.length > 0) { const r = await uploadViaJSBridge(); imageUploadSuccess = r.success; newImageUrl = r.url; }
+        else if (selectedImageFile) { const r = await uploadViaFileInput(); imageUploadSuccess = r.success; newImageUrl = r.url; }
+        if (!imageUploadSuccess || !newImageUrl) throw new Error('Image upload failed');
+        uploadedImageUrl = newImageUrl; saveImageToStorage(newImageUrl);
         showUploadStatus('✅ फोटो अपलोड हो गई! बुकिंग कम्प्लीट हो रही है...', 'success');
         completeBtn.innerHTML = '<div class="loading-inline"></div> बुकिंग पूरी हो रही है...';
-        
         const bookingSuccess = await makeBookingAction('complete');
-        
         if (bookingSuccess) {
-          // Success!
           completeBtn.innerHTML = '<i class="fas fa-check-circle"></i> पूरी हो गई';
           completeBtn.style.background = 'var(--success-color)';
-          showUploadStatus(`✅ बुकिंग सफलतापूर्वक पूरी हो गई!`, 'success');
-          
-          // Disable the entire section
+          showUploadStatus('✅ बुकिंग सफलतापूर्वक पूरी हो गई!', 'success');
           document.querySelector('.completion-section').classList.add('disabled');
-          
           alert('बुकिंग और फोटो अपलोड सफलतापूर्वक हो गए!');
-          
-          // Redirect after 3 seconds
-          setTimeout(() => {
-            const mechanicName = localStorage.getItem('mechanic');
-            if (mechanicName) {
-              window.location.href = `https://instantmechanic.online/mechanic-view.html?mechanic=${encodeURIComponent(mechanicName)}`;
-            }
-          }, 3000);
-        } else {
-          throw new Error('Booking completion failed');
-        }
-
-      } catch (error) {
-        console.error('Error in complete booking process:', error);
-        
-        // Reset button
+          setTimeout(() => { const mn = localStorage.getItem('mechanic'); if (mn) window.location.href = `https://instantmechanic.online/mechanic-view.html?mechanic=${encodeURIComponent(mn)}`; }, 3000);
+        } else throw new Error('Booking completion failed');
+      } catch(error) {
         completeBtn.disabled = false;
         completeBtn.innerHTML = '<i class="fas fa-check-circle"></i> बुकिंग पूरी करें';
         showUploadStatus('❌ Error: ' + error.message, 'error');
-        
         alert('बुकिंग पूरी करने में समस्या हुई: ' + error.message);
       }
     }
 
-    // Function to complete booking when image is already uploaded
     async function completeBookingOnly() {
       const completeBtn = document.getElementById('completeBookingBtn');
-      
       completeBtn.disabled = true;
       completeBtn.innerHTML = '<div class="loading-inline"></div> बुकिंग पूरी हो रही है...';
       showUploadStatus('🔄 बुकिंग कम्प्लीट हो रही है...', 'uploading');
-
       try {
         const bookingSuccess = await makeBookingAction('complete');
-        
         if (bookingSuccess) {
           completeBtn.innerHTML = '<i class="fas fa-check-circle"></i> पूरी हो गई';
           completeBtn.style.background = 'var(--success-color)';
-          showUploadStatus(`✅ बुकिंग सफलतापूर्वक पूरी हो गई!`, 'success');
-          
+          showUploadStatus('✅ बुकिंग सफलतापूर्वक पूरी हो गई!', 'success');
           document.querySelector('.completion-section').classList.add('disabled');
           alert('बुकिंग सफलतापूर्वक पूरी हो गई!');
-          
-          setTimeout(() => {
-            const mechanicName = localStorage.getItem('mechanic');
-            if (mechanicName) {
-              window.location.href = `https://instantmechanic.online/mechanic-view.html?mechanic=${encodeURIComponent(mechanicName)}`;
-            }
-          }, 3000);
-        } else {
-          throw new Error('Booking completion failed');
-        }
-      } catch (error) {
-        console.error('Error completing booking:', error);
-        
+          setTimeout(() => { const mn = localStorage.getItem('mechanic'); if (mn) window.location.href = `https://instantmechanic.online/mechanic-view.html?mechanic=${encodeURIComponent(mn)}`; }, 3000);
+        } else throw new Error('Booking completion failed');
+      } catch(error) {
         completeBtn.disabled = false;
         completeBtn.innerHTML = '<i class="fas fa-check-circle"></i> बुकिंग पूरी करें';
         showUploadStatus('❌ Error: ' + error.message, 'error');
-        
         alert('बुकिंग पूरी करने में समस्या हुई: ' + error.message);
       }
     }
@@ -1438,23 +860,13 @@
       return new Promise((resolve) => {
         if (typeof AndroidBridge !== 'undefined' && AndroidBridge.uploadImageFromUri) {
           const uri = jsBridgeUris[0];
-          
-          // Set up callback for JSBridge upload result
           window.tempUploadCallback = function(result) {
-            console.log('JSBridge upload result:', result);
-            if (result && result.success) {
-              resolve({ success: true, url: result.imageUrl });
-            } else {
-              resolve({ success: false, url: null });
-            }
-            // Cleanup
+            if (result && result.success) resolve({ success: true, url: result.imageUrl });
+            else resolve({ success: false, url: null });
             delete window.tempUploadCallback;
           };
-          
           AndroidBridge.uploadImageFromUri(uri, 'tempUploadCallback', bookingId);
-        } else {
-          resolve({ success: false, url: null });
-        }
+        } else resolve({ success: false, url: null });
       });
     }
 
@@ -1462,75 +874,37 @@
       try {
         const formData = new FormData();
         formData.append('image', selectedImageFile);
-
-
-        const response = await fetch(`https://ai.instantmechanic.online/bot/upload-car-image/`, {
-          method: 'POST',
-          body: formData
-        });
-
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-
+        const response = await fetch('https://ai.instantmechanic.online/bot/upload-car-image/', { method: 'POST', body: formData });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
         const result = await response.json();
-        console.log('File input upload result:', result);
         return { success: true, url: result.image_url };
-
-      } catch (error) {
-        console.error('File input upload failed:', error);
-        return { success: false, url: null };
-      }
+      } catch(error) { return { success: false, url: null }; }
     }
 
-    // Sub-Mechanic Functions (keeping existing functionality)
     async function loadSubMechanics(isCompleted = false) {
       const mechanicName = localStorage.getItem('mechanic');
-      if (!mechanicName) {
-        console.log('No mechanic name in localStorage');
-        return;
-      }
-
+      if (!mechanicName) return;
       try {
         const response = await fetch(`https://ai.instantmechanic.online/bot/get-mechanics?parent_mechanic=${encodeURIComponent(mechanicName)}`);
         const data = await response.json();
-        
         if (response.ok && data.sub_mechanics && data.sub_mechanics.length > 0) {
           subMechanics = data.sub_mechanics;
           checkAssignedMechanic();
           displaySubMechanicCard(isCompleted);
-        } else {
-          console.log('No sub-mechanics found or error:', data.error || 'Unknown error');
         }
-      } catch (error) {
-        console.error('Error loading sub-mechanics:', error);
-      }
+      } catch(error) { console.error('Error loading sub-mechanics:', error); }
     }
 
     function checkAssignedMechanic() {
-      const storageKey = `assigned_mechanic_${bookingId}`;
-      const stored = localStorage.getItem(storageKey);
-      if (stored) {
-        assignedMechanic = JSON.parse(stored);
-      }
+      const stored = localStorage.getItem(`assigned_mechanic_${bookingId}`);
+      if (stored) assignedMechanic = JSON.parse(stored);
     }
 
     function displaySubMechanicCard(isCompleted = false) {
+      if (assignedMechanic) displayAssignedMechanic(isCompleted);
+      else displayMechanicList(isCompleted);
       const card = document.getElementById('subMechanicCard');
-      const content = document.getElementById('subMechanicContent');
-      
-      if (assignedMechanic) {
-        displayAssignedMechanic(isCompleted);
-      } else {
-        displayMechanicList(isCompleted);
-      }
-      
-      if (isCompleted) {
-        card.classList.add('disabled');
-        card.style.opacity = '0.6';
-        card.style.pointerEvents = 'none';
-      }
-      
+      if (isCompleted) { card.classList.add('disabled'); card.style.opacity = '0.6'; card.style.pointerEvents = 'none'; }
       card.style.display = 'block';
     }
 
@@ -1538,257 +912,99 @@
       const card = document.getElementById('subMechanicCard');
       const title = document.getElementById('subMechanicTitle');
       const content = document.getElementById('subMechanicContent');
-      
       card.classList.add('assigned-mechanic-card');
       title.innerHTML = `<i class="fas fa-check-circle"></i> आपने इस बुकिंग पर "${assignedMechanic.name}" को भेजा है`;
-      
-      if (isCompleted) {
-        content.innerHTML = `
-          <div class="assigned-mechanic-info">
-            <div class="assigned-mechanic-name">${assignedMechanic.name}</div>
-            <div class="assigned-mechanic-status">इस बुकिंग को असाइन किया गया था (बुकिंग पूर्ण हो गई)</div>
-          </div>
-        `;
-      } else {
-        content.innerHTML = `
-          <div class="assigned-mechanic-info">
-            <div class="assigned-mechanic-name">${assignedMechanic.name}</div>
-            <div class="assigned-mechanic-status">इस बुकिंग को असाइन किया गया</div>
-            <button class="btn btn-warning" onclick="showReassignOptions()" style="margin-top: 12px; font-size: 0.9rem; padding: 8px 16px;">
-              <i class="fas fa-exchange-alt"></i>
-              दूसरे मैकेनिक को असाइन करें
-            </button>
-          </div>
-        `;
-      }
+      content.innerHTML = isCompleted
+        ? `<div class="assigned-mechanic-info"><div class="assigned-mechanic-name">${assignedMechanic.name}</div><div class="assigned-mechanic-status">इस बुकिंग को असाइन किया गया था (बुकिंग पूर्ण हो गई)</div></div>`
+        : `<div class="assigned-mechanic-info"><div class="assigned-mechanic-name">${assignedMechanic.name}</div><div class="assigned-mechanic-status">इस बुकिंग को असाइन किया गया</div><button onclick="showReassignOptions()" style="margin-top:12px;font-size:0.9rem;padding:8px 16px;background:var(--warning-color);color:white;border:none;border-radius:8px;cursor:pointer;"><i class="fas fa-exchange-alt"></i> दूसरे मैकेनिक को असाइन करें</button></div>`;
     }
 
     function displayMechanicList(isCompleted = false) {
       const content = document.getElementById('subMechanicContent');
-      
-      if (isCompleted) {
-        content.innerHTML = `
-          <div class="current-assignment" style="background: rgba(255,255,255,0.1); padding: 12px; border-radius: 8px; text-align: center; color: var(--text-secondary);">
-            <i class="fas fa-info-circle"></i> बुकिंग पूर्ण हो गई - असाइनमेंट अब उपलब्ध नहीं है
-          </div>
-        `;
-        return;
-      }
-      
-      const mechanicListHTML = subMechanics.map(mechanic => `
-        <div class="mechanic-item" onclick="assignMechanic(${mechanic.id}, '${mechanic.name}')">
-          <div class="mechanic-name">${mechanic.name}</div>
-          <div class="mechanic-select-icon">
-            <i class="fas fa-arrow-right"></i>
-          </div>
-        </div>
-      `).join('');
-      
-      content.innerHTML = `
-        <div class="mechanic-list">
-          ${mechanicListHTML}
-        </div>
-      `;
+      if (isCompleted) { content.innerHTML = `<div style="text-align:center;color:var(--text-secondary);padding:12px;"><i class="fas fa-info-circle"></i> बुकिंग पूर्ण हो गई</div>`; return; }
+      content.innerHTML = `<div class="mechanic-list">${subMechanics.map(m => `<div class="mechanic-item" onclick="assignMechanic(${m.id}, '${m.name}')"><div class="mechanic-name">${m.name}</div><div class="mechanic-select-icon"><i class="fas fa-arrow-right"></i></div></div>`).join('')}</div>`;
     }
 
     function showReassignOptions() {
       const card = document.getElementById('subMechanicCard');
       const title = document.getElementById('subMechanicTitle');
       const content = document.getElementById('subMechanicContent');
-      
       card.classList.remove('assigned-mechanic-card');
       title.innerHTML = `<i class="fas fa-exchange-alt"></i> दूसरा मैकेनिक चुनें`;
-      
-      const availableMechanics = subMechanics.filter(mechanic => mechanic.id !== assignedMechanic.id);
-      
-      const mechanicListHTML = availableMechanics.map(mechanic => `
-        <div class="mechanic-item" onclick="reassignMechanic(${mechanic.id}, '${mechanic.name}')">
-          <div class="mechanic-name">${mechanic.name}</div>
-          <div class="mechanic-select-icon">
-            <i class="fas fa-arrow-right"></i>
-          </div>
-        </div>
-      `).join('');
-      
-      content.innerHTML = `
-        <div class="current-assignment" style="background: rgba(255,255,255,0.1); padding: 12px; border-radius: 8px; margin-bottom: 12px; text-align: center; color: var(--text-secondary);">
-          <i class="fas fa-info-circle"></i> वर्तमान में असाइन: <strong>${assignedMechanic.name}</strong>
-        </div>
-        <div class="mechanic-list">
-          ${mechanicListHTML}
-        </div>
-        <button class="btn btn-secondary" onclick="cancelReassign()" style="margin-top: 12px; background: var(--text-secondary);">
-          <i class="fas fa-times"></i>
-          कैंसिल करें
-        </button>
-      `;
+      const available = subMechanics.filter(m => m.id !== assignedMechanic.id);
+      content.innerHTML = `<div style="background:rgba(0,0,0,0.05);padding:12px;border-radius:8px;margin-bottom:12px;text-align:center;color:var(--text-secondary);"><i class="fas fa-info-circle"></i> वर्तमान में: <strong>${assignedMechanic.name}</strong></div><div class="mechanic-list">${available.map(m => `<div class="mechanic-item" onclick="reassignMechanic(${m.id}, '${m.name}')"><div class="mechanic-name">${m.name}</div><div class="mechanic-select-icon"><i class="fas fa-arrow-right"></i></div></div>`).join('')}</div><button onclick="cancelReassign()" style="margin-top:12px;padding:8px 16px;background:var(--text-secondary);color:white;border:none;border-radius:8px;cursor:pointer;"><i class="fas fa-times"></i> कैंसिल करें</button>`;
     }
 
-    function cancelReassign() {
-      displayAssignedMechanic();
-    }
+    function cancelReassign() { displayAssignedMechanic(); }
 
     async function reassignMechanic(mechanicId, mechanicName) {
-      if (!confirm(`क्या आप वाकई में ${assignedMechanic.name} की जगह ${mechanicName} को असाइन करना चाहते हैं?`)) {
-        return;
-      }
-      
-      const clickedItem = event.currentTarget;
-      clickedItem.innerHTML = `
-        <div class="mechanic-name">
-          <i class="fas fa-spinner fa-spin"></i> ${mechanicName} को असाइन कर रहे हैं...
-        </div>
-      `;
-      clickedItem.style.pointerEvents = 'none';
-      
-      try {
-        const response = await fetch('https://ai.instantmechanic.online/bot/assign-sub-mechanic', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            booking: bookingId,
-            sub_mechanic_id: mechanicId.toString()
-          })
-        });
+      if (!confirm(`क्या आप ${assignedMechanic.name} की जगह ${mechanicName} को असाइन करना चाहते हैं?`)) return;
 
+      const clickedItem = event.currentTarget;
+      clickedItem.innerHTML = `<div class="mechanic-name"><i class="fas fa-spinner fa-spin"></i> ${mechanicName} को असाइन कर रहे हैं...</div>`;
+      clickedItem.style.pointerEvents = 'none';
+
+      try {
+        const response = await fetch('https://ai.instantmechanic.online/bot/assign-sub-mechanic', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ booking: bookingId, sub_mechanic_id: mechanicId.toString() }) });
         if (response.ok) {
           assignedMechanic = { id: mechanicId, name: mechanicName };
-          const storageKey = `assigned_mechanic_${bookingId}`;
-          localStorage.setItem(storageKey, JSON.stringify(assignedMechanic));
-          
+          localStorage.setItem(`assigned_mechanic_${bookingId}`, JSON.stringify(assignedMechanic));
           displayAssignedMechanic();
           alert(`${mechanicName} को सफलतापूर्वक री-असाइन किया गया!`);
-        } else {
-          throw new Error('Reassignment failed');
-        }
-      } catch (error) {
-        console.error('Error reassigning mechanic:', error);
-        alert('मैकेनिक री-असाइन करने में समस्या हुई। कृपया दोबारा कोशिश करें।');
-        
-        clickedItem.innerHTML = `
-          <div class="mechanic-name">${mechanicName}</div>
-          <div class="mechanic-select-icon">
-            <i class="fas fa-arrow-right"></i>
-          </div>
-        `;
+        } else throw new Error('Reassignment failed');
+      } catch(error) {
+        console.error(error);
+        alert('री-असाइन करने में समस्या हुई।');
+        clickedItem.innerHTML = `<div class="mechanic-name">${mechanicName}</div><div class="mechanic-select-icon"><i class="fas fa-arrow-right"></i></div>`;
         clickedItem.style.pointerEvents = 'auto';
       }
     }
 
     async function assignMechanic(mechanicId, mechanicName) {
       if (assignedMechanic) return;
-      
-      const clickedItem = event.currentTarget;
-      clickedItem.innerHTML = `
-        <div class="mechanic-name">
-          <i class="fas fa-spinner fa-spin"></i> ${mechanicName} को असाइन कर रहे हैं...
-        </div>
-      `;
-      clickedItem.style.pointerEvents = 'none';
-      
-      try {
-        const response = await fetch('https://ai.instantmechanic.online/bot/assign-sub-mechanic', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            booking: bookingId,
-            sub_mechanic_id: mechanicId.toString()
-          })
-        });
 
+      const clickedItem = event.currentTarget;
+      clickedItem.innerHTML = `<div class="mechanic-name"><i class="fas fa-spinner fa-spin"></i> ${mechanicName} को असाइन कर रहे हैं...</div>`;
+      clickedItem.style.pointerEvents = 'none';
+
+      try {
+        const response = await fetch('https://ai.instantmechanic.online/bot/assign-sub-mechanic', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ booking: bookingId, sub_mechanic_id: mechanicId.toString() }) });
         if (response.ok) {
           assignedMechanic = { id: mechanicId, name: mechanicName };
-          const storageKey = `assigned_mechanic_${bookingId}`;
-          localStorage.setItem(storageKey, JSON.stringify(assignedMechanic));
-          
+          localStorage.setItem(`assigned_mechanic_${bookingId}`, JSON.stringify(assignedMechanic));
           displayAssignedMechanic();
-          alert(`${mechanicName} को सफलतापूर्वक इस बुकिंग पर असाइन किया गया!`);
-        } else {
-          throw new Error('Assignment failed');
-        }
-      } catch (error) {
-        console.error('Error assigning mechanic:', error);
-        alert('मैकेनिक असाइन करने में समस्या हुई। कृपया दोबारा कोशिश करें।');
-        
-        clickedItem.innerHTML = `
-          <div class="mechanic-name">${mechanicName}</div>
-          <div class="mechanic-select-icon">
-            <i class="fas fa-arrow-right"></i>
-          </div>
-        `;
+          alert(`${mechanicName} को सफलतापूर्वक असाइन किया गया!`);
+        } else throw new Error('Assignment failed');
+      } catch(error) {
+        console.error(error);
+        alert('असाइन करने में समस्या हुई।');
+        clickedItem.innerHTML = `<div class="mechanic-name">${mechanicName}</div><div class="mechanic-select-icon"><i class="fas fa-arrow-right"></i></div>`;
         clickedItem.style.pointerEvents = 'auto';
       }
     }
 
-    // API Functions
     async function makeBookingAction(action) {
       const mechanicName = localStorage.getItem('mechanic');
-      if (!mechanicName) {
-        alert('मैकेनिक का नाम localStorage में नहीं मिला');
-        return false;
-      }
-
+      if (!mechanicName) { alert('मैकेनिक का नाम localStorage में नहीं मिला'); return false; }
       try {
-        const response = await fetch('https://ai.instantmechanic.online/bot/api/mechanic-booking-action', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            mechanic: mechanicName,
-            booking: parseInt(bookingId),
-            action: action
-          })
-        });
-
+        const response = await fetch('https://ai.instantmechanic.online/bot/api/mechanic-booking-action', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ mechanic: mechanicName, booking: parseInt(bookingId), action }) });
         const result = await response.json();
-        
-        if (response.ok) {
-          return true;
-        } else {
-          throw new Error(result.message || 'API error');
-        }
-      } catch (error) {
-        console.error('API Error:', error);
-        alert('एक्शन भेजने में समस्या हुई: ' + error.message);
-        return false;
-      }
+        if (response.ok) return true;
+        throw new Error(result.message || 'API error');
+      } catch(error) { console.error('API Error:', error); alert('एक्शन भेजने में समस्या हुई: ' + error.message); return false; }
     }
 
-    function callCompany() {
-      window.open('tel:+911234567890', '_self');
-    }
-
-    // Load booking data
     async function loadBookingData() {
-      if (!bookingId) {
-        showError('URL में बुकिंग ID नहीं मिली');
-        return;
-      }
-
+      if (!bookingId) { showError('URL में बुकिंग ID नहीं मिली'); return; }
       try {
         const response = await fetch(`https://ai.instantmechanic.online/bot/api/bookings/${bookingId}/`);
-        
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-        
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
         const data = await response.json();
         displayBookingData(data);
-        
         const isCompleted = data.booking_status === 'complete';
         await loadSubMechanics(isCompleted);
-        
-        // Load saved image after booking data is loaded
         loadSavedImage(data.user_car_image || null);
-      } catch (error) {
-        console.error('Error loading booking:', error);
-        showError('बुकिंग डेटा लोड करने में असमर्थ। कृपया अपना इंटरनेट कनेक्शन चेक करें।');
-      }
+      } catch(error) { console.error('Error loading booking:', error); showError('बुकिंग डेटा लोड करने में असमर्थ।'); }
     }
 
     function showError(message) {
@@ -1800,14 +1016,9 @@
     function displayBookingData(data) {
       document.getElementById('loadingState').style.display = 'none';
       document.getElementById('mainContent').style.display = 'block';
-
       const isCompleted = data.booking_status === 'complete';
+      if (data.created_at && !isCompleted) startTimer(data.created_at);
 
-      if (data.created_at && !isCompleted) {
-        startTimer(data.created_at);
-      }
-
-      // Payment calculations
       const companyProfit = parseFloat(data.company_profit) || 0;
       const mechanicPayment = parseFloat(data.pending_payment_amount) || 0;
       const advancePayment = parseFloat(data.advance_payment_amount) || 0;
@@ -1816,167 +1027,107 @@
       const needToCollectPayment = data.need_to_collect_payment_on_gomech;
       const amountToCollectOnGomech = parseFloat(data.amount_to_collect_on_gomech) || 0;
 
-      // Update advance payment status
-      const advanceTitle = document.getElementById('advanceTitle');
       const advanceAmountEl = document.getElementById('advanceAmount');
-      
-      if (isGoMechanicCall && !needToCollectPayment) {
-        advanceTitle.textContent = ' कस्टमर का एडवांस';
-        advanceAmountEl.innerHTML = 'कस्टमर का पूरा एडवांस आ गया है';
-        advanceAmountEl.style.color = 'var(--secondary-color)';
-      } else if (isGoMechanicCall && needToCollectPayment) {
-        advanceTitle.textContent = ' कस्टमर का एडवांस';
-        advanceAmountEl.innerHTML = 'कोई एडवांस नहीं आया है';
-        advanceAmountEl.style.color = 'var(--danger-color)';
-      } else if (paymentStatus === 'partially-paid' && advancePayment > 0) {
-        advanceTitle.textContent = ' कस्टमर का एडवांस';
-        advanceAmountEl.innerHTML = `<strong>₹${advancePayment}</strong> आ गया है`;
-        advanceAmountEl.style.color = 'var(--secondary-color)';
-      } else {
-        advanceTitle.textContent = ' कस्टमर का एडवांस';
-        advanceAmountEl.innerHTML = 'कोई एडवांस नहीं आया है';
-        advanceAmountEl.style.color = 'var(--danger-color)';
-      }
+      if (isGoMechanicCall && !needToCollectPayment) { advanceAmountEl.innerHTML = 'कस्टमर का पूरा एडवांस आ गया है'; advanceAmountEl.style.color = 'var(--secondary-color)'; }
+      else if (isGoMechanicCall && needToCollectPayment) { advanceAmountEl.innerHTML = 'कोई एडवांस नहीं आया है'; advanceAmountEl.style.color = 'var(--danger-color)'; }
+      else if (paymentStatus === 'partially-paid' && advancePayment > 0) { advanceAmountEl.innerHTML = `<strong>₹${advancePayment}</strong> आ गया है`; advanceAmountEl.style.color = 'var(--secondary-color)'; }
+      else { advanceAmountEl.innerHTML = 'कोई एडवांस नहीं आया है'; advanceAmountEl.style.color = 'var(--danger-color)'; }
 
-      // Calculate total collection amount
       let totalCollectAmount;
-      if (isGoMechanicCall && needToCollectPayment) {
-        totalCollectAmount = amountToCollectOnGomech;
-      } else if (isGoMechanicCall && !needToCollectPayment) {
-        totalCollectAmount = 0;
-      } else {
-        totalCollectAmount = companyProfit + mechanicPayment;
-        if (paymentStatus === 'partially-paid') {
-          totalCollectAmount = Math.max(0, totalCollectAmount - advancePayment);
-        }
-      }
+      if (isGoMechanicCall && needToCollectPayment) totalCollectAmount = amountToCollectOnGomech;
+      else if (isGoMechanicCall && !needToCollectPayment) totalCollectAmount = 0;
+      else { totalCollectAmount = companyProfit + mechanicPayment; if (paymentStatus === 'partially-paid') totalCollectAmount = Math.max(0, totalCollectAmount - advancePayment); }
       document.getElementById('totalCollect').textContent = `₹${totalCollectAmount}`;
 
-      // Agent information
       document.getElementById('agentName').textContent = data.agent_name || 'उपलब्ध नहीं';
-      const agentMobileFormatted = formatMobile(data.agent_mobile);
-      document.getElementById('agentMobile').textContent = agentMobileFormatted || 'उपलब्ध नहीं';
-      
+      document.getElementById('agentMobile').textContent = formatMobile(data.agent_mobile) || 'उपलब्ध नहीं';
       if (data.agent_mobile) {
         const agentCallButton = document.getElementById('agentCallButton');
         const callLink = agentCallButton.querySelector('a');
         const cleanMobile = data.agent_mobile.replace(/\D/g, '');
-        const formattedMobile = cleanMobile.startsWith('91') ? cleanMobile : '91' + cleanMobile.slice(-10);
-        callLink.href = `tel:+${formattedMobile}`;
+        callLink.href = `tel:+${cleanMobile.startsWith('91') ? cleanMobile : '91' + cleanMobile.slice(-10)}`;
         agentCallButton.style.display = 'block';
       }
 
-      // Basic information
       document.getElementById('carName').textContent = data.car || 'अज्ञात वाहन';
       document.getElementById('problemDescription').textContent = data.problem || 'सर्विस आवश्यक';
-      
-      let customerMobileDisplay;
-      if (isCompleted) {
-        const formattedMobile = formatMobile(data.customer_mobile);
-        if (formattedMobile && formattedMobile !== 'उपलब्ध नहीं') {
-          customerMobileDisplay = formattedMobile.replace(/\d{4}$/, '****');
-        } else {
-          customerMobileDisplay = formattedMobile;
-        }
-      } else {
-        customerMobileDisplay = formatMobile(data.customer_mobile);
-      }
-      document.getElementById('customerMobile').textContent = customerMobileDisplay;
-      
       document.getElementById('servicePrice').textContent = data.price || 'कीमत निर्दिष्ट नहीं';
       document.getElementById('mechanicPayment').textContent = `₹${mechanicPayment}`;
-
       bookingLocation = data.location;
+
+      // Store raw customer mobile for IVR use
+      rawCustomerMobile = data.customer_mobile || '';
+
+      // Display masked mobile
+      const maskedMobile = maskMobile(data.customer_mobile);
+      document.getElementById('customerMobileDisplay').textContent = maskedMobile;
+
+      // Check if already unlocked from previous attempts
+      if (getCallAttempts() >= 3) unlockCustomerContact();
 
       if (data.car_image) {
         const carImage = document.getElementById('carImage');
-        carImage.src = data.car_image;
-        carImage.style.display = 'block';
-        carImage.onerror = function() {
-          this.style.display = 'none';
-        };
+        carImage.src = data.car_image; carImage.style.display = 'block';
+        carImage.onerror = function() { this.style.display = 'none'; };
       }
 
       updateBookingStatus(data);
-      setupActionButtons(data);
+      if (!isCompleted) setupActionButtons(data);
+      if (data.is_cancelled) { document.getElementById('carCard').classList.add('cancelled-overlay'); document.querySelector('.completion-section').classList.add('disabled'); }
+      if (isCompleted) handleCompletedBooking();
+    }
 
-      if (data.is_cancelled) {
-        document.getElementById('carCard').classList.add('cancelled-overlay');
-        document.querySelector('.completion-section').classList.add('disabled');
-      }
-
-      if (isCompleted) {
-        handleCompletedBooking();
-      }
+    function maskMobile(mobile) {
+      if (!mobile) return 'उपलब्ध नहीं';
+      const cleaned = mobile.replace(/\D/g, '');
+      const number = cleaned.length >= 10 ? cleaned.slice(-10) : cleaned;
+      // Show first 6 digits, mask last 4
+      return `+91 ${number.slice(0,3)} ${number.slice(3,6)} ****`;
     }
 
     function formatMobile(mobile) {
       if (!mobile) return 'उपलब्ध नहीं';
       const cleaned = mobile.replace(/\D/g, '');
-      if (cleaned.length >= 10) {
-        const number = cleaned.slice(-10);
-        return `+91 ${number.slice(0, 5)} ${number.slice(5)}`;
-      }
+      if (cleaned.length >= 10) { const number = cleaned.slice(-10); return `+91 ${number.slice(0,5)} ${number.slice(5)}`; }
       return mobile;
     }
 
-    function updateBookingStatus(data) {
-      const statusElement = document.getElementById('bookingStatus');
-      const statusBadge = statusElement.querySelector('.status-badge');
-      
-      if (data.is_cancelled) {
-        statusBadge.className = 'status-badge status-pending';
-        statusBadge.innerHTML = '<i class="fas fa-times-circle"></i> कैंसिल';
-      } else if (data.booking_status === 'complete') {
-        statusBadge.className = 'status-badge status-call-done';
-        statusBadge.innerHTML = '<i class="fas fa-check-double"></i> Call Done';
-      } else {
-        statusBadge.className = 'status-badge status-completed';
-        statusBadge.innerHTML = '<i class="fas fa-check-circle"></i> सक्रिय';
-      }
+    function setupWhatsAppLink(data) {
+      // WhatsApp stays locked until unlocked — href set when unlocked
     }
 
     function setupActionButtons(data) {
-      if (data.booking_status === 'complete') {
-        return;
-      }
-      
+      if (data.booking_status === 'complete') return;
       const mobile = data.customer_mobile;
-      
       if (mobile) {
         const cleanMobile = mobile.replace(/\D/g, '');
         const formattedMobile = cleanMobile.startsWith('91') ? cleanMobile : '91' + cleanMobile.slice(-10);
-        
-        document.getElementById('callButton').href = `tel:+${formattedMobile}`;
-        
+        // WhatsApp message pre-filled (button stays locked until unlocked via IVR logic)
         const message = encodeURIComponent(`नमस्ते! मैं आपकी गाड़ी की सर्विस के लिए आने वाला मैकेनिक हूँ। आपकी ${data.problem} की समस्या के लिए मैं जल्दी ही आपके पास पहुंच रहा हूँ। कृपया अपनी सटीक लोकेशन भेजें यदि आवश्यक हो।`);
-        document.getElementById('whatsappButton').href = `https://wa.me/${formattedMobile}?text=${message}`;
+        // Store for use when unlocked
+        window._whatsappHref = `https://wa.me/${formattedMobile}?text=${message}`;
       } else {
         document.getElementById('callButton').classList.add('disabled');
         document.getElementById('whatsappButton').classList.add('disabled');
       }
     }
 
-    // Cleanup timer on page unload
-    window.addEventListener('beforeunload', function() {
-      if (timerInterval) {
-        clearInterval(timerInterval);
-      }
-    });
-
-    // Load data when page loads
-    window.addEventListener('load', function() {
-      loadBookingData();
-    });
-
-    function retryLoad() {
-      document.getElementById('errorState').style.display = 'none';
-      document.getElementById('loadingState').style.display = 'flex';
-      setTimeout(loadBookingData, 500);
+    function callCompany() {
+      window.open('tel:+911234567890', '_self');
     }
 
-    // Add to window for inline onclick handlers
-    window.retryLoad = retryLoad;
+    function updateBookingStatus(data) {
+      const statusElement = document.getElementById('bookingStatus');
+      const statusBadge = statusElement.querySelector('.status-badge');
+      if (data.is_cancelled) { statusBadge.className = 'status-badge status-pending'; statusBadge.innerHTML = '<i class="fas fa-times-circle"></i> कैंसिल'; }
+      else if (data.booking_status === 'complete') { statusBadge.className = 'status-badge status-call-done'; statusBadge.innerHTML = '<i class="fas fa-check-double"></i> Call Done'; }
+      else { statusBadge.className = 'status-badge status-completed'; statusBadge.innerHTML = '<i class="fas fa-check-circle"></i> सक्रिय'; }
+    }
+
+    window.addEventListener('beforeunload', function() { if (timerInterval) clearInterval(timerInterval); });
+    window.addEventListener('load', function() { loadBookingData(); });
+
+    window.retryLoad = () => { document.getElementById('errorState').style.display = 'none'; document.getElementById('loadingState').style.display = 'flex'; setTimeout(loadBookingData, 500); };
     window.assignMechanic = assignMechanic;
     window.showReassignOptions = showReassignOptions;
     window.cancelReassign = cancelReassign;
@@ -1986,6 +1137,10 @@
     window.completeBookingWithImage = completeBookingWithImage;
     window.changeUploadedImage = changeUploadedImage;
     window.handleImageError = handleImageError;
+    window.handleCallClick = handleCallClick;
+    window.handleRetry = handleRetry;
+    window.closeIVRPopup = closeIVRPopup;
+    window.callCompany = callCompany;
   </script>
 </body>
 </html>
