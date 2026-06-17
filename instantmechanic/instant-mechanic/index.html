@@ -385,6 +385,42 @@ section{padding:80px 40px}
 .plan-btn-primary{background:var(--orange);color:#fff;box-shadow:0 6px 20px rgba(249,115,22,.3)}
 .plan-btn-primary:hover{background:var(--orange-dark);transform:translateY(-1px)}
 
+  .hero-section {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.hero-text {
+    flex: 0 0 60%;
+}
+
+.hero-image {
+    flex: 0 0 40%;
+}
+
+.hero-image img {
+    width: 100%;
+    height: auto;
+    display: block;
+    margin-top: -69px;
+    margin-bottom: 36px;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .hero-section {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .hero-text,
+    .hero-image {
+        flex: 0 0 100%;
+        width: 100%;
+    }
+}
+
 /* ─── HOW IT WORKS ────────────────────────────────────── */
 .hiw-section{background:var(--surface)}
 .hiw-grid{display:grid;grid-template-columns:repeat(4,1fr)}
@@ -764,11 +800,19 @@ section{padding:80px 40px}
       <span class="badge-pulse"></span>
       Building India's Largest Car Care Platform
     </div>
-    <h1 class="fade-up d2">
-      Your Car Deserves<br>
-      <em>Expert Care,</em><br>
-      Not a Gamble.
-    </h1>
+<div class="hero-section">
+    <div class="hero-text">
+        <h1 class="fade-up d2">
+            Your Car Deserves<br>
+            <em>Expert Care,</em><br>
+            Not a Gamble.
+        </h1>
+    </div>
+
+    <div class="hero-image">
+        <img src="https://customers-car-image.s3.ap-south-1.amazonaws.com/car-images/572d9a1f-f38b-4a8a-9a1e-450576788821.png" alt="गाड़ी खराब, मेकैनिक तैयार — Car broken, Mechanic ready. Instant Mechanic 24×7 Delhi NCR" loading="lazy" decoding="async">
+    </div>
+</div>
     <p class="hero-sub fade-up d3">
       One platform for every car need — instant roadside help in 20 minutes, AI-powered diagnosis, transparent repair bills, and complete car care membership. Delhi NCR's most trusted car care company.
     </p>
