@@ -1,3351 +1,630 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Instant Mechanic - Premium Car Service</title>
-    <link rel="icon" href="assets/img/favicon.png">
-    
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    
-    <!-- External CSS -->
-<style>
-    :root {
-    --primary-color: #2563eb;
-    --secondary-color: #f59e0b;
-    --accent-color: #10b981;
-    --dark-color: #0f172a;
-    --light-color: #f8fafc;
-    --gray-50: #f9fafb;
-    --gray-100: #f3f4f6;
-    --gray-200: #e5e7eb;
-    --gray-300: #d1d5db;
-    --gray-400: #9ca3af;
-    --gray-500: #6b7280;
-    --gray-600: #4b5563;
-    --gray-700: #374151;
-    --gray-800: #1f2937;
-    --gray-900: #111827;
-    --white: #ffffff;
-    --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    --gradient-accent: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-    --gradient-success: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
-    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-}
-
-* { margin: 0; padding: 0; box-sizing: border-box; }
-
-body {
-    font-family: 'Inter', sans-serif;
-    line-height: 1.6;
-    color: var(--gray-800);
-    background: var(--gray-50);
-    overflow-x: hidden;
-}
-
-/* Header */
-.header {
-    background: var(--white);
-    box-shadow: var(--shadow-md);
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 1000;
-    backdrop-filter: blur(10px);
-}
-
-.header-top {
-    background: var(--dark-color);
-    color: var(--white);
-    padding: 8px 0;
-    font-size: 14px;
-}
-
-.header-top .container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 20px;
-}
-
-.header-info { display: flex; gap: 20px; }
-.header-info span { display: flex; align-items: center; gap: 8px; }
-.header-social { display: flex; gap: 15px; }
-.header-social a { color: var(--white); transition: color 0.3s ease; }
-.header-social a:hover { color: var(--secondary-color); }
-
-.header-main { padding: 12px 0; }
-.header-main .container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 20px;
-}
-
-.logo {
-    font-size: 24px;
-    font-weight: 700;
-    color: var(--primary-color);
-    text-decoration: none;
-    font-family: 'Poppins', sans-serif;
-}
-
-.nav { display: flex; gap: 25px; list-style: none; }
-.nav a {
-    color: var(--gray-700);
-    text-decoration: none;
-    font-weight: 500;
-    transition: color 0.3s ease;
-    position: relative;
-}
-.nav a:hover { color: var(--primary-color); }
-.nav a::after {
-    content: '';
-    position: absolute;
-    width: 0;
-    height: 2px;
-    bottom: -5px;
-    left: 0;
-    background: var(--primary-color);
-    transition: width 0.3s ease;
-}
-.nav a:hover::after { width: 100%; }
-
-.cta-button {
-    background: var(--gradient-primary);
-    color: var(--white);
-    padding: 10px 20px;
-    border-radius: 25px;
-    text-decoration: none;
-    font-weight: 500;
-    transition: all 0.3s ease;
-    box-shadow: var(--shadow-md);
-    font-size: 14px;
-}
-.cta-button:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-lg);
-}
-
-/* Main Content */
-.main-content {
-    margin-top: 110px;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 20px 15px;
-}
-
-.progress-bar { width: 100%; max-width: 500px; margin-bottom: 30px; }
-.progress-steps {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    position: relative;
-}
-.progress-steps::before {
-    content: '';
-    position: absolute;
-    top: 20px;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: var(--gray-200);
-    z-index: 1;
-}
-.progress-line {
-    position: absolute;
-    top: 20px;
-    left: 0;
-    height: 2px;
-    background: var(--gradient-primary);
-    transition: width 0.5s ease;
-    z-index: 2;
-}
-.step {
-    width: 35px;
-    height: 35px;
-    border-radius: 50%;
-    background: var(--white);
-    border: 2px solid var(--gray-200);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 600;
-    color: var(--gray-400);
-    position: relative;
-    z-index: 3;
-    transition: all 0.3s ease;
-    font-size: 14px;
-}
-.step.active {
-    background: var(--primary-color);
-    border-color: var(--primary-color);
-    color: var(--white);
-    transform: scale(1.1);
-}
-.step.completed {
-    background: var(--accent-color);
-    border-color: var(--accent-color);
-    color: var(--white);
-}
-
-.section-title { text-align: center; margin-bottom: 30px; }
-.section-title h1 {
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: var(--gray-900);
-    margin-bottom: 8px;
-    font-family: 'Poppins', sans-serif;
-}
-.section-title p {
-    font-size: 0.95rem;
-    color: var(--gray-600);
-    max-width: 500px;
-    margin: 0 auto;
-    line-height: 1.5;
-}
-
-.content-container { width: 100%; max-width: 1000px; margin: 0 auto; }
-.grid-container {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-    margin-top: 20px;
-}
-
-/* Cards */
-.brand-card {
-    background: var(--white);
-    border-radius: 15px;
-    padding: 20px 12px;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: var(--shadow-sm);
-    border: 2px solid transparent;
-    position: relative;
-    overflow: hidden;
-}
-.brand-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: var(--gradient-accent);
-    opacity: 0.1;
-    transition: left 0.5s ease;
-}
-.brand-card:hover {
-    transform: translateY(-3px);
-    box-shadow: var(--shadow-lg);
-    border-color: var(--primary-color);
-}
-.brand-card:hover::before { left: 0; }
-.brand-card img {
-    width: 50px;
-    height: 50px;
-    object-fit: contain;
-    margin-bottom: 10px;
-    transition: transform 0.3s ease;
-}
-.brand-card:hover img { transform: scale(1.05); }
-.brand-card h3 {
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: var(--gray-800);
-    margin-bottom: 5px;
-}
-
-.car-card {
-    background: var(--white);
-    border-radius: 15px;
-    overflow: hidden;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: var(--shadow-sm);
-    border: 2px solid transparent;
-}
-.car-card:hover {
-    transform: translateY(-3px);
-    box-shadow: var(--shadow-lg);
-    border-color: var(--primary-color);
-}
-.car-card img { width: 100%; height: 120px; object-fit: cover; }
-.car-card-content { padding: 15px 10px; text-align: center; }
-.car-card h3 {
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: var(--gray-800);
-    line-height: 1.3;
-}
-
-.selected-car {
-    background: var(--white);
-    border-radius: 20px;
-    padding: 25px;
-    text-align: center;
-    margin-bottom: 30px;
-    box-shadow: var(--shadow-lg);
-    border: 2px solid var(--primary-color);
-}
-.selected-car img {
-    width: 100%;
-    max-width: 280px;
-    height: 180px;
-    object-fit: cover;
-    border-radius: 12px;
-    margin-bottom: 15px;
-}
-.selected-car h2 {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--primary-color);
-    margin-bottom: 10px;
-}
-
-.back-btn {
-    background: transparent;
-    color: var(--primary-color);
-    border: 2px solid var(--primary-color);
-    padding: 8px 16px;
-    border-radius: 20px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 20px;
-    font-size: 0.9rem;
-}
-.back-btn:hover {
-    background: var(--primary-color);
-    color: var(--white);
-    transform: translateY(-1px);
-}
-
-/* Mobile Section */
-.mobile-section {
-    background: var(--white);
-    border-radius: 20px;
-    padding: 30px;
-    text-align: center;
-    margin-bottom: 30px;
-    box-shadow: var(--shadow-lg);
-    border: 2px solid var(--accent-color);
-    max-width: 500px;
-    margin: 0 auto 30px;
-}
-.mobile-section .icon {
-    width: 60px;
-    height: 60px;
-    background: var(--gradient-accent);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 20px;
-    color: var(--white);
-    font-size: 1.5rem;
-}
-.mobile-section h3 {
-    font-size: 1.3rem;
-    font-weight: 700;
-    color: var(--gray-900);
-    margin-bottom: 10px;
-    font-family: 'Poppins', sans-serif;
-}
-.mobile-section p {
-    color: var(--gray-600);
-    margin-bottom: 25px;
-    font-size: 0.95rem;
-}
-.mobile-form {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    align-items: center;
-}
-.mobile-input-group {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    width: 100%;
-    max-width: 350px;
-}
-.country-code {
-    background: var(--gray-100);
-    padding: 12px 15px;
-    border-radius: 12px;
-    font-weight: 600;
-    color: var(--gray-700);
-    border: 2px solid var(--gray-200);
-}
-.mobile-input {
-    flex: 1;
-    padding: 12px 16px;
-    border: 2px solid var(--gray-200);
-    border-radius: 12px;
-    font-size: 1rem;
-    transition: all 0.3s ease;
-    background: var(--gray-50);
-}
-.mobile-input:focus {
-    outline: none;
-    border-color: var(--primary-color);
-    background: var(--white);
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-}
-.mobile-input.error { border-color: #ef4444; background: #fef2f2; }
-.mobile-submit-btn {
-    background: var(--gradient-primary);
-    color: var(--white);
-    border: none;
-    padding: 12px 30px;
-    border-radius: 25px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: var(--shadow-md);
-    min-width: 180px;
-}
-.mobile-submit-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-lg);
-}
-.mobile-submit-btn:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    transform: none;
-}
-.mobile-error {
-    color: #ef4444;
-    font-size: 0.85rem;
-    margin-top: 5px;
-    text-align: center;
-}
-
-/* Service Cards */
-.service-card {
-    background: var(--white);
-    border-radius: 18px;
-    overflow: hidden;
-    margin-bottom: 20px;
-    box-shadow: var(--shadow-md);
-    transition: all 0.3s ease;
-    border: 2px solid transparent;
-}
-.service-card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-xl);
-    border-color: var(--primary-color);
-}
-.service-header {
-    background: var(--gradient-primary);
-    color: var(--white);
-    padding: 18px;
-    position: relative;
-}
-.service-tag {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    background: var(--secondary-color);
-    color: var(--white);
-    padding: 4px 10px;
-    border-radius: 15px;
-    font-size: 0.75rem;
-    font-weight: 600;
-}
-.service-header h3 {
-    font-size: 1.2rem;
-    font-weight: 700;
-    margin-bottom: 5px;
-}
-.service-content { padding: 20px; }
-.service-image {
-    width: 100%;
-    height: 160px;
-    object-fit: cover;
-    border-radius: 12px;
-    margin-bottom: 15px;
-}
-
-/* Pricing */
-.gst-notice {
-    text-align: center;
-    font-size: 0.75rem;
-    color: var(--gray-500);
-    margin-bottom: 8px;
-    font-style: italic;
-}
-.price-details-box {
-    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-    border: 2px solid #bae6fd;
-    border-radius: 12px;
-    padding: 12px 15px;
-    margin-bottom: 15px;
-}
-.price-row-detail {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 8px;
-    font-size: 0.9rem;
-}
-.price-row-detail:last-child {
-    margin-bottom: 0;
-    padding-top: 8px;
-    border-top: 2px dashed #38bdf8;
-    font-weight: 700;
-    font-size: 1rem;
-    color: var(--primary-color);
-}
-.price-row-detail .label { color: var(--gray-700); }
-.price-row-detail .value { font-weight: 600; color: var(--gray-900); }
-.gst-info-tag {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    font-size: 0.75rem;
-    color: var(--primary-color);
-    background: rgba(37, 99, 235, 0.1);
-    padding: 2px 8px;
-    border-radius: 10px;
-    margin-left: 8px;
-}
-
-.price-section {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 18px;
-    flex-wrap: wrap;
-}
-.original-price {
-    font-size: 1rem;
-    text-decoration: line-through;
-    color: var(--gray-400);
-}
-.discounted-price {
-    font-size: 1.4rem;
-    font-weight: 700;
-    color: var(--accent-color);
-}
-.discount-badge {
-    background: var(--accent-color);
-    color: var(--white);
-    padding: 3px 8px;
-    border-radius: 8px;
-    font-size: 0.75rem;
-    font-weight: 600;
-}
-
-/* Coupon Section - New Professional Design */
-.coupon-section {
-    background: linear-gradient(135deg, #fff5e6 0%, #ffe9cc 100%);
-    border: 2px solid #ff9800;
-    border-radius: 16px;
-    padding: 20px;
-    margin: 20px 0;
-    position: relative;
-    overflow: hidden;
-}
-
-.coupon-section::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    right: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle, rgba(255, 152, 0, 0.1) 0%, transparent 70%);
-    animation: pulse 3s ease-in-out infinite;
-}
-
-.coupon-promo {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 15px;
-    position: relative;
-    z-index: 1;
-}
-
-.coupon-promo-content {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    flex: 1;
-}
-
-.coupon-icon {
-    width: 50px;
-    height: 50px;
-    background: linear-gradient(135deg, #ff6a00, #ff9800);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 1.5rem;
-    animation: bounce 2s ease-in-out infinite;
-    box-shadow: 0 4px 15px rgba(255, 106, 0, 0.3);
-}
-
-.coupon-promo-text h4 {
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: #ff6a00;
-    margin: 0 0 4px 0;
-    font-family: 'Poppins', sans-serif;
-}
-
-.coupon-promo-text p {
-    font-size: 0.9rem;
-    color: var(--gray-700);
-    margin: 0;
-}
-
-.coupon-promo-text .highlight {
-    font-weight: 700;
-    color: #ff6a00;
-    font-size: 1.1rem;
-}
-
-.apply-coupon-direct-btn {
-    background: linear-gradient(135deg, #ff6a00, #ff9800);
-    color: white;
-    border: none;
-    padding: 12px 24px;
-    border-radius: 25px;
-    font-weight: 600;
-    font-size: 0.95rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(255, 106, 0, 0.3);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    white-space: nowrap;
-}
-
-.apply-coupon-direct-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(255, 106, 0, 0.4);
-}
-
-.apply-coupon-direct-btn:active {
-    transform: translateY(0);
-}
-
-.coupon-applied-badge {
-    background: linear-gradient(135deg, #10b981, #059669);
-    color: white;
-    padding: 15px 20px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-weight: 600;
-    font-size: 1rem;
-    animation: slideInScale 0.5s ease-out;
-    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
-}
-
-.coupon-applied-badge i {
-    font-size: 1.3rem;
-}
-
-.manual-coupon-btn {
-    background: transparent;
-    border: none;
-    color: var(--primary-color);
-    font-size: 0.85rem;
-    cursor: pointer;
-    padding: 8px 0;
-    text-decoration: underline;
-    transition: color 0.3s ease;
-    margin-top: 10px;
-    display: block;
-    width: 100%;
-    text-align: center;
-}
-
-.manual-coupon-btn:hover {
-    color: #1d4ed8;
-}
-
-.coupon-input-section {
-    margin-top: 15px;
-    animation: slideDown 0.3s ease;
-}
-
-.coupon-input-group { 
-    display: flex; 
-    gap: 8px; 
-    margin-bottom: 12px; 
-}
-
-.coupon-input {
-    flex: 1;
-    padding: 10px 12px;
-    border: 2px solid var(--gray-200);
-    border-radius: 8px;
-    font-size: 0.9rem;
-    text-transform: uppercase;
-    font-weight: 500;
-    transition: all 0.3s ease;
-}
-
-.coupon-input:focus {
-    outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-}
-
-.coupon-input.success { 
-    border-color: var(--accent-color); 
-    background: #f0fdf4; 
-}
-
-.coupon-input.error { 
-    border-color: #ef4444; 
-    background: #fef2f2; 
-}
-
-.apply-coupon-btn {
-    background: var(--primary-color);
-    color: var(--white);
-    border: none;
-    padding: 10px 16px;
-    border-radius: 8px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 0.9rem;
-    min-width: 60px;
-}
-
-.apply-coupon-btn:hover { 
-    background: #1d4ed8; 
-}
-
-.apply-coupon-btn:disabled { 
-    opacity: 0.6; 
-    cursor: not-allowed; 
-}
-
-.coupon-message {
-    font-size: 0.85rem;
-    padding: 8px 0;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.coupon-message.success { 
-    color: var(--accent-color); 
-}
-
-.coupon-message.error { 
-    color: #ef4444; 
-}
-
-/* Mobile Collection Modal */
-.mobile-collection-modal {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.75);
-    z-index: 9999;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    backdrop-filter: blur(5px);
-}
-
-.mobile-collection-modal.show {
-    opacity: 1;
-}
-
-.mobile-collection-content {
-    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-    padding: 35px 30px;
-    width: 90%;
-    max-width: 450px;
-    border-radius: 24px;
-    position: relative;
-    animation: modalSlideUp 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-}
-
-.mobile-collection-header {
-    text-align: center;
-    margin-bottom: 25px;
-}
-
-.coupon-badge-modal {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: linear-gradient(135deg, #ff6a00, #ff9800);
-    color: white;
-    padding: 8px 20px;
-    border-radius: 20px;
-    font-weight: 700;
-    font-size: 1.1rem;
-    margin-bottom: 15px;
-    box-shadow: 0 4px 15px rgba(255, 106, 0, 0.3);
-    animation: badgePulse 2s ease-in-out infinite;
-}
-
-.coupon-badge-modal i {
-    font-size: 1.2rem;
-}
-
-.mobile-collection-header h3 {
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: var(--gray-900);
-    margin-bottom: 8px;
-    font-family: 'Poppins', sans-serif;
-}
-
-.mobile-collection-header p {
-    color: var(--gray-600);
-    font-size: 0.95rem;
-    line-height: 1.5;
-}
-
-.mobile-collection-form {
-    margin-bottom: 20px;
-}
-
-.mobile-input-wrapper {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 12px;
-}
-
-.country-code-modal {
-    background: var(--gray-100);
-    padding: 14px 16px;
-    border-radius: 12px;
-    font-weight: 600;
-    color: var(--gray-700);
-    border: 2px solid var(--gray-200);
-    font-size: 1rem;
-}
-
-.mobile-input-modal {
-    flex: 1;
-    padding: 14px 16px;
-    border: 2px solid var(--gray-200);
-    border-radius: 12px;
-    font-size: 1rem;
-    transition: all 0.3s ease;
-    background: var(--gray-50);
-}
-
-.mobile-input-modal:focus {
-    outline: none;
-    border-color: #ff6a00;
-    background: var(--white);
-    box-shadow: 0 0 0 3px rgba(255, 106, 0, 0.1);
-}
-
-.mobile-input-modal.error {
-    border-color: #ef4444;
-    background: #fef2f2;
-    animation: shake 0.5s ease;
-}
-
-.mobile-error-modal {
-    color: #ef4444;
-    font-size: 0.85rem;
-    margin-bottom: 12px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.mobile-error-modal::before {
-    content: '⚠️';
-}
-
-.apply-with-mobile-btn {
-    width: 100%;
-    background: linear-gradient(135deg, #ff6a00, #ff9800);
-    color: white;
-    border: none;
-    padding: 14px 24px;
-    border-radius: 12px;
-    font-weight: 600;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(255, 106, 0, 0.3);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-}
-
-.apply-with-mobile-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(255, 106, 0, 0.4);
-}
-
-.apply-with-mobile-btn:active {
-    transform: translateY(0);
-}
-
-.apply-with-mobile-btn:disabled {
-    opacity: 0.7;
-    cursor: not-allowed;
-    transform: none;
-}
-
-.mobile-collection-benefits {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    padding: 15px;
-    background: var(--gray-50);
-    border-radius: 12px;
-}
-
-.benefit-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    font-size: 0.75rem;
-    color: var(--gray-600);
-}
-
-.benefit-item i {
-    color: #ff6a00;
-    font-size: 1.2rem;
-}
-
-.close-modal-btn {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    width: 35px;
-    height: 35px;
-    background: var(--gray-100);
-    border: none;
-    border-radius: 50%;
-    color: var(--gray-500);
-    font-size: 1.2rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.close-modal-btn:hover {
-    background: var(--gray-200);
-    color: var(--gray-700);
-    transform: rotate(90deg);
-}
-
-/* Mobile Collection Modal Animations */
-@keyframes modalSlideUp {
-    0% {
-        transform: translateY(100px) scale(0.9);
-        opacity: 0;
+<script src="https://cdn.zipy.ai/sdk/v1.0/zipy.min.umd.js" crossorigin="anonymous"></script> <script> window.zipy && window.zipy.init('3a0a3904');</script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Booking Details | Instant Mechanic</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>body { font-family: 'Inter', sans-serif; }</style>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCgulBmFWyyk8zV7AO0v2qiMSBNlKHaQE0"></script>
+  
+  <!-- Mixpanel SDK -->
+  <script type="text/javascript">
+    (function(c,a){if(!a.__SV){var b=window;try{var d,m,j,k=b.location,f=k.hash;d=function(a,b){return(m=a.match(RegExp(b+"=([^&]*)")))?m[1]:null};f&&d(f,"state")&&(j=JSON.parse(decodeURIComponent(d(f,"state"))),"mpeditor"===j.action&&(b.sessionStorage.setItem("_mpcehash",f),history.replaceState(j.desiredHash||"",c.title,k.pathname+k.search)))}catch(n){}var l,h;window.mixpanel=a;a._i=[];a.init=function(b,d,g){function c(b,i){var a=i.split(".");2==a.length&&(b=b[a[0]],i=a[1]);b[i]=function(){b.push([i].concat(Array.prototype.slice.call(arguments,0)))}}var e=a;"undefined"!==typeof g?e=a[g]=[]:g="mixpanel";e.people=e.people||[];e.toString=function(b){var a="mixpanel";"mixpanel"!==g&&(a+="."+g);b||(a+=" (stub)");return a};e.people.toString=function(){return e.toString(1)+".people (stub)"};l="disable time_event track track_pageview track_links track_forms register register_once alias unregister identify name_tag set_config reset opt_in_tracking opt_out_tracking has_opted_in_tracking has_opted_out_tracking clear_opt_in_out_tracking start_batch_senders people.set people.set_once people.unset people.increment people.append people.union people.track_charge people.clear_charges people.delete_user".split(" ");for(h=0;h<l.length;h++)c(e,l[h]);a._i.push([b,d,g])};a.__SV=1.2;b=c.createElement("script");b.type="text/javascript";b.async=!0;b.src="undefined"!==typeof MIXPANEL_CUSTOM_LIB_URL?MIXPANEL_CUSTOM_LIB_URL:"file:"===c.location.protocol&&"//cdn4.mxpnl.com/libs/mixpanel-2-latest.min.js".match(/^\/\//)?"https://cdn4.mxpnl.com/libs/mixpanel-2-latest.min.js":"//cdn4.mxpnl.com/libs/mixpanel-2-latest.min.js";d=c.getElementsByTagName("script")[0];d.parentNode.insertBefore(b,d)}})(document,window.mixpanel||[]);
+    mixpanel.init('afeb927e0d7ee7ddfa033985ab2fe603');
+  </script>
+
+  <style>
+    @keyframes pulse-ring {
+      0% { transform: scale(1); opacity: 0.8; }
+      100% { transform: scale(1.6); opacity: 0; }
     }
-    100% {
-        transform: translateY(0) scale(1);
-        opacity: 1;
+    .pulse-ring {
+      animation: pulse-ring 1.2s ease-out infinite;
     }
-}
-
-@keyframes badgePulse {
-    0%, 100% {
-        transform: scale(1);
+    #ivrPopup {
+      transition: opacity 0.2s ease;
     }
-    50% {
-        transform: scale(1.05);
-    }
-}
-
-@keyframes shake {
-    0%, 100% {
-        transform: translateX(0);
-    }
-    25% {
-        transform: translateX(-10px);
-    }
-    75% {
-        transform: translateX(10px);
-    }
-}
-
-/* Celebration Overlay */
-.celebration-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.8);
-    z-index: 10000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.celebration-overlay.show {
-    opacity: 1;
-}
-
-.celebration-content {
-    background: white;
-    padding: 40px;
-    border-radius: 24px;
-    text-align: center;
-    max-width: 400px;
-    position: relative;
-    animation: celebrationBounce 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-}
-
-.celebration-icon {
-    width: 80px;
-    height: 80px;
-    background: linear-gradient(135deg, #10b981, #059669);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 20px;
-    animation: celebrationPulse 0.6s ease-out;
-}
-
-.celebration-icon i {
-    color: white;
-    font-size: 2.5rem;
-    animation: celebrationCheck 0.6s ease-out 0.2s both;
-}
-
-.celebration-content h3 {
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: var(--gray-900);
-    margin-bottom: 10px;
-    font-family: 'Poppins', sans-serif;
-}
-
-.celebration-content p {
-    font-size: 1.1rem;
-    color: var(--gray-600);
-    margin-bottom: 0;
-}
-
-.celebration-amount {
-    font-size: 2rem;
-    font-weight: 700;
-    color: #10b981;
-    display: block;
-    margin-top: 5px;
-}
-
-.confetti-container {
-    position: absolute;
-    inset: 0;
-    overflow: hidden;
-    pointer-events: none;
-}
-
-.confetti {
-    position: absolute;
-    width: 10px;
-    height: 10px;
-    top: -10px;
-    animation: confettiFall 3s linear forwards;
-}
-
-/* Celebration Animations */
-@keyframes celebrationBounce {
-    0% {
-        transform: scale(0.3) translateY(100px);
-        opacity: 0;
-    }
-    50% {
-        transform: scale(1.05);
-    }
-    70% {
-        transform: scale(0.95);
-    }
-    100% {
-        transform: scale(1) translateY(0);
-        opacity: 1;
-    }
-}
-
-@keyframes celebrationPulse {
-    0% {
-        transform: scale(0);
-    }
-    50% {
-        transform: scale(1.2);
-    }
-    100% {
-        transform: scale(1);
-    }
-}
-
-@keyframes celebrationCheck {
-    0% {
-        transform: scale(0) rotate(-45deg);
-        opacity: 0;
-    }
-    100% {
-        transform: scale(1) rotate(0deg);
-        opacity: 1;
-    }
-}
-
-@keyframes confettiFall {
-    to {
-        transform: translateY(100vh) rotate(360deg);
-        opacity: 0;
-    }
-}
-
-@keyframes bounce {
-    0%, 100% {
-        transform: translateY(0);
-    }
-    50% {
-        transform: translateY(-5px);
-    }
-}
-
-@keyframes pulse {
-    0%, 100% {
-        opacity: 1;
-    }
-    50% {
-        opacity: 0.5;
-    }
-}
-
-@keyframes slideInScale {
-    0% {
-        transform: scale(0.8) translateY(-20px);
-        opacity: 0;
-    }
-    100% {
-        transform: scale(1) translateY(0);
-        opacity: 1;
-    }
-}
-
-/* Final Price Section */
-.final-price-section {
-    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-    border-radius: 12px;
-    padding: 15px;
-    margin: 15px 0;
-    border: 1px solid var(--secondary-color);
-}
-.price-breakdown { display: flex; flex-direction: column; gap: 8px; }
-.price-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 0.9rem;
-}
-.price-row.total {
-    border-top: 2px solid var(--secondary-color);
-    padding-top: 8px;
-    margin-top: 8px;
-    font-weight: 700;
-    font-size: 1.1rem;
-    color: var(--dark-color);
-}
-.price-row .discount { color: var(--accent-color); font-weight: 600; }
-
-.service-details { margin-bottom: 18px; }
-.service-details h4 {
-    font-size: 1rem;
-    font-weight: 600;
-    color: var(--gray-800);
-    margin-bottom: 12px;
-}
-.inclusions-list { list-style: none; margin-bottom: 12px; }
-.inclusions-list li {
-    display: flex;
-    align-items: flex-start;
-    gap: 8px;
-    margin-bottom: 6px;
-    font-size: 0.9rem;
-    color: var(--gray-700);
-    line-height: 1.4;
-}
-.inclusions-list li i {
-    color: var(--accent-color);
-    font-size: 0.9rem;
-    margin-top: 2px;
-    flex-shrink: 0;
-}
-.see-more-btn {
-    background: transparent;
-    color: var(--primary-color);
-    border: 1px solid var(--primary-color);
-    padding: 6px 14px;
-    border-radius: 15px;
-    cursor: pointer;
-    font-weight: 500;
-    transition: all 0.3s ease;
-    margin-bottom: 12px;
-    font-size: 0.85rem;
-}
-.see-more-btn:hover {
-    background: var(--primary-color);
-    color: var(--white);
-}
-
-.service-info {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 18px;
-    padding: 12px;
-    background: var(--gray-50);
-    border-radius: 12px;
-}
-.info-item { text-align: center; flex: 1; }
-.info-item i {
-    color: var(--primary-color);
-    font-size: 1rem;
-    margin-bottom: 4px;
-    display: block;
-}
-.info-item .label {
-    font-size: 0.75rem;
-    color: var(--gray-500);
-    display: block;
-    margin-bottom: 2px;
-}
-.info-item .value {
-    font-weight: 600;
-    color: var(--gray-800);
-    font-size: 0.8rem;
-}
-
-.book-service-btn {
-    background: var(--gradient-secondary);
-    color: var(--white);
-    border: none;
-    padding: 12px 25px;
-    border-radius: 20px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    width: 100%;
-    transition: all 0.3s ease;
-    box-shadow: var(--shadow-md);
-}
-.book-service-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-lg);
-}
-
-/* Success Page */
-.success-page {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: var(--white);
-    z-index: 3000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.5s ease;
-}
-.success-page.show { opacity: 1; visibility: visible; }
-.success-content {
-    text-align: center;
-    max-width: 500px;
-    padding: 40px 30px;
-}
-.success-animation {
-    width: 120px;
-    height: 120px;
-    margin: 0 auto 30px;
-    background: var(--gradient-success);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    animation: successPulse 2s infinite;
-}
-.success-animation i { color: var(--white); font-size: 3rem; }
-.success-title {
-    font-size: 2rem;
-    font-weight: 700;
-    color: var(--gray-900);
-    margin-bottom: 15px;
-    font-family: 'Poppins', sans-serif;
-}
-.success-subtitle {
-    font-size: 1.1rem;
-    color: var(--gray-600);
-    margin-bottom: 30px;
-    line-height: 1.6;
-}
-.success-details {
-    background: var(--gray-50);
-    border-radius: 20px;
-    padding: 25px;
-    margin-bottom: 30px;
-    text-align: left;
-}
-.detail-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 0;
-    border-bottom: 1px solid var(--gray-200);
-}
-.detail-row:last-child { border-bottom: none; }
-.detail-label { font-weight: 600; color: var(--gray-700); }
-.detail-value { color: var(--gray-900); font-weight: 500; }
-.success-actions { display: flex; gap: 15px; flex-direction: column; }
-.btn-whatsapp {
-    background: #25d366;
-    color: var(--white);
-    padding: 15px 25px;
-    border-radius: 20px;
-    text-decoration: none;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    transition: all 0.3s ease;
-    font-size: 1.1rem;
-}
-.btn-whatsapp:hover {
-    background: #128c7e;
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-lg);
-}
-.btn-home {
-    background: var(--gradient-primary);
-    color: var(--white);
-    padding: 12px 25px;
-    border-radius: 20px;
-    text-decoration: none;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    transition: all 0.3s ease;
-}
-.btn-home:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-lg);
-}
-
-/* Coupon Modal */
-.coupon-button {
-    background: linear-gradient(135deg, #ff6a00, #ff3d00);
-    color: #fff;
-    padding: 12px 22px;
-    border-radius: 30px;
-    font-weight: 600;
-    text-decoration: none;
-    animation: pulseGlow 1.8s infinite;
-    box-shadow: 0 0 0 rgba(255, 106, 0, 0.7);
-    cursor: pointer;
-    border: none;
-    font-size: 14px;
-}
-.coupon-modal {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.75);
-    z-index: 9999;
-    align-items: center;
-    justify-content: center;
-    backdrop-filter: blur(5px);
-}
-.coupon-modal.show { display: flex; }
-.coupon-content {
-    background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
-    padding: 35px 30px;
-    width: 90%;
-    max-width: 400px;
-    text-align: center;
-    border-radius: 20px;
-    animation: slideUpBounce 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-    position: relative;
-}
-.close-btn {
-    position: absolute;
-    right: 15px;
-    top: 15px;
-    font-size: 28px;
-    cursor: pointer;
-    color: var(--gray-400);
-    width: 35px;
-    height: 35px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    background: var(--gray-100);
-    transition: all 0.3s ease;
-    line-height: 1;
-}
-.close-btn:hover {
-    background: var(--gray-200);
-    color: var(--gray-700);
-    transform: rotate(90deg);
-}
-.coupon-content h2 {
-    font-size: 1.8rem;
-    margin-bottom: 10px;
-    color: var(--gray-900);
-    font-family: 'Poppins', sans-serif;
-}
-.coupon-content > p {
-    color: var(--gray-600);
-    margin-bottom: 25px;
-    font-size: 0.95rem;
-}
-.scratch-container {
-    position: relative;
-    width: 100%;
-    max-width: 300px;
-    height: 150px;
-    margin: 20px auto;
-    border-radius: 15px;
-    overflow: hidden;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-}
-.scratch-card-bg {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-}
-.scratch-card-bg .coupon-code-reveal {
-    font-size: 2rem;
-    font-weight: 700;
-    color: #fff;
-    letter-spacing: 3px;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-    margin-bottom: 8px;
-}
-.scratch-card-bg .coupon-subtitle {
-    font-size: 0.9rem;
-    color: rgba(255, 255, 255, 0.9);
-    font-weight: 500;
-}
-.scratch-canvas {
-    position: absolute;
-    inset: 0;
-    cursor: pointer;
-    touch-action: none;
-}
-.scratch-instruction {
-    margin-top: 15px;
-    color: var(--gray-600);
-    font-size: 0.85rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-}
-.scratch-instruction i {
-    color: var(--primary-color);
-    font-size: 1rem;
-}
-.copy-btn {
-    background: linear-gradient(135deg, #2563eb, #1d4ed8);
-    color: #fff;
-    border: none;
-    padding: 12px 28px;
-    border-radius: 12px;
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 1rem;
-    margin-top: 20px;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
-}
-.copy-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
-}
-.copy-btn:active { transform: translateY(0); }
-.copy-msg {
-    margin-top: 12px;
-    font-size: 0.9rem;
-    color: var(--accent-color);
-    font-weight: 600;
-    min-height: 20px;
-}
-
-/* Loading State */
-.loading {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 40px;
-    color: var(--primary-color);
-    font-size: 1rem;
-}
-.spinner {
-    width: 32px;
-    height: 32px;
-    border: 3px solid var(--gray-200);
-    border-top: 3px solid var(--primary-color);
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin-right: 12px;
-}
-
-/* Animations */
-@keyframes pulseGlow {
-    0% { box-shadow: 0 0 0 0 rgba(255, 106, 0, 0.7); }
-    70% { box-shadow: 0 0 0 14px rgba(255, 106, 0, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(255, 106, 0, 0); }
-}
-@keyframes slideUpBounce {
-    0% { transform: translateY(100px) scale(0.8); opacity: 0; }
-    100% { transform: translateY(0) scale(1); opacity: 1; }
-}
-@keyframes successPulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-}
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-@keyframes slideInLeft {
-    from { opacity: 0; transform: translateX(-50px); }
-    to { opacity: 1; transform: translateX(0); }
-}
-@keyframes slideInRight {
-    from { opacity: 0; transform: translateX(50px); }
-    to { opacity: 1; transform: translateX(0); }
-}
-@keyframes slideDown {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.fade-in { animation: fadeIn 0.5s ease-in; }
-.slide-in-left { animation: slideInLeft 0.5s ease-out; }
-.slide-in-right { animation: slideInRight 0.5s ease-out; }
-
-/* Utility Classes */
-.hidden { display: none !important; }
-.text-center { text-align: center; }
-.mb-20 { margin-bottom: 20px; }
-.mt-20 { margin-top: 20px; }
-
-/* Mobile Responsive */
-@media (max-width: 768px) {
-    .header-top { display: none; }
-    .header-main { padding: 10px 0; }
-    .header-main .container { padding: 0 12px; }
-    .logo { font-size: 20px; }
-    .nav { display: none; }
-    .cta-button { padding: 8px 16px; font-size: 13px; }
-    .main-content { margin-top: 70px; padding: 15px 10px; }
-    .section-title h1 { font-size: 1.5rem; }
-    .section-title p { font-size: 0.9rem; }
-    .progress-bar { max-width: 100%; margin-bottom: 25px; }
-    .step { width: 30px; height: 30px; font-size: 12px; }
-    .grid-container { grid-template-columns: repeat(3, 1fr); gap: 8px; }
-    .brand-card { padding: 15px 8px; border-radius: 12px; }
-    .brand-card img { width: 40px; height: 40px; margin-bottom: 8px; }
-    .brand-card h3 { font-size: 0.8rem; line-height: 1.2; }
-    .car-card img { height: 90px; padding: 6px; background: var(--gray-50); }
-    .car-card-content { padding: 12px 8px; }
-    .car-card h3 { font-size: 0.8rem; }
-    .selected-car { padding: 15px; margin-bottom: 20px; }
-    .selected-car img { height: 100px; max-width: 160px; padding: 6px; }
-    .selected-car h2 { font-size: 1.1rem; }
-    .mobile-section { padding: 20px; margin: 0 10px 20px; }
-    .mobile-section .icon { width: 50px; height: 50px; font-size: 1.3rem; }
-    .mobile-section h3 { font-size: 1.2rem; }
-    .mobile-input-group { flex-direction: column; max-width: 100%; }
-    .country-code { text-align: center; width: 100%; }
-    .mobile-submit-btn { width: 100%; min-width: auto; }
-    .service-card { margin-bottom: 15px; border-radius: 15px; }
-    .service-header { padding: 15px; }
-    .service-header h3 { font-size: 1.1rem; }
-    .service-tag { font-size: 0.7rem; padding: 3px 8px; }
-    .service-content { padding: 15px; }
-    .service-image { height: 140px; }
-    .price-section { gap: 8px; }
-    .original-price { font-size: 0.9rem; }
-    .discounted-price { font-size: 1.3rem; }
-    .mobile-collection-content { 
-        padding: 30px 20px; 
-        max-width: 95%; 
-        border-radius: 20px;
-    }
-    .mobile-collection-header h3 { 
-        font-size: 1.5rem; 
-    }
-    .coupon-badge-modal { 
-        font-size: 1rem; 
-        padding: 6px 16px; 
-    }
-    .mobile-input-wrapper { 
-        flex-direction: column; 
-        gap: 10px; 
-    }
-    .country-code-modal { 
-        width: 100%; 
-        text-align: center; 
-    }
-    .mobile-collection-benefits { 
-        gap: 15px; 
-        padding: 12px; 
-    }
-    .benefit-item { 
-        font-size: 0.7rem; 
-    }
-    .benefit-item i { 
-        font-size: 1rem; 
-    }
-    .apply-with-mobile-btn { 
-        padding: 12px 20px; 
-        font-size: 0.95rem; 
-    }
-    .coupon-section { padding: 15px; margin: 15px 0; }
-    .coupon-promo { flex-direction: column; align-items: flex-start; gap: 12px; }
-    .coupon-promo-content { flex-direction: column; align-items: flex-start; gap: 12px; width: 100%; }
-    .coupon-icon { width: 45px; height: 45px; font-size: 1.3rem; }
-    .coupon-promo-text h4 { font-size: 1rem; }
-    .coupon-promo-text p { font-size: 0.85rem; }
-    .coupon-promo-text .highlight { font-size: 1rem; }
-    .apply-coupon-direct-btn { width: 100%; justify-content: center; padding: 12px 20px; }
-    .coupon-applied-badge { padding: 12px 15px; font-size: 0.9rem; }
-    .celebration-content { padding: 30px 20px; max-width: 90%; }
-    .celebration-icon { width: 70px; height: 70px; }
-    .celebration-icon i { font-size: 2rem; }
-    .celebration-content h3 { font-size: 1.5rem; }
-    .celebration-content p { font-size: 1rem; }
-    .celebration-amount { font-size: 1.7rem; }
-    .coupon-input-group { flex-direction: column; gap: 10px; }
-    .apply-coupon-btn { width: 100%; padding: 12px 16px; }
-    .final-price-section { padding: 12px; margin: 12px 0; }
-    .service-info { gap: 8px; padding: 10px; }
-    .info-item { display: flex; align-items: center; justify-content: space-between; text-align: left; }
-    .info-item i { margin-bottom: 0; margin-right: 8px; }
-    .book-service-btn { font-size: 0.95rem; padding: 11px 20px; }
-    .success-content { padding: 30px 20px; }
-    .success-title { font-size: 1.6rem; }
-    .success-actions { gap: 12px; }
-    .back-btn { font-size: 0.85rem; padding: 8px 14px; }
-    .coupon-content { padding: 30px 20px; width: 95%; }
-    .coupon-content h2 { font-size: 1.5rem; }
-    .scratch-container { max-width: 280px; height: 140px; }
-    .scratch-card-bg .coupon-code-reveal { font-size: 1.6rem; letter-spacing: 2px; }
-}
-
-@media (max-width: 480px) {
-    .main-content { padding: 12px 8px; }
-    .grid-container { gap: 6px; }
-    .brand-card { padding: 12px 6px; }
-    .brand-card img { width: 35px; height: 35px; }
-    .brand-card h3 { font-size: 0.75rem; }
-    .section-title h1 { font-size: 1.3rem; }
-    .success-animation { width: 100px; height: 100px; }
-    .success-animation i { font-size: 2.5rem; }
-    .scratch-container { max-width: 260px; height: 130px; }
-    .scratch-card-bg .coupon-code-reveal { font-size: 1.4rem; }
-}
-</style>    
-    <!-- Mixpanel -->
-    <script type="text/javascript">
-    (function(f,b){if(!b.__SV){var e,g,i,h;window.mixpanel=b;b._i=[];b.init=function(e,f,c){function g(a,d){var b=d.split(".");2==b.length&&(a=a[b[0]],d=b[1]);a[d]=function(){a.push([d].concat(Array.prototype.slice.call(arguments,0)))}}var a=b;"undefined"!==typeof c?a=b[c]=[]:c="mixpanel";a.people=a.people||[];a.toString=function(a){var d="mixpanel";"mixpanel"!==c&&(d+="."+c);a||(d+=" (stub)");return d};a.people.toString=function(){return a.toString(1)+".people (stub)"};i="disable time_event track track_pageview track_links track_forms track_with_groups add_group set_group remove_group register register_once alias unregister identify name_tag set_config reset opt_in_tracking opt_out_tracking has_opted_in_tracking has_opted_out_tracking clear_opt_in_out_tracking start_batch_senders people.set people.set_once people.unset people.increment people.append people.union people.track_charge people.clear_charges people.delete_user people.remove".split(" ");
-    for(h=0;h<i.length;h++)g(a,i[h]);var j="set set_once union unset remove delete".split(" ");a.get_group=function(){function b(c){d[c]=function(){call2_args=arguments;call2=[c].concat(Array.prototype.slice.call(call2_args,0));a.push([e,call2])}}for(var d={},e=["get_group"].concat(Array.prototype.slice.call(arguments,0)),c=0;c<j.length;c++)b(j[c]);return d};b._i.push([e,f,c])};b.__SV=1.2;e=f.createElement("script");e.type="text/javascript";e.async=!0;e.src="undefined"!==typeof MIXPANEL_CUSTOM_LIB_URL?MIXPANEL_CUSTOM_LIB_URL:"file:"===f.location.protocol&&"//cdn.mxpnl.com/libs/mixpanel-2-latest.min.js".match(/^\/\//)?"https://cdn.mxpnl.com/libs/mixpanel-2-latest.min.js":"//cdn.mxpnl.com/libs/mixpanel-2-latest.min.js";g=f.getElementsByTagName("script")[0];g.parentNode.insertBefore(e,g)}})(document,window.mixpanel||[]);
-    mixpanel.init("afeb927e0d7ee7ddfa033985ab2fe603", {debug: true, track_pageview: true, persistence: 'localStorage'});
-    </script>
-
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=AW-11438043010"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'AW-11438043010');
-    </script>
-
-    <!-- Meta Pixel Code -->
-    <script>
-      !function(f,b,e,v,n,t,s)
-      {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-      n.queue=[];t=b.createElement(e);t.async=!0;
-      t.src=v;s=b.getElementsByTagName(e)[0];
-      s.parentNode.insertBefore(t,s)}(window, document,'script',
-      'https://connect.facebook.net/en_US/fbevents.js');
-      fbq('init', '479182611911558');
-      fbq('track', 'PageView');
-    </script>
-    <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=479182611911558&ev=PageView&noscript=1"/></noscript>
+  </style>
 </head>
+<body class="bg-[#F4F5F9] flex flex-col items-center min-h-screen">
 
-<body>
-    <!-- Header -->
-    <header class="header">
-        <div class="header-top">
-            <div class="container">
-                <div class="header-info">
-                    <span><i class="fas fa-phone"></i> +91 9266961110</span>
-                    <span><i class="fas fa-map-marker-alt"></i> Sector 75, Gurgaon, Haryana</span>
-                </div>
-                <div class="header-social">
-                    <a href="#"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#"><i class="fab fa-twitter"></i></a>
-                    <a href="#"><i class="fab fa-instagram"></i></a>
-                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
-                </div>
-            </div>
-        </div>
-        
-        <div class="header-main">
-            <div class="container">
-                <a href="index.html" class="logo">Instant Mechanic</a>
-                <nav class="nav">
-                    <a href="#home">Home</a>
-                    <a href="#services">Services</a>
-                    <a href="#about">About</a>
-                    <a href="#contact">Contact</a>
-                </nav>
-                <a href="javascript:void(0)" class="coupon-button" onclick="openHeaderCouponPopup()">🎁 Get ₹500 OFF</a>
-            </div>
-        </div>
-    </header>
-
-    <!-- Main Content -->
-    <main class="main-content">
-        <!-- Progress Bar -->
-        <div class="progress-bar">
-            <div class="progress-steps">
-                <div class="progress-line" id="progressLine"></div>
-                <div class="step active" id="step1">1</div>
-                <div class="step" id="step2">2</div>
-                <div class="step" id="step3">3</div>
-                <div class="step" id="step4">4</div>
-            </div>
-        </div>
-
-        <!-- Dynamic Content -->
-        <div class="content-container">
-            <button class="back-btn hidden" id="backBtn" onclick="goBack()">
-                <i class="fas fa-arrow-left"></i> Back
-            </button>
-
-            <div class="section-title" id="sectionTitle">
-                <h1>Choose Your Car Brand</h1>
-                <p>Select your car brand to get started with our premium service experience</p>
-            </div>
-
-            <div class="grid-container" id="brandContainer"></div>
-            <div class="grid-container hidden" id="carContainer"></div>
-            <div class="selected-car hidden" id="selectedCarDisplay"></div>
-
-            <!-- Mobile Number Section -->
-            <div class="mobile-section hidden" id="mobileSection">
-                <div class="icon"><i class="fas fa-mobile-alt"></i></div>
-                <h3>Get Service Prices Instantly!</h3>
-                <p>Enter your mobile number to view personalized service packages and pricing for your vehicle.</p>
-                
-                <form class="mobile-form" id="mobileForm">
-                    <div class="mobile-input-group">
-                        <div class="country-code">+91</div>
-                        <input type="tel" id="mobileNumber" class="mobile-input" 
-                               placeholder="Enter your 10-digit mobile number" maxlength="10" pattern="[0-9]{10}">
-                    </div>
-                    <div class="mobile-error hidden" id="mobileError"></div>
-                    <button type="submit" class="mobile-submit-btn" id="mobileSubmitBtn">
-                        <i class="fas fa-search"></i> View Service Prices for Free
-                    </button>
-                </form>
-            </div>
-
-            <div class="content-container hidden" id="serviceContainer"></div>
-            <div class="loading hidden" id="loadingState">
-                <div class="spinner"></div> Loading services...
-            </div>
-        </div>
-    </main>
-
-    <!-- Success Page -->
-    <div class="success-page" id="successPage">
-        <div class="success-content">
-            <div class="success-animation"><i class="fas fa-check"></i></div>
-            <h1 class="success-title">Booking Confirmed!</h1>
-            <p class="success-subtitle">Thank you for choosing Instant Mechanic! Your service has been successfully booked. Our expert team will contact you shortly to confirm the appointment details.</p>
-            <div class="success-details" id="bookingDetails"></div>
-            <div class="success-actions">
-                <a href="#" class="btn-whatsapp" id="whatsappLink">
-                    <i class="fab fa-whatsapp"></i> Chat on WhatsApp
-                </a>
-                <a href="/" class="btn-home"><i class="fas fa-home"></i> Back to Home</a>
-            </div>
-        </div>
+<!-- IVR Call Countdown Popup -->
+<div id="ivrPopup" class="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center hidden">
+  <div class="bg-white rounded-3xl p-8 mx-4 w-full max-w-xs shadow-2xl text-center">
+    
+    <!-- Phone icon with pulse -->
+    <div class="relative flex items-center justify-center mb-6">
+      <span class="absolute w-20 h-20 rounded-full bg-purple-200 pulse-ring"></span>
+      <div class="w-16 h-16 rounded-full bg-purple-600 flex items-center justify-center z-10">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 7V5z"/>
+        </svg>
+      </div>
     </div>
 
-    <!-- Coupon Modal -->
-    <div id="couponModal" class="coupon-modal">
-        <div class="coupon-content">
-            <span class="close-btn" onclick="closeCouponPopup()">×</span>
-            <h2>🎉 Exclusive Offer!</h2>
-            <p>Scratch to reveal your coupon code</p>
-            <div class="scratch-container">
-                <div class="scratch-card-bg">
-                    <div class="coupon-code-reveal">INSTANT500</div>
-                    <div class="coupon-subtitle">₹500 OFF on Services</div>
-                </div>
-                <canvas id="scratchCanvas" class="scratch-canvas"></canvas>
-            </div>
-            <div class="scratch-instruction">
-                <i class="fas fa-hand-pointer"></i>
-                <span id="scratchText">Scratch above to reveal code</span>
-            </div>
-            <button class="copy-btn" onclick="copyCoupon()">
-                <i class="fas fa-copy"></i> Copy Code
-            </button>
-            <p class="copy-msg" id="copyMsg"></p>
-        </div>
+    <!-- State: Counting down -->
+    <div id="ivrCountdownState">
+      <p class="text-gray-500 text-sm mb-1">You'll receive a call in</p>
+      <p id="ivrCountdown" class="text-6xl font-bold text-purple-600 mb-2">10</p>
+      <p class="text-gray-400 text-xs">seconds</p>
     </div>
 
-    <!-- External JavaScript -->
+    <!-- State: Connecting -->
+    <div id="ivrConnectingState" class="hidden">
+      <p class="text-lg font-semibold text-gray-800 mb-1">Connecting you now</p>
+      <p class="text-gray-500 text-sm">You should receive a call shortly</p>
+    </div>
+
+    <!-- Retry button (shown after connecting state) -->
+    <button id="ivrRetryBtn" class="hidden mt-6 w-full bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-2xl text-sm font-semibold transition-colors">
+      Retry Call
+    </button>
+
+    <!-- Cancel -->
+    <button id="ivrCancelBtn" class="mt-3 w-full bg-gray-100 hover:bg-gray-200 text-gray-600 py-3 rounded-2xl text-sm font-medium transition-colors">
+      Cancel
+    </button>
+  </div>
+</div>
+
+<!-- Car Number Popup (Mandatory) -->
+<div id="carNumberPopup" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
+  <div class="bg-white rounded-3xl p-8 mx-4 w-full max-w-sm shadow-2xl">
+    <div class="text-center mb-6">
+      <h2 class="text-2xl font-bold text-gray-800 mb-2">Enter Car Number</h2>
+      <p class="text-gray-600 text-sm">Please provide your car number to locate easily</p>
+    </div>
+    
+    <div class="mb-6">
+      <div class="flex items-center bg-gray-100 rounded-2xl overflow-hidden">
+        <div class="bg-orange-500 text-white px-2 py-5 flex items-center">
+          <img src="https://flagcdn.com/w20/in.png" alt="India" class="w-5 h-3 mr-2">
+          <span class="text-sm font-semibold">IND</span>
+        </div>
+        <input 
+          type="text" 
+          id="vehicleNumberInput" 
+          placeholder="DL 12 AA 1234" 
+          class="flex-1 px-4 py-3 text-gray-700 text-lg font-medium placeholder-gray-400 bg-transparent focus:outline-none uppercase"
+          maxlength="15"
+        >
+      </div>
+    </div>
+    
+    <button 
+      id="submitVehicleNumber" 
+      class="w-full bg-orange-500 hover:bg-orange-600 text-white py-4 rounded-2xl text-lg font-semibold transition-colors"
+    >
+      Submit
+    </button>
+  </div>
+</div>
+
+<!-- Paid UI Image Replacement -->
+<div id="paidSection" class="relative w-full h-[50vh] max-w-sm overflow-hidden hidden">
+  <div class="absolute top-4 left-4 bg-white rounded-full px-3 py-1 text-xs font-medium text-gray-700 shadow">Moving</div>
+</div>
+
+<!-- Map Container (default view) -->
+<div id="mapContainer" class="relative w-full h-[50vh] max-w-sm overflow-hidden">
+  <div id="map" class="absolute top-0 left-0 w-full h-full rounded-xl"></div>
+  <div class="absolute top-4 left-4 bg-white rounded-full px-3 py-1 text-xs font-medium text-gray-700 shadow">Moving</div>
+</div>
+
+<!-- After Payment Overlay -->
+<div id="afterPaymentOverlay" class="hidden w-full max-w-sm h-[50vh] bg-[#6B21A8] text-white relative flex flex-col items-center justify-start rounded-b-[2rem] overflow-hidden">
+  <!-- Countdown Circle -->
+  <div class="mt-12 w-32 h-32 rounded-full border-[6px] border-white flex items-center justify-center text-center">
+    <div>
+      <div class="text-xs font-light">ARRIVING IN</div>
+      <div id="countdownTimer" class="text-2xl font-bold mt-1">00:00</div>
+    </div>
+  </div>
+
+  <!-- Itinerary Timeline -->
+  <div class="mt-4 pl-6 relative">
+    <div class="absolute top-0 left-3 w-px h-full bg-gray-300" style="margin-left: 19px;"></div>
+
+    <div class="flex items-center mb-4 relative">
+      <div class="w-4 h-4 rounded-full bg-green-400 z-10"></div>
+      <span class="ml-3 text-white text-sm font-medium">BOOKING CONFIRMED</span>
+    </div>
+
+    <div class="flex items-center mb-4 relative">
+      <div class="w-4 h-4 rounded-full bg-green-400 z-10"></div>
+      <span class="ml-3 text-white text-sm font-medium">SECURITY PAYMENT RECEIVED</span>
+    </div>
+
+    <div class="flex items-center mb-4 relative">
+      <span class="absolute w-4 h-4 rounded-full bg-green-400 opacity-75 animate-ping"></span>
+      <div class="w-4 h-4 rounded-full bg-green-400 z-10"></div>
+      <span class="ml-3 text-white text-sm font-medium">HELP IS ON THE WAY</span>
+    </div>
+
+    <div class="flex items-center relative">
+      <div class="w-4 h-4 rounded-full bg-white border border-gray-300 z-10"></div>
+      <span class="ml-3 text-gray-300 text-sm font-medium">ARRIVED</span>
+    </div>
+  </div>
+</div>
+
+<!-- Message -->
+<div id="statusMessage" class="mt-4 w-full max-w-sm px-4">
+  <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 text-sm font-semibold rounded-xl px-4 py-3 shadow flex items-start space-x-2">
+    <span class="text-xl">🛠️</span>
+    <span id="statusText">Service is ready to move. Please <span class="underline decoration-dotted">pay security payment</span> to proceed.</span>
+  </div>
+</div>
+
+<!-- Booking Card -->
+<div class="w-full max-w-sm bg-white rounded-t-3xl mt-4 p-4 space-y-4 shadow-xl">
+  <div class="flex items-center space-x-4">
+    <img id="carImage" src="" alt="Car" class="w-28 h-20 object-cover rounded-xl shadow" />
+    <div class="flex-1">
+      <p id="car" class="text-sm font-bold text-gray-800">Car Name</p>
+      <p id="problem" class="text-xs text-gray-500 mt-1">Service Detail</p>
+      <p id="price" class="text-sm font-semibold text-purple-600 mt-1">Amount</p>
+    </div>
+  </div>
+
+  <div class="flex space-x-2">
+    <button id="payNow" class="flex-1 bg-purple-600 text-white py-3 rounded-xl text-sm font-semibold">Pay Now</button>
+    <button id="ring" class="flex-1 bg-purple-500 hover:bg-purple-600 text-white py-3 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition">
+      <img src="https://cdn-icons-png.flaticon.com/512/3670/3670051.png" alt="WhatsApp" class="h-5 w-5">
+      Get Help
+    </button>
+  </div>
+  <button id="cancelBooking" class="w-full bg-gray-200 text-gray-800 py-3 rounded-xl text-sm font-semibold">Call Instant Mechanic Team</button>
+  <p class="text-center text-[11px] text-gray-400" id="footer-text">Complete payment in <span id="timer">10:00</span> to avoid auto-cancellation.</p>
+</div>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
-    // ==================== Global Variables ====================
-let brands = [], cars = [], currentStep = 1;
-let selectedBrand = null, selectedCar = null, selectedService = null;
-let userMobile = null, appliedCoupon = null, couponDiscount = 0;
-let canvas, ctx, isDrawing = false, scratchRevealed = false;
+  const query = new URLSearchParams(window.location.search);
+  const mobile = query.get('mobile');
+  const carNumber = query.get('cn');
+  const apiUrl = `https://ai.instantmechanic.online/bot/api/booking-details?mobile=${mobile}`;
+  const isPaid = localStorage.getItem('paid') === 'true';
+  const hasVehicleNumber = localStorage.getItem('vehicleNumber');
 
-// ==================== Initialization ====================
-document.addEventListener('DOMContentLoaded', function() {
-    // Check if mobile is already in localStorage
-    const storedMobile = localStorage.getItem('userMobile');
-    if (storedMobile && isValidMobile(storedMobile)) {
-        userMobile = storedMobile;
-        mixpanel.identify(storedMobile);
-        console.log('Mobile loaded from localStorage:', storedMobile);
-    }
-    
-    initializeTracking();
-    Promise.all([loadBrandData(), loadCarData()]).then(() => {
-        if (!checkDirectAccess()) displayBrands();
-    }).catch(() => displayBrands());
-});
-
-// ==================== URL Parameters ====================
-function getURLParams() {
-    const urlParams = new URLSearchParams(window.location.search);
-    return {
-        mobile: extractMobile(urlParams.get('mobile')),
-        brand_id: urlParams.get('brand_id'),
-        brand_name: urlParams.get('brand_name') || urlParams.get('brand'),
-        car_id: urlParams.get('car_id'),
-        car_name: urlParams.get('car_name') || urlParams.get('car'),
-        car_image: urlParams.get('car_image')
-    };
-}
-
-function extractMobile(mobileParam) {
-    if (!mobileParam) return null;
-    let mobile = decodeURIComponent(mobileParam);
-    if (mobile.includes('/')) mobile = mobile.split('/')[0];
-    mobile = mobile.replace(/[^0-9]/g, '');
-    if (mobile.startsWith('91') && mobile.length === 12) mobile = mobile.substring(2);
-    return mobile.length === 10 ? mobile : null;
-}
-
-// ==================== Tracking ====================
-function initializeTracking() {
-    const urlParams = getURLParams();
-    if (urlParams.mobile && isValidMobile(urlParams.mobile)) {
-        userMobile = urlParams.mobile;
-        mixpanel.identify(userMobile);
-        mixpanel.people.set({ "$phone": userMobile, "Last Seen": new Date() });
-    }
-    const trackingData = {
-        'Source': 'Service Selection Page',
-        'Mobile': userMobile,
-        'Timestamp': new Date().toISOString()
-    };
-    if (urlParams.brand_id || urlParams.car_id) {
-        trackingData['Direct Access'] = true;
-        trackingData['Brand ID'] = urlParams.brand_id;
-        trackingData['Car ID'] = urlParams.car_id;
-        trackingData['Brand Name'] = urlParams.brand_name;
-        trackingData['Car Name'] = urlParams.car_name;
-    }
-    mixpanel.track('Service Page Opened', trackingData);
-}
-
-function isValidMobile(mobile) {
-    return /^[6-9]\d{9}$/.test(mobile);
-}
-
-// ==================== Direct Access ====================
-function checkDirectAccess() {
-    const urlParams = getURLParams();
-    if (urlParams.brand_id && urlParams.car_id) {
-        const brandId = parseInt(urlParams.brand_id);
-        const carId = urlParams.car_id;
-        let matchingBrand = brands.find(b => b.id === brandId);
-        let matchingCar = cars.find(c => 
-            c.car_type_id === carId || 
-            c.car_type_id === parseInt(carId) || 
-            c.car_type_id.toString() === carId.toString()
-        );
-        
-        if (matchingBrand && matchingCar) {
-            selectedBrand = matchingBrand;
-            selectedCar = matchingCar;
-            localStorage.setItem('selectedBrand', JSON.stringify(selectedBrand));
-            localStorage.setItem("selectedCarId", selectedCar.car_type_id);
-            localStorage.setItem("selectedCarName", selectedCar.name);
-            localStorage.setItem("carImage", selectedCar.image_path);
-            localStorage.setItem("brand", selectedCar.brand.name);
-            localStorage.setItem("carName", selectedCar.name);
-            mixpanel.track('Direct Service Access', {
-                'Brand': selectedBrand.name,
-                'Car Model': selectedCar.name,
-                'Car ID': selectedCar.car_type_id,
-                'Fuel Type': selectedCar.fuel_type,
-                'Mobile': userMobile,
-                'Access Type': 'Agent Shared Link',
-                'URL Format': 'ID Based',
-                'Timestamp': new Date().toISOString()
-            });
-            skipToPricingPage();
-            return true;
-        } else if (matchingBrand && !matchingCar) {
-            selectedBrand = matchingBrand;
-            localStorage.setItem('selectedBrand', JSON.stringify(selectedBrand));
-            skipToCarSelection();
-            return true;
-        }
-    }
-    return false;
-}
-
-function skipToCarSelection() {
-    updateProgress(2);
-    updateSectionTitle('Select Your Car Model', `Choose your ${selectedBrand.name} model`);
-    document.getElementById('brandContainer').classList.add('hidden');
-    document.getElementById('backBtn').classList.remove('hidden');
-    document.getElementById('loadingState').classList.remove('hidden');
-    setTimeout(() => {
-        document.getElementById('loadingState').classList.add('hidden');
-        displayCars(selectedBrand.id);
-    }, 800);
-}
-
-function skipToMobileCollection() {
-    // Check if mobile is already in localStorage
-    const storedMobile = localStorage.getItem('userMobile');
-    
-    if (storedMobile && isValidMobile(storedMobile)) {
-        // Mobile already exists, skip directly to pricing
-        userMobile = storedMobile;
-        console.log('Mobile found in localStorage, skipping mobile collection:', storedMobile);
-        
-        mixpanel.track('Mobile Step Skipped', {
-            'Mobile': storedMobile,
-            'Reason': 'Already in localStorage',
-            'Timestamp': new Date().toISOString()
-        });
-        
-        skipToPricingPage();
-    } else {
-        // No mobile in localStorage, show mobile collection
-        updateProgress(3);
-        updateSectionTitle('Enter Your Mobile Number', 'Get instant service prices for your selected vehicle');
-        document.getElementById('carContainer').classList.add('hidden');
-        displaySelectedCar(selectedCar);
-        showMobileSection();
-    }
-}
-
-function skipToPricingPage() {
-    updateProgress(4);
-    updateSectionTitle('Choose Your Service', `Perfect service packages for your ${selectedBrand.name} ${selectedCar.name}`);
-    document.getElementById('brandContainer').classList.add('hidden');
-    document.getElementById('carContainer').classList.add('hidden');
-    document.getElementById('mobileSection').classList.add('hidden');
-    document.getElementById('backBtn').classList.remove('hidden');
-    displaySelectedCar(selectedCar);
-    loadServices(selectedCar.car_type_id);
-}
-
-// ==================== Navigation ====================
-function goBack() {
-    if (currentStep === 4) {
-        updateProgress(3);
-        updateSectionTitle('Enter Your Mobile Number', 'Get instant service prices for your selected vehicle');
-        document.getElementById('serviceContainer').classList.add('hidden');
-        document.getElementById('mobileSection').classList.remove('hidden');
-        showMobileSection();
-    } else if (currentStep === 3) {
-        updateProgress(2);
-        updateSectionTitle('Select Your Car Model', `Choose your ${selectedBrand.name} model`);
-        document.getElementById('mobileSection').classList.add('hidden');
-        document.getElementById('selectedCarDisplay').classList.add('hidden');
-        document.getElementById('carContainer').classList.remove('hidden');
-    } else if (currentStep === 2) {
-        updateProgress(1);
-        updateSectionTitle('Choose Your Car Brand', 'Select your car brand to get started with our premium service experience');
-        document.getElementById('carContainer').classList.add('hidden');
-        document.getElementById('brandContainer').classList.remove('hidden');
-        document.getElementById('backBtn').classList.add('hidden');
-        selectedBrand = null;
-        selectedCar = null;
-    }
-}
-
-// ==================== Data Loading ====================
-async function loadBrandData() {
-    const response = await fetch('car_brand.json');
-    brands = await response.json();
-}
-
-async function loadCarData() {
-    const response = await fetch('car.json');
-    cars = await response.json();
-}
-
-// ==================== Display Functions ====================
-function displayBrands() {
-    const container = document.getElementById('brandContainer');
-    container.innerHTML = '';
-    brands.forEach((brand, index) => {
-        const brandCard = document.createElement('div');
-        brandCard.className = 'brand-card fade-in';
-        brandCard.style.animationDelay = `${index * 0.1}s`;
-        brandCard.innerHTML = `
-            <img src="${brand.brand_logo}" alt="${brand.name}" loading="lazy">
-            <h3>${brand.name}</h3>
-        `;
-        brandCard.addEventListener('click', () => selectBrand(brand));
-        container.appendChild(brandCard);
+  // Initialize Mixpanel
+  if (mobile) {
+    const userId = `${mobile}`;
+    mixpanel.identify(userId);
+    mixpanel.track('Customer opened Payment page', {
+      mobile: mobile,
+      user_id: userId,
+      timestamp: new Date().toISOString()
     });
-}
+  }
 
-function selectBrand(brand) {
-    selectedBrand = brand;
-    localStorage.setItem('selectedBrand', JSON.stringify(brand));
-    mixpanel.track('Service Page - Brand Selected', {
-        'Brand': brand.name,
-        'Brand ID': brand.id,
-        'Mobile': userMobile,
-        'Timestamp': new Date().toISOString()
-    });
-    updateProgress(2);
-    updateSectionTitle('Select Your Car Model', `Choose your ${brand.name} model`);
-    document.getElementById('brandContainer').classList.add('hidden');
-    document.getElementById('backBtn').classList.remove('hidden');
-    document.getElementById('loadingState').classList.remove('hidden');
-    setTimeout(() => {
-        document.getElementById('loadingState').classList.add('hidden');
-        displayCars(brand.id);
-    }, 800);
-}
+  if (carNumber == "y" && !hasVehicleNumber) {
+    showCarNumberPopup();
+  }
 
-function displayCars(brandId) {
-    const container = document.getElementById('carContainer');
-    container.innerHTML = '';
-    container.classList.remove('hidden');
-    if (cars.length === 0) {
-        container.innerHTML = '<p class="text-center">No car data available. Please try again.</p>';
-        return;
-    }
-    let filteredCars = cars.filter(car => car.brand && car.brand.id === brandId);
-    if (filteredCars.length === 0) {
-        container.innerHTML = '<p class="text-center">No cars found for this brand.</p>';
-        return;
-    }
-    let uniqueCars = [];
-    let seenNames = new Set();
-    filteredCars.forEach(car => {
-        if (!seenNames.has(car.name)) {
-            seenNames.add(car.name);
-            uniqueCars.push(car);
-        }
-    });
-    uniqueCars.forEach((car, index) => {
-        const carCard = document.createElement('div');
-        carCard.className = 'car-card slide-in-left';
-        carCard.style.animationDelay = `${index * 0.1}s`;
-        carCard.innerHTML = `
-            <img src="${car.image_path || 'assets/img/default-car.jpg'}" alt="${car.name}" loading="lazy" 
-                 onerror="this.src='assets/img/logo.svg'">
-            <div class="car-card-content">
-                <h3>${car.name}</h3>
-            </div>
-        `;
-        carCard.addEventListener('click', () => selectCar(car));
-        container.appendChild(carCard);
-    });
-}
+  if (isPaid && hasVehicleNumber) {
+    showAfterPaymentUI();
+  } else if (isPaid && !hasVehicleNumber) {
+    showCarNumberPopup();
+  }
 
-function selectCar(car) {
-    selectedCar = car;
-    localStorage.setItem("selectedCarId", car.car_type_id);
-    localStorage.setItem("selectedCarName", car.name);
-    localStorage.setItem("carImage", car.image_path);
-    localStorage.setItem("brand", car.brand.name);
-    localStorage.setItem("carName", car.name);
-    mixpanel.track('Service Page - Car Selected', {
-        'Brand': car.brand.name,
-        'Car Model': car.name,
-        'Car ID': car.car_type_id,
-        'Mobile': userMobile,
-        'Timestamp': new Date().toISOString()
-    });
-    skipToMobileCollection();
-}
+  // ─── IVR Call Logic ────────────────────────────────────────────────
+  let ivrCountdownInterval = null;
 
-function displaySelectedCar(car) {
-    const container = document.getElementById('selectedCarDisplay');
-    container.classList.remove('hidden');
-    const carName = `${car.brand.name} ${car.name}`;
-    container.innerHTML = `
-        <img src="${car.image_path}" alt="Selected Car" loading="lazy" class="fade-in" 
-             onerror="this.src='assets/img/default-car.jpg'">
-        <h2 class="fade-in">${carName}</h2>
-    `;
-}
+  function triggerIVRCall(mobile1, mobile2, context) {
+    return fetch(`https://ai.instantmechanic.online/bot/ivr_call?mobile1=${mobile1}&mobile2=${mobile2}&context=${context}`)
+      .then(res => res.json())
+      .catch(err => console.error('IVR call failed:', err));
+  }
 
-function showMobileSection() {
-    const mobileSection = document.getElementById('mobileSection');
-    mobileSection.classList.remove('hidden');
-    
-    // Pre-fill mobile if exists in localStorage
-    const storedMobile = localStorage.getItem('userMobile');
-    if (storedMobile && isValidMobile(storedMobile)) {
-        document.getElementById('mobileNumber').value = storedMobile;
-    }
-    
-    setTimeout(() => document.getElementById('mobileNumber').focus(), 300);
-}
+  function showIVRPopup(mobile1, context) {
+    const popup = document.getElementById('ivrPopup');
+    const countdownEl = document.getElementById('ivrCountdown');
+    const countdownState = document.getElementById('ivrCountdownState');
+    const connectingState = document.getElementById('ivrConnectingState');
+    const retryBtn = document.getElementById('ivrRetryBtn');
 
-// ==================== Mobile Form ====================
-document.getElementById('mobileForm').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    const mobileInput = document.getElementById('mobileNumber');
-    const mobile = mobileInput.value.trim();
-    const errorDiv = document.getElementById('mobileError');
-    const submitBtn = document.getElementById('mobileSubmitBtn');
-    
-    errorDiv.classList.add('hidden');
-    errorDiv.textContent = '';
-    mobileInput.classList.remove('error');
-    
-    if (!mobile) {
-        errorDiv.textContent = 'Please enter your mobile number';
-        errorDiv.classList.remove('hidden');
-        mobileInput.classList.add('error');
-        return;
-    }
-    
-    if (!isValidMobile(mobile)) {
-        errorDiv.textContent = 'Please enter a valid 10-digit mobile number starting with 6-9';
-        errorDiv.classList.remove('hidden');
-        mobileInput.classList.add('error');
-        return;
-    }
-    
-    submitBtn.disabled = true;
-    const originalText = submitBtn.innerHTML;
-    submitBtn.innerHTML = '<div class="spinner"></div> Processing...';
-    
-    try {
-        userMobile = mobile;
-        mixpanel.identify(mobile);
-        mixpanel.people.set({ "$phone": mobile, "Last Updated": new Date() });
-        
-        const brand = selectedCar.brand.name;
-        const carName = selectedCar.name;
-        const message = `Mobile number collected - Brand: ${brand}, Car Model: ${carName}, Mobile: ${mobile}`;
-        
-        await fetch('https://ai.instantmechanic.online/bot/service-query/', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ mobile: mobile, message: message })
-        });
-        
-        mixpanel.track('Mobile Number Collected', {
-            'Brand': brand,
-            'Car Model': carName,
-            'Mobile': mobile,
-            'Source': 'Service Selection Flow',
-            'Timestamp': new Date().toISOString()
-        });
-        
-        setTimeout(() => {
-            skipToPricingPage();
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = originalText;
-        }, 1000);
-    } catch (error) {
-        mixpanel.track('Mobile Collection API Error', {
-            'Brand': selectedCar.brand.name,
-            'Car Model': selectedCar.name,
-            'Mobile': mobile,
-            'Error': error.message,
-            'Timestamp': new Date().toISOString()
-        });
-        setTimeout(() => {
-            skipToPricingPage();
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = originalText;
-        }, 1000);
-    }
-});
+    // Reset state
+    countdownState.classList.remove('hidden');
+    connectingState.classList.add('hidden');
+    retryBtn.classList.add('hidden');
+    countdownEl.textContent = '10';
+    popup.classList.remove('hidden');
 
-document.getElementById('mobileNumber').addEventListener('input', function() {
-    this.value = this.value.replace(/[^0-9]/g, '');
-    if (this.value.length > 0) {
-        this.classList.remove('error');
-        document.getElementById('mobileError').classList.add('hidden');
-    }
-});
+    // Clear any existing interval
+    if (ivrCountdownInterval) clearInterval(ivrCountdownInterval);
 
-document.getElementById('mobileNumber').addEventListener('paste', function() {
-    setTimeout(() => {
-        this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);
-    }, 10);
-});
+    let count = 10;
+    ivrCountdownInterval = setInterval(() => {
+      count--;
+      countdownEl.textContent = count;
 
-// ==================== Service Loading ====================
-async function loadServices(carId) {
-    document.getElementById('loadingState').classList.remove('hidden');
-    const apiUrl = `https://gomechanic.app/api/v2/oauth/customer/get-services-details-by-category?car_id=${carId}&city_id=6&category_id=0&user_car_id=null`;
-    const headers = {
-        "Accept": "*/*",
-        "Authorization": "Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJiNGJjM2NhZjVkMWVhOTlkYzk2YjQzM2NjYzQzMDI0ZTAyM2I0MGM2YjQ5ZjExN2JjMDk5OGY2MWU3ZDI1ZjM2MTU1YWU5ZDIxNjE2ZTc5NSIsImV4cCI6MTc3MTA2OTMxNi4wLCJhdWQiOiIzIiwic2NvcGVzIjpbXSwiaWF0IjoxNzY4NDc3MzE2LjAsInN1YiI6IjE3Njg0NzczMTY3MiIsIm5iZiI6MTc2ODQ3NzMxNi4wfQ.Ko0LyX_QvqLdLgx-3qbgRDFXycG1P4eQnPPNbTJQQSh9hHnnTE6yK172TqH8k-2-3Hsj88GvEZyb_KB0loU-ROG6Esn2JSm-_FQx6Wqy5aO2j3gW-4-ceSwEbC1hXS4raN9Tq9DlL8Gn_L3i9Y-7B7T98MiulCV21WOiVq8Y-O_jk-mS-9KJDHdahxcfLCAxla6fCmAVGNq7zBj6wiAHcpJABUl4go5ZjGdzGHtYe_HQLC_6ckY6VNVlJZX2z-30e3dZDMmrPxcD_oexwgvqgL5VyoMBFInp1JnlFCvOPGb4n1UqVufIHA6JPy11ocoDFTaUgmM2Pj6UMhfQ3S8JR806f9PBx91Z3ZZ9xKAXCUZeAYq6bJAk3ideIpwg5b8n63phZCAKBVVU-zxYx0pnueycudoqriY841vOGjPSU5ALoDCATKriJ0ODL7mDqldRFm16hXL9U2lmOw8O1OKFrJq-19EDYXfo_nyfWo3bvOE2Qd8olPoZ0wrKKTBlIRypEmFmcZxXpp5DUwF5eIFZ0pRs9M-sQvUj55D7-8VVwUqJKYebRmi6PjDkKynpni2Z2ySJue9q0q5yScF_6D-42CzAcCzO6UxvmChQ_dxyL3swkUQX2VqsMcu7CJwrUivALLKzR_RNl1nFRJ_q-Cr4i31L3rPrrh-r4vV3SynemN4",
-        "Content-Type": "application/json"
-    };
-    
-    try {
-        const response = await fetch(apiUrl, { method: "GET", headers: headers });
-        const data = await response.json();
-        document.getElementById('loadingState').classList.add('hidden');
-        
-        if (data.status && data.data.length > 0) {
-            const services = data.data[0].services;
-            if (services && services.length > 0) {
-                const extractedServices = services.map(service => ({
-                    name: service.name || "N/A",
-                    service_tag: service.service_tag || "Every 3 Month",
-                    price: service.package_details?.[0]?.strikethrough || "N/A",
-                    discounted_price: service.package_details?.[0]?.total || "N/A",
-                    image: getServiceImage(service.name),
-                    description: service.desc_details || {},
-                    inclusion: service.desc_details?.inclusion || [],
-                    time_taken: service.desc_details?.time_taken || "N/A",
-                    warranty: service.desc_details?.warranty || "N/A"
-                }));
-                displayServices(extractedServices);
-            } else {
-                displayNoServicesMessage();
-            }
-        } else {
-            displayNoServicesMessage();
-        }
-    } catch (error) {
-        document.getElementById('loadingState').classList.add('hidden');
-        displayErrorMessage();
-    }
-}
+      if (count <= 0) {
+        clearInterval(ivrCountdownInterval);
+        ivrCountdownInterval = null;
 
-function displayNoServicesMessage() {
-    const container = document.getElementById('serviceContainer');
-    container.classList.remove('hidden');
-    container.innerHTML = `
-        <div class="text-center" style="padding: 40px;">
-            <i class="fas fa-exclamation-circle" style="font-size: 3rem; color: var(--gray-400); margin-bottom: 20px;"></i>
-            <h3 style="color: var(--gray-600); margin-bottom: 10px;">No Services Available</h3>
-            <p style="color: var(--gray-500);">We couldn't find services for this vehicle. Please contact us directly.</p>
-            <a href="tel:+918393990942" class="cta-button" style="display: inline-block; margin-top: 20px;">
-                <i class="fas fa-phone"></i> Call Now
-            </a>
-        </div>
-    `;
-}
+        // Switch to connecting state
+        countdownState.classList.add('hidden');
+        connectingState.classList.remove('hidden');
+        retryBtn.classList.remove('hidden');
 
-function displayErrorMessage() {
-    const container = document.getElementById('serviceContainer');
-    container.classList.remove('hidden');
-    container.innerHTML = `
-        <div class="text-center" style="padding: 40px;">
-            <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: var(--secondary-color); margin-bottom: 20px;"></i>
-            <h3 style="color: var(--gray-600); margin-bottom: 10px;">Unable to Load Services</h3>
-            <p style="color: var(--gray-500);">There was an error loading services. Please try again or contact us.</p>
-            <div style="margin-top: 20px; display: flex; gap: 15px; justify-content: center;">
-                <button onclick="loadServices(selectedCar.car_type_id)" class="btn-primary" style="padding: 10px 20px;">
-                    <i class="fas fa-refresh"></i> Try Again
-                </button>
-                <a href="tel:+919266961110" class="cta-button">
-                    <i class="fas fa-phone"></i> Call Now
-                </a>
-            </div>
-        </div>
-    `;
-}
-
-function getServiceImage(serviceName) {
-    const imageMap = {
-        "Standard Service": "assets/img/standard.jpg",
-        "Comprehensive Service": "assets/img/premium.jpg",
-        "Basic Service": "assets/img/basic.jpg"
-    };
-    return imageMap[serviceName] || "assets/img/basic.jpg";
-}
-
-// ==================== Service Display ====================
-function displayServices(services) {
-    const container = document.getElementById('serviceContainer');
-    container.classList.remove('hidden');
-    container.innerHTML = '';
-    
-    services.forEach((service, index) => {
-        const serviceCard = document.createElement('div');
-        serviceCard.className = 'service-card slide-in-right';
-        serviceCard.style.animationDelay = `${index * 0.2}s`;
-        
-        const inclusions = Array.isArray(service.inclusion) ? service.inclusion : [];
-        const visibleInclusions = inclusions.slice(0, 5);
-        const hiddenInclusions = inclusions.slice(5);
-        
-        const apiDiscountedPrice = parseInt(service.discounted_price);
-        const priceWithCharges = apiDiscountedPrice + 300;
-        const priceExcludingGST = Math.round(priceWithCharges / 1.18);
-        const gstAmount = priceWithCharges - priceExcludingGST;
-        
-        const originalPrice = parseInt(service.price);
-        const savings = originalPrice - priceWithCharges;
-        const discountPercentage = Math.round((savings / originalPrice) * 100);
-        
-        serviceCard.innerHTML = `
-            <div class="service-header">
-                <h3>${service.name}</h3>
-                <div class="service-tag">${service.service_tag}</div>
-            </div>
-            <div class="service-content">
-                <img src="${service.image}" alt="${service.name}" class="service-image" loading="lazy">
-                <div class="gst-notice">*Prices are excluding GST</div>
-                <div class="price-section">
-                    <span class="original-price">₹${service.price}</span>
-                    <span class="discounted-price">₹${priceExcludingGST}</span>
-                    <span class="discount-badge">Save ${discountPercentage}%</span>
-                </div>
-                <div class="price-details-box">
-
-                    <div class="price-row-detail">
-                        <span class="label">Service Price:</span>
-                        <span class="value">₹${priceExcludingGST}</span>
-                    </div>
-                    <div class="price-row-detail">
-                        <span class="label">GST (18%):</span>
-                        <span class="value">₹${gstAmount}</span>
-                    </div>
-                    <div class="price-row-detail">
-                        <span class="label">Total Payable: <span class="gst-info-tag"><i class="fas fa-info-circle"></i> Inc. GST</span></span>
-                        <span class="value">₹${priceWithCharges}</span>
-                    </div>
-                </div>
-                <div class="coupon-section">
-                    <div class="coupon-promo" id="coupon-promo-${index}">
-                        <div class="coupon-promo-content">
-                            <div class="coupon-icon">
-                                <i class="fas fa-gift"></i>
-                            </div>
-                            <div class="coupon-promo-text">
-                                <h4>Special Offer!</h4>
-                                <p>Get <span class="highlight">₹500 OFF</span> on this service</p>
-                            </div>
-                        </div>
-                        <button class="apply-coupon-direct-btn" id="apply-direct-btn-${index}" 
-                                onclick="applyDirectCoupon(${index}, ${apiDiscountedPrice})">
-                            <i class="fas fa-tag"></i> Apply Coupon
-                        </button>
-                    </div>
-                    <div class="coupon-applied-badge hidden" id="coupon-applied-${index}">
-                        <i class="fas fa-check-circle"></i>
-                        <span>Coupon Applied! You saved ₹500</span>
-                    </div>
-                    <button class="manual-coupon-btn" id="manual-coupon-btn-${index}" 
-                            onclick="toggleManualCoupon(${index})">
-                        Have a different code? Click here
-                    </button>
-                    <div class="coupon-input-section hidden" id="coupon-input-${index}">
-                        <div class="coupon-input-group">
-                            <input type="text" class="coupon-input" id="coupon-code-${index}" 
-                                   placeholder="Enter coupon code" maxlength="15">
-                            <button class="apply-coupon-btn" id="apply-btn-${index}" 
-                                    onclick="applyCoupon(${index}, ${apiDiscountedPrice})">Apply</button>
-                        </div>
-                        <div class="coupon-message" id="coupon-message-${index}"></div>
-                    </div>
-                </div>
-                <div class="final-price-section" id="final-price-${index}" style="display: none;"></div>
-                <div class="service-details">
-                    <h4><i class="fas fa-check-circle"></i> What's Included:</h4>
-                    <ul class="inclusions-list">
-                        ${visibleInclusions.map(item => `<li><i class="fas fa-check"></i> ${item}</li>`).join('')}
-                        <div class="hidden-inclusions hidden" id="more-${index}">
-                            ${hiddenInclusions.map(item => `<li><i class="fas fa-check"></i> ${item}</li>`).join('')}
-                        </div>
-                    </ul>
-                    ${hiddenInclusions.length > 0 ? `
-                        <button class="see-more-btn" onclick="toggleInclusions(${index})">
-                            <i class="fas fa-chevron-down"></i> Show More
-                        </button>
-                    ` : ''}
-                </div>
-                <div class="service-info">
-                    <div class="info-item">
-                        <i class="fas fa-clock"></i>
-                        <div>
-                            <span class="label">Duration</span>
-                            <span class="value">${service.time_taken}</span>
-                        </div>
-                    </div>
-                    <div class="info-item">
-                        <i class="fas fa-shield-alt"></i>
-                        <div>
-                            <span class="label">Warranty</span>
-                            <span class="value">${service.warranty}</span>
-                        </div>
-                    </div>
-                    <div class="info-item">
-                        <i class="fas fa-star"></i>
-                        <div>
-                            <span class="label">Rating</span>
-                            <span class="value">4.8/5</span>
-                        </div>
-                    </div>
-                </div>
-                <button class="book-service-btn" onclick="bookService('${service.name}', ${priceWithCharges}, ${index})">
-                    <i class="fas fa-calendar-check"></i> Book Service Now
-                </button>
-            </div>
-        `;
-        container.appendChild(serviceCard);
-    });
-}
-
-function toggleInclusions(index) {
-    const moreDiv = document.getElementById(`more-${index}`);
-    const button = event.target;
-    if (moreDiv.classList.contains('hidden')) {
-        moreDiv.classList.remove('hidden');
-        button.innerHTML = '<i class="fas fa-chevron-up"></i> Show Less';
-    } else {
-        moreDiv.classList.add('hidden');
-        button.innerHTML = '<i class="fas fa-chevron-down"></i> Show More';
-    }
-}
-
-// ==================== Coupon Functions ====================
-function applyDirectCoupon(serviceIndex, originalPrice) {
-    // Check if mobile number is already collected
-    const storedMobile = localStorage.getItem('userMobile');
-    
-    if (storedMobile && isValidMobile(storedMobile)) {
-        // User already provided mobile, apply coupon directly
-        userMobile = storedMobile;
-        proceedWithCouponApplication(serviceIndex, originalPrice);
-    } else {
-        // Show mobile collection modal
-        showMobileCollectionModal(serviceIndex, originalPrice);
-    }
-}
-
-function proceedWithCouponApplication(serviceIndex, originalPrice) {
-    // Apply the INSTANT500 coupon directly
-    appliedCoupon = { code: 'INSTANT500', discount: 500, serviceIndex: serviceIndex };
-    couponDiscount = 500;
-    
-    // Hide promo section
-    const promoSection = document.getElementById(`coupon-promo-${serviceIndex}`);
-    const appliedBadge = document.getElementById(`coupon-applied-${serviceIndex}`);
-    const manualBtn = document.getElementById(`manual-coupon-btn-${serviceIndex}`);
-    
-    promoSection.style.display = 'none';
-    manualBtn.style.display = 'none';
-    appliedBadge.classList.remove('hidden');
-    
-    // Show celebration animation
-    showCelebration(serviceIndex);
-    
-    // Update final price
-    updateFinalPrice(serviceIndex, originalPrice);
-    
-    // Track event
-    mixpanel.track('Direct Coupon Applied', {
-        'Coupon Code': 'INSTANT500',
-        'Discount Amount': 500,
-        'Service Index': serviceIndex,
-        'Original Price': originalPrice,
-        'Mobile': userMobile,
-        'Timestamp': new Date().toISOString()
-    });
-    
-    // Send to API
-    sendMobileToAPI(userMobile, 'Coupon Applied');
-}
-
-function showMobileCollectionModal(serviceIndex, originalPrice) {
-    // Create mobile collection modal
-    const modal = document.createElement('div');
-    modal.className = 'mobile-collection-modal';
-    modal.id = 'mobileCollectionModal';
-    modal.innerHTML = `
-        <div class="mobile-collection-content">
-            <div class="mobile-collection-header">
-                <div class="coupon-badge-modal">
-                    <i class="fas fa-gift"></i>
-                    <span>₹500 OFF</span>
-                </div>
-                <h3>Unlock Your Coupon!</h3>
-                <p>Enter your mobile number to apply ₹500 discount instantly</p>
-            </div>
-            
-            <div class="mobile-collection-form">
-                <div class="mobile-input-wrapper">
-                    <div class="country-code-modal">+91</div>
-                    <input 
-                        type="tel" 
-                        id="couponMobileInput" 
-                        class="mobile-input-modal" 
-                        placeholder="Enter 10-digit mobile number"
-                        maxlength="10"
-                        pattern="[0-9]{10}"
-                        autocomplete="tel"
-                    >
-                </div>
-                <div class="mobile-error-modal hidden" id="couponMobileError"></div>
-                <button class="apply-with-mobile-btn" id="applyWithMobileBtn">
-                    <i class="fas fa-check-circle"></i> Apply Coupon
-                </button>
-            </div>
-            
-            <div class="mobile-collection-benefits">
-                <div class="benefit-item">
-                    <i class="fas fa-lock"></i>
-                    <span>100% Secure</span>
-                </div>
-                <div class="benefit-item">
-                    <i class="fas fa-bell"></i>
-                    <span>Get Updates</span>
-                </div>
-                <div class="benefit-item">
-                    <i class="fas fa-tag"></i>
-                    <span>Exclusive Offers</span>
-                </div>
-            </div>
-            
-            <button class="close-modal-btn" onclick="closeMobileCollectionModal()">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-    `;
-    
-    document.body.appendChild(modal);
-    
-    // Animate in
-    setTimeout(() => modal.classList.add('show'), 10);
-    
-    // Focus on input
-    setTimeout(() => document.getElementById('couponMobileInput').focus(), 300);
-    
-    // Setup event listeners
-    const mobileInput = document.getElementById('couponMobileInput');
-    const applyBtn = document.getElementById('applyWithMobileBtn');
-    const errorDiv = document.getElementById('couponMobileError');
-    
-    // Input validation
-    mobileInput.addEventListener('input', function() {
-        this.value = this.value.replace(/[^0-9]/g, '');
-        if (this.value.length > 0) {
-            this.classList.remove('error');
-            errorDiv.classList.add('hidden');
-        }
-    });
-    
-    // Enter key submit
-    mobileInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            applyBtn.click();
-        }
-    });
-    
-    // Apply button click
-    applyBtn.addEventListener('click', function() {
-        const mobile = mobileInput.value.trim();
-        
-        // Clear previous errors
-        errorDiv.classList.add('hidden');
-        errorDiv.textContent = '';
-        mobileInput.classList.remove('error');
-        
-        // Validate
-        if (!mobile) {
-            errorDiv.textContent = 'Please enter your mobile number';
-            errorDiv.classList.remove('hidden');
-            mobileInput.classList.add('error');
-            return;
-        }
-        
-        if (!isValidMobile(mobile)) {
-            errorDiv.textContent = 'Please enter a valid 10-digit mobile number (6-9)';
-            errorDiv.classList.remove('hidden');
-            mobileInput.classList.add('error');
-            return;
-        }
-        
-        // Show loading
-        applyBtn.disabled = true;
-        const originalText = applyBtn.innerHTML;
-        applyBtn.innerHTML = '<div class="spinner" style="width: 20px; height: 20px; margin: 0 auto;"></div>';
-        
-        // Save mobile
-        userMobile = mobile;
-        localStorage.setItem('userMobile', mobile);
-        
-        // Identify user in Mixpanel
-        mixpanel.identify(mobile);
-        mixpanel.people.set({
-            "$phone": mobile,
-            "Coupon Interest": true,
-            "Last Seen": new Date().toISOString()
-        });
-        
-        // Track mobile collection
-        mixpanel.track('Mobile Collected via Coupon', {
-            'Mobile': mobile,
-            'Service Index': serviceIndex,
-            'Collection Method': 'Coupon Button',
-            'Timestamp': new Date().toISOString()
-        });
-        
-        // Close modal and apply coupon
-        setTimeout(() => {
-            closeMobileCollectionModal();
-            proceedWithCouponApplication(serviceIndex, originalPrice);
-        }, 800);
-    });
-    
-    // Close on outside click
-    modal.addEventListener('click', function(e) {
-        if (e.target === modal) {
-            closeMobileCollectionModal();
-        }
-    });
-}
-
-function closeMobileCollectionModal() {
-    const modal = document.getElementById('mobileCollectionModal');
-    if (modal) {
-        modal.classList.remove('show');
-        setTimeout(() => modal.remove(), 300);
-    }
-}
-
-async function sendMobileToAPI(mobile, context) {
-    try {
-        const brand = selectedCar ? selectedCar.brand.name : 'Unknown';
-        const carName = selectedCar ? selectedCar.name : 'Unknown';
-        const message = `Mobile collected via ${context} - Brand: ${brand}, Car: ${carName}, Mobile: ${mobile}`;
-        
-        await fetch('https://ai.instantmechanic.online/bot/service-query/', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ mobile: mobile, message: message })
-        });
-    } catch (error) {
-        console.log('API call failed:', error);
-    }
-}
-
-function toggleManualCoupon(serviceIndex) {
-    const inputSection = document.getElementById(`coupon-input-${serviceIndex}`);
-    inputSection.classList.toggle('hidden');
-}
-
-function showCelebration(serviceIndex) {
-    // Create celebration overlay
-    const celebration = document.createElement('div');
-    celebration.className = 'celebration-overlay';
-    celebration.innerHTML = `
-        <div class="celebration-content">
-            <div class="celebration-icon">
-                <i class="fas fa-check-circle"></i>
-            </div>
-            <h3>Coupon Applied!</h3>
-            <p>You saved <span class="celebration-amount">₹500</span></p>
-            <div class="confetti-container">
-                ${generateConfetti()}
-            </div>
-        </div>
-    `;
-    
-    document.body.appendChild(celebration);
-    
-    // Animate in
-    setTimeout(() => celebration.classList.add('show'), 10);
-    
-    // Remove after animation
-    setTimeout(() => {
-        celebration.classList.remove('show');
-        setTimeout(() => celebration.remove(), 500);
-    }, 2500);
-    
-    // Play success sound (optional)
-    playSuccessSound();
-}
-
-function generateConfetti() {
-    let confetti = '';
-    const colors = ['#f59e0b', '#10b981', '#2563eb', '#f093fb', '#ff6a00'];
-    for (let i = 0; i < 50; i++) {
-        const color = colors[Math.floor(Math.random() * colors.length)];
-        const left = Math.random() * 100;
-        const delay = Math.random() * 0.5;
-        const duration = 2 + Math.random() * 1;
-        confetti += `<div class="confetti" style="left: ${left}%; background: ${color}; animation-delay: ${delay}s; animation-duration: ${duration}s;"></div>`;
-    }
-    return confetti;
-}
-
-function playSuccessSound() {
-    // Optional: Add a subtle success sound
-    try {
-        const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBiuBzvLZiTQIG2m98OSfTREIXrPp66hVFApGn+DyvmwhBiuBzvLZiTQIG2m98OSfTREIXrPp66hVFApGn+DyvmwhBiuBzvLZiTQIG2m98OSfTREIXrPp66hVFApGn+DyvmwhBiuBzvLZiTQIG2m98OSfTREIXrPp66hVFApGn+DyvmwhBiuBzvLZiTQIG2m98OSfTREIXrPp66hVFApGn+DyvmwhBiuBzvLZiTQIG2m98OSfTREIXrPp66hVFApGn+DyvmwhBiuBzvLZiTQIG2m98OSfTREIXrPp66hVFApGn+DyvmwhBiuBzvLZiTQIG2m98OSfTREIXrPp66hVFApGn+DyvmwhBiuBzvLZiTQIG2m98OSfTREIXrPp66hVFApGn+DyvmwhBiuBzvLZiTQIG2m98OSfTREIXrPp66hVFApGn+DyvmwhBiuBzvLZiTQIG2m98OSfTREIXrPp66hVFApGn+DyvmwhBiuBzvLZiTQIG2m98OSfTREIXrPp66hVFApGn+DyvmwhBiuBzvLZiTQIG2m98OSfTREIXrPp66hVFApGn+DyvmwhBiuBzvLZiTQIG2m98OSfTREIXrPp66hVFApGn+DyvmwhBiuBzvLZiTQIG2m98OSfTREIXrPp66hVFApGn+DyvmwhBiuBzvLZiTQIG2m98OSfTREIXrPp66hVFApGn+DyvmwhBiuBzvLZiTQIG2m98OSfTREIXrPp66hVFApGn+DyvmwhBiuBzvLZiTQIG2m98OSfTREIXrPp66hVFApGn+DyvmwhBiuBzvLZiTQIG2m98OSfTREIXrPp66hVFApGn+DyvmwhBiuBzvLZiTQIG2m98OSfTREIXrPp66hVFA==');
-        audio.volume = 0.3;
-        audio.play().catch(() => {}); // Ignore if autoplay is blocked
-    } catch (e) {}
-}
-
-function toggleCouponSection(serviceIndex) {
-    const couponInput = document.getElementById(`coupon-input-${serviceIndex}`);
-    const couponToggle = document.getElementById(`coupon-toggle-${serviceIndex}`);
-    if (couponInput.classList.contains('active')) {
-        couponInput.classList.remove('active');
-        couponToggle.classList.remove('expanded');
-    } else {
-        couponInput.classList.add('active');
-        couponToggle.classList.add('expanded');
-    }
-}
-
-function applyCoupon(serviceIndex, originalPrice) {
-    const couponInput = document.getElementById(`coupon-code-${serviceIndex}`);
-    const applyBtn = document.getElementById(`apply-btn-${serviceIndex}`);
-    const messageDiv = document.getElementById(`coupon-message-${serviceIndex}`);
-    const couponCode = couponInput.value.trim().toUpperCase();
-    
-    couponInput.classList.remove('success', 'error');
-    messageDiv.innerHTML = '';
-    
-    if (!couponCode) {
-        showCouponMessage(serviceIndex, 'Please enter a coupon code', 'error');
-        couponInput.classList.add('error');
-        return;
-    }
-    
-    applyBtn.disabled = true;
-    applyBtn.innerHTML = '<div class="spinner" style="width: 16px; height: 16px; margin: 0;"></div>';
-    
-    setTimeout(() => {
-        if (couponCode === 'INSTANT500') {
-            appliedCoupon = { code: couponCode, discount: 500, serviceIndex: serviceIndex };
-            couponDiscount = 500;
-            couponInput.classList.add('success');
-            showCouponMessage(serviceIndex, 'Coupon applied successfully! ₹500 discount added.', 'success');
-            showCouponSavings(serviceIndex, 500);
-            updateFinalPrice(serviceIndex, originalPrice);
-            mixpanel.track('Coupon Applied Successfully', {
-                'Coupon Code': couponCode,
-                'Discount Amount': 500,
-                'Service Index': serviceIndex,
-                'Original Price': originalPrice,
-                'Mobile': userMobile,
-                'Timestamp': new Date().toISOString()
-            });
-            applyBtn.style.display = 'none';
-            couponInput.disabled = true;
-        } else {
-            couponInput.classList.add('error');
-            showCouponMessage(serviceIndex, 'Invalid coupon code. Please try again.', 'error');
-            mixpanel.track('Coupon Application Failed', {
-                'Coupon Code': couponCode,
-                'Service Index': serviceIndex,
-                'Mobile': userMobile,
-                'Timestamp': new Date().toISOString()
-            });
-        }
-        applyBtn.disabled = false;
-        applyBtn.innerHTML = 'Apply';
+        // Trigger IVR API
+        triggerIVRCall(mobile1, mobile, context);
+      }
     }, 1000);
-}
 
-function showCouponMessage(serviceIndex, message, type) {
-    const messageDiv = document.getElementById(`coupon-message-${serviceIndex}`);
-    const icon = type === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-circle';
-    messageDiv.innerHTML = `<i class="${icon}"></i> ${message}`;
-    messageDiv.className = `coupon-message ${type}`;
-}
+    // Retry button
+    retryBtn.onclick = () => {
+      connectingState.classList.add('hidden');
+      countdownState.classList.remove('hidden');
+      retryBtn.classList.add('hidden');
+      countdownEl.textContent = '10';
 
-function showCouponSavings(serviceIndex, savings) {
-    const savingsDiv = document.getElementById(`coupon-savings-${serviceIndex}`);
-    savingsDiv.innerHTML = `🎉 You saved ₹${savings} with this coupon!`;
-    savingsDiv.style.display = 'block';
-}
-
-function updateFinalPrice(serviceIndex, originalPrice) {
-    const finalPriceDiv = document.getElementById(`final-price-${serviceIndex}`);
-    const basePrice = originalPrice + 300;
-    const finalPrice = basePrice - couponDiscount;
-    finalPriceDiv.innerHTML = `
-        <div class="price-breakdown">
-            <div class="price-row">
-                <span>Service Price:</span>
-                <span>₹${basePrice}</span>
-            </div>
-
-            ${couponDiscount > 0 ? `
-            <div class="price-row">
-                <span class="discount">Coupon Discount (${appliedCoupon.code}):</span>
-                <span class="discount">-₹${couponDiscount}</span>
-            </div>` : ''}
-            <div class="price-row total">
-                <span>Final Amount:</span>
-                <span>₹${finalPrice}</span>
-            </div>
-        </div>
-    `;
-    finalPriceDiv.style.display = 'block';
-}
-
-// ==================== Booking ====================
-function bookService(serviceName, basePrice, serviceIndex) {
-    let finalPrice = basePrice;
-    if (appliedCoupon && appliedCoupon.serviceIndex === serviceIndex) {
-        finalPrice = basePrice - couponDiscount;
-    }
-    selectedService = {
-        name: serviceName,
-        basePrice: basePrice,
-        finalPrice: finalPrice,
-        couponApplied: appliedCoupon ? appliedCoupon.code : null,
-        discountAmount: couponDiscount
+      let retryCount = 10;
+      if (ivrCountdownInterval) clearInterval(ivrCountdownInterval);
+      ivrCountdownInterval = setInterval(() => {
+        retryCount--;
+        countdownEl.textContent = retryCount;
+        if (retryCount <= 0) {
+          clearInterval(ivrCountdownInterval);
+          ivrCountdownInterval = null;
+          countdownState.classList.add('hidden');
+          connectingState.classList.remove('hidden');
+          retryBtn.classList.remove('hidden');
+          triggerIVRCall(mobile1, mobile, context);
+        }
+      }, 1000);
     };
-    proceedWithBooking();
-}
+  }
 
-async function proceedWithBooking() {
-    const brand = localStorage.getItem("brand");
-    const carName = localStorage.getItem("carName");
-    
+  function hideIVRPopup() {
+    if (ivrCountdownInterval) {
+      clearInterval(ivrCountdownInterval);
+      ivrCountdownInterval = null;
+    }
+    document.getElementById('ivrPopup').classList.add('hidden');
+  }
+
+  document.getElementById('ivrCancelBtn').addEventListener('click', hideIVRPopup);
+  // ───────────────────────────────────────────────────────────────────
+
+  function showCarNumberPopup() {
+    document.getElementById('carNumberPopup').classList.remove('hidden');
+    document.getElementById('vehicleNumberInput').focus();
+  }
+
+  function hideCarNumberPopup() {
+    document.getElementById('carNumberPopup').classList.add('hidden');
+  }
+
+  document.getElementById('submitVehicleNumber').addEventListener('click', function() {
+    const vehicleNumber = document.getElementById('vehicleNumberInput').value.trim().toUpperCase();
+    if (vehicleNumber.length < 6) {
+      alert('Please enter a valid vehicle number');
+      return;
+    }
+    localStorage.setItem('vehicleNumber', vehicleNumber);
+    sendVehicleNumberToAPI(vehicleNumber);
+  });
+
+  document.getElementById('vehicleNumberInput').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') document.getElementById('submitVehicleNumber').click();
+  });
+
+  document.getElementById('vehicleNumberInput').addEventListener('input', function(e) {
+    let value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+    if (value.length > 2) value = value.substring(0, 2) + ' ' + value.substring(2);
+    if (value.length > 5) value = value.substring(0, 5) + ' ' + value.substring(5);
+    if (value.length > 8) value = value.substring(0, 8) + ' ' + value.substring(8);
+    e.target.value = value;
+  });
+
+  async function sendVehicleNumberToAPI(vehicleNumber) {
     try {
-        document.getElementById('loadingState').classList.remove('hidden');
-        updateSectionTitle('Processing Your Booking...', 'Please wait while we confirm your service booking');
-        
-        let bookingMessage = `Service Booking: ${selectedService.name} for ${brand} ${carName}`;
-        if (selectedService.couponApplied) {
-            bookingMessage += ` - Original Price: ₹${selectedService.basePrice} - Coupon Applied: ${selectedService.couponApplied} (₹${selectedService.discountAmount} discount) - Final Price: ₹${selectedService.finalPrice}`;
-        } else {
-            bookingMessage += ` - Price: ₹${selectedService.finalPrice}`;
-        }
-        
-        await fetch('https://ai.instantmechanic.online/bot/service-query/', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ mobile: userMobile, message: bookingMessage })
-        });
-        
-        const trackingData = {
-            'Service': selectedService.name,
-            'Brand': brand,
-            'Car Model': carName,
-            'Base Price': selectedService.basePrice,
-            'Final Price': selectedService.finalPrice,
-            'Mobile': userMobile,
-            'Booking Status': 'Confirmed',
-            'Timestamp': new Date().toISOString()
-        };
-        
-        if (selectedService.couponApplied) {
-            trackingData['Coupon Used'] = selectedService.couponApplied;
-            trackingData['Discount Amount'] = selectedService.discountAmount;
-            trackingData['Coupon Savings'] = selectedService.discountAmount;
-        }
-        
-        mixpanel.track('Service Booking Confirmed', trackingData);
-        
-        if (typeof fbq !== 'undefined') {
-            fbq('track', 'Purchase', {
-                content_name: selectedService.name,
-                content_category: 'Car Service',
-                value: selectedService.finalPrice,
-                currency: 'INR'
-            });
-        }
-        
-        document.getElementById('loadingState').classList.add('hidden');
-        showSuccessPage();
+      const bookingId = localStorage.getItem('booking_id');
+      const response = await fetch('https://ai.instantmechanic.online/bot/api/update-vehicle-number', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mobile: mobile, booking_id: bookingId, vehicle_number: vehicleNumber })
+      });
+      if (response.ok) console.log('Vehicle number updated successfully');
     } catch (error) {
-        document.getElementById('loadingState').classList.add('hidden');
-        mixpanel.track('Service Booking Error', {
-            'Service': selectedService.name,
-            'Brand': brand,
-            'Car Model': carName,
-            'Mobile': userMobile,
-            'Error': error.message,
-            'Timestamp': new Date().toISOString()
-        });
-        alert('Booking failed. Please try again or contact us directly.');
+      console.error('Failed to update vehicle number:', error);
+    } finally {
+      hideCarNumberPopup();
+      window.location.reload();
     }
-}
+  }
 
-function showSuccessPage() {
-    const brand = localStorage.getItem("brand");
-    const carName = localStorage.getItem("carName");
-    const detailsContainer = document.getElementById('bookingDetails');
-    
-    let detailsHTML = `
-        <div class="detail-row">
-            <span class="detail-label">Service:</span>
-            <span class="detail-value">${selectedService.name}</span>
-        </div>
-        <div class="detail-row">
-            <span class="detail-label">Vehicle:</span>
-            <span class="detail-value">${brand} ${carName}</span>
-        </div>
-        <div class="detail-row">
-            <span class="detail-label">Mobile:</span>
-            <span class="detail-value">+91 ${userMobile}</span>
-        </div>`;
-    
-    if (selectedService.couponApplied) {
-        detailsHTML += `
-        <div class="detail-row">
-            <span class="detail-label">Base Price:</span>
-            <span class="detail-value">₹${selectedService.basePrice}</span>
-        </div>
-        <div class="detail-row">
-            <span class="detail-label">Coupon Applied:</span>
-            <span class="detail-value">${selectedService.couponApplied} (-₹${selectedService.discountAmount})</span>
-        </div>`;
+  function startCountdown() {
+    const storageKey = `booking_timer_${mobile}`;
+    if (!localStorage.getItem(storageKey)) {
+      localStorage.setItem(storageKey, Date.now());
     }
-    
-    detailsHTML += `
-        <div class="detail-row">
-            <span class="detail-label">Final Price:</span>
-            <span class="detail-value">₹${selectedService.finalPrice}</span>
-        </div>
-        <div class="detail-row">
-            <span class="detail-label">Booking ID:</span>
-            <span class="detail-value">#IM${Date.now().toString().slice(-6)}</span>
-        </div>`;
-    
-    detailsContainer.innerHTML = detailsHTML;
-    
-    let message = `Hi Instant Mechanic team! 👋\n\nMy service booking details:\n🔧 Service: ${selectedService.name}\n🚗 Vehicle: ${brand} ${carName}`;
-    if (selectedService.couponApplied) {
-        message += `\n💰 Base Price: ₹${selectedService.basePrice}\n🎟️ Coupon: ${selectedService.couponApplied} (₹${selectedService.discountAmount} off)\n💵 Final Price: ₹${selectedService.finalPrice}`;
+    const startTime = parseInt(localStorage.getItem(storageKey));
+    const countdownDuration = 10 * 60 * 1000;
+    const interval = setInterval(() => {
+      const elapsed = Date.now() - startTime;
+      const remaining = countdownDuration - elapsed;
+      if (remaining <= 0) {
+        clearInterval(interval);
+        localStorage.removeItem(storageKey);
+        document.getElementById('timer').textContent = `00:00`;
+        return;
+      }
+      const mins = String(Math.floor(remaining / 60000)).padStart(2, '0');
+      const secs = String(Math.floor((remaining % 60000) / 1000)).padStart(2, '0');
+      document.getElementById('timer').textContent = `${mins}:${secs}`;
+    }, 1000);
+  }
+
+  function showAfterPaymentUI() {
+    document.getElementById('mapContainer').classList.add('hidden');
+    document.getElementById('afterPaymentOverlay').classList.remove('hidden');
+    document.getElementById('statusText').textContent = 'Our service is on the way to help, you can reach out to team for further update.';
+
+    const payBtn = document.getElementById('payNow');
+    if (payBtn) payBtn.textContent = `Paid (₹${window.amountToPay / 100})`;
+
+    const DISPLAY_DURATION_SECONDS = 18 * 60;
+    const storageKey = 'arrival_display_start_time';
+    let displaySecondsLeft = DISPLAY_DURATION_SECONDS;
+    const timerEl = document.getElementById('countdownTimer');
+
+    let displayStartTime = localStorage.getItem(storageKey);
+    if (!displayStartTime) {
+      displayStartTime = Date.now();
+      localStorage.setItem(storageKey, displayStartTime);
     } else {
-        message += `\n💰 Price: ₹${selectedService.finalPrice}`;
+      displayStartTime = parseInt(displayStartTime);
     }
-    message += `\n📱 Mobile: ${userMobile}\n\nPlease confirm my appointment. Thank you!`;
-    
-    document.getElementById('whatsappLink').href = `https://wa.me/919266961110?text=${encodeURIComponent(message)}`;
-    document.getElementById('successPage').classList.add('show');
-}
 
-// ==================== Scratch Card ====================
-function openHeaderCouponPopup() {
-    // Check if mobile is already collected
-    const storedMobile = localStorage.getItem('userMobile');
-    
-    if (storedMobile && isValidMobile(storedMobile)) {
-        // User already provided mobile, show scratch card directly
-        userMobile = storedMobile;
-        openCouponPopup();
+    function updateTimerDisplay(sec) {
+      const mins = String(Math.floor(sec / 60)).padStart(2, '0');
+      const secs = String(sec % 60).padStart(2, '0');
+      timerEl.textContent = `${mins}:${secs}`;
+    }
+
+    async function countdownLoop() {
+      if (displaySecondsLeft <= 60) {
+        updateTimerDisplay(60);
+        return;
+      }
+      updateTimerDisplay(displaySecondsLeft);
+      let delay = 1000;
+      if (displaySecondsLeft <= 4 * 60) delay = 2000;
+      else if (displaySecondsLeft <= 15 * 60) delay = 1500;
+      await new Promise(r => setTimeout(r, delay));
+      displaySecondsLeft--;
+      countdownLoop();
+    }
+
+    function computeFakeSecondsLeft() {
+      const realElapsedMs = Date.now() - displayStartTime;
+      let fakeElapsed = 0;
+      if (realElapsedMs <= 3 * 60 * 1000) {
+        fakeElapsed = realElapsedMs / 1000;
+      } else if (realElapsedMs <= (3 + 11) * 60 * 1000) {
+        const over3Min = realElapsedMs - 3 * 60 * 1000;
+        fakeElapsed = 3 * 60 + (over3Min / 1500);
+      } else {
+        const over14Min = realElapsedMs - 14 * 60 * 1000;
+        fakeElapsed = 3 * 60 + (11 * 60 / 1.5) + (over14Min / 2000);
+      }
+      return Math.max(0, Math.floor(DISPLAY_DURATION_SECONDS - fakeElapsed));
+    }
+
+    displaySecondsLeft = computeFakeSecondsLeft();
+    countdownLoop();
+  }
+
+  function initMap(lat, lng, bookingId) {
+    const map = new google.maps.Map(document.getElementById("map"), {
+      center: { lat, lng },
+      zoom: 13,
+      gestureHandling: "greedy",
+      zoomControl: true,
+      fullscreenControl: false,
+      streetViewControl: false,
+      mapTypeControl: false,
+      styles: [
+        { featureType: "poi", stylers: [{ visibility: "off" }] },
+        { featureType: "transit", stylers: [{ visibility: "off" }] }
+      ]
+    });
+
+    new google.maps.Marker({
+      position: { lat, lng },
+      map: map,
+      title: "Customer",
+      icon: { url: "https://maps.google.com/mapfiles/ms/icons/red-dot.png" }
+    });
+
+    const mechanics = [
+      { name: "Narendra", eta: "11 min" },
+      { name: "Saheed", eta: "11 min" },
+      { name: "Harbeer", eta: "13 min" },
+      { name: "Lal Babu", eta: "14 min" },
+      { name: "Nitin", eta: "15 min" },
+      { name: "Arjun", eta: "18 min" }
+    ];
+
+    const key = `mechanic_locations_${bookingId}`;
+    let savedLocations = localStorage.getItem(key);
+    if (savedLocations) {
+      savedLocations = JSON.parse(savedLocations);
     } else {
-        // Show mobile collection modal first
-        showHeaderMobileCollection();
+      savedLocations = mechanics.map(() => {
+        const angle = Math.random() * 2 * Math.PI;
+        const distance = 2 + Math.random();
+        const deltaLat = (distance / 111) * Math.cos(angle);
+        const deltaLng = (distance / (111 * Math.cos(lat * Math.PI / 180))) * Math.sin(angle);
+        return { lat: lat + deltaLat, lng: lng + deltaLng };
+      });
+      localStorage.setItem(key, JSON.stringify(savedLocations));
     }
-}
 
-function showHeaderMobileCollection() {
-    // Create mobile collection modal for header coupon
-    const modal = document.createElement('div');
-    modal.className = 'mobile-collection-modal';
-    modal.id = 'headerMobileModal';
-    modal.innerHTML = `
-        <div class="mobile-collection-content">
-            <div class="mobile-collection-header">
-                <div class="coupon-badge-modal">
-                    <i class="fas fa-gift"></i>
-                    <span>₹500 OFF Coupon</span>
-                </div>
-                <h3>Get Your Exclusive Coupon!</h3>
-                <p>Enter your mobile number to unlock ₹500 discount code</p>
-            </div>
-            
-            <div class="mobile-collection-form">
-                <div class="mobile-input-wrapper">
-                    <div class="country-code-modal">+91</div>
-                    <input 
-                        type="tel" 
-                        id="headerMobileInput" 
-                        class="mobile-input-modal" 
-                        placeholder="Enter 10-digit mobile number"
-                        maxlength="10"
-                        pattern="[0-9]{10}"
-                        autocomplete="tel"
-                    >
-                </div>
-                <div class="mobile-error-modal hidden" id="headerMobileError"></div>
-                <button class="apply-with-mobile-btn" id="headerApplyBtn">
-                    <i class="fas fa-gift"></i> Get Coupon Code
-                </button>
-            </div>
-            
-            <div class="mobile-collection-benefits">
-                <div class="benefit-item">
-                    <i class="fas fa-lock"></i>
-                    <span>100% Secure</span>
-                </div>
-                <div class="benefit-item">
-                    <i class="fas fa-tag"></i>
-                    <span>Instant Discount</span>
-                </div>
-                <div class="benefit-item">
-                    <i class="fas fa-star"></i>
-                    <span>Exclusive Deals</span>
-                </div>
-            </div>
-            
-            <button class="close-modal-btn" onclick="closeHeaderMobileModal()">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-    `;
-    
-    document.body.appendChild(modal);
-    
-    // Animate in
-    setTimeout(() => modal.classList.add('show'), 10);
-    
-    // Focus on input
-    setTimeout(() => document.getElementById('headerMobileInput').focus(), 300);
-    
-    // Setup event listeners
-    const mobileInput = document.getElementById('headerMobileInput');
-    const applyBtn = document.getElementById('headerApplyBtn');
-    const errorDiv = document.getElementById('headerMobileError');
-    
-    // Input validation
-    mobileInput.addEventListener('input', function() {
-        this.value = this.value.replace(/[^0-9]/g, '');
-        if (this.value.length > 0) {
-            this.classList.remove('error');
-            errorDiv.classList.add('hidden');
+    savedLocations.forEach((pos, i) => {
+      const mechanic = mechanics[i];
+      new google.maps.Marker({
+        position: pos,
+        map: map,
+        title: `${mechanic.name} (${mechanic.eta})`,
+        icon: {
+          url: "https://cdn-icons-png.flaticon.com/512/1995/1995470.png",
+          scaledSize: new google.maps.Size(30, 30)
+        },
+        label: {
+          text: `${mechanic.name} ------- (${mechanic.eta})`,
+          color: "#111",
+          fontSize: "10px",
+          fontWeight: "bold"
         }
+      });
     });
-    
-    // Enter key submit
-    mobileInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            applyBtn.click();
-        }
-    });
-    
-    // Apply button click
-    applyBtn.addEventListener('click', function() {
-        const mobile = mobileInput.value.trim();
-        
-        // Clear previous errors
-        errorDiv.classList.add('hidden');
-        errorDiv.textContent = '';
-        mobileInput.classList.remove('error');
-        
-        // Validate
-        if (!mobile) {
-            errorDiv.textContent = 'Please enter your mobile number';
-            errorDiv.classList.remove('hidden');
-            mobileInput.classList.add('error');
-            return;
-        }
-        
-        if (!isValidMobile(mobile)) {
-            errorDiv.textContent = 'Please enter a valid 10-digit mobile number (6-9)';
-            errorDiv.classList.remove('hidden');
-            mobileInput.classList.add('error');
-            return;
-        }
-        
-        // Show loading
-        applyBtn.disabled = true;
-        const originalText = applyBtn.innerHTML;
-        applyBtn.innerHTML = '<div class="spinner" style="width: 20px; height: 20px; margin: 0 auto;"></div>';
-        
-        // Save mobile
-        userMobile = mobile;
-        localStorage.setItem('userMobile', mobile);
-        
-        // Identify user in Mixpanel
-        mixpanel.identify(mobile);
-        mixpanel.people.set({
-            "$phone": mobile,
-            "Header Coupon Interest": true,
-            "Last Seen": new Date().toISOString()
-        });
-        
-        // Track mobile collection
-        mixpanel.track('Mobile Collected via Header Coupon', {
-            'Mobile': mobile,
-            'Collection Method': 'Header Button',
-            'Page': 'Service Selection',
-            'Timestamp': new Date().toISOString()
-        });
-        
-        // Send to API
-        sendMobileToAPI(mobile, 'Header Coupon Button');
-        
-        // Close modal and show scratch card
-        setTimeout(() => {
-            closeHeaderMobileModal();
-            openCouponPopup();
-        }, 800);
-    });
-    
-    // Close on outside click
-    modal.addEventListener('click', function(e) {
-        if (e.target === modal) {
-            closeHeaderMobileModal();
-        }
-    });
-}
+  }
 
-function closeHeaderMobileModal() {
-    const modal = document.getElementById('headerMobileModal');
-    if (modal) {
-        modal.classList.remove('show');
-        setTimeout(() => modal.remove(), 300);
+  async function fetchBookingDetails() {
+    const res = await fetch(apiUrl);
+    const data = await res.json();
+    document.getElementById('car').textContent = data.car;
+    document.getElementById('problem').textContent = data.problem;
+    document.getElementById('price').textContent = data.price;
+    document.getElementById('carImage').src = data.car_image;
+
+    if (data.payment_status === "partially-paid" && !isPaid) {
+      localStorage.setItem('paid', 'true');
+      localStorage.removeItem(`booking_timer_${mobile}`);
+      window.location.reload();
     }
-}
 
-function initScratchCard() {
-    canvas = document.getElementById('scratchCanvas');
-    if (!canvas) return;
-    ctx = canvas.getContext('2d');
-    const container = canvas.parentElement;
-    canvas.width = container.offsetWidth;
-    canvas.height = container.offsetHeight;
-    
-    ctx.fillStyle = '#e0e0e0';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = '#c0c0c0';
-    ctx.font = 'bold 16px Arial';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('🎁 SCRATCH HERE 🎁', canvas.width / 2, canvas.height / 2);
-    
-    for (let i = 0; i < 15; i++) {
-        ctx.beginPath();
-        ctx.arc(Math.random() * canvas.width, Math.random() * canvas.height, 3, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
-        ctx.fill();
+    // Store agent_mobile separately as fallback for "Call Team"
+    const agentMobile = data.agent_mobile;
+    localStorage.setItem("agentMobile", agentMobile);
+    localStorage.setItem("mechanicMobile", agentMobile); // default; overridden below if mechanic assigned
+
+    try {
+      const latlng = data.location.split('=')[1];
+      [lat, lng] = latlng.split(',').map(Number);
+    } catch (error) {
+      [lat, lng] = await getLatLngFromAddress(data.location);
     }
-    
-    canvas.addEventListener('mousedown', startScratch);
-    canvas.addEventListener('mousemove', scratch);
-    canvas.addEventListener('mouseup', endScratch);
-    canvas.addEventListener('mouseleave', endScratch);
-    canvas.addEventListener('touchstart', startScratch);
-    canvas.addEventListener('touchmove', scratch);
-    canvas.addEventListener('touchend', endScratch);
-}
 
-function startScratch(e) {
-    e.preventDefault();
-    isDrawing = true;
-    scratch(e);
-}
+    if (!isPaid) initMap(lat, lng, data.id);
 
-function scratch(e) {
-    if (!isDrawing) return;
-    e.preventDefault();
-    const rect = canvas.getBoundingClientRect();
-    const x = (e.clientX || e.touches[0].clientX) - rect.left;
-    const y = (e.clientY || e.touches[0].clientY) - rect.top;
-    ctx.globalCompositeOperation = 'destination-out';
-    ctx.beginPath();
-    ctx.arc(x, y, 20, 0, Math.PI * 2);
-    ctx.fill();
-    checkScratchComplete();
-}
+    window.razorpayOrderId = data.payment_id;
+    window.amountToPay = parseInt(data.advance_payment_amount) * 100;
+    document.getElementById('payNow').textContent = `Pay Now (₹${data.advance_payment_amount})`;
 
-function endScratch() {
-    isDrawing = false;
-}
+    if (isPaid) {
+      document.getElementById('payNow').innerHTML = `
+        <img src="https://cdn-icons-png.flaticon.com/512/4272/4272841.png" class="w-4 h-4 mr-2 inline-block" />
+        Paid (₹${data.advance_payment_amount})
+      `;
 
-function checkScratchComplete() {
-    if (scratchRevealed) return;
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    const pixels = imageData.data;
-    let transparent = 0;
-    for (let i = 3; i < pixels.length; i += 4) {
-        if (pixels[i] === 0) transparent++;
+      if (data.mechanic) {
+        fetch(`https://ai.instantmechanic.online/bot/api/mechanic/${data.mechanic}/`)
+          .then(res => res.json())
+          .then(mechanicData => {
+            const mechanic_name = mechanicData.name;
+            const mechanic_number = mechanicData.mobile;
+            document.getElementById('statusText').textContent = `${mechanic_name} is on the way to help, you can reach out to him for further update.`;
+            document.getElementById('cancelBooking').textContent = `Call ${mechanic_name}`;
+            // Override with actual mechanic number
+            localStorage.setItem("mechanicMobile", mechanic_number);
+          })
+          .catch(err => console.error("Failed to fetch mechanic:", err));
+      } else {
+        // No mechanic assigned — button stays "Call Instant Mechanic Team", use agentMobile
+        document.getElementById('cancelBooking').textContent = 'Call Instant Mechanic Team';
+      }
     }
-    const percentScratched = (transparent / (pixels.length / 4)) * 100;
-    if (percentScratched > 50) {
-        scratchRevealed = true;
-        revealCoupon();
+
+    localStorage.setItem('booking_id', data.id);
+  }
+
+  document.getElementById('payNow').addEventListener('click', () => {
+    if (mobile) {
+      mixpanel.track('Customer initiated payment', {
+        mobile: mobile,
+        user_id: `${mobile}`,
+        amount: window.amountToPay / 100,
+        booking_id: localStorage.getItem('booking_id'),
+        timestamp: new Date().toISOString()
+      });
     }
-}
 
-function revealCoupon() {
-    canvas.style.transition = 'opacity 0.5s';
-    canvas.style.opacity = '0';
-    setTimeout(() => {
-        canvas.style.display = 'none';
-        document.getElementById('scratchText').innerHTML = '<i class="fas fa-check-circle"></i> Code Revealed!';
-        mixpanel.track('Coupon Scratch Completed', {
-            'Coupon Code': 'INSTANT500',
-            'Mobile': userMobile,
-            'Timestamp': new Date().toISOString()
-        });
-    }, 500);
-}
+    const options = {
+      key: 'rzp_live_NYD17iu2Juy3A5',
+      amount: window.amountToPay,
+      currency: 'INR',
+      name: 'Instant Mechanic',
+      description: 'Advance Payment',
+      order_id: window.razorpayOrderId,
+      handler: function (response) {
+        alert('✅ Payment Successful!');
+        localStorage.setItem('paid', 'true');
+        localStorage.removeItem(`booking_timer_${mobile}`);
+        window.location.reload();
+      },
+      prefill: { contact: mobile },
+      theme: { color: '#7c3aed' }
+    };
+    const rzp = new Razorpay(options);
+    rzp.open();
+  });
 
-function openCouponPopup() {
-    const modal = document.getElementById('couponModal');
-    modal.classList.add('show');
-    scratchRevealed = false;
-    setTimeout(() => initScratchCard(), 100);
-    mixpanel.track('Scratch Card Opened', {
-        'Mobile': userMobile,
-        'Has Mobile': userMobile ? true : false,
-        'Source': 'Header Button',
-        'Timestamp': new Date().toISOString()
-    });
-}
+  document.getElementById('cancelBooking').addEventListener('click', () => {
+    const mechanicNumber = localStorage.getItem("mechanicMobile");
+    const agentMobile = localStorage.getItem("agentMobile");
 
-function closeCouponPopup() {
-    document.getElementById('couponModal').classList.remove('show');
-    document.getElementById('copyMsg').innerText = '';
-}
+    // mobile1: mechanic if assigned, else agent from API
+    const mobile1 = mechanicNumber || agentMobile;
+    const isMechanic = mechanicNumber && mechanicNumber !== agentMobile;
+    const context = isMechanic ? 'mechanic_call' : 'team_call';
 
-function copyCoupon() {
-    const code = 'INSTANT500';
-    navigator.clipboard.writeText(code).then(() => {
-        document.getElementById('copyMsg').innerText = "✅ Coupon code copied!";
-        mixpanel.track('Coupon Code Copied', {
-            'Coupon Code': code,
-            'Mobile': userMobile,
-            'Timestamp': new Date().toISOString()
-        });
-        setTimeout(() => closeCouponPopup(), 1500);
-    });
-}
-
-document.getElementById('couponModal').addEventListener('click', function(e) {
-    if (e.target === this) closeCouponPopup();
-});
-
-// ==================== Progress & UI Updates ====================
-function updateProgress(step) {
-    currentStep = step;
-    for (let i = 1; i <= 4; i++) {
-        const stepElement = document.getElementById(`step${i}`);
-        stepElement.classList.remove('active', 'completed');
-        if (i < step) {
-            stepElement.classList.add('completed');
-            stepElement.innerHTML = '<i class="fas fa-check"></i>';
-        } else if (i === step) {
-            stepElement.classList.add('active');
-            stepElement.innerHTML = i;
-        } else {
-            stepElement.innerHTML = i;
-        }
+    if (mobile) {
+      mixpanel.track(isMechanic ? 'Customer Called mechanic' : 'Customer Called instant mechanic team', {
+        mobile: mobile,
+        user_id: `${mobile}`,
+        mobile1: mobile1,
+        booking_id: localStorage.getItem('booking_id'),
+        timestamp: new Date().toISOString()
+      });
     }
-    const progressLine = document.getElementById('progressLine');
-    progressLine.style.width = `${((step - 1) / 3) * 100}%`;
-}
 
-function updateSectionTitle(title, subtitle) {
-    document.getElementById('sectionTitle').innerHTML = `
-        <h1 class="fade-in">${title}</h1>
-        <p class="fade-in">${subtitle}</p>
-    `;
-}
+    showIVRPopup(mobile1, context);
+  });
 
-window.addEventListener('beforeunload', function(e) {
-    if (currentStep > 1) {
-        e.preventDefault();
-        e.returnValue = 'Are you sure you want to leave? Your progress will be lost.';
+  document.getElementById('ring').addEventListener('click', () => {
+    window.location.href = 'https://wa.me/918700199791';
+    localStorage.removeItem(`booking_timer_${mobile}`);
+  });
+
+  async function getLatLngFromAddress(address) {
+    const apiKey = 'AIzaSyCgulBmFWyyk8zV7AO0v2qiMSBNlKHaQE0';
+    const encodedAddress = encodeURIComponent(address);
+    const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodedAddress}&key=${apiKey}`;
+    try {
+      const response = await fetch(url);
+      const data = await response.json();
+      if (data.status === "OK") {
+        const location = data.results[0].geometry.location;
+        return [location.lat, location.lng];
+      } else {
+        console.error("Geocoding failed:", data.status);
+        return [null, null];
+      }
+    } catch (error) {
+      console.error("Error fetching lat/lng:", error);
+      return [null, null];
     }
-});
+  }
+
+  startCountdown();
+  fetchBookingDetails();
 </script>
 </body>
 </html>
