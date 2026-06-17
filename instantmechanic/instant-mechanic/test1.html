@@ -220,6 +220,7 @@
   }
 
   function showIVRPopup(mobile1, context) {
+    const customerMobile = mobile.replace(/^91/, '');
     const popup = document.getElementById('ivrPopup');
     const countdownEl = document.getElementById('ivrCountdown');
     const countdownState = document.getElementById('ivrCountdownState');
@@ -233,6 +234,9 @@
     countdownEl.textContent = '10';
     popup.classList.remove('hidden');
 
+    // Hit API immediately — countdown is purely UX
+    triggerIVRCall(mobile1, customerMobile, context);
+
     // Clear any existing interval
     if (ivrCountdownInterval) clearInterval(ivrCountdownInterval);
 
@@ -244,23 +248,20 @@
       if (count <= 0) {
         clearInterval(ivrCountdownInterval);
         ivrCountdownInterval = null;
-
-        // Switch to connecting state
         countdownState.classList.add('hidden');
         connectingState.classList.remove('hidden');
         retryBtn.classList.remove('hidden');
-
-        // Trigger IVR API
-        triggerIVRCall(mobile1, mobile, context);
       }
     }, 1000);
 
-    // Retry button
+    // Retry button — re-hits API and resets countdown
     retryBtn.onclick = () => {
       connectingState.classList.add('hidden');
       countdownState.classList.remove('hidden');
       retryBtn.classList.add('hidden');
       countdownEl.textContent = '10';
+
+      triggerIVRCall(mobile1, customerMobile, context);
 
       let retryCount = 10;
       if (ivrCountdownInterval) clearInterval(ivrCountdownInterval);
@@ -273,7 +274,6 @@
           countdownState.classList.add('hidden');
           connectingState.classList.remove('hidden');
           retryBtn.classList.remove('hidden');
-          triggerIVRCall(mobile1, mobile, context);
         }
       }, 1000);
     };
