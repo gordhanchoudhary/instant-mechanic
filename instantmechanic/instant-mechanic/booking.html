@@ -346,7 +346,7 @@
   <!-- Mixpanel -->
   <script type="text/javascript">
     (function(c,a){if(!a.__SV){var b=window;try{var d,m,j,k=b.location,f=k.hash;d=function(a,b){return(m=a.match(RegExp(b+"=([^&]*)")))?m[1]:null};f&&d(f,"state")&&(j=JSON.parse(decodeURIComponent(d(f,"state"))),"mpeditor"===j.action&&(b.sessionStorage.setItem("_mpcehash",f),history.replaceState(j.desiredHash||"",c.title,k.pathname+k.search)))}catch(n){}var l,h;window.mixpanel=a;a._i=[];a.init=function(b,d,g){function c(b,i){var a=i.split(".");2==a.length&&(b=b[a[0]],i=a[1]);b[i]=function(){b.push([i].concat(Array.prototype.slice.call(arguments,0)))}}var e=a;"undefined"!==typeof g?e=a[g]=[]:g="mixpanel";e.people=e.people||[];e.toString=function(b){var a="mixpanel";"mixpanel"!==g&&(a+="."+g);b||(a+=" (stub)");return a};e.people.toString=function(){return e.toString(1)+".people (stub)"};l="disable time_event track track_pageview track_links track_forms track_with_groups add_group set_group remove_group register register_once alias unregister identify name_tag set_config reset opt_in_tracking opt_out_tracking has_opted_in_tracking has_opted_out_tracking clear_opt_in_out_tracking start_batch_senders people.set people.set_once people.unset people.increment people.append people.union people.track_charge people.clear_charges people.delete_user people.remove".split(" ");for(h=0;h<l.length;h++)c(e,l[h]);var f="set set_once union unset remove delete".split(" ");e.get_group=function(){function a(c){b[c]=function(){call2_args=arguments;call2=[c].concat(Array.prototype.slice.call(call2_args,0));e.push([d,call2])}}for(var b={},d=["get_group"].concat(Array.prototype.slice.call(arguments,0)),c=0;c<f.length;c++)a(f[c]);return b};a._i.push([b,d,g])};a.__SV=1.2;b=c.createElement("script");b.type="text/javascript";b.async=!0;b.src="undefined"!==typeof MIXPANEL_CUSTOM_LIB_URL?MIXPANEL_CUSTOM_LIB_URL:"file:"===c.location.protocol&&"//cdn.mxpnl.com/libs/mixpanel-2-latest.min.js".match(/^\/\//)?"https://cdn.mxpnl.com/libs/mixpanel-2-latest.min.js":"//cdn.mxpnl.com/libs/mixpanel-2-latest.min.js";d=c.getElementsByTagName("script")[0];d.parentNode.insertBefore(b,d)}})(document,window.mixpanel||[]);
-    
+
     mixpanel.init("afeb927e0d7ee7ddfa033985ab2fe603");
   </script>
 
@@ -364,11 +364,6 @@
 
     function debugLog(message) {
       console.log(message);
-      const debugOutput = document.getElementById("debugOutput");
-      if (debugOutput) {
-        debugOutput.innerHTML += new Date().toLocaleTimeString() + ': ' + message + '<br>';
-        debugOutput.scrollTop = debugOutput.scrollHeight;
-      }
     }
 
     function waitForMixpanel(callback, maxAttempts = 50, attempt = 1) {
@@ -414,10 +409,8 @@
       const badge = document.getElementById("membershipBadge");
       badge.textContent = isOn ? "ON" : "OFF";
       badge.className = "membership-badge" + (isOn ? "" : " off");
-      // Show/hide membership price field
       const priceSection = document.getElementById("membershipPriceSection");
       priceSection.style.display = isOn ? "block" : "none";
-      // Clear error when toggled off
       if (!isOn) {
         document.getElementById("membershipPriceError").style.display = "none";
         document.getElementById("membershipPrice").style.borderColor = "";
@@ -436,7 +429,7 @@
 
       const location = bookingData.location;
       let searchUrl = "https://instantmechanic.online/mechanic-search.html?q=";
-      
+
       try {
         if (location.includes("google.com/maps")) {
           const coordMatch = location.match(/q=([0-9.-]+),([0-9.-]+)/);
@@ -451,9 +444,9 @@
         } else {
           searchUrl += encodeURIComponent(location);
         }
-        
+
         window.open(searchUrl, "_blank");
-        
+
         if (customerMobile) {
           waitForMixpanel(() => {
             identifyMixpanelUser(customerMobile);
@@ -513,7 +506,7 @@
           originalMechanicId = data.mechanic;
           currentExtraPayment = data.mechanic_extra_payment || 0;
           currentPaymentOnQr = data.payment_on_qr || 0;
-          
+
           customerMobile = data.customer_mobile || data.mobile || null;
 
           if (customerMobile) {
@@ -559,27 +552,27 @@
 
           details += createSecurityAmountSection(data);
           document.getElementById("bookingDetails").innerHTML = details;
-          
+
           document.getElementById("mechanicExtraPayment").value = data.mechanic_extra_payment || 0;
           document.getElementById("paymentOnQr").value = data.payment_on_qr || 0;
           document.getElementById("markCancelled").checked = data.is_cancelled;
           document.getElementById("cancelReason").value = data.cancellation_reason || "";
 
-          // Sync membership toggle with backend value
           const isMember = data.agent_convert_into_member === true;
           document.getElementById("upgradeMembership").checked = isMember;
           updateMembershipBadge();
-          // Sync membership price from backend
           document.getElementById("membershipPrice").value = data.agent_mebership_price || "";
 
-          // Hide membership toggle if customer is already a member
           const priceStr = (data.price || "").toString().toLowerCase();
           const isAlreadyMember = priceStr.includes("annual membership") || priceStr.includes("membership");
           const membershipSection = document.querySelector(".membership-toggle-container");
           if (membershipSection) {
             membershipSection.style.display = isAlreadyMember ? "none" : "flex";
           }
-          
+
+          // Reset mechanic input before fetching so dropdown re-populates cleanly
+          userChangedMechanic = false;
+          document.getElementById("mechanicInput").value = "";
           fetchMechanics();
           fetchChat();
         })
@@ -650,52 +643,84 @@
         .then(res => res.json())
         .then(data => {
           mechanicList = data;
-          populateMechanicDropdown(data);
+          // Pre-fill mechanic input with assigned mechanic name
+          if (assignedMechanicId) {
+            const assigned = mechanicList.find(m => m.id === assignedMechanicId);
+            if (assigned) {
+              document.getElementById("mechanicInput").value = `${assigned.name} - ${assigned.mobile} - ${assigned.city}`;
+            }
+          }
         })
         .catch(error => console.error('Error fetching mechanics:', error));
     }
 
-    function populateMechanicDropdown(list) {
+    // ── Mechanic dropdown rendering ──
+    function renderDropdown(list) {
       const dropdown = document.getElementById("mechanicDropdown");
       dropdown.innerHTML = "";
-      dropdown.style.display = list.length ? "block" : "none";
+
+      if (!list.length) {
+        dropdown.style.display = "none";
+        return;
+      }
 
       list.forEach(m => {
         const div = document.createElement("div");
         div.textContent = `${m.name} - ${m.mobile} - ${m.city}`;
         div.dataset.id = m.id;
 
-        if (m.id === assignedMechanicId && !userChangedMechanic) {
+        if (m.id === assignedMechanicId) {
           div.classList.add("selected");
-          document.getElementById("mechanicInput").value = div.textContent;
         }
 
-        div.onclick = () => {
+        // mousedown fires before blur so dropdown doesn't hide before selection
+        div.addEventListener("mousedown", function (e) {
+          e.preventDefault();
           document.getElementById("mechanicInput").value = div.textContent;
-          document.getElementById("mechanicDropdown").style.display = "none";
           assignedMechanicId = m.id;
           userChangedMechanic = true;
-        };
+          dropdown.style.display = "none";
+        });
 
         dropdown.appendChild(div);
       });
+
+      dropdown.style.display = "block";
     }
 
+    // ── Input: filter on type ──
     document.getElementById("mechanicInput").addEventListener("input", function () {
-      const query = this.value.toLowerCase();
+      const query = this.value.toLowerCase().trim();
+
       if (this.value === "") {
         assignedMechanicId = null;
         userChangedMechanic = true;
       }
-      const filtered = mechanicList.filter(m =>
-        m.name.toLowerCase().includes(query) || m.mobile.includes(query)
-      );
-      populateMechanicDropdown(filtered);
+
+      const filtered = query === ""
+        ? mechanicList
+        : mechanicList.filter(m =>
+            m.name.toLowerCase().includes(query) || m.mobile.includes(query)
+          );
+
+      renderDropdown(filtered);
     });
 
+    // ── Focus: show full list (or filtered if text already present) ──
+    document.getElementById("mechanicInput").addEventListener("focus", function () {
+      const query = this.value.toLowerCase().trim();
+      const filtered = query === ""
+        ? mechanicList
+        : mechanicList.filter(m =>
+            m.name.toLowerCase().includes(query) || m.mobile.includes(query)
+          );
+      renderDropdown(filtered);
+    });
+
+    // ── Click outside: hide dropdown ──
     document.addEventListener("click", function (event) {
       const container = document.querySelector(".select-container");
-      if (!container.contains(event.target)) {
+      if (container && !container.contains(event.target)) {
         document.getElementById("mechanicDropdown").style.display = "none";
       }
     });
@@ -719,13 +744,10 @@
         mechanic_extra_payment: extraPayment || 0,
         payment_on_qr: paymentOnQr || 0,
         is_cancelled: isCancelled,
-        cancellation_reason: cancelReason
+        cancellation_reason: cancelReason,
+        agent_convert_into_member: upgradeMembership === true
       };
 
-      // ── Always send explicitly so backend never defaults to true ──
-      updateData.agent_convert_into_member = upgradeMembership === true;
-
-      // ── Membership price: required if toggle is ON ──
       const membershipPrice = document.getElementById("membershipPrice").value;
       if (upgradeMembership) {
         if (!membershipPrice || membershipPrice <= 0) {
@@ -750,7 +772,7 @@
           if (customerMobile) {
             waitForMixpanel(() => {
               identifyMixpanelUser(customerMobile);
-              
+
               if (assignedMechanicId && !originalMechanicId) {
                 trackMixpanelEvent("Mechanic Assigned", {
                   "agent_name": agentName,
@@ -761,7 +783,7 @@
                   "timestamp": new Date().toISOString()
                 });
               }
-              
+
               if (assignedMechanicId && originalMechanicId && assignedMechanicId !== originalMechanicId) {
                 trackMixpanelEvent("Mechanic Reassigned", {
                   "agent_name": agentName,
@@ -774,7 +796,7 @@
                   "timestamp": new Date().toISOString()
                 });
               }
-              
+
               if (isCancelled && (!bookingData || !bookingData.is_cancelled)) {
                 trackMixpanelEvent("Booking Cancelled", {
                   "agent_name": agentName,
@@ -785,7 +807,6 @@
                 });
               }
 
-              // ── Track membership conversion ──
               if (upgradeMembership) {
                 trackMixpanelEvent("Agent Converted to Member", {
                   "agent_name": agentName,
@@ -796,7 +817,7 @@
               }
             });
           }
-          
+
           alert("Booking updated successfully.");
           userChangedMechanic = false;
           fetchBooking();
