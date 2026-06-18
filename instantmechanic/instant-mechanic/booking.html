@@ -2,14 +2,13 @@
 <html lang="en">
 <head>
   <script src="https://instantmechanic.online/login.js"></script>
-
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Instant Mechanic Agent</title>
   <style>
     body { font-family: Arial, sans-serif; padding: 20px; background-color: #f3f3f3; }
     .container { max-width: 500px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-    input, button, textarea { width: 100%; padding: 10px; margin: 8px 0; border-radius: 6px; border: 1px solid #ccc; }
+    input, button, textarea { width: 100%; padding: 10px; margin: 8px 0; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box; }
     button { background-color: #4CAF50; color: white; cursor: pointer; }
     h2, h3 { text-align: center; }
     .hidden { display: none; }
@@ -56,11 +55,13 @@
 
     .chat-wrapper { display: flex; flex-direction: column; }
 
-    #mechanicDropdown div { padding: 10px; cursor: pointer; }
+    #mechanicDropdown div {
+      padding: 10px;
+      cursor: pointer;
+      border-bottom: 1px solid #f0f0f0;
+    }
     #mechanicDropdown div:hover { background-color: #f0f0f0; }
-    #mechanicDropdown .selected { background-color: #dcedc8; }
-
-    .payment-input { width: 100px; display: inline-block; margin-left: 10px; }
+    #mechanicDropdown div.selected { background-color: #dcedc8; }
 
     .checkbox-container {
       display: flex;
@@ -127,26 +128,6 @@
       margin: 5px 0;
     }
 
-    .debug-section {
-      margin-top: 20px;
-      display: hidden;
-      padding: 15px;
-      background-color: #f8f9fa;
-      border-radius: 8px;
-      border: 1px solid #e9ecef;
-    }
-
-    .debug-button {
-      background-color: #6c757d;
-      color: white;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 4px;
-      cursor: pointer;
-      margin: 5px;
-      width: auto;
-    }
-
     .search-mechanic-btn {
       background-color: #007bff !important;
       color: white !important;
@@ -174,7 +155,6 @@
 
     .booking-title { flex: 1; margin: 0; min-width: 200px; }
 
-    /* ── Membership Toggle Styles ── */
     .membership-toggle-container {
       display: flex;
       align-items: center;
@@ -239,13 +219,8 @@
       transition: 0.3s;
     }
 
-    .toggle-switch input:checked + .toggle-slider {
-      background-color: #4CAF50;
-    }
-
-    .toggle-switch input:checked + .toggle-slider:before {
-      transform: translateX(24px);
-    }
+    .toggle-switch input:checked + .toggle-slider { background-color: #4CAF50; }
+    .toggle-switch input:checked + .toggle-slider:before { transform: translateX(24px); }
 
     .membership-badge {
       display: inline-block;
@@ -258,8 +233,14 @@
       vertical-align: middle;
     }
 
-    .membership-badge.off {
-      background-color: #aaa;
+    .membership-badge.off { background-color: #aaa; }
+
+    /* No results message */
+    .no-results {
+      padding: 10px;
+      color: #888;
+      font-style: italic;
+      text-align: center;
     }
   </style>
 </head>
@@ -301,7 +282,6 @@
       <input type="number" id="paymentOnQr" placeholder="Enter payment on QR amount" min="0" step="1">
     </div>
 
-    <!-- ── Membership Upgrade Toggle ── -->
     <div class="membership-toggle-container">
       <div class="membership-toggle-label">
         <strong>
@@ -315,7 +295,6 @@
       </label>
     </div>
 
-    <!-- ── Membership Price (visible only when toggle is ON) ── -->
     <div id="membershipPriceSection" style="display:none;">
       <div class="form-group">
         <label for="membershipPrice">Membership Price (₹) <span style="color:red;">*</span></label>
@@ -336,7 +315,6 @@
 
     <button onclick="updateBooking()">Update Booking</button>
 
-    <!-- Chat Section -->
     <h3>Customer Chat History</h3>
     <div id="chatContainer">
       <div id="chatMessages"></div>
@@ -346,7 +324,6 @@
   <!-- Mixpanel -->
   <script type="text/javascript">
     (function(c,a){if(!a.__SV){var b=window;try{var d,m,j,k=b.location,f=k.hash;d=function(a,b){return(m=a.match(RegExp(b+"=([^&]*)")))?m[1]:null};f&&d(f,"state")&&(j=JSON.parse(decodeURIComponent(d(f,"state"))),"mpeditor"===j.action&&(b.sessionStorage.setItem("_mpcehash",f),history.replaceState(j.desiredHash||"",c.title,k.pathname+k.search)))}catch(n){}var l,h;window.mixpanel=a;a._i=[];a.init=function(b,d,g){function c(b,i){var a=i.split(".");2==a.length&&(b=b[a[0]],i=a[1]);b[i]=function(){b.push([i].concat(Array.prototype.slice.call(arguments,0)))}}var e=a;"undefined"!==typeof g?e=a[g]=[]:g="mixpanel";e.people=e.people||[];e.toString=function(b){var a="mixpanel";"mixpanel"!==g&&(a+="."+g);b||(a+=" (stub)");return a};e.people.toString=function(){return e.toString(1)+".people (stub)"};l="disable time_event track track_pageview track_links track_forms track_with_groups add_group set_group remove_group register register_once alias unregister identify name_tag set_config reset opt_in_tracking opt_out_tracking has_opted_in_tracking has_opted_out_tracking clear_opt_in_out_tracking start_batch_senders people.set people.set_once people.unset people.increment people.append people.union people.track_charge people.clear_charges people.delete_user people.remove".split(" ");for(h=0;h<l.length;h++)c(e,l[h]);var f="set set_once union unset remove delete".split(" ");e.get_group=function(){function a(c){b[c]=function(){call2_args=arguments;call2=[c].concat(Array.prototype.slice.call(call2_args,0));e.push([d,call2])}}for(var b={},d=["get_group"].concat(Array.prototype.slice.call(arguments,0)),c=0;c<f.length;c++)a(f[c]);return b};a._i.push([b,d,g])};a.__SV=1.2;b=c.createElement("script");b.type="text/javascript";b.async=!0;b.src="undefined"!==typeof MIXPANEL_CUSTOM_LIB_URL?MIXPANEL_CUSTOM_LIB_URL:"file:"===c.location.protocol&&"//cdn.mxpnl.com/libs/mixpanel-2-latest.min.js".match(/^\/\//)?"https://cdn.mxpnl.com/libs/mixpanel-2-latest.min.js":"//cdn.mxpnl.com/libs/mixpanel-2-latest.min.js";d=c.getElementsByTagName("script")[0];d.parentNode.insertBefore(b,d)}})(document,window.mixpanel||[]);
-
     mixpanel.init("afeb927e0d7ee7ddfa033985ab2fe603");
   </script>
 
@@ -356,16 +333,11 @@
     let assignedMechanicId = null;
     let originalMechanicId = null;
     let userChangedMechanic = false;
-    let currentExtraPayment = 0;
-    let currentPaymentOnQr = 0;
     let bookingData = null;
     let customerMobile = null;
     let mixpanelReady = false;
 
-    function debugLog(message) {
-      console.log(message);
-    }
-
+    // ── Mixpanel helpers ──
     function waitForMixpanel(callback, maxAttempts = 50, attempt = 1) {
       if (window.mixpanel && typeof window.mixpanel.track === 'function' && !window.mixpanel.toString().includes('stub')) {
         mixpanelReady = true;
@@ -376,96 +348,113 @@
     }
 
     function trackMixpanelEvent(eventName, properties) {
-      if (!mixpanelReady) {
-        waitForMixpanel(() => trackMixpanelEvent(eventName, properties));
-        return;
-      }
-      try {
-        if (window.mixpanel && typeof window.mixpanel.track === 'function') {
-          mixpanel.track(eventName, properties);
-        }
-      } catch (error) {
-        console.error('Error tracking Mixpanel event:', error);
-      }
+      if (!mixpanelReady) { waitForMixpanel(() => trackMixpanelEvent(eventName, properties)); return; }
+      try { mixpanel.track(eventName, properties); } catch (e) { console.error(e); }
     }
 
     function identifyMixpanelUser(userId) {
-      if (!mixpanelReady) {
-        waitForMixpanel(() => identifyMixpanelUser(userId));
-        return;
-      }
-      try {
-        if (window.mixpanel && typeof window.mixpanel.identify === 'function') {
-          mixpanel.identify(userId);
-        }
-      } catch (error) {
-        console.error('Error identifying Mixpanel user:', error);
-      }
+      if (!mixpanelReady) { waitForMixpanel(() => identifyMixpanelUser(userId)); return; }
+      try { mixpanel.identify(userId); } catch (e) { console.error(e); }
     }
 
-    // ── Membership badge updater ──
+    window.addEventListener('load', () => waitForMixpanel(() => {}));
+
+    // ── Membership badge ──
     function updateMembershipBadge() {
       const isOn = document.getElementById("upgradeMembership").checked;
       const badge = document.getElementById("membershipBadge");
       badge.textContent = isOn ? "ON" : "OFF";
       badge.className = "membership-badge" + (isOn ? "" : " off");
-      const priceSection = document.getElementById("membershipPriceSection");
-      priceSection.style.display = isOn ? "block" : "none";
+      document.getElementById("membershipPriceSection").style.display = isOn ? "block" : "none";
       if (!isOn) {
         document.getElementById("membershipPriceError").style.display = "none";
         document.getElementById("membershipPrice").style.borderColor = "";
       }
     }
 
-    window.addEventListener('load', function() {
-      waitForMixpanel(() => {});
-    });
+    // ────────────────────────────────────────────
+    // MECHANIC DROPDOWN — core rendering function
+    // ────────────────────────────────────────────
+    function renderDropdown(list) {
+      const dropdown = document.getElementById("mechanicDropdown");
+      dropdown.innerHTML = "";
 
-    function searchMechanic() {
-      if (!bookingData || !bookingData.location) {
-        alert("No location data available");
+      if (!list || list.length === 0) {
+        // Show "no results" only if user has typed something
+        const query = document.getElementById("mechanicInput").value.trim();
+        if (query.length > 0) {
+          const noResult = document.createElement("div");
+          noResult.className = "no-results";
+          noResult.textContent = "No mechanic found";
+          dropdown.appendChild(noResult);
+          dropdown.style.display = "block";
+        } else {
+          dropdown.style.display = "none";
+        }
         return;
       }
 
-      const location = bookingData.location;
-      let searchUrl = "https://instantmechanic.online/mechanic-search.html?q=";
+      list.forEach(m => {
+        const div = document.createElement("div");
+        div.textContent = `${m.name} - ${m.mobile} - ${m.city}`;
+        div.dataset.id = m.id;
+        if (m.id === assignedMechanicId) div.classList.add("selected");
 
-      try {
-        if (location.includes("google.com/maps")) {
-          const coordMatch = location.match(/q=([0-9.-]+),([0-9.-]+)/);
-          if (coordMatch) {
-            searchUrl += `${coordMatch[1]},${coordMatch[2]}`;
-          } else {
-            searchUrl += encodeURIComponent(location);
-          }
-        } else if (location.includes("instantmechanic.online") && location.includes("q=")) {
-          const queryMatch = location.match(/q=([^&]*)/);
-          searchUrl += queryMatch ? queryMatch[1] : encodeURIComponent(location);
-        } else {
-          searchUrl += encodeURIComponent(location);
-        }
+        // mousedown fires before blur — prevents dropdown hiding before selection registers
+        div.addEventListener("mousedown", function (e) {
+          e.preventDefault();
+          document.getElementById("mechanicInput").value = div.textContent;
+          assignedMechanicId = m.id;
+          userChangedMechanic = true;
+          dropdown.style.display = "none";
+        });
 
-        window.open(searchUrl, "_blank");
+        dropdown.appendChild(div);
+      });
 
-        if (customerMobile) {
-          waitForMixpanel(() => {
-            identifyMixpanelUser(customerMobile);
-            trackMixpanelEvent("Mechanic Search Initiated", {
-              "agent_name": localStorage.getItem("agent_name"),
-              "booking_id": bookingId,
-              "search_location": location,
-              "search_url": searchUrl,
-              "customer_mobile": customerMobile,
-              "timestamp": new Date().toISOString()
-            });
-          });
-        }
-      } catch (error) {
-        console.error("Error processing location for mechanic search:", error);
-        window.open("https://instantmechanic.online/mechanic-search.html?q=" + encodeURIComponent(location), "_blank");
-      }
+      dropdown.style.display = "block";
     }
 
+    // Returns filtered list based on current input value
+    function getFilteredList() {
+      const query = document.getElementById("mechanicInput").value.toLowerCase().trim();
+      if (!query) return mechanicList;
+      return mechanicList.filter(m =>
+        m.name.toLowerCase().includes(query) || (m.mobile && m.mobile.includes(query))
+      );
+    }
+
+    // ── Input event: filter as user types ──
+    document.getElementById("mechanicInput").addEventListener("input", function () {
+      if (this.value === "") {
+        assignedMechanicId = null;
+        userChangedMechanic = true;
+      }
+      // mechanicList may still be loading — render whatever is available
+      renderDropdown(getFilteredList());
+    });
+
+    // ── Focus: always show dropdown when user clicks in ──
+    document.getElementById("mechanicInput").addEventListener("focus", function () {
+      renderDropdown(getFilteredList());
+    });
+
+    // ── Click outside: close dropdown ──
+    document.addEventListener("click", function (e) {
+      const container = document.querySelector(".select-container");
+      if (container && !container.contains(e.target)) {
+        document.getElementById("mechanicDropdown").style.display = "none";
+      }
+    });
+
+    // ── On Escape: close dropdown ──
+    document.getElementById("mechanicInput").addEventListener("keydown", function (e) {
+      if (e.key === "Escape") document.getElementById("mechanicDropdown").style.display = "none";
+    });
+
+    // ────────────────────────────────────────────
+    // BOOT
+    // ────────────────────────────────────────────
     document.getElementById("loginBox").classList.add("hidden");
     document.getElementById("bookingBox").classList.remove("hidden");
     fetchBooking();
@@ -474,7 +463,6 @@
       const mobile = document.getElementById("mobile").value;
       const password = document.getElementById("password").value;
       const agentName = document.getElementById("agentName").value;
-
       if (/^\d{10}$/.test(mobile) && password === "InstantMech") {
         localStorage.setItem("agent_login", "Yes");
         localStorage.setItem("agent_name", agentName);
@@ -504,14 +492,9 @@
           bookingData = data;
           assignedMechanicId = data.mechanic;
           originalMechanicId = data.mechanic;
-          currentExtraPayment = data.mechanic_extra_payment || 0;
-          currentPaymentOnQr = data.payment_on_qr || 0;
-
           customerMobile = data.customer_mobile || data.mobile || null;
 
-          if (customerMobile) {
-            waitForMixpanel(() => identifyMixpanelUser(customerMobile));
-          }
+          if (customerMobile) waitForMixpanel(() => identifyMixpanelUser(customerMobile));
 
           const searchBtn = document.getElementById("searchMechanicBtn");
           if (searchBtn && data.location) searchBtn.style.display = "block";
@@ -566,13 +549,13 @@
           const priceStr = (data.price || "").toString().toLowerCase();
           const isAlreadyMember = priceStr.includes("annual membership") || priceStr.includes("membership");
           const membershipSection = document.querySelector(".membership-toggle-container");
-          if (membershipSection) {
-            membershipSection.style.display = isAlreadyMember ? "none" : "flex";
-          }
+          if (membershipSection) membershipSection.style.display = isAlreadyMember ? "none" : "flex";
 
-          // Reset mechanic input before fetching so dropdown re-populates cleanly
+          // Reset mechanic input then fetch mechanics
           userChangedMechanic = false;
           document.getElementById("mechanicInput").value = "";
+          document.getElementById("mechanicDropdown").style.display = "none";
+
           fetchMechanics();
           fetchChat();
         })
@@ -591,8 +574,7 @@
                 <span><strong>Security Amount:</strong> ₹${data.advance_payment_amount}</span>
               </div>
               <small style="color: #ff6b6b;">Cannot update security amount - payment is partially paid</small>
-            </div>
-          `;
+            </div>`;
         } else {
           return `
             <div class="security-amount-container">
@@ -601,8 +583,7 @@
                 <button class="security-amount-button" onclick="updateSecurityAmount()">Set to ₹100</button>
               </div>
               <small style="color: #666;">Click button to update security amount to ₹100</small>
-            </div>
-          `;
+            </div>`;
         }
       }
       return '';
@@ -616,26 +597,21 @@
         body: JSON.stringify({ agent: agentName, advance_payment_amount: 100 })
       })
         .then(res => res.json())
-        .then(data => {
+        .then(() => {
           if (customerMobile) {
             waitForMixpanel(() => {
               identifyMixpanelUser(customerMobile);
               trackMixpanelEvent("Booking Security Changed", {
-                "agent_name": agentName,
-                "booking_id": bookingId,
-                "new_security_amount": 100,
-                "customer_mobile": customerMobile,
-                "timestamp": new Date().toISOString()
+                agent_name: agentName, booking_id: bookingId,
+                new_security_amount: 100, customer_mobile: customerMobile,
+                timestamp: new Date().toISOString()
               });
             });
           }
           alert("Security amount updated to ₹100 successfully.");
           fetchBooking();
         })
-        .catch(error => {
-          console.error('Error updating security amount:', error);
-          alert("Error updating security amount: " + error.message);
-        });
+        .catch(error => alert("Error updating security amount: " + error.message));
     }
 
     function fetchMechanics() {
@@ -643,92 +619,28 @@
         .then(res => res.json())
         .then(data => {
           mechanicList = data;
-          // Pre-fill mechanic input with assigned mechanic name
+
+          // Pre-fill input with assigned mechanic name once list is loaded
           if (assignedMechanicId) {
             const assigned = mechanicList.find(m => m.id === assignedMechanicId);
             if (assigned) {
               document.getElementById("mechanicInput").value = `${assigned.name} - ${assigned.mobile} - ${assigned.city}`;
             }
           }
+
+          // If user was typing while list was loading, re-render with now-available data
+          const inputEl = document.getElementById("mechanicInput");
+          if (document.activeElement === inputEl && inputEl.value.trim()) {
+            renderDropdown(getFilteredList());
+          }
         })
         .catch(error => console.error('Error fetching mechanics:', error));
     }
 
-    // ── Mechanic dropdown rendering ──
-    function renderDropdown(list) {
-      const dropdown = document.getElementById("mechanicDropdown");
-      dropdown.innerHTML = "";
-
-      if (!list.length) {
-        dropdown.style.display = "none";
-        return;
-      }
-
-      list.forEach(m => {
-        const div = document.createElement("div");
-        div.textContent = `${m.name} - ${m.mobile} - ${m.city}`;
-        div.dataset.id = m.id;
-
-        if (m.id === assignedMechanicId) {
-          div.classList.add("selected");
-        }
-
-        // mousedown fires before blur so dropdown doesn't hide before selection
-        div.addEventListener("mousedown", function (e) {
-          e.preventDefault();
-          document.getElementById("mechanicInput").value = div.textContent;
-          assignedMechanicId = m.id;
-          userChangedMechanic = true;
-          dropdown.style.display = "none";
-        });
-
-        dropdown.appendChild(div);
-      });
-
-      dropdown.style.display = "block";
-    }
-
-    // ── Input: filter on type ──
-    document.getElementById("mechanicInput").addEventListener("input", function () {
-      const query = this.value.toLowerCase().trim();
-
-      if (this.value === "") {
-        assignedMechanicId = null;
-        userChangedMechanic = true;
-      }
-
-      const filtered = query === ""
-        ? mechanicList
-        : mechanicList.filter(m =>
-            m.name.toLowerCase().includes(query) || m.mobile.includes(query)
-          );
-
-      renderDropdown(filtered);
-    });
-
-    // ── Focus: show full list (or filtered if text already present) ──
-    document.getElementById("mechanicInput").addEventListener("focus", function () {
-      const query = this.value.toLowerCase().trim();
-      const filtered = query === ""
-        ? mechanicList
-        : mechanicList.filter(m =>
-            m.name.toLowerCase().includes(query) || m.mobile.includes(query)
-          );
-      renderDropdown(filtered);
-    });
-
-    // ── Click outside: hide dropdown ──
-    document.addEventListener("click", function (event) {
-      const container = document.querySelector(".select-container");
-      if (container && !container.contains(event.target)) {
-        document.getElementById("mechanicDropdown").style.display = "none";
-      }
-    });
-
-    function getMechanicNameById(mechanicId) {
-      if (!mechanicId) return null;
-      const mechanic = mechanicList.find(m => m.id === mechanicId);
-      return mechanic ? mechanic.name : `Unknown Mechanic (ID: ${mechanicId})`;
+    function getMechanicNameById(id) {
+      if (!id) return null;
+      const m = mechanicList.find(m => m.id === id);
+      return m ? m.name : `Unknown (ID: ${id})`;
     }
 
     function updateBooking() {
@@ -768,51 +680,42 @@
         body: JSON.stringify(updateData)
       })
         .then(res => res.json())
-        .then(data => {
+        .then(() => {
           if (customerMobile) {
             waitForMixpanel(() => {
               identifyMixpanelUser(customerMobile);
 
               if (assignedMechanicId && !originalMechanicId) {
                 trackMixpanelEvent("Mechanic Assigned", {
-                  "agent_name": agentName,
-                  "booking_id": bookingId,
-                  "mechanic_name": getMechanicNameById(assignedMechanicId),
-                  "mechanic_id": assignedMechanicId,
-                  "customer_mobile": customerMobile,
-                  "timestamp": new Date().toISOString()
+                  agent_name: agentName, booking_id: bookingId,
+                  mechanic_name: getMechanicNameById(assignedMechanicId),
+                  mechanic_id: assignedMechanicId, customer_mobile: customerMobile,
+                  timestamp: new Date().toISOString()
                 });
               }
 
               if (assignedMechanicId && originalMechanicId && assignedMechanicId !== originalMechanicId) {
                 trackMixpanelEvent("Mechanic Reassigned", {
-                  "agent_name": agentName,
-                  "booking_id": bookingId,
-                  "old_mechanic_name": getMechanicNameById(originalMechanicId),
-                  "new_mechanic_name": getMechanicNameById(assignedMechanicId),
-                  "old_mechanic_id": originalMechanicId,
-                  "new_mechanic_id": assignedMechanicId,
-                  "customer_mobile": customerMobile,
-                  "timestamp": new Date().toISOString()
+                  agent_name: agentName, booking_id: bookingId,
+                  old_mechanic_name: getMechanicNameById(originalMechanicId),
+                  new_mechanic_name: getMechanicNameById(assignedMechanicId),
+                  old_mechanic_id: originalMechanicId, new_mechanic_id: assignedMechanicId,
+                  customer_mobile: customerMobile, timestamp: new Date().toISOString()
                 });
               }
 
               if (isCancelled && (!bookingData || !bookingData.is_cancelled)) {
                 trackMixpanelEvent("Booking Cancelled", {
-                  "agent_name": agentName,
-                  "booking_id": bookingId,
-                  "cancellation_reason": cancelReason || "No reason provided",
-                  "customer_mobile": customerMobile,
-                  "timestamp": new Date().toISOString()
+                  agent_name: agentName, booking_id: bookingId,
+                  cancellation_reason: cancelReason || "No reason provided",
+                  customer_mobile: customerMobile, timestamp: new Date().toISOString()
                 });
               }
 
               if (upgradeMembership) {
                 trackMixpanelEvent("Agent Converted to Member", {
-                  "agent_name": agentName,
-                  "booking_id": bookingId,
-                  "customer_mobile": customerMobile,
-                  "timestamp": new Date().toISOString()
+                  agent_name: agentName, booking_id: bookingId,
+                  customer_mobile: customerMobile, timestamp: new Date().toISOString()
                 });
               }
             });
@@ -822,10 +725,37 @@
           userChangedMechanic = false;
           fetchBooking();
         })
-        .catch(error => {
-          console.error('Error updating booking:', error);
-          alert("Error updating booking: " + error.message);
-        });
+        .catch(error => alert("Error updating booking: " + error.message));
+    }
+
+    function searchMechanic() {
+      if (!bookingData || !bookingData.location) { alert("No location data available"); return; }
+      const location = bookingData.location;
+      let searchUrl = "https://instantmechanic.online/mechanic-search.html?q=";
+      try {
+        if (location.includes("google.com/maps")) {
+          const coordMatch = location.match(/q=([0-9.-]+),([0-9.-]+)/);
+          searchUrl += coordMatch ? `${coordMatch[1]},${coordMatch[2]}` : encodeURIComponent(location);
+        } else if (location.includes("instantmechanic.online") && location.includes("q=")) {
+          const queryMatch = location.match(/q=([^&]*)/);
+          searchUrl += queryMatch ? queryMatch[1] : encodeURIComponent(location);
+        } else {
+          searchUrl += encodeURIComponent(location);
+        }
+        window.open(searchUrl, "_blank");
+        if (customerMobile) {
+          waitForMixpanel(() => {
+            identifyMixpanelUser(customerMobile);
+            trackMixpanelEvent("Mechanic Search Initiated", {
+              agent_name: localStorage.getItem("agent_name"), booking_id: bookingId,
+              search_location: location, search_url: searchUrl,
+              customer_mobile: customerMobile, timestamp: new Date().toISOString()
+            });
+          });
+        }
+      } catch (error) {
+        window.open("https://instantmechanic.online/mechanic-search.html?q=" + encodeURIComponent(location), "_blank");
+      }
     }
 
     function fetchChat() {
@@ -836,19 +766,15 @@
             const messages = res.data[0]?.chats || [];
             const chatContainer = document.getElementById("chatMessages");
             chatContainer.innerHTML = "";
-
             messages.forEach(msg => {
               const div = document.createElement("div");
               div.classList.add("chat-wrapper");
-
               const bubble = document.createElement("div");
               bubble.classList.add("chat-bubble", msg.is_from_customer ? "chat-customer" : "chat-agent");
               bubble.textContent = msg.message;
-
               const time = document.createElement("div");
               time.classList.add("chat-time");
               time.textContent = new Date(msg.timestamp).toLocaleString();
-
               div.appendChild(bubble);
               div.appendChild(time);
               chatContainer.appendChild(div);
