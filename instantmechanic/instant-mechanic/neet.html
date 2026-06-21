@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Motion Live Answer Key</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}body{font-family:Arial,sans-serif;background:linear-gradient(135deg,#0f172a,#1e293b);color:#fff}
+.hero{max-width:1200px;margin:30px auto;padding:30px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:24px;backdrop-filter:blur(12px);text-align:center}
+.badge{display:inline-block;background:#f59e0b;color:#111;padding:8px 18px;border-radius:30px;font-weight:bold}
+.hero h1{margin:15px 0;font-size:42px}
+.hero p{color:#cbd5e1}
+.people{display:flex;justify-content:center;gap:20px;flex-wrap:wrap;margin-top:25px}
+.person{width:250px;padding:22px;background:rgba(255,255,255,.07);border-radius:18px;transition:.3s}
+.person:hover{transform:translateY(-8px);background:rgba(255,255,255,.12)}
+.person .icon{font-size:46px}
+.person h2{margin:10px 0}
+.header{position:sticky;top:0;background:#111827ee;padding:18px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+select,input,button{padding:12px;border:none;border-radius:10px}
+button{background:#2563eb;color:#fff;cursor:pointer}
+.stats{display:flex;gap:15px;padding:15px;flex-wrap:wrap}
+.stat{background:#1e293b;padding:15px;border-radius:12px;min-width:150px}
+#grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:12px;padding:18px}
+.card{background:#1e293b;padding:15px;border-radius:14px;text-align:center;border:2px solid transparent;transition:.3s}
+.card:hover{transform:translateY(-4px)}
+.card.updated{animation:flash 2s}
+.q{color:#94a3b8;font-size:13px}.a{font-size:34px;color:#22c55e;font-weight:bold}
+@keyframes flash{0%{background:#14532d}100%{background:#1e293b}}
+</style></head>
+<body>
+
+<div class="hero">
+<div class="badge">🏆 Special Appreciation</div>
+<h1>Motion Live Answer Key Dashboard</h1>
+<p>This dashboard has been specially crafted with gratitude and appreciation.</p>
+<div class="people">
+<div class="person"><div class="icon">🌟</div><h2>Lalita</h2><p>Thank you for your dedication, support and continuous encouragement.</p></div>
+<div class="person"><div class="icon">🚀</div><h2>Mukesh</h2><p>Your guidance, trust and commitment made this possible.</p></div>
+<div class="person"><div class="icon">💎</div><h2>Harish</h2><p>Your hard work and contribution are truly appreciated.</p></div>
+</div>
+<p style="margin-top:20px;color:#fbbf24;font-size:18px">❤️ Dedicated with respect and gratitude to Lalita, Mukesh & Harish ❤️</p>
+</div>
+
+<div class="header">
+<select id="code"></select>
+<input id="search" placeholder="Search Question">
+<button onclick="loadData()">🔄 Refresh Now</button>
+<div style="margin-left:auto">🟢 LIVE | Last Update: <span id="last">-</span> | Refresh in <span id="count">10</span>s</div>
+</div>
+
+<div class="stats">
+<div class="stat">Questions<br><b id="total">0</b></div>
+<div class="stat">Auto Refresh<br><b>10 Seconds</b></div>
+</div>
+
+<div id="grid"></div>
+
+<script>
+const API="https://cdn.motion.ac.in/motion-data-backup/data.json";
+let data={},prev={},t=10;
+async function loadData(){
+ try{
+  const r=await fetch(API+"?t="+Date.now());
+  data=await r.json();
+  const sel=document.getElementById("code");
+  if(sel.options.length===0){
+    Object.keys(data.data).forEach(c=>sel.add(new Option(c,c)));
+    sel.onchange=render;
+  }
+  document.getElementById("last").textContent=new Date().toLocaleTimeString();
+  render();
+ }catch(e){console.log(e);}
+}
+function render(){
+ const code=document.getElementById("code").value;
+ const list=data.data[code]||[];
+ const q=document.getElementById("search").value.trim();
+ document.getElementById("total").textContent=list.length;
+ const grid=document.getElementById("grid");grid.innerHTML="";
+ list.filter(i=>!q||i.question.includes(q)).sort((a,b)=>a.question-b.question).forEach(i=>{
+   const k=code+"-"+i.question;
+   const d=document.createElement("div");
+   d.className="card";
+   if(prev[k]&&prev[k]!=i.option)d.classList.add("updated");
+   prev[k]=i.option;
+   d.innerHTML="<div class='q'>Q"+i.question+"</div><div class='a'>"+i.option+"</div>";
+   grid.appendChild(d);
+ });
+}
+document.getElementById("search").oninput=render;
+setInterval(()=>{t--;if(t<=0){t=10;loadData();}document.getElementById("count").textContent=t;},1000);
+loadData();
+</script>
+</body></html>
