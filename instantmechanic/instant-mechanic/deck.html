@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -102,28 +101,39 @@ body{
 }
 </style>
 
-<!-- Mixpanel -->
+<!--
+  Mixpanel JS SDK — latest (v2.76+) loaded via CDN snippet.
+  record_sessions_percent is intentionally set to 0 here.
+  We call mixpanel.start_session_recording() manually AFTER
+  the investor identifies themselves, so the replay is tied
+  to a known identity from frame 1.
+-->
 <script type="text/javascript">
-(function(c,a){if(!a.__SV){var b=window;var d,h;window.mixpanel=a;a._i=[];a.init=function(b,d,g){
-function c(b,i){var a=i.split(".");
-if(a.length==2){b=b[a[0]];i=a[1]}
-b[i]=function(){b.push([i].concat(Array.prototype.slice.call(arguments,0)))}}
-var e=a;
-if(typeof g!=="undefined"){e=a[g]=[]}else{g="mixpanel"}
-e.people=e.people||[];
-var f='track track_pageview identify people.set people.increment'.split(' ');
-for(h=0;h<f.length;h++)c(e,f[h]);
-a._i.push([b,d,g])
-};
-a.__SV=1.2;
-b=document.createElement("script");
-b.async=true;
-b.src="https://cdn.mxpnl.com/libs/mixpanel-2-latest.min.js";
-d=document.getElementsByTagName("script")[0];
-d.parentNode.insertBefore(b,d);
-}})(document,window.mixpanel||[]);
+(function(f,b){if(!b.__SV){var e,g,i,h;window.mixpanel=b;b._i=[];b.init=function(e,f,c){function g(a,d){var b=d.split(".");2==b.length&&(a=a[b[0]],d=b[1]);a[d]=function(){a.push([d].concat(Array.prototype.slice.call(arguments,0)))}}var a=b;"undefined"!==typeof c?a=b[c]=[]:c="mixpanel";a.people=a.people||[];a.toString=function(a){var d="mixpanel";"mixpanel"!==c&&(d+="."+c);a||(d+=" (stub)");return d};a.people.toString=function(){return a.toString(1)+".people (stub)"};i="disable time_event track track_pageview track_links track_forms track_with_groups add_group set_group remove_group register register_once alias unregister identify name_tag set_config reset opt_in_tracking opt_out_tracking has_opted_in_tracking has_opted_out_tracking clear_opt_in_out_tracking start_batch_senders people.set people.set_once people.unset people.increment people.append people.union people.track_charge people.clear_charges people.delete_user people.remove start_session_recording stop_session_recording pause_session_recording resume_session_recording get_session_recording_properties get_session_replay_url".split(" ");
+for(h=0;h<i.length;h++)g(a,i[h]);var j="https://cdn.mxpnl.com/libs/mixpanel-2-latest.min.js";b._i.push([e,f,c]);if(!b.__SV){b.__SV=1.2;var k=f.createElement("script");k.type="text/javascript";k.async=!0;k.src=j;f=f.getElementsByTagName("script")[0];f.parentNode.insertBefore(k,f)}})(document,window.mixpanel||[]);
 
-mixpanel.init("afeb927e0d7ee7ddfa033985ab2fe603", { debug: false });
+mixpanel.init("afeb927e0d7ee7ddfa033985ab2fe603", {
+    debug: false,
+
+    // Session Replay — disabled at init, started manually post-identity
+    record_sessions_percent: 0,
+
+    // Once we start, record everything useful
+    record_console:      true,   // capture JS console logs/errors in replay
+    record_heatmap_data: true,   // rage clicks, dead clicks, heatmap data
+    record_network:      true,   // capture API calls timeline in replay
+    record_network_options: {
+        initiatorTypes: ["fetch", "xmlhttprequest"],
+        recordInitialRequests: true
+    },
+
+    // Privacy — mask everything by default (this is an investor page, not a public app)
+    record_mask_all_text:   false,   // we WANT to see what they're reading
+    record_mask_all_inputs: true,    // mask any inputs that appear
+
+    record_idle_timeout_ms: 900000,  // end replay after 15min idle
+    record_min_ms:          5000     // discard accidental sub-5s replays
+});
 </script>
 
 </head>
@@ -171,29 +181,24 @@ const investors = {
     "kalaari":     { emails: ["jayraj@kalaari.com","vamshi@kalaari.com"] }
 };
 
-const params       = new URLSearchParams(window.location.search);
-const vc           = (params.get("vc") || "").toLowerCase();
-const sessionStart = Date.now();
+const params        = new URLSearchParams(window.location.search);
+const vc            = (params.get("vc") || "").toLowerCase();
+const sessionStart  = Date.now();
 let   selectedEmail = "";
 
-// Scroll depth tracking state
-let maxScrollPct      = 0;
-let scrollMilestones  = {};
-
-// Attention / focus time tracking
+// Engagement state
 let focusStart        = Date.now();
 let totalFocusSeconds = 0;
 let isFocused         = !document.hidden;
-
-// Idle detection
+let maxScrollPct      = 0;
+let scrollMilestones  = {};
 let idleTimer;
-let lastActivity      = Date.now();
-const IDLE_THRESHOLD  = 30; // seconds
+const IDLE_THRESHOLD  = 30;
 
 document.getElementById("downloadBtn").href = PDF_URL;
 const data = investors[vc];
-document.getElementById("vcNameDisplay").innerText  = vc ? vc.toUpperCase() + " Team" : "Investor Deck";
-document.getElementById("welcomeTitle").innerText   = vc ? `Welcome ${vc.toUpperCase()} Team` : "Welcome";
+document.getElementById("vcNameDisplay").innerText = vc ? vc.toUpperCase() + " Team" : "Investor Deck";
+document.getElementById("welcomeTitle").innerText  = vc ? `Welcome ${vc.toUpperCase()} Team` : "Welcome";
 
 // Build identity options
 const optionsContainer = document.getElementById("investorOptions");
@@ -218,13 +223,11 @@ function continueOther() {
     startViewing(email);
 }
 
-// ─── Core: identify + open deck ───────────────────────────────────────────────
+// ─── Core: identify → start replay → open deck ────────────────────────────────
 function startViewing(email) {
     selectedEmail = email;
 
-    document.getElementById("investorModal").style.display = "none";
-    document.getElementById("pdfViewer").src = PDF_URL;
-
+    // 1. Identify the user BEFORE starting replay so the recording is attributed
     mixpanel.identify(email);
     mixpanel.people.set({
         "$email":    email,
@@ -232,33 +235,44 @@ function startViewing(email) {
         "first_seen": new Date().toISOString()
     });
 
+    // 2. Start Session Replay — now every click/scroll/hover is captured
+    mixpanel.start_session_recording();
+
+    // 3. Show the deck
+    document.getElementById("investorModal").style.display = "none";
+    document.getElementById("pdfViewer").src = PDF_URL;
+
+    // 4. Track the open event (this gets the $mp_replay_id attached automatically)
     track("Deck Opened", {
-        referrer:    document.referrer || "direct",
-        utm_source:  params.get("utm_source") || null,
-        utm_medium:  params.get("utm_medium") || null,
-        utm_campaign:params.get("utm_campaign") || null,
-        device_type: /Mobi|Android/i.test(navigator.userAgent) ? "mobile" : "desktop",
-        screen_res:  `${screen.width}x${screen.height}`,
-        timezone:    Intl.DateTimeFormat().resolvedOptions().timeZone
+        referrer:     document.referrer || "direct",
+        utm_source:   params.get("utm_source")  || null,
+        utm_medium:   params.get("utm_medium")  || null,
+        utm_campaign: params.get("utm_campaign")|| null,
+        device_type:  /Mobi|Android/i.test(navigator.userAgent) ? "mobile" : "desktop",
+        screen_res:   `${screen.width}x${screen.height}`,
+        timezone:     Intl.DateTimeFormat().resolvedOptions().timeZone,
+        replay_url:   mixpanel.get_session_replay_url() || null
     });
 
     startEngagementTracking();
-    startScrollTracking();
     startIdleDetection();
     startHeartbeat();
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function track(event, props = {}) {
-    const base = { email: selectedEmail, vc: vc };
-    mixpanel.track(event, Object.assign(base, props));
+    mixpanel.track(event, Object.assign({ email: selectedEmail, vc: vc }, props));
 }
 
 function secondsInSession() {
     return Math.round((Date.now() - sessionStart) / 1000);
 }
 
-// ─── Focus / attention time ───────────────────────────────────────────────────
+function currentFocusSeconds() {
+    return totalFocusSeconds + (isFocused ? Math.round((Date.now() - focusStart) / 1000) : 0);
+}
+
+// ─── Focus / attention time + visibility ─────────────────────────────────────
 function startEngagementTracking() {
     document.addEventListener("visibilitychange", () => {
         if (document.hidden) {
@@ -266,10 +280,15 @@ function startEngagementTracking() {
                 totalFocusSeconds += Math.round((Date.now() - focusStart) / 1000);
                 isFocused = false;
             }
-            track("Tab Hidden", { time_in_session_s: secondsInSession(), total_focus_s: totalFocusSeconds });
+            mixpanel.pause_session_recording();
+            track("Tab Hidden", {
+                time_in_session_s: secondsInSession(),
+                total_focus_s:     totalFocusSeconds
+            });
         } else {
             focusStart = Date.now();
             isFocused  = true;
+            mixpanel.resume_session_recording();
             track("Tab Visible", { time_in_session_s: secondsInSession() });
         }
     });
@@ -282,49 +301,32 @@ function startEngagementTracking() {
     });
 }
 
-// ─── Scroll depth (on the page, not inside the PDF) ───────────────────────────
-function startScrollTracking() {
-    window.addEventListener("scroll", () => {
-        const scrolled = window.scrollY + window.innerHeight;
-        const total    = document.documentElement.scrollHeight;
-        const pct      = Math.round((scrolled / total) * 100);
-
-        if (pct > maxScrollPct) maxScrollPct = pct;
-
-        [25, 50, 75, 100].forEach(milestone => {
-            if (pct >= milestone && !scrollMilestones[milestone]) {
-                scrollMilestones[milestone] = true;
-                track("Scroll Depth Reached", { depth_pct: milestone, time_in_session_s: secondsInSession() });
-            }
-        });
-    });
-}
-
 // ─── Idle detection ───────────────────────────────────────────────────────────
 function startIdleDetection() {
     function resetIdle() {
-        lastActivity = Date.now();
         clearTimeout(idleTimer);
         idleTimer = setTimeout(() => {
-            track("User Idle", { idle_after_s: IDLE_THRESHOLD, time_in_session_s: secondsInSession() });
+            track("User Idle", {
+                idle_after_s:      IDLE_THRESHOLD,
+                time_in_session_s: secondsInSession(),
+                replay_url:        mixpanel.get_session_replay_url() || null
+            });
         }, IDLE_THRESHOLD * 1000);
     }
     ["mousemove", "keydown", "click", "touchstart"].forEach(e => window.addEventListener(e, resetIdle));
     resetIdle();
 }
 
-// ─── Heartbeat — proof of sustained engagement ────────────────────────────────
+// ─── Heartbeat ────────────────────────────────────────────────────────────────
 function startHeartbeat() {
-    const intervals = [30, 60, 120, 180, 300]; // seconds
-    intervals.forEach(sec => {
+    [30, 60, 120, 180, 300].forEach(sec => {
         setTimeout(() => {
-            if (selectedEmail) {
-                track("Engagement Heartbeat", {
-                    elapsed_s:     sec,
-                    total_focus_s: totalFocusSeconds + (isFocused ? Math.round((Date.now() - focusStart) / 1000) : 0),
-                    max_scroll_pct: maxScrollPct
-                });
-            }
+            if (!selectedEmail) return;
+            track("Engagement Heartbeat", {
+                elapsed_s:      sec,
+                total_focus_s:  currentFocusSeconds(),
+                replay_url:     mixpanel.get_session_replay_url() || null
+            });
         }, sec * 1000);
     });
 }
@@ -344,30 +346,33 @@ document.addEventListener("fullscreenchange", () => {
 
 // ─── Download ─────────────────────────────────────────────────────────────────
 document.getElementById("downloadBtn").addEventListener("click", () => {
-    track("Deck Downloaded", { time_in_session_s: secondsInSession() });
+    track("Deck Downloaded", {
+        time_in_session_s: secondsInSession(),
+        replay_url:        mixpanel.get_session_replay_url() || null
+    });
     mixpanel.people.increment("download_count");
 });
 
-// ─── Copy / Print detection ───────────────────────────────────────────────────
+// ─── Copy / Print ─────────────────────────────────────────────────────────────
 document.addEventListener("copy", () => track("Text Copied", { time_in_session_s: secondsInSession() }));
 window.addEventListener("beforeprint", () => track("Print Attempted", { time_in_session_s: secondsInSession() }));
 
 // ─── Session end ──────────────────────────────────────────────────────────────
 window.addEventListener("beforeunload", () => {
     if (!selectedEmail) return;
-    if (isFocused) totalFocusSeconds += Math.round((Date.now() - focusStart) / 1000);
     const total_s = secondsInSession();
     track("Session Ended", {
-        duration_s:      total_s,
-        total_focus_s:   totalFocusSeconds,
-        max_scroll_pct:  maxScrollPct,
-        engaged:         total_s >= 60 ? true : false
+        duration_s:     total_s,
+        total_focus_s:  currentFocusSeconds(),
+        engaged:        total_s >= 60,
+        replay_url:     mixpanel.get_session_replay_url() || null
     });
     mixpanel.people.set({
-        "last_session_s":    total_s,
-        "last_seen":         new Date().toISOString()
+        "last_session_s": total_s,
+        "last_seen":      new Date().toISOString()
     });
     mixpanel.people.increment("session_count");
+    mixpanel.stop_session_recording();
 });
 
 </script>
