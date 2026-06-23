@@ -4,369 +4,214 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Instant Mechanic Investor Deck</title>
-
 <style>
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:Inter,Arial,sans-serif;
-}
-body{
-    background:#f5f7fb;
-}
-.header{
-    background:white;
-    border-bottom:1px solid #e5e7eb;
-    padding:18px 30px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-}
-.logo{
-    font-size:24px;
-    font-weight:700;
-}
-.sub{
-    color:#666;
-    font-size:14px;
-}
-.actions{
-    display:flex;
-    gap:10px;
-}
-.btn{
-    background:#111827;
-    color:white;
-    border:none;
-    padding:10px 18px;
-    border-radius:8px;
-    cursor:pointer;
-    text-decoration:none;
-}
-.btn:hover{
-    opacity:.9;
-}
-.viewer{
-    width:100%;
-    height:calc(100vh - 64px);
-}
-.viewer iframe{
-    width:100%;
-    height:100%;
-    border:none;
-}
-.modal{
-    position:fixed;
-    inset:0;
-    background:rgba(0,0,0,.55);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    z-index:999;
-}
-.modal-card{
-    background:white;
-    width:500px;
-    max-width:95%;
-    border-radius:16px;
-    padding:25px;
-}
-.modal-card h2{
-    margin-bottom:8px;
-}
-.modal-card p{
-    color:#666;
-    margin-bottom:20px;
-}
-.option{
-    border:1px solid #ddd;
-    padding:14px;
-    border-radius:10px;
-    margin-bottom:10px;
-    cursor:pointer;
-}
-.option:hover{
-    background:#f8fafc;
-}
-#otherEmail{
-    width:100%;
-    padding:12px;
-    border:1px solid #ddd;
-    border-radius:8px;
-    margin-top:10px;
-}
-#otherContainer{
-    display:none;
-}
+*{margin:0;padding:0;box-sizing:border-box;font-family:Inter,Arial,sans-serif;}
+body{background:#f5f7fb;}
+.header{background:white;border-bottom:1px solid #e5e7eb;padding:18px 30px;display:flex;justify-content:space-between;align-items:center;}
+.logo{font-size:24px;font-weight:700;}
+.sub{color:#666;font-size:14px;}
+.actions{display:flex;gap:10px;}
+.btn{background:#111827;color:white;border:none;padding:10px 18px;border-radius:8px;cursor:pointer;text-decoration:none;}
+.btn:hover{opacity:.9;}
+.viewer{width:100%;height:calc(100vh - 64px);}
+.viewer iframe{width:100%;height:100%;border:none;}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;z-index:999;}
+.modal-card{background:white;width:500px;max-width:95%;border-radius:16px;padding:25px;}
+.modal-card h2{margin-bottom:8px;}
+.modal-card p{color:#666;margin-bottom:20px;}
+.option{border:1px solid #ddd;padding:14px;border-radius:10px;margin-bottom:10px;cursor:pointer;}
+.option:hover{background:#f8fafc;}
+#otherEmail{width:100%;padding:12px;border:1px solid #ddd;border-radius:8px;margin-top:10px;}
+#otherContainer{display:none;}
 </style>
-
-<!-- Mixpanel SDK — full snippet with replay methods -->
 <script type="text/javascript">
-(function(f,b){if(!b.__SV){var e,g,i,h;window.mixpanel=b;b._i=[];b.init=function(e,f,c){function g(a,d){var b=d.split(".");2==b.length&&(a=a[b[0]],d=b[1]);a[d]=function(){a.push([d].concat(Array.prototype.slice.call(arguments,0)))}}var a=b;"undefined"!==typeof c?a=b[c]=[]:c="mixpanel";a.people=a.people||[];a.toString=function(a){var d="mixpanel";"mixpanel"!==c&&(d+="."+c);a||(d+=" (stub)");return d};a.people.toString=function(){return a.toString(1)+".people (stub)"};i="disable time_event track track_pageview track_links track_forms track_with_groups add_group set_group remove_group register register_once alias unregister identify name_tag set_config reset opt_in_tracking opt_out_tracking has_opted_in_tracking has_opted_out_tracking clear_opt_in_out_tracking start_batch_senders people.set people.set_once people.unset people.increment people.append people.union people.track_charge people.clear_charges people.delete_user people.remove start_session_recording stop_session_recording pause_session_recording resume_session_recording get_session_recording_properties get_session_replay_url".split(" ");
-for(h=0;h<i.length;h++)g(a,i[h]);var j="https://cdn.mxpnl.com/libs/mixpanel-2-latest.min.js";b._i.push([e,f,c]);if(!b.__SV){b.__SV=1.2;var k=f.createElement("script");k.type="text/javascript";k.async=!0;k.src=j;f=f.getElementsByTagName("script")[0];f.parentNode.insertBefore(k,f)}})(document,window.mixpanel||[]);
-
-mixpanel.init("afeb927e0d7ee7ddfa033985ab2fe603", {
-    debug: false,
-    record_sessions_percent: 0,      // manual start only — after identity
-    record_console:          true,
-    record_heatmap_data:     true,
-    record_network:          true,
-    record_network_options: {
-        initiatorTypes:        ["fetch", "xmlhttprequest"],
-        recordInitialRequests: true
-    },
-    record_mask_all_text:   false,
-    record_mask_all_inputs: true,
-    record_idle_timeout_ms: 900000,
-    record_min_ms:          5000
+(function(c,a){if(!a.__SV){var b=window;var d,h;window.mixpanel=a;a._i=[];a.init=function(b,d,g){function c(b,i){var a=i.split(".");if(a.length==2){b=b[a[0]];i=a[1]}b[i]=function(){b.push([i].concat(Array.prototype.slice.call(arguments,0)))}}var e=a;if(typeof g!=="undefined"){e=a[g]=[]}else{g="mixpanel"}e.people=e.people||[];var f="disable time_event track track_pageview track_links track_forms track_with_groups add_group set_group remove_group register register_once alias unregister identify name_tag set_config reset opt_in_tracking opt_out_tracking has_opted_in_tracking has_opted_out_tracking clear_opt_in_out_tracking start_batch_senders people.set people.set_once people.unset people.increment people.append people.union people.track_charge people.clear_charges people.delete_user people.remove start_session_recording stop_session_recording pause_session_recording resume_session_recording get_session_recording_properties get_session_replay_url".split(" ");for(h=0;h<f.length;h++)c(e,f[h]);a._i.push([b,d,g])};a.__SV=1.2;b=document.createElement("script");b.type="text/javascript";b.async=true;b.src="https://cdn.mxpnl.com/libs/mixpanel-2-latest.min.js";d=document.getElementsByTagName("script")[0];d.parentNode.insertBefore(b,d)}})(document,window.mixpanel||[]);
+mixpanel.init("afeb927e0d7ee7ddfa033985ab2fe603",{
+  debug:false,
+  record_sessions_percent:0,
+  record_console:true,
+  record_heatmap_data:true,
+  record_network:true,
+  record_network_options:{initiatorTypes:["fetch","xmlhttprequest"],recordInitialRequests:true},
+  record_mask_all_text:false,
+  record_mask_all_inputs:true,
+  record_idle_timeout_ms:900000,
+  record_min_ms:5000
 });
 </script>
-
 </head>
 <body>
 
 <div id="investorModal" class="modal">
-    <div class="modal-card">
-        <h2 id="welcomeTitle">Welcome</h2>
-        <p>Please identify yourself before viewing the deck.</p>
-        <div id="investorOptions"></div>
-        <div id="otherContainer">
-            <input id="otherEmail" placeholder="Enter your email">
-            <button class="btn" style="margin-top:10px;width:100%;" onclick="continueOther()">Continue</button>
-        </div>
+  <div class="modal-card">
+    <h2 id="welcomeTitle">Welcome</h2>
+    <p>Please identify yourself before viewing the deck.</p>
+    <div id="investorOptions"></div>
+    <div id="otherContainer">
+      <input id="otherEmail" placeholder="Enter your email">
+      <button class="btn" style="margin-top:10px;width:100%;" onclick="continueOther()">Continue</button>
     </div>
+  </div>
 </div>
 
 <div class="header">
-    <div>
-        <div class="logo">Instant Mechanic</div>
-        <div class="sub" id="vcNameDisplay">Investor Deck</div>
-    </div>
-    <div class="actions">
-        <a class="btn" id="downloadBtn" target="_blank">Download Deck</a>
-        <button class="btn" onclick="openFullscreen()">Fullscreen</button>
-    </div>
+  <div>
+    <div class="logo">Instant Mechanic</div>
+    <div class="sub" id="vcNameDisplay">Investor Deck</div>
+  </div>
+  <div class="actions">
+    <a class="btn" id="downloadBtn" target="_blank">Download Deck</a>
+    <button class="btn" onclick="openFullscreen()">Fullscreen</button>
+  </div>
 </div>
 
 <div class="viewer" id="viewerContainer">
-    <iframe id="pdfViewer"></iframe>
+  <iframe id="pdfViewer"></iframe>
 </div>
 
 <script>
+var PDF_URL = "https://customers-car-image.s3.ap-south-1.amazonaws.com/car-images/78adbc25-0d15-4e1f-9d8a-af4b083c7a66.pdf";
 
-const PDF_URL = "https://customers-car-image.s3.ap-south-1.amazonaws.com/car-images/78adbc25-0d15-4e1f-9d8a-af4b083c7a66.pdf";
-
-const investors = {
-    "accel":       { emails: ["mahendran@accel.com","nnandan@accel.com"] },
-    "100x.vc":     { emails: ["sanjay@100x.vc","vatsal@100x.vc"] },
-    "antler":      { emails: ["rajiv@antler.co","bhavna.suresh@antler.co"] },
-    "peakxv":      { emails: ["amohan@peakxv.com","rajan@peakxv.com"] },
-    "blume":       { emails: ["arpit@blume.vc","karthik@blume.vc"] },
-    "kae-capital": { emails: ["nisha@kae-capital.com","sunitha@kae-capital.com"] },
-    "z47":         { emails: ["rajat@z47.com","tarun@z47.com"] },
-    "kalaari":     { emails: ["jayraj@kalaari.com","vamshi@kalaari.com"] }
+var investors = {
+  "accel":       {emails:["mahendran@accel.com","nnandan@accel.com"]},
+  "100x.vc":     {emails:["sanjay@100x.vc","vatsal@100x.vc"]},
+  "antler":      {emails:["rajiv@antler.co","bhavna.suresh@antler.co"]},
+  "peakxv":      {emails:["amohan@peakxv.com","rajan@peakxv.com"]},
+  "blume":       {emails:["arpit@blume.vc","karthik@blume.vc"]},
+  "kae-capital": {emails:["nisha@kae-capital.com","sunitha@kae-capital.com"]},
+  "z47":         {emails:["rajat@z47.com","tarun@z47.com"]},
+  "kalaari":     {emails:["jayraj@kalaari.com","vamshi@kalaari.com"]}
 };
 
-const params        = new URLSearchParams(window.location.search);
-const vc            = (params.get("vc") || "").toLowerCase();
-const sessionStart  = Date.now();
-let   selectedEmail = "";
-
-// Engagement state
-let focusStart        = Date.now();
-let totalFocusSeconds = 0;
-let isFocused         = !document.hidden;
-let idleTimer;
-const IDLE_THRESHOLD  = 30;
+var params       = new URLSearchParams(window.location.search);
+var vc           = (params.get("vc") || "").toLowerCase();
+var sessionStart = Date.now();
+var selectedEmail = "";
+var focusStart        = Date.now();
+var totalFocusSeconds = 0;
+var isFocused         = !document.hidden;
+var idleTimer;
+var IDLE_THRESHOLD = 30;
 
 document.getElementById("downloadBtn").href = PDF_URL;
-const data = investors[vc];
+var data = investors[vc];
 document.getElementById("vcNameDisplay").innerText = vc ? vc.toUpperCase() + " Team" : "Investor Deck";
 document.getElementById("welcomeTitle").innerText  = vc ? "Welcome " + vc.toUpperCase() + " Team" : "Welcome";
 
-// Build identity options
-const optionsContainer = document.getElementById("investorOptions");
-
+var optionsContainer = document.getElementById("investorOptions");
 if (data) {
-    data.emails.forEach(function(email) {
-        var div = document.createElement("div");
-        div.className = "option";
-        div.innerText = email;
-        div.onclick = function() { startViewing(email); };
-        optionsContainer.appendChild(div);
-    });
+  data.emails.forEach(function(email) {
+    var div = document.createElement("div");
+    div.className = "option";
+    div.innerText = email;
+    div.onclick = function() { startViewing(email); };
+    optionsContainer.appendChild(div);
+  });
 }
-
-// Other option
 var otherDiv = document.createElement("div");
 otherDiv.className = "option";
 otherDiv.innerText = "Other";
-otherDiv.onclick = function() {
-    document.getElementById("otherContainer").style.display = "block";
-};
+otherDiv.onclick = function() { document.getElementById("otherContainer").style.display = "block"; };
 optionsContainer.appendChild(otherDiv);
 
 function continueOther() {
-    var email = document.getElementById("otherEmail").value.trim();
-    if (!email) { alert("Please enter your email"); return; }
-    startViewing(email);
+  var email = document.getElementById("otherEmail").value.trim();
+  if (!email) { alert("Please enter your email"); return; }
+  startViewing(email);
 }
 
-// ─── Core: identify → start replay → open deck ────────────────────────────────
 function startViewing(email) {
-    selectedEmail = email;
-
-    // Identify first so replay is tied to known person
-    mixpanel.identify(email);
-    mixpanel.people.set({
-        "$email":     email,
-        "vc":         vc,
-        "first_seen": new Date().toISOString()
-    });
-
-    // Start Session Replay — after identify so it's attributed correctly
-    try { mixpanel.start_session_recording(); } catch(e) {}
-
-    // Hide modal and load PDF
-    document.getElementById("investorModal").style.display = "none";
-    document.getElementById("pdfViewer").src = PDF_URL;
-
-    // Track open (replay ID auto-attached by SDK via $mp_replay_id)
-    track("Deck Opened", {
-        referrer:     document.referrer || "direct",
-        utm_source:   params.get("utm_source")   || null,
-        utm_medium:   params.get("utm_medium")   || null,
-        utm_campaign: params.get("utm_campaign") || null,
-        device_type:  /Mobi|Android/i.test(navigator.userAgent) ? "mobile" : "desktop",
-        screen_res:   screen.width + "x" + screen.height,
-        timezone:     Intl.DateTimeFormat().resolvedOptions().timeZone
-    });
-
-    startEngagementTracking();
-    startIdleDetection();
-    startHeartbeat();
+  selectedEmail = email;
+  mixpanel.identify(email);
+  mixpanel.people.set({"$email":email,"vc":vc,"first_seen":new Date().toISOString()});
+  try { mixpanel.start_session_recording(); } catch(e) { console.log("replay start error", e); }
+  document.getElementById("investorModal").style.display = "none";
+  document.getElementById("pdfViewer").src = PDF_URL;
+  track("Deck Opened", {
+    referrer:     document.referrer || "direct",
+    utm_source:   params.get("utm_source")   || null,
+    utm_medium:   params.get("utm_medium")   || null,
+    utm_campaign: params.get("utm_campaign") || null,
+    device_type:  /Mobi|Android/i.test(navigator.userAgent) ? "mobile" : "desktop",
+    screen_res:   screen.width + "x" + screen.height,
+    timezone:     Intl.DateTimeFormat().resolvedOptions().timeZone
+  });
+  startEngagementTracking();
+  startIdleDetection();
+  startHeartbeat();
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
 function track(event, props) {
-    props = props || {};
-    props.email = selectedEmail;
-    props.vc    = vc;
-    mixpanel.track(event, props);
+  props = props || {};
+  props.email = selectedEmail;
+  props.vc = vc;
+  mixpanel.track(event, props);
 }
 
-function secondsInSession() {
-    return Math.round((Date.now() - sessionStart) / 1000);
-}
+function secondsInSession() { return Math.round((Date.now() - sessionStart) / 1000); }
+function currentFocusSeconds() { return totalFocusSeconds + (isFocused ? Math.round((Date.now() - focusStart) / 1000) : 0); }
+function safeReplayUrl() { try { return mixpanel.get_session_replay_url() || null; } catch(e) { return null; } }
 
-function currentFocusSeconds() {
-    return totalFocusSeconds + (isFocused ? Math.round((Date.now() - focusStart) / 1000) : 0);
-}
-
-function safeReplayUrl() {
-    try { return mixpanel.get_session_replay_url() || null; } catch(e) { return null; }
-}
-
-// ─── Focus / visibility ───────────────────────────────────────────────────────
 function startEngagementTracking() {
-    document.addEventListener("visibilitychange", function() {
-        if (document.hidden) {
-            if (isFocused) {
-                totalFocusSeconds += Math.round((Date.now() - focusStart) / 1000);
-                isFocused = false;
-            }
-            try { mixpanel.pause_session_recording(); } catch(e) {}
-            track("Tab Hidden", { time_in_session_s: secondsInSession(), total_focus_s: totalFocusSeconds });
-        } else {
-            focusStart = Date.now();
-            isFocused  = true;
-            try { mixpanel.resume_session_recording(); } catch(e) {}
-            track("Tab Visible", { time_in_session_s: secondsInSession() });
-        }
-    });
-}
-
-// ─── Idle detection ───────────────────────────────────────────────────────────
-function startIdleDetection() {
-    function resetIdle() {
-        clearTimeout(idleTimer);
-        idleTimer = setTimeout(function() {
-            track("User Idle", {
-                idle_after_s:      IDLE_THRESHOLD,
-                time_in_session_s: secondsInSession(),
-                replay_url:        safeReplayUrl()
-            });
-        }, IDLE_THRESHOLD * 1000);
+  document.addEventListener("visibilitychange", function() {
+    if (document.hidden) {
+      if (isFocused) { totalFocusSeconds += Math.round((Date.now() - focusStart) / 1000); isFocused = false; }
+      try { mixpanel.pause_session_recording(); } catch(e) {}
+      track("Tab Hidden", {time_in_session_s:secondsInSession(),total_focus_s:totalFocusSeconds});
+    } else {
+      focusStart = Date.now(); isFocused = true;
+      try { mixpanel.resume_session_recording(); } catch(e) {}
+      track("Tab Visible", {time_in_session_s:secondsInSession()});
     }
-    ["mousemove","keydown","click","touchstart"].forEach(function(e) {
-        window.addEventListener(e, resetIdle);
-    });
-    resetIdle();
+  });
 }
 
-// ─── Heartbeat ────────────────────────────────────────────────────────────────
+function startIdleDetection() {
+  function resetIdle() {
+    clearTimeout(idleTimer);
+    idleTimer = setTimeout(function() {
+      track("User Idle", {idle_after_s:IDLE_THRESHOLD,time_in_session_s:secondsInSession(),replay_url:safeReplayUrl()});
+    }, IDLE_THRESHOLD * 1000);
+  }
+  ["mousemove","keydown","click","touchstart"].forEach(function(e) { window.addEventListener(e, resetIdle); });
+  resetIdle();
+}
+
 function startHeartbeat() {
-    [30, 60, 120, 180, 300].forEach(function(sec) {
-        setTimeout(function() {
-            if (!selectedEmail) return;
-            track("Engagement Heartbeat", {
-                elapsed_s:     sec,
-                total_focus_s: currentFocusSeconds(),
-                replay_url:    safeReplayUrl()
-            });
-        }, sec * 1000);
-    });
+  [30,60,120,180,300].forEach(function(sec) {
+    setTimeout(function() {
+      if (!selectedEmail) return;
+      track("Engagement Heartbeat", {elapsed_s:sec,total_focus_s:currentFocusSeconds(),replay_url:safeReplayUrl()});
+    }, sec * 1000);
+  });
 }
 
-// ─── Fullscreen ───────────────────────────────────────────────────────────────
 function openFullscreen() {
-    track("Fullscreen Clicked", { time_in_session_s: secondsInSession() });
-    var elem = document.getElementById("viewerContainer");
-    if (elem.requestFullscreen) elem.requestFullscreen();
+  track("Fullscreen Clicked", {time_in_session_s:secondsInSession()});
+  var elem = document.getElementById("viewerContainer");
+  if (elem.requestFullscreen) elem.requestFullscreen();
 }
 
 document.addEventListener("fullscreenchange", function() {
-    track(document.fullscreenElement ? "Entered Fullscreen" : "Exited Fullscreen", {
-        time_in_session_s: secondsInSession()
-    });
+  track(document.fullscreenElement ? "Entered Fullscreen" : "Exited Fullscreen", {time_in_session_s:secondsInSession()});
 });
 
-// ─── Download ─────────────────────────────────────────────────────────────────
 document.getElementById("downloadBtn").addEventListener("click", function() {
-    track("Deck Downloaded", {
-        time_in_session_s: secondsInSession(),
-        replay_url:        safeReplayUrl()
-    });
-    mixpanel.people.increment("download_count");
+  track("Deck Downloaded", {time_in_session_s:secondsInSession(),replay_url:safeReplayUrl()});
+  mixpanel.people.increment("download_count");
 });
 
-// ─── Copy / Print ─────────────────────────────────────────────────────────────
-document.addEventListener("copy", function() {
-    track("Text Copied", { time_in_session_s: secondsInSession() });
-});
-window.addEventListener("beforeprint", function() {
-    track("Print Attempted", { time_in_session_s: secondsInSession() });
-});
+document.addEventListener("copy", function() { track("Text Copied", {time_in_session_s:secondsInSession()}); });
+window.addEventListener("beforeprint", function() { track("Print Attempted", {time_in_session_s:secondsInSession()}); });
 
-// ─── Session end ──────────────────────────────────────────────────────────────
 window.addEventListener("beforeunload", function() {
-    if (!selectedEmail) return;
-    var total_s = secondsInSession();
-    track("Session Ended", {
-        duration_s:    total_s,
-        total_focus_s: currentFocusSeconds(),
-        engaged:       total_s >= 60,
-        replay_url:    safeReplayUrl()
-    });
-    mixpanel.people.set({
-        "last_session_s": total_s,
-        "last_seen":      new Date().toISOString()
-    });
-    mixpanel.people.increment("session_count");
-    try { mixpanel.stop_session_recording(); } catch(e) {}
+  if (!selectedEmail) return;
+  var total_s = secondsInSession();
+  track("Session Ended", {duration_s:total_s,total_focus_s:currentFocusSeconds(),engaged:total_s>=60,replay_url:safeReplayUrl()});
+  mixpanel.people.set({"last_session_s":total_s,"last_seen":new Date().toISOString()});
+  mixpanel.people.increment("session_count");
+  try { mixpanel.stop_session_recording(); } catch(e) {}
 });
-
 </script>
 </body>
 </html>
