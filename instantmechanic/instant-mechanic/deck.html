@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Instant Mechanic Investor Deck</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Inter,Arial,sans-serif;
+}
+body{
+    background:#f5f7fb;
+}
+.header{
+    background:white;
+    border-bottom:1px solid #e5e7eb;
+    padding:18px 30px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+.logo{
+    font-size:24px;
+    font-weight:700;
+}
+.sub{
+    color:#666;
+    font-size:14px;
+}
+.actions{
+    display:flex;
+    gap:10px;
+}
+.btn{
+    background:#111827;
+    color:white;
+    border:none;
+    padding:10px 18px;
+    border-radius:8px;
+    cursor:pointer;
+    text-decoration:none;
+}
+.btn:hover{
+    opacity:.9;
+}
+.viewer{
+    width:100%;
+    height:calc(100vh - 64px);
+}
+.viewer iframe{
+    width:100%;
+    height:100%;
+    border:none;
+}
+.modal{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.55);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:999;
+}
+.modal-card{
+    background:white;
+    width:500px;
+    max-width:95%;
+    border-radius:16px;
+    padding:25px;
+}
+.modal-card h2{
+    margin-bottom:8px;
+}
+.modal-card p{
+    color:#666;
+    margin-bottom:20px;
+}
+.option{
+    border:1px solid #ddd;
+    padding:14px;
+    border-radius:10px;
+    margin-bottom:10px;
+    cursor:pointer;
+}
+.option:hover{
+    background:#f8fafc;
+}
+#otherEmail{
+    width:100%;
+    padding:12px;
+    border:1px solid #ddd;
+    border-radius:8px;
+    margin-top:10px;
+}
+.hidden{
+    display:none;
+}
+</style>
+
+<!-- Mixpanel -->
+<script type="text/javascript">
+(function(c,a){if(!a.__SV){var b=window;var d,h;window.mixpanel=a;a._i=[];a.init=function(b,d,g){
+function c(b,i){var a=i.split(".");
+if(a.length==2){b=b[a[0]];i=a[1]}
+b[i]=function(){b.push([i].concat(Array.prototype.slice.call(arguments,0)))}}
+var e=a;
+if(typeof g!=="undefined"){e=a[g]=[]}else{g="mixpanel"}
+e.people=e.people||[];
+var f='track track_pageview identify people.set people.increment'.split(' ');
+for(h=0;h<f.length;h++)c(e,f[h]);
+a._i.push([b,d,g])
+};
+a.__SV=1.2;
+b=document.createElement("script");
+b.async=true;
+b.src="https://cdn.mxpnl.com/libs/mixpanel-2-latest.min.js";
+d=document.getElementsByTagName("script")[0];
+d.parentNode.insertBefore(b,d);
+}})(document,window.mixpanel||[]);
+
+mixpanel.init("afeb927e0d7ee7ddfa033985ab2fe603", { debug: false });
+</script>
+
+</head>
+<body>
+
+<div id="investorModal" class="modal">
+    <div class="modal-card">
+        <h2 id="welcomeTitle">Welcome</h2>
+        <p>Please identify yourself before viewing the deck.</p>
+        <div id="investorOptions"></div>
+        <div id="otherContainer" class="hidden">
+            <input id="otherEmail" placeholder="Enter your email">
+            <button class="btn" style="margin-top:10px;width:100%;" onclick="continueOther()">Continue</button>
+        </div>
+    </div>
+</div>
+
+<div class="header">
+    <div>
+        <div class="logo">Instant Mechanic</div>
+        <div class="sub" id="vcNameDisplay">Investor Deck</div>
+    </div>
+    <div class="actions">
+        <a class="btn" id="downloadBtn" target="_blank">Download Deck</a>
+        <button class="btn" onclick="openFullscreen()">Fullscreen</button>
+    </div>
+</div>
+
+<div class="viewer" id="viewerContainer">
+    <iframe id="pdfViewer"></iframe>
+</div>
+
+<script>
+
+const PDF_URL = "https://customers-car-image.s3.ap-south-1.amazonaws.com/car-images/78adbc25-0d15-4e1f-9d8a-af4b083c7a66.pdf";
+
+const investors = {
+    "accel":       { emails: ["mahendran@accel.com","nnandan@accel.com"] },
+    "100x.vc":     { emails: ["sanjay@100x.vc","vatsal@100x.vc"] },
+    "antler":      { emails: ["rajiv@antler.co","bhavna.suresh@antler.co"] },
+    "peakxv":      { emails: ["amohan@peakxv.com","rajan@peakxv.com"] },
+    "blume":       { emails: ["arpit@blume.vc","karthik@blume.vc"] },
+    "kae-capital": { emails: ["nisha@kae-capital.com","sunitha@kae-capital.com"] },
+    "z47":         { emails: ["rajat@z47.com","tarun@z47.com"] },
+    "kalaari":     { emails: ["jayraj@kalaari.com","vamshi@kalaari.com"] }
+};
+
+const params       = new URLSearchParams(window.location.search);
+const vc           = (params.get("vc") || "").toLowerCase();
+const sessionStart = Date.now();
+let   selectedEmail = "";
+
+// Scroll depth tracking state
+let maxScrollPct      = 0;
+let scrollMilestones  = {};
+
+// Attention / focus time tracking
+let focusStart        = Date.now();
+let totalFocusSeconds = 0;
+let isFocused         = !document.hidden;
+
+// Idle detection
+let idleTimer;
+let lastActivity      = Date.now();
+const IDLE_THRESHOLD  = 30; // seconds
+
+document.getElementById("downloadBtn").href = PDF_URL;
+const data = investors[vc];
+document.getElementById("vcNameDisplay").innerText  = vc ? vc.toUpperCase() + " Team" : "Investor Deck";
+document.getElementById("welcomeTitle").innerText   = vc ? `Welcome ${vc.toUpperCase()} Team` : "Welcome";
+
+// Build identity options
+const optionsContainer = document.getElementById("investorOptions");
+if (data) {
+    data.emails.forEach(email => {
+        const div = document.createElement("div");
+        div.className = "option";
+        div.innerText = email;
+        div.onclick = () => startViewing(email);
+        optionsContainer.appendChild(div);
+    });
+}
+const otherDiv = document.createElement("div");
+otherDiv.className = "option";
+otherDiv.innerText = "Other";
+otherDiv.onclick = () => document.getElementById("otherContainer").classList.remove("hidden");
+optionsContainer.appendChild(otherDiv);
+
+function continueOther() {
+    const email = document.getElementById("otherEmail").value.trim();
+    if (!email) { alert("Please enter your email"); return; }
+    startViewing(email);
+}
+
+// ─── Core: identify + open deck ───────────────────────────────────────────────
+function startViewing(email) {
+    selectedEmail = email;
+
+    document.getElementById("investorModal").style.display = "none";
+    document.getElementById("pdfViewer").src = PDF_URL;
+
+    mixpanel.identify(email);
+    mixpanel.people.set({
+        "$email":    email,
+        "vc":        vc,
+        "first_seen": new Date().toISOString()
+    });
+
+    track("Deck Opened", {
+        referrer:    document.referrer || "direct",
+        utm_source:  params.get("utm_source") || null,
+        utm_medium:  params.get("utm_medium") || null,
+        utm_campaign:params.get("utm_campaign") || null,
+        device_type: /Mobi|Android/i.test(navigator.userAgent) ? "mobile" : "desktop",
+        screen_res:  `${screen.width}x${screen.height}`,
+        timezone:    Intl.DateTimeFormat().resolvedOptions().timeZone
+    });
+
+    startEngagementTracking();
+    startScrollTracking();
+    startIdleDetection();
+    startHeartbeat();
+}
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+function track(event, props = {}) {
+    const base = { email: selectedEmail, vc: vc };
+    mixpanel.track(event, Object.assign(base, props));
+}
+
+function secondsInSession() {
+    return Math.round((Date.now() - sessionStart) / 1000);
+}
+
+// ─── Focus / attention time ───────────────────────────────────────────────────
+function startEngagementTracking() {
+    document.addEventListener("visibilitychange", () => {
+        if (document.hidden) {
+            if (isFocused) {
+                totalFocusSeconds += Math.round((Date.now() - focusStart) / 1000);
+                isFocused = false;
+            }
+            track("Tab Hidden", { time_in_session_s: secondsInSession(), total_focus_s: totalFocusSeconds });
+        } else {
+            focusStart = Date.now();
+            isFocused  = true;
+            track("Tab Visible", { time_in_session_s: secondsInSession() });
+        }
+    });
+
+    window.addEventListener("focus", () => {
+        if (!isFocused) { focusStart = Date.now(); isFocused = true; }
+    });
+    window.addEventListener("blur", () => {
+        if (isFocused) { totalFocusSeconds += Math.round((Date.now() - focusStart) / 1000); isFocused = false; }
+    });
+}
+
+// ─── Scroll depth (on the page, not inside the PDF) ───────────────────────────
+function startScrollTracking() {
+    window.addEventListener("scroll", () => {
+        const scrolled = window.scrollY + window.innerHeight;
+        const total    = document.documentElement.scrollHeight;
+        const pct      = Math.round((scrolled / total) * 100);
+
+        if (pct > maxScrollPct) maxScrollPct = pct;
+
+        [25, 50, 75, 100].forEach(milestone => {
+            if (pct >= milestone && !scrollMilestones[milestone]) {
+                scrollMilestones[milestone] = true;
+                track("Scroll Depth Reached", { depth_pct: milestone, time_in_session_s: secondsInSession() });
+            }
+        });
+    });
+}
+
+// ─── Idle detection ───────────────────────────────────────────────────────────
+function startIdleDetection() {
+    function resetIdle() {
+        lastActivity = Date.now();
+        clearTimeout(idleTimer);
+        idleTimer = setTimeout(() => {
+            track("User Idle", { idle_after_s: IDLE_THRESHOLD, time_in_session_s: secondsInSession() });
+        }, IDLE_THRESHOLD * 1000);
+    }
+    ["mousemove", "keydown", "click", "touchstart"].forEach(e => window.addEventListener(e, resetIdle));
+    resetIdle();
+}
+
+// ─── Heartbeat — proof of sustained engagement ────────────────────────────────
+function startHeartbeat() {
+    const intervals = [30, 60, 120, 180, 300]; // seconds
+    intervals.forEach(sec => {
+        setTimeout(() => {
+            if (selectedEmail) {
+                track("Engagement Heartbeat", {
+                    elapsed_s:     sec,
+                    total_focus_s: totalFocusSeconds + (isFocused ? Math.round((Date.now() - focusStart) / 1000) : 0),
+                    max_scroll_pct: maxScrollPct
+                });
+            }
+        }, sec * 1000);
+    });
+}
+
+// ─── Fullscreen ───────────────────────────────────────────────────────────────
+function openFullscreen() {
+    track("Fullscreen Clicked", { time_in_session_s: secondsInSession() });
+    const elem = document.getElementById("viewerContainer");
+    if (elem.requestFullscreen) elem.requestFullscreen();
+}
+
+document.addEventListener("fullscreenchange", () => {
+    track(document.fullscreenElement ? "Entered Fullscreen" : "Exited Fullscreen", {
+        time_in_session_s: secondsInSession()
+    });
+});
+
+// ─── Download ─────────────────────────────────────────────────────────────────
+document.getElementById("downloadBtn").addEventListener("click", () => {
+    track("Deck Downloaded", { time_in_session_s: secondsInSession() });
+    mixpanel.people.increment("download_count");
+});
+
+// ─── Copy / Print detection ───────────────────────────────────────────────────
+document.addEventListener("copy", () => track("Text Copied", { time_in_session_s: secondsInSession() }));
+window.addEventListener("beforeprint", () => track("Print Attempted", { time_in_session_s: secondsInSession() }));
+
+// ─── Session end ──────────────────────────────────────────────────────────────
+window.addEventListener("beforeunload", () => {
+    if (!selectedEmail) return;
+    if (isFocused) totalFocusSeconds += Math.round((Date.now() - focusStart) / 1000);
+    const total_s = secondsInSession();
+    track("Session Ended", {
+        duration_s:      total_s,
+        total_focus_s:   totalFocusSeconds,
+        max_scroll_pct:  maxScrollPct,
+        engaged:         total_s >= 60 ? true : false
+    });
+    mixpanel.people.set({
+        "last_session_s":    total_s,
+        "last_seen":         new Date().toISOString()
+    });
+    mixpanel.people.increment("session_count");
+});
+
+</script>
+</body>
+</html>
