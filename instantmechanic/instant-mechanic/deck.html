@@ -4,31 +4,67 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Instant Mechanic Investor Deck</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Inter,Arial,sans-serif;}
-body{background:#f5f7fb;}
-.header{background:white;border-bottom:1px solid #e5e7eb;padding:18px 30px;display:flex;justify-content:space-between;align-items:center;}
+body{background:#f5f7fb;overflow:hidden;}
+.header{background:white;border-bottom:1px solid #e5e7eb;padding:18px 30px;display:flex;justify-content:space-between;align-items:center;height:64px;}
 .logo{font-size:24px;font-weight:700;}
 .sub{color:#666;font-size:14px;}
-.actions{display:flex;gap:10px;}
-.btn{background:#111827;color:white;border:none;padding:10px 18px;border-radius:8px;cursor:pointer;text-decoration:none;}
+.actions{display:flex;gap:10px;align-items:center;}
+.btn{background:#111827;color:white;border:none;padding:10px 18px;border-radius:8px;cursor:pointer;text-decoration:none;font-size:14px;}
 .btn:hover{opacity:.9;}
-.viewer{width:100%;height:calc(100vh - 64px);}
-.viewer iframe{width:100%;height:100%;border:none;}
+.btn-ghost{background:transparent;color:#111827;border:1px solid #e5e7eb;padding:10px 18px;border-radius:8px;cursor:pointer;font-size:14px;}
+.btn-ghost:hover{background:#f5f7fb;}
+
+/* PDF Viewer */
+.viewer-wrap{width:100%;height:calc(100vh - 64px);display:flex;flex-direction:column;background:#e5e7eb;}
+.toolbar{background:#1f2937;color:white;display:flex;align-items:center;justify-content:space-between;padding:8px 20px;flex-shrink:0;gap:12px;}
+.toolbar-left,.toolbar-right{display:flex;align-items:center;gap:8px;}
+.toolbar-center{display:flex;align-items:center;gap:10px;}
+.t-btn{background:rgba(255,255,255,.1);border:none;color:white;width:32px;height:32px;border-radius:6px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;}
+.t-btn:hover{background:rgba(255,255,255,.2);}
+.t-btn:disabled{opacity:.3;cursor:default;}
+#pageDisplay{color:white;font-size:13px;min-width:90px;text-align:center;}
+.progress-bar{flex:1;height:4px;background:rgba(255,255,255,.15);border-radius:2px;max-width:200px;}
+.progress-fill{height:100%;background:#3b82f6;border-radius:2px;transition:width .3s;}
+.zoom-val{color:white;font-size:12px;min-width:44px;text-align:center;}
+
+.canvas-scroll{flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:center;padding:24px 0;gap:16px;}
+.page-wrap{position:relative;background:white;box-shadow:0 2px 16px rgba(0,0,0,.18);border-radius:2px;}
+.page-wrap canvas{display:block;}
+.page-num-badge{position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,.45);color:white;font-size:11px;padding:3px 8px;border-radius:10px;}
+
+/* Loading */
+#loadingOverlay{position:absolute;inset:0;background:#f5f7fb;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:10;gap:14px;}
+.spinner{width:40px;height:40px;border:3px solid #e5e7eb;border-top-color:#111827;border-radius:50%;animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* Slide time tooltip */
+.slide-time{position:absolute;top:8px;left:8px;background:rgba(59,130,246,.85);color:white;font-size:11px;padding:3px 8px;border-radius:10px;display:none;}
+
+/* Modal */
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;z-index:999;}
 .modal-card{background:white;width:500px;max-width:95%;border-radius:16px;padding:25px;}
-.modal-card h2{margin-bottom:8px;}
-.modal-card p{color:#666;margin-bottom:20px;}
-.option{border:1px solid #ddd;padding:14px;border-radius:10px;margin-bottom:10px;cursor:pointer;}
+.modal-card h2{margin-bottom:8px;font-size:22px;}
+.modal-card p{color:#666;margin-bottom:20px;font-size:14px;}
+.option{border:1px solid #ddd;padding:14px;border-radius:10px;margin-bottom:10px;cursor:pointer;font-size:14px;transition:background .15s;}
 .option:hover{background:#f8fafc;}
-#otherEmail{width:100%;padding:12px;border:1px solid #ddd;border-radius:8px;margin-top:10px;}
+#otherEmail{width:100%;padding:12px;border:1px solid #ddd;border-radius:8px;margin-top:10px;font-size:14px;}
 #otherContainer{display:none;}
+
+/* Fullscreen */
+:-webkit-full-screen .viewer-wrap{height:100vh;}
+:-moz-full-screen .viewer-wrap{height:100vh;}
+:fullscreen .viewer-wrap{height:100vh;}
 </style>
+
+<!-- Mixpanel -->
 <script type="text/javascript">
 (function(c,a){if(!a.__SV){var b=window;var d,h;window.mixpanel=a;a._i=[];a.init=function(b,d,g){function c(b,i){var a=i.split(".");if(a.length==2){b=b[a[0]];i=a[1]}b[i]=function(){b.push([i].concat(Array.prototype.slice.call(arguments,0)))}}var e=a;if(typeof g!=="undefined"){e=a[g]=[]}else{g="mixpanel"}e.people=e.people||[];var f="disable time_event track track_pageview track_links track_forms track_with_groups add_group set_group remove_group register register_once alias unregister identify name_tag set_config reset opt_in_tracking opt_out_tracking has_opted_in_tracking has_opted_out_tracking clear_opt_in_out_tracking start_batch_senders people.set people.set_once people.unset people.increment people.append people.union people.track_charge people.clear_charges people.delete_user people.remove start_session_recording stop_session_recording pause_session_recording resume_session_recording get_session_recording_properties get_session_replay_url".split(" ");for(h=0;h<f.length;h++)c(e,f[h]);a._i.push([b,d,g])};a.__SV=1.2;b=document.createElement("script");b.type="text/javascript";b.async=true;b.src="https://cdn.mxpnl.com/libs/mixpanel-2-latest.min.js";d=document.getElementsByTagName("script")[0];d.parentNode.insertBefore(b,d)}})(document,window.mixpanel||[]);
 mixpanel.init("afeb927e0d7ee7ddfa033985ab2fe603",{
   debug:false,
-  record_sessions_percent:0,
+  record_sessions_percent:100,
   record_console:true,
   record_heatmap_data:true,
   record_network:true,
@@ -42,34 +78,63 @@ mixpanel.init("afeb927e0d7ee7ddfa033985ab2fe603",{
 </head>
 <body>
 
+<!-- Identity Modal -->
 <div id="investorModal" class="modal">
   <div class="modal-card">
     <h2 id="welcomeTitle">Welcome</h2>
     <p>Please identify yourself before viewing the deck.</p>
     <div id="investorOptions"></div>
     <div id="otherContainer">
-      <input id="otherEmail" placeholder="Enter your email">
+      <input id="otherEmail" placeholder="Enter your email" onkeydown="if(event.key==='Enter')continueOther()">
       <button class="btn" style="margin-top:10px;width:100%;" onclick="continueOther()">Continue</button>
     </div>
   </div>
 </div>
 
+<!-- Header -->
 <div class="header">
   <div>
     <div class="logo">Instant Mechanic</div>
     <div class="sub" id="vcNameDisplay">Investor Deck</div>
   </div>
   <div class="actions">
-    <a class="btn" id="downloadBtn" target="_blank">Download Deck</a>
+    <a class="btn-ghost" id="downloadBtn" target="_blank">Download PDF</a>
     <button class="btn" onclick="openFullscreen()">Fullscreen</button>
   </div>
 </div>
 
-<div class="viewer" id="viewerContainer">
-  <iframe id="pdfViewer"></iframe>
+<!-- Viewer -->
+<div class="viewer-wrap" id="viewerContainer">
+
+  <!-- PDF Toolbar -->
+  <div class="toolbar">
+    <div class="toolbar-left">
+      <button class="t-btn" id="prevBtn" onclick="goPage(-1)" disabled title="Previous">&#8592;</button>
+      <button class="t-btn" id="nextBtn" onclick="goPage(1)" disabled title="Next">&#8594;</button>
+      <span id="pageDisplay">— / —</span>
+    </div>
+    <div class="toolbar-center">
+      <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+    </div>
+    <div class="toolbar-right">
+      <button class="t-btn" onclick="changeZoom(-0.15)" title="Zoom out">&#8722;</button>
+      <span class="zoom-val" id="zoomVal">100%</span>
+      <button class="t-btn" onclick="changeZoom(0.15)" title="Zoom in">&#43;</button>
+      <button class="t-btn" onclick="fitWidth()" title="Fit width">&#8596;</button>
+    </div>
+  </div>
+
+  <!-- Canvas scroll area -->
+  <div class="canvas-scroll" id="canvasScroll">
+    <div id="loadingOverlay">
+      <div class="spinner"></div>
+      <span style="color:#666;font-size:14px;">Loading deck…</span>
+    </div>
+  </div>
 </div>
 
 <script>
+// ─── Config ───────────────────────────────────────────────────────────────────
 var PDF_URL = "https://customers-car-image.s3.ap-south-1.amazonaws.com/car-images/78adbc25-0d15-4e1f-9d8a-af4b083c7a66.pdf";
 
 var investors = {
@@ -83,36 +148,50 @@ var investors = {
   "kalaari":     {emails:["jayraj@kalaari.com","vamshi@kalaari.com"]}
 };
 
-var params       = new URLSearchParams(window.location.search);
-var vc           = (params.get("vc") || "").toLowerCase();
-var sessionStart = Date.now();
+// ─── State ────────────────────────────────────────────────────────────────────
+var params        = new URLSearchParams(window.location.search);
+var vc            = (params.get("vc") || "").toLowerCase();
 var selectedEmail = "";
-var focusStart        = Date.now();
-var totalFocusSeconds = 0;
-var isFocused         = !document.hidden;
+var sessionStart  = Date.now();
+var focusStart    = Date.now();
+var totalFocusSec = 0;
+var isFocused     = !document.hidden;
 var idleTimer;
 var IDLE_THRESHOLD = 30;
 
+// slide tracking
+var pdfDoc        = null;
+var currentPage   = 1;
+var totalPages    = 0;
+var zoomScale     = 1.0;
+var slideEnterTs  = Date.now();
+var slideTimes    = {};   // {pageNum: totalSecondsViewed}
+var slideVisited  = {};   // {pageNum: true}
+var scrollPages   = {};   // tracked via IntersectionObserver
+
+pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+
+// ─── Modal setup ──────────────────────────────────────────────────────────────
 document.getElementById("downloadBtn").href = PDF_URL;
-var data = investors[vc];
+var vcData = investors[vc];
 document.getElementById("vcNameDisplay").innerText = vc ? vc.toUpperCase() + " Team" : "Investor Deck";
 document.getElementById("welcomeTitle").innerText  = vc ? "Welcome " + vc.toUpperCase() + " Team" : "Welcome";
 
-var optionsContainer = document.getElementById("investorOptions");
-if (data) {
-  data.emails.forEach(function(email) {
-    var div = document.createElement("div");
-    div.className = "option";
-    div.innerText = email;
-    div.onclick = function() { startViewing(email); };
-    optionsContainer.appendChild(div);
+var optCont = document.getElementById("investorOptions");
+if (vcData) {
+  vcData.emails.forEach(function(email) {
+    var d = document.createElement("div");
+    d.className = "option";
+    d.innerText = email;
+    d.onclick = function() { startViewing(email); };
+    optCont.appendChild(d);
   });
 }
 var otherDiv = document.createElement("div");
 otherDiv.className = "option";
 otherDiv.innerText = "Other";
 otherDiv.onclick = function() { document.getElementById("otherContainer").style.display = "block"; };
-optionsContainer.appendChild(otherDiv);
+optCont.appendChild(otherDiv);
 
 function continueOther() {
   var email = document.getElementById("otherEmail").value.trim();
@@ -120,13 +199,14 @@ function continueOther() {
   startViewing(email);
 }
 
+// ─── Start session ────────────────────────────────────────────────────────────
 function startViewing(email) {
   selectedEmail = email;
   mixpanel.identify(email);
   mixpanel.people.set({"$email":email,"vc":vc,"first_seen":new Date().toISOString()});
-  try { mixpanel.start_session_recording(); } catch(e) { console.log("replay start error", e); }
+  try { mixpanel.start_session_recording(); } catch(e) {}
   document.getElementById("investorModal").style.display = "none";
-  document.getElementById("pdfViewer").src = PDF_URL;
+
   track("Deck Opened", {
     referrer:     document.referrer || "direct",
     utm_source:   params.get("utm_source")   || null,
@@ -136,11 +216,191 @@ function startViewing(email) {
     screen_res:   screen.width + "x" + screen.height,
     timezone:     Intl.DateTimeFormat().resolvedOptions().timeZone
   });
+
+  loadPDF();
   startEngagementTracking();
   startIdleDetection();
   startHeartbeat();
+  startScrollTracking();
 }
 
+// ─── PDF.js loader ────────────────────────────────────────────────────────────
+function loadPDF() {
+  pdfjsLib.getDocument(PDF_URL).promise.then(function(pdf) {
+    pdfDoc   = pdf;
+    totalPages = pdf.numPages;
+    document.getElementById("loadingOverlay").style.display = "none";
+    document.getElementById("prevBtn").disabled = false;
+    document.getElementById("nextBtn").disabled = false;
+    renderAllPages();
+  }).catch(function(err) {
+    document.getElementById("loadingOverlay").innerHTML = '<span style="color:#ef4444;font-size:14px;">Failed to load PDF. Check URL or CORS.</span>';
+    console.error(err);
+  });
+}
+
+function renderAllPages() {
+  var scroll = document.getElementById("canvasScroll");
+  // render pages sequentially
+  (function renderNext(n) {
+    if (n > totalPages) {
+      setupScrollObserver();
+      updateUI(1);
+      return;
+    }
+    pdfDoc.getPage(n).then(function(page) {
+      var vp   = page.getViewport({scale: zoomScale});
+      var wrap = document.createElement("div");
+      wrap.className = "page-wrap";
+      wrap.dataset.page = n;
+      wrap.style.width  = vp.width + "px";
+      wrap.style.height = vp.height + "px";
+
+      var canvas  = document.createElement("canvas");
+      canvas.width  = vp.width;
+      canvas.height = vp.height;
+
+      var badge = document.createElement("div");
+      badge.className = "page-num-badge";
+      badge.innerText = n + " / " + totalPages;
+
+      var timeBadge = document.createElement("div");
+      timeBadge.className = "slide-time";
+      timeBadge.id = "st-" + n;
+
+      wrap.appendChild(canvas);
+      wrap.appendChild(badge);
+      wrap.appendChild(timeBadge);
+      scroll.appendChild(wrap);
+
+      page.render({canvasContext: canvas.getContext("2d"), viewport: vp}).promise.then(function() {
+        renderNext(n + 1);
+      });
+    });
+  })(1);
+}
+
+// ─── Scroll-based page detection via IntersectionObserver ────────────────────
+function setupScrollObserver() {
+  var opts = { root: document.getElementById("canvasScroll"), threshold: 0.5 };
+  var obs = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      var pg = parseInt(entry.target.dataset.page);
+      if (entry.isIntersecting) {
+        onSlideEnter(pg);
+      } else {
+        onSlideLeave(pg);
+      }
+    });
+  }, opts);
+
+  document.querySelectorAll(".page-wrap").forEach(function(el) {
+    obs.observe(el);
+  });
+}
+
+function onSlideEnter(pg) {
+  if (scrollPages[pg]) return;
+  scrollPages[pg] = {start: Date.now(), logged: false};
+  currentPage = pg;
+  updateUI(pg);
+
+  if (!slideVisited[pg]) {
+    slideVisited[pg] = true;
+    track("Slide First Viewed", {
+      slide: pg,
+      total_slides: totalPages,
+      time_in_session_s: secInSession()
+    });
+  }
+}
+
+function onSlideLeave(pg) {
+  if (!scrollPages[pg]) return;
+  var elapsed = Math.round((Date.now() - scrollPages[pg].start) / 1000);
+  slideTimes[pg] = (slideTimes[pg] || 0) + elapsed;
+  track("Slide Time", {
+    slide: pg,
+    total_slides: totalPages,
+    time_on_slide_s: elapsed,
+    cumulative_s: slideTimes[pg],
+    time_in_session_s: secInSession()
+  });
+  // update badge
+  var badge = document.getElementById("st-" + pg);
+  if (badge) { badge.style.display = "block"; badge.innerText = slideTimes[pg] + "s"; }
+  delete scrollPages[pg];
+}
+
+// ─── Page navigation ──────────────────────────────────────────────────────────
+function goPage(dir) {
+  var target = currentPage + dir;
+  if (target < 1 || target > totalPages) return;
+  var wrap = document.querySelector("[data-page='" + target + "']");
+  if (wrap) wrap.scrollIntoView({behavior:"smooth", block:"start"});
+}
+
+function updateUI(pg) {
+  currentPage = pg;
+  document.getElementById("pageDisplay").innerText = pg + " / " + (totalPages || "—");
+  var pct = totalPages > 1 ? ((pg - 1) / (totalPages - 1) * 100) : 0;
+  document.getElementById("progressFill").style.width = pct + "%";
+  document.getElementById("prevBtn").disabled = pg <= 1;
+  document.getElementById("nextBtn").disabled = pg >= totalPages;
+}
+
+// ─── Zoom ─────────────────────────────────────────────────────────────────────
+function changeZoom(delta) {
+  zoomScale = Math.min(3, Math.max(0.5, zoomScale + delta));
+  document.getElementById("zoomVal").innerText = Math.round(zoomScale * 100) + "%";
+  reRenderAll();
+  track("Zoom Changed", {zoom: Math.round(zoomScale*100), time_in_session_s: secInSession()});
+}
+
+function fitWidth() {
+  var scroll = document.getElementById("canvasScroll");
+  if (!pdfDoc) return;
+  pdfDoc.getPage(1).then(function(page) {
+    var vp = page.getViewport({scale:1});
+    zoomScale = (scroll.clientWidth - 48) / vp.width;
+    document.getElementById("zoomVal").innerText = Math.round(zoomScale * 100) + "%";
+    reRenderAll();
+  });
+}
+
+function reRenderAll() {
+  if (!pdfDoc) return;
+  var wraps = document.querySelectorAll(".page-wrap");
+  wraps.forEach(function(wrap) {
+    var n = parseInt(wrap.dataset.page);
+    pdfDoc.getPage(n).then(function(page) {
+      var vp = page.getViewport({scale: zoomScale});
+      wrap.style.width  = vp.width + "px";
+      wrap.style.height = vp.height + "px";
+      var canvas = wrap.querySelector("canvas");
+      canvas.width  = vp.width;
+      canvas.height = vp.height;
+      page.render({canvasContext: canvas.getContext("2d"), viewport: vp});
+    });
+  });
+}
+
+// ─── Scroll depth on page ─────────────────────────────────────────────────────
+function startScrollTracking() {
+  var marks = {25:false, 50:false, 75:false, 100:false};
+  var scroll = document.getElementById("canvasScroll");
+  scroll.addEventListener("scroll", function() {
+    var pct = Math.round((scroll.scrollTop + scroll.clientHeight) / scroll.scrollHeight * 100);
+    [25,50,75,100].forEach(function(m) {
+      if (!marks[m] && pct >= m) {
+        marks[m] = true;
+        track("Scroll Depth", {depth_pct:m, time_in_session_s:secInSession()});
+      }
+    });
+  });
+}
+
+// ─── Analytics helpers ────────────────────────────────────────────────────────
 function track(event, props) {
   props = props || {};
   props.email = selectedEmail;
@@ -148,20 +408,20 @@ function track(event, props) {
   mixpanel.track(event, props);
 }
 
-function secondsInSession() { return Math.round((Date.now() - sessionStart) / 1000); }
-function currentFocusSeconds() { return totalFocusSeconds + (isFocused ? Math.round((Date.now() - focusStart) / 1000) : 0); }
-function safeReplayUrl() { try { return mixpanel.get_session_replay_url() || null; } catch(e) { return null; } }
+function secInSession() { return Math.round((Date.now() - sessionStart) / 1000); }
+function curFocusSec()  { return totalFocusSec + (isFocused ? Math.round((Date.now() - focusStart) / 1000) : 0); }
+function safeReplayUrl(){ try { return mixpanel.get_session_replay_url() || null; } catch(e){ return null; } }
 
 function startEngagementTracking() {
   document.addEventListener("visibilitychange", function() {
     if (document.hidden) {
-      if (isFocused) { totalFocusSeconds += Math.round((Date.now() - focusStart) / 1000); isFocused = false; }
+      if (isFocused) { totalFocusSec += Math.round((Date.now() - focusStart) / 1000); isFocused = false; }
       try { mixpanel.pause_session_recording(); } catch(e) {}
-      track("Tab Hidden", {time_in_session_s:secondsInSession(),total_focus_s:totalFocusSeconds});
+      track("Tab Hidden", {time_in_session_s:secInSession(), total_focus_s:totalFocusSec, current_slide:currentPage});
     } else {
       focusStart = Date.now(); isFocused = true;
       try { mixpanel.resume_session_recording(); } catch(e) {}
-      track("Tab Visible", {time_in_session_s:secondsInSession()});
+      track("Tab Visible", {time_in_session_s:secInSession(), current_slide:currentPage});
     }
   });
 }
@@ -170,10 +430,10 @@ function startIdleDetection() {
   function resetIdle() {
     clearTimeout(idleTimer);
     idleTimer = setTimeout(function() {
-      track("User Idle", {idle_after_s:IDLE_THRESHOLD,time_in_session_s:secondsInSession(),replay_url:safeReplayUrl()});
+      track("User Idle", {idle_after_s:IDLE_THRESHOLD, time_in_session_s:secInSession(), current_slide:currentPage, replay_url:safeReplayUrl()});
     }, IDLE_THRESHOLD * 1000);
   }
-  ["mousemove","keydown","click","touchstart"].forEach(function(e) { window.addEventListener(e, resetIdle); });
+  ["mousemove","keydown","click","touchstart"].forEach(function(e){ window.addEventListener(e, resetIdle); });
   resetIdle();
 }
 
@@ -181,36 +441,67 @@ function startHeartbeat() {
   [30,60,120,180,300].forEach(function(sec) {
     setTimeout(function() {
       if (!selectedEmail) return;
-      track("Engagement Heartbeat", {elapsed_s:sec,total_focus_s:currentFocusSeconds(),replay_url:safeReplayUrl()});
+      track("Engagement Heartbeat", {
+        elapsed_s: sec,
+        total_focus_s: curFocusSec(),
+        current_slide: currentPage,
+        slides_seen: Object.keys(slideVisited).length,
+        total_slides: totalPages,
+        replay_url: safeReplayUrl()
+      });
     }, sec * 1000);
   });
 }
 
+// ─── Fullscreen ───────────────────────────────────────────────────────────────
 function openFullscreen() {
-  track("Fullscreen Clicked", {time_in_session_s:secondsInSession()});
+  track("Fullscreen Clicked", {time_in_session_s:secInSession()});
   var elem = document.getElementById("viewerContainer");
   if (elem.requestFullscreen) elem.requestFullscreen();
+  else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
 }
-
 document.addEventListener("fullscreenchange", function() {
-  track(document.fullscreenElement ? "Entered Fullscreen" : "Exited Fullscreen", {time_in_session_s:secondsInSession()});
+  track(document.fullscreenElement ? "Entered Fullscreen" : "Exited Fullscreen", {time_in_session_s:secInSession()});
 });
 
+// ─── Download / copy / print ──────────────────────────────────────────────────
 document.getElementById("downloadBtn").addEventListener("click", function() {
-  track("Deck Downloaded", {time_in_session_s:secondsInSession(),replay_url:safeReplayUrl()});
+  track("Deck Downloaded", {time_in_session_s:secInSession(), replay_url:safeReplayUrl()});
   mixpanel.people.increment("download_count");
 });
+document.addEventListener("copy",         function(){ track("Text Copied",       {time_in_session_s:secInSession()}); });
+window.addEventListener("beforeprint",    function(){ track("Print Attempted",   {time_in_session_s:secInSession()}); });
 
-document.addEventListener("copy", function() { track("Text Copied", {time_in_session_s:secondsInSession()}); });
-window.addEventListener("beforeprint", function() { track("Print Attempted", {time_in_session_s:secondsInSession()}); });
-
+// ─── Session end ──────────────────────────────────────────────────────────────
 window.addEventListener("beforeunload", function() {
   if (!selectedEmail) return;
-  var total_s = secondsInSession();
-  track("Session Ended", {duration_s:total_s,total_focus_s:currentFocusSeconds(),engaged:total_s>=60,replay_url:safeReplayUrl()});
-  mixpanel.people.set({"last_session_s":total_s,"last_seen":new Date().toISOString()});
+
+  // flush any slides still visible
+  Object.keys(scrollPages).forEach(function(pg) {
+    var elapsed = Math.round((Date.now() - scrollPages[pg].start) / 1000);
+    slideTimes[pg] = (slideTimes[pg] || 0) + elapsed;
+  });
+
+  var total_s = secInSession();
+  track("Session Ended", {
+    duration_s:    total_s,
+    total_focus_s: curFocusSec(),
+    engaged:       total_s >= 60,
+    slides_seen:   Object.keys(slideVisited).length,
+    total_slides:  totalPages,
+    slide_times:   JSON.stringify(slideTimes),
+    replay_url:    safeReplayUrl()
+  });
+  mixpanel.people.set({"last_session_s":total_s,"last_seen":new Date().toISOString(),"last_slide_times":JSON.stringify(slideTimes)});
   mixpanel.people.increment("session_count");
   try { mixpanel.stop_session_recording(); } catch(e) {}
+});
+
+// ─── Keyboard nav ─────────────────────────────────────────────────────────────
+document.addEventListener("keydown", function(e) {
+  if (!pdfDoc) return;
+  if (e.key === "ArrowRight" || e.key === "ArrowDown")  goPage(1);
+  if (e.key === "ArrowLeft"  || e.key === "ArrowUp")    goPage(-1);
 });
 </script>
 </body>
