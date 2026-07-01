@@ -105,7 +105,7 @@
             font-size: 16px;
         }
 
-        input[type="text"], input[type="tel"], textarea {
+        input[type="text"], input[type="tel"], textarea, select {
             width: 100%;
             padding: 14px 16px;
             border: 2px solid #e5e7eb;
@@ -115,13 +115,24 @@
             background: white;
         }
 
+        select {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23374151' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            background-size: 18px;
+            cursor: pointer;
+        }
+
         .phone-input-wrapper input[type="tel"] {
             border: none;
             border-radius: 0;
             flex: 1;
         }
 
-        input[type="text"]:focus, input[type="tel"]:focus, textarea:focus {
+        input[type="text"]:focus, input[type="tel"]:focus, textarea:focus, select:focus {
             outline: none;
             border-color: #667eea;
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
@@ -787,28 +798,39 @@
         
         <div class="form-container">
             <form id="bookingForm">
+                <!-- RENAMED: Is Insurance Company Call? (was: Is GoMechanic Call?) -->
                 <div class="form-group">
                     <div class="toggle-group">
-                        <span class="toggle-label">Is GoMechanic Call?</span>
+                        <span class="toggle-label">Is Insurance Company Call?</span>
                         <div class="toggle-switch" id="goMechanicToggle">
                             <div class="toggle-slider"></div>
                         </div>
                     </div>
                 </div>
 
+                <!-- NEW: Insurance Company Name (mandatory, shown only when toggle above is ON) -->
+                <div class="form-group hidden" id="insuranceCompanyGroup">
+                    <label for="insuranceCompany">Choose Company Name *</label>
+                    <select id="insuranceCompany" name="insuranceCompany">
+                        <option value="" disabled selected>Select insurance company</option>
+                        <option value="GoMechanic">GoMechanic</option>
+                        <option value="Allianz Partners">Allianz Partners</option>
+                        <option value="Road Ready">Road Ready</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
                 <!-- Membership Toggle -->
-<div class="form-group" id="membershipGroup">
-    <div class="toggle-group">
-        <span class="toggle-label">Is Membership?</span>
-        <div class="toggle-switch" id="membershipToggle">
-            <div class="toggle-slider"></div>
-        </div>
-    </div>
-</div>
+                <div class="form-group" id="membershipGroup">
+                    <div class="toggle-group">
+                        <span class="toggle-label">Is Membership?</span>
+                        <div class="toggle-switch" id="membershipToggle">
+                            <div class="toggle-slider"></div>
+                        </div>
+                    </div>
+                </div>
 
-<!-- NEW: Payment Collection Toggle (hidden by default) -->
-
-                <!-- NEW: Payment Collection Toggle (hidden by default) -->
+                <!-- Payment Collection Toggle (hidden by default) -->
                 <div class="form-group hidden" id="paymentCollectionGroup">
                     <div class="toggle-group">
                         <span class="toggle-label">Payment need to collect?</span>
@@ -818,7 +840,7 @@
                     </div>
                 </div>
 
-                <!-- NEW: Amount to Collect Field (hidden by default) -->
+                <!-- Amount to Collect Field (hidden by default) -->
                 <div class="form-group hidden" id="amountToCollectGroup">
                     <label for="amountToCollect">Amount to Collect (₹)</label>
                     <input type="text" id="amountToCollect" name="amountToCollect" placeholder="Enter amount to collect">
@@ -1719,11 +1741,11 @@
         }
 
         // Function to toggle price and security amount visibility
-        function togglePriceAndSecurityVisibility(isGoMechanic) {
+        function togglePriceAndSecurityVisibility(isInsurance) {
             const priceGroup = document.getElementById('priceGroup');
             const securityAmountGroup = document.getElementById('securityAmountGroup');
             
-            if (isGoMechanic) {
+            if (isInsurance) {
                 priceGroup.classList.add('hidden');
                 securityAmountGroup.classList.add('hidden');
             } else {
@@ -1733,10 +1755,10 @@
         }
 
         // Function to toggle payment collection visibility
-        function togglePaymentCollectionVisibility(isGoMechanic) {
+        function togglePaymentCollectionVisibility(isInsurance) {
             const paymentCollectionGroup = document.getElementById('paymentCollectionGroup');
             
-            if (isGoMechanic) {
+            if (isInsurance) {
                 paymentCollectionGroup.classList.remove('hidden');
             } else {
                 paymentCollectionGroup.classList.add('hidden');
@@ -1757,6 +1779,21 @@
                 amountToCollectGroup.classList.add('hidden');
                 // Clear the amount field when hidden
                 document.getElementById('amountToCollect').value = '';
+            }
+        }
+
+        // NEW: Function to toggle insurance company dropdown visibility
+        function toggleInsuranceCompanyVisibility(isInsurance) {
+            const insuranceCompanyGroup = document.getElementById('insuranceCompanyGroup');
+            const insuranceCompanySelect = document.getElementById('insuranceCompany');
+
+            if (isInsurance) {
+                insuranceCompanyGroup.classList.remove('hidden');
+                insuranceCompanySelect.setAttribute('required', 'required');
+            } else {
+                insuranceCompanyGroup.classList.add('hidden');
+                insuranceCompanySelect.removeAttribute('required');
+                insuranceCompanySelect.value = '';
             }
         }
 
@@ -1850,13 +1887,15 @@
                 document.getElementById('securityAmount').value = calculatedSecurity || '428';
             }
 
-            // Toggle functionality for GoMechanic with visibility control
+            // Toggle functionality for Insurance Company Call with visibility control
+            // (was: GoMechanic toggle; renamed but logic unchanged, plus new insurance company dropdown)
             const goMechanicToggle = document.getElementById('goMechanicToggle');
             goMechanicToggle.addEventListener('click', function() {
                 this.classList.toggle('active');
-                const isGoMechanic = this.classList.contains('active');
-                togglePriceAndSecurityVisibility(isGoMechanic);
-                togglePaymentCollectionVisibility(isGoMechanic);
+                const isInsurance = this.classList.contains('active');
+                togglePriceAndSecurityVisibility(isInsurance);
+                togglePaymentCollectionVisibility(isInsurance);
+                toggleInsuranceCompanyVisibility(isInsurance); // NEW
             });
 
             const membershipToggle = document.getElementById('membershipToggle');
@@ -1968,10 +2007,16 @@
                 successMessage.style.display = 'none';
                 errorMessage.style.display = 'none';
 
-                // Check if GoMechanic toggle is active
-                const isGoMechanic = document.getElementById('goMechanicToggle').classList.contains('active');
+                // Check if Insurance Company Call toggle is active (was: GoMechanic toggle)
+                const isInsuranceBooking = document.getElementById('goMechanicToggle').classList.contains('active');
+
+                // Selected insurance company (only relevant when isInsuranceBooking is true)
+                const insuranceCompany = document.getElementById('insuranceCompany').value || null;
+
+                // Backward-compatible field: true only if insurance booking AND company is GoMechanic
+                const isGoMechanicCall = isInsuranceBooking && insuranceCompany === 'GoMechanic';
                 
-                // Check if Payment Collection toggle is active (only relevant when GoMechanic is true)
+                // Check if Payment Collection toggle is active (only relevant when insurance booking is true)
                 const needToCollectPayment = document.getElementById('paymentCollectionToggle').classList.contains('active');
 
                 // Get form values
@@ -1991,10 +2036,12 @@
                     carModel: carModel,
                     location: location,
                     securityAmount: mechanicPayout || null,
-                    isGoMechanicCall: isGoMechanic,
+                    isGoMechanicCall: isGoMechanicCall, // backward-compatible: true only when company === GoMechanic
+                    is_insurance_booking: isInsuranceBooking, // NEW
+                    insurance_company: isInsuranceBooking ? insuranceCompany : null, // NEW
                     is_membership: document.getElementById('membershipToggle').classList.contains('active'),
-                    need_to_collect_payment_on_gomech: isGoMechanic ? needToCollectPayment : false, // NEW FIELD
-                    amount_to_collect_on_gomech: (isGoMechanic && needToCollectPayment && amountToCollect > 0) ? amountToCollect : null, // NEW FIELD
+                    need_to_collect_payment_on_gomech: isInsuranceBooking ? needToCollectPayment : false,
+                    amount_to_collect_on_gomech: (isInsuranceBooking && needToCollectPayment && amountToCollect > 0) ? amountToCollect : null,
                     timestamp: new Date().toISOString(),
                     agent: localStorage.getItem("agent_name_im") || "Harshit"
                 };
@@ -2016,9 +2063,11 @@
                         "security_asked": 199, // Fixed as per your requirement
                         "mechanic_payout": mechanicPayout,
                         "total_price": price,
-                        "is_gomechanic_call": isGoMechanic,
-                        "need_to_collect_payment_on_gomech": isGoMechanic ? needToCollectPayment : false,
-                        "amount_to_collect_on_gomech": (isGoMechanic && needToCollectPayment && amountToCollect > 0) ? amountToCollect : null
+                        "is_gomechanic_call": isGoMechanicCall,
+                        "is_insurance_booking": isInsuranceBooking,
+                        "insurance_company": isInsuranceBooking ? insuranceCompany : null,
+                        "need_to_collect_payment_on_gomech": isInsuranceBooking ? needToCollectPayment : false,
+                        "amount_to_collect_on_gomech": (isInsuranceBooking && needToCollectPayment && amountToCollect > 0) ? amountToCollect : null
                     });
 
                     successMessage.style.display = 'block';
@@ -2030,6 +2079,7 @@
                     togglePriceAndSecurityVisibility(false); // Show price and security fields
                     togglePaymentCollectionVisibility(false); // Hide payment collection toggle
                     toggleAmountToCollectVisibility(false); // Hide amount to collect field
+                    toggleInsuranceCompanyVisibility(false); // Hide insurance company dropdown
                     document.getElementById('price').value = '742';
                     const calculatedSecurity = calculateSecurityAmount('742');
                     document.getElementById('securityAmount').value = calculatedSecurity;
@@ -2055,9 +2105,11 @@
                             "security_asked": 199,
                             "mechanic_payout": mechanicPayout,
                             "total_price": price,
-                            "is_gomechanic_call": isGoMechanic,
-                            "need_to_collect_payment_on_gomech": isGoMechanic ? needToCollectPayment : false,
-                            "amount_to_collect_on_gomech": (isGoMechanic && needToCollectPayment && amountToCollect > 0) ? amountToCollect : null
+                            "is_gomechanic_call": isGoMechanicCall,
+                            "is_insurance_booking": isInsuranceBooking,
+                            "insurance_company": isInsuranceBooking ? insuranceCompany : null,
+                            "need_to_collect_payment_on_gomech": isInsuranceBooking ? needToCollectPayment : false,
+                            "amount_to_collect_on_gomech": (isInsuranceBooking && needToCollectPayment && amountToCollect > 0) ? amountToCollect : null
                         });
                         
                         document.getElementById('bookingForm').reset();
@@ -2067,6 +2119,7 @@
                         togglePriceAndSecurityVisibility(false); // Show price and security fields
                         togglePaymentCollectionVisibility(false); // Hide payment collection toggle
                         toggleAmountToCollectVisibility(false); // Hide amount to collect field
+                        toggleInsuranceCompanyVisibility(false); // Hide insurance company dropdown
                         document.getElementById('price').value = '742';
                         const calculatedSecurity = calculateSecurityAmount('742');
                         document.getElementById('securityAmount').value = calculatedSecurity;
@@ -2095,6 +2148,14 @@
                 const mobile = document.getElementById('mobile').value;
                 if (mobile.length !== 10) {
                     alert('Please enter a valid 10-digit mobile number');
+                    return;
+                }
+
+                // NEW: Validate insurance company selection when insurance toggle is ON
+                const isInsuranceBooking = document.getElementById('goMechanicToggle').classList.contains('active');
+                const insuranceCompany = document.getElementById('insuranceCompany').value;
+                if (isInsuranceBooking && !insuranceCompany) {
+                    alert('Please select the insurance company name');
                     return;
                 }
 
