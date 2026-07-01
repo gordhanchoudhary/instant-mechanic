@@ -2169,7 +2169,7 @@
             const settlementAmount = parseFloat(document.getElementById('partialSettlementAmount').value);
             const remarks = document.getElementById('partialRemarks').value;
 
-            if (!settlementAmount || settlementAmount <= 0) {
+            if (!settlementAmount ) {
                 showAlert('error', 'Please enter a valid settlement amount');
                 return;
             }
