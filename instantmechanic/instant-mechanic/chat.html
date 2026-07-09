@@ -66,7 +66,7 @@
   .customer.flag-cancel{background:var(--wa-red-soft);}
   .customer.flag-cancel .cust-top strong{color:var(--wa-red);}
   .customer.flag-booking{background:#dff5e1;}
-  .customer.flag-stale{background:#fbeaea;}
+  .customer.flag-stale{background:#f5b7b1;}
   .cust-top{display:flex;justify-content:space-between;align-items:center;}
   .cust-name{font-weight:600;font-size:14.5px;}
   .cust-name.unread{font-weight:700;}
@@ -76,6 +76,7 @@
   .cust-preview.unread{color:var(--wa-text);font-weight:600;}
   .badge{background:var(--wa-green);color:#fff;font-size:11px;min-width:18px;height:18px;border-radius:9px;
     display:flex;align-items:center;justify-content:center;padding:0 5px;font-weight:700;}
+  .badge.badge-red{background:var(--wa-red);}
   .tag-row{display:flex;gap:4px;margin-top:2px;}
   .tag{font-size:10px;padding:1px 6px;border-radius:8px;font-weight:700;letter-spacing:.2px;}
   .tag.cancel{background:var(--wa-red);color:#fff;}
@@ -333,16 +334,31 @@ document.addEventListener('DOMContentLoaded', function(){
   initializeApp();
 });
 
+let pendingAutoOpenMobile = null;
+
 async function initializeApp(){
   await loadAgents();
-  const storedAgent = ls('im_agent_name');
-  if (storedAgent){
-    currentAgent = allAgents.find(a => a.name === storedAgent);
-    if (currentAgent){
-      updateAgentDisplay();
-      startPolling();
-      return;
-    }
+
+  const params = new URLSearchParams(window.location.search);
+  const paramAgent = params.get('agent_name');
+  const paramMobile = params.get('mobile');
+  if (paramMobile) pendingAutoOpenMobile = paramMobile;
+
+  let agentToUse = null;
+  if (paramAgent){
+    agentToUse = allAgents.find(a => a.name === paramAgent);
+  }
+  if (!agentToUse){
+    const storedAgent = ls('im_agent_name');
+    if (storedAgent) agentToUse = allAgents.find(a => a.name === storedAgent);
+  }
+
+  if (agentToUse){
+    currentAgent = agentToUse;
+    setLs('im_agent_name', currentAgent.name);
+    updateAgentDisplay();
+    startPolling();
+    return;
   }
   showAgentModal();
 }
@@ -435,6 +451,14 @@ async function fetchChats(isFreshLoad){
     allCustomers = newCustomers;
     renderCustomerList(getFilteredCustomers());
 
+    if (pendingAutoOpenMobile){
+      const target = allCustomers.find(c => c.mobile === pendingAutoOpenMobile);
+      if (target){
+        selectCustomer(pendingAutoOpenMobile);
+        pendingAutoOpenMobile = null;
+      }
+    }
+
     if (selectedMobile){
       const cust = allCustomers.find(c => c.mobile === selectedMobile);
       if (cust) renderChat(cust, false);
@@ -450,13 +474,34 @@ async function fetchChats(isFreshLoad){
 }
 
 /* ============ CUSTOMER META / LIST ============ */
-function getUnreadCount(c){
+function getReadCutoff(c){
+  // Prefer the per-customer "last opened" timestamp we stamped in localStorage.
+  // If we've never opened this customer on this device, fall back to the agent's
+  // own updated_at from the agent API so old messages aren't shown as new/unread.
   const lastSeen = ls('im_lastseen_' + c.mobile);
-  if (!lastSeen) return c.chats.filter(m => m.is_from_customer).length ? countUnreadFrom(c, 0) : 0;
-  return countUnreadFrom(c, new Date(lastSeen).getTime());
+  if (lastSeen) return new Date(lastSeen).getTime();
+  if (currentAgent && currentAgent.updated_at) return new Date(currentAgent.updated_at).getTime();
+  return null; // no baseline at all — treat as read rather than flooding with "new"
+}
+function getUnreadCount(c){
+  const cutoff = getReadCutoff(c);
+  if (cutoff === null) return 0;
+  return countUnreadFrom(c, cutoff);
 }
 function countUnreadFrom(c, sinceMs){
   return c.chats.filter(m => m.is_from_customer && new Date(m.timestamp).getTime() > sinceMs).length;
+}
+function unreadIsCustomerReply(c){
+  // True if the customer has an unread message that came in AFTER the agent
+  // last messaged them — i.e. this is a reply to something we sent, not a
+  // fresh/unprompted message.
+  const lastSent = ls('im_lastsent_' + c.mobile);
+  if (!lastSent) return false;
+  const lastSentMs = new Date(lastSent).getTime();
+  const cutoff = getReadCutoff(c);
+  return c.chats.some(m => m.is_from_customer &&
+    new Date(m.timestamp).getTime() > lastSentMs &&
+    (cutoff === null || new Date(m.timestamp).getTime() > cutoff));
 }
 function isCancelRecent(c){
   const now = Date.now();
@@ -465,9 +510,11 @@ function isCancelRecent(c){
     (m.message||'').toLowerCase().includes('cancel'));
 }
 function isStale(c){
+  // Complete red: last activity is older than 5 minutes and there's no booking.
+  // Booking always wins (stays green) regardless of how old the last message is.
+  if (hasBooking(c)) return false;
   if (!c.chats.length) return false;
   const last = c.chats[c.chats.length-1];
-  if (!last.is_from_customer) return false; // last message was ours, not stale
   return (Date.now() - new Date(last.timestamp).getTime()) > STALE_MS;
 }
 function hasBooking(c){ return c.bookings && c.bookings.length > 0; }
@@ -511,6 +558,7 @@ function renderCustomerList(customers){
     div.className = cls;
 
     const unread = getUnreadCount(c);
+    const badgeIsReply = unread > 0 && unreadIsCustomerReply(c);
     const lastMsg = c.chats.length ? c.chats[c.chats.length-1] : null;
     const lastTime = lastMsg ? formatTime(lastMsg.timestamp) : '';
     const preview = lastMsg ? (lastMsg.is_from_customer ? '' : '✓ ') + lastMsg.message.slice(0,38) : 'No messages yet';
@@ -527,7 +575,7 @@ function renderCustomerList(customers){
       </div>
       <div class="cust-bottom">
         <span class="cust-preview ${unread ? 'unread':''}">${escapeHtml(preview)}</span>
-        ${unread ? `<span class="badge">${unread}</span>` : ''}
+        ${unread ? `<span class="badge ${badgeIsReply ? 'badge-red' : ''}">${unread}</span>` : ''}
       </div>
       ${tags ? `<div class="tag-row">${tags}</div>` : ''}
     `;
