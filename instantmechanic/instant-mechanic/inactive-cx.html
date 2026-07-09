@@ -95,10 +95,13 @@
   }
 
   function handleManualBookingClick() {
-const cleanedMobile = mobile.replace(/^(\+91|91)/, "");
+    const cleanedMobile = mobile.replace(/^(\+91|91)/, "");
+    window.open(`https://instantmechanic.online/manual-booking.html?mobile=${cleanedMobile}`, "_blank");
+  }
 
-window.open(`https://instantmechanic.online/manual-booking.html?mobile=${cleanedMobile}`, "_blank");
-}
+  function handleOpenChatClick() {
+    window.open(`https://instantmechanic.online/chat.html?agent_name=${encodeURIComponent(agentName)}&mobile=${encodeURIComponent(mobile)}`, "_blank");
+  }
 
   document.getElementById("submitRemarksBtn").addEventListener("click", async () => {
     const remarks = document.getElementById("remarksText").value.trim();
@@ -126,6 +129,9 @@ window.open(`https://instantmechanic.online/manual-booking.html?mobile=${cleaned
     </a>
     <a href="javascript:void(0)" onclick="handleManualBookingClick()">
       <img src="https://cdn-icons-png.flaticon.com/512/2921/2921222.png" alt="Manual Booking Icon"> Manual Booking
+    </a>
+    <a href="javascript:void(0)" onclick="handleOpenChatClick()">
+      <img src="https://cdn-icons-png.flaticon.com/512/2462/2462719.png" alt="Open Chat Icon"> Open Chat
     </a>
   `;
   document.getElementById("actionButtons").innerHTML = buttonsHTML;
