@@ -116,6 +116,7 @@
 
   .booking-button{background:var(--wa-green);color:#fff;padding:6px 14px;border:none;border-radius:16px;
     font-size:13px;cursor:pointer;align-self:center;margin-bottom:10px;font-weight:600;}
+  .booking-button.remarks-button{background:var(--wa-teal);}
   .booking-details{background:#fff;border-left:4px solid var(--wa-teal);padding:12px 14px;margin:0 0 14px 0;
     border-radius:8px;font-size:13.5px;line-height:1.5;align-self:center;width:90%;box-shadow:0 1px 3px rgba(0,0,0,.1);}
   .booking-details hr{border:none;border-top:1px dashed #ddd;margin:8px 0;}
@@ -184,6 +185,7 @@
     <input type="date" id="datePicker" onchange="onDateChange()" />
   </div>
   <div class="right">
+    <button class="icon-btn" id="notifToggle" onclick="requestNotificationPermission()" title="Enable browser notifications">🔔 Enable Notifications</button>
     <button class="icon-btn" id="soundToggle" onclick="toggleSound()" title="Toggle notification sound">🔔 On</button>
     <div class="agent-chip" id="currentAgentDisplay"></div>
   </div>
@@ -332,8 +334,56 @@ document.addEventListener('visibilitychange', ()=>{
 document.addEventListener('DOMContentLoaded', function(){
   document.getElementById('datePicker').valueAsDate = new Date();
   document.getElementById('soundToggle').innerText = soundMuted ? '🔕 Off' : '🔔 On';
+  updateNotifButton();
   initializeApp();
 });
+
+function requestNotificationPermission(){
+  if (!('Notification' in window)){
+    toast('Browser notifications are not supported in this browser.');
+    return;
+  }
+  if (Notification.permission === 'granted'){
+    updateNotifButton();
+    toast('Notifications are already enabled.');
+    return;
+  }
+  if (Notification.permission === 'denied'){
+    updateNotifButton();
+    toast('Notifications are blocked. Enable them in your browser\'s site settings.');
+    return;
+  }
+  Notification.requestPermission().then(perm => {
+    updateNotifButton();
+    toast(perm === 'granted' ? 'Notifications enabled.' : 'Notifications not enabled.');
+  });
+}
+function updateNotifButton(){
+  const btn = document.getElementById('notifToggle');
+  if (!btn) return;
+  if (!('Notification' in window)){
+    btn.innerText = '🔕 Unsupported';
+    btn.disabled = true;
+    return;
+  }
+  if (Notification.permission === 'granted') btn.innerText = '🔔 Notifications On';
+  else if (Notification.permission === 'denied') btn.innerText = '🔕 Blocked';
+  else btn.innerText = '🔔 Enable Notifications';
+}
+function showBrowserNotification(customer, messageText){
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
+  try{
+    const n = new Notification(`New message — ${customer.name || customer.mobile}`, {
+      body: (messageText || '').slice(0, 120),
+      tag: 'im-chat-' + customer.mobile // collapses repeat alerts for the same customer
+    });
+    n.onclick = () => {
+      window.focus();
+      selectCustomer(customer.mobile);
+      n.close();
+    };
+  }catch(e){ console.error('Notification error', e); }
+}
 
 let pendingAutoOpenMobile = null;
 
@@ -437,6 +487,7 @@ async function fetchChats(isFreshLoad){
     allCustomers.forEach(c => prevByMobile[c.mobile] = c);
 
     let anyNewIncoming = false;
+    const newlyArrived = []; // {customer, message}
 
     newCustomers.forEach(c => {
       const prev = prevByMobile[c.mobile];
@@ -445,7 +496,10 @@ async function fetchChats(isFreshLoad){
 
       if (newLastMsg && newLastMsg.is_from_customer && (!prevLastTs || new Date(newLastMsg.timestamp) > new Date(prevLastTs))){
         // genuinely new incoming customer message since our last poll
-        if (!isFreshLoad) anyNewIncoming = true;
+        if (!isFreshLoad){
+          anyNewIncoming = true;
+          newlyArrived.push({ customer: c, message: newLastMsg.message });
+        }
       }
     });
 
@@ -468,6 +522,14 @@ async function fetchChats(isFreshLoad){
     if (anyNewIncoming){
       beep();
       if (document.hidden) flashTitle(true);
+      // Only pop a browser notification if the tab isn't focused, or the
+      // customer's chat isn't the one currently open on screen — avoids
+      // notifying about a conversation the agent is already looking at.
+      newlyArrived.forEach(({customer, message}) => {
+        if (document.hidden || selectedMobile !== customer.mobile){
+          showBrowserNotification(customer, message);
+        }
+      });
     }
   }catch(e){
     console.error('Error loading chats', e);
@@ -625,6 +687,14 @@ function renderChat(customer, scrollToBottom){
     box.appendChild(btn);
   }
 
+  if (customer.remarks && customer.remarks.length){
+    const btn = document.createElement('button');
+    btn.className = 'booking-button remarks-button';
+    btn.innerText = `📝 View Remarks (${customer.remarks.length})`;
+    btn.onclick = () => toggleRemarksDetails(customer);
+    box.appendChild(btn);
+  }
+
   let allMessages = [];
   customer.chats.forEach(m => allMessages.push({ type:'chat', ...m }));
   customer.calls.forEach(c => allMessages.push({ type:'call', timestamp:c.created_at }));
@@ -698,6 +768,18 @@ function renderChat(customer, scrollToBottom){
   }
 }
 
+function insertAfterHeaderButtons(box, div){
+  // Insert right after any leading booking/remarks buttons at the top of the
+  // chat, so this works whether one or both buttons are present.
+  const buttons = box.querySelectorAll(':scope > button.booking-button');
+  if (buttons.length){
+    const lastBtn = buttons[buttons.length - 1];
+    lastBtn.insertAdjacentElement('afterend', div);
+  } else {
+    box.insertBefore(div, box.firstChild);
+  }
+}
+
 function toggleBookingDetails(customer){
   const box = document.getElementById('chatMessages');
   const existing = document.getElementById('booking-details-block');
@@ -713,7 +795,22 @@ function toggleBookingDetails(customer){
     <div><strong>Remarks:</strong> ${escapeHtml(b.remarks||'-')}</div>
     <div><strong>Date:</strong> ${new Date(b.created_at).toLocaleString()}</div>
   `).join('<hr>');
-  box.insertBefore(div, box.children[1] || null);
+  insertAfterHeaderButtons(box, div);
+}
+
+function toggleRemarksDetails(customer){
+  const box = document.getElementById('chatMessages');
+  const existing = document.getElementById('remarks-details-block');
+  if (existing){ existing.remove(); return; }
+
+  const sorted = [...customer.remarks].sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
+  const div = document.createElement('div');
+  div.className = 'booking-details remarks-details';
+  div.id = 'remarks-details-block';
+  div.innerHTML = sorted.map(r => `
+    <div><strong>${new Date(r.created_at).toLocaleString()}:</strong> ${escapeHtml(r.remark || '-')}</div>
+  `).join('<hr>');
+  insertAfterHeaderButtons(box, div);
 }
 
 /* ============ QUICK REPLIES ============ */
