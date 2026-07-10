@@ -67,6 +67,7 @@
   .customer.flag-cancel .cust-top strong{color:var(--wa-red);}
   .customer.flag-booking{background:#dff5e1;}
   .customer.flag-stale{background:#f5b7b1;}
+  .customer.flag-remark{background:#eceff1;}
   .cust-top{display:flex;justify-content:space-between;align-items:center;}
   .cust-name{font-weight:600;font-size:14.5px;}
   .cust-name.unread{font-weight:700;}
@@ -77,12 +78,14 @@
   .badge{background:var(--wa-green);color:#fff;font-size:11px;min-width:18px;height:18px;border-radius:9px;
     display:flex;align-items:center;justify-content:center;padding:0 5px;font-weight:700;}
   .badge.badge-red{background:var(--wa-red);}
-  .tag-row{display:flex;gap:4px;margin-top:2px;}
+  .tag-row{display:flex;gap:4px;margin-top:2px;flex-wrap:wrap;}
   .tag{font-size:10px;padding:1px 6px;border-radius:8px;font-weight:700;letter-spacing:.2px;
     max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
   .tag.cancel{background:var(--wa-red);color:#fff;}
   .tag.booked{background:var(--wa-green);color:#fff;}
   .tag.stale{background:#c0392b;color:#fff;}
+  .tag.remark{background:#5f6368;color:#fff;white-space:normal;max-width:100%;overflow:visible;
+    text-overflow:unset;line-height:1.35;padding:3px 8px;font-weight:600;letter-spacing:0;}
   .empty-hint{padding:30px 16px;color:var(--wa-sub);font-size:13px;text-align:center;}
 
   /* Chat window */
@@ -617,10 +620,12 @@ function renderCustomerList(customers){
     const cancel = isCancelRecent(c);
     const booked = hasBooking(c);
     const stale = isStale(c);
+    const latestRemark = stale ? getLatestRemark(c) : null;
     let cls = 'customer';
     if (c.mobile === selectedMobile) cls += ' active';
     if (cancel) cls += ' flag-cancel';
     else if (booked) cls += ' flag-booking';
+    else if (stale && latestRemark) cls += ' flag-remark';
     else if (stale) cls += ' flag-stale';
     div.className = cls;
 
@@ -634,9 +639,11 @@ function renderCustomerList(customers){
     if (cancel) tags += '<span class="tag cancel">CANCEL RISK</span>';
     if (booked) tags += '<span class="tag booked">BOOKED</span>';
     if (stale && !cancel){
-      const latestRemark = getLatestRemark(c);
-      const staleLabel = latestRemark ? latestRemark.remark : 'NO REPLY 5m+ & No remarks';
-      tags += `<span class="tag stale">${escapeHtml(staleLabel)}</span>`;
+      if (latestRemark){
+        tags += `<span class="tag remark">${escapeHtml(latestRemark.remark)}</span>`;
+      } else {
+        tags += '<span class="tag stale">NO REPLY 5m+ &amp; No remarks</span>';
+      }
     }
 
     div.innerHTML = `
