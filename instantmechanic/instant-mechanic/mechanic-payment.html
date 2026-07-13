@@ -1201,34 +1201,35 @@
                 <div class="card-amount" id="totalPending">₹0</div>
                 <div class="card-subtitle" id="lastUpdated">Last updated: --</div>
             </div>
-
-            <div class="card">
+<div class="card">
                 <div class="card-header">
                     <div class="card-icon warning">
-                        <i class="fas fa-users"></i>
+                        <i class="fas fa-hourglass-half"></i>
                     </div>
                     <div>
-                        <div class="card-title">Mechanics with Pending</div>
-                        <div class="card-subtitle">Active pending balances</div>
+                        <div class="card-title">Total Today Mechanic Pending</div>
+                        <div class="card-subtitle">Today's unpaid payouts</div>
                     </div>
                 </div>
-                <div class="card-amount" id="mechanicsWithPending">0</div>
-                <div class="card-subtitle">mechanics have pending amounts</div>
+                <div class="card-amount" id="totalTodayPending">₹0</div>
+                <div class="card-subtitle">pending amount for today</div>
             </div>
 
             <div class="card">
                 <div class="card-header">
                     <div class="card-icon success">
-                        <i class="fas fa-history"></i>
+                        <i class="fas fa-hand-holding-usd"></i>
                     </div>
                     <div>
-                        <div class="card-title">Recent Payouts</div>
-                        <div class="card-subtitle">Today's transactions</div>
+                        <div class="card-title">Total Today Collected</div>
+                        <div class="card-subtitle">Today's settled payouts</div>
                     </div>
                 </div>
-                <div class="card-amount" id="recentPayouts">0</div>
-                <div class="card-subtitle">transactions today</div>
+                <div class="card-amount" id="totalTodayCollected">₹0</div>
+                <div class="card-subtitle">collected amount for today</div>
             </div>
+
+
         </div>
 
         <!-- Enhanced Filters with Search -->
@@ -1994,26 +1995,33 @@
             }
         }
 
-        // Update overview cards
+// Update overview cards
         function updateOverviewCards() {
             const totalPendingEl = document.getElementById('totalPending');
             const lastUpdatedEl = document.getElementById('lastUpdated');
-            const mechanicsWithPendingEl = document.getElementById('mechanicsWithPending');
-            const recentPayoutsEl = document.getElementById('recentPayouts');
+            const totalTodayPendingEl = document.getElementById('totalTodayPending');
+            const totalTodayCollectedEl = document.getElementById('totalTodayCollected');
 
             const totalPending = paymentData.overall_payment.pending_payments || 0;
             totalPendingEl.textContent = formatCurrency(totalPending);
-            
+
             if (paymentData.overall_payment.updated_at) {
                 lastUpdatedEl.textContent = `Last updated: ${formatDateTime(paymentData.overall_payment.updated_at)}`;
             }
 
-            const mechanicsWithPending = paymentData.mechanic_pending.filter(m => Math.abs(m.pending_balance) > 0).length;
-            mechanicsWithPendingEl.textContent = mechanicsWithPending;
-
             const today = new Date().toISOString().split('T')[0];
-            const todayPayouts = paymentData.daily_payouts.filter(p => p.payout_date === today && !p.is_deleted).length;
-            recentPayoutsEl.textContent = todayPayouts;
+
+            // Today's pending: not deleted, not yet paid out
+            const todayPending = (paymentData.daily_payouts || [])
+                .filter(p => p.payout_date === today && p.is_deleted !== true && p.payment_transfer !== true)
+                .reduce((sum, p) => sum + (p.pending_amount || 0), 0);
+            totalTodayPendingEl.textContent = formatCurrency(todayPending);
+
+            // Today's collected: not deleted, payment transferred
+            const todayCollected = (paymentData.daily_payouts || [])
+                .filter(p => p.payout_date === today && p.is_deleted !== true && p.payment_transfer === true)
+                .reduce((sum, p) => sum + (p.pending_amount || 0), 0);
+            totalTodayCollectedEl.textContent = formatCurrency(todayCollected);
         }
 
         // Update mechanic pending table
