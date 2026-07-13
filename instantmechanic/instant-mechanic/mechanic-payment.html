@@ -2074,6 +2074,7 @@
             yesterdayAdjustedEl.textContent = `Yesterday: ${formatCurrency(yesterdayAdjusted)}`;
         }
         // Update mechanic pending table
+       // Update mechanic pending table
         function updateMechanicPendingTable() {
             const tbody = document.getElementById('mechanicPendingTableBody');
             
@@ -2098,7 +2099,9 @@
                 return a.mechanic_name.localeCompare(b.mechanic_name);
             });
 
-            tbody.innerHTML = sortedMechanics.map(item => `
+            tbody.innerHTML = sortedMechanics.map(item => {
+                const lastPaidCreatedAt = getLastPaidUpdateTime(item.mechanic_name);
+                return `
                 <tr>
                     <td>
                         <span class="mechanic-name-link" onclick="selectMechanicForPayouts('${item.mechanic_name}')">
@@ -2108,7 +2111,7 @@
                     <td class="${item.pending_balance >= 0 ? 'amount-positive' : 'amount-negative'}">
                         ${formatCurrency(item.pending_balance)}
                     </td>
-                    <td>${formatDateTime(item.updated_at)}</td>
+                    <td>${lastPaidCreatedAt ? formatDateTime(lastPaidCreatedAt) : '—'}</td>
                     <td>
                         <div class="pending-balance">
                             ${Math.abs(item.pending_balance) > 0 ? 
@@ -2140,9 +2143,24 @@
                         </div>
                     </td>
                 </tr>
-            `).join('');
+            `;
+            }).join('');
         }
 
+        // Get the created_at of the most recent settled (paid) payout for a mechanic
+        function getLastPaidUpdateTime(mechanicName) {
+            const payouts = paymentData.daily_payouts || [];
+            const paidEntries = payouts.filter(p =>
+                p.mechanic_name === mechanicName &&
+                p.is_deleted !== true &&
+                p.payment_transfer === true
+            );
+
+            if (paidEntries.length === 0) return null;
+
+            paidEntries.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+            return paidEntries[0].created_at;
+        }
         // Update daily payouts table
         function updateDailyPayoutsTable() {
             const dailyPayoutsSection = document.getElementById('dailyPayoutsSection');
