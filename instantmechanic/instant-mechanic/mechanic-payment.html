@@ -1213,6 +1213,7 @@
                 </div>
                 <div class="card-amount" id="totalTodayPending">₹0</div>
                 <div class="card-subtitle">pending amount for today</div>
+                <div class="card-subtitle" id="yesterdayPending" style="margin-top: 4px; font-size: 0.75rem; color: var(--gray-400);">Yesterday: ₹0</div>
             </div>
 
             <div class="card">
@@ -1227,8 +1228,8 @@
                 </div>
                 <div class="card-amount" id="totalTodayCollected">₹0</div>
                 <div class="card-subtitle">collected amount for today</div>
+                <div class="card-subtitle" id="yesterdayCollected" style="margin-top: 4px; font-size: 0.75rem; color: var(--gray-400);">Yesterday: ₹0</div>
             </div>
-
 
         </div>
 
@@ -1996,11 +1997,14 @@
         }
 
 // Update overview cards
+     // Update overview cards
         function updateOverviewCards() {
             const totalPendingEl = document.getElementById('totalPending');
             const lastUpdatedEl = document.getElementById('lastUpdated');
             const totalTodayPendingEl = document.getElementById('totalTodayPending');
             const totalTodayCollectedEl = document.getElementById('totalTodayCollected');
+            const yesterdayPendingEl = document.getElementById('yesterdayPending');
+            const yesterdayCollectedEl = document.getElementById('yesterdayCollected');
 
             const totalPending = paymentData.overall_payment.pending_payments || 0;
             totalPendingEl.textContent = formatCurrency(totalPending);
@@ -2009,21 +2013,39 @@
                 lastUpdatedEl.textContent = `Last updated: ${formatDateTime(paymentData.overall_payment.updated_at)}`;
             }
 
-            const today = new Date().toISOString().split('T')[0];
+            const todayDate = new Date();
+            const today = todayDate.toISOString().split('T')[0];
+
+            const yesterdayDate = new Date(todayDate);
+            yesterdayDate.setDate(yesterdayDate.getDate() - 1);
+            const yesterday = yesterdayDate.toISOString().split('T')[0];
+
+            const payouts = paymentData.daily_payouts || [];
 
             // Today's pending: not deleted, not yet paid out
-            const todayPending = (paymentData.daily_payouts || [])
+            const todayPending = payouts
                 .filter(p => p.payout_date === today && p.is_deleted !== true && p.payment_transfer !== true)
                 .reduce((sum, p) => sum + (p.pending_amount || 0), 0);
             totalTodayPendingEl.textContent = formatCurrency(todayPending);
 
             // Today's collected: not deleted, payment transferred
-            const todayCollected = (paymentData.daily_payouts || [])
+            const todayCollected = payouts
                 .filter(p => p.payout_date === today && p.is_deleted !== true && p.payment_transfer === true)
                 .reduce((sum, p) => sum + (p.pending_amount || 0), 0);
             totalTodayCollectedEl.textContent = formatCurrency(todayCollected);
-        }
 
+            // Yesterday's pending
+            const yesterdayPending = payouts
+                .filter(p => p.payout_date === yesterday && p.is_deleted !== true && p.payment_transfer !== true)
+                .reduce((sum, p) => sum + (p.pending_amount || 0), 0);
+            yesterdayPendingEl.textContent = `Yesterday: ${formatCurrency(yesterdayPending)}`;
+
+            // Yesterday's collected
+            const yesterdayCollected = payouts
+                .filter(p => p.payout_date === yesterday && p.is_deleted !== true && p.payment_transfer === true)
+                .reduce((sum, p) => sum + (p.pending_amount || 0), 0);
+            yesterdayCollectedEl.textContent = `Yesterday: ${formatCurrency(yesterdayCollected)}`;
+        }
         // Update mechanic pending table
         function updateMechanicPendingTable() {
             const tbody = document.getElementById('mechanicPendingTableBody');
