@@ -1291,11 +1291,12 @@
                 <h3>Mechanic Pending Balances</h3>
             </div>
             <div class="table-container">
-                <table class="table">
+<table class="table">
                     <thead>
                         <tr>
                             <th>Mechanic Name</th>
                             <th>Pending Balance</th>
+                            <th>Yesterday Pending</th>
                             <th>Last Updated</th>
                             <th>Status</th>
                             <th>Actions</th>
@@ -2073,8 +2074,7 @@
                 .reduce((sum, p) => sum + (p.pending_amount || 0), 0);
             yesterdayAdjustedEl.textContent = `Yesterday: ${formatCurrency(yesterdayAdjusted)}`;
         }
-        // Update mechanic pending table
-       // Update mechanic pending table
+// Update mechanic pending table
         function updateMechanicPendingTable() {
             const tbody = document.getElementById('mechanicPendingTableBody');
             
@@ -2083,7 +2083,7 @@
             if (dataToDisplay.length === 0) {
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="5" class="empty-state">
+                        <td colspan="6" class="empty-state">
                             <i class="fas fa-inbox"></i>
                             <div>No pending balances found</div>
                         </td>
@@ -2101,6 +2101,7 @@
 
             tbody.innerHTML = sortedMechanics.map(item => {
                 const lastPaidCreatedAt = getLastPaidUpdateTime(item.mechanic_name);
+                const yesterdayPendingAmount = getYesterdayPendingBalance(item.mechanic_name);
                 return `
                 <tr>
                     <td>
@@ -2110,6 +2111,9 @@
                     </td>
                     <td class="${item.pending_balance >= 0 ? 'amount-positive' : 'amount-negative'}">
                         ${formatCurrency(item.pending_balance)}
+                    </td>
+                    <td class="${yesterdayPendingAmount !== null ? (yesterdayPendingAmount >= 0 ? 'amount-positive' : 'amount-negative') : ''}">
+                        ${yesterdayPendingAmount !== null ? formatCurrency(yesterdayPendingAmount) : '—'}
                     </td>
                     <td>${lastPaidCreatedAt ? formatDateTime(lastPaidCreatedAt) : '—'}</td>
                     <td>
@@ -2136,9 +2140,9 @@
                                     Send Hisab
                                 </button>
                                 <button class="btn btn-primary" onclick="viewQRPayments('${item.mechanic_name}')" style="padding: 8px 16px; font-size: 13px;">
-    <i class="fas fa-qrcode"></i>
-    View QR Payments
-</button>
+                                    <i class="fas fa-qrcode"></i>
+                                    View QR Payments
+                                </button>
                             ` : '<span class="settled-badge"><i class="fas fa-check"></i> Settled</span>'}
                         </div>
                     </td>
@@ -2161,7 +2165,28 @@
             paidEntries.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
             return paidEntries[0].created_at;
         }
-        // Update daily payouts table
+
+        // Get the mechanic's pending balance as it stood at end of yesterday
+        // (latest non-deleted payout entry for payout_date = yesterday)
+        function getYesterdayPendingBalance(mechanicName) {
+            const payouts = paymentData.daily_payouts || [];
+
+            const todayDate = new Date();
+            const yesterdayDate = new Date(todayDate);
+            yesterdayDate.setDate(yesterdayDate.getDate() - 1);
+            const yesterday = yesterdayDate.toISOString().split('T')[0];
+
+            const entries = payouts.filter(p =>
+                p.mechanic_name === mechanicName &&
+                p.payout_date === yesterday &&
+                p.is_deleted !== true
+            );
+
+            if (entries.length === 0) return null;
+
+            entries.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+            return entries[0].pending_amount;
+        }
         function updateDailyPayoutsTable() {
             const dailyPayoutsSection = document.getElementById('dailyPayoutsSection');
             const searchValue = document.getElementById('mechanicSearchInput').value;
