@@ -1230,6 +1230,20 @@
                 <div class="card-subtitle">collected amount for today</div>
                 <div class="card-subtitle" id="yesterdayCollected" style="margin-top: 4px; font-size: 0.75rem; color: var(--gray-400);">Yesterday: ₹0</div>
             </div>
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon primary">
+                        <i class="fas fa-balance-scale"></i>
+                    </div>
+                    <div>
+                        <div class="card-title">Payment Adjusted</div>
+                        <div class="card-subtitle">Today's adjustment entries</div>
+                    </div>
+                </div>
+                <div class="card-amount" id="totalTodayAdjusted">₹0</div>
+                <div class="card-subtitle">adjusted amount for today</div>
+                <div class="card-subtitle" id="yesterdayAdjusted" style="margin-top: 4px; font-size: 0.75rem; color: var(--gray-400);">Yesterday: ₹0</div>
+            </div>
 
         </div>
 
@@ -1997,14 +2011,15 @@
         }
 
 // Update overview cards
-     // Update overview cards
         function updateOverviewCards() {
             const totalPendingEl = document.getElementById('totalPending');
             const lastUpdatedEl = document.getElementById('lastUpdated');
             const totalTodayPendingEl = document.getElementById('totalTodayPending');
             const totalTodayCollectedEl = document.getElementById('totalTodayCollected');
+            const totalTodayAdjustedEl = document.getElementById('totalTodayAdjusted');
             const yesterdayPendingEl = document.getElementById('yesterdayPending');
             const yesterdayCollectedEl = document.getElementById('yesterdayCollected');
+            const yesterdayAdjustedEl = document.getElementById('yesterdayAdjusted');
 
             const totalPending = paymentData.overall_payment.pending_payments || 0;
             totalPendingEl.textContent = formatCurrency(totalPending);
@@ -2028,11 +2043,17 @@
                 .reduce((sum, p) => sum + (p.pending_amount || 0), 0);
             totalTodayPendingEl.textContent = formatCurrency(todayPending);
 
-            // Today's collected: not deleted, payment transferred
+            // Today's collected: not deleted, transferred, NOT an adjustment
             const todayCollected = payouts
-                .filter(p => p.payout_date === today && p.is_deleted !== true && p.payment_transfer === true)
+                .filter(p => p.payout_date === today && p.is_deleted !== true && p.payment_transfer === true && p.is_adjustment !== true)
                 .reduce((sum, p) => sum + (p.pending_amount || 0), 0);
             totalTodayCollectedEl.textContent = formatCurrency(todayCollected);
+
+            // Today's adjusted: not deleted, transferred, IS an adjustment
+            const todayAdjusted = payouts
+                .filter(p => p.payout_date === today && p.is_deleted !== true && p.payment_transfer === true && p.is_adjustment === true)
+                .reduce((sum, p) => sum + (p.pending_amount || 0), 0);
+            totalTodayAdjustedEl.textContent = formatCurrency(todayAdjusted);
 
             // Yesterday's pending
             const yesterdayPending = payouts
@@ -2040,11 +2061,17 @@
                 .reduce((sum, p) => sum + (p.pending_amount || 0), 0);
             yesterdayPendingEl.textContent = `Yesterday: ${formatCurrency(yesterdayPending)}`;
 
-            // Yesterday's collected
+            // Yesterday's collected (excluding adjustments)
             const yesterdayCollected = payouts
-                .filter(p => p.payout_date === yesterday && p.is_deleted !== true && p.payment_transfer === true)
+                .filter(p => p.payout_date === yesterday && p.is_deleted !== true && p.payment_transfer === true && p.is_adjustment !== true)
                 .reduce((sum, p) => sum + (p.pending_amount || 0), 0);
             yesterdayCollectedEl.textContent = `Yesterday: ${formatCurrency(yesterdayCollected)}`;
+
+            // Yesterday's adjustments
+            const yesterdayAdjusted = payouts
+                .filter(p => p.payout_date === yesterday && p.is_deleted !== true && p.payment_transfer === true && p.is_adjustment === true)
+                .reduce((sum, p) => sum + (p.pending_amount || 0), 0);
+            yesterdayAdjustedEl.textContent = `Yesterday: ${formatCurrency(yesterdayAdjusted)}`;
         }
         // Update mechanic pending table
         function updateMechanicPendingTable() {
