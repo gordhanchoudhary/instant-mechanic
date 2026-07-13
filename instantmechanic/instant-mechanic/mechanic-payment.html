@@ -1874,17 +1874,25 @@
                                 <div class="history-entry-amount ${payout.pending_amount >= 0 ? 'positive' : 'negative'}">
                                     ${formatCurrency(payout.pending_amount)}
                                 </div>
-                                <div class="history-entry-actions">
+<div class="history-entry-actions">
                                     ${entry.hasHistory ? `
                                         <button class="history-entry-expand" onclick="toggleHistoricalData(${index})" id="expand-btn-${index}">
                                             <i class="fas fa-chevron-down"></i> 
                                             History (${entry.historicalCount})
                                         </button>
                                     ` : ''}
-                                    <button class="btn btn-primary" onclick="viewDetails('${payout.payout_date}', '${mechanicFilter}')" style="padding: 8px 16px; font-size: 0.8rem;">
-                                        <i class="fas fa-eye"></i>
-                                        View Details
-                                    </button>
+                                    ${isPaid ? `
+                                        ${payout.is_adjustment === true ? `
+                                            <div style="font-size: 1.1rem; font-weight: 800; color: var(--warning-dark); text-transform: uppercase; letter-spacing: 0.05em; padding: 8px 16px;">
+                                                Adjustment
+                                            </div>
+                                        ` : ''}
+                                    ` : `
+                                        <button class="btn btn-primary" onclick="viewDetails('${payout.payout_date}', '${mechanicFilter}')" style="padding: 8px 16px; font-size: 0.8rem;">
+                                            <i class="fas fa-eye"></i>
+                                            View Details
+                                        </button>
+                                    `}
                                 </div>
                             </div>
                             ${entry.hasHistory ? `
