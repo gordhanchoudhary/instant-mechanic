@@ -355,6 +355,7 @@ async function startCall() {
       model: MODEL_NAME,
       config: {
         responseModalities: [Modality.AUDIO],
+        temperature: 0.4, // lower = less random variation in delivery/tone between turns
         speechConfig: {
           voiceConfig: { prebuiltVoiceConfig: { voiceName: "Kore" } }
           // No languageCode set deliberately — native audio models auto-detect
