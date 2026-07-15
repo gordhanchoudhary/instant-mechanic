@@ -373,6 +373,16 @@ async function startCall() {
           resetSilenceTimers();
         },
         onmessage: async (msg) => {
+          // Any message at all counts as activity — reset silence timers here,
+          // not only on customer speech, so we never nudge mid-response.
+          resetSilenceTimers();
+
+          if (msg.serverContent && msg.serverContent.interrupted) {
+            // Customer barged in — stop all queued/playing audio immediately
+            // so the old response doesn't keep playing under the new one.
+            stopAllPlayback();
+          }
+
           if (msg.data) {
             playAudioChunk(msg.data);
           }
@@ -381,7 +391,6 @@ async function startCall() {
           }
           if (msg.serverContent && msg.serverContent.inputTranscription) {
             appendTranscript("Customer: " + msg.serverContent.inputTranscription.text, "system-line");
-            resetSilenceTimers();
           }
           if (msg.toolCall) {
             for (const fc of msg.toolCall.functionCalls) {
@@ -444,6 +453,11 @@ function teardown() {
     audioContext.close();
     audioContext = null;
   }
+  stopAllPlayback();
+  if (playbackContext) {
+    playbackContext.close();
+    playbackContext = null;
+  }
   session = null;
   callInProgress = false;
   startBtn.disabled = false;
@@ -483,10 +497,18 @@ async function startMic() {
 
 // ---------------------------------------------------------------------
 // AUDIO PLAYBACK -> base64 PCM 24kHz from Gemini -> speaker
+// Chunks are scheduled back-to-back (never overlapping) using an
+// incrementing nextStartTime. On interruption, all pending/playing
+// sources are stopped and the schedule resets, per Gemini's guidance
+// for handling barge-in.
 // ---------------------------------------------------------------------
+let nextStartTime = 0;
+let scheduledSources = [];
+
 function getPlaybackContext() {
   if (!playbackContext) {
     playbackContext = new AudioContext({ sampleRate: 24000 });
+    nextStartTime = 0;
   }
   return playbackContext;
 }
@@ -500,10 +522,27 @@ function playAudioChunk(base64Data) {
   const buffer = ctx.createBuffer(1, pcm16.length, 24000);
   const channel = buffer.getChannelData(0);
   for (let i = 0; i < pcm16.length; i++) channel[i] = pcm16[i] / 32768;
+
   const src = ctx.createBufferSource();
   src.buffer = buffer;
   src.connect(ctx.destination);
-  src.start();
+
+  const now = ctx.currentTime;
+  if (nextStartTime < now) nextStartTime = now; // catch up if we fell behind
+  src.start(nextStartTime);
+  scheduledSources.push(src);
+  src.onended = () => {
+    scheduledSources = scheduledSources.filter(s => s !== src);
+  };
+  nextStartTime += buffer.duration;
+}
+
+function stopAllPlayback() {
+  for (const src of scheduledSources) {
+    try { src.stop(); } catch (e) { /* already stopped */ }
+  }
+  scheduledSources = [];
+  if (playbackContext) nextStartTime = playbackContext.currentTime;
 }
 
 // ---------------------------------------------------------------------
