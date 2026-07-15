@@ -1,76 +1,371 @@
-<!-- demo.html -->
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <script type="importmap">
-    { "imports": { "@google/genai": "https://esm.sh/@google/genai" } }
-  </script>
+<meta charset="UTF-8">
+<title>Instant Mechanic — Namira Voice Agent Demo</title>
+<script type="importmap">
+  { "imports": { "@google/genai": "https://esm.sh/@google/genai" } }
+</script>
+<style>
+  body { font-family: -apple-system, Segoe UI, Roboto, sans-serif; max-width: 640px; margin: 40px auto; padding: 0 20px; color: #1a1a1a; }
+  h1 { font-size: 20px; font-weight: 600; }
+  .status { font-size: 13px; color: #666; margin-bottom: 16px; }
+  .status.connected { color: #0a7d3a; }
+  .status.error { color: #b91c1c; }
+  button { padding: 10px 20px; font-size: 14px; border-radius: 6px; border: 1px solid #ccc; background: #fff; cursor: pointer; margin-right: 8px; }
+  button:disabled { opacity: 0.4; cursor: not-allowed; }
+  #startBtn { background: #111; color: #fff; border: none; }
+  #stopBtn { background: #f3f3f3; }
+  #transcript { margin-top: 24px; white-space: pre-wrap; font-family: ui-monospace, Menlo, monospace; font-size: 13px; line-height: 1.6; background: #fafafa; border: 1px solid #eee; border-radius: 8px; padding: 16px; min-height: 200px; max-height: 480px; overflow-y: auto; }
+  .agent-line { color: #111; }
+  .system-line { color: #999; font-style: italic; }
+</style>
 </head>
 <body>
-  <button id="startBtn">Start call</button>
-  <button id="stopBtn" disabled>End call</button>
-  <div id="transcript" style="white-space:pre-wrap;margin-top:20px;font-family:monospace;"></div>
+
+<h1>Instant Mechanic — Namira (demo)</h1>
+<div id="statusEl" class="status">Not connected</div>
+
+<button id="startBtn">Start call</button>
+<button id="stopBtn" disabled>End call</button>
+
+<div id="transcript"></div>
 
 <script type="module">
 import { GoogleGenAI, Modality } from "@google/genai";
 
-let session, audioContext, micStream, scriptNode;
+// ---------------------------------------------------------------------
+// CONFIG
+// ---------------------------------------------------------------------
+const TOKEN_ENDPOINT = "https://ai.instantmechanic.online/bot/live-token";
+const TOOL_ENDPOINT_BASE = "https://ai.instantmechanic.online/bot/tools";
+const MODEL_NAME = "gemini-3.1-flash-live-preview";
+
+const NAMIRA_SYSTEM_PROMPT = `You are Namira, the dedicated customer support voice agent for Instant Mechanic —
+Delhi NCR's fastest car roadside assistance service.
+
+LANGUAGE:
+Always respond in English only, regardless of what language the customer speaks in.
+RESPOND IN ENGLISH. YOU MUST RESPOND UNMISTAKABLY IN ENGLISH, even if the customer
+speaks Hindi or Hinglish. If the customer doesn't understand, politely repeat the
+same point in simpler English rather than switching languages.
+
+VOICE AND DELIVERY:
+Speak calmly and professionally — warm but composed, like an experienced human support
+agent on a phone call, never rushed. Natural pauses between sentences. One question at a
+time. Briefly confirm what you heard before moving to the next question. No filler
+acknowledgments (okay, got it, sure, alright). Keep each turn to 1-2 short sentences.
+
+YOUR GOAL:
+- Quickly understand the customer's problem
+- Collect required info: location, car model, issue
+- Offer correct pricing
+- Get the customer to confirm a booking verbally
+- Never leave the conversation idle for long
+- Reassure and support the customer politely throughout
+- Provide the best human-like support, especially during emergencies
+
+COVERAGE:
+Instant Mechanic operates across India. We support ONLY cars — do not support bikes,
+trucks, or any other vehicle.
+
+SERVICES OFFERED:
+- Car battery jump start / new battery installation
+- Flat tyre help: stepney change or puncture repair
+- Fuel delivery: petrol or diesel
+- Key lockout
+- Minor repairs: car heating, belt issues, coolant leaks, clutch cable, etc.
+- Car scanning, electrical, inspection
+- Towing (underlift or flatbed) — flatbed preferred for luxury cars (e.g. BMW) or major damage
+
+CONVERSATION FLOW (follow strictly):
+
+1. Start the call: "Hi, this is Namira from Instant Mechanic. What issue are you facing with
+   your car?"
+
+2. After the customer replies, ask for their location: "Thanks for reaching out. Could you
+   tell me your current location or the nearest landmark?"
+
+3. Once location is received:
+   - If within serviceable area: "Great, you're within our service area. May I know your
+     car model, and a bit more about the issue?"
+   - If outside serviceable area: "I'm really sorry, Instant Mechanic isn't available at
+     your location right now."
+
+4. Once both the issue and car model are known, work out pricing internally — never say
+   "I will calculate charges" out loud, just state the final numbers:
+
+   Base RescueCharge: 668 rupees + GST (788 rupees incl. GST)
+
+   Pricing rules:
+   - Puncture repair: add 100 rupees per puncture
+   - Car heating, belt issue, gear issue, key lockout, bumper, window-door lock issue,
+     engine scanning, clutch wire: add 150 rupees to RescueCharge
+   - Expensive or luxury car: add 150 rupees to RescueCharge
+   - Any part installed (coolant, belt, clutch cable): additional charges apply as per MRP
+   - Fuel delivery: mention fuel cost is extra, on top of RescueCharge
+
+   Membership price based on final RescueCharge incl. GST:
+   - Less than 800 rupees -> Membership = 1,375 rupees
+   - 850 to under 950 rupees -> Membership = 1,475 rupees
+
+   Present both options verbally, clearly separated:
+   "I have two options for you. Option A is our Annual Membership at [membership price]
+   rupees including GST — that covers 12 roadside rescues over 12 months, today's service
+   included, and priority dispatch every time. Option B is a One-Time Rescue at
+   [RescueCharge incl. GST] rupees including GST, covering just today's service. Which
+   would you like — A or B?"
+
+   Wait for the customer's verbal choice before confirming.
+
+   For flat tyre issues, ask: "Is your stepney available? Would you like a stepney change
+   or a puncture repair?"
+
+   For fuel delivery, ask: "Petrol or diesel, and how many litres do you need?"
+
+   If asked whether the annual membership covers other cars: "No, this covers a single
+   car only."
+
+5. If the issue is major, ask: "Would you like your car towed to a nearby garage, or
+   somewhere else of your choice?"
+
+6. If towing is requested, ask for: pickup location, drop location, car model, and the
+   problem (to decide flatbed vs underlift). Then state:
+   "The towing charge, including toll and taxes, is [amount] rupees plus GST, which comes
+   to [amount incl. GST] rupees. This includes toll charges, commercial entry tax if
+   applicable, and the towing distance."
+   Flatbed is recommended for luxury cars or if all tyres are burst.
+   Never present Option A / Option B for towing cases.
+
+7. If the customer says the price is high:
+   - Never reduce price on towing cases. Say: "The charges include towing distance, tolls,
+     and commercial tax where applicable — this ensures smooth transport without hassle."
+   - For minor repair cases, if they keep negotiating, you may offer up to 10% discount,
+     politely and naturally.
+
+8. Booking confirmation — use this exact spoken format:
+   - For repairs: "Booking confirmed. A mechanic is on the way and will reach you within
+     15 minutes."
+   - For towing: "Booking confirmed. A crane has been dispatched and will reach you within
+     15 minutes."
+   Then ask: "What's your car's registration number? It helps the mechanic identify your
+   car easily."
+   Never confirm the same booking twice. If asked again, say: "Your booking is already
+   confirmed with Instant Mechanic."
+
+   IMPORTANT: Every time you confirm a booking or share final pricing, silently call the
+   log_booking tool with the structured details (car name, problem, location, price, plan,
+   remarks). Never speak this data aloud, never read it back to the customer — it is a
+   backend log only, completely separate from what you say out loud.
+
+POST-BOOKING COMPLAINTS — handle like this:
+- "Send mechanic ASAP" / "mechanic taking 1 hour": "Let me check with the mechanic — he
+  might be delayed due to traffic or collecting tools. I'll ask him to hurry."
+- "Mechanic not picking up" / "no one called": "You'll get a call shortly from the assigned
+  mechanic. I'll remind him to call you right away."
+- "Mechanic was rude": "I'm really sorry to hear that. I've noted this and will raise a
+  complaint so it doesn't happen again."
+- "Tell him to bring tools": "Don't worry, the mechanic will bring everything needed."
+- "Should I pay now": "Yes, we request a small advance payment — the rest is paid after
+  the service is completed."
+- If the mechanic is delayed or unavailable: "Let me check quickly — if needed I'll assign
+  someone closer. Give me two to three minutes."
+
+SPECIAL SITUATIONS:
+- Cancel after confirmation: "Are you sure? The mechanic is already on the way — you'll be
+  back on the road soon." If they confirm, cancel politely.
+- Discount requested after confirmation: "The booking's already confirmed, but I'll make
+  sure you get a good discount on your next service."
+- Issue unclear (e.g. "car has stopped"): always ask — "Would you like a mechanic to
+  inspect it, or should we tow it to a garage?"
+- Mechanic asking for advance: "Yes, 100 to 200 rupees secures your slot and speeds up
+  service — it's adjusted into your final bill."
+
+GOLDEN RULES:
+- Never say "I will calculate charges"
+- Never ask the customer to calculate distance
+- Never repeat the same message twice, even if the customer repeats themselves
+- Never re-ask a question already answered — location, car model, etc.
+- Never change an agreed final price
+- Never present Option A / Option B for towing cases
+- Always speak clearly, politely, and like a composed professional — never robotic
+
+Use the customer's first name occasionally if they give it — don't repeat it every turn.`;
+
+// ---------------------------------------------------------------------
+// STATE
+// ---------------------------------------------------------------------
+let session = null;
+let audioContext = null;
+let playbackContext = null;
+let micStream = null;
+let scriptNode = null;
+let callInProgress = false;
+
+const startBtn = document.getElementById("startBtn");
+const stopBtn = document.getElementById("stopBtn");
+const statusEl = document.getElementById("statusEl");
 const transcriptEl = document.getElementById("transcript");
 
+function setStatus(text, cls) {
+  statusEl.textContent = text;
+  statusEl.className = "status" + (cls ? " " + cls : "");
+}
+
+function appendTranscript(text, cls) {
+  const line = document.createElement("div");
+  line.className = cls || "agent-line";
+  line.textContent = text;
+  transcriptEl.appendChild(line);
+  transcriptEl.scrollTop = transcriptEl.scrollHeight;
+}
+
+// ---------------------------------------------------------------------
+// TOKEN + SESSION
+// ---------------------------------------------------------------------
 async function getToken() {
-  const res = await fetch("https://ai.instantmechanic.online/bot/live-token");
+  const res = await fetch(TOKEN_ENDPOINT);
+  if (!res.ok) throw new Error("Failed to fetch live token: " + res.status);
   const data = await res.json();
-  return data.token; // e.g. "auth_tokens/254aaa..."
+  return data.token;
 }
 
 async function startCall() {
-  const token = await getToken();
-  const ai = new GoogleGenAI({ apiKey: token });
+  if (callInProgress) return;
+  callInProgress = true;
+  startBtn.disabled = true;
+  setStatus("Connecting…");
+  transcriptEl.innerHTML = "";
 
-  session = await ai.live.connect({
-    model: "gemini-3.1-flash-live-preview",
-    config: {
-      responseModalities: [Modality.AUDIO],
-      systemInstruction: `You are Instant Mechanic's roadside assistant.
-        No filler words, no "okay/got it/sure". Ask for the vehicle issue,
-        then location, then confirm. Keep replies to 1-2 short sentences.`,
-      tools: [{
-        functionDeclarations: [{
-          name: "check_mechanic_availability",
-          description: "Check nearby mechanic availability for a location",
-          parameters: {
-            type: "OBJECT",
-            properties: { location: { type: "STRING" } },
-            required: ["location"]
-          }
+  try {
+    const token = await getToken();
+    const ai = new GoogleGenAI({ apiKey: token });
+
+    session = await ai.live.connect({
+      model: MODEL_NAME,
+      config: {
+        responseModalities: [Modality.AUDIO],
+        speechConfig: {
+          voiceConfig: { prebuiltVoiceConfig: { voiceName: "Kore" } },
+          languageCode: "en-IN"
+        },
+        systemInstruction: NAMIRA_SYSTEM_PROMPT,
+        tools: [{
+          functionDeclarations: [
+            {
+              name: "check_mechanic_availability",
+              description: "Check nearby mechanic availability for a given location",
+              parameters: {
+                type: "OBJECT",
+                properties: { location: { type: "STRING" } },
+                required: ["location"]
+              }
+            },
+            {
+              name: "log_booking",
+              description: "Silently log structured booking data to the backend after confirming a booking or sharing final price. Never spoken aloud to the customer.",
+              parameters: {
+                type: "OBJECT",
+                properties: {
+                  car_name: { type: "STRING" },
+                  problem: { type: "STRING" },
+                  location: { type: "STRING" },
+                  price: { type: "STRING" },
+                  plan: { type: "STRING", enum: ["Annual Membership", "One-Time Rescue", "Towing"] },
+                  remarks: { type: "STRING" }
+                },
+                required: ["car_name", "problem", "location", "price", "plan"]
+              }
+            }
+          ]
         }]
-      }]
-    },
-    callbacks: {
-      onmessage: async (msg) => {
-        if (msg.data) playAudioChunk(msg.data); // base64 PCM audio out
-        if (msg.serverContent?.outputTranscription) {
-          transcriptEl.textContent += "\nAgent: " + msg.serverContent.outputTranscription.text;
-        }
-        if (msg.toolCall) {
-          for (const fc of msg.toolCall.functionCalls) {
-            const result = await callDjangoTool(fc.name, fc.args);
-            session.sendToolResponse({
-              functionResponses: [{ id: fc.id, name: fc.name, response: result }]
-            });
-          }
-        }
       },
-      onerror: (e) => console.error("Live session error", e),
-      onclose: () => console.log("Session closed")
-    }
-  });
+      callbacks: {
+        onopen: () => {
+          setStatus("Connected — speak now", "connected");
+          stopBtn.disabled = false;
+        },
+        onmessage: async (msg) => {
+          if (msg.data) {
+            playAudioChunk(msg.data);
+          }
+          if (msg.serverContent && msg.serverContent.outputTranscription) {
+            appendTranscript("Namira: " + msg.serverContent.outputTranscription.text, "agent-line");
+          }
+          if (msg.serverContent && msg.serverContent.inputTranscription) {
+            appendTranscript("Customer: " + msg.serverContent.inputTranscription.text, "system-line");
+          }
+          if (msg.toolCall) {
+            for (const fc of msg.toolCall.functionCalls) {
+              try {
+                const result = await callDjangoTool(fc.name, fc.args);
+                session.sendToolResponse({
+                  functionResponses: [{ id: fc.id, name: fc.name, response: result }]
+                });
+                if (fc.name === "log_booking") {
+                  appendTranscript("[logged booking: " + JSON.stringify(fc.args) + "]", "system-line");
+                }
+              } catch (err) {
+                console.error("Tool call failed:", fc.name, err);
+                session.sendToolResponse({
+                  functionResponses: [{ id: fc.id, name: fc.name, response: { error: String(err) } }]
+                });
+              }
+            }
+          }
+        },
+        onerror: (e) => {
+          console.error("Live session error", e);
+          setStatus("Connection error — check console", "error");
+        },
+        onclose: () => {
+          setStatus("Call ended");
+          teardown();
+        }
+      }
+    });
 
-  startMic();
-  document.getElementById("startBtn").disabled = true;
-  document.getElementById("stopBtn").disabled = false;
+    await startMic();
+  } catch (err) {
+    console.error(err);
+    setStatus("Failed to start: " + err.message, "error");
+    callInProgress = false;
+    startBtn.disabled = false;
+  }
 }
 
+function endCall() {
+  if (session) {
+    try { session.close(); } catch (e) { /* ignore */ }
+  }
+  teardown();
+}
+
+function teardown() {
+  if (micStream) {
+    micStream.getTracks().forEach(t => t.stop());
+    micStream = null;
+  }
+  if (scriptNode) {
+    scriptNode.disconnect();
+    scriptNode = null;
+  }
+  if (audioContext) {
+    audioContext.close();
+    audioContext = null;
+  }
+  session = null;
+  callInProgress = false;
+  startBtn.disabled = false;
+  stopBtn.disabled = true;
+  if (statusEl.className.indexOf("error") === -1) {
+    setStatus("Not connected");
+  }
+}
+
+// ---------------------------------------------------------------------
+// MIC CAPTURE -> PCM16 16kHz -> Gemini Live
+// ---------------------------------------------------------------------
 async function startMic() {
   micStream = await navigator.mediaDevices.getUserMedia({ audio: { sampleRate: 16000 } });
   audioContext = new AudioContext({ sampleRate: 16000 });
@@ -78,12 +373,17 @@ async function startMic() {
   scriptNode = audioContext.createScriptProcessor(4096, 1, 1);
 
   scriptNode.onaudioprocess = (e) => {
+    if (!session) return;
     const input = e.inputBuffer.getChannelData(0);
     const pcm16 = new Int16Array(input.length);
     for (let i = 0; i < input.length; i++) {
-      pcm16[i] = Math.max(-32768, Math.min(32767, input[i] * 32768));
+      const s = Math.max(-1, Math.min(1, input[i]));
+      pcm16[i] = s < 0 ? s * 32768 : s * 32767;
     }
-    const base64 = btoa(String.fromCharCode(...new Uint8Array(pcm16.buffer)));
+    const bytes = new Uint8Array(pcm16.buffer);
+    let binary = "";
+    for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
+    const base64 = btoa(binary);
     session.sendRealtimeInput({ audio: { data: base64, mimeType: "audio/pcm;rate=16000" } });
   };
 
@@ -91,36 +391,50 @@ async function startMic() {
   scriptNode.connect(audioContext.destination);
 }
 
+// ---------------------------------------------------------------------
+// AUDIO PLAYBACK -> base64 PCM 24kHz from Gemini -> speaker
+// ---------------------------------------------------------------------
+function getPlaybackContext() {
+  if (!playbackContext) {
+    playbackContext = new AudioContext({ sampleRate: 24000 });
+  }
+  return playbackContext;
+}
+
 function playAudioChunk(base64Data) {
-  // decode base64 PCM 24kHz, queue + play — use a simple AudioContext buffer player
-  const bytes = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
+  const ctx = getPlaybackContext();
+  const binary = atob(base64Data);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
   const pcm16 = new Int16Array(bytes.buffer);
-  const playCtx = new AudioContext({ sampleRate: 24000 });
-  const buffer = playCtx.createBuffer(1, pcm16.length, 24000);
+  const buffer = ctx.createBuffer(1, pcm16.length, 24000);
   const channel = buffer.getChannelData(0);
   for (let i = 0; i < pcm16.length; i++) channel[i] = pcm16[i] / 32768;
-  const src = playCtx.createBufferSource();
+  const src = ctx.createBufferSource();
   src.buffer = buffer;
-  src.connect(playCtx.destination);
+  src.connect(ctx.destination);
   src.start();
 }
 
+// ---------------------------------------------------------------------
+// DJANGO TOOL BRIDGE
+// ---------------------------------------------------------------------
 async function callDjangoTool(name, args) {
-  const res = await fetch(`https://ai.instantmechanic.online/bot/tools/${name}`, {
+  const res = await fetch(`${TOOL_ENDPOINT_BASE}/${name}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(args)
   });
+  if (!res.ok) throw new Error(`Tool ${name} failed: ${res.status}`);
   return await res.json();
 }
 
-document.getElementById("startBtn").onclick = startCall;
-document.getElementById("stopBtn").onclick = () => {
-  session?.close();
-  micStream?.getTracks().forEach(t => t.stop());
-  document.getElementById("startBtn").disabled = false;
-  document.getElementById("stopBtn").disabled = true;
-};
+// ---------------------------------------------------------------------
+// WIRE UP BUTTONS
+// ---------------------------------------------------------------------
+startBtn.addEventListener("click", startCall);
+stopBtn.addEventListener("click", endCall);
 </script>
+
 </body>
 </html>
