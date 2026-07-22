@@ -909,7 +909,7 @@ document.getElementById('testCallBtn').addEventListener('click', async () => {
     if (token) headers['Authorization'] = token.startsWith('Token ') ? token : `Token ${token}`;
 
     const res = await fetch(`${EXOTEL_CALL_URL}?mobile=${fullNumber}`, {
-      method: 'POST',
+      method: 'GET',
       headers,
       body: ''
     });
