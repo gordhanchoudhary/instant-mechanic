@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Anika Control Room — Instant Mechanic</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#12151a;
+    --panel:#1a1f27;
+    --panel-2:#212832;
+    --panel-3:#171b22;
+    --border:#2a313d;
+    --border-soft:#232a34;
+    --text:#e7eaee;
+    --text-dim:#98a2b0;
+    --text-faint:#5b6472;
+    --accent:#ff8f3d;
+    --accent-dim:#ff8f3d33;
+    --accent-2:#33d6a6;
+    --accent-2-dim:#33d6a633;
+    --danger:#ff5c72;
+    --danger-dim:#ff5c7226;
+    --radius:10px;
+    --font-display:'Space Grotesk',sans-serif;
+    --font-body:'Inter',sans-serif;
+    --font-mono:'JetBrains Mono',monospace;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:var(--font-body);
+    font-size:14px;
+    line-height:1.5;
+    min-height:100vh;
+  }
+  ::selection{background:var(--accent-dim);}
+  a{color:inherit;}
+
+  /* ---------- layout shell ---------- */
+  .shell{
+    display:grid;
+    grid-template-columns:280px 1fr;
+    min-height:100vh;
+  }
+  @media (max-width:900px){
+    .shell{grid-template-columns:1fr;}
+    .sidebar{position:sticky;top:0;z-index:20;}
+  }
+
+  /* ---------- sidebar ---------- */
+  .sidebar{
+    background:var(--panel-3);
+    border-right:1px solid var(--border);
+    padding:22px 18px;
+    display:flex;
+    flex-direction:column;
+    gap:22px;
+  }
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .brand-mark{
+    width:34px;height:34px;border-radius:9px;
+    background:linear-gradient(155deg,var(--accent),#c9601a);
+    display:flex;align-items:center;justify-content:center;
+    font-family:var(--font-display);font-weight:700;font-size:15px;color:#141414;
+    flex-shrink:0;
+  }
+  .brand-text h1{
+    font-family:var(--font-display);
+    font-size:15px;font-weight:600;margin:0;letter-spacing:.2px;
+  }
+  .brand-text p{margin:1px 0 0;font-size:11.5px;color:var(--text-faint);}
+
+  .road-rule{
+    height:2px;
+    background-image:repeating-linear-gradient(90deg,var(--border) 0 10px,transparent 10px 18px);
+    border:none;
+  }
+
+  .side-section-label{
+    font-size:11px;text-transform:uppercase;letter-spacing:.09em;
+    color:var(--text-faint);font-weight:600;margin:0 0 8px 2px;
+  }
+
+  .config-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;max-height:280px;overflow-y:auto;}
+  .config-item{
+    display:flex;align-items:center;justify-content:space-between;gap:8px;
+    padding:9px 10px;border-radius:8px;cursor:pointer;
+    border:1px solid transparent;
+    transition:background .12s, border-color .12s;
+  }
+  .config-item:hover{background:var(--panel-2);}
+  .config-item.selected{background:var(--panel-2);border-color:var(--border);}
+  .config-item .ci-name{font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .config-item .ci-meta{font-size:11px;color:var(--text-faint);margin-top:1px;}
+  .live-dot{
+    width:7px;height:7px;border-radius:50%;background:var(--accent-2);flex-shrink:0;
+    box-shadow:0 0 0 0 var(--accent-2-dim);
+    animation:pulse-dot 2s infinite;
+  }
+  @keyframes pulse-dot{
+    0%{box-shadow:0 0 0 0 var(--accent-2-dim);}
+    70%{box-shadow:0 0 0 6px transparent;}
+    100%{box-shadow:0 0 0 0 transparent;}
+  }
+
+  .btn{
+    font-family:var(--font-body);
+    font-weight:600;
+    font-size:13px;
+    padding:9px 14px;
+    border-radius:8px;
+    border:1px solid var(--border);
+    background:var(--panel-2);
+    color:var(--text);
+    cursor:pointer;
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    transition:transform .08s ease, border-color .12s, background .12s;
+    white-space:nowrap;
+  }
+  .btn:hover{border-color:var(--text-faint);}
+  .btn:active{transform:scale(.97);}
+  .btn:disabled{opacity:.45;cursor:not-allowed;}
+  .btn-primary{background:var(--accent);border-color:var(--accent);color:#171008;}
+  .btn-primary:hover{border-color:var(--accent);filter:brightness(1.08);}
+  .btn-ghost{background:transparent;}
+  .btn-danger{background:transparent;border-color:var(--danger);color:var(--danger);}
+  .btn-danger:hover{background:var(--danger-dim);}
+  .btn-sm{padding:6px 10px;font-size:12px;}
+  .btn-block{width:100%;justify-content:center;}
+
+  .auth-box{margin-top:auto;padding-top:14px;border-top:1px solid var(--border);}
+  .auth-box label{font-size:11px;color:var(--text-faint);display:block;margin-bottom:6px;}
+  .auth-box input{
+    width:100%;background:var(--panel-2);border:1px solid var(--border);
+    color:var(--text);border-radius:7px;padding:8px 10px;font-family:var(--font-mono);font-size:12px;
+  }
+  .auth-hint{font-size:10.5px;color:var(--text-faint);margin-top:6px;line-height:1.4;}
+
+  /* ---------- main ---------- */
+  .main{padding:26px 34px 60px;max-width:1180px;}
+  .topbar{
+    display:flex;align-items:flex-start;justify-content:space-between;gap:20px;
+    margin-bottom:20px;flex-wrap:wrap;
+  }
+  .topbar h2{font-family:var(--font-display);font-size:22px;margin:0 0 4px;}
+  .topbar .sub{color:var(--text-dim);font-size:13px;max-width:520px;}
+  .topbar-actions{display:flex;gap:10px;flex-wrap:wrap;}
+
+  .status-pill{
+    display:inline-flex;align-items:center;gap:6px;
+    font-size:11.5px;font-weight:600;padding:4px 10px;border-radius:99px;
+    border:1px solid var(--border);color:var(--text-dim);
+  }
+  .status-pill.live{border-color:var(--accent-2-dim);color:var(--accent-2);background:var(--accent-2-dim);}
+  .status-pill.draft{color:var(--text-faint);}
+
+  /* ---------- test call panel ---------- */
+  .panel{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:20px 22px;
+    margin-bottom:22px;
+  }
+  .panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;flex-wrap:wrap;}
+  .panel-title{
+    font-family:var(--font-display);font-size:14px;font-weight:600;
+    display:flex;align-items:center;gap:8px;
+  }
+  .panel-title .tag{
+    font-family:var(--font-mono);font-size:10.5px;color:var(--text-faint);
+    border:1px solid var(--border-soft);padding:2px 7px;border-radius:5px;
+  }
+
+  .test-call-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+  .mobile-input-wrap{
+    display:flex;align-items:center;background:var(--panel-2);
+    border:1px solid var(--border);border-radius:8px;overflow:hidden;
+  }
+  .mobile-input-wrap .prefix{
+    padding:9px 10px;font-family:var(--font-mono);font-size:13px;color:var(--text-faint);
+    border-right:1px solid var(--border);
+  }
+  .mobile-input-wrap input{
+    background:transparent;border:none;outline:none;color:var(--text);
+    font-family:var(--font-mono);font-size:13px;padding:9px 10px;width:170px;
+  }
+
+  .waveform{display:flex;align-items:flex-end;gap:2.5px;height:18px;}
+  .waveform span{
+    width:3px;background:var(--accent);border-radius:2px;height:5px;
+    animation:none;
+  }
+  .waveform.active span{animation:wf 0.9s ease-in-out infinite;}
+  .waveform span:nth-child(1){animation-delay:0s;}
+  .waveform span:nth-child(2){animation-delay:.1s;}
+  .waveform span:nth-child(3){animation-delay:.2s;}
+  .waveform span:nth-child(4){animation-delay:.3s;}
+  .waveform span:nth-child(5){animation-delay:.4s;}
+  @keyframes wf{
+    0%,100%{height:5px;}
+    50%{height:18px;}
+  }
+
+  .call-result{
+    margin-top:12px;font-family:var(--font-mono);font-size:12px;
+    padding:10px 12px;border-radius:7px;border:1px solid var(--border-soft);
+    background:var(--panel-3);color:var(--text-dim);display:none;
+    white-space:pre-wrap;word-break:break-word;
+  }
+  .call-result.show{display:block;}
+  .call-result.ok{border-color:var(--accent-2-dim);color:var(--accent-2);}
+  .call-result.err{border-color:var(--danger);color:var(--danger);}
+
+  /* ---------- form sections ---------- */
+  .section{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    margin-bottom:16px;
+    overflow:hidden;
+  }
+  .section-header{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:16px 20px;cursor:pointer;user-select:none;
+  }
+  .section-header h3{
+    margin:0;font-family:var(--font-display);font-size:15px;font-weight:600;
+    display:flex;align-items:center;gap:9px;
+  }
+  .section-header .chev{
+    color:var(--text-faint);transition:transform .15s ease;font-size:13px;
+  }
+  .section.collapsed .chev{transform:rotate(-90deg);}
+  .section.collapsed .section-body{display:none;}
+  .section-body{padding:2px 20px 20px;}
+  .section-desc{color:var(--text-faint);font-size:12.5px;margin:-6px 0 14px;}
+
+  .field-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;}
+  .field{display:flex;flex-direction:column;gap:6px;}
+  .field.full{grid-column:1/-1;}
+
+  .field-label{
+    display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;color:var(--text);
+  }
+  .info-icon{
+    width:15px;height:15px;border-radius:50%;
+    border:1px solid var(--text-faint);color:var(--text-faint);
+    font-size:10px;display:flex;align-items:center;justify-content:center;
+    cursor:pointer;flex-shrink:0;position:relative;font-family:var(--font-mono);
+    transition:border-color .12s, color .12s;
+  }
+  .info-icon:hover, .info-icon.open{border-color:var(--accent);color:var(--accent);}
+  .info-pop{
+    display:none;position:absolute;top:20px;left:0;z-index:30;
+    width:260px;background:var(--panel-2);border:1px solid var(--border);
+    border-radius:8px;padding:10px 12px;font-size:12px;font-weight:400;
+    color:var(--text-dim);line-height:1.45;box-shadow:0 8px 24px rgba(0,0,0,.4);
+  }
+  .info-icon.open .info-pop{display:block;}
+
+  input[type=text], input[type=number], textarea, select{
+    width:100%;background:var(--panel-2);border:1px solid var(--border);
+    color:var(--text);border-radius:7px;padding:9px 11px;font-size:13px;
+    font-family:var(--font-body);outline:none;
+    transition:border-color .12s;
+  }
+  input[type=number]{font-family:var(--font-mono);}
+  input:focus, textarea:focus, select:focus{border-color:var(--accent);}
+  textarea{resize:vertical;font-family:var(--font-mono);font-size:12.5px;line-height:1.55;min-height:90px;}
+  textarea.prompt-area{min-height:180px;}
+
+  .kv-rows{display:flex;flex-direction:column;gap:8px;}
+  .kv-row{display:flex;gap:8px;align-items:center;}
+  .kv-row input{flex:1;}
+  .kv-row input.kv-val{max-width:110px;flex:none;}
+  .kv-remove{
+    background:transparent;border:1px solid var(--border);color:var(--danger);
+    border-radius:6px;width:30px;height:30px;flex-shrink:0;cursor:pointer;font-size:15px;
+  }
+  .kv-add{margin-top:4px;}
+
+  .tag-input-wrap{
+    display:flex;flex-wrap:wrap;gap:6px;background:var(--panel-2);
+    border:1px solid var(--border);border-radius:7px;padding:8px 10px;
+  }
+  .tag-chip{
+    display:flex;align-items:center;gap:6px;background:var(--panel-3);
+    border:1px solid var(--border-soft);padding:4px 8px;border-radius:6px;font-size:12px;
+    font-family:var(--font-mono);
+  }
+  .tag-chip button{background:none;border:none;color:var(--text-faint);cursor:pointer;font-size:13px;padding:0;}
+  .tag-input-wrap input{border:none;background:none;flex:1;min-width:100px;padding:4px;}
+
+  .row-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  .row-4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
+  @media (max-width:640px){.row-4{grid-template-columns:1fr 1fr;} }
+
+  .sticky-actions{
+    position:sticky;bottom:0;background:linear-gradient(to top,var(--bg) 70%, transparent);
+    padding:18px 0 4px;display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;
+  }
+
+  .toast-stack{position:fixed;top:18px;right:18px;z-index:100;display:flex;flex-direction:column;gap:8px;}
+  .toast{
+    background:var(--panel-2);border:1px solid var(--border);border-radius:8px;
+    padding:11px 16px;font-size:13px;box-shadow:0 8px 24px rgba(0,0,0,.4);
+    min-width:220px;animation:toast-in .18s ease;
+  }
+  .toast.ok{border-color:var(--accent-2-dim);}
+  .toast.err{border-color:var(--danger);}
+  @keyframes toast-in{from{opacity:0;transform:translateY(-6px);}to{opacity:1;transform:translateY(0);}}
+
+  .empty-state{
+    text-align:center;padding:60px 20px;color:var(--text-faint);
+  }
+  .empty-state h3{font-family:var(--font-display);color:var(--text-dim);margin-bottom:6px;}
+
+  ::-webkit-scrollbar{width:9px;height:9px;}
+  ::-webkit-scrollbar-thumb{background:var(--border);border-radius:6px;}
+  ::-webkit-scrollbar-track{background:transparent;}
+
+  .readonly-meta{display:flex;gap:18px;flex-wrap:wrap;font-size:11.5px;color:var(--text-faint);margin-top:10px;font-family:var(--font-mono);}
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">AN</div>
+      <div class="brand-text">
+        <h1>Anika Control Room</h1>
+        <p>Instant Mechanic · voicebot config</p>
+      </div>
+    </div>
+    <hr class="road-rule">
+
+    <div>
+      <p class="side-section-label">Config versions</p>
+      <ul class="config-list" id="configList"></ul>
+    </div>
+
+    <button class="btn btn-primary btn-block" id="newConfigBtn">+ New draft from current</button>
+
+    <div class="auth-box">
+      <label for="apiToken">API token (optional)</label>
+      <input type="text" id="apiToken" placeholder="Token xxxxxxxxxxxx">
+      <p class="auth-hint">Sent as <code>Authorization</code> header on every request. Stored only in this browser. Leave blank if the API is open on your network.</p>
+    </div>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <h2>Anika call configuration</h2>
+        <p class="sub">Everything Anika says, quotes, and decides on a call — editable here, live on the next call, no deploy needed.</p>
+      </div>
+      <div class="topbar-actions" id="topbarActions"></div>
+    </div>
+
+    <!-- Test call panel -->
+    <div class="panel">
+      <div class="panel-head">
+        <div class="panel-title">📞 Test call <span class="tag">exotel-call</span></div>
+        <div class="waveform" id="waveform"><span></span><span></span><span></span><span></span><span></span></div>
+      </div>
+      <div class="test-call-row">
+        <div class="mobile-input-wrap">
+          <span class="prefix">+91</span>
+          <input type="text" id="testMobile" placeholder="9505020055" maxlength="10">
+        </div>
+        <button class="btn btn-primary" id="testCallBtn">Trigger test call</button>
+      </div>
+      <div class="call-result" id="callResult"></div>
+    </div>
+
+    <div id="formRoot"></div>
+  </main>
+</div>
+
+<div class="toast-stack" id="toastStack"></div>
+
+<script>
+/* =====================================================================
+   CONFIG — adjust these two if your API is hosted elsewhere.
+===================================================================== */
+const API_BASE = 'https://ai.instantmechanic.online/bot/api/ai-call-config';
+const EXOTEL_CALL_URL = 'https://ai.instantmechanic.online/bot/exotel-call';
+
+/* =====================================================================
+   FIELD METADATA — label, help text, input type, grouping.
+   This drives both the form rendering and the info-icon tooltips.
+===================================================================== */
+const SECTIONS = [
+  {
+    key: 'identity',
+    title: '🪪 Identity & voice',
+    desc: 'Which model powers Anika and how she sounds.',
+    fields: [
+      { key:'name', label:'Config name', type:'text', full:true,
+        help:'Internal label only — customers never see this. Use something that tells the next person what you changed, e.g. "v4 - slower pace test".' },
+      { key:'model_name', label:'Gemini model', type:'text',
+        help:'The exact Gemini Live model ID Anika runs on, e.g. gemini-3.1-flash-live-preview. Only change this if you\'ve confirmed the new model name is live on Google\'s side — a typo here breaks every call instantly.' },
+      { key:'tts_model_name', label:'Opener TTS model', type:'text',
+        help:'Backup text-to-speech model kept for the opening greeting path. Leave as-is unless engineering asks you to change it.' },
+      { key:'voice_name', label:'Voice', type:'text',
+        help:'Which built-in Gemini voice Anika speaks with (e.g. Zephyr). Changing this changes how she sounds on every call the moment this config goes live.' },
+    ]
+  },
+  {
+    key:'sampling',
+    title:'🎛️ Response behaviour',
+    desc:'How creative vs. predictable Anika\'s replies are. Roadside assistance is transactional — lower is usually safer.',
+    fields:[
+      { key:'temperature', label:'Temperature', type:'number', step:'0.05', min:0, max:2,
+        help:'Controls randomness. Lower (e.g. 0.2) = Anika says the same reliable thing every time. Higher (e.g. 0.8) = more varied, more creative, but more likely to go off-script. Keep this low for pricing/booking accuracy.' },
+      { key:'top_p', label:'Top P', type:'number', step:'0.05', min:0, max:1,
+        help:'A second randomness dial that works alongside Temperature. Most teams never need to touch this — leave at 0.9 unless engineering suggests otherwise.' },
+      { key:'top_k', label:'Top K', type:'number', step:'1', min:1,
+        help:'A third randomness dial. Same advice as Top P — leave alone unless you know exactly why you\'re changing it.' },
+      { key:'max_output_tokens', label:'Max response length', type:'number', step:'10', min:50,
+        help:'The longest thing Anika is allowed to say in one turn. If this is too low, her sentences get cut off mid-word and she goes silent — that\'s a bug we\'ve hit before. If a cutoff happens again, raise this number.' },
+    ]
+  },
+  {
+    key:'prompts',
+    title:'💬 What Anika says',
+    desc:'The actual script and personality — this is what your team edits most often.',
+    fields:[
+      { key:'core_identity_prompt', label:'Personality & speaking style', type:'textarea', full:true, big:true,
+        help:'Who Anika is, her tone, pace, and the hard rules she must never break (never claim to be AI, never invent a price). Edit wording here to change how she "feels" on a call.' },
+      { key:'business_rules_prompt', label:'Services & call flow', type:'textarea', full:true, big:true,
+        help:'What Instant Mechanic offers, the order she collects information in, membership/towing/discount rules. Edit here when a business policy changes — e.g. a new service type or a new discount cap.' },
+      { key:'live_tool_rules_prompt', label:'Tool-calling & live updates', type:'textarea', full:true, big:true,
+        help:'The rules that stop Anika from inventing prices/booking IDs, and how she should weave in a live update (like a customer\'s WhatsApp location) naturally instead of announcing it like an alert. Only edit this with engineering\'s input — it\'s more technical than the other two blocks.' },
+    ]
+  },
+  {
+    key:'pricing',
+    title:'💰 Pricing rules',
+    desc:'Every number Anika quotes comes from here — she never makes up a price herself.',
+    fields:[
+      { key:'base_rescue_charge', label:'Base rescue charge (₹)', type:'number', step:'1',
+        help:'The starting price for any one-time rescue call-out, before any add-ons, parts, or tax.' },
+      { key:'gst_rate', label:'GST rate', type:'number', step:'0.01',
+        help:'Tax rate applied on top of the rescue charge, as a decimal — 0.18 means 18%.' },
+      { key:'luxury_car_addon', label:'Luxury car add-on (₹)', type:'number', step:'1',
+        help:'Extra amount added to the price when the customer\'s car is tagged "luxury" category.' },
+      { key:'puncture_addon_per_unit', label:'Puncture add-on, per tyre (₹)', type:'number', step:'1',
+        help:'Extra amount added for each punctured tyre being handled.' },
+      { key:'membership_price_threshold', label:'Membership price threshold (₹)', type:'number', step:'1',
+        help:'The rescue-charge cutoff Anika uses to decide which annual membership price to offer. Below this, she offers the lower membership price; at or above it, the higher one.' },
+      { key:'membership_price_low', label:'Membership price — below threshold (₹)', type:'number', step:'1',
+        help:'Annual membership price offered when the one-time rescue charge is below the threshold above.' },
+      { key:'membership_price_high', label:'Membership price — at/above threshold (₹)', type:'number', step:'1',
+        help:'Annual membership price offered when the one-time rescue charge is at or above the threshold above.' },
+      { key:'max_discount_percent', label:'Max discount on repairs (%)', type:'number', step:'1',
+        help:'The most Anika is allowed to knock off a repair price if a customer negotiates. She only offers this if they push back — never upfront.' },
+      { key:'addon_problems', label:'Problem-specific add-ons (₹)', type:'kv',
+        help:'Extra charge added for specific problem types — heating, belt, gear, lockout, bumper, lock, scanning, clutch, etc. Add a new row for a new problem type, or change the amount for an existing one.' },
+    ]
+  },
+  {
+    key:'serviceability',
+    title:'📍 Where Anika will say "yes, we cover that"',
+    desc:'Determines whether a customer\'s location gets a "serviceable" or "not serviceable" answer.',
+    fields:[
+      { key:'serviceable_keywords', label:'Serviceable area keywords', type:'tags', full:true,
+        help:'If a customer\'s location doesn\'t come through as GPS coordinates (e.g. they just say a place name), Anika checks whether it contains one of these words — city/area names like "gurugram" or "noida".' },
+      { key:'ncr_lat_min', label:'Coverage box — min latitude', type:'number', step:'0.01',
+        help:'Southern edge of the rough rectangle used to check GPS coordinates shared via WhatsApp. This is a coarse box, not an exact service-area map.' },
+      { key:'ncr_lat_max', label:'Coverage box — max latitude', type:'number', step:'0.01',
+        help:'Northern edge of the coverage rectangle.' },
+      { key:'ncr_lng_min', label:'Coverage box — min longitude', type:'number', step:'0.01',
+        help:'Western edge of the coverage rectangle.' },
+      { key:'ncr_lng_max', label:'Coverage box — max longitude', type:'number', step:'0.01',
+        help:'Eastern edge of the coverage rectangle.' },
+    ]
+  },
+  {
+    key:'audio',
+    title:'🎧 Call audio tuning',
+    desc:'Rarely needs changing — only touch this with engineering\'s guidance.',
+    fields:[
+      { key:'prebuffer_chunks', label:'Prebuffer chunks', type:'number', step:'1', min:1,
+        help:'How much of a cushion (in ~100ms pieces) Anika builds up before starting to speak each new turn. Higher = safer against choppy audio but a touch slower to start talking. Lower = snappier but more likely to stutter on a bad connection.' },
+      { key:'prewarm_ttl_seconds', label:'Pre-warm session timeout (sec)', type:'number', step:'5', min:10,
+        help:'How long a "getting ready" session for an incoming call is kept warm before being thrown away if the call never actually connects.' },
+    ]
+  },
+];
+
+/* =====================================================================
+   STATE
+===================================================================== */
+let allConfigs = [];
+let currentConfig = null;   // the config object currently loaded in the form
+let currentIsNew = false;   // true if this is an unsaved draft
+let collapsedSections = new Set();
+
+/* =====================================================================
+   API HELPER
+===================================================================== */
+async function api(path, options = {}) {
+  const token = document.getElementById('apiToken').value.trim();
+  const headers = Object.assign({ 'Content-Type': 'application/json' }, options.headers || {});
+  if (token) headers['Authorization'] = token.startsWith('Token ') ? token : `Token ${token}`;
+  const res = await fetch(`${API_BASE}${path}`, { ...options, headers });
+  let data = null;
+  try { data = await res.json(); } catch (e) { /* no body */ }
+  if (!res.ok) {
+    const msg = (data && (data.detail || data.error || JSON.stringify(data))) || `HTTP ${res.status}`;
+    throw new Error(msg);
+  }
+  return data;
+}
+
+/* =====================================================================
+   TOASTS
+===================================================================== */
+function toast(msg, kind = 'ok') {
+  const stack = document.getElementById('toastStack');
+  const el = document.createElement('div');
+  el.className = `toast ${kind}`;
+  el.textContent = msg;
+  stack.appendChild(el);
+  setTimeout(() => el.remove(), 4200);
+}
+
+/* =====================================================================
+   LOAD + RENDER SIDEBAR LIST
+===================================================================== */
+async function loadConfigList(selectId = null) {
+  try {
+    const data = await api('/');
+    allConfigs = Array.isArray(data) ? data : (data.results || []);
+  } catch (e) {
+    toast(`Couldn't load configs: ${e.message}`, 'err');
+    allConfigs = [];
+  }
+  renderSidebarList();
+
+  if (allConfigs.length === 0) {
+    renderEmptyState();
+    return;
+  }
+  const toSelect = selectId
+    ? allConfigs.find(c => c.id === selectId)
+    : (allConfigs.find(c => c.is_active) || allConfigs[0]);
+  selectConfig(toSelect);
+}
+
+function renderSidebarList() {
+  const list = document.getElementById('configList');
+  list.innerHTML = '';
+  allConfigs
+    .slice()
+    .sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at))
+    .forEach(cfg => {
+      const li = document.createElement('li');
+      li.className = 'config-item' + (currentConfig && currentConfig.id === cfg.id ? ' selected' : '');
+      li.innerHTML = `
+        <div>
+          <div class="ci-name">${escapeHtml(cfg.name)}</div>
+          <div class="ci-meta">${new Date(cfg.updated_at).toLocaleString()}</div>
+        </div>
+        ${cfg.is_active ? '<span class="live-dot" title="Active — live on calls now"></span>' : ''}
+      `;
+      li.addEventListener('click', () => selectConfig(cfg));
+      list.appendChild(li);
+    });
+}
+
+function selectConfig(cfg) {
+  if (!cfg) { renderEmptyState(); return; }
+  currentConfig = JSON.parse(JSON.stringify(cfg));
+  currentIsNew = false;
+  renderSidebarList();
+  renderForm();
+}
+
+/* =====================================================================
+   NEW DRAFT — clone whichever config is currently loaded
+===================================================================== */
+document.getElementById('newConfigBtn').addEventListener('click', () => {
+  const base = currentConfig || allConfigs.find(c => c.is_active) || allConfigs[0];
+  if (!base) {
+    toast('No existing config to clone from yet — create the first one manually.', 'err');
+    return;
+  }
+  const draft = JSON.parse(JSON.stringify(base));
+  delete draft.id;
+  draft.is_active = false;
+  draft.created_at = null;
+  draft.updated_at = null;
+  draft.name = `${base.name.replace(/^v\d+\s*-\s*/, '')} (copy)`;
+  currentConfig = draft;
+  currentIsNew = true;
+  renderSidebarList();
+  renderForm();
+  toast('New draft created from ' + base.name + ' — edit and save.', 'ok');
+});
+
+/* =====================================================================
+   EMPTY STATE
+===================================================================== */
+function renderEmptyState() {
+  currentConfig = null;
+  document.getElementById('topbarActions').innerHTML = '';
+  document.getElementById('formRoot').innerHTML = `
+    <div class="empty-state">
+      <h3>No configs yet</h3>
+      <p>Seed the first one from the backend, then it'll show up here.</p>
+    </div>`;
+}
+
+/* =====================================================================
+   FORM RENDERING
+===================================================================== */
+function renderForm() {
+  if (!currentConfig) return;
+  renderTopbarActions();
+
+  const root = document.getElementById('formRoot');
+  root.innerHTML = '';
+
+  SECTIONS.forEach(section => {
+    const isCollapsed = collapsedSections.has(section.key);
+    const sectionEl = document.createElement('div');
+    sectionEl.className = 'section' + (isCollapsed ? ' collapsed' : '');
+    sectionEl.innerHTML = `
+      <div class="section-header" data-section="${section.key}">
+        <h3>${section.title}</h3>
+        <span class="chev">▾</span>
+      </div>
+      <div class="section-body">
+        <p class="section-desc">${section.desc}</p>
+        <div class="field-grid" data-fieldgrid></div>
+      </div>
+    `;
+    const grid = sectionEl.querySelector('[data-fieldgrid]');
+    section.fields.forEach(f => grid.appendChild(renderField(f)));
+    sectionEl.querySelector('.section-header').addEventListener('click', () => {
+      if (collapsedSections.has(section.key)) collapsedSections.delete(section.key);
+      else collapsedSections.add(section.key);
+      renderForm();
+    });
+    root.appendChild(sectionEl);
+  });
+
+  // read-only meta + sticky save bar
+  const metaAndActions = document.createElement('div');
+  metaAndActions.innerHTML = `
+    <div class="readonly-meta">
+      ${currentConfig.updated_by ? `<span>Last edited by ${escapeHtml(currentConfig.updated_by)}</span>` : ''}
+      ${currentConfig.updated_at ? `<span>Updated ${new Date(currentConfig.updated_at).toLocaleString()}</span>` : ''}
+    </div>
+    <div class="sticky-actions">
+      ${!currentIsNew && !currentConfig.is_active ? '<button class="btn btn-danger" id="deleteBtn">Delete this version</button>' : ''}
+      ${!currentIsNew && !currentConfig.is_active ? '<button class="btn" id="activateBtn">Make this the active config</button>' : ''}
+      <button class="btn btn-primary" id="saveBtn">${currentIsNew ? 'Create draft' : 'Save changes'}</button>
+    </div>
+  `;
+  root.appendChild(metaAndActions);
+
+  const saveBtn = document.getElementById('saveBtn');
+  if (saveBtn) saveBtn.addEventListener('click', saveCurrentConfig);
+  const activateBtn = document.getElementById('activateBtn');
+  if (activateBtn) activateBtn.addEventListener('click', activateCurrentConfig);
+  const deleteBtn = document.getElementById('deleteBtn');
+  if (deleteBtn) deleteBtn.addEventListener('click', deleteCurrentConfig);
+}
+
+function renderTopbarActions() {
+  const el = document.getElementById('topbarActions');
+  const pill = currentConfig.is_active
+    ? '<span class="status-pill live">● LIVE ON CALLS</span>'
+    : currentIsNew
+      ? '<span class="status-pill draft">UNSAVED DRAFT</span>'
+      : '<span class="status-pill draft">draft</span>';
+  el.innerHTML = pill;
+}
+
+function renderField(f) {
+  const wrap = document.createElement('div');
+  wrap.className = 'field' + (f.full ? ' full' : '');
+  const val = currentConfig[f.key];
+
+  const labelHtml = `
+    <label class="field-label" for="fld-${f.key}">
+      ${escapeHtml(f.label)}
+      <span class="info-icon" data-info="${f.key}">i
+        <span class="info-pop">${escapeHtml(f.help)}</span>
+      </span>
+    </label>`;
+
+  let inputHtml = '';
+  if (f.type === 'textarea') {
+    inputHtml = `<textarea id="fld-${f.key}" class="${f.big ? 'prompt-area' : ''}" data-key="${f.key}">${escapeHtml(val || '')}</textarea>`;
+  } else if (f.type === 'number') {
+    inputHtml = `<input type="number" id="fld-${f.key}" data-key="${f.key}" value="${val ?? ''}" step="${f.step || '1'}" ${f.min !== undefined ? `min="${f.min}"` : ''} ${f.max !== undefined ? `max="${f.max}"` : ''}>`;
+  } else if (f.type === 'kv') {
+    inputHtml = renderKvEditor(f, val || {});
+  } else if (f.type === 'tags') {
+    inputHtml = renderTagEditor(f, val || []);
+  } else {
+    inputHtml = `<input type="text" id="fld-${f.key}" data-key="${f.key}" value="${escapeHtml(val || '')}">`;
+  }
+
+  wrap.innerHTML = labelHtml + inputHtml;
+
+  const icon = wrap.querySelector('.info-icon');
+  icon.addEventListener('click', (e) => {
+    e.stopPropagation();
+    document.querySelectorAll('.info-icon.open').forEach(o => { if (o !== icon) o.classList.remove('open'); });
+    icon.classList.toggle('open');
+  });
+
+  if (f.type !== 'kv' && f.type !== 'tags') {
+    const input = wrap.querySelector(`[data-key="${f.key}"]`);
+    input.addEventListener('input', () => {
+      currentConfig[f.key] = f.type === 'number' ? parseFloat(input.value) : input.value;
+    });
+  }
+
+  return wrap;
+}
+
+/* ---- key/value editor (addon_problems) ---- */
+function renderKvEditor(f, obj) {
+  const rowsHtml = Object.entries(obj).map(([k, v], i) => kvRowHtml(f.key, k, v, i)).join('');
+  return `
+    <div class="kv-rows" id="kv-${f.key}">
+      ${rowsHtml}
+    </div>
+    <button type="button" class="btn btn-sm kv-add" data-kvadd="${f.key}">+ Add problem type</button>
+  `;
+}
+function kvRowHtml(fkey, k, v, i) {
+  return `
+    <div class="kv-row" data-kvrow="${i}">
+      <input type="text" placeholder="problem type e.g. heating" value="${escapeHtml(k)}" data-kvkey="${fkey}:${i}">
+      <input type="number" class="kv-val" placeholder="₹" value="${v ?? ''}" data-kvval="${fkey}:${i}">
+      <button type="button" class="kv-remove" data-kvremove="${fkey}:${i}">×</button>
+    </div>`;
+}
+
+/* ---- tag editor (serviceable_keywords) ---- */
+function renderTagEditor(f, arr) {
+  const chips = arr.map((tag, i) => `
+    <span class="tag-chip" data-tagchip="${i}">${escapeHtml(tag)}<button type="button" data-tagremove="${f.key}:${i}">×</button></span>
+  `).join('');
+  return `
+    <div class="tag-input-wrap" id="tags-${f.key}">
+      ${chips}
+      <input type="text" placeholder="type & press Enter" data-tagadd="${f.key}">
+    </div>`;
+}
+
+/* delegate events for dynamic kv/tag rows (attached once) */
+document.addEventListener('click', (e) => {
+  // close info popovers when clicking elsewhere
+  if (!e.target.closest('.info-icon')) {
+    document.querySelectorAll('.info-icon.open').forEach(o => o.classList.remove('open'));
+  }
+
+  const addBtn = e.target.closest('[data-kvadd]');
+  if (addBtn) {
+    const fkey = addBtn.getAttribute('data-kvadd');
+    currentConfig[fkey] = currentConfig[fkey] || {};
+    currentConfig[fkey][''] = 0;
+    renderForm();
+    return;
+  }
+  const rmBtn = e.target.closest('[data-kvremove]');
+  if (rmBtn) {
+    const [fkey, idx] = rmBtn.getAttribute('data-kvremove').split(':');
+    const entries = Object.entries(currentConfig[fkey] || {});
+    entries.splice(parseInt(idx), 1);
+    currentConfig[fkey] = Object.fromEntries(entries);
+    renderForm();
+    return;
+  }
+  const tagRm = e.target.closest('[data-tagremove]');
+  if (tagRm) {
+    const [fkey, idx] = tagRm.getAttribute('data-tagremove').split(':');
+    currentConfig[fkey].splice(parseInt(idx), 1);
+    renderForm();
+    return;
+  }
+});
+
+document.addEventListener('input', (e) => {
+  if (e.target.matches('[data-kvkey]')) {
+    const [fkey, idx] = e.target.getAttribute('data-kvkey').split(':');
+    const entries = Object.entries(currentConfig[fkey] || {});
+    if (entries[idx]) {
+      entries[idx][0] = e.target.value;
+      currentConfig[fkey] = Object.fromEntries(entries);
+    }
+  }
+  if (e.target.matches('[data-kvval]')) {
+    const [fkey, idx] = e.target.getAttribute('data-kvval').split(':');
+    const entries = Object.entries(currentConfig[fkey] || {});
+    if (entries[idx]) {
+      entries[idx][1] = parseFloat(e.target.value) || 0;
+      currentConfig[fkey] = Object.fromEntries(entries);
+    }
+  }
+});
+
+document.addEventListener('keydown', (e) => {
+  if (e.target.matches('[data-tagadd]') && e.key === 'Enter') {
+    e.preventDefault();
+    const fkey = e.target.getAttribute('data-tagadd');
+    const val = e.target.value.trim().toLowerCase();
+    if (!val) return;
+    currentConfig[fkey] = currentConfig[fkey] || [];
+    if (!currentConfig[fkey].includes(val)) currentConfig[fkey].push(val);
+    renderForm();
+  }
+});
+
+/* =====================================================================
+   SAVE / ACTIVATE / DELETE
+===================================================================== */
+async function saveCurrentConfig() {
+  const payload = { ...currentConfig };
+  delete payload.id;
+  delete payload.created_at;
+  delete payload.updated_at;
+  delete payload.is_active; // activation happens via its own endpoint, not here
+
+  try {
+    if (currentIsNew) {
+      const created = await api('/', { method: 'POST', body: JSON.stringify(payload) });
+      toast(`Draft "${created.name}" created.`, 'ok');
+      await loadConfigList(created.id);
+    } else {
+      const updated = await api(`/${currentConfig.id}/`, { method: 'PATCH', body: JSON.stringify(payload) });
+      toast('Changes saved.', 'ok');
+      await loadConfigList(updated.id);
+    }
+  } catch (e) {
+    toast(`Save failed: ${e.message}`, 'err');
+  }
+}
+
+async function activateCurrentConfig() {
+  if (!confirm(`Make "${currentConfig.name}" the live config for all new calls?`)) return;
+  try {
+    await api(`/${currentConfig.id}/activate/`, { method: 'POST' });
+    toast(`"${currentConfig.name}" is now live.`, 'ok');
+    await loadConfigList(currentConfig.id);
+  } catch (e) {
+    toast(`Activate failed: ${e.message}`, 'err');
+  }
+}
+
+async function deleteCurrentConfig() {
+  if (!confirm(`Delete "${currentConfig.name}"? This can't be undone.`)) return;
+  try {
+    await api(`/${currentConfig.id}/`, { method: 'DELETE' });
+    toast('Deleted.', 'ok');
+    await loadConfigList();
+  } catch (e) {
+    toast(`Delete failed: ${e.message}`, 'err');
+  }
+}
+
+/* =====================================================================
+   TEST CALL
+===================================================================== */
+document.getElementById('testCallBtn').addEventListener('click', async () => {
+  const mobileRaw = document.getElementById('testMobile').value.trim();
+  const digits = mobileRaw.replace(/\D/g, '');
+  if (digits.length !== 10) {
+    toast('Enter a 10-digit mobile number (without 91).', 'err');
+    return;
+  }
+  const fullNumber = `91${digits}`;
+  const btn = document.getElementById('testCallBtn');
+  const waveform = document.getElementById('waveform');
+  const resultBox = document.getElementById('callResult');
+
+  btn.disabled = true;
+  btn.textContent = 'Calling…';
+  waveform.classList.add('active');
+  resultBox.className = 'call-result';
+  resultBox.textContent = '';
+
+  try {
+    const token = document.getElementById('apiToken').value.trim();
+    const headers = { 'Content-Type': 'application/json' };
+    if (token) headers['Authorization'] = token.startsWith('Token ') ? token : `Token ${token}`;
+
+    const res = await fetch(`${EXOTEL_CALL_URL}?mobile=${fullNumber}`, {
+      method: 'POST',
+      headers,
+      body: ''
+    });
+    const text = await res.text();
+    if (!res.ok) throw new Error(text || `HTTP ${res.status}`);
+    resultBox.textContent = `Call triggered to +${fullNumber}\n${text}`;
+    resultBox.className = 'call-result show ok';
+    toast(`Test call triggered to +${fullNumber}`, 'ok');
+  } catch (e) {
+    resultBox.textContent = `Failed to trigger call to +${fullNumber}\n${e.message}`;
+    resultBox.className = 'call-result show err';
+    toast('Test call failed — see details below.', 'err');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Trigger test call';
+    waveform.classList.remove('active');
+  }
+});
+
+/* =====================================================================
+   UTIL
+===================================================================== */
+function escapeHtml(str) {
+  return String(str ?? '').replace(/[&<>"']/g, m => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[m]));
+}
+
+/* =====================================================================
+   INIT
+===================================================================== */
+loadConfigList();
+</script>
+</body>
+</html>
