@@ -908,11 +908,10 @@ document.getElementById('testCallBtn').addEventListener('click', async () => {
     const headers = { 'Content-Type': 'application/json' };
     if (token) headers['Authorization'] = token.startsWith('Token ') ? token : `Token ${token}`;
 
-    const res = await fetch(`${EXOTEL_CALL_URL}?mobile=${fullNumber}`, {
-      method: 'GET',
-      headers,
-      body: ''
-    });
+const res = await fetch(`${EXOTEL_CALL_URL}?mobile=${fullNumber}`, {
+  method: 'GET',
+  headers
+});
     const text = await res.text();
     if (!res.ok) throw new Error(text || `HTTP ${res.status}`);
     resultBox.textContent = `Call triggered to +${fullNumber}\n${text}`;
