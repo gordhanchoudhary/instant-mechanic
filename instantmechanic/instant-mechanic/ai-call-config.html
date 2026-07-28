@@ -85,6 +85,19 @@
     border:none;
   }
 
+  /* ---------- mode / call-type segmented toggles ---------- */
+  .seg-group{display:flex;background:var(--panel-2);border:1px solid var(--border);border-radius:9px;padding:3px;gap:3px;}
+  .seg-btn{
+    flex:1;background:transparent;border:none;color:var(--text-dim);
+    font-family:var(--font-body);font-weight:600;font-size:12.5px;
+    padding:8px 6px;border-radius:6px;cursor:pointer;transition:background .12s,color .12s;
+  }
+  .seg-btn:hover{color:var(--text);}
+  .seg-btn.active{background:var(--accent);color:#171008;}
+  .seg-group.compact .seg-btn{font-size:11.5px;padding:7px 4px;}
+  .seg-group.calltype{display:none;}
+  .seg-group.calltype.show{display:flex;}
+
   .side-section-label{
     font-size:11px;text-transform:uppercase;letter-spacing:.09em;
     color:var(--text-faint);font-weight:600;margin:0 0 8px 2px;
@@ -196,6 +209,20 @@
     background:transparent;border:none;outline:none;color:var(--text);
     font-family:var(--font-mono);font-size:13px;padding:9px 10px;width:170px;
   }
+  .mini-input-wrap{
+    display:flex;align-items:center;background:var(--panel-2);
+    border:1px solid var(--border);border-radius:8px;overflow:hidden;
+  }
+  .mini-input-wrap .prefix{
+    padding:9px 10px;font-family:var(--font-mono);font-size:12px;color:var(--text-faint);
+    border-right:1px solid var(--border);white-space:nowrap;
+  }
+  .mini-input-wrap input{
+    background:transparent;border:none;outline:none;color:var(--text);
+    font-family:var(--font-mono);font-size:13px;padding:9px 10px;width:80px;
+  }
+  .mechanic-test-extra{display:none;gap:10px;align-items:center;flex-wrap:wrap;}
+  .mechanic-test-extra.show{display:flex;}
 
   .waveform{display:flex;align-items:flex-end;gap:2.5px;height:18px;}
   .waveform span{
@@ -348,6 +375,17 @@
     </div>
     <hr class="road-rule">
 
+    <div class="seg-group" id="modeToggle">
+      <button class="seg-btn active" data-mode="customer">👤 Customer side</button>
+      <button class="seg-btn" data-mode="mechanic">🔧 Mechanic side</button>
+    </div>
+
+    <div class="seg-group compact calltype" id="calltypeToggle">
+      <button class="seg-btn" data-calltype="assignment">Assignment</button>
+      <button class="seg-btn" data-calltype="followup">Follow-up</button>
+      <button class="seg-btn" data-calltype="completion">Completion</button>
+    </div>
+
     <div>
       <p class="side-section-label">Config versions</p>
       <ul class="config-list" id="configList"></ul>
@@ -358,7 +396,7 @@
     <div class="auth-box">
       <label for="apiToken">API token (optional)</label>
       <input type="text" id="apiToken" placeholder="Token xxxxxxxxxxxx">
-      <p class="auth-hint">Sent as <code>Authorization</code> header on every request. Stored only in this browser. Leave blank if the API is open on your network.</p>
+      <p class="auth-hint">Sent as <code>Authorization</code> header on every request. Stored only in this browser. Every request from this page — customer or mechanic side — goes straight to the API subdomain below, so this file works standalone from anywhere (no need to be served by Django itself).</p>
     </div>
   </aside>
 
@@ -366,8 +404,8 @@
   <main class="main">
     <div class="topbar">
       <div>
-        <h2>Anika call configuration</h2>
-        <p class="sub">Everything Anika says, quotes, and decides on a call — editable here, live on the next call, no deploy needed.</p>
+        <h2 id="pageTitle">Anika call configuration</h2>
+        <p class="sub" id="pageSub">Everything Anika says, quotes, and decides on a call — editable here, live on the next call, no deploy needed.</p>
       </div>
       <div class="topbar-actions" id="topbarActions"></div>
     </div>
@@ -375,13 +413,23 @@
     <!-- Test call panel -->
     <div class="panel">
       <div class="panel-head">
-        <div class="panel-title">📞 Test call <span class="tag">exotel-call</span></div>
+        <div class="panel-title">📞 Test call <span class="tag" id="testCallTag">exotel-call</span></div>
         <div class="waveform" id="waveform"><span></span><span></span><span></span><span></span><span></span></div>
       </div>
       <div class="test-call-row">
         <div class="mobile-input-wrap">
           <span class="prefix">+91</span>
           <input type="text" id="testMobile" placeholder="9505020055" maxlength="10">
+        </div>
+        <div class="mechanic-test-extra" id="mechanicTestExtra">
+          <div class="mini-input-wrap">
+            <span class="prefix">Booking ID</span>
+            <input type="text" id="testBookingId" placeholder="optional">
+          </div>
+          <div class="mini-input-wrap">
+            <span class="prefix">Mechanic ID</span>
+            <input type="text" id="testMechanicId" placeholder="optional">
+          </div>
         </div>
         <button class="btn btn-primary" id="testCallBtn">Trigger test call</button>
       </div>
@@ -396,16 +444,23 @@
 
 <script>
 /* =====================================================================
-   CONFIG — adjust these two if your API is hosted elsewhere.
+   CONFIG — everything hits the live API subdomain directly (this file
+   is standalone: it doesn't need to be served by Django itself, and
+   never uses relative/internal paths for any request).
 ===================================================================== */
-const API_BASE = 'https://ai.instantmechanic.online/bot/api/ai-call-config';
-const EXOTEL_CALL_URL = 'https://ai.instantmechanic.online/bot/exotel-call';
+const CUSTOMER_API_BASE  = 'https://ai.instantmechanic.online/bot/api/ai-call-config';
+const MECHANIC_API_BASE  = 'https://ai.instantmechanic.online/bot/api/mechanic-ai-call-config';
+const EXOTEL_CALL_URL    = 'https://ai.instantmechanic.online/bot/exotel-call';
 
 /* =====================================================================
    FIELD METADATA — label, help text, input type, grouping.
    This drives both the form rendering and the info-icon tooltips.
+   Two sets: CUSTOMER_SECTIONS (Anika-sells-to-customer flow, unchanged)
+   and MECHANIC_SECTIONS (the assignment/follow-up/completion calls to
+   mechanics — same MechanicAiCallConfig shape across all three call
+   types, only the prompt CONTENT differs per type).
 ===================================================================== */
-const SECTIONS = [
+const CUSTOMER_SECTIONS = [
   {
     key: 'identity',
     title: '🪪 Identity & voice',
@@ -504,22 +559,127 @@ const SECTIONS = [
   },
 ];
 
+const MECHANIC_SECTIONS = [
+  {
+    key: 'identity',
+    title: '🪪 Identity & voice',
+    desc: 'Which model powers this call type and how the caller sounds. Shared shape across all three call types — only the prompt content below differs.',
+    fields: [
+      { key:'name', label:'Config name', type:'text', full:true,
+        help:'Internal label only — mechanics never see this. Use something that tells the next person what you changed, e.g. "assignment v2 - shorter greeting".' },
+      { key:'model_name', label:'Gemini model', type:'text',
+        help:'The exact Gemini Live model ID this call runs on. Only change this if you\'ve confirmed the new model name is live on Google\'s side.' },
+      { key:'tts_model_name', label:'Opener TTS model', type:'text',
+        help:'Backup text-to-speech model kept for the opening greeting path. Leave as-is unless engineering asks you to change it.' },
+      { key:'voice_name', label:'Voice', type:'text',
+        help:'Which built-in Gemini voice speaks on this call type (e.g. Zephyr).' },
+    ]
+  },
+  {
+    key:'sampling',
+    title:'🎛️ Response behaviour',
+    desc:'How creative vs. predictable the caller\'s replies are. Keep this low — these calls need to reliably ask ETA / confirm arrival / confirm payment, not improvise.',
+    fields:[
+      { key:'temperature', label:'Temperature', type:'number', step:'0.05', min:0, max:2,
+        help:'Controls randomness. Lower = says the same reliable thing every time. Keep this low so ETA/decline/arrival logging stays predictable.' },
+      { key:'top_p', label:'Top P', type:'number', step:'0.05', min:0, max:1,
+        help:'A second randomness dial. Leave at 0.9 unless engineering suggests otherwise.' },
+      { key:'top_k', label:'Top K', type:'number', step:'1', min:1,
+        help:'A third randomness dial. Leave alone unless you know exactly why you\'re changing it.' },
+      { key:'max_output_tokens', label:'Max response length', type:'number', step:'10', min:50,
+        help:'The longest thing the caller is allowed to say in one turn. If sentences get cut off mid-word, raise this.' },
+    ]
+  },
+  {
+    key:'prompts',
+    title:'💬 What the caller says',
+    desc:'The actual script for this call type — this is what your team edits most often. Write these for whichever call type is selected above the config list (Assignment / Follow-up / Completion).',
+    fields:[
+      { key:'core_identity_prompt', label:'Personality & speaking style', type:'textarea', full:true, big:true,
+        help:'Who the caller is, tone, pace, and hard rules. e.g. "Instant Mechanic dispatch se baat kar rahe ho, seedha aur casual raho."' },
+      { key:'business_rules_prompt', label:'Call flow', type:'textarea', full:true, big:true,
+        help:'The actual step-by-step script for this call type — what to ask, what to say for each possible answer, which tool to call when. This is the block you\'ll iterate on most.' },
+      { key:'live_tool_rules_prompt', label:'Tool-calling discipline', type:'textarea', full:true, big:true,
+        help:'Rules for when to call each tool (e.g. log_eta, mechanic_declined, confirm_reached) — never guess/skip a tool call, always react to what the tool returns rather than deciding yourself.' },
+    ]
+  },
+  {
+    key:'eta',
+    title:'⏱️ ETA rules (assignment calls)',
+    desc:'Only used by the log_eta tool on Assignment-type calls — the bucket boundaries for "on time" vs "hurry up" vs "escalate to another mechanic".',
+    fields:[
+      { key:'eta_ok_max_minutes', label:'ETA "OK" up to (min)', type:'number', step:'1', min:0,
+        help:'A stated ETA at or below this many minutes gets the "ok, chale jao" reaction — no pushback needed.' },
+      { key:'eta_warn_max_minutes', label:'ETA "hurry" up to (min)', type:'number', step:'1', min:0,
+        help:'A stated ETA above the "OK" threshold but at or below this gets the "please hurry, customer is waiting" reaction. Above THIS number is treated like a decline and triggers escalation to another mechanic.' },
+    ]
+  },
+  {
+    key:'pacing',
+    title:'🎧 Call pacing & timing',
+    desc:'Rarely needs changing — only touch this with engineering\'s guidance.',
+    fields:[
+      { key:'silence_timeout_seconds', label:'Silence timeout (sec)', type:'number', step:'1', min:1,
+        help:'How long to wait with no response before nudging the mechanic ("bhaiya, sun rahe ho?").' },
+      { key:'max_silence_nudges', label:'Max silence nudges', type:'number', step:'1', min:0,
+        help:'How many times to nudge before giving up and ending the call as unclear/no-answer.' },
+      { key:'target_call_duration_seconds', label:'Target call length (sec)', type:'number', step:'10', min:10,
+        help:'Roughly how long this call type should take — these are meant to be short, transactional calls, not conversations.' },
+      { key:'prebuffer_chunks', label:'Prebuffer chunks', type:'number', step:'1', min:1,
+        help:'How much of a cushion (in ~100ms pieces) is built up before speaking each turn. Higher = safer against choppy audio, slightly slower to start talking.' },
+      { key:'prewarm_ttl_seconds', label:'Pre-warm session timeout (sec)', type:'number', step:'5', min:10,
+        help:'How long a "getting ready" session is kept warm before being discarded if the call never actually connects.' },
+    ]
+  },
+];
+
+const MODES = {
+  customer: {
+    label: 'Customer',
+    apiBase: CUSTOMER_API_BASE,
+    sections: CUSTOMER_SECTIONS,
+    hasCallType: false,
+    title: 'Anika call configuration',
+    sub: 'Everything Anika says, quotes, and decides on a call to a CUSTOMER — editable here, live on the next call, no deploy needed.',
+  },
+  mechanic: {
+    label: 'Mechanic',
+    apiBase: MECHANIC_API_BASE,
+    sections: MECHANIC_SECTIONS,
+    hasCallType: true,
+    title: 'Mechanic call configuration',
+    sub: 'What the AI says on calls TO mechanics — assignment briefing, 30-min arrival follow-up, and 1-hour completion/payment call.',
+  },
+};
+
+const CALL_TYPES = [
+  { key:'assignment', label:'Assignment' },
+  { key:'followup',   label:'Follow-up' },
+  { key:'completion', label:'Completion' },
+];
+
 /* =====================================================================
    STATE
 ===================================================================== */
+let currentMode = 'customer';      // 'customer' | 'mechanic'
+let currentCallType = 'assignment'; // only meaningful when currentMode === 'mechanic'
 let allConfigs = [];
 let currentConfig = null;   // the config object currently loaded in the form
 let currentIsNew = false;   // true if this is an unsaved draft
 let collapsedSections = new Set();
 
+function modeCfg() { return MODES[currentMode]; }
+
 /* =====================================================================
-   API HELPER
+   API HELPER — always hits the absolute subdomain URL for the current
+   mode (never a relative/internal path), so this file works standalone
+   from any host.
 ===================================================================== */
 async function api(path, options = {}) {
   const token = document.getElementById('apiToken').value.trim();
   const headers = Object.assign({ 'Content-Type': 'application/json' }, options.headers || {});
   if (token) headers['Authorization'] = token.startsWith('Token ') ? token : `Token ${token}`;
-  const res = await fetch(`${API_BASE}${path}`, { ...options, headers });
+  const res = await fetch(`${modeCfg().apiBase}${path}`, { ...options, headers });
   let data = null;
   try { data = await res.json(); } catch (e) { /* no body */ }
   if (!res.ok) {
@@ -542,11 +702,57 @@ function toast(msg, kind = 'ok') {
 }
 
 /* =====================================================================
+   MODE / CALL-TYPE SWITCHING
+===================================================================== */
+document.getElementById('modeToggle').addEventListener('click', (e) => {
+  const btn = e.target.closest('[data-mode]');
+  if (!btn) return;
+  const mode = btn.getAttribute('data-mode');
+  if (mode === currentMode) return;
+  currentMode = mode;
+  collapsedSections = new Set();
+  applyModeChrome();
+  loadConfigList();
+});
+
+document.getElementById('calltypeToggle').addEventListener('click', (e) => {
+  const btn = e.target.closest('[data-calltype]');
+  if (!btn) return;
+  const ct = btn.getAttribute('data-calltype');
+  if (ct === currentCallType) return;
+  currentCallType = ct;
+  collapsedSections = new Set();
+  renderCalltypeToggle();
+  loadConfigList();
+});
+
+function applyModeChrome() {
+  document.querySelectorAll('#modeToggle [data-mode]').forEach(b => {
+    b.classList.toggle('active', b.getAttribute('data-mode') === currentMode);
+  });
+  const ctToggle = document.getElementById('calltypeToggle');
+  ctToggle.classList.toggle('show', modeCfg().hasCallType);
+  renderCalltypeToggle();
+
+  document.getElementById('pageTitle').textContent = modeCfg().title;
+  document.getElementById('pageSub').textContent = modeCfg().sub;
+  document.getElementById('testCallTag').textContent = currentMode === 'mechanic' ? 'exotel-call · mechanic' : 'exotel-call';
+  document.getElementById('mechanicTestExtra').classList.toggle('show', currentMode === 'mechanic');
+}
+
+function renderCalltypeToggle() {
+  document.querySelectorAll('#calltypeToggle [data-calltype]').forEach(b => {
+    b.classList.toggle('active', b.getAttribute('data-calltype') === currentCallType);
+  });
+}
+
+/* =====================================================================
    LOAD + RENDER SIDEBAR LIST
 ===================================================================== */
 async function loadConfigList(selectId = null) {
   try {
-    const data = await api('/');
+    const query = modeCfg().hasCallType ? `/?call_type=${currentCallType}` : '/';
+    const data = await api(query);
     allConfigs = Array.isArray(data) ? data : (data.results || []);
   } catch (e) {
     toast(`Couldn't load configs: ${e.message}`, 'err');
@@ -594,7 +800,8 @@ function selectConfig(cfg) {
 }
 
 /* =====================================================================
-   NEW DRAFT — clone whichever config is currently loaded
+   NEW DRAFT — clone whichever config is currently loaded (within the
+   current mode + call type)
 ===================================================================== */
 document.getElementById('newConfigBtn').addEventListener('click', () => {
   const base = currentConfig || allConfigs.find(c => c.is_active) || allConfigs[0];
@@ -608,6 +815,7 @@ document.getElementById('newConfigBtn').addEventListener('click', () => {
   draft.created_at = null;
   draft.updated_at = null;
   draft.name = `${base.name.replace(/^v\d+\s*-\s*/, '')} (copy)`;
+  if (modeCfg().hasCallType) draft.call_type = currentCallType;
   currentConfig = draft;
   currentIsNew = true;
   renderSidebarList();
@@ -624,7 +832,9 @@ function renderEmptyState() {
   document.getElementById('formRoot').innerHTML = `
     <div class="empty-state">
       <h3>No configs yet</h3>
-      <p>Seed the first one from the backend, then it'll show up here.</p>
+      <p>${modeCfg().hasCallType
+        ? `Seed the first "${currentCallType}" config from the backend, then it'll show up here.`
+        : `Seed the first one from the backend, then it'll show up here.`}</p>
     </div>`;
 }
 
@@ -638,7 +848,7 @@ function renderForm() {
   const root = document.getElementById('formRoot');
   root.innerHTML = '';
 
-  SECTIONS.forEach(section => {
+  modeCfg().sections.forEach(section => {
     const isCollapsed = collapsedSections.has(section.key);
     const sectionEl = document.createElement('div');
     sectionEl.className = 'section' + (isCollapsed ? ' collapsed' : '');
@@ -666,6 +876,7 @@ function renderForm() {
   const metaAndActions = document.createElement('div');
   metaAndActions.innerHTML = `
     <div class="readonly-meta">
+      ${modeCfg().hasCallType ? `<span>Call type: ${escapeHtml(currentCallType)}</span>` : ''}
       ${currentConfig.updated_by ? `<span>Last edited by ${escapeHtml(currentConfig.updated_by)}</span>` : ''}
       ${currentConfig.updated_at ? `<span>Updated ${new Date(currentConfig.updated_at).toLocaleString()}</span>` : ''}
     </div>
@@ -844,6 +1055,7 @@ async function saveCurrentConfig() {
   delete payload.created_at;
   delete payload.updated_at;
   delete payload.is_active; // activation happens via its own endpoint, not here
+  if (modeCfg().hasCallType) payload.call_type = currentCallType; // fixed by the sidebar toggle, not user-editable in the form
 
   try {
     if (currentIsNew) {
@@ -861,7 +1073,8 @@ async function saveCurrentConfig() {
 }
 
 async function activateCurrentConfig() {
-  if (!confirm(`Make "${currentConfig.name}" the live config for all new calls?`)) return;
+  const scope = modeCfg().hasCallType ? ` (${currentCallType} calls)` : '';
+  if (!confirm(`Make "${currentConfig.name}" the live config for all new${scope} calls?`)) return;
   try {
     await api(`/${currentConfig.id}/activate/`, { method: 'POST' });
     toast(`"${currentConfig.name}" is now live.`, 'ok');
@@ -883,7 +1096,10 @@ async function deleteCurrentConfig() {
 }
 
 /* =====================================================================
-   TEST CALL
+   TEST CALL — mode-aware. Customer mode calls exotel-call?mobile=...
+   (unchanged). Mechanic mode adds call_kind=mechanic, the currently
+   selected call type, and optional booking_id/mechanic_id so the call
+   can be tested with real booking context if you have one handy.
 ===================================================================== */
 document.getElementById('testCallBtn').addEventListener('click', async () => {
   const mobileRaw = document.getElementById('testMobile').value.trim();
@@ -908,10 +1124,20 @@ document.getElementById('testCallBtn').addEventListener('click', async () => {
     const headers = { 'Content-Type': 'application/json' };
     if (token) headers['Authorization'] = token.startsWith('Token ') ? token : `Token ${token}`;
 
-const res = await fetch(`${EXOTEL_CALL_URL}?mobile=${fullNumber}`, {
-  method: 'GET',
-  headers
-});
+    const params = new URLSearchParams({ mobile: fullNumber });
+    if (currentMode === 'mechanic') {
+      params.set('call_kind', 'mechanic');
+      params.set('call_type', currentCallType);
+      const bookingId = document.getElementById('testBookingId').value.trim();
+      const mechanicId = document.getElementById('testMechanicId').value.trim();
+      if (bookingId) params.set('booking_id', bookingId);
+      if (mechanicId) params.set('mechanic_id', mechanicId);
+    }
+
+    const res = await fetch(`${EXOTEL_CALL_URL}?${params.toString()}`, {
+      method: 'GET',
+      headers
+    });
     const text = await res.text();
     if (!res.ok) throw new Error(text || `HTTP ${res.status}`);
     resultBox.textContent = `Call triggered to +${fullNumber}\n${text}`;
@@ -940,6 +1166,7 @@ function escapeHtml(str) {
 /* =====================================================================
    INIT
 ===================================================================== */
+applyModeChrome();
 loadConfigList();
 </script>
 </body>
