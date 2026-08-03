@@ -36,8 +36,11 @@ async function startSession() {
   const { token, model } = await res.json();
   log("got token, model: " + model);
 
-  // 2. Get camera + mic
-  stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+  // 2. Get camera + mic (back camera preferred on mobile)
+  stream = await navigator.mediaDevices.getUserMedia({
+    video: { facingMode: { ideal: "environment" } },
+    audio: true
+  });
   document.getElementById("cam").srcObject = stream;
 
   // 3. Open Gemini Live WebSocket using the ephemeral token
