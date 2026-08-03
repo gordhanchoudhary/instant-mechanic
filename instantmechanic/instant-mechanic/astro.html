@@ -21,7 +21,7 @@
   <audio id="player" autoplay></audio>
 
 <script>
-const BACKEND = "http://localhost:8000"; // your FastAPI backend
+const BACKEND = "https://ai.instantmechanic.online/bot/get-token"; // your Django endpoint
 let ws, stream, audioCtx, videoInterval, procNode;
 const log = (m) => document.getElementById("log").textContent += m + "\n";
 
@@ -32,8 +32,10 @@ async function startSession() {
   document.getElementById("start").style.display = "none";
   document.getElementById("stop").style.display = "inline-block";
 
-  // 1. Get short-lived token from our backend
-  const { token, model } = await (await fetch(`${BACKEND}/get-token`, { method: "POST" })).json();
+  // 1. Get short-lived token from Django backend
+  const res = await fetch(BACKEND, { method: "POST" });
+  const { token, model } = await res.json();
+  log("got token, model: " + model);
 
   // 2. Get camera + mic
   stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
@@ -56,8 +58,8 @@ async function startSession() {
     if (audioB64) playAudioChunk(audioB64);
   };
 
-  ws.onerror = (e) => log("ws error: " + e.message);
-  ws.onclose = () => log("session closed");
+  ws.onerror = (e) => log("ws error: " + JSON.stringify(e));
+  ws.onclose = (e) => log("session closed: " + e.code + " " + e.reason);
 }
 
 // Send one JPEG video frame per second
