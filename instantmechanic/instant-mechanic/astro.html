@@ -18,7 +18,6 @@
   <button id="start">Start Diagnosis</button>
   <button id="stop">Stop</button>
   <div id="log"></div>
-  <audio id="player" autoplay></audio>
 
 <script>
 const BACKEND = "https://ai.instantmechanic.online/bot/get-token"; // your Django endpoint
@@ -47,13 +46,32 @@ async function startSession() {
   );
 
   ws.onopen = () => {
-    log("connected — session live");
-    startMicStreaming();
-    startVideoStreaming();
+    log("connected — sending setup");
+    ws.send(JSON.stringify({
+      setup: {
+        model: `models/${model}`,
+        generationConfig: { responseModalities: ["AUDIO"] }
+      }
+    }));
   };
 
   ws.onmessage = async (evt) => {
-    const msg = JSON.parse(evt.data);
+    const text = evt.data instanceof Blob ? await evt.data.text() : evt.data;
+    let msg;
+    try {
+      msg = JSON.parse(text);
+    } catch (e) {
+      log("parse error: " + e.message);
+      return;
+    }
+
+    if (msg.setupComplete) {
+      log("setup complete — session live");
+      startMicStreaming();
+      startVideoStreaming();
+      return;
+    }
+
     const audioB64 = msg?.serverContent?.modelTurn?.parts?.[0]?.inlineData?.data;
     if (audioB64) playAudioChunk(audioB64);
   };
@@ -97,11 +115,28 @@ function startMicStreaming() {
   };
 }
 
-// Play back Anika's spoken response
+// Play back Anika's spoken response — raw PCM16 @ 24kHz, queued gapless
+let outputCtx, nextPlayTime = 0;
+
 function playAudioChunk(b64) {
+  if (!outputCtx) outputCtx = new AudioContext({ sampleRate: 24000 });
+
   const bytes = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
-  const blob = new Blob([bytes], { type: "audio/wav" });
-  document.getElementById("player").src = URL.createObjectURL(blob);
+  const pcm16 = new Int16Array(bytes.buffer);
+  const float32 = new Float32Array(pcm16.length);
+  for (let i = 0; i < pcm16.length; i++) float32[i] = pcm16[i] / 32768;
+
+  const buffer = outputCtx.createBuffer(1, float32.length, 24000);
+  buffer.copyToChannel(float32, 0);
+
+  const src = outputCtx.createBufferSource();
+  src.buffer = buffer;
+  src.connect(outputCtx.destination);
+
+  const now = outputCtx.currentTime;
+  const startAt = Math.max(now, nextPlayTime);
+  src.start(startAt);
+  nextPlayTime = startAt + buffer.duration;
 }
 
 function stopSession() {
