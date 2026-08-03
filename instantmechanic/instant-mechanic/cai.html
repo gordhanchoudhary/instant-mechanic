@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Instant Mechanic — Your Car Assistant</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F5F6F8;
+    --surface:#FFFFFF;
+    --surface-sunken:#EEF0F3;
+    --ink:#14171C;
+    --ink-soft:#5B6472;
+    --ink-faint:#98A0AC;
+    --line:#E4E7EB;
+    --accent:#FF6A1A;
+    --accent-ink:#B84800;
+    --accent-soft:#FFE9DC;
+    --alert:#D6321C;
+    --alert-soft:#FCE2DE;
+    --live:#17A672;
+    --live-soft:#DEF4EB;
+    --radius:18px;
+    --shadow-sm:0 1px 2px rgba(20,23,28,.04), 0 1px 1px rgba(20,23,28,.03);
+    --shadow-md:0 8px 24px rgba(20,23,28,.08);
+    --shadow-lg:0 24px 60px rgba(20,23,28,.14);
+  }
+  *{box-sizing:border-box;}
+  html{-webkit-text-size-adjust:100%;}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:'Inter',sans-serif; -webkit-font-smoothing:antialiased;
+    padding-bottom:60px;
+  }
+  h1,h2,h3,.display{ font-family:'Space Grotesk',sans-serif; letter-spacing:-0.01em; }
+  .mono{ font-family:'JetBrains Mono',monospace; letter-spacing:0; }
+  a{ color:inherit; text-decoration:none; }
+  button{ font-family:inherit; }
+  :focus-visible{ outline:2.5px solid var(--accent); outline-offset:2px; border-radius:6px; }
+
+  /* ---------- Top bar ---------- */
+  .topbar{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:18px 20px; max-width:920px; margin:0 auto;
+  }
+  .brand{ display:flex; align-items:center; gap:10px; }
+  .brand img{ height:26px; }
+  .status-pill{
+    display:flex; align-items:center; gap:7px;
+    background:var(--surface); border:1px solid var(--line);
+    border-radius:999px; padding:7px 13px 7px 10px; box-shadow:var(--shadow-sm);
+    font-size:12.5px; font-weight:600; color:var(--ink-soft);
+  }
+  .dot{ width:7px; height:7px; border-radius:50%; background:var(--live); position:relative; flex:none; }
+  .dot::after{
+    content:""; position:absolute; inset:-4px; border-radius:50%;
+    background:var(--live); opacity:.35; animation:pulse-dot 2s ease-out infinite;
+  }
+  @keyframes pulse-dot{ 0%{transform:scale(.6);opacity:.5;} 100%{transform:scale(2.2);opacity:0;} }
+
+  .wrap{ max-width:920px; margin:0 auto; padding:0 20px; }
+
+  /* ---------- Hero: identity + ignition CTA ---------- */
+  .hero{
+    display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-top:6px;
+  }
+  @media (max-width:760px){ .hero{ grid-template-columns:1fr; } }
+
+  .id-card{
+    background:var(--surface); border-radius:var(--radius); box-shadow:var(--shadow-md);
+    padding:22px; position:relative; overflow:hidden; border:1px solid var(--line);
+  }
+  .id-card .car-shot{
+    width:100%; height:150px; object-fit:cover; border-radius:12px;
+    background:var(--surface-sunken); margin-bottom:16px;
+  }
+  .eyebrow{
+    font-size:11.5px; font-weight:700; letter-spacing:.08em; text-transform:uppercase;
+    color:var(--ink-faint); margin:0 0 4px;
+  }
+  .customer-name{ font-size:22px; font-weight:700; margin:0 0 2px; }
+  .customer-sub{ font-size:13.5px; color:var(--ink-soft); margin:0 0 16px; }
+  .id-rows{ display:flex; flex-direction:column; gap:10px; }
+  .id-row{ display:flex; align-items:center; justify-content:space-between; font-size:13.5px; }
+  .id-row .k{ color:var(--ink-soft); }
+  .id-row .v{ font-weight:600; text-align:right; }
+  .mech-chip{
+    display:flex; align-items:center; gap:9px; margin-top:16px; padding:10px 12px;
+    background:var(--surface-sunken); border-radius:12px;
+  }
+  .mech-avatar{
+    width:34px; height:34px; border-radius:50%; background:var(--accent-soft); color:var(--accent-ink);
+    display:flex; align-items:center; justify-content:center; font-weight:700; font-size:14px; flex:none;
+  }
+  .mech-chip .name{ font-weight:600; font-size:13.5px; }
+  .mech-chip .role{ font-size:11.5px; color:var(--ink-soft); }
+  .mech-chip a.call{
+    margin-left:auto; background:var(--ink); color:#fff; padding:7px 12px; border-radius:999px;
+    font-size:12px; font-weight:600; display:flex; align-items:center; gap:6px;
+  }
+
+  /* ---------- Ignition CTA ---------- */
+  .ignition-panel{
+    background:linear-gradient(180deg,#181B20,#0E1013); border-radius:var(--radius);
+    box-shadow:var(--shadow-lg); padding:26px; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; text-align:center; color:#fff; position:relative;
+    overflow:hidden;
+  }
+  .ignition-panel::before{
+    content:""; position:absolute; inset:0;
+    background:radial-gradient(circle at 50% 15%, rgba(255,106,26,.18), transparent 60%);
+  }
+  .ign-label{ font-size:11.5px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:#B8BCC4; position:relative; }
+  .ign-btn{
+    width:132px; height:132px; border-radius:50%; margin:18px 0 14px; cursor:pointer; border:none;
+    background:radial-gradient(circle at 35% 30%, #FF8A45, var(--accent) 55%, #C4470E 100%);
+    box-shadow:0 0 0 8px rgba(255,106,26,.12), 0 12px 30px rgba(255,106,26,.35), inset 0 2px 6px rgba(255,255,255,.35);
+    display:flex; align-items:center; justify-content:center; position:relative; z-index:1;
+    transition:transform .15s ease;
+  }
+  .ign-btn:active{ transform:scale(.95); }
+  .ign-ring{
+    position:absolute; inset:-14px; border-radius:50%; border:1.5px solid rgba(255,106,26,.4);
+    animation:idle-ring 2.6s ease-out infinite;
+  }
+  @keyframes idle-ring{ 0%{transform:scale(.9);opacity:.9;} 100%{transform:scale(1.35);opacity:0;} }
+  .ign-btn svg{ width:46px; height:46px; }
+  .ign-title{ font-size:19px; font-weight:700; position:relative; }
+  .ign-sub{ font-size:12.5px; color:#9CA0AA; margin-top:4px; max-width:230px; position:relative; }
+
+  /* ---------- Section heading ---------- */
+  .section-head{ display:flex; align-items:baseline; justify-content:space-between; margin:34px 0 14px; }
+  .section-head h2{ font-size:17px; margin:0; }
+  .section-head .hint{ font-size:12px; color:var(--ink-faint); }
+
+  /* ---------- Feature grid ---------- */
+  .grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+  @media (max-width:760px){ .grid{ grid-template-columns:repeat(2,1fr); } }
+  @media (max-width:460px){ .grid{ grid-template-columns:1fr 1fr; gap:10px; } }
+
+  .feature{
+    background:var(--surface); border:1px solid var(--line); border-radius:14px;
+    padding:16px 14px; display:flex; flex-direction:column; gap:10px; box-shadow:var(--shadow-sm);
+    transition:transform .15s ease, box-shadow .15s ease; position:relative;
+  }
+  a.feature:hover{ transform:translateY(-2px); box-shadow:var(--shadow-md); }
+  .feature.disabled{ opacity:.55; }
+  .feature.urgent{ border-color:#F3C6BC; background:linear-gradient(180deg,#FFFFFF,#FFF7F5); }
+  .f-icon{
+    width:38px; height:38px; border-radius:10px; background:var(--accent-soft); color:var(--accent-ink);
+    display:flex; align-items:center; justify-content:center; flex:none;
+  }
+  .feature.urgent .f-icon{ background:var(--alert-soft); color:var(--alert); }
+  .f-icon svg{ width:19px; height:19px; }
+  .f-title{ font-size:13.5px; font-weight:700; line-height:1.25; }
+  .f-badge{
+    position:absolute; top:12px; right:12px; font-size:9.5px; font-weight:700; letter-spacing:.05em;
+    text-transform:uppercase; padding:3px 7px; border-radius:999px;
+  }
+  .f-badge.live{ background:var(--live-soft); color:var(--live); }
+  .f-badge.soon{ background:var(--surface-sunken); color:var(--ink-faint); }
+
+  /* ---------- Map ---------- */
+  #map{ height:230px; border-radius:var(--radius); overflow:hidden; box-shadow:var(--shadow-sm); border:1px solid var(--line); }
+  .map-empty{
+    height:230px; border-radius:var(--radius); background:var(--surface); border:1px dashed var(--line);
+    display:flex; align-items:center; justify-content:center; color:var(--ink-faint); font-size:13px;
+  }
+
+  /* ---------- Bookings timeline ---------- */
+  .timeline{ display:flex; flex-direction:column; }
+  .tl-item{ display:flex; gap:14px; padding-bottom:20px; position:relative; }
+  .tl-item:not(:last-child)::before{
+    content:""; position:absolute; left:9px; top:22px; bottom:0; width:1.5px; background:var(--line);
+  }
+  .tl-dot{
+    width:20px; height:20px; border-radius:50%; background:var(--surface); border:2px solid var(--accent);
+    flex:none; margin-top:2px;
+  }
+  .tl-card{
+    flex:1; background:var(--surface); border:1px solid var(--line); border-radius:14px;
+    padding:14px 16px; box-shadow:var(--shadow-sm);
+  }
+  .tl-top{ display:flex; justify-content:space-between; align-items:flex-start; gap:8px; }
+  .tl-problem{ font-weight:700; font-size:14px; }
+  .tl-date{ font-size:11.5px; color:var(--ink-faint); white-space:nowrap; }
+  .tl-meta{ font-size:12.5px; color:var(--ink-soft); margin-top:4px; }
+  .tl-price{ font-size:12.5px; font-weight:600; margin-top:8px; color:var(--accent-ink); }
+  .status-tag{
+    display:inline-block; margin-top:8px; font-size:10.5px; font-weight:700; text-transform:uppercase;
+    letter-spacing:.04em; padding:3px 8px; border-radius:999px; background:var(--live-soft); color:var(--live);
+  }
+
+  .empty-state{
+    text-align:center; padding:30px 20px; color:var(--ink-faint); font-size:13.5px;
+    background:var(--surface); border:1px dashed var(--line); border-radius:var(--radius);
+  }
+  .skeleton{ background:linear-gradient(90deg,var(--surface-sunken) 25%,#E4E7EB 37%,var(--surface-sunken) 63%); background-size:400% 100%; animation:shimmer 1.4s ease infinite; border-radius:8px; }
+  @keyframes shimmer{ 0%{background-position:100% 0;} 100%{background-position:0 0;} }
+
+  footer{ text-align:center; margin-top:50px; color:var(--ink-faint); font-size:12px; }
+  footer .heart{ color:var(--accent); }
+
+  @media (prefers-reduced-motion: reduce){
+    .dot::after, .ign-ring{ animation:none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">
+    <img src="https://instantmechanic.online/assets/img/logo.svg" alt="Instant Mechanic">
+  </div>
+  <div class="status-pill"><span class="dot"></span> <span id="statusText">Connecting…</span></div>
+</div>
+
+<div class="wrap">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="id-card" id="idCard">
+      <img class="car-shot skeleton" id="carImg" alt="Your car">
+      <p class="eyebrow">Registered to</p>
+      <h1 class="customer-name" id="custName">Loading…</h1>
+      <p class="customer-sub" id="custSub">Fetching your details</p>
+      <div class="id-rows" id="idRows"></div>
+      <div class="mech-chip" id="mechChip" style="display:none;">
+        <div class="mech-avatar" id="mechInitial">M</div>
+        <div>
+          <div class="name" id="mechName">—</div>
+          <div class="role">Your assigned mechanic</div>
+        </div>
+        <a class="call" id="mechCall" href="#"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>Call</a>
+      </div>
+    </div>
+
+    <div class="ignition-panel">
+      <div class="ign-label">One tap · AI Car Assistant</div>
+      <button class="ign-btn" id="ignBtn" aria-label="Start talking to your car">
+        <span class="ign-ring"></span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 1a4 4 0 0 0-4 4v6a4 4 0 0 0 8 0V5a4 4 0 0 0-4-4z"/>
+          <path d="M19 10v1a7 7 0 0 1-14 0v-1"/>
+          <line x1="12" y1="18" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/>
+        </svg>
+      </button>
+      <div class="ign-title">Talk to your car</div>
+      <div class="ign-sub">Show it what's wrong on camera — get an instant AI diagnosis, no typing.</div>
+    </div>
+  </div>
+
+  <!-- FEATURES -->
+  <div class="section-head"><h2>What Instant Mechanic can do</h2><span class="hint">Tap any card</span></div>
+  <div class="grid" id="featureGrid"></div>
+
+  <!-- MAP -->
+  <div class="section-head"><h2>Last known location</h2></div>
+  <div id="map"></div>
+  <div class="map-empty" id="mapEmpty" style="display:none;">No location on file yet</div>
+
+  <!-- BOOKINGS -->
+  <div class="section-head"><h2>My bookings</h2><span class="hint" id="bookingCount"></span></div>
+  <div class="timeline" id="bookingTimeline">
+    <div class="tl-item"><div class="tl-dot skeleton" style="border:none;"></div><div class="tl-card skeleton" style="height:70px;"></div></div>
+  </div>
+
+  <footer>Built with <span class="heart">♥</span> by Instant Mechanic — your car's AI assistant, always on call.</footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+// ─────────────────────────────────────────────
+// CONFIG — edit these to match your real routes
+// ─────────────────────────────────────────────
+const CONFIG = {
+  customerApi: (mobile) => `https://ai.instantmechanic.online/bot/customer_chats/?mobile=${mobile}`,
+  bookingApi:  (mobile) => `https://ai.instantmechanic.online/bot/api/booking-details?mobile=${mobile}`,
+  videoDiagnosisUrl: (mobile) => `ai-flow.html?m=${mobile}`,
+  whatsappUrl: "https://wa.me/message/R7LYR65MG47ZB1",
+  ambulanceUrl: "https://blinkit.com/ambulance?srsltid=AfmBOooo9rv2AoIqtmqltkaZzwMFjV50h86s4HnGaM4oOH6b-Hrv_8sV",
+  obd2Url: "https://instantmechanic.online/obd2.html",
+};
+
+const params = new URLSearchParams(location.search);
+const mobile = params.get("m") || params.get("mobile") || "";
+
+const icon = (path) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${path}</svg>`;
+
+const ICONS = {
+  video:   icon('<path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/>'),
+  headset: icon('<path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/>'),
+  shield:  icon('<path d="M12 2 4 5v6c0 5 3.4 9 8 11 4.6-2 8-6 8-11V5l-8-3z"/>'),
+  wrench:  icon('<path d="M14.7 6.3a4 4 0 0 1-5.4 5.4L4 17l3 3 5.3-5.3a4 4 0 0 1 5.4-5.4l-3-3-3 3 3 3z"/>'),
+  cross:   icon('<path d="M12 8v8M8 12h8"/><rect x="3" y="3" width="18" height="18" rx="4"/>'),
+  siren:   icon('<path d="M7 18v-6a5 5 0 0 1 10 0v6"/><path d="M3 18h18"/><path d="M12 2v3"/>'),
+  plug:    icon('<path d="M9 2v5M15 2v5M6 7h12l-1 6a5 5 0 0 1-5 4h0a5 5 0 0 1-5-4L6 7z"/><path d="M12 17v5"/>'),
+  receipt: icon('<path d="M6 2h12v20l-3-2-3 2-3-2-3 2V2z"/><path d="M9 8h6M9 12h6"/>'),
+  map:     icon('<path d="M9 3 3 6v15l6-3 6 3 6-3V3l-6 3-6-3z"/><path d="M9 3v15M15 6v15"/>'),
+  chat:    icon('<path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5 8.4 8.4 0 0 1-3.9-.9L3 21l1.9-5.6A8.5 8.5 0 1 1 21 11.5z"/>'),
+  history: icon('<path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><path d="M12 7v5l4 2"/>'),
+};
+
+const FEATURES = [
+  { title:"Video diagnosis",        icon:ICONS.video,   status:"live", href:CONFIG.videoDiagnosisUrl(mobile) },
+  { title:"Audio call diagnosis",   icon:ICONS.headset, status:"soon" },
+  { title:"Policy analyser",        icon:ICONS.shield,  status:"soon" },
+  { title:"Call mechanic for me",   icon:ICONS.wrench,  status:"soon" },
+  { title:"Call ambulance",         icon:ICONS.cross,   status:"live", href:CONFIG.ambulanceUrl, urgent:true },
+  { title:"Book a mechanic",        icon:ICONS.wrench,  status:"live", href:CONFIG.whatsappUrl },
+  { title:"SOS",                    icon:ICONS.siren,   status:"live", href:CONFIG.whatsappUrl, urgent:true },
+  { title:"OBD2 diagnosis",         icon:ICONS.plug,     status:"live", href:CONFIG.obd2Url },
+  { title:"Estimate for repair",    icon:ICONS.receipt, status:"soon" },
+  { title:"Chat with us",           icon:ICONS.chat,     status:"live", href:CONFIG.whatsappUrl },
+];
+
+function renderFeatures(){
+  const grid = document.getElementById("featureGrid");
+  grid.innerHTML = FEATURES.map(f => {
+    const tag = f.href ? "a" : "div";
+    const hrefAttr = f.href ? `href="${f.href}" target="_blank" rel="noopener"` : "";
+    return `<${tag} class="feature ${f.status==='soon'?'disabled':''} ${f.urgent?'urgent':''}" ${hrefAttr}>
+      <span class="f-badge ${f.status}">${f.status === 'live' ? 'Live' : 'Soon'}</span>
+      <div class="f-icon">${f.icon}</div>
+      <div class="f-title">${f.title}</div>
+    </${tag}>`;
+  }).join("");
+}
+renderFeatures();
+
+document.getElementById("ignBtn").onclick = () => {
+  window.location.href = CONFIG.videoDiagnosisUrl(mobile);
+};
+
+// ─────────────────────────────────────────────
+// Fetch customer profile
+// ─────────────────────────────────────────────
+async function loadCustomer(){
+  const statusEl = document.getElementById("statusText");
+  if (!mobile){
+    statusEl.textContent = "No mobile number in URL";
+    document.getElementById("custName").textContent = "Welcome";
+    document.getElementById("custSub").textContent = "Open this page via your car's NFC tag to see your details";
+    return;
+  }
+  try{
+    const res = await fetch(CONFIG.customerApi(mobile));
+    const json = await res.json();
+    const c = json?.data?.[0];
+    if (!c) throw new Error("no customer record");
+
+    statusEl.textContent = "Connected";
+    document.getElementById("custName").textContent = c.name?.trim() ? c.name : `Customer ${mobile.slice(-4)}`;
+    document.getElementById("custSub").textContent = c.car ? c.car.trim() : "Vehicle not on file yet";
+
+    if (c.car_image){
+      const img = document.getElementById("carImg");
+      img.src = c.car_image; img.classList.remove("skeleton");
+    }
+
+    const lastBooking = c.bookings?.[0];
+    const rows = [];
+    if (c.car_number) rows.push(["Reg. number", c.car_number]);
+    if (lastBooking) rows.push(["Last issue", lastBooking.problem]);
+    if (lastBooking?.price) rows.push(["Charged", lastBooking.price]);
+    document.getElementById("idRows").innerHTML = rows.map(([k,v]) =>
+      `<div class="id-row"><span class="k">${k}</span><span class="v">${v}</span></div>`).join("");
+
+    if (c.agent){
+      document.getElementById("mechChip").style.display = "flex";
+      document.getElementById("mechName").textContent = c.agent;
+      document.getElementById("mechInitial").textContent = c.agent[0].toUpperCase();
+    }
+
+    // Map from last booking location (google maps url with lat,lng)
+    const loc = lastBooking?.location;
+    const match = loc?.match(/(-?\d+\.\d+)[,\/](-?\d+\.\d+)/);
+    if (match){
+      const lat = parseFloat(match[1]), lng = parseFloat(match[2]);
+      const map = L.map('map', { zoomControl:false, attributionControl:false }).setView([lat,lng], 15);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+      L.circleMarker([lat,lng], { radius:9, color:"#FF6A1A", fillColor:"#FF6A1A", fillOpacity:.9, weight:3 }).addTo(map);
+    } else {
+      document.getElementById("map").style.display = "none";
+      document.getElementById("mapEmpty").style.display = "flex";
+    }
+
+  } catch(e){
+    statusEl.textContent = "Couldn't load profile";
+    document.getElementById("custName").textContent = "Welcome to Instant Mechanic";
+    document.getElementById("custSub").textContent = "We couldn't fetch your details right now";
+    document.getElementById("map").style.display = "none";
+    document.getElementById("mapEmpty").style.display = "flex";
+  }
+}
+
+// ─────────────────────────────────────────────
+// Fetch booking history
+// ─────────────────────────────────────────────
+async function loadBookings(){
+  const el = document.getElementById("bookingTimeline");
+  if (!mobile){ el.innerHTML = `<div class="empty-state">Tap your car's NFC tag to see booking history</div>`; return; }
+  try{
+    const res = await fetch(CONFIG.bookingApi(mobile));
+    const json = await res.json();
+    const bookings = Array.isArray(json) ? json : [json];
+    if (!bookings.length || !bookings[0]?.id) throw new Error("no bookings");
+
+    document.getElementById("bookingCount").textContent = `${bookings.length} record${bookings.length>1?'s':''}`;
+    el.innerHTML = bookings.map(b => {
+      const date = new Date(b.created_at).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' });
+      const statusLabel = b.is_cancelled ? "Cancelled" : (b.booking_status || "Completed");
+      return `<div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-card">
+          <div class="tl-top">
+            <div class="tl-problem">${b.problem || "Service booking"}</div>
+            <div class="tl-date mono">${date}</div>
+          </div>
+          <div class="tl-meta">${b.car || ""} · Mechanic: ${b.mechanic_name || "Unassigned"}</div>
+          <div class="tl-price mono">${b.price || ""}</div>
+          <span class="status-tag">${statusLabel}</span>
+        </div>
+      </div>`;
+    }).join("");
+  } catch(e){
+    el.innerHTML = `<div class="empty-state">No bookings on file yet</div>`;
+  }
+}
+
+loadCustomer();
+loadBookings();
+</script>
+</body>
+</html>
