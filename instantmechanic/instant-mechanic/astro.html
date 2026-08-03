@@ -43,7 +43,7 @@ async function startSession() {
 
   // 3. Open Gemini Live WebSocket using the ephemeral token
   ws = new WebSocket(
-    `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContent?access_token=${token}`
+    `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContentConstrained?access_token=${token}`
   );
 
   ws.onopen = () => {
