@@ -568,6 +568,7 @@
   let procNode = null;
   let nextPlayTime = 0;
 
+  let activeAudioSources = [];
   let frameTimer = null;
   let callTimerInterval = null;
   let callStartedAt = null;
@@ -794,7 +795,25 @@
     src.start(startAt);
     nextPlayTime = startAt + buffer.duration;
 
+    activeAudioSources.push(src);
+    src.onended = () => {
+      const i = activeAudioSources.indexOf(src);
+      if (i !== -1) activeAudioSources.splice(i, 1);
+    };
+
     pulseAnikaRing(buffer.duration);
+  }
+
+  // Stops every currently playing/queued audio chunk immediately.
+  // Needed on barge-in (`interrupted`): without this, the tail of the
+  // previous turn keeps sounding while the new turn's audio starts,
+  // which is heard as two overlapping Anika voices.
+  function stopAllAudioPlayback() {
+    activeAudioSources.forEach(src => {
+      try { src.onended = null; src.stop(); } catch (e) {}
+    });
+    activeAudioSources = [];
+    if (outputAudioCtx) nextPlayTime = outputAudioCtx.currentTime;
   }
 
   function pulseAnikaRing(duration) {
@@ -894,7 +913,10 @@
       if (msg.setupComplete) {
         reconnectAttempts = 0;
         setReconnectBanner(false);
+        stopAllAudioPlayback(); // clear any leftover audio from a prior connection before this one starts talking
         if (!isReconnect) {
+          sessionStarting = false;
+          el("btn-start").disabled = false;
           showScreen("call");
           startCallTimer();
           startMicStreaming();
@@ -907,7 +929,7 @@
       if (!sc) return;
 
       if (sc.interrupted) {
-        nextPlayTime = outputAudioCtx ? outputAudioCtx.currentTime : 0;
+        stopAllAudioPlayback();
       }
 
       const audioB64 = sc?.modelTurn?.parts?.[0]?.inlineData?.data;
@@ -957,7 +979,14 @@
   // ---------------------------------------------------------------
   // Session lifecycle
   // ---------------------------------------------------------------
+  let sessionStarting = false;
+
   async function startSession() {
+    if (sessionStarting) return; // guards against a double-tap opening two sessions at once
+    sessionStarting = true;
+    el("btn-start").disabled = true;
+
+    teardownMedia(); // safety net: fully close any prior session before opening a new one
     intentionalClose = false;
     reconnectAttempts = 0;
     showScreen("connecting");
@@ -986,6 +1015,8 @@
           ? "Instant Mechanic needs camera and microphone access for a live diagnosis. Allow access in your browser settings, then try again."
           : "We couldn't reach your camera. Make sure no other app is using it, then try again."
       );
+      sessionStarting = false;
+      el("btn-start").disabled = false;
       return;
     }
 
@@ -1000,12 +1031,16 @@
     } catch (e) {
       teardownMedia();
       goError("Couldn't connect", "We couldn't start the call with Anika. Check your connection and try again.");
+      sessionStarting = false;
+      el("btn-start").disabled = false;
     }
   }
 
   function teardownMedia() {
     clearInterval(frameTimer); frameTimer = null;
     stopCallTimer();
+    activeAudioSources.forEach(src => { try { src.onended = null; src.stop(); } catch (e) {} });
+    activeAudioSources = [];
     if (procNode) { try { procNode.disconnect(); } catch (e) {} procNode = null; }
     if (inputAudioCtx) { try { inputAudioCtx.close(); } catch (e) {} inputAudioCtx = null; }
     if (outputAudioCtx) { try { outputAudioCtx.close(); } catch (e) {} outputAudioCtx = null; }
@@ -1028,6 +1063,8 @@
     micMuted = false;
     anikaMuted = false;
     reconnectAttempts = 0;
+    sessionStarting = false;
+    el("btn-start").disabled = false;
     el("caption-anika").classList.remove("show");
     el("caption-user").classList.remove("show");
     showScreen("greet");
