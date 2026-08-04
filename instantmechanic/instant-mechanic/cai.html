@@ -355,9 +355,6 @@ const CONFIG = {
   ambulanceUrl: "https://blinkit.com/ambulance?srsltid=AfmBOooo9rv2AoIqtmqltkaZzwMFjV50h86s4HnGaM4oOH6b-Hrv_8sV",
   obd2Url: "https://instantmechanic.online/obd2.html",
   challanCheckUrl: "https://echallan.parivahan.gov.in/index/accused-challan",
-  // SOS should hit YOUR backend, which then calls Exotel server-side.
-  // Calling Exotel directly from the browser is not viable — see notes below.
-  sosApi: (mobile) => `https://ai.instantmechanic.online/bot/api/sos-call?mobile=${mobile}`,
 };
 
 const params = new URLSearchParams(location.search);
@@ -456,10 +453,12 @@ function bindActionCards(){
 }
 
 // ─────────────────────────────────────────────
-// SOS — connects the customer to an agent by phone.
-// This calls YOUR backend (CONFIG.sosApi), which places the Exotel
-// call server-side. Do NOT call Exotel's connect.json directly from
-// this page — see the notes in the reply for why.
+// SOS — connects the customer to an agent by phone via Exotel.
+// NOTE: this calls Exotel directly from the browser, which means the
+// Authorization credentials below are visible to anyone who views
+// this page's source, and Exotel's API may block the cross-origin
+// request outright (no CORS headers). If calls silently fail in
+// production, move this exact fetch into a backend endpoint instead.
 // ─────────────────────────────────────────────
 async function triggerSOS(){
   if (!mobile){
@@ -468,7 +467,19 @@ async function triggerSOS(){
   }
   toast("Connecting you now…");
   try{
-    const res = await fetch(CONFIG.sosApi(mobile), { method: "POST" });
+    const body = new URLSearchParams({
+      From: mobile,
+      CallerId: "08047287350",
+      Url: "http://my.exotel.com/instantmechanic2/exoml/start_voice/1298964",
+    });
+    const res = await fetch("https://api.exotel.com/v1/Accounts/instantmechanic2/Calls/connect.json", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Authorization": "Basic ZTFhNzAwMmY4NjA2ZmE4YjRiNThlZTk5OTAyZTgyNjgyMDRiN2Q4YWJkYzZlMzIyOjkzODg0N2ZkYWJjNTVlMzk0ZjE2ZDM2Zjg4OTQxNWVhNWNmMzlmOWUyMjgzYjI4Nw==",
+      },
+      body,
+    });
     if (res.ok){
       toast("Help is on the way — expect a call shortly");
     } else {
