@@ -350,15 +350,29 @@
 const CONFIG = {
   customerApi: (mobile) => `https://ai.instantmechanic.online/bot/customer_chats/?mobile=${mobile}`,
   bookingApi:  (mobile) => `https://ai.instantmechanic.online/bot/api/booking-details?mobile=${mobile}`,
-  videoDiagnosisUrl: (mobile) => `astro.html?m=${mobile}`,
+  videoDiagnosisBase: "https://instantmechanic.online/ai-video-diagnosis.html",
   whatsappUrl: "https://wa.me/message/R7LYR65MG47ZB1",
   ambulanceUrl: "https://blinkit.com/ambulance?srsltid=AfmBOooo9rv2AoIqtmqltkaZzwMFjV50h86s4HnGaM4oOH6b-Hrv_8sV",
   obd2Url: "https://instantmechanic.online/obd2.html",
   challanCheckUrl: "https://echallan.parivahan.gov.in/index/accused-challan",
+  // SOS should hit YOUR backend, which then calls Exotel server-side.
+  // Calling Exotel directly from the browser is not viable — see notes below.
+  sosApi: (mobile) => `https://ai.instantmechanic.online/bot/api/sos-call?mobile=${mobile}`,
 };
 
 const params = new URLSearchParams(location.search);
 const mobile = params.get("m") || params.get("mobile") || "";
+
+// Filled in once loadCustomer() resolves — used to build the video diagnosis link
+const customerInfo = { name: "", car: "" };
+
+function buildVideoDiagnosisUrl(){
+  const p = new URLSearchParams();
+  if (customerInfo.name) p.set("name", customerInfo.name);
+  if (customerInfo.car) p.set("car", customerInfo.car);
+  if (mobile) p.set("mobile", mobile);
+  return `${CONFIG.videoDiagnosisBase}?${p.toString()}`;
+}
 
 const icon = (path, sw="1.8") => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round">${path}</svg>`;
 
@@ -407,10 +421,11 @@ function renderCard(f){
   const tag = f.href ? "a" : "div";
   const hrefAttr = f.href ? `href="${f.href}" target="_blank" rel="noopener"` : "";
   const toastMsg = f.toastMsg || `${f.title} is coming soon — we'll notify you the moment it's live.`;
-  const toastAttr = f.href ? "" : `data-toast="${escAttr(toastMsg)}"`;
+  const toastAttr = (!f.href && !f.action) ? `data-toast="${escAttr(toastMsg)}"` : "";
+  const actionAttr = f.action ? `data-action="${f.action}"` : "";
   const badgeClass = f.status === 'live' ? 'live' : (f.status === 'check' ? 'check' : 'soon');
   const badgeLabel = f.status === 'live' ? 'Live' : (f.status === 'check' ? 'Check now' : 'Soon');
-  return `<${tag} class="feature ${f.status!=='live' && f.status!=='check' ?'disabled':''}" ${hrefAttr} ${toastAttr} role="button" tabindex="0">
+  return `<${tag} class="feature ${f.status!=='live' && f.status!=='check' ?'disabled':''}" ${hrefAttr} ${toastAttr} ${actionAttr} role="button" tabindex="0">
     <span class="f-badge ${badgeClass}">${badgeLabel}</span>
     <div class="f-icon" style="background:${cat.bg};color:${cat.fg}">${f.icon}</div>
     <div class="f-title">${f.title}</div>
@@ -427,6 +442,45 @@ function bindToastCards(){
   });
 }
 
+const ACTIONS = { sos: triggerSOS };
+
+function bindActionCards(){
+  document.querySelectorAll('.feature[data-action]').forEach(el => {
+    const fn = ACTIONS[el.getAttribute('data-action')];
+    if (!fn) return;
+    el.addEventListener('click', fn);
+    el.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); fn(); }
+    });
+  });
+}
+
+// ─────────────────────────────────────────────
+// SOS — connects the customer to an agent by phone.
+// This calls YOUR backend (CONFIG.sosApi), which places the Exotel
+// call server-side. Do NOT call Exotel's connect.json directly from
+// this page — see the notes in the reply for why.
+// ─────────────────────────────────────────────
+async function triggerSOS(){
+  if (!mobile){
+    toast("Open this from your car's tag to use SOS");
+    return;
+  }
+  toast("Connecting you now…");
+  try{
+    const res = await fetch(CONFIG.sosApi(mobile), { method: "POST" });
+    if (res.ok){
+      toast("Help is on the way — expect a call shortly");
+    } else {
+      toast("Couldn't place the call — opening WhatsApp instead");
+      window.open(CONFIG.whatsappUrl, "_blank");
+    }
+  } catch(e){
+    toast("Network error — opening WhatsApp instead");
+    window.open(CONFIG.whatsappUrl, "_blank");
+  }
+}
+
 // ─────────────────────────────────────────────
 // Compliance & money — Fastag / Challan / PUC / Insurance
 // ─────────────────────────────────────────────
@@ -441,13 +495,11 @@ const COMPLIANCE = [
 // Core Instant Mechanic actions (existing)
 // ─────────────────────────────────────────────
 const FEATURES = [
-  { title:"Video diagnosis",      detail:"Show us the problem, live",        icon:ICONS.video,   cat:"smart", status:"live", href:CONFIG.videoDiagnosisUrl(mobile) },
-  { title:"Audio call diagnosis", detail:"Talk it through with our AI",      icon:ICONS.headset, cat:"smart", status:"soon" },
   { title:"Book a mechanic",      detail:"500+ verified mechanics nearby",   icon:ICONS.wrench,  cat:"money", status:"live", href:CONFIG.whatsappUrl },
   { title:"OBD2 diagnosis",       detail:"Plug in and read your car's mind", icon:ICONS.plug,     cat:"smart", status:"live", href:CONFIG.obd2Url },
   { title:"Estimate for repair",  detail:"Know the cost before you commit",  icon:ICONS.receipt, cat:"money", status:"soon" },
   { title:"Call ambulance",       detail:"For roadside medical emergencies", icon:ICONS.cross,   cat:"legal", status:"live", href:CONFIG.ambulanceUrl },
-  { title:"SOS",                  detail:"Instant help, wherever you are",   icon:ICONS.siren,   cat:"legal", status:"live", href:CONFIG.whatsappUrl },
+  { title:"SOS",                  detail:"Instant help, wherever you are",   icon:ICONS.siren,   cat:"legal", status:"live", action:"sos" },
   { title:"Chat with us",         detail:"A real human, one tap away",       icon:ICONS.chat,     cat:"shield",status:"live", href:CONFIG.whatsappUrl },
 ];
 
@@ -465,11 +517,12 @@ function renderGrids(){
   document.getElementById("featureGrid").innerHTML = FEATURES.map(renderCard).join("");
   document.getElementById("ideaGrid").innerHTML = IDEAS.map(renderCard).join("");
   bindToastCards();
+  bindActionCards();
 }
 renderGrids();
 
 document.getElementById("ignBtn").onclick = () => {
-  window.location.href = CONFIG.videoDiagnosisUrl(mobile);
+  window.location.href = buildVideoDiagnosisUrl();
 };
 
 // ─────────────────────────────────────────────
@@ -499,6 +552,8 @@ async function loadCustomer(){
     statusEl.textContent = "Connected";
     document.getElementById("custName").textContent = c.name?.trim() ? c.name : `Customer ${mobile.slice(-4)}`;
     document.getElementById("custSub").textContent = c.car ? c.car.trim() : "Vehicle not on file yet";
+    customerInfo.name = c.name?.trim() || "";
+    customerInfo.car = c.car?.trim() || "";
 
     if (c.car_image){
       const img = document.getElementById("carImg");
