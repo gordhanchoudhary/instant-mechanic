@@ -3,6 +3,7 @@
 document.addEventListener('DOMContentLoaded', () => {
   /* ---------- Sticky header ---------- */
   const header = document.querySelector('.site-header');
+  const backToTop = document.querySelector('.back-to-top');
   const onScroll = () => {
     header.classList.toggle('is-scrolled', window.scrollY > 40);
     backToTop.classList.toggle('is-visible', window.scrollY > 700);
@@ -76,7 +77,6 @@ document.addEventListener('DOMContentLoaded', () => {
   counters.forEach((el) => counterIO.observe(el));
 
   /* ---------- Back to top ---------- */
-  const backToTop = document.querySelector('.back-to-top');
   backToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
 
   /* ---------- Contact form (placeholder — no backend wired up) ---------- */
