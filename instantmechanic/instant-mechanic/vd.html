@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Instant Mechanic — Video Diagnosis Test</title>
+<style>
+  body { font-family: sans-serif; background:#111; color:#eee; text-align:center; padding:40px; }
+  video { width:320px; border-radius:8px; background:#000; }
+  button { padding:14px 28px; font-size:16px; border-radius:8px; border:none; cursor:pointer; margin-top:20px; }
+  #start { background:#2ecc71; color:#000; }
+  #stop  { background:#e74c3c; color:#fff; display:none; }
+  #log { margin-top:20px; font-size:13px; color:#999; white-space:pre-wrap; text-align:left; max-width:400px; margin-inline:auto; }
+</style>
+</head>
+<body>
+  <h2>🚗 Video Diagnosis Test</h2>
+  <video id="cam" autoplay muted playsinline></video><br>
+  <button id="start">Start Diagnosis</button>
+  <button id="stop">Stop</button>
+  <div id="log"></div>
+  <audio id="player" autoplay></audio>
+
+<script>
+const BACKEND = "https://ai.instantmechanic.online/bot/get-token"; // your Django endpoint
+let ws, stream, audioCtx, videoInterval, procNode;
+const log = (m) => document.getElementById("log").textContent += m + "\n";
+
+document.getElementById("start").onclick = startSession;
+document.getElementById("stop").onclick = stopSession;
+
+async function startSession() {
+  document.getElementById("start").style.display = "none";
+  document.getElementById("stop").style.display = "inline-block";
+
+  // 1. Get short-lived token from Django backend
+  const res = await fetch(BACKEND, { method: "POST" });
+  const { token, model } = await res.json();
+  log("got token, model: " + model);
+
+  // 2. Get camera + mic
+  stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+  document.getElementById("cam").srcObject = stream;
+
+  // 3. Open Gemini Live WebSocket using the ephemeral token
+  ws = new WebSocket(
+    `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContent?access_token=${token}`
+  );
+
+  ws.onopen = () => {
+    log("connected — session live");
+    startMicStreaming();
+    startVideoStreaming();
+  };
+
+  ws.onmessage = async (evt) => {
+    const msg = JSON.parse(evt.data);
+    const audioB64 = msg?.serverContent?.modelTurn?.parts?.[0]?.inlineData?.data;
+    if (audioB64) playAudioChunk(audioB64);
+  };
+
+  ws.onerror = (e) => log("ws error: " + JSON.stringify(e));
+  ws.onclose = (e) => log("session closed: " + e.code + " " + e.reason);
+}
+
+// Send one JPEG video frame per second
+function startVideoStreaming() {
+  const track = stream.getVideoTracks()[0];
+  const capture = new ImageCapture(track);
+  videoInterval = setInterval(async () => {
+    if (ws.readyState !== 1) return;
+    const bitmap = await capture.grabFrame();
+    const canvas = document.createElement("canvas");
+    canvas.width = bitmap.width; canvas.height = bitmap.height;
+    canvas.getContext("2d").drawImage(bitmap, 0, 0);
+    const jpegB64 = canvas.toDataURL("image/jpeg", 0.7).split(",")[1];
+    ws.send(JSON.stringify({
+      realtimeInput: { video: { mimeType: "image/jpeg", data: jpegB64 } }
+    }));
+  }, 1000);
+}
+
+// Stream mic audio as 16-bit PCM @ 16kHz
+function startMicStreaming() {
+  audioCtx = new AudioContext({ sampleRate: 16000 });
+  const src = audioCtx.createMediaStreamSource(stream);
+  procNode = audioCtx.createScriptProcessor(4096, 1, 1);
+  src.connect(procNode); procNode.connect(audioCtx.destination);
+  procNode.onaudioprocess = (e) => {
+    if (ws.readyState !== 1) return;
+    const input = e.inputBuffer.getChannelData(0);
+    const pcm16 = new Int16Array(input.length);
+    for (let i = 0; i < input.length; i++) pcm16[i] = input[i] * 32767;
+    const b64 = btoa(String.fromCharCode(...new Uint8Array(pcm16.buffer)));
+    ws.send(JSON.stringify({
+      realtimeInput: { audio: { mimeType: "audio/pcm;rate=16000", data: b64 } }
+    }));
+  };
+}
+
+// Play back Anika's spoken response
+function playAudioChunk(b64) {
+  const bytes = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+  const blob = new Blob([bytes], { type: "audio/wav" });
+  document.getElementById("player").src = URL.createObjectURL(blob);
+}
+
+function stopSession() {
+  clearInterval(videoInterval);
+  if (procNode) procNode.disconnect();
+  if (stream) stream.getTracks().forEach(t => t.stop());
+  if (ws) ws.close();
+  document.getElementById("start").style.display = "inline-block";
+  document.getElementById("stop").style.display = "none";
+}
+</script>
+</body>
+</html>

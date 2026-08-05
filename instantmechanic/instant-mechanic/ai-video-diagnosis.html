@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#090C10">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="color-scheme" content="dark">
+<title>Live Diagnosis — Instant Mechanic</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink-950:#090C10;
+    --ink-900:#11161D;
+    --ink-850:#161C24;
+    --ink-800:#1D242D;
+    --ink-750:#252D38;
+    --mist:#8992A0;
+    --mist-dim:#5B6472;
+    --paper:#F3F6F8;
+    --signal:#FF5A1F;
+    --signal-dim:#B84420;
+    --diagnose:#23D9A8;
+    --diagnose-dim:#12CB98;
+    --caution:#FFB020;
+    --danger:#EF4444;
+    --danger-dim:#C93838;
+    --safe-t:env(safe-area-inset-top, 0px);
+    --safe-b:env(safe-area-inset-bottom, 0px);
+    --safe-l:env(safe-area-inset-left, 0px);
+    --safe-r:env(safe-area-inset-right, 0px);
+  }
+
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{height:100%; margin:0; overscroll-behavior:none;}
+  body{
+    background:var(--ink-950);
+    color:var(--paper);
+    font-family:'Inter',system-ui,-apple-system,sans-serif;
+    -webkit-font-smoothing:antialiased;
+    overflow:hidden;
+    height:100dvh;
+  }
+  .mono{font-family:'JetBrains Mono',ui-monospace,monospace;}
+  .display{font-family:'Space Grotesk',sans-serif;}
+  button{font-family:inherit; -webkit-appearance:none; appearance:none;}
+  svg{display:block;}
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important;}
+  }
+
+  #app{position:relative; width:100%; height:100dvh; overflow:hidden;}
+
+  .screen{
+    position:absolute; inset:0;
+    display:flex; flex-direction:column;
+    opacity:0; visibility:hidden; pointer-events:none;
+    transition:opacity .35s ease;
+  }
+  .screen.active{opacity:1; visibility:visible; pointer-events:auto;}
+
+  /* ---------- Shared brand mark ---------- */
+  .brand-row{display:flex; align-items:center; gap:9px;}
+  .brand-mark{
+    width:26px; height:26px; border-radius:8px;
+    background:linear-gradient(135deg, var(--signal), #FF8A50);
+    display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  }
+  .brand-mark svg{width:15px; height:15px;}
+  .brand-name{font-size:12.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--mist); font-weight:600;}
+
+  /* ================= GREET SCREEN ================= */
+  #screen-greet{
+    background:
+      radial-gradient(120% 65% at 50% -10%, rgba(255,90,31,0.16), transparent 60%),
+      radial-gradient(90% 55% at 85% 110%, rgba(35,217,168,0.10), transparent 60%),
+      var(--ink-950);
+    padding: calc(28px + var(--safe-t)) 24px calc(24px + var(--safe-b));
+    justify-content:space-between;
+  }
+  .greet-top{display:flex; justify-content:center;}
+  .greet-mid{display:flex; flex-direction:column; align-items:center; text-align:center; gap:18px; margin-top:6px;}
+
+  .avatar-hero{position:relative; width:104px; height:104px; margin-bottom:4px;}
+  .avatar-hero .ring{position:absolute; inset:0; border-radius:50%; border:1.5px solid rgba(35,217,168,0.35); animation:breathe 3.6s ease-in-out infinite;}
+  .avatar-hero .ring.r2{inset:-14px; animation-delay:.6s; border-color:rgba(35,217,168,0.18);}
+  @keyframes breathe{0%,100%{transform:scale(1); opacity:.7;} 50%{transform:scale(1.08); opacity:.15;}}
+  .avatar-hero .core{
+    position:absolute; inset:10px; border-radius:50%;
+    background:linear-gradient(160deg, #1A2129, #0D1319);
+    border:1px solid var(--ink-750);
+    display:flex; align-items:center; justify-content:center;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02), 0 14px 30px -10px rgba(0,0,0,0.7);
+  }
+  .avatar-hero .core svg{width:38px; height:38px;}
+
+  .eyebrow{font-size:11.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--diagnose); font-weight:600;}
+  h1.greet-title{font-size:26px; line-height:1.2; margin:2px 0 0; font-weight:600;}
+  h1.greet-title .name{color:var(--signal);}
+  p.greet-sub{font-size:15.5px; line-height:1.55; color:var(--mist); margin:0; max-width:320px;}
+  p.greet-sub b{color:var(--paper); font-weight:600;}
+
+  .chip-row{display:flex; gap:8px; flex-wrap:wrap; justify-content:center; margin-top:2px;}
+  .chip{
+    display:flex; align-items:center; gap:6px;
+    background:var(--ink-850); border:1px solid var(--ink-750);
+    padding:8px 13px; border-radius:100px; font-size:13.5px; color:var(--paper); font-weight:500;
+  }
+  .chip svg{width:14px; height:14px; opacity:.7; flex-shrink:0;}
+
+  .greet-bottom{display:flex; flex-direction:column; align-items:center; gap:14px;}
+  .btn-start{
+    width:100%; max-width:360px;
+    display:flex; align-items:center; justify-content:center; gap:10px;
+    background:linear-gradient(135deg, var(--signal), #FF7A40);
+    color:#12100D; font-weight:700; font-size:16px;
+    border:none; border-radius:16px; padding:17px 20px;
+    box-shadow:0 16px 32px -12px rgba(255,90,31,0.55);
+    cursor:pointer; transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .btn-start:active{transform:scale(.97); box-shadow:0 8px 18px -10px rgba(255,90,31,0.5);}
+  .btn-start:disabled{opacity:.6; pointer-events:none;}
+  .btn-start svg{width:19px; height:19px;}
+  .fine-print{font-size:12px; color:var(--mist-dim); text-align:center; max-width:300px; line-height:1.5;}
+  .fine-print b{color:var(--mist);}
+
+  /* ================= CONNECTING SCREEN ================= */
+  #screen-connecting{background:var(--ink-950); align-items:center; justify-content:center; gap:22px; text-align:center; padding:24px;}
+  .spin-ring{width:52px; height:52px; position:relative;}
+  .spin-ring svg{width:100%; height:100%; animation:spin 1.1s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  #connect-status{font-size:15px; color:var(--mist); max-width:280px; line-height:1.5;}
+  #connect-status b{color:var(--paper);}
+
+  /* ================= CALL SCREEN (shared chrome) ================= */
+  #screen-call{background:#000;}
+
+  .call-topbar{
+    position:absolute; top:0; left:0; right:0; z-index:9;
+    padding: calc(14px + var(--safe-t)) calc(16px + var(--safe-r)) 10px calc(16px + var(--safe-l));
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .live-badge{
+    display:flex; align-items:center; gap:7px;
+    background:rgba(20,24,30,0.55); backdrop-filter:blur(10px);
+    border:1px solid rgba(255,255,255,0.08);
+    padding:7px 12px 7px 10px; border-radius:100px;
+  }
+  .live-dot{width:7px; height:7px; border-radius:50%; background:var(--danger); animation:pulse-dot 1.4s ease-in-out infinite;}
+  @keyframes pulse-dot{0%,100%{opacity:1; transform:scale(1);} 50%{opacity:.4; transform:scale(.8);}}
+  .live-badge span{font-size:12.5px; font-weight:600; letter-spacing:.03em;}
+  .call-timer{font-size:12.5px; color:var(--mist); font-weight:500;}
+  .topbar-right{display:flex; align-items:center; gap:8px;}
+  .icon-btn-ghost{
+    width:34px; height:34px; border-radius:50%;
+    background:rgba(20,24,30,0.55); backdrop-filter:blur(10px);
+    border:1px solid rgba(255,255,255,0.08);
+    display:flex; align-items:center; justify-content:center;
+    color:var(--paper); cursor:pointer;
+  }
+  .icon-btn-ghost svg{width:16px; height:16px;}
+  .icon-btn-ghost.on-accent{background:rgba(255,176,32,0.9); border-color:transparent; color:#1a1200;}
+
+  /* ---- VOICE STAGE (audio-only mode) ---- */
+  .voice-stage{
+    position:absolute; inset:0;
+    background:
+      radial-gradient(90% 55% at 50% 8%, rgba(35,217,168,0.14), transparent 62%),
+      radial-gradient(80% 50% at 50% 100%, rgba(255,90,31,0.08), transparent 60%),
+      var(--ink-950);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:16px; padding:0 32px;
+  }
+  .hero-orb{position:relative; width:172px; height:172px; margin-bottom:2px;}
+  .hero-orb .hring{position:absolute; inset:0; border-radius:50%; border:1.5px solid rgba(35,217,168,0.3); animation:breathe 3.8s ease-in-out infinite;}
+  .hero-orb .hring.r2{inset:-20px; animation-delay:.7s; border-color:rgba(35,217,168,0.14);}
+  .hero-orb .hring.amp{
+    inset:-8px; border-width:2px; border-color:var(--diagnose);
+    opacity:calc(0.25 + var(--amp, 0) * 0.6);
+    transform:scale(calc(1 + var(--amp, 0) * 0.06));
+    transition:transform 90ms linear, opacity 90ms linear;
+    animation:none;
+  }
+  .hero-core{
+    position:absolute; inset:16px; border-radius:50%;
+    background:linear-gradient(160deg, #1A2129, #0B1015);
+    border:1px solid var(--ink-750);
+    display:flex; align-items:center; justify-content:center;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02), 0 20px 40px -14px rgba(0,0,0,0.75);
+  }
+  .hero-core svg{width:60px; height:60px;}
+  .hero-name{font-size:19px; font-weight:600;}
+  .hero-status{font-size:14px; color:var(--mist);}
+  .mic-bars{display:flex; align-items:flex-end; justify-content:center; gap:3px; height:16px; margin-top:2px;}
+  .mic-bars i{width:3px; border-radius:2px; background:var(--diagnose); height:3px; transition:height 90ms linear; display:block;}
+  .mic-bars.pip-bars{position:absolute; top:8px; left:8px; height:12px; gap:2px; margin-top:0;}
+  .mic-bars.pip-bars i{width:2.5px;}
+
+  /* ---- VIDEO STAGE (camera mode) ---- */
+  .video-stage{position:absolute; inset:0; background:#000;}
+  #localVideo{width:100%; height:100%; object-fit:cover;}
+  #localVideo.front-cam{transform:scaleX(-1);}
+  .video-scrim-top{position:absolute; top:0; left:0; right:0; height:150px; background:linear-gradient(180deg, rgba(0,0,0,0.65), transparent); pointer-events:none;}
+  .video-scrim-bottom{position:absolute; bottom:0; left:0; right:0; height:230px; background:linear-gradient(0deg, rgba(0,0,0,0.72), transparent); pointer-events:none;}
+  .scan-overlay{position:absolute; inset:0; pointer-events:none; overflow:hidden;}
+  .corner{position:absolute; width:26px; height:26px; border:2.5px solid var(--diagnose); opacity:.8;}
+  .corner.tl{top:calc(78px + var(--safe-t)); left:18px; border-right:none; border-bottom:none; border-radius:7px 0 0 0;}
+  .corner.tr{top:calc(78px + var(--safe-t)); right:18px; border-left:none; border-bottom:none; border-radius:0 7px 0 0;}
+  .corner.bl{bottom:190px; left:18px; border-right:none; border-top:none; border-radius:0 0 0 7px;}
+  .corner.br{bottom:190px; right:18px; border-left:none; border-top:none; border-radius:0 0 7px 0;}
+  .scan-line{
+    position:absolute; left:9%; right:9%; height:2px;
+    background:linear-gradient(90deg, transparent, var(--diagnose), transparent);
+    box-shadow:0 0 14px 3px rgba(35,217,168,0.7); mix-blend-mode:screen;
+    animation:sweep 3.4s ease-in-out infinite;
+  }
+  @keyframes sweep{0%{top:16%; opacity:0;} 8%{opacity:1;} 50%{top:80%; opacity:1;} 60%{opacity:0;} 100%{top:16%; opacity:0;}}
+
+  .pip{position:absolute; top:calc(66px + var(--safe-t)); right:calc(16px + var(--safe-r)); width:96px; height:128px; z-index:6;}
+  .pip-inner{
+    position:relative; width:100%; height:100%; border-radius:16px;
+    background:linear-gradient(165deg, #1A2129, #0B1015);
+    border:1px solid rgba(255,255,255,0.08);
+    box-shadow:0 12px 26px -10px rgba(0,0,0,0.65);
+    display:flex; align-items:center; justify-content:center; overflow:hidden;
+  }
+  .pip-ring{
+    position:absolute; inset:0; border-radius:16px; border:1.5px solid var(--diagnose);
+    opacity:calc(0.25 + var(--amp, 0) * 0.65);
+    transform:scale(calc(1 + var(--amp, 0) * 0.045));
+    transition:transform 90ms linear, opacity 90ms linear; pointer-events:none;
+  }
+  .pip-avatar{width:40px; height:40px;}
+  .pip-label{position:absolute; left:0; right:0; bottom:6px; text-align:center; font-size:10.5px; font-weight:600; color:var(--paper); letter-spacing:.02em;}
+
+  /* mode switching visibility */
+  #screen-call.mode-audio .video-stage,
+  #screen-call.mode-audio .pip{display:none;}
+  #screen-call.mode-video .voice-stage{display:none;}
+
+  /* captions (shared) */
+  .captions-wrap{
+    position:absolute; left:0; right:0; bottom:150px; padding:0 20px; z-index:5;
+    display:flex; flex-direction:column; align-items:center; gap:6px; pointer-events:none;
+  }
+  .caption-user{
+    font-size:12.5px; color:var(--mist); background:rgba(15,18,22,0.5); backdrop-filter:blur(8px);
+    padding:5px 12px; border-radius:100px; max-width:88%; text-align:center;
+    opacity:0; transform:translateY(4px); transition:opacity .25s ease, transform .25s ease;
+  }
+  .caption-user.show{opacity:1; transform:translateY(0);}
+  .caption-anika{
+    font-size:15.5px; line-height:1.4; font-weight:500; text-align:center;
+    background:rgba(9,12,16,0.62); backdrop-filter:blur(10px);
+    border:1px solid rgba(35,217,168,0.18);
+    padding:11px 16px; border-radius:16px; max-width:92%;
+    opacity:0; transform:translateY(6px); transition:opacity .3s ease, transform .3s ease;
+  }
+  .caption-anika.show{opacity:1; transform:translateY(0);}
+
+  /* bottom controls (shared) */
+  .call-controls{
+    position:absolute; left:0; right:0; bottom:0; z-index:8;
+    padding: 14px calc(20px + var(--safe-r)) calc(22px + var(--safe-b)) calc(20px + var(--safe-l));
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .ctrl-btn{
+    width:52px; height:52px; border-radius:50%;
+    background:rgba(29,36,45,0.7); backdrop-filter:blur(12px);
+    border:1px solid rgba(255,255,255,0.08);
+    display:flex; align-items:center; justify-content:center;
+    color:var(--paper); cursor:pointer; position:relative;
+    transition:background .15s ease, transform .1s ease;
+  }
+  .ctrl-btn:active{transform:scale(.93);}
+  .ctrl-btn svg{width:21px; height:21px;}
+  .ctrl-btn.off{background:rgba(239,68,68,0.85); border-color:transparent;}
+  .ctrl-btn.on-accent{background:rgba(255,176,32,0.9); border-color:transparent; color:#1a1200;}
+  .ctrl-btn.video-accent{background:linear-gradient(135deg, var(--diagnose), var(--diagnose-dim)); border-color:transparent; color:#04231a;}
+  .ctrl-btn[disabled]{opacity:.35; pointer-events:none;}
+  .ctrl-btn-end{
+    width:64px; height:64px; border-radius:50%;
+    background:linear-gradient(135deg, var(--danger), var(--danger-dim));
+    border:none; display:flex; align-items:center; justify-content:center;
+    color:#fff; cursor:pointer; box-shadow:0 12px 24px -8px rgba(239,68,68,0.55);
+    transition:transform .1s ease;
+  }
+  .ctrl-btn-end:active{transform:scale(.93);}
+  .ctrl-btn-end svg{width:25px; height:25px;}
+
+  .reconnect-banner, .mode-toast{
+    position:absolute; top:calc(64px + var(--safe-t)); left:50%; transform:translateX(-50%) translateY(-12px);
+    font-size:12.5px; font-weight:600; padding:7px 14px; border-radius:100px; z-index:10;
+    opacity:0; pointer-events:none; transition:opacity .25s ease, transform .25s ease;
+    display:flex; align-items:center; gap:7px; white-space:nowrap;
+  }
+  .reconnect-banner{background:rgba(255,176,32,0.14); border:1px solid rgba(255,176,32,0.4); color:var(--caution);}
+  .reconnect-banner .dot{width:6px; height:6px; border-radius:50%; background:var(--caution); animation:pulse-dot 1s ease-in-out infinite;}
+  .reconnect-banner.show, .mode-toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+  .mode-toast{background:rgba(20,24,30,0.85); border:1px solid rgba(255,255,255,0.1); color:var(--paper);}
+
+  /* ================= ENDED SCREEN ================= */
+  #screen-ended{
+    background:radial-gradient(120% 60% at 50% 0%, rgba(35,217,168,0.12), transparent 60%), var(--ink-950);
+    align-items:center; justify-content:center; text-align:center; padding:32px 24px; gap:22px;
+  }
+  .end-check{width:76px; height:76px; border-radius:50%; background:rgba(35,217,168,0.12); border:1.5px solid rgba(35,217,168,0.4); display:flex; align-items:center; justify-content:center;}
+  .end-check svg{width:34px; height:34px;}
+  #screen-ended h2{font-size:21px; font-weight:600; margin:0;}
+  #screen-ended p{font-size:14.5px; color:var(--mist); line-height:1.6; max-width:300px; margin:0;}
+  .end-stats{display:flex; gap:10px;}
+  .end-stat{background:var(--ink-850); border:1px solid var(--ink-750); border-radius:12px; padding:11px 18px; text-align:center;}
+  .end-stat .v{font-size:16px; font-weight:600;}
+  .end-stat .l{font-size:10.5px; color:var(--mist-dim); text-transform:uppercase; letter-spacing:.06em; margin-top:2px;}
+  .btn-secondary{width:100%; max-width:320px; background:var(--ink-850); border:1px solid var(--ink-750); color:var(--paper); font-weight:600; font-size:15px; padding:15px; border-radius:14px; cursor:pointer;}
+
+  /* ================= ERROR SCREEN ================= */
+  #screen-error{background:var(--ink-950); align-items:center; justify-content:center; text-align:center; padding:32px 24px; gap:18px;}
+  .err-icon{width:64px; height:64px; border-radius:50%; background:rgba(239,68,68,0.12); border:1.5px solid rgba(239,68,68,0.4); display:flex; align-items:center; justify-content:center;}
+  .err-icon svg{width:28px; height:28px;}
+  #screen-error h2{font-size:19px; font-weight:600; margin:0;}
+  #screen-error p{font-size:14px; color:var(--mist); line-height:1.6; max-width:300px; margin:0;}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ============ GREET SCREEN ============ -->
+  <section id="screen-greet" class="screen active">
+    <div class="greet-top">
+      <div class="brand-row">
+        <div class="brand-mark">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M3 13l1.8-5.4A2 2 0 016.7 6h10.6a2 2 0 011.9 1.6L21 13" stroke="#12100D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 13h18v4a1 1 0 01-1 1h-2a1 1 0 01-1-1v-1H7v1a1 1 0 01-1 1H4a1 1 0 01-1-1v-4z" stroke="#12100D" stroke-width="2" stroke-linejoin="round"/><circle cx="7.5" cy="18" r="1.4" fill="#12100D"/><circle cx="16.5" cy="18" r="1.4" fill="#12100D"/></svg>
+        </div>
+        <span class="brand-name">Instant Mechanic</span>
+      </div>
+    </div>
+
+    <div class="greet-mid">
+      <div class="avatar-hero">
+        <div class="ring"></div>
+        <div class="ring r2"></div>
+        <div class="core">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M12 3a4 4 0 014 4v2a4 4 0 01-8 0V7a4 4 0 014-4z" stroke="#23D9A8" stroke-width="1.6"/><path d="M6 11a6 6 0 0012 0" stroke="#23D9A8" stroke-width="1.6" stroke-linecap="round"/><path d="M12 17v3M9 20h6" stroke="#23D9A8" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </div>
+      </div>
+
+      <div>
+        <div class="eyebrow">Live diagnosis</div>
+        <h1 class="greet-title">Hey <span class="name" id="greet-name">there</span> 👋</h1>
+      </div>
+
+      <p class="greet-sub">Tell <b>Anika</b> what's wrong with <b id="greet-car-inline">your car</b>. She'll start listening — you can flip on the camera anytime and show her.</p>
+
+      <div class="chip-row">
+        <div class="chip" id="chip-car">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M3 13l1.8-5.4A2 2 0 016.7 6h10.6a2 2 0 011.9 1.6L21 13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 13h18v4a1 1 0 01-1 1h-2a1 1 0 01-1-1v-1H7v1a1 1 0 01-1 1H4a1 1 0 01-1-1v-4z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+          <span id="chip-car-text">Your car</span>
+        </div>
+        <div class="chip" id="chip-mobile" style="display:none;">
+          <svg viewBox="0 0 24 24" fill="none"><rect x="7" y="2" width="10" height="20" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M11 18h2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          <span id="chip-mobile-text">—</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="greet-bottom">
+      <button class="btn-start" id="btn-start">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M4.5 4h3.4a1 1 0 011 .8l.9 3.6a1 1 0 01-.5 1.1L7.6 10.7a12 12 0 006 6l1.2-1.7a1 1 0 011.1-.5l3.6.9a1 1 0 01.8 1V19a2 2 0 01-2 2A16 16 0 013.5 6a2 2 0 011-2z" stroke="#12100D" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg>
+        Start with Anika
+      </button>
+      <p class="fine-print">Starts as a <b>voice call</b> — you can switch on video anytime so Anika can see the problem too.</p>
+    </div>
+  </section>
+
+  <!-- ============ CONNECTING SCREEN ============ -->
+  <section id="screen-connecting" class="screen">
+    <div class="spin-ring">
+      <svg viewBox="0 0 50 50" fill="none"><circle cx="25" cy="25" r="20" stroke="#252D38" stroke-width="4"/><path d="M25 5a20 20 0 0120 20" stroke="#23D9A8" stroke-width="4" stroke-linecap="round"/></svg>
+    </div>
+    <div id="connect-status">Getting your mic ready…</div>
+  </section>
+
+  <!-- ============ CALL SCREEN ============ -->
+  <section id="screen-call" class="screen mode-audio">
+
+    <!-- Voice-only hero -->
+    <div class="voice-stage" id="voice-stage">
+      <div class="hero-orb">
+        <div class="hring"></div>
+        <div class="hring r2"></div>
+        <div class="hring amp amp-ring" id="hero-ring"></div>
+        <div class="hero-core">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M12 3a4 4 0 014 4v2a4 4 0 01-8 0V7a4 4 0 014-4z" stroke="#23D9A8" stroke-width="1.5"/><path d="M6 11a6 6 0 0012 0" stroke="#23D9A8" stroke-width="1.5" stroke-linecap="round"/><path d="M12 17v3" stroke="#23D9A8" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </div>
+      </div>
+      <div class="hero-name display">Anika</div>
+      <div class="hero-status" id="anika-status">Listening…</div>
+      <div class="mic-bars" id="hero-mic-bars"><i></i><i></i><i></i><i></i><i></i></div>
+    </div>
+
+    <!-- Video stage -->
+    <div class="video-stage" id="video-stage">
+      <video id="localVideo" autoplay muted playsinline></video>
+      <canvas id="captureCanvas" hidden></canvas>
+      <div class="video-scrim-top"></div>
+      <div class="video-scrim-bottom"></div>
+      <div class="scan-overlay">
+        <div class="corner tl"></div><div class="corner tr"></div>
+        <div class="corner bl"></div><div class="corner br"></div>
+        <div class="scan-line"></div>
+      </div>
+    </div>
+
+    <div class="pip">
+      <div class="pip-inner">
+        <div class="pip-ring amp-ring" id="pip-ring"></div>
+        <div class="mic-bars pip-bars" id="pip-mic-bars"><i></i><i></i><i></i><i></i></div>
+        <svg class="pip-avatar" viewBox="0 0 24 24" fill="none"><path d="M12 3a4 4 0 014 4v2a4 4 0 01-8 0V7a4 4 0 014-4z" stroke="#23D9A8" stroke-width="1.6"/><path d="M6 11a6 6 0 0012 0" stroke="#23D9A8" stroke-width="1.6" stroke-linecap="round"/><path d="M12 17v2" stroke="#23D9A8" stroke-width="1.6" stroke-linecap="round"/></svg>
+        <div class="pip-label">Anika</div>
+      </div>
+    </div>
+
+    <div class="call-topbar">
+      <div class="live-badge">
+        <span class="live-dot"></span>
+        <span>LIVE</span>
+        <span class="call-timer mono" id="call-timer">00:00</span>
+      </div>
+      <div class="topbar-right">
+        <button class="icon-btn-ghost" id="btn-speaker" aria-label="Toggle Anika's voice">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M4 9v6h4l5 4V5L8 9H4z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M16.5 8.5a5 5 0 010 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="reconnect-banner" id="reconnect-banner"><span class="dot"></span><span>Reconnecting…</span></div>
+    <div class="mode-toast" id="mode-toast"></div>
+
+    <div class="captions-wrap">
+      <div class="caption-user mono" id="caption-user"></div>
+      <div class="caption-anika" id="caption-anika"></div>
+    </div>
+
+    <div class="call-controls">
+      <button class="ctrl-btn" id="btn-torch" aria-label="Toggle flashlight" style="display:none;">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M9 2h6l-1 7h3l-8 13 2-9H8l1-11z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+      </button>
+      <button class="ctrl-btn" id="btn-flip" aria-label="Flip camera" style="display:none;">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M17 2l3 3-3 3M20 5H8a5 5 0 00-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 22l-3-3 3-3M4 19h12a5 5 0 005-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <button class="ctrl-btn" id="btn-mic" aria-label="Mute microphone">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M12 15a3 3 0 003-3V6a3 3 0 00-6 0v6a3 3 0 003 3z" stroke="currentColor" stroke-width="1.8"/><path d="M6 11a6 6 0 0012 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M12 17v3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      </button>
+      <button class="ctrl-btn video-accent" id="btn-mode" aria-label="Switch to video">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M15 8.5l4.3-2.5a1 1 0 011.5.9v10.2a1 1 0 01-1.5.9L15 15.5" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><rect x="2" y="6" width="13" height="12" rx="2.5" stroke="currentColor" stroke-width="1.8"/></svg>
+      </button>
+      <button class="ctrl-btn-end" id="btn-end" aria-label="End call">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M21 15.5c0 .3-.1.6-.3.8l-2.2 2.2a1.7 1.7 0 01-2 .3c-1.6-.8-3.7-2.2-5.7-4.2S7.4 10.6 6.6 9c-.4-.8-.2-1.6.3-2l2.2-2.2c.2-.2.5-.3.8-.3.4 0 .8.2 1 .6l1.4 2.5c.2.4.2.9-.1 1.3l-1 1.2c.6 1 2.4 2.8 3.4 3.4l1.2-1c.4-.3.9-.3 1.3-.1l2.5 1.4c.4.2.6.6.6 1z" fill="#fff"/></svg>
+      </button>
+    </div>
+  </section>
+
+  <!-- ============ ENDED SCREEN ============ -->
+  <section id="screen-ended" class="screen">
+    <div class="end-check">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#23D9A8" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <h2>Diagnosis complete</h2>
+    <p>Anika's got what she needs. Next steps for <span id="end-car-name">your car</span> will follow on WhatsApp shortly.</p>
+    <div class="end-stats">
+      <div class="end-stat"><div class="v mono" id="end-duration">00:00</div><div class="l">Call length</div></div>
+      <div class="end-stat"><div class="v" id="end-with">Anika</div><div class="l">Diagnosed by</div></div>
+    </div>
+    <button class="btn-secondary" id="btn-restart">Start another call</button>
+  </section>
+
+  <!-- ============ ERROR SCREEN ============ -->
+  <section id="screen-error" class="screen">
+    <div class="err-icon">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M12 8v5M12 16h.01" stroke="#EF4444" stroke-width="2.2" stroke-linecap="round"/><circle cx="12" cy="12" r="9" stroke="#EF4444" stroke-width="1.8"/></svg>
+    </div>
+    <h2 id="err-title">Couldn't connect</h2>
+    <p id="err-body">Something interrupted the call. Check your connection and try again.</p>
+    <button class="btn-secondary" id="btn-retry">Try again</button>
+  </section>
+
+</div>
+
+<script>
+(() => {
+  "use strict";
+
+  // ---------------------------------------------------------------
+  // Config
+  // ---------------------------------------------------------------
+  const BACKEND = "https://ai.instantmechanic.online/bot/get-token";
+  const FRAME_INTERVAL_MS = 1000;
+  const JPEG_QUALITY = 0.7;
+  const MAX_RECONNECT_ATTEMPTS = 2;
+
+  // ---------------------------------------------------------------
+  // Personalisation from URL params
+  // ?mobile=917426967410&car=creta&name=Maninder
+  // ---------------------------------------------------------------
+  const params = new URLSearchParams(window.location.search);
+
+  function titleCase(str) {
+    return str
+      .replace(/[-_]+/g, " ")
+      .trim()
+      .split(" ")
+      .filter(Boolean)
+      .map(w => w[0].toUpperCase() + w.slice(1).toLowerCase())
+      .join(" ");
+  }
+
+  function maskMobile(m) {
+    const digits = (m || "").replace(/\D/g, "");
+    if (digits.length < 4) return "";
+    return "•••••" + digits.slice(-4);
+  }
+
+  const rawName = params.get("name") || "";
+  const rawCar = params.get("car") || "";
+  const rawMobile = params.get("mobile") || "";
+  // ?mode=video on the link starts the call straight into video instead of voice
+  const startMode = (params.get("mode") || "").toLowerCase() === "video" ? "video" : "audio";
+
+  const customerName = rawName ? titleCase(rawName) : "";
+  const carName = rawCar ? titleCase(rawCar) : "";
+  const mobile = rawMobile.trim();
+
+  // ---------------------------------------------------------------
+  // DOM refs
+  // ---------------------------------------------------------------
+  const screens = {
+    greet: document.getElementById("screen-greet"),
+    connecting: document.getElementById("screen-connecting"),
+    call: document.getElementById("screen-call"),
+    ended: document.getElementById("screen-ended"),
+    error: document.getElementById("screen-error"),
+  };
+
+  function showScreen(name) {
+    Object.values(screens).forEach(s => s.classList.remove("active"));
+    screens[name].classList.add("active");
+  }
+
+  const el = id => document.getElementById(id);
+
+  el("greet-name").textContent = customerName || "there";
+  el("greet-car-inline").textContent = carName || "your car";
+  el("end-car-name").textContent = carName || "your car";
+
+  if (carName) {
+    el("chip-car-text").textContent = carName;
+  } else {
+    el("chip-car").style.display = "none";
+  }
+  const maskedMobile = maskMobile(mobile);
+  if (maskedMobile) {
+    el("chip-mobile-text").textContent = maskedMobile;
+    el("chip-mobile").style.display = "flex";
+  }
+
+  // ---------------------------------------------------------------
+  // State
+  // ---------------------------------------------------------------
+  let ws = null;
+  let audioStream = null;   // mic-only MediaStream, lives for the whole call
+  let videoStream = null;   // camera-only MediaStream, only exists in video mode
+  let localVideoTrack = null;
+  let facingMode = "environment";
+  let torchOn = false;
+  let micMuted = false;
+  let anikaMuted = false;
+  let mode = "audio";        // 'audio' | 'video'
+  let modeSwitching = false;
+
+  let inputAudioCtx = null;
+  let outputAudioCtx = null;
+  let outputGain = null;
+  let procNode = null;
+  let nextPlayTime = 0;
+  let activeAudioSources = [];
+
+  let frameTimer = null;
+  let callTimerInterval = null;
+  let callStartedAt = null;
+  let sessionToken = null;
+  let sessionModel = null;
+  let intentionalClose = false;
+  let reconnectAttempts = 0;
+  let sessionStarting = false;
+
+  let captionFadeTimer = null;
+  let userCaptionFadeTimer = null;
+  let currentAnikaCaption = "";
+  let toastTimer = null;
+
+  // ---------------------------------------------------------------
+  // Timer helpers
+  // ---------------------------------------------------------------
+  function fmtDuration(ms) {
+    const totalSec = Math.floor(ms / 1000);
+    const m = Math.floor(totalSec / 60).toString().padStart(2, "0");
+    const s = (totalSec % 60).toString().padStart(2, "0");
+    return `${m}:${s}`;
+  }
+  function startCallTimer() {
+    callStartedAt = Date.now();
+    el("call-timer").textContent = "00:00";
+    callTimerInterval = setInterval(() => {
+      el("call-timer").textContent = fmtDuration(Date.now() - callStartedAt);
+    }, 1000);
+  }
+  function stopCallTimer() { clearInterval(callTimerInterval); callTimerInterval = null; }
+
+  function goError(title, body) {
+    el("err-title").textContent = title;
+    el("err-body").textContent = body;
+    showScreen("error");
+  }
+
+  function showToast(msg, ms = 2600) {
+    const node = el("mode-toast");
+    node.textContent = msg;
+    node.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => node.classList.remove("show"), ms);
+  }
+
+  // ---------------------------------------------------------------
+  // Media acquisition
+  // ---------------------------------------------------------------
+  async function acquireMicStream() {
+    return navigator.mediaDevices.getUserMedia({
+      audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
+    });
+  }
+
+  async function acquireVideoStream(fmode) {
+    return navigator.mediaDevices.getUserMedia({
+      video: { facingMode: { ideal: fmode }, width: { ideal: 1280 }, height: { ideal: 720 } },
+    });
+  }
+
+  function attachVideoStreamToEl(s) {
+    const videoEl = el("localVideo");
+    videoEl.srcObject = s;
+    videoEl.classList.toggle("front-cam", facingMode === "user");
+    localVideoTrack = s.getVideoTracks()[0] || null;
+    updateTorchAvailability();
+  }
+
+  function updateTorchAvailability() {
+    const btn = el("btn-torch");
+    if (mode !== "video" || !localVideoTrack || facingMode !== "environment") {
+      btn.style.display = "none";
+      return;
+    }
+    const caps = localVideoTrack.getCapabilities ? localVideoTrack.getCapabilities() : {};
+    btn.style.display = caps && caps.torch ? "flex" : "none";
+  }
+
+  async function flipCamera() {
+    if (mode !== "video" || !videoStream) return;
+    const newMode = facingMode === "environment" ? "user" : "environment";
+    try {
+      const newStream = await acquireVideoStream(newMode);
+      videoStream.getVideoTracks().forEach(t => t.stop());
+      videoStream = newStream;
+      facingMode = newMode;
+      attachVideoStreamToEl(videoStream);
+      torchOn = false;
+    } catch (e) {
+      console.warn("flip camera failed", e);
+    }
+  }
+
+  async function toggleTorch() {
+    if (!localVideoTrack) return;
+    try {
+      torchOn = !torchOn;
+      await localVideoTrack.applyConstraints({ advanced: [{ torch: torchOn }] });
+      el("btn-torch").classList.toggle("on-accent", torchOn);
+    } catch (e) {
+      console.warn("torch toggle failed", e);
+      torchOn = !torchOn;
+    }
+  }
+
+  function toggleMic() {
+    if (!audioStream) return;
+    micMuted = !micMuted;
+    audioStream.getAudioTracks().forEach(t => (t.enabled = !micMuted));
+    const btn = el("btn-mic");
+    btn.classList.toggle("off", micMuted);
+    btn.innerHTML = micMuted
+      ? '<svg viewBox="0 0 24 24" fill="none"><path d="M3 3l18 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M12 15a3 3 0 003-3V6a3 3 0 00-5.6-1.5M9 9v3a3 3 0 004.7 2.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M6 11a6 6 0 008.6 5.4M18 11a6 6 0 01-.6 2.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M12 17v3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>'
+      : '<svg viewBox="0 0 24 24" fill="none"><path d="M12 15a3 3 0 003-3V6a3 3 0 00-6 0v6a3 3 0 003 3z" stroke="currentColor" stroke-width="1.8"/><path d="M6 11a6 6 0 0012 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M12 17v3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
+  }
+
+  function toggleSpeaker() {
+    anikaMuted = !anikaMuted;
+    if (outputGain) outputGain.gain.value = anikaMuted ? 0 : 1;
+    const btn = el("btn-speaker");
+    btn.classList.toggle("on-accent", anikaMuted);
+    btn.innerHTML = anikaMuted
+      ? '<svg viewBox="0 0 24 24" fill="none"><path d="M4 9v6h4l5 4V5L8 9H4z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M15 9l5 6M20 9l-5 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>'
+      : '<svg viewBox="0 0 24 24" fill="none"><path d="M4 9v6h4l5 4V5L8 9H4z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M16.5 8.5a5 5 0 010 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
+  }
+
+  // ---------------------------------------------------------------
+  // Mode switching — audio call <-> video call, same WS session
+  // ---------------------------------------------------------------
+  function applyCallModeUI() {
+    screens.call.classList.toggle("mode-audio", mode === "audio");
+    screens.call.classList.toggle("mode-video", mode === "video");
+    el("btn-flip").style.display = mode === "video" ? "flex" : "none";
+    updateTorchAvailability();
+    const modeBtn = el("btn-mode");
+    modeBtn.classList.toggle("video-accent", mode === "audio");
+    modeBtn.setAttribute("aria-label", mode === "audio" ? "Switch to video" : "Switch to voice only");
+    modeBtn.innerHTML = mode === "audio"
+      ? '<svg viewBox="0 0 24 24" fill="none"><path d="M15 8.5l4.3-2.5a1 1 0 011.5.9v10.2a1 1 0 01-1.5.9L15 15.5" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><rect x="2" y="6" width="13" height="12" rx="2.5" stroke="currentColor" stroke-width="1.8"/></svg>'
+      : '<svg viewBox="0 0 24 24" fill="none"><path d="M4.5 4h3.4a1 1 0 011 .8l.9 3.6a1 1 0 01-.5 1.1L7.6 10.7a12 12 0 006 6l1.2-1.7a1 1 0 011.1-.5l3.6.9a1 1 0 01.8 1V19a2 2 0 01-2 2A16 16 0 013.5 6a2 2 0 011-2z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/></svg>';
+  }
+
+  async function switchToVideo() {
+    if (mode === "video" || modeSwitching) return;
+    modeSwitching = true;
+    el("btn-mode").disabled = true;
+    try {
+      videoStream = await acquireVideoStream(facingMode);
+      attachVideoStreamToEl(videoStream);
+      mode = "video";
+      applyCallModeUI();
+      startVideoStreaming();
+    } catch (e) {
+      const denied = e && (e.name === "NotAllowedError" || e.name === "PermissionDeniedError");
+      showToast(denied ? "Camera access blocked — enable it in browser settings" : "Couldn't turn on the camera");
+    } finally {
+      modeSwitching = false;
+      el("btn-mode").disabled = false;
+    }
+  }
+
+  function switchToAudio() {
+    if (mode === "audio") return;
+    clearInterval(frameTimer); frameTimer = null;
+    if (videoStream) { videoStream.getVideoTracks().forEach(t => t.stop()); videoStream = null; }
+    localVideoTrack = null;
+    torchOn = false;
+    mode = "audio";
+    applyCallModeUI();
+  }
+
+  function toggleMode() {
+    if (mode === "audio") switchToVideo();
+    else switchToAudio();
+  }
+
+  // ---------------------------------------------------------------
+  // Frame capture (video mode) — draws the live <video> element to
+  // canvas, not ImageCapture, so it also works on iOS Safari.
+  // ---------------------------------------------------------------
+  function startVideoStreaming() {
+    clearInterval(frameTimer);
+    const videoEl = el("localVideo");
+    const canvas = el("captureCanvas");
+    const ctx = canvas.getContext("2d");
+    frameTimer = setInterval(() => {
+      if (mode !== "video" || !ws || ws.readyState !== 1) return;
+      if (!videoEl.videoWidth) return;
+      canvas.width = videoEl.videoWidth;
+      canvas.height = videoEl.videoHeight;
+      ctx.drawImage(videoEl, 0, 0, canvas.width, canvas.height);
+      const jpegB64 = canvas.toDataURL("image/jpeg", JPEG_QUALITY).split(",")[1];
+      ws.send(JSON.stringify({ realtimeInput: { video: { mimeType: "image/jpeg", data: jpegB64 } } }));
+    }, FRAME_INTERVAL_MS);
+  }
+
+  // ---------------------------------------------------------------
+  // Mic streaming — 16-bit PCM @ 16kHz, drives both mic-bar meters
+  // ---------------------------------------------------------------
+  function startMicStreaming() {
+    inputAudioCtx = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 16000 });
+    const src = inputAudioCtx.createMediaStreamSource(audioStream);
+    procNode = inputAudioCtx.createScriptProcessor(4096, 1, 1);
+    src.connect(procNode);
+    procNode.connect(inputAudioCtx.destination);
+
+    let lastMeterUpdate = 0;
+    procNode.onaudioprocess = (e) => {
+      const input = e.inputBuffer.getChannelData(0);
+
+      const now = performance.now();
+      if (now - lastMeterUpdate > 90) {
+        let sum = 0;
+        for (let i = 0; i < input.length; i += 8) sum += input[i] * input[i];
+        const rms = Math.sqrt(sum / (input.length / 8));
+        updateMicBars(rms);
+        lastMeterUpdate = now;
+      }
+
+      if (!ws || ws.readyState !== 1 || micMuted) return;
+      const pcm16 = new Int16Array(input.length);
+      for (let i = 0; i < input.length; i++) {
+        const s = Math.max(-1, Math.min(1, input[i]));
+        pcm16[i] = s * 32767;
+      }
+      const bytes = new Uint8Array(pcm16.buffer);
+      let binary = "";
+      for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
+      ws.send(JSON.stringify({ realtimeInput: { audio: { mimeType: "audio/pcm;rate=16000", data: btoa(binary) } } }));
+    };
+  }
+
+  function updateMicBars(rms) {
+    const level = Math.min(1, rms * 9);
+    [el("hero-mic-bars"), el("pip-mic-bars")].forEach(container => {
+      if (!container) return;
+      const bars = container.querySelectorAll("i");
+      const heightScale = container.id === "hero-mic-bars" ? [5, 9, 14, 9, 5] : [4, 7, 11, 7];
+      bars.forEach((bar, i) => {
+        const h = 3 + (heightScale[i] || 6) * level;
+        bar.style.height = h.toFixed(1) + "px";
+      });
+    });
+  }
+
+  // ---------------------------------------------------------------
+  // Audio playback — raw PCM16 @ 24kHz, gapless queue, gain-controlled
+  // ---------------------------------------------------------------
+  function playAudioChunk(b64) {
+    if (!outputAudioCtx) return;
+    const bytes = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+    const pcm16 = new Int16Array(bytes.buffer);
+    const float32 = new Float32Array(pcm16.length);
+    for (let i = 0; i < pcm16.length; i++) float32[i] = pcm16[i] / 32768;
+
+    const buffer = outputAudioCtx.createBuffer(1, float32.length, 24000);
+    buffer.copyToChannel(float32, 0);
+
+    const src = outputAudioCtx.createBufferSource();
+    src.buffer = buffer;
+    src.connect(outputGain);
+
+    const now = outputAudioCtx.currentTime;
+    const startAt = Math.max(now, nextPlayTime);
+    src.start(startAt);
+    nextPlayTime = startAt + buffer.duration;
+
+    activeAudioSources.push(src);
+    setAnikaStatus("Speaking…");
+    src.onended = () => {
+      const i = activeAudioSources.indexOf(src);
+      if (i !== -1) activeAudioSources.splice(i, 1);
+      if (activeAudioSources.length === 0) setAnikaStatus("Listening…");
+    };
+
+    pulseAnikaRing(buffer.duration);
+  }
+
+  // Stops every currently playing/queued audio chunk immediately.
+  // Needed on barge-in (`interrupted`): without this, the tail of the
+  // previous turn keeps sounding while the new turn's audio starts —
+  // heard as two overlapping Anika voices.
+  function stopAllAudioPlayback() {
+    activeAudioSources.forEach(src => { try { src.onended = null; src.stop(); } catch (e) {} });
+    activeAudioSources = [];
+    if (outputAudioCtx) nextPlayTime = outputAudioCtx.currentTime;
+    setAnikaStatus("Listening…");
+  }
+
+  function pulseAnikaRing(duration) {
+    let start = performance.now();
+    const dur = duration * 1000;
+    const rings = document.querySelectorAll(".amp-ring");
+    function frame(t) {
+      const elapsed = t - start;
+      if (elapsed > dur) { rings.forEach(r => r.style.setProperty("--amp", "0")); return; }
+      const amp = Math.max(0, Math.min(1, 0.4 + Math.sin(elapsed / 90) * 0.35 + 0.25));
+      rings.forEach(r => r.style.setProperty("--amp", amp.toString()));
+      requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+  }
+
+  function setAnikaStatus(text) {
+    const node = el("anika-status");
+    if (node) node.textContent = text;
+  }
+
+  // ---------------------------------------------------------------
+  // Captions
+  // ---------------------------------------------------------------
+  function setAnikaCaption(text) {
+    const node = el("caption-anika");
+    currentAnikaCaption = text;
+    node.textContent = text;
+    node.classList.add("show");
+    clearTimeout(captionFadeTimer);
+  }
+  function fadeAnikaCaptionSoon() {
+    clearTimeout(captionFadeTimer);
+    captionFadeTimer = setTimeout(() => {
+      el("caption-anika").classList.remove("show");
+      currentAnikaCaption = "";
+    }, 3200);
+  }
+  function setUserCaption(text) {
+    const node = el("caption-user");
+    node.textContent = text;
+    node.classList.add("show");
+    clearTimeout(userCaptionFadeTimer);
+    userCaptionFadeTimer = setTimeout(() => node.classList.remove("show"), 2200);
+  }
+
+  function setReconnectBanner(show) { el("reconnect-banner").classList.toggle("show", show); }
+
+  // ---------------------------------------------------------------
+  // Token fetch — sends mobile (and name/car for context) in body
+  // ---------------------------------------------------------------
+  async function fetchToken() {
+    const res = await fetch(BACKEND, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ mobile: mobile, name: customerName || undefined, car: carName || undefined }),
+    });
+    if (!res.ok) throw new Error("token_fetch_failed_" + res.status);
+    const data = await res.json();
+    if (!data || !data.token || !data.model) throw new Error("token_response_invalid");
+    return data;
+  }
+
+  // ---------------------------------------------------------------
+  // WebSocket / Gemini Live session
+  // ---------------------------------------------------------------
+  function connectWebSocket(token, model, { isReconnect = false } = {}) {
+    ws = new WebSocket(
+      `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContentConstrained?access_token=${token}`
+    );
+
+    ws.onopen = () => {
+      ws.send(JSON.stringify({
+        setup: {
+          model: `models/${model}`,
+          generationConfig: { responseModalities: ["AUDIO"] },
+          inputAudioTranscription: {},
+          outputAudioTranscription: {},
+        },
+      }));
+    };
+
+    ws.onmessage = async (evt) => {
+      const text = evt.data instanceof Blob ? await evt.data.text() : evt.data;
+      let msg;
+      try { msg = JSON.parse(text); } catch (e) { return; }
+
+      if (msg.setupComplete) {
+        reconnectAttempts = 0;
+        setReconnectBanner(false);
+        stopAllAudioPlayback(); // clear any leftover audio from a prior connection
+        if (!isReconnect) {
+          sessionStarting = false;
+          el("btn-start").disabled = false;
+          showScreen("call");
+          startCallTimer();
+          startMicStreaming();
+          if (mode === "video") startVideoStreaming();
+        }
+        return;
+      }
+
+      const sc = msg.serverContent;
+      if (!sc) return;
+
+      if (sc.interrupted) stopAllAudioPlayback();
+
+      const audioB64 = sc?.modelTurn?.parts?.[0]?.inlineData?.data;
+      if (audioB64) playAudioChunk(audioB64);
+
+      const outText = sc?.outputTranscription?.text;
+      if (outText) setAnikaCaption((currentAnikaCaption + outText).slice(-220));
+
+      const inText = sc?.inputTranscription?.text;
+      if (inText) setUserCaption(inText);
+
+      if (sc.turnComplete) fadeAnikaCaptionSoon();
+    };
+
+    ws.onerror = () => {};
+    ws.onclose = () => { if (!intentionalClose) handleUnexpectedClose(); };
+  }
+
+  async function handleUnexpectedClose() {
+    if (screens.call.classList.contains("active") && reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
+      reconnectAttempts++;
+      setReconnectBanner(true);
+      try {
+        const { token, model } = await fetchToken();
+        sessionToken = token; sessionModel = model;
+        connectWebSocket(token, model, { isReconnect: true });
+      } catch (e) {
+        setReconnectBanner(false);
+        endCallToError();
+      }
+    } else if (screens.call.classList.contains("active")) {
+      setReconnectBanner(false);
+      endCallToError();
+    }
+  }
+
+  function endCallToError() {
+    teardownMedia();
+    goError("Connection lost", "Anika got disconnected mid-call. Check your network and start again.");
+  }
+
+  // ---------------------------------------------------------------
+  // Session lifecycle
+  // ---------------------------------------------------------------
+  async function startSession() {
+    if (sessionStarting) return;
+    sessionStarting = true;
+    el("btn-start").disabled = true;
+
+    teardownMedia(); // safety net: fully close any prior session first
+    intentionalClose = false;
+    reconnectAttempts = 0;
+    mode = startMode;
+    applyCallModeUI();
+    showScreen("connecting");
+    el("connect-status").innerHTML = mode === "video" ? "Getting your camera & mic ready…" : "Getting your mic ready…";
+
+    try {
+      outputAudioCtx = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 24000 });
+      outputGain = outputAudioCtx.createGain();
+      outputGain.gain.value = anikaMuted ? 0 : 1;
+      outputGain.connect(outputAudioCtx.destination);
+      if (outputAudioCtx.state === "suspended") await outputAudioCtx.resume();
+    } catch (e) {
+      console.warn("audio context init failed", e);
+    }
+
+    try {
+      audioStream = await acquireMicStream();
+      if (mode === "video") {
+        videoStream = await acquireVideoStream(facingMode);
+        attachVideoStreamToEl(videoStream);
+      }
+    } catch (e) {
+      const denied = e && (e.name === "NotAllowedError" || e.name === "PermissionDeniedError");
+      goError(
+        denied ? "Mic access blocked" : "Couldn't access your mic",
+        denied
+          ? "Instant Mechanic needs microphone access to start the call. Allow access in your browser settings, then try again."
+          : "We couldn't reach your microphone. Make sure no other app is using it, then try again."
+      );
+      sessionStarting = false;
+      el("btn-start").disabled = false;
+      return;
+    }
+
+    el("connect-status").innerHTML = "Connecting to <b>Anika</b>…";
+    try {
+      const { token, model } = await fetchToken();
+      sessionToken = token; sessionModel = model;
+      connectWebSocket(token, model);
+    } catch (e) {
+      teardownMedia();
+      goError("Couldn't connect", "We couldn't start the call with Anika. Check your connection and try again.");
+      sessionStarting = false;
+      el("btn-start").disabled = false;
+    }
+  }
+
+  function teardownMedia() {
+    clearInterval(frameTimer); frameTimer = null;
+    stopCallTimer();
+    activeAudioSources.forEach(src => { try { src.onended = null; src.stop(); } catch (e) {} });
+    activeAudioSources = [];
+    if (procNode) { try { procNode.disconnect(); } catch (e) {} procNode = null; }
+    if (inputAudioCtx) { try { inputAudioCtx.close(); } catch (e) {} inputAudioCtx = null; }
+    if (outputAudioCtx) { try { outputAudioCtx.close(); } catch (e) {} outputAudioCtx = null; }
+    if (audioStream) { audioStream.getTracks().forEach(t => t.stop()); audioStream = null; }
+    if (videoStream) { videoStream.getTracks().forEach(t => t.stop()); videoStream = null; }
+    localVideoTrack = null;
+    if (ws) { try { ws.close(); } catch (e) {} ws = null; }
+    nextPlayTime = 0;
+  }
+
+  function endCall() {
+    intentionalClose = true;
+    const duration = callStartedAt ? Date.now() - callStartedAt : 0;
+    teardownMedia();
+    el("end-duration").textContent = fmtDuration(duration);
+    showScreen("ended");
+  }
+
+  function resetToGreet() {
+    facingMode = "environment";
+    torchOn = false;
+    micMuted = false;
+    anikaMuted = false;
+    reconnectAttempts = 0;
+    sessionStarting = false;
+    mode = startMode;
+    el("btn-start").disabled = false;
+    el("caption-anika").classList.remove("show");
+    el("caption-user").classList.remove("show");
+    applyCallModeUI();
+    showScreen("greet");
+  }
+
+  // ---------------------------------------------------------------
+  // Wire up controls
+  // ---------------------------------------------------------------
+  el("btn-start").addEventListener("click", startSession);
+  el("btn-end").addEventListener("click", endCall);
+  el("btn-mic").addEventListener("click", toggleMic);
+  el("btn-flip").addEventListener("click", flipCamera);
+  el("btn-torch").addEventListener("click", toggleTorch);
+  el("btn-speaker").addEventListener("click", toggleSpeaker);
+  el("btn-mode").addEventListener("click", toggleMode);
+  el("btn-restart").addEventListener("click", resetToGreet);
+  el("btn-retry").addEventListener("click", resetToGreet);
+
+  window.addEventListener("pagehide", () => { intentionalClose = true; teardownMedia(); });
+
+  applyCallModeUI();
+})();
+</script>
+</body>
+</html>

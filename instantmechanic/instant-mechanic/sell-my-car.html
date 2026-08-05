@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SellMyCar — Best Price Guaranteed | Instant Mechanic</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<!-- ── MIXPANEL ── -->
+<script type="text/javascript">
+(function(f,b){if(!b.__SV){var e,g,i,h;window.mixpanel=b;b._i=[];b.init=function(e,f,c){function g(a,d){var b=d.split(".");2==b.length&&(a=a[b[0]],d=b[1]);a[d]=function(){a.push([d].concat(Array.prototype.slice.call(arguments,0)))}}var a=b;"undefined"!==typeof c?a=b[c]=[]:c="mixpanel";a.people=a.people||[];a.toString=function(a){var d="mixpanel";"mixpanel"!==c&&(d+="."+c);a||(d+=" (stub)");return d};a.people.toString=function(){return a.toString(1)+".people (stub)"};i="disable time_event track track_pageview track_links track_forms track_with_groups add_group set_group remove_group register register_once alias unregister identify name_tag set_config reset opt_in_tracking opt_out_tracking has_opted_in_tracking has_opted_out_tracking clear_opt_in_out_tracking start_batch_senders people.set people.set_once people.unset people.increment people.append people.union people.track_charge people.clear_charges people.delete_user people.remove".split(" ");
+for(h=0;h<i.length;h++)g(a,i[h]);var j="set set_once union unset remove delete".split(" ");a.get_group=function(){function b(c){d[c]=function(){call2_args=arguments;call2=[c].concat(Array.prototype.slice.call(call2_args,0));a.push([e,call2])}}for(var d={},e=["get_group"].concat(Array.prototype.slice.call(arguments,0)),c=0;c<j.length;c++)b(j[c]);return d};b._i.push([e,f,c])};b.__SV=1.2;e=f.createElement("script");e.type="text/javascript";e.async=!0;e.src="undefined"!==typeof MIXPANEL_CUSTOM_LIB_URL?MIXPANEL_CUSTOM_LIB_URL:"file:"===f.location.protocol&&"//cdn.mxpnl.com/libs/mixpanel-2-latest.min.js".match(/^\/\//)?"https://cdn.mxpnl.com/libs/mixpanel-2-latest.min.js":"//cdn.mxpnl.com/libs/mixpanel-2-latest.min.js";g=f.getElementsByTagName("script")[0];g.parentNode.insertBefore(e,g)}})(document,window.mixpanel||[]);
+mixpanel.init("afeb927e0d7ee7ddfa033985ab2fe603", {debug: true, track_pageview: true, persistence: 'localStorage'});
+</script>
+
+<style>
+  :root {
+    --cream: #FAF8F4;
+    --white: #FFFFFF;
+    --charcoal: #1A1A2E;
+    --dark: #2C2C3E;
+    --accent: #FF6B35;
+    --accent-light: #FFF0EA;
+    --gold: #C8952A;
+    --muted: #7A7A8C;
+    --border: #E8E4DC;
+    --green: #27AE60;
+    --shadow-sm: 0 2px 12px rgba(0,0,0,0.06);
+    --shadow-md: 0 8px 32px rgba(0,0,0,0.10);
+    --shadow-lg: 0 20px 60px rgba(0,0,0,0.13);
+    --radius: 16px;
+    --radius-sm: 10px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--charcoal);
+    overflow-x: hidden;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(250,248,244,0.94);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 48px;
+    height: 64px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .nav-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px; font-weight: 900;
+    color: var(--charcoal); letter-spacing: -0.5px;
+  }
+  .nav-logo span { color: var(--accent); }
+  .nav-right { display: flex; align-items: center; gap: 12px; }
+  .nav-id-pill {
+    font-size: 11px; font-weight: 600;
+    background: rgba(255,107,53,0.1);
+    color: var(--accent);
+    padding: 4px 12px; border-radius: 50px;
+    letter-spacing: 0.3px;
+    display: none;
+  }
+  .nav-cta {
+    background: var(--charcoal); color: #fff;
+    padding: 10px 24px; border-radius: 50px;
+    font-size: 14px; font-weight: 500;
+    cursor: pointer; border: none; transition: all 0.2s;
+  }
+  .nav-cta:hover { background: var(--accent); transform: translateY(-1px); }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: flex; align-items: center;
+    padding: 120px 48px 80px;
+    position: relative; overflow: hidden;
+  }
+  .hero-bg {
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, #FAF8F4 0%, #FFF0EA 50%, #FAF8F4 100%);
+    z-index: 0;
+  }
+  .hero-orb {
+    position: absolute;
+    width: 800px; height: 800px;
+    background: radial-gradient(circle, rgba(255,107,53,0.08) 0%, transparent 65%);
+    right: -160px; top: 50%; transform: translateY(-50%);
+    z-index: 0;
+  }
+  .hero-content { position: relative; z-index: 1; max-width: 660px; }
+
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--accent-light);
+    border: 1px solid rgba(255,107,53,0.22);
+    color: var(--accent);
+    padding: 6px 16px; border-radius: 50px;
+    font-size: 13px; font-weight: 600;
+    margin-bottom: 28px;
+    animation: fadeUp 0.6s ease both;
+  }
+  .live-dot {
+    width: 7px; height: 7px;
+    background: var(--accent); border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%,100% { opacity:1; transform:scale(1); }
+    50% { opacity:0.45; transform:scale(1.5); }
+  }
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(44px, 6vw, 74px);
+    font-weight: 900; line-height: 1.05;
+    letter-spacing: -2px; color: var(--charcoal);
+    margin-bottom: 24px;
+    animation: fadeUp 0.6s 0.1s ease both;
+  }
+  h1 .highlight {
+    color: var(--accent); position: relative; display: inline-block;
+  }
+  h1 .highlight::after {
+    content: ''; position: absolute;
+    bottom: 4px; left: 0; right: 0; height: 4px;
+    background: var(--accent); opacity: 0.18; border-radius: 2px;
+  }
+  .hero-sub {
+    font-size: 18px; color: var(--muted); line-height: 1.7;
+    margin-bottom: 44px; font-weight: 300; max-width: 520px;
+    animation: fadeUp 0.6s 0.2s ease both;
+  }
+  .hero-actions {
+    display: flex; gap: 16px; flex-wrap: wrap;
+    animation: fadeUp 0.6s 0.3s ease both;
+  }
+  .btn-primary {
+    background: var(--accent); color: #fff;
+    padding: 16px 36px; border-radius: 50px;
+    font-size: 16px; font-weight: 600; border: none;
+    cursor: pointer; transition: all 0.25s;
+    box-shadow: 0 8px 24px rgba(255,107,53,0.32);
+  }
+  .btn-primary:hover {
+    background: #e55a25; transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(255,107,53,0.44);
+  }
+  .btn-ghost {
+    background: transparent; color: var(--charcoal);
+    padding: 16px 36px; border-radius: 50px;
+    font-size: 16px; font-weight: 500;
+    border: 2px solid var(--border); cursor: pointer; transition: all 0.25s;
+  }
+  .btn-ghost:hover { border-color: var(--charcoal); }
+
+  /* ── TRUST STRIP ── */
+  .trust-strip {
+    background: var(--charcoal); color: #fff;
+    padding: 18px 48px;
+    display: flex; align-items: center; justify-content: center;
+    gap: 44px; flex-wrap: wrap;
+  }
+  .trust-item { display: flex; align-items: center; gap: 9px; font-size: 13px; opacity: 0.82; }
+
+  /* ── SECTIONS ── */
+  .section { padding: 96px 48px; }
+  .section-label {
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 3.5px; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 12px;
+  }
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(32px, 4vw, 52px); font-weight: 700;
+    letter-spacing: -1.5px; color: var(--charcoal); margin-bottom: 16px;
+  }
+  .section-sub {
+    font-size: 17px; color: var(--muted); font-weight: 300;
+    max-width: 500px; line-height: 1.7;
+  }
+
+  /* ── STEPS ── */
+  .steps-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 28px; margin-top: 60px;
+  }
+  .step-card {
+    background: var(--white); border-radius: var(--radius);
+    padding: 36px 28px; border: 1px solid var(--border);
+    position: relative; transition: all 0.3s; overflow: hidden;
+  }
+  .step-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: var(--accent); transform: scaleX(0); transition: transform 0.3s; transform-origin: left;
+  }
+  .step-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+  .step-card:hover::before { transform: scaleX(1); }
+  .step-num {
+    font-family: 'Playfair Display', serif; font-size: 52px; font-weight: 900;
+    color: var(--border); line-height: 1; margin-bottom: 20px;
+  }
+  .step-icon { font-size: 32px; margin-bottom: 16px; }
+  .step-title { font-size: 18px; font-weight: 600; margin-bottom: 10px; }
+  .step-desc { font-size: 14px; color: var(--muted); line-height: 1.7; }
+
+  /* ── STATS ── */
+  .stats-section { background: var(--cream); padding: 80px 48px; }
+  .stats-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 40px; max-width: 900px; margin: 0 auto; text-align: center;
+  }
+  .stat-number {
+    font-family: 'Playfair Display', serif; font-size: 52px; font-weight: 900;
+    color: var(--charcoal); letter-spacing: -2px; line-height: 1; margin-bottom: 8px;
+  }
+  .stat-number span { color: var(--accent); }
+  .stat-label { font-size: 14px; color: var(--muted); }
+
+  /* ── PLATFORMS ── */
+  .platforms-section { background: var(--white); padding: 96px 48px; }
+  .platforms-intro {
+    display: flex; justify-content: space-between; align-items: flex-end;
+    flex-wrap: wrap; gap: 24px; margin-bottom: 60px;
+  }
+  .platforms-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 24px;
+  }
+
+  /* Platform card */
+  .platform-card {
+    border: 2px solid var(--border); border-radius: var(--radius);
+    padding: 32px 28px; background: var(--white);
+    cursor: pointer; transition: all 0.28s;
+    position: relative; overflow: hidden;
+  }
+  .platform-card:hover:not(.selected) {
+    border-color: var(--charcoal);
+    transform: translateY(-3px); box-shadow: var(--shadow-md);
+  }
+  .platform-card.selected {
+    border-color: var(--accent);
+    background: var(--accent-light);
+    box-shadow: 0 0 0 4px rgba(255,107,53,0.10);
+  }
+  .check-badge {
+    position: absolute; top: 16px; right: 16px;
+    width: 28px; height: 28px;
+    background: var(--accent); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-size: 14px; font-weight: 700;
+    opacity: 0; transform: scale(0.4);
+    transition: all 0.28s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .platform-card.selected .check-badge { opacity: 1; transform: scale(1); }
+
+  /* Direct redirect button on card — always visible */
+  .card-redirect-btn {
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    width: 100%; margin-top: 20px;
+    background: var(--charcoal); color: #fff;
+    border: none; border-radius: 10px;
+    padding: 11px 16px; font-size: 13px; font-weight: 600;
+    cursor: pointer; transition: all 0.22s; letter-spacing: 0.2px;
+    text-decoration: none;
+  }
+  .card-redirect-btn:hover {
+    background: var(--accent);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(255,107,53,0.35);
+  }
+  .platform-card.selected .card-redirect-btn { background: var(--accent); }
+  .platform-card.selected .card-redirect-btn:hover { background: #e55a25; }
+
+  .platform-logo-area {
+    height: 52px; display: flex; align-items: center; margin-bottom: 18px;
+  }
+  .platform-logo-img {
+    max-height: 42px; max-width: 140px; object-fit: contain;
+  }
+  .logo-fallback {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px; font-weight: 900; letter-spacing: -0.5px;
+  }
+  .platform-tagline { font-size: 13px; color: var(--muted); margin-bottom: 14px; line-height: 1.55; }
+  .platform-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag {
+    font-size: 11px; font-weight: 600;
+    padding: 4px 10px; border-radius: 50px;
+    background: var(--cream); color: var(--dark); letter-spacing: 0.3px;
+  }
+  .tag.green { background: #EAF8F0; color: var(--green); }
+  .tag.blue  { background: #EAF0FF; color: #2563EB; }
+  .tag.orange{ background: var(--accent-light); color: var(--accent); }
+
+  /* Selector buttons */
+  .platform-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+  .btn-sm {
+    padding: 10px 20px; border-radius: 50px;
+    font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s;
+    border: 1.5px solid var(--border); background: var(--white); color: var(--charcoal);
+  }
+  .btn-sm:hover { border-color: var(--charcoal); }
+  .btn-sm.filled { background: var(--charcoal); color: #fff; border-color: var(--charcoal); }
+
+  /* ── CTA SECTION ── */
+  .cta-section {
+    background: var(--charcoal); padding: 96px 48px;
+    text-align: center; position: relative; overflow: hidden;
+  }
+  .cta-section::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse at center, rgba(255,107,53,0.16) 0%, transparent 65%);
+  }
+  .cta-section > * { position: relative; z-index: 1; }
+  .selected-summary {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: rgba(255,255,255,0.09);
+    border: 1px solid rgba(255,255,255,0.14);
+    color: rgba(255,255,255,0.8);
+    padding: 10px 22px; border-radius: 50px;
+    font-size: 14px; margin-bottom: 32px; min-height: 42px;
+  }
+  .cta-section h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(36px, 5vw, 62px); font-weight: 900;
+    color: #fff; letter-spacing: -2px; margin-bottom: 20px;
+  }
+  .cta-section p.sub {
+    font-size: 18px; color: rgba(255,255,255,0.55);
+    font-weight: 300; margin-bottom: 52px;
+    max-width: 460px; margin-left: auto; margin-right: auto; line-height: 1.7;
+  }
+
+  /* Individual redirect chips */
+  .redirect-chips {
+    display: flex; flex-wrap: wrap; gap: 12px;
+    justify-content: center; margin-bottom: 36px;
+  }
+  .redirect-chip {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(255,255,255,0.08);
+    border: 1.5px solid rgba(255,255,255,0.16);
+    color: #fff; padding: 12px 22px; border-radius: 50px;
+    font-size: 14px; font-weight: 500;
+    cursor: pointer; transition: all 0.22s;
+    text-decoration: none;
+  }
+  .redirect-chip:hover {
+    background: var(--accent); border-color: var(--accent);
+    transform: translateY(-2px); box-shadow: 0 8px 24px rgba(255,107,53,0.4);
+  }
+  .chip-arrow { opacity: 0.5; transition: all 0.2s; }
+  .redirect-chip:hover .chip-arrow { opacity: 1; transform: translateX(4px); }
+
+  /* Big redirect all button */
+  .redirect-all-btn {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: var(--accent); color: #fff;
+    padding: 18px 52px; border-radius: 50px;
+    font-size: 17px; font-weight: 700; border: none; cursor: pointer;
+    transition: all 0.25s; box-shadow: 0 8px 32px rgba(255,107,53,0.4);
+    letter-spacing: -0.2px;
+  }
+  .redirect-all-btn:hover {
+    background: #e55a25; transform: translateY(-2px);
+    box-shadow: 0 14px 40px rgba(255,107,53,0.52);
+  }
+  .cta-disclaimer {
+    margin-top: 24px; font-size: 12px; color: rgba(255,255,255,0.28);
+  }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(80px);
+    background: var(--charcoal); color: #fff;
+    padding: 14px 28px; border-radius: 50px;
+    font-size: 14px; font-weight: 500;
+    box-shadow: var(--shadow-lg); z-index: 9999;
+    transition: transform 0.4s cubic-bezier(0.34,1.3,0.64,1), opacity 0.3s;
+    opacity: 0; white-space: nowrap;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--charcoal); color: rgba(255,255,255,0.45);
+    padding: 32px 48px;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 16px; font-size: 13px;
+    border-top: 1px solid rgba(255,255,255,0.07);
+  }
+  footer .nav-logo { color: #fff; font-size: 18px; }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .fade-up { opacity: 0; transform: translateY(30px); transition: opacity 0.55s ease, transform 0.55s ease; }
+  .fade-up.visible { opacity: 1; transform: translateY(0); }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 768px) {
+    nav, .section, .platforms-section, .cta-section, .stats-section, footer {
+      padding-left: 20px; padding-right: 20px;
+    }
+    .hero { padding: 100px 20px 60px; }
+    .trust-strip { gap: 20px; padding: 16px 20px; }
+    .platforms-intro { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<nav>
+  <div class="nav-logo">Sell<span>My</span>Car</div>
+  <div class="nav-right">
+    <div class="nav-id-pill" id="navIdPill"></div>
+    <button class="nav-cta" onclick="scrollToPlatforms()">Get Best Price →</button>
+  </div>
+</nav>
+
+<!-- ── HERO ── -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-orb"></div>
+  <div class="hero-content">
+    <div class="hero-badge"><div class="live-dot"></div> India's #1 Car Selling Aggregator</div>
+    <h1>Sell your car at the <span class="highlight">best price</span> — hassle free</h1>
+    <p class="hero-sub">We share your car profile with India's top buyers — Spinny, CARS24, CarDekho and more — so you get the highest offer without visiting multiple showrooms.</p>
+    <div class="hero-actions">
+      <button class="btn-primary" onclick="handleHeroCTA()">Compare All Buyers</button>
+      <button class="btn-ghost" onclick="scrollToHow()">How it works</button>
+    </div>
+  </div>
+</section>
+
+<!-- ── TRUST STRIP ── -->
+<div class="trust-strip">
+  <div class="trust-item">✅ 100% Free to Use</div>
+  <div class="trust-item">⚡ Instant Redirects</div>
+  <div class="trust-item">🏆 6 Top Platforms</div>
+  <div class="trust-item">🔒 No Middlemen</div>
+  <div class="trust-item">💰 Best Market Rate</div>
+</div>
+
+<!-- ── HOW IT WORKS ── -->
+<section class="section" id="how">
+  <div class="fade-up">
+    <div class="section-label">How it works</div>
+    <div class="section-title">3 steps to the<br>best car deal</div>
+    <p class="section-sub">We connect you directly to India's top car buying platforms — no hidden fees, no middlemen.</p>
+  </div>
+  <div class="steps-grid">
+    <div class="step-card fade-up">
+      <div class="step-num">01</div>
+      <div class="step-icon">🎯</div>
+      <div class="step-title">Pick your platforms</div>
+      <div class="step-desc">Choose one or all top platforms. Compare Spinny, CARS24, CarDekho, Droom, OLX Autos, CarWale side by side.</div>
+    </div>
+    <div class="step-card fade-up" style="transition-delay:0.08s">
+      <div class="step-num">02</div>
+      <div class="step-icon">🚀</div>
+      <div class="step-title">Get redirected instantly</div>
+      <div class="step-desc">We take you directly to the sell page of each platform. Get a real quote in minutes — no cold calls, no waiting.</div>
+    </div>
+    <div class="step-card fade-up" style="transition-delay:0.16s">
+      <div class="step-num">03</div>
+      <div class="step-icon">💰</div>
+      <div class="step-title">Accept the best offer</div>
+      <div class="step-desc">Compare all quotes and choose the highest. Same-day payment, free RC transfer, zero paperwork hassle.</div>
+    </div>
+    <div class="step-card fade-up" style="transition-delay:0.24s">
+      <div class="step-num">04</div>
+      <div class="step-icon">🎉</div>
+      <div class="step-title">Money in your bank</div>
+      <div class="step-desc">Top platforms offer same-day payments directly to your account. No broker cuts — 100% of the sale price is yours.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── STATS ── -->
+<div class="stats-section">
+  <div class="stats-grid fade-up">
+    <div><div class="stat-number">6<span>+</span></div><div class="stat-label">Top Platforms</div></div>
+    <div><div class="stat-number">₹<span>0</span></div><div class="stat-label">Commission Charged</div></div>
+    <div><div class="stat-number">24<span>h</span></div><div class="stat-label">Avg. Settlement</div></div>
+    <div><div class="stat-number">0<span>%</span></div><div class="stat-label">Hidden Fees</div></div>
+  </div>
+</div>
+
+<!-- ── PLATFORMS ── -->
+<section class="platforms-section" id="platforms">
+  <div class="platforms-intro fade-up">
+    <div>
+      <div class="section-label">Choose your buyer</div>
+      <div class="section-title">Top car buying<br>platforms in India</div>
+      <p class="section-sub" style="margin-top:8px">Select one or more — we'll open them all simultaneously with one click.</p>
+    </div>
+    <div class="platform-actions">
+      <button class="btn-sm filled" id="btnSelectAll" onclick="selectAll()">✓ Select All</button>
+      <button class="btn-sm" id="btnClear" onclick="selectNone()">Clear</button>
+    </div>
+  </div>
+
+  <div class="platforms-grid" id="platformsGrid">
+
+    <div class="platform-card" data-key="cars24" data-base-url="https://www.cars24.com/sell-used-car/" data-name="CARS24" onclick="togglePlatform(this)">
+      <div class="check-badge">✓</div>
+      <div class="platform-logo-area">
+        <img class="platform-logo-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/85/Cars24_logo.svg/320px-Cars24_logo.svg.png"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='block'" alt="CARS24">
+        <span class="logo-fallback" style="display:none;color:#e63946;">CARS24</span>
+      </div>
+      <p class="platform-tagline">India's largest used car marketplace. Instant AI valuation, same-day payment & free RC transfer.</p>
+      <div class="platform-tags">
+        <span class="tag green">Same-day Payment</span>
+        <span class="tag orange">AI Valuation</span>
+        <span class="tag blue">300+ Cities</span>
+      </div>
+      <button class="card-redirect-btn" onclick="redirectSingle(event, this.closest('.platform-card'))">
+        Get Quote on CARS24 →
+      </button>
+    </div>
+
+    <div class="platform-card" data-key="spinny" data-base-url="https://www.spinny.com/sell-car/" data-name="Spinny" onclick="togglePlatform(this)">
+      <div class="check-badge">✓</div>
+      <div class="platform-logo-area">
+        <img class="platform-logo-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Spinny_logo.svg/320px-Spinny_logo.svg.png"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='block'" alt="Spinny">
+        <span class="logo-fallback" style="display:none;color:#1e3a5f;">Spinny</span>
+      </div>
+      <p class="platform-tagline">Premium used car brand. 200-point inspection, transparent pricing & hassle-free paperwork.</p>
+      <div class="platform-tags">
+        <span class="tag green">Trusted Brand</span>
+        <span class="tag blue">200-pt Inspection</span>
+        <span class="tag orange">Free RC Transfer</span>
+      </div>
+      <button class="card-redirect-btn" onclick="redirectSingle(event, this.closest('.platform-card'))">
+        Get Quote on Spinny →
+      </button>
+    </div>
+
+    <div class="platform-card" data-key="cardekho" data-base-url="https://www.cardekho.com/sell-car" data-name="CarDekho" onclick="togglePlatform(this)">
+      <div class="check-badge">✓</div>
+      <div class="platform-logo-area">
+        <img class="platform-logo-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/CarDekho_logo.svg/320px-CarDekho_logo.svg.png"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='block'" alt="CarDekho">
+        <span class="logo-fallback" style="display:none;color:#e84118;">CarDekho</span>
+      </div>
+      <p class="platform-tagline">India's top auto portal with 5 Cr+ monthly users. Widest dealer network for best competitive bids.</p>
+      <div class="platform-tags">
+        <span class="tag green">Dealer Network</span>
+        <span class="tag blue">Free Valuation</span>
+        <span class="tag orange">5Cr+ Users</span>
+      </div>
+      <button class="card-redirect-btn" onclick="redirectSingle(event, this.closest('.platform-card'))">
+        Get Quote on CarDekho →
+      </button>
+    </div>
+
+    <div class="platform-card" data-key="olx" data-base-url="https://www.olx.in/cars_c84" data-name="OLX Autos" onclick="togglePlatform(this)">
+      <div class="check-badge">✓</div>
+      <div class="platform-logo-area">
+        <img class="platform-logo-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/OLX_logo_new.svg/320px-OLX_logo_new.svg.png"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='block'" alt="OLX Autos">
+        <span class="logo-fallback" style="display:none;color:#002f34;font-size:18px;">OLX Autos</span>
+      </div>
+      <p class="platform-tagline">Largest C2C auto classifieds. Sell directly to 5 Cr+ buyers. List for free & close at your price.</p>
+      <div class="platform-tags">
+        <span class="tag green">Free Listing</span>
+        <span class="tag blue">C2C Direct</span>
+        <span class="tag orange">Widest Reach</span>
+      </div>
+      <button class="card-redirect-btn" onclick="redirectSingle(event, this.closest('.platform-card'))">
+        Post on OLX Autos →
+      </button>
+    </div>
+
+    <div class="platform-card" data-key="droom" data-base-url="https://www.droom.in/sell-car" data-name="Droom" onclick="togglePlatform(this)">
+      <div class="check-badge">✓</div>
+      <div class="platform-logo-area">
+        <img class="platform-logo-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Droom_logo.svg/320px-Droom_logo.svg.png"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='block'" alt="Droom">
+        <span class="logo-fallback" style="display:none;color:#ff6200;">droom</span>
+      </div>
+      <p class="platform-tagline">Tech-first auto marketplace. OBV pricing algorithm ensures scientifically accurate market valuations.</p>
+      <div class="platform-tags">
+        <span class="tag green">OBV Pricing</span>
+        <span class="tag blue">Eco Inspect</span>
+        <span class="tag orange">All Vehicle Types</span>
+      </div>
+      <button class="card-redirect-btn" onclick="redirectSingle(event, this.closest('.platform-card'))">
+        Get Quote on Droom →
+      </button>
+    </div>
+
+    <div class="platform-card" data-key="carwale" data-base-url="https://www.carwale.com/sell-used-car/" data-name="CarWale" onclick="togglePlatform(this)">
+      <div class="check-badge">✓</div>
+      <div class="platform-logo-area">
+        <img class="platform-logo-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/CarWale_logo.svg/320px-CarWale_logo.svg.png"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='block'" alt="CarWale">
+        <span class="logo-fallback" style="display:none;color:#003580;font-size:18px;">CarWale</span>
+      </div>
+      <p class="platform-tagline">20+ year trusted auto platform. Part of CarTrade group. Best for premium & luxury car sellers.</p>
+      <div class="platform-tags">
+        <span class="tag green">20Yr Legacy</span>
+        <span class="tag blue">Premium Cars</span>
+        <span class="tag orange">NSE Listed</span>
+      </div>
+      <button class="card-redirect-btn" onclick="redirectSingle(event, this.closest('.platform-card'))">
+        Get Quote on CarWale →
+      </button>
+    </div>
+
+  </div>
+</section>
+
+<!-- ── CTA SECTION ── -->
+<section class="cta-section" id="cta">
+  <div class="selected-summary" id="selectedSummary">🎯 Select platforms above to get started</div>
+  <h2>Ready to get the<br>best price?</h2>
+  <p class="sub">No registration needed. Click below and we open every chosen platform simultaneously — 60 seconds to your first quote.</p>
+  <div class="redirect-chips" id="redirectChips"></div>
+  <button class="redirect-all-btn" onclick="redirectAll()">
+    🚀 Open All Selected Platforms
+  </button>
+  <p class="cta-disclaimer">You'll be redirected to external websites. SellMyCar by Instant Mechanic is a free aggregator — we earn nothing from your sale.</p>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <div class="nav-logo">Sell<span style="color:var(--accent)">My</span>Car</div>
+  <div>One stop. Best price. Zero commission.</div>
+  <div>by <strong style="color:rgba(255,255,255,0.7)">Instant Mechanic</strong> · © 2025</div>
+</footer>
+
+<!-- ── TOAST ── -->
+<div class="toast" id="toast"></div>
+
+<!-- ── MAIN SCRIPT ── -->
+<script>
+// ════════════════════════════════════════════
+//  INIT — read URL params
+// ════════════════════════════════════════════
+const urlParams  = new URLSearchParams(window.location.search);
+const USER_ID    = urlParams.get('id') || null;
+const UTM_SOURCE = 'instant_mechanic';
+
+// Show user id pill in nav if present
+if (USER_ID) {
+  const pill = document.getElementById('navIdPill');
+  pill.textContent = 'ID: ' + USER_ID;
+  pill.style.display = 'inline-flex';
+}
+
+// Identify user in Mixpanel if id present
+if (USER_ID) {
+  mixpanel.identify(USER_ID);
+  mixpanel.people.set({ '$id': USER_ID, source: UTM_SOURCE });
+}
+
+// ── Page Land event ──
+mixpanel.track('sell_car_page_land', {
+  user_id:    USER_ID,
+  utm_source: UTM_SOURCE,
+  url:        window.location.href,
+  referrer:   document.referrer || 'direct',
+  timestamp:  new Date().toISOString()
+});
+
+// ════════════════════════════════════════════
+//  UTM helper — append utm_source + id to any URL
+// ════════════════════════════════════════════
+function buildUrl(baseUrl) {
+  try {
+    const u = new URL(baseUrl);
+    u.searchParams.set('utm_source', UTM_SOURCE);
+    u.searchParams.set('utm_medium', 'sell_page');
+    u.searchParams.set('utm_campaign', 'car_sell');
+    if (USER_ID) u.searchParams.set('ref_id', USER_ID);
+    return u.toString();
+  } catch(e) {
+    // fallback for URLs that may not parse
+    const sep = baseUrl.includes('?') ? '&' : '?';
+    let out = baseUrl + sep + 'utm_source=' + UTM_SOURCE + '&utm_medium=sell_page&utm_campaign=car_sell';
+    if (USER_ID) out += '&ref_id=' + encodeURIComponent(USER_ID);
+    return out;
+  }
+}
+
+// ════════════════════════════════════════════
+//  STATE
+// ════════════════════════════════════════════
+const selectedPlatforms = new Set();
+
+// ════════════════════════════════════════════
+//  PLATFORM TOGGLE
+// ════════════════════════════════════════════
+function togglePlatform(card) {
+  // Don't toggle when clicking the redirect button itself
+  const name = card.dataset.name;
+  if (selectedPlatforms.has(name)) {
+    selectedPlatforms.delete(name);
+    card.classList.remove('selected');
+  } else {
+    selectedPlatforms.add(name);
+    card.classList.add('selected');
+  }
+  updateUI();
+}
+
+function selectAll() {
+  document.querySelectorAll('.platform-card').forEach(c => {
+    selectedPlatforms.add(c.dataset.name);
+    c.classList.add('selected');
+  });
+  updateUI();
+}
+
+function selectNone() {
+  document.querySelectorAll('.platform-card').forEach(c => c.classList.remove('selected'));
+  selectedPlatforms.clear();
+  updateUI();
+}
+
+// ════════════════════════════════════════════
+//  UPDATE UI — chips + summary
+// ════════════════════════════════════════════
+function updateUI() {
+  const count = selectedPlatforms.size;
+  const summary = document.getElementById('selectedSummary');
+  const chipsEl = document.getElementById('redirectChips');
+
+  summary.textContent = count === 0
+    ? '🎯 Select platforms above to get started'
+    : `✅ ${count} platform${count > 1 ? 's' : ''} selected: ${[...selectedPlatforms].join(', ')}`;
+
+  // Rebuild chips
+  chipsEl.innerHTML = '';
+  document.querySelectorAll('.platform-card.selected').forEach(card => {
+    const chip = document.createElement('button');
+    chip.className = 'redirect-chip';
+    chip.innerHTML = card.dataset.name + ' <span class="chip-arrow">→</span>';
+    chip.onclick = () => doRedirect(card.dataset.name, card.dataset.baseUrl, 'cta_chip');
+    chipsEl.appendChild(chip);
+  });
+}
+
+// ════════════════════════════════════════════
+//  REDIRECT — core function with Mixpanel event
+// ════════════════════════════════════════════
+function doRedirect(platformName, baseUrl, trigger) {
+  const finalUrl = buildUrl(baseUrl);
+
+  // 🔥 Mixpanel: redirect event
+  mixpanel.track('sell_car_redirect', {
+    platform:    platformName,
+    trigger:     trigger,           // 'card_button' | 'cta_chip' | 'redirect_all'
+    user_id:     USER_ID,
+    utm_source:  UTM_SOURCE,
+    destination: finalUrl,
+    timestamp:   new Date().toISOString()
+  });
+
+  window.open(finalUrl, '_blank', 'noopener,noreferrer');
+}
+
+// Single card button click (stops card toggle propagation)
+function redirectSingle(event, card) {
+  event.stopPropagation();
+  doRedirect(card.dataset.name, card.dataset.baseUrl, 'card_button');
+  showToast('Opening ' + card.dataset.name + '...');
+}
+
+// Open ALL selected
+function redirectAll() {
+  if (selectedPlatforms.size === 0) {
+    scrollToPlatforms();
+    flashGrid();
+    return;
+  }
+
+  // 🔥 Mixpanel: redirect_all event
+  mixpanel.track('sell_car_redirect_all', {
+    platforms:   [...selectedPlatforms],
+    count:       selectedPlatforms.size,
+    user_id:     USER_ID,
+    utm_source:  UTM_SOURCE,
+    timestamp:   new Date().toISOString()
+  });
+
+  document.querySelectorAll('.platform-card.selected').forEach((card, i) => {
+    setTimeout(() => {
+      doRedirect(card.dataset.name, card.dataset.baseUrl, 'redirect_all');
+    }, i * 350);
+  });
+
+  showToast('🚀 Opening ' + selectedPlatforms.size + ' platforms...');
+}
+
+// ════════════════════════════════════════════
+//  SCROLL HELPERS
+// ════════════════════════════════════════════
+function scrollToPlatforms() {
+  document.getElementById('platforms').scrollIntoView({ behavior: 'smooth' });
+  mixpanel.track('sell_car_scroll_to_platforms', { user_id: USER_ID });
+}
+function scrollToHow() {
+  document.getElementById('how').scrollIntoView({ behavior: 'smooth' });
+}
+function handleHeroCTA() {
+  scrollToPlatforms();
+  mixpanel.track('sell_car_hero_cta_click', { user_id: USER_ID, utm_source: UTM_SOURCE });
+}
+
+// ════════════════════════════════════════════
+//  UTILS
+// ════════════════════════════════════════════
+function flashGrid() {
+  const grid = document.getElementById('platformsGrid');
+  grid.style.outline = '2px solid var(--accent)';
+  grid.style.outlineOffset = '6px';
+  grid.style.borderRadius = '12px';
+  setTimeout(() => { grid.style.outline = 'none'; }, 1600);
+}
+
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// ════════════════════════════════════════════
+//  SCROLL ANIMATION
+// ════════════════════════════════════════════
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1 });
+document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+// ════════════════════════════════════════════
+//  INIT — all selected on load
+// ════════════════════════════════════════════
+selectAll();
+</script>
+</body>
+</html>

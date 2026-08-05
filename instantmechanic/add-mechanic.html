@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>मैकेनिक जोड़ें</title>
+
+    <style>
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont;
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            margin: 0;
+            padding: 20px;
+            color: #fff;
+        }
+
+        .container {
+            max-width: 420px;
+            margin: auto;
+            background: #ffffff;
+            color: #333;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 22px;
+            margin-bottom: 6px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-weight: 600;
+            margin-top: 12px;
+            display: block;
+            font-size: 14px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-top: 6px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            font-size: 15px;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: #2c5364;
+        }
+
+        button {
+            width: 100%;
+            margin-top: 18px;
+            padding: 14px;
+            background: linear-gradient(135deg, #2c5364, #203a43);
+            color: #fff;
+            font-size: 16px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .message {
+            margin-top: 12px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .success { color: green; }
+        .error { color: red; }
+
+        hr {
+            margin: 26px 0;
+            border: none;
+            border-top: 1px solid #eee;
+        }
+
+        .list-title {
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .mechanic-card {
+            background: #f7f9fb;
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            border-left: 4px solid #2c5364;
+        }
+
+        .mechanic-name {
+            font-weight: 600;
+        }
+
+        .mechanic-mobile {
+            font-size: 14px;
+            color: #555;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <h1>🔧 मैकेनिक जोड़ें</h1>
+    <div class="subtitle">अपने गैराज के लिए नया मैकेनिक जोड़ें</div>
+
+    <label>मैकेनिक का नाम</label>
+    <input type="text" id="name" placeholder="जैसे: अमित">
+
+    <label>मोबाइल नंबर</label>
+    <input type="tel" id="mobile" placeholder="10 अंकों का नंबर">
+
+    <button id="addBtn">मेरा मैकेनिक जोड़ें</button>
+
+    <div class="message" id="message"></div>
+
+    <hr>
+
+    <div class="list-title">👨‍🔧 आपके मैकेनिक</div>
+    <div id="mechanicList">लोड हो रहा है...</div>
+</div>
+
+<script>
+    const BASE_URL = "https://ai.instantmechanic.online/bot";
+    const parentMechanic = localStorage.getItem("mechanic");
+
+    if (!parentMechanic) {
+        alert("Main mechanic name localStorage में नहीं मिला");
+    }
+
+    const addBtn = document.getElementById("addBtn");
+    const messageDiv = document.getElementById("message");
+    const mechanicListDiv = document.getElementById("mechanicList");
+
+    addBtn.onclick = async () => {
+        const name = document.getElementById("name").value.trim();
+        const mobile = document.getElementById("mobile").value.trim();
+
+        messageDiv.innerHTML = "";
+
+        if (!name || !mobile) {
+            messageDiv.innerHTML = "<span class='error'>सभी फ़ील्ड भरना ज़रूरी है</span>";
+            return;
+        }
+
+        addBtn.disabled = true;
+
+        try {
+            const res = await fetch(`${BASE_URL}/create-mechanic/`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    name,
+                    mobile,
+                    main_mechanic_name: parentMechanic
+                })
+            });
+
+            const data = await res.json();
+
+            if (res.ok) {
+                messageDiv.innerHTML = "<span class='success'>मैकेनिक सफलतापूर्वक जोड़ दिया गया ✅</span>";
+                document.getElementById("name").value = "";
+                document.getElementById("mobile").value = "";
+                loadMechanics();
+            } else {
+                messageDiv.innerHTML = `<span class='error'>${data.error || "कुछ गलत हो गया"}</span>`;
+            }
+        } catch (err) {
+            messageDiv.innerHTML = "<span class='error'>सर्वर से कनेक्शन नहीं हो पाया</span>";
+        }
+
+        addBtn.disabled = false;
+    };
+
+    async function loadMechanics() {
+        mechanicListDiv.innerHTML = "लोड हो रहा है...";
+
+        try {
+            const res = await fetch(
+                `${BASE_URL}/get-mechanics?parent_mechanic=${encodeURIComponent(parentMechanic)}`
+            );
+            const data = await res.json();
+
+            if (!data.sub_mechanics || data.sub_mechanics.length === 0) {
+                mechanicListDiv.innerHTML = "कोई मैकेनिक नहीं मिला";
+                return;
+            }
+
+            mechanicListDiv.innerHTML = "";
+            data.sub_mechanics.forEach(m => {
+                mechanicListDiv.innerHTML += `
+                    <div class="mechanic-card">
+                        <div class="mechanic-name">${m.name}</div>
+                        <div class="mechanic-mobile">📞 ${m.mobile || "N/A"}</div>
+                    </div>
+                `;
+            });
+
+        } catch {
+            mechanicListDiv.innerHTML = "डेटा लोड करने में समस्या आई";
+        }
+    }
+
+    loadMechanics();
+</script>
+
+</body>
+</html>

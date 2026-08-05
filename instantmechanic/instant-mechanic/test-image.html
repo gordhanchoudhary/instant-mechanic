@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Car Images Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: system-ui, sans-serif;
+      background: #f4f6fb;
+    }
+
+    h1 {
+      margin-bottom: 16px;
+      color: #111827;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+      overflow: hidden;
+    }
+
+    .card img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      background: #e5e7eb;
+    }
+
+    .info {
+      padding: 12px 14px;
+    }
+
+    .booking {
+      font-weight: 700;
+      color: #1f2937;
+      margin-bottom: 6px;
+    }
+
+    .mechanic span {
+      color: #2563eb;
+      font-weight: 600;
+    }
+
+    .no-mechanic {
+      color: #9ca3af;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Car Images</h1>
+<div class="grid" id="carGrid"></div>
+
+<script>
+const data = [
+  { image:"https://customers-car-image.s3.ap-south-1.amazonaws.com/car-images/7f505443-bc3f-4fb7-a725-e6749b9df31b.jpg", mechanic:"Sahid Gurugram", bookingId:"19284" },
+  { image:"https://customers-car-image.s3.ap-south-1.amazonaws.com/car-images/f840519d-c0da-4a1d-8435-c77ecaba8877.jpg", mechanic:"Sahid Gurugram", bookingId:"19283" },
+  { image:"https://customers-car-image.s3.ap-south-1.amazonaws.com/car-images/386eda5e-5472-4a19-86f5-e6e2e73ff90e.jpg", mechanic:"Harshit Testing", bookingId:"19298" },
+  { image:"https://customers-car-image.s3.ap-south-1.amazonaws.com/car-images/2aebd74c-8662-42ad-8d75-5c5b0aed6178.avif", mechanic:null, bookingId:"101" },
+  { image:"https://customers-car-image.s3.ap-south-1.amazonaws.com/car-images/c7c9e09f-c63c-458e-a1fe-1a53516664a9.jpeg", mechanic:"Shahid Fire Noida Sec 50", bookingId:"8984" },
+  { image:"https://customers-car-image.s3.ap-south-1.amazonaws.com/car-images/af8445b5-3781-4ff5-bd1b-a9999ff50764.jpg", mechanic:"Harshit Testing", bookingId:"19334" },
+  { image:"https://customers-car-image.s3.ap-south-1.amazonaws.com/car-images/cb64aba0-6df1-42ed-9736-8f0b75d8bc68.jpg", mechanic:"Arman Gurugram", bookingId:"19322" },
+  { image:"https://customers-car-image.s3.ap-south-1.amazonaws.com/car-images/f0dc4a0b-ce40-4d87-b5c9-734e7e388328.jpg", mechanic:"Harshit Testing", bookingId:"19340" },
+  { image:"https://customers-car-image.s3.ap-south-1.amazonaws.com/car-images/0a208409-c92c-44f4-ac51-e2a71a05c0c5.jpg", mechanic:"Sahid Gurugram", bookingId:"19290" },
+  { image:"https://customers-car-image.s3.ap-south-1.amazonaws.com/car-images/d2011065-f299-4042-8f9c-3b89ad73278c.jpg", mechanic:"Sahid Gurugram", bookingId:"19300" },
+  { image:"https://customers-car-image.s3.ap-south-1.amazonaws.com/car-images/c6fc4a48-3b8d-4753-819a-d9662871ff10.jpg", mechanic:"Malik Gurugram", bookingId:"19333" },
+  { image:"https://customers-car-image.s3.ap-south-1.amazonaws.com/car-images/ff39994e-5bf8-4b55-b08a-f522b2a5b017.jpg", mechanic:"Sahid Gurugram", bookingId:"19384" },
+  { image:"https://customers-car-image.s3.ap-south-1.amazonaws.com/car-images/74cfed77-a64a-4042-8957-eb88f09e48ff.jpg", mechanic:"Sahid Gurugram", bookingId:"19398" },
+  { image:"https://customers-car-image.s3.ap-south-1.amazonaws.com/car-images/cad7d833-9f94-4823-a8ca-d9c5d0769679.jpg", mechanic:"Arman Gurugram", bookingId:"19404" },
+  { image:"https://customers-car-image.s3.ap-south-1.amazonaws.com/car-images/5920aa28-31fe-4a64-936b-22c1abf7da84.jpg", mechanic:"Sahid Gurugram", bookingId:"19405" },
+  { image:"https://customers-car-image.s3.ap-south-1.amazonaws.com/car-images/3d15a508-a73f-4506-87b2-038468a7f271.jpg", mechanic:"Tasleem Gurugram", bookingId:"19361" },
+  { image:"https://customers-car-image.s3.ap-south-1.amazonaws.com/car-images/6d8d33ae-0fe7-45b9-bcec-0e1d3a6192a6.jpg", mechanic:"Arman Gurugram", bookingId:"19414" },
+  { image:"https://customers-car-image.s3.ap-south-1.amazonaws.com/car-images/ec34aaf1-8b6b-4722-84b7-9546d4b4ad93.jpg", mechanic:"Harshit Testing", bookingId:"19417" },
+  { image:"https://customers-car-image.s3.ap-south-1.amazonaws.com/car-images/91706558-fd15-429d-b648-5015d2590d34.jpg", mechanic:"Sufiyan (Testing)", bookingId:"18778" },
+  { image:"https://customers-car-image.s3.ap-south-1.amazonaws.com/car-images/2b82fb65-7f61-4801-84b0-f05f967d04c9.jpg", mechanic:"Malik Gurugram", bookingId:"19438" },
+  { image:"https://customers-car-image.s3.ap-south-1.amazonaws.com/car-images/e8f46d29-614c-4967-beb7-5f64a2a0aea6.jpg", mechanic:"Arman Gurugram", bookingId:"19431" },
+  { image:"https://customers-car-image.s3.ap-south-1.amazonaws.com/car-images/2aaf2343-d650-4ad4-8ed2-cb6d71951064.jpg", mechanic:"Malik Gurugram", bookingId:"19435" },
+  { image:"https://customers-car-image.s3.ap-south-1.amazonaws.com/car-images/ede68e39-da93-46be-b9fc-11ae564afc76.jpg", mechanic:"Arman Gurugram", bookingId:"19436" },
+  { image:"https://customers-car-image.s3.ap-south-1.amazonaws.com/car-images/4b7e5cd2-1b66-456e-81ac-c5b5e73e56e0.jpg", mechanic:"Sahid Gurugram", bookingId:"19479" },
+  { image:"https://customers-car-image.s3.ap-south-1.amazonaws.com/car-images/916e6386-6a2e-477f-98ab-60a3093dfef7.jpg", mechanic:"Malik Gurugram", bookingId:"19476" },
+  { image:"https://customers-car-image.s3.ap-south-1.amazonaws.com/car-images/b65c2930-3bcc-41d4-8ff8-13c1915bf143.jpg", mechanic:"Sahid Gurugram", bookingId:"19495" },
+  { image:"https://customers-car-image.s3.ap-south-1.amazonaws.com/car-images/0f717298-4d51-440f-893a-9f420f417941.jpg", mechanic:"Imran Gurgaon", bookingId:"19493" },
+  { image:"https://customers-car-image.s3.ap-south-1.amazonaws.com/car-images/a6f2284a-ef8f-403c-a249-86c56ab1b3e9.jpg", mechanic:"Malik Gurugram", bookingId:"19500" },
+  { image:"https://customers-car-image.s3.ap-south-1.amazonaws.com/car-images/18f825a0-556b-4f99-85ff-9ff47a7d564a.jpg", mechanic:"Shadab Dwarka", bookingId:"19497" },
+  { image:"https://customers-car-image.s3.ap-south-1.amazonaws.com/car-images/b2766c08-ff32-4fcc-a1ed-fd5db0a8e1ff.jpg", mechanic:"Sahid Gurugram", bookingId:"19509" },
+  { image:"https://customers-car-image.s3.ap-south-1.amazonaws.com/car-images/8a73216e-315e-4ed0-9c73-7dff3b708a1d.jpg", mechanic:"Sahid Gurugram", bookingId:"19499" },
+  { image:"https://customers-car-image.s3.ap-south-1.amazonaws.com/car-images/5ec980de-0261-434d-adc0-6f1d7bd3b5eb.jpg", mechanic:"Harinder Dwarka", bookingId:"19277" },
+  { image:"https://customers-car-image.s3.ap-south-1.amazonaws.com/car-images/d5f01071-b1d0-40b0-9532-ea482bcd738b.jpg", mechanic:"Shadab Dwarka", bookingId:"19498" },
+  { image:"https://customers-car-image.s3.ap-south-1.amazonaws.com/car-images/a6d72456-cd85-484d-849a-600b85b2b4e0.jpg", mechanic:"Sahid Gurugram", bookingId:"19511" },
+  { image:"https://customers-car-image.s3.ap-south-1.amazonaws.com/car-images/87f33019-335d-4952-9bc7-c60c671dc80d.jpg", mechanic:"Sahid Gurugram", bookingId:"19513" },
+  { image:"https://customers-car-image.s3.ap-south-1.amazonaws.com/car-images/339b9003-41cb-44cc-b62f-5d68ff9277c6.jpg", mechanic:"Malik Gurugram", bookingId:"19519" }
+];
+
+const grid = document.getElementById("carGrid");
+
+data.forEach(item => {
+  grid.innerHTML += `
+    <div class="card">
+      <img src="${item.image}" loading="lazy">
+      <div class="info">
+        <div class="booking">Booking ID: ${item.bookingId}</div>
+        ${item.mechanic
+          ? `<div class="mechanic">Mechanic: <span>${item.mechanic}</span></div>`
+          : `<div class="no-mechanic">Mechanic not assigned</div>`}
+      </div>
+    </div>
+  `;
+});
+</script>
+
+</body>
+</html>

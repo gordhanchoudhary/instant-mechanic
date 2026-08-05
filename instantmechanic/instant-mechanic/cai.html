@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Instant Mechanic — Your Car's AI Assistant</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F3F4F7;
+    --surface:#FFFFFF;
+    --surface-sunken:#EEF0F3;
+    --ink:#14171C;
+    --ink-soft:#5B6472;
+    --ink-faint:#98A0AC;
+    --line:#E4E7EB;
+    --accent:#FF6A1A;
+    --accent-ink:#B84800;
+    --accent-soft:#FFE9DC;
+    --alert:#D6321C;
+    --alert-soft:#FCE2DE;
+    --live:#17A672;
+    --live-soft:#DEF4EB;
+
+    /* service category tokens — color encodes the kind of task */
+    --cat-money:#2F6FED;   --cat-money-soft:#E4ECFE;   /* pay / recharge */
+    --cat-legal:#D6321C;   --cat-legal-soft:#FCE2DE;   /* fines / compliance you must clear */
+    --cat-enviro:#178A5B;  --cat-enviro-soft:#DDF3E9;  /* PUC / emissions */
+    --cat-shield:#7C5CFC;  --cat-shield-soft:#EEE9FF;  /* insurance / protection */
+    --cat-smart:#B8460E;   --cat-smart-soft:#FFE9DC;   /* AI-driven Instant Mechanic features */
+
+    --radius:20px;
+    --shadow-sm:0 1px 2px rgba(20,23,28,.04), 0 1px 1px rgba(20,23,28,.03);
+    --shadow-md:0 8px 24px rgba(20,23,28,.08);
+    --shadow-lg:0 24px 60px rgba(20,23,28,.16);
+  }
+  *{box-sizing:border-box;}
+  html{-webkit-text-size-adjust:100%; scroll-behavior:smooth;}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:'Inter',sans-serif; -webkit-font-smoothing:antialiased;
+    padding-bottom:60px;
+  }
+  h1,h2,h3,.display{ font-family:'Space Grotesk',sans-serif; letter-spacing:-0.015em; }
+  .mono{ font-family:'JetBrains Mono',monospace; letter-spacing:0; }
+  a{ color:inherit; text-decoration:none; }
+  button{ font-family:inherit; }
+  :focus-visible{ outline:2.5px solid var(--accent); outline-offset:2px; border-radius:6px; }
+
+  /* ---------- Top bar ---------- */
+  .topbar{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:16px 20px 10px; max-width:640px; margin:0 auto;
+  }
+  .brand{ display:flex; align-items:center; gap:9px; }
+  .brand img{ height:42px; }
+  .status-pill{
+    display:flex; align-items:center; gap:7px;
+    background:var(--surface); border:1px solid var(--line);
+    border-radius:999px; padding:6px 12px 6px 9px; box-shadow:var(--shadow-sm);
+    font-size:12px; font-weight:600; color:var(--ink-soft);
+  }
+  .dot{ width:7px; height:7px; border-radius:50%; background:var(--live); position:relative; flex:none; }
+  .dot::after{
+    content:""; position:absolute; inset:-4px; border-radius:50%;
+    background:var(--live); opacity:.35; animation:pulse-dot 2s ease-out infinite;
+  }
+  @keyframes pulse-dot{ 0%{transform:scale(.6);opacity:.5;} 100%{transform:scale(2.2);opacity:0;} }
+
+  .wrap{ max-width:640px; margin:0 auto; padding:0 20px; }
+
+  /* ================= HERO — talk to your car, front and center ================= */
+  .ignition-panel{
+    background:
+      radial-gradient(circle at 22% -10%, rgba(255,106,26,.35), transparent 55%),
+      linear-gradient(165deg,#1B1E24,#0C0D10 78%);
+    border-radius:24px; box-shadow:var(--shadow-lg);
+    padding:30px 24px 26px; display:flex; flex-direction:column;
+    align-items:center; text-align:center; color:#fff; position:relative;
+    overflow:hidden; margin-top:8px;
+  }
+  .ignition-panel .viewfinder{ position:absolute; inset:14px; border-radius:16px; pointer-events:none; opacity:.5; }
+  .vf-corner{ position:absolute; width:22px; height:22px; border-color:var(--accent); border-style:solid; opacity:.8; }
+  .vf-corner.tl{ top:0; left:0; border-width:2px 0 0 2px; border-top-left-radius:8px; }
+  .vf-corner.tr{ top:0; right:0; border-width:2px 2px 0 0; border-top-right-radius:8px; }
+  .vf-corner.bl{ bottom:0; left:0; border-width:0 0 2px 2px; border-bottom-left-radius:8px; }
+  .vf-corner.br{ bottom:0; right:0; border-width:0 2px 2px 0; border-bottom-right-radius:8px; }
+
+  .ign-label{
+    font-size:11px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:#C9CCD3;
+    display:flex; align-items:center; gap:7px; position:relative; z-index:1;
+  }
+  .ign-label .liveDotSm{ width:6px; height:6px; border-radius:50%; background:var(--accent); box-shadow:0 0 0 3px rgba(255,106,26,.25); }
+
+  .ign-btn{
+    width:118px; height:118px; border-radius:50%; margin:20px 0 16px; cursor:pointer; border:none;
+    background:radial-gradient(circle at 35% 28%, #FF8A45, var(--accent) 55%, #C4470E 100%);
+    box-shadow:0 0 0 9px rgba(255,106,26,.10), 0 14px 34px rgba(255,106,26,.4), inset 0 2px 6px rgba(255,255,255,.4);
+    display:flex; align-items:center; justify-content:center; position:relative; z-index:1;
+    transition:transform .15s ease;
+  }
+  .ign-btn:active{ transform:scale(.95); }
+  .ign-ring{
+    position:absolute; inset:-16px; border-radius:50%; border:1.5px solid rgba(255,106,26,.45);
+    animation:idle-ring 2.6s ease-out infinite;
+  }
+  .ign-ring.d2{ animation-delay:1.3s; }
+  @keyframes idle-ring{ 0%{transform:scale(.88);opacity:.9;} 100%{transform:scale(1.4);opacity:0;} }
+  .ign-btn svg{ width:42px; height:42px; }
+
+  .ign-title{ font-size:21px; font-weight:800; position:relative; z-index:1; }
+  .ign-sub{ font-size:13px; color:#A7ABB4; margin-top:5px; max-width:260px; position:relative; z-index:1; line-height:1.45; }
+  .ign-tags{ display:flex; gap:8px; margin-top:16px; position:relative; z-index:1; flex-wrap:wrap; justify-content:center; }
+  .ign-tag{
+    font-size:11px; font-weight:600; color:#D5D8DD; background:rgba(255,255,255,.08);
+    border:1px solid rgba(255,255,255,.12); padding:5px 10px; border-radius:999px;
+    display:flex; align-items:center; gap:5px;
+  }
+  .ign-tag svg{ width:12px; height:12px; }
+
+  /* ================= Car identity card (secondary, below hero) ================= */
+  .id-card{
+    background:var(--surface); border:1px solid var(--line); border-radius:20px; box-shadow:var(--shadow-sm);
+    margin-top:14px; overflow:hidden;
+  }
+  .id-card .car-banner{
+    width:67%; height:234px; margin-left: 84px; object-fit:cover; display:block; background:var(--surface-sunken);
+  }
+  .id-card .car-banner.fallback{
+    display:flex; align-items:center; justify-content:center;
+    background:linear-gradient(155deg,#20242B,#0F1114 75%); color:#4A4F58;
+  }
+  .id-card .car-banner.fallback svg{ width:56px; height:56px; opacity:.55; }
+  .id-card .id-body{ padding:15px 16px 14px; display:flex; align-items:flex-end; gap:12px; }
+  .id-card .id-text{ min-width:0; flex:1; }
+  .eyebrow{
+    font-size:10.5px; font-weight:700; letter-spacing:.08em; text-transform:uppercase;
+    color:var(--ink-faint); margin:0 0 3px;
+  }
+  .customer-name{ font-size:19px; font-weight:800; margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .customer-sub{ font-size:13px; color:var(--ink-soft); margin:2px 0 0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .id-card .id-extra{ text-align:right; flex:none; font-size:11px; color:var(--ink-faint); }
+  .id-card .id-extra .v{ font-weight:800; color:var(--ink); font-size:14.5px; }
+
+  .mech-chip{
+    display:flex; align-items:center; gap:9px; margin:0 16px 15px; padding:10px 12px;
+    background:var(--surface-sunken); border-radius:12px;
+  }
+  .mech-avatar{
+    width:32px; height:32px; border-radius:50%; background:var(--accent-soft); color:var(--accent-ink);
+    display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13px; flex:none;
+  }
+  .mech-chip .name{ font-weight:600; font-size:13px; }
+  .mech-chip .role{ font-size:11px; color:var(--ink-soft); }
+  .mech-chip a.call{
+    margin-left:auto; background:var(--ink); color:#fff; padding:7px 12px; border-radius:999px;
+    font-size:12px; font-weight:600; display:flex; align-items:center; gap:6px;
+  }
+
+  /* ---------- Section heading ---------- */
+  .section-head{ display:flex; align-items:baseline; justify-content:space-between; margin:32px 0 13px; }
+  .section-head h2{ font-size:16.5px; margin:0; }
+  .section-head .hint{ font-size:11.5px; color:var(--ink-faint); }
+
+  /* ---------- Category legend ---------- */
+  .legend{ display:flex; gap:14px; flex-wrap:wrap; margin:-3px 0 15px; }
+  .legend span{ font-size:10.5px; color:var(--ink-soft); display:flex; align-items:center; gap:5px; font-weight:600; }
+  .legend i{ width:7px; height:7px; border-radius:2px; display:inline-block; }
+
+  /* ---------- Feature grid ---------- */
+  .grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:11px; }
+
+  .feature{
+    background:var(--surface); border:1px solid var(--line); border-radius:16px;
+    padding:15px 14px 14px; display:flex; flex-direction:column; gap:9px; box-shadow:var(--shadow-sm);
+    transition:transform .15s ease, box-shadow .15s ease; position:relative; overflow:hidden;
+  }
+  a.feature:active{ transform:scale(.97); }
+  .feature.disabled{ opacity:.68; }
+  .f-icon{
+    width:40px; height:40px; border-radius:11px;
+    display:flex; align-items:center; justify-content:center; flex:none;
+  }
+  .f-icon svg{ width:20px; height:20px; }
+  .f-title{ font-size:13.5px; font-weight:700; line-height:1.25; }
+  .f-detail{ font-size:11px; color:var(--ink-soft); line-height:1.3; margin-top:-4px; }
+  .f-badge{
+    position:absolute; top:12px; right:12px; font-size:9px; font-weight:700; letter-spacing:.05em;
+    text-transform:uppercase; padding:3px 7px; border-radius:999px;
+  }
+  .f-badge.live{ background:var(--live-soft); color:var(--live); }
+  .f-badge.soon{ background:var(--surface-sunken); color:var(--ink-faint); }
+  .f-badge.check{ background:var(--cat-legal-soft); color:var(--cat-legal); }
+
+  /* ---------- Map ---------- */
+  #map{ height:220px; border-radius:var(--radius); overflow:hidden; box-shadow:var(--shadow-sm); border:1px solid var(--line); }
+  .map-empty{
+    height:220px; border-radius:var(--radius); background:var(--surface); border:1px dashed var(--line);
+    display:flex; align-items:center; justify-content:center; color:var(--ink-faint); font-size:13px;
+  }
+
+  /* ---------- Bookings timeline ---------- */
+  .timeline{ display:flex; flex-direction:column; }
+  .tl-item{ display:flex; gap:14px; padding-bottom:18px; position:relative; }
+  .tl-item:not(:last-child)::before{
+    content:""; position:absolute; left:9px; top:22px; bottom:0; width:1.5px; background:var(--line);
+  }
+  .tl-dot{
+    width:20px; height:20px; border-radius:50%; background:var(--surface); border:2px solid var(--accent);
+    flex:none; margin-top:2px;
+  }
+  .tl-card{
+    flex:1; background:var(--surface); border:1px solid var(--line); border-radius:14px;
+    padding:13px 15px; box-shadow:var(--shadow-sm);
+  }
+  .tl-top{ display:flex; justify-content:space-between; align-items:flex-start; gap:8px; }
+  .tl-problem{ font-weight:700; font-size:13.5px; }
+  .tl-date{ font-size:11px; color:var(--ink-faint); white-space:nowrap; }
+  .tl-meta{ font-size:12px; color:var(--ink-soft); margin-top:4px; }
+  .tl-price{ font-size:12px; font-weight:600; margin-top:7px; color:var(--accent-ink); }
+  .status-tag{
+    display:inline-block; margin-top:7px; font-size:10px; font-weight:700; text-transform:uppercase;
+    letter-spacing:.04em; padding:3px 8px; border-radius:999px; background:var(--live-soft); color:var(--live);
+  }
+
+  .empty-state{
+    text-align:center; padding:26px 20px; color:var(--ink-faint); font-size:13px;
+    background:var(--surface); border:1px dashed var(--line); border-radius:var(--radius);
+  }
+  .skeleton{ background:linear-gradient(90deg,var(--surface-sunken) 25%,#E4E7EB 37%,var(--surface-sunken) 63%); background-size:400% 100%; animation:shimmer 1.4s ease infinite; border-radius:8px; }
+  @keyframes shimmer{ 0%{background-position:100% 0;} 100%{background-position:0 0;} }
+
+  /* ---------- Toast (for "soon" taps) ---------- */
+  .toast{
+    position:fixed; left:50%; bottom:26px; transform:translateX(-50%) translateY(20px);
+    background:var(--ink); color:#fff; padding:11px 18px; border-radius:999px; font-size:12.5px; font-weight:600;
+    box-shadow:var(--shadow-lg); opacity:0; pointer-events:none; transition:opacity .2s ease, transform .2s ease;
+    z-index:50; white-space:nowrap; max-width:88vw; overflow:hidden; text-overflow:ellipsis;
+  }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+
+  footer{ text-align:center; margin-top:44px; color:var(--ink-faint); font-size:11.5px; }
+  footer .heart{ color:var(--accent); }
+
+  @media (prefers-reduced-motion: reduce){
+    .dot::after, .ign-ring{ animation:none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">
+    <img src="https://customers-car-image.s3.ap-south-1.amazonaws.com/car-images/b397527b-b2c3-4897-b4ed-f11dbac79f2f.png" alt="Instant Mechanic">
+  </div>
+  <div class="status-pill"><span class="dot"></span> <span id="statusText">Connecting…</span></div>
+</div>
+
+<div class="wrap">
+
+  <!-- ================= HERO: talk to your car (video-first) ================= -->
+  <div class="ignition-panel">
+    <div class="viewfinder">
+      <span class="vf-corner tl"></span><span class="vf-corner tr"></span>
+      <span class="vf-corner bl"></span><span class="vf-corner br"></span>
+    </div>
+    <div class="ign-label"><span class="liveDotSm"></span> AI Car Assistant · One tap</div>
+    <button class="ign-btn" id="ignBtn" aria-label="Start a video diagnosis with your car">
+      <span class="ign-ring"></span>
+      <span class="ign-ring d2"></span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="3"/>
+      </svg>
+    </button>
+    <div class="ign-title">Show your car, get answers</div>
+    <div class="ign-sub">Point your camera at the problem — our AI mechanic diagnoses it live and tells you exactly what to do next.</div>
+    <div class="ign-tags">
+      <span class="ign-tag">🎥 Live video</span>
+      <span class="ign-tag">⚡ Instant read</span>
+      <span class="ign-tag">🔧 Live Diagnosis</span>
+    </div>
+  </div>
+
+  <!-- ================= Car identity (secondary, below hero) ================= -->
+  <div class="id-card" id="idCard">
+    <img class="car-banner skeleton" id="carImg" alt="Your car">
+    <div class="car-banner fallback" id="carFallback" style="display:none;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17h14M5 17a2 2 0 0 1-2-2v-3.5a2 2 0 0 1 .4-1.2L5 7a2 2 0 0 1 1.6-.8h10.8A2 2 0 0 1 19 7l1.6 3.3a2 2 0 0 1 .4 1.2V15a2 2 0 0 1-2 2M5 17v2a1 1 0 0 0 1 1h1a1 1 0 0 0 1-1v-2m10 0v2a1 1 0 0 0 1 1h1a1 1 0 0 0 1-1v-2M6 11h12"/></svg>
+    </div>
+    <div class="id-body">
+      <div class="id-text">
+        <p class="eyebrow" id="idEyebrow">Registered to</p>
+        <p class="customer-name" id="custName">Loading…</p>
+        <p class="customer-sub" id="custSub">Fetching your details</p>
+      </div>
+      <div class="id-extra" id="idExtra"></div>
+    </div>
+    <div class="mech-chip" id="mechChip" style="display:none;">
+      <div class="mech-avatar" id="mechInitial">M</div>
+      <div>
+        <div class="name" id="mechName">—</div>
+        <div class="role">Your assigned agent</div>
+      </div>
+      <a class="call" id="mechCall" href="#"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>Call</a>
+    </div>
+  </div>
+
+  <!-- ================= Everything else Instant Mechanic can do ================= -->
+  <div class="section-head"><h2>What Instant Mechanic can do</h2><span class="hint">Tap any card</span></div>
+  <div class="grid" id="featureGrid"></div>
+
+
+  <!-- ================= Vehicle compliance & money — the new stuff ================= -->
+  <div class="section-head"><h2>Stay road-legal, on autopilot</h2></div>
+  <div class="legend">
+    <span><i style="background:var(--cat-money)"></i>Pay</span>
+    <span><i style="background:var(--cat-legal)"></i>Compliance</span>
+    <span><i style="background:var(--cat-enviro)"></i>Emissions</span>
+    <span><i style="background:var(--cat-shield)"></i>Protection</span>
+  </div>
+  <div class="grid" id="complianceGrid"></div>
+
+  <!-- ================= 3 new ideas built for car owners ================= -->
+  <div class="section-head"><h2>New — built for how you actually own a car</h2></div>
+  <div class="grid" id="ideaGrid"></div>
+
+  <!-- MAP -->
+  <div class="section-head"><h2>Last known location</h2></div>
+  <div id="map"></div>
+  <div class="map-empty" id="mapEmpty" style="display:none;">No location on file yet</div>
+
+  <!-- BOOKINGS -->
+  <div class="section-head"><h2>My bookings</h2><span class="hint" id="bookingCount"></span></div>
+  <div class="timeline" id="bookingTimeline">
+    <div class="tl-item"><div class="tl-dot skeleton" style="border:none;"></div><div class="tl-card skeleton" style="height:70px;"></div></div>
+  </div>
+
+  <footer>Built with <span class="heart">♥</span> by Instant Mechanic — your car's AI assistant, always on call.</footer>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+// ─────────────────────────────────────────────
+// CONFIG — edit these to match your real routes
+// ─────────────────────────────────────────────
+const CONFIG = {
+  customerApi: (mobile) => `https://ai.instantmechanic.online/bot/customer_chats/?mobile=${mobile}`,
+  bookingApi:  (mobile) => `https://ai.instantmechanic.online/bot/api/booking-details?mobile=${mobile}`,
+  videoDiagnosisBase: "https://instantmechanic.online/ai-video-diagnosis.html",
+  whatsappUrl: "https://wa.me/message/R7LYR65MG47ZB1",
+  ambulanceUrl: "https://blinkit.com/ambulance?srsltid=AfmBOooo9rv2AoIqtmqltkaZzwMFjV50h86s4HnGaM4oOH6b-Hrv_8sV",
+  obd2Url: "https://instantmechanic.online/obd2.html",
+  challanCheckUrl: "https://echallan.parivahan.gov.in/index/accused-challan",
+  // SOS should hit YOUR backend, which then calls Exotel server-side.
+  // Calling Exotel directly from the browser is not viable — see notes below.
+  sosApi: (mobile) => `https://ai.instantmechanic.online/bot/api/sos-call?mobile=${mobile}`,
+};
+
+const params = new URLSearchParams(location.search);
+const mobile = params.get("m") || params.get("mobile") || "";
+
+// Filled in once loadCustomer() resolves — used to build the video diagnosis link
+const customerInfo = { name: "", car: "" };
+
+function buildVideoDiagnosisUrl(){
+  const p = new URLSearchParams();
+  if (customerInfo.name) p.set("name", customerInfo.name);
+  if (customerInfo.car) p.set("car", customerInfo.car);
+  if (mobile) p.set("mobile", mobile);
+  return `${CONFIG.videoDiagnosisBase}?${p.toString()}`;
+}
+
+const icon = (path, sw="1.8") => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round">${path}</svg>`;
+
+const ICONS = {
+  video:    icon('<path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/>'),
+  headset:  icon('<path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/>'),
+  shield:   icon('<path d="M12 2 4 5v6c0 5 3.4 9 8 11 4.6-2 8-6 8-11V5l-8-3z"/>'),
+  wrench:   icon('<path d="M14.7 6.3a4 4 0 0 1-5.4 5.4L4 17l3 3 5.3-5.3a4 4 0 0 1 5.4-5.4l-3-3-3 3 3 3z"/>'),
+  cross:    icon('<path d="M12 8v8M8 12h8"/><rect x="3" y="3" width="18" height="18" rx="4"/>'),
+  siren:    icon('<path d="M7 18v-6a5 5 0 0 1 10 0v6"/><path d="M3 18h18"/><path d="M12 2v3"/>'),
+  plug:     icon('<path d="M9 2v5M15 2v5M6 7h12l-1 6a5 5 0 0 1-5 4h0a5 5 0 0 1-5-4L6 7z"/><path d="M12 17v5"/>'),
+  receipt:  icon('<path d="M6 2h12v20l-3-2-3 2-3-2-3 2V2z"/><path d="M9 8h6M9 12h6"/>'),
+  chat:     icon('<path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5 8.4 8.4 0 0 1-3.9-.9L3 21l1.9-5.6A8.5 8.5 0 1 1 21 11.5z"/>'),
+  tollgate: icon('<path d="M4 21V8l8-5 8 5v13"/><path d="M4 12h16"/><rect x="9" y="12" width="6" height="9"/>'),
+  gavel:    icon('<path d="m14 13-7.5 7.5a1.7 1.7 0 0 1-2.4-2.4L11.5 10.5"/><path d="m16 16 6-6"/><path d="m8 8 6-6 5.5 5.5-6 6z"/>'),
+  leaf:     icon('<path d="M11 20A7 7 0 0 1 9 6c2-2 6-2 9 1s3 7 1 9-7 4-9 4z"/><path d="M2 21c4-2 8-6 12-12"/>'),
+  umbrella: icon('<path d="M12 2a9 9 0 0 1 9 9H3a9 9 0 0 1 9-9z"/><path d="M12 11v9a2 2 0 0 1-4 0"/><path d="M12 2v2"/>'),
+  wallet:   icon('<path d="M20 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/><path d="M18 7V5a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v2"/><path d="M17 14h.01"/>'),
+  calendar: icon('<rect x="3" y="4" width="18" height="18" rx="3"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="m9 16 2 2 4-4"/>'),
+  tag:      icon('<path d="M12 2H2v10l9.3 9.3a2 2 0 0 0 2.8 0l7.2-7.2a2 2 0 0 0 0-2.8L12 2z"/><path d="M7 7h.01"/>'),
+};
+
+// ── Category tokens: color always maps to the same kind of task ──
+const CATS = {
+  money:  { bg:"var(--cat-money-soft)",  fg:"var(--cat-money)"  },
+  legal:  { bg:"var(--cat-legal-soft)",  fg:"var(--cat-legal)"  },
+  enviro: { bg:"var(--cat-enviro-soft)", fg:"var(--cat-enviro)" },
+  shield: { bg:"var(--cat-shield-soft)", fg:"var(--cat-shield)" },
+  smart:  { bg:"var(--cat-smart-soft)",  fg:"var(--cat-smart)"  },
+};
+
+function toast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(toast._h);
+  toast._h = setTimeout(()=>t.classList.remove("show"), 2200);
+}
+
+function escAttr(s){
+  return String(s).replace(/&/g,"&amp;").replace(/"/g,"&quot;");
+}
+
+function renderCard(f){
+  const cat = CATS[f.cat];
+  const tag = f.href ? "a" : "div";
+  const hrefAttr = f.href ? `href="${f.href}" target="_blank" rel="noopener"` : "";
+  const toastMsg = f.toastMsg || `${f.title} is coming soon — we'll notify you the moment it's live.`;
+  const toastAttr = (!f.href && !f.action) ? `data-toast="${escAttr(toastMsg)}"` : "";
+  const actionAttr = f.action ? `data-action="${f.action}"` : "";
+  const badgeClass = f.status === 'live' ? 'live' : (f.status === 'check' ? 'check' : 'soon');
+  const badgeLabel = f.status === 'live' ? 'Live' : (f.status === 'check' ? 'Check now' : 'Soon');
+  return `<${tag} class="feature ${f.status!=='live' && f.status!=='check' ?'disabled':''}" ${hrefAttr} ${toastAttr} ${actionAttr} role="button" tabindex="0">
+    <span class="f-badge ${badgeClass}">${badgeLabel}</span>
+    <div class="f-icon" style="background:${cat.bg};color:${cat.fg}">${f.icon}</div>
+    <div class="f-title">${f.title}</div>
+    <div class="f-detail">${f.detail}</div>
+  </${tag}>`;
+}
+
+function bindToastCards(){
+  document.querySelectorAll('.feature[data-toast]').forEach(el => {
+    el.addEventListener('click', () => toast(el.getAttribute('data-toast')));
+    el.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); toast(el.getAttribute('data-toast')); }
+    });
+  });
+}
+
+const ACTIONS = { sos: triggerSOS };
+
+function bindActionCards(){
+  document.querySelectorAll('.feature[data-action]').forEach(el => {
+    const fn = ACTIONS[el.getAttribute('data-action')];
+    if (!fn) return;
+    el.addEventListener('click', fn);
+    el.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); fn(); }
+    });
+  });
+}
+
+// ─────────────────────────────────────────────
+// SOS — connects the customer to an agent by phone.
+// This calls YOUR backend (CONFIG.sosApi), which places the Exotel
+// call server-side. Do NOT call Exotel's connect.json directly from
+// this page — see the notes in the reply for why.
+// ─────────────────────────────────────────────
+async function triggerSOS(){
+  if (!mobile){
+    toast("Open this from your car's tag to use SOS");
+    return;
+  }
+  toast("Connecting you now…");
+  try{
+    const res = await fetch(CONFIG.sosApi(mobile), { method: "POST" });
+    if (res.ok){
+      toast("Help is on the way — expect a call shortly");
+    } else {
+      toast("Couldn't place the call — opening WhatsApp instead");
+      window.open(CONFIG.whatsappUrl, "_blank");
+    }
+  } catch(e){
+    toast("Network error — opening WhatsApp instead");
+    window.open(CONFIG.whatsappUrl, "_blank");
+  }
+}
+
+// ─────────────────────────────────────────────
+// Compliance & money — Fastag / Challan / PUC / Insurance
+// ─────────────────────────────────────────────
+const COMPLIANCE = [
+  { title:"FASTag balance", detail:"Check & recharge before you hit the toll", icon:ICONS.tollgate, cat:"money",  status:"soon", toastMsg:"FASTag balance & recharge is coming soon — link your tag from Settings once it's live." },
+  { title:"Traffic challans", detail:"See pending e-challans on your number", icon:ICONS.gavel,    cat:"legal",  status:"check", href:CONFIG.challanCheckUrl },
+  { title:"PUC certificate",  detail:"Track your emission test expiry",        icon:ICONS.leaf,     cat:"enviro", status:"soon", toastMsg:"PUC expiry tracking is coming soon — we'll remind you before it lapses." },
+  { title:"Insurance renewal",detail:"Never miss a policy renewal date",       icon:ICONS.umbrella, cat:"shield", status:"soon", toastMsg:"Insurance tracking is coming soon — add your policy to get renewal alerts." },
+];
+
+// ─────────────────────────────────────────────
+// Core Instant Mechanic actions (existing)
+// ─────────────────────────────────────────────
+const FEATURES = [
+  { title:"Book a mechanic",      detail:"32+ verified mechanics nearby",   icon:ICONS.wrench,  cat:"money", status:"live", href:CONFIG.whatsappUrl },
+  { title:"OBD2 diagnosis",       detail:"Plug in and read your car's mind", icon:ICONS.plug,     cat:"smart", status:"live", href:CONFIG.obd2Url },
+  { title:"Estimate for repair",  detail:"Know the cost before you commit",  icon:ICONS.receipt, cat:"money", status:"soon" },
+  { title:"Call ambulance",       detail:"For roadside medical emergencies", icon:ICONS.cross,   cat:"legal", status:"live", href:CONFIG.ambulanceUrl },
+  { title:"SOS",                  detail:"Instant help, wherever you are",   icon:ICONS.siren,   cat:"legal", status:"live", action:"sos" },
+  { title:"Chat with us",         detail:"A Mechanic, one tap away",       icon:ICONS.chat,     cat:"shield",status:"live", href:CONFIG.whatsappUrl },
+];
+
+// ─────────────────────────────────────────────
+// 3 new ideas — genuinely useful for a car owner, not in the original page
+// ─────────────────────────────────────────────
+const IDEAS = [
+  { title:"Service reminder", detail:"We'll tell you when your car is due — before it tells you the hard way", icon:ICONS.calendar, cat:"smart", status:"soon", toastMsg:"Service reminders are coming soon — see your live estimate in the strip above once you have a booking on file." },
+  { title:"My Garage — document wallet", detail:"RC, insurance, PUC — all in one place, ready to show anyone", icon:ICONS.wallet, cat:"shield", status:"soon", toastMsg:"My Garage is coming soon — a single, secure home for every vehicle document." },
+  { title:"What's my car worth", detail:"An instant, honest resale estimate — no dealer markdown games", icon:ICONS.tag, cat:"money", status:"soon", toastMsg:"Instant resale valuation is coming soon." },
+];
+
+function renderGrids(){
+  document.getElementById("complianceGrid").innerHTML = COMPLIANCE.map(renderCard).join("");
+  document.getElementById("featureGrid").innerHTML = FEATURES.map(renderCard).join("");
+  document.getElementById("ideaGrid").innerHTML = IDEAS.map(renderCard).join("");
+  bindToastCards();
+  bindActionCards();
+}
+renderGrids();
+
+document.getElementById("ignBtn").onclick = () => {
+  window.location.href = buildVideoDiagnosisUrl();
+};
+
+// ─────────────────────────────────────────────
+// Fetch customer profile
+// ─────────────────────────────────────────────
+function showCarFallback(){
+  document.getElementById("carImg").style.display = "none";
+  document.getElementById("carFallback").style.display = "flex";
+}
+
+async function loadCustomer(){
+  const statusEl = document.getElementById("statusText");
+  if (!mobile){
+    statusEl.textContent = "No mobile number in URL";
+    document.getElementById("custName").textContent = "Welcome";
+    document.getElementById("custSub").textContent = "Open this page via your car's NFC tag to see your details";
+    document.getElementById("idExtra").innerHTML = "";
+    showCarFallback();
+    return;
+  }
+  try{
+    const res = await fetch(CONFIG.customerApi(mobile));
+    const json = await res.json();
+    const c = json?.data?.[0];
+    if (!c) throw new Error("no customer record");
+
+    statusEl.textContent = "Connected";
+    document.getElementById("custName").textContent = c.name?.trim() ? c.name : `Customer ${mobile.slice(-4)}`;
+    document.getElementById("custSub").textContent = c.car ? c.car.trim() : "Vehicle not on file yet";
+    customerInfo.name = c.name?.trim() || "";
+    customerInfo.car = c.car?.trim() || "";
+
+    if (c.car_image){
+      const img = document.getElementById("carImg");
+      img.src = c.car_image; img.classList.remove("skeleton");
+      img.onerror = showCarFallback;
+    } else {
+      showCarFallback();
+    }
+
+    const lastBooking = c.bookings?.[0];
+    if (c.car_number){
+      document.getElementById("idExtra").innerHTML = `<div class="v mono">${c.car_number}</div><div>Reg. number</div>`;
+    }
+
+    if (c.agent){
+      document.getElementById("mechChip").style.display = "flex";
+      document.getElementById("mechName").textContent = c.agent;
+      document.getElementById("mechInitial").textContent = c.agent[0].toUpperCase();
+    }
+
+    // Map from last booking location (google maps url with lat,lng)
+    const loc = lastBooking?.location;
+    const match = loc?.match(/(-?\d+\.\d+)[,\/](-?\d+\.\d+)/);
+    if (match){
+      const lat = parseFloat(match[1]), lng = parseFloat(match[2]);
+      const map = L.map('map', { zoomControl:false, attributionControl:false }).setView([lat,lng], 15);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+      L.circleMarker([lat,lng], { radius:9, color:"#FF6A1A", fillColor:"#FF6A1A", fillOpacity:.9, weight:3 }).addTo(map);
+    } else {
+      document.getElementById("map").style.display = "none";
+      document.getElementById("mapEmpty").style.display = "flex";
+    }
+
+  } catch(e){
+    statusEl.textContent = "Couldn't load profile";
+    document.getElementById("custName").textContent = "Welcome to Instant Mechanic";
+    document.getElementById("custSub").textContent = "We couldn't fetch your details right now";
+    document.getElementById("idExtra").innerHTML = "";
+    showCarFallback();
+    document.getElementById("map").style.display = "none";
+    document.getElementById("mapEmpty").style.display = "flex";
+  }
+}
+
+// ─────────────────────────────────────────────
+// Fetch booking history + power the live "service due" hint
+// ─────────────────────────────────────────────
+function updateServiceReminder(bookings){
+  const idea = IDEAS.find(i => i.title === "Service reminder");
+  if (!idea || !bookings?.length) return;
+  const last = bookings[0];
+  const lastDate = new Date(last.created_at);
+  if (isNaN(lastDate)) return;
+  const dueDate = new Date(lastDate); dueDate.setMonth(dueDate.getMonth() + 6);
+  const daysLeft = Math.round((dueDate - new Date()) / 86400000);
+  idea.detail = daysLeft > 0
+    ? `Based on your last visit, your next service is due in ~${daysLeft} days`
+    : `Based on your last visit, your car looks overdue for a check-up`;
+  idea.status = "soon"; // still a roadmap feature — this line is a live preview of it
+  document.getElementById("ideaGrid").innerHTML = IDEAS.map(renderCard).join("");
+  bindToastCards();
+}
+
+async function loadBookings(){
+  const el = document.getElementById("bookingTimeline");
+  if (!mobile){ el.innerHTML = `<div class="empty-state">Tap your car's NFC tag to see booking history</div>`; return; }
+  try{
+    const res = await fetch(CONFIG.bookingApi(mobile));
+    const json = await res.json();
+    const bookings = Array.isArray(json) ? json : [json];
+    if (!bookings.length || !bookings[0]?.id) throw new Error("no bookings");
+
+    document.getElementById("bookingCount").textContent = `${bookings.length} record${bookings.length>1?'s':''}`;
+    el.innerHTML = bookings.map(b => {
+      const date = new Date(b.created_at).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' });
+      const statusLabel = b.is_cancelled ? "Cancelled" : (b.booking_status || "Completed");
+      return `<div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-card">
+          <div class="tl-top">
+            <div class="tl-problem">${b.problem || "Service booking"}</div>
+            <div class="tl-date mono">${date}</div>
+          </div>
+          <div class="tl-meta">${b.car || ""} · Mechanic: ${b.mechanic_name || "Unassigned"}</div>
+          <div class="tl-price mono">${b.price || ""}</div>
+          <span class="status-tag">${statusLabel}</span>
+        </div>
+      </div>`;
+    }).join("");
+
+    updateServiceReminder(bookings);
+  } catch(e){
+    el.innerHTML = `<div class="empty-state">No bookings on file yet</div>`;
+  }
+}
+
+loadCustomer();
+loadBookings();
+</script>
+</body>
+</html>

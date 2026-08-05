@@ -1,12 +1,223 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script src="https://instantmechanic.online/login.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Agent Performance Dashboard - Instant Mechanic</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
+
+        /* Agent shift dropdown */
+.shift-row {
+    background: #f8fafc;
+}
+
+.shift-details {
+    padding: 1rem 1.5rem;
+    font-size: 0.85rem;
+    color: #374151;
+}
+
+.shift-details span {
+    display: inline-block;
+    margin-right: 1.5rem;
+    font-weight: 500;
+}
+
+.agent-clickable {
+    cursor: pointer;
+    color: #2563eb;
+}
+
+.agent-clickable:hover {
+    text-decoration: underline;
+}
+
+/* Multi-select dropdown styles */
+.multi-select-container {
+    position: relative;
+    width: 100%;
+}
+
+.multi-select-header {
+    padding: 0.75rem 1rem;
+    border: 1.5px solid var(--gray-300);
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    background: white;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.2s ease;
+}
+
+.multi-select-header:hover {
+    border-color: var(--gray-400);
+}
+
+.multi-select-header.open {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.multi-select-header i {
+    transition: transform 0.2s ease;
+    color: var(--gray-500);
+}
+
+.multi-select-header.open i {
+    transform: rotate(180deg);
+}
+
+.multi-select-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    margin-top: 0.25rem;
+    background: white;
+    border: 1.5px solid var(--gray-300);
+    border-radius: 0.5rem;
+    box-shadow: var(--shadow-md);
+    z-index: 100;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.multi-select-search {
+    padding: 0.75rem;
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.multi-select-search input {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--gray-300);
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+}
+
+.multi-select-search input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+.multi-select-actions {
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid var(--gray-200);
+    display: flex;
+    gap: 0.5rem;
+}
+
+.multi-select-btn {
+    padding: 0.25rem 0.75rem;
+    border: 1px solid var(--gray-300);
+    background: white;
+    border-radius: 0.375rem;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex: 1;
+}
+
+.multi-select-btn:hover {
+    background: var(--gray-50);
+    border-color: var(--gray-400);
+}
+
+.agent-checkbox-list {
+    padding: 0.5rem;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.agent-checkbox-item {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    transition: background 0.1s ease;
+}
+
+.agent-checkbox-item:hover {
+    background: var(--gray-50);
+}
+
+.agent-checkbox-item input[type="checkbox"] {
+    margin-right: 0.75rem;
+    cursor: pointer;
+}
+
+.agent-checkbox-item label {
+    cursor: pointer;
+    font-size: 0.875rem;
+    color: var(--gray-700);
+    flex: 1;
+    user-select: none;
+}
+
+.agent-checkbox-item.selected {
+    background: rgba(59, 130, 246, 0.05);
+}
+
+.agent-checkbox-item.selected label {
+    color: var(--primary-color);
+    font-weight: 500;
+}
+
+#selectedAgentsText {
+    color: var(--gray-700);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1;
+}
+
+.selected-count {
+    background: var(--primary-color);
+    color: white;
+    padding: 0.125rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    margin-left: 0.5rem;
+}
+
+.multi-select-footer {
+    padding: 0.75rem;
+    border-top: 1px solid var(--gray-200);
+    background: var(--gray-50);
+}
+
+.apply-btn {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.apply-btn:hover {
+    background: var(--primary-dark);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow);
+}
+
+.apply-btn:active {
+    transform: translateY(0);
+    box-shadow: none;
+}
+
         :root {
             --primary-color: #3b82f6;
             --primary-dark: #2563eb;
@@ -679,10 +890,28 @@
                 </div>
                 
                 <div class="filter-group">
-                    <label for="agentSelect">Select Agent</label>
-                    <select id="agentSelect" class="filter-input">
-                        <option value="">All Agents</option>
-                    </select>
+                    <label for="agentSelect">Select Agents</label>
+                    <div class="multi-select-container">
+                        <div class="multi-select-header" id="multiSelectHeader" onclick="toggleMultiSelect()">
+                            <span id="selectedAgentsText">All Agents</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div id="agentMultiSelect" class="multi-select-dropdown" style="display: none;">
+                            <div class="multi-select-search">
+                                <input type="text" id="agentSearchInput" placeholder="Search agents..." class="filter-input" onclick="event.stopPropagation()">
+                            </div>
+                            <div class="multi-select-actions">
+                                <button class="multi-select-btn" onclick="selectAllAgents()">Select All</button>
+                                <button class="multi-select-btn" onclick="clearAllAgents()">Clear All</button>
+                            </div>
+                            <div id="agentCheckboxList" class="agent-checkbox-list">
+                                <!-- Checkboxes will be populated dynamically -->
+                            </div>
+                            <div class="multi-select-footer">
+                                <button class="apply-btn" onclick="applyAgentSelection()">Apply Selection</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -871,20 +1100,23 @@
                     </div>
                     <div style="overflow-x: auto;">
                         <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Agent</th>
-                                    <th>Type</th>
-                                    <th>Working Hours</th>
-                                    <th>Chats</th>
-                                    <th>Bookings</th>
-                                    <th>Cancelled</th>
-                                    <th>Conversion Rate</th>
-                                    <th>Cancellation Rate</th>
-                                    <th>Revenue</th>
-                                    <th>Efficiency</th>
-                                </tr>
-                            </thead>
+                         <thead>
+<tr>
+    <th>Agent</th>
+    <th>Total Chats</th>
+    <th>Total Bookings</th>
+    <th>Total Cancelled</th>
+    <th>Net Bookings</th>
+    <th>Overall Conversion %</th>
+    <th>Net Conversion %</th>
+    <th>Cancellation %</th>
+    <th>Revenue</th>
+    <th>Efficacy (₹/hr)</th>
+</tr>
+</thead>
+
+
+
                             <tbody id="performanceTableBody">
                                 <!-- Table rows will be populated by JavaScript -->
                             </tbody>
@@ -974,9 +1206,12 @@
             dateRange: 'today',
             startDate: '',
             endDate: '',
-            agent: '',
+            agents: [], // Changed to array for multiple agents
             agentType: 'primary'
         };
+        
+        // Multi-select state
+        let selectedAgents = new Set();
 
         // Initialize dashboard
         document.addEventListener('DOMContentLoaded', function() {
@@ -1033,15 +1268,124 @@
                 }
             });
 
-            // Agent select
-            document.getElementById('agentSelect').addEventListener('change', function() {
-                currentFilters.agent = this.value;
-                loadDashboardData();
+            // Agent search input
+            document.getElementById('agentSearchInput').addEventListener('input', function(e) {
+                e.stopPropagation();
+                filterAgents(this.value);
             });
 
             // Action buttons
             document.getElementById('refreshBtn').addEventListener('click', loadDashboardData);
             document.getElementById('exportBtn').addEventListener('click', exportData);
+        }
+        
+        // Multi-select dropdown functions
+        function toggleMultiSelect() {
+            const dropdown = document.getElementById('agentMultiSelect');
+            const header = document.getElementById('multiSelectHeader');
+            
+            if (dropdown.style.display === 'none') {
+                dropdown.style.display = 'block';
+                header.classList.add('open');
+                // Close on outside click
+                document.addEventListener('click', closeMultiSelectOnOutsideClick);
+            } else {
+                dropdown.style.display = 'none';
+                header.classList.remove('open');
+                document.removeEventListener('click', closeMultiSelectOnOutsideClick);
+            }
+        }
+        
+        function closeMultiSelectOnOutsideClick(e) {
+            const container = document.querySelector('.multi-select-container');
+            if (!container.contains(e.target)) {
+                const dropdown = document.getElementById('agentMultiSelect');
+                const header = document.getElementById('multiSelectHeader');
+                dropdown.style.display = 'none';
+                header.classList.remove('open');
+                document.removeEventListener('click', closeMultiSelectOnOutsideClick);
+            }
+        }
+        
+        function selectAllAgents() {
+            selectedAgents.clear();
+            allAgents.forEach(agent => selectedAgents.add(agent));
+            updateAgentCheckboxes();
+            updateSelectedAgentsText();
+        }
+        
+        function clearAllAgents() {
+            selectedAgents.clear();
+            updateAgentCheckboxes();
+            updateSelectedAgentsText();
+            // Don't reload data yet - wait for Apply button
+        }
+        
+        function applyAgentSelection() {
+            // Close the dropdown
+            const dropdown = document.getElementById('agentMultiSelect');
+            const header = document.getElementById('multiSelectHeader');
+            dropdown.style.display = 'none';
+            header.classList.remove('open');
+            document.removeEventListener('click', closeMultiSelectOnOutsideClick);
+            
+            // Update filters and reload data
+            currentFilters.agents = Array.from(selectedAgents);
+            loadDashboardData();
+        }
+        
+        function filterAgents(searchTerm) {
+            const items = document.querySelectorAll('.agent-checkbox-item');
+            const term = searchTerm.toLowerCase();
+            
+            items.forEach(item => {
+                const agentName = item.getAttribute('data-agent-name').toLowerCase();
+                if (agentName.includes(term)) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+        
+        function updateAgentCheckboxes() {
+            document.querySelectorAll('.agent-checkbox-item input[type="checkbox"]').forEach(checkbox => {
+                const agentName = checkbox.value;
+                checkbox.checked = selectedAgents.has(agentName);
+                const item = checkbox.closest('.agent-checkbox-item');
+                if (checkbox.checked) {
+                    item.classList.add('selected');
+                } else {
+                    item.classList.remove('selected');
+                }
+            });
+        }
+        
+        function updateSelectedAgentsText() {
+            const textElement = document.getElementById('selectedAgentsText');
+            
+            if (selectedAgents.size === 0 || selectedAgents.size === allAgents.length) {
+                textElement.innerHTML = 'All Agents';
+            } else if (selectedAgents.size === 1) {
+                textElement.innerHTML = Array.from(selectedAgents)[0];
+            } else if (selectedAgents.size <= 3) {
+                // Show agent names if 3 or fewer selected
+                textElement.innerHTML = Array.from(selectedAgents).join(', ');
+            } else {
+                // Show count if more than 3 selected
+                textElement.innerHTML = `${selectedAgents.size} agents selected`;
+            }
+        }
+        
+        function toggleAgent(agentName) {
+            if (selectedAgents.has(agentName)) {
+                selectedAgents.delete(agentName);
+            } else {
+                selectedAgents.add(agentName);
+            }
+            updateAgentCheckboxes();
+            updateSelectedAgentsText();
+            // Don't reload data yet - wait for Apply button
         }
 
         // Set default dates (today)
@@ -1111,18 +1455,40 @@
                 }
 
                 const dateParam = dates.join(',');
-                const agentParam = currentFilters.agent ? `&agent=${currentFilters.agent}` : '';
+                
+                // If multiple agents selected, fetch all data and filter client-side
+                // API only supports single agent parameter
+                const agentParam = currentFilters.agents.length === 1 ? 
+                    `&agent=${encodeURIComponent(currentFilters.agents[0])}` : '';
 
                 // Fetch performance data
                 const performanceResponse = await fetch(`https://ai.instantmechanic.online/bot/api/agent-performance?date=${dateParam}${agentParam}`);
-                const rawPerformanceData = await performanceResponse.json();
+                let rawPerformanceData = await performanceResponse.json();
 
                 // Fetch activity data
                 const activityResponse = await fetch(`https://ai.instantmechanic.online/bot/api/agent-activity/?date=${dateParam}${agentParam}`);
-                activityData = await activityResponse.json();
-
+                let rawActivityData = await activityResponse.json();
+                
                 // Store all agents before filtering
                 allAgents = [...new Set(rawPerformanceData.map(item => item.agent))];
+                
+                // Initialize selected agents if empty (first load)
+                if (selectedAgents.size === 0 && currentFilters.agents.length > 0) {
+                    currentFilters.agents.forEach(agent => selectedAgents.add(agent));
+                }
+
+                // Filter by selected agents if multiple agents selected
+                if (currentFilters.agents.length > 1) {
+                    rawPerformanceData = rawPerformanceData.filter(item => 
+                        currentFilters.agents.includes(item.agent)
+                    );
+                    rawActivityData = rawActivityData.filter(item => 
+                        currentFilters.agents.includes(item.agent_name)
+                    );
+                }
+                
+                // Store filtered activity data
+                activityData = rawActivityData;
 
                 // Filter by agent type
                 if (currentFilters.agentType !== 'all') {
@@ -1155,26 +1521,57 @@
 
         // Update agent select dropdown
         function updateAgentSelect() {
-            const agentSelect = document.getElementById('agentSelect');
-            const currentValue = agentSelect.value;
+            const checkboxList = document.getElementById('agentCheckboxList');
+            checkboxList.innerHTML = '';
             
-            agentSelect.innerHTML = '<option value="">All Agents</option>';
+            // Sort agents alphabetically
+            const sortedAgents = allAgents.sort((a, b) => a.localeCompare(b));
             
-            allAgents.forEach(agent => {
-                const option = document.createElement('option');
-                option.value = agent;
-                option.textContent = agent;
-                agentSelect.appendChild(option);
+            sortedAgents.forEach(agent => {
+                const item = document.createElement('div');
+                item.className = 'agent-checkbox-item';
+                item.setAttribute('data-agent-name', agent);
+                
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.id = `agent-${agent}`;
+                checkbox.value = agent;
+                checkbox.checked = selectedAgents.has(agent);
+                checkbox.addEventListener('change', () => toggleAgent(agent));
+                
+                const label = document.createElement('label');
+                label.htmlFor = `agent-${agent}`;
+                label.textContent = agent;
+                
+                if (checkbox.checked) {
+                    item.classList.add('selected');
+                }
+                
+                item.appendChild(checkbox);
+                item.appendChild(label);
+                
+                // Make the whole item clickable
+                item.addEventListener('click', (e) => {
+                    if (e.target.tagName !== 'INPUT') {
+                        checkbox.checked = !checkbox.checked;
+                        toggleAgent(agent);
+                    }
+                });
+                
+                checkboxList.appendChild(item);
             });
             
-            if (currentValue && allAgents.includes(currentValue)) {
-                agentSelect.value = currentValue;
-            }
+            updateSelectedAgentsText();
         }
 
         // Update KPIs
         function updateKPIs() {
+            const hasSelectedAgents = currentFilters.agents.length > 0;
+            
             const totals = performanceData.reduce((acc, agent) => {
+                // Filter by selected agents if any
+                if (hasSelectedAgents && !currentFilters.agents.includes(agent.agent)) return acc;
+                
                 acc.chats += agent.chats_handled || 0;
                 acc.bookings += agent.total_bookings || 0;
                 acc.cancellations += agent.cancelled_bookings || 0;
@@ -1252,12 +1649,14 @@
         // Update all charts
         function updateCharts() {
             // Check if we're analyzing a single agent with multiple dates
-            const isSingleAgentAnalysis = currentFilters.agent && getCurrentDateCount() > 1;
+            const isSingleAgentAnalysis = currentFilters.agents.length === 1 && getCurrentDateCount() > 1;
             
             // Update analytics title
             const analyticsTitle = document.getElementById('analyticsTitle');
             if (isSingleAgentAnalysis) {
-                analyticsTitle.innerHTML = `<i class="fas fa-chart-bar"></i> ${currentFilters.agent} - Day-wise Performance Analytics`;
+                analyticsTitle.innerHTML = `<i class="fas fa-chart-bar"></i> ${currentFilters.agents[0]} - Day-wise Performance Analytics`;
+            } else if (currentFilters.agents.length > 1) {
+                analyticsTitle.innerHTML = `<i class="fas fa-chart-bar"></i> Performance Analytics - ${currentFilters.agents.length} Agents Selected`;
             } else {
                 analyticsTitle.innerHTML = `<i class="fas fa-chart-bar"></i> Performance Analytics`;
             }
@@ -1286,13 +1685,14 @@
             
             if (charts.mainPerformance) charts.mainPerformance.destroy();
 
-            const isSingleAgentAnalysis = currentFilters.agent && getCurrentDateCount() > 1;
+            const isSingleAgentAnalysis = currentFilters.agents.length === 1 && getCurrentDateCount() > 1;
+            const hasSelectedAgents = currentFilters.agents.length > 0;
 
             // Group data by date
             const dateGroups = {};
             performanceData.forEach(agent => {
-                // For single agent analysis, only include selected agent
-                if (isSingleAgentAnalysis && agent.agent !== currentFilters.agent) return;
+                // Filter by selected agents if any
+                if (hasSelectedAgents && !currentFilters.agents.includes(agent.agent)) return;
                 
                 if (!dateGroups[agent.date]) {
                     dateGroups[agent.date] = {
@@ -1311,9 +1711,12 @@
             const bookingsData = labels.map(date => dateGroups[date].bookings);
             const cancelledData = labels.map(date => dateGroups[date].cancelled);
 
-            const chartTitle = isSingleAgentAnalysis ? 
-                `${currentFilters.agent} - Daily Performance` : 
-                'Team Daily Performance';
+            let chartTitle = 'Team Daily Performance';
+            if (isSingleAgentAnalysis) {
+                chartTitle = `${currentFilters.agents[0]} - Daily Performance`;
+            } else if (currentFilters.agents.length > 1) {
+                chartTitle = `Daily Performance - ${currentFilters.agents.length} Agents`;
+            }
 
             charts.mainPerformance = new Chart(ctx, {
                 type: 'line',
@@ -1368,14 +1771,15 @@
         function updateSingleAgentBreakdownTable() {
             const tbody = document.getElementById('singleAgentBreakdownTableBody');
             const titleElement = document.getElementById('singleAgentBreakdownTitle');
+            const selectedAgent = currentFilters.agents[0]; // Since this is for single agent analysis
             
             tbody.innerHTML = '';
-            titleElement.textContent = `${currentFilters.agent} - Day-wise Performance Breakdown`;
+            titleElement.textContent = `${selectedAgent} - Day-wise Performance Breakdown`;
 
             // Get agent working hours by date
             const agentHoursByDate = {};
             activityData.forEach(activity => {
-                if (activity.activity_type !== 'Regular' || activity.agent_name !== currentFilters.agent) return;
+                if (activity.activity_type !== 'Regular' || activity.agent_name !== selectedAgent) return;
                 
                 const date = activity.start_time.split('T')[0];
                 
@@ -1399,7 +1803,7 @@
 
             // Filter performance data for selected agent and sort by date
             const agentPerformanceByDate = performanceData
-                .filter(data => data.agent === currentFilters.agent)
+                .filter(data => data.agent === selectedAgent)
                 .sort((a, b) => new Date(a.date) - new Date(b.date));
 
             agentPerformanceByDate.forEach(dayData => {
@@ -1455,14 +1859,16 @@
             
             if (charts.conversion) charts.conversion.destroy();
 
-            const isSingleAgentAnalysis = currentFilters.agent && getCurrentDateCount() > 1;
+            const isSingleAgentAnalysis = currentFilters.agents.length === 1 && getCurrentDateCount() > 1;
+            const hasSelectedAgents = currentFilters.agents.length > 0;
 
             let labels, conversionRates, bookingsCount, chartTitle, yAxisTitle;
 
             if (isSingleAgentAnalysis) {
                 // Show day-wise conversion rates for single agent
+                const selectedAgent = currentFilters.agents[0];
                 const agentDayData = performanceData
-                    .filter(data => data.agent === currentFilters.agent)
+                    .filter(data => data.agent === selectedAgent)
                     .sort((a, b) => new Date(a.date) - new Date(b.date));
                 
                 labels = agentDayData.map(data => new Date(data.date).toLocaleDateString());
@@ -1471,12 +1877,15 @@
                         ((data.total_bookings / data.chats_handled) * 100).toFixed(1) : 0;
                 });
                 bookingsCount = agentDayData.map(data => data.total_bookings || 0);
-                chartTitle = `${currentFilters.agent} - Daily Conversion Rate`;
+                chartTitle = `${selectedAgent} - Daily Conversion Rate`;
                 yAxisTitle = 'Daily Conversion Rate (%)';
             } else {
                 // Show agent comparison
                 const agentTotals = {};
                 performanceData.forEach(agent => {
+                    // Filter by selected agents if any
+                    if (hasSelectedAgents && !currentFilters.agents.includes(agent.agent)) return;
+                    
                     if (!agentTotals[agent.agent]) {
                         agentTotals[agent.agent] = { chats: 0, bookings: 0 };
                     }
@@ -1490,7 +1899,9 @@
                         ((agentTotals[agent].bookings / agentTotals[agent].chats) * 100).toFixed(1) : 0;
                 });
                 bookingsCount = labels.map(agent => agentTotals[agent].bookings);
-                chartTitle = 'Conversion Rate by Agent';
+                chartTitle = hasSelectedAgents ? 
+                    `Conversion Rate - ${currentFilters.agents.length} Agents` : 
+                    'Conversion Rate by Agent';
                 yAxisTitle = 'Conversion Rate (%)';
             }
 
@@ -1549,14 +1960,16 @@
             
             if (charts.cancellation) charts.cancellation.destroy();
 
-            const isSingleAgentAnalysis = currentFilters.agent && getCurrentDateCount() > 1;
+            const isSingleAgentAnalysis = currentFilters.agents.length === 1 && getCurrentDateCount() > 1;
+            const hasSelectedAgents = currentFilters.agents.length > 0;
 
             let labels, cancellationRates, cancelledCount, chartTitle, yAxisTitle;
 
             if (isSingleAgentAnalysis) {
                 // Show day-wise cancellation rates for single agent
+                const selectedAgent = currentFilters.agents[0];
                 const agentDayData = performanceData
-                    .filter(data => data.agent === currentFilters.agent)
+                    .filter(data => data.agent === selectedAgent)
                     .sort((a, b) => new Date(a.date) - new Date(b.date));
                 
                 labels = agentDayData.map(data => new Date(data.date).toLocaleDateString());
@@ -1565,12 +1978,15 @@
                         (((data.cancelled_bookings || 0) / data.total_bookings) * 100).toFixed(1) : 0;
                 });
                 cancelledCount = agentDayData.map(data => data.cancelled_bookings || 0);
-                chartTitle = `${currentFilters.agent} - Daily Cancellation Rate`;
+                chartTitle = `${selectedAgent} - Daily Cancellation Rate`;
                 yAxisTitle = 'Daily Cancellation Rate (%)';
             } else {
                 // Show agent comparison
                 const agentTotals = {};
                 performanceData.forEach(agent => {
+                    // Filter by selected agents if any
+                    if (hasSelectedAgents && !currentFilters.agents.includes(agent.agent)) return;
+                    
                     if (!agentTotals[agent.agent]) {
                         agentTotals[agent.agent] = { bookings: 0, cancelled: 0 };
                     }
@@ -1584,7 +2000,9 @@
                         ((agentTotals[agent].cancelled / agentTotals[agent].bookings) * 100).toFixed(1) : 0;
                 });
                 cancelledCount = labels.map(agent => agentTotals[agent].cancelled);
-                chartTitle = 'Cancellation Rate by Agent';
+                chartTitle = hasSelectedAgents ? 
+                    `Cancellation Rate - ${currentFilters.agents.length} Agents` :
+                    'Cancellation Rate by Agent';
                 yAxisTitle = 'Cancellation Rate (%)';
             }
 
@@ -1645,11 +2063,16 @@
             
             if (charts.productivity) charts.productivity.destroy();
 
+            const hasSelectedAgents = currentFilters.agents.length > 0;
+
             // Calculate productivity metrics
             const agentProductivity = {};
             
             // Get performance data
             performanceData.forEach(agent => {
+                // Filter by selected agents if any
+                if (hasSelectedAgents && !currentFilters.agents.includes(agent.agent)) return;
+                
                 if (!agentProductivity[agent.agent]) {
                     agentProductivity[agent.agent] = { 
                         revenue: 0, 
@@ -1786,7 +2209,8 @@
 
         // Update all tables
         function updateTables() {
-            const isSingleAgentAnalysis = currentFilters.agent && getCurrentDateCount() > 1;
+            const isSingleAgentAnalysis = currentFilters.agents.length === 1 && getCurrentDateCount() > 1;
+            const hasSelectedAgents = currentFilters.agents.length > 0;
             
             // Show/hide single agent analysis indicator
             const indicator = document.getElementById('singleAgentIndicator');
@@ -1794,7 +2218,10 @@
             
             if (isSingleAgentAnalysis) {
                 indicator.style.display = 'block';
-                indicatorText.textContent = `${currentFilters.agent} - Day-wise Performance Analysis (${getCurrentDateCount()} days)`;
+                indicatorText.textContent = `${currentFilters.agents[0]} - Day-wise Performance Analysis (${getCurrentDateCount()} days)`;
+            } else if (hasSelectedAgents && currentFilters.agents.length > 1) {
+                indicator.style.display = 'block';
+                indicatorText.textContent = `Multi-Agent Comparison - ${currentFilters.agents.length} Agents Selected`;
             } else {
                 indicator.style.display = 'none';
             }
@@ -1821,9 +2248,13 @@
         function updateRevenueLossTable() {
             const tbody = document.getElementById('revenueLossTableBody');
             tbody.innerHTML = '';
+            
+            const hasSelectedAgents = currentFilters.agents.length > 0;
 
             const agentTotals = {};
             performanceData.forEach(agent => {
+                // Filter by selected agents if any
+                if (hasSelectedAgents && !currentFilters.agents.includes(agent.agent)) return;
                 if (!agentTotals[agent.agent]) {
                     agentTotals[agent.agent] = {
                         type: agent.agent_type,
@@ -1888,11 +2319,16 @@
         function updateAgentDurationTable() {
             const tbody = document.getElementById('agentDurationTableBody');
             tbody.innerHTML = '';
+            
+            const hasSelectedAgents = currentFilters.agents.length > 0;
 
             // Group activity data by date and agent
             const datewiseData = {};
             activityData.forEach(activity => {
                 if (activity.activity_type !== 'Regular') return;
+                
+                // Filter by selected agents if any
+                if (hasSelectedAgents && !currentFilters.agents.includes(activity.agent_name)) return;
                 
                 const date = activity.start_time.split('T')[0];
                 const agent = activity.agent_name;
@@ -1940,7 +2376,11 @@
                     
                     row.innerHTML = `
                         <td>${new Date(date).toLocaleDateString()}</td>
-                        <td class="agent-name">${agentName}</td>
+                       <td class="agent-name agent-clickable" 
+    onclick="toggleShiftDetails('${date}','${agentName}', this)">
+    ${agentName}
+</td>
+
                         <td>
                             <span class="status-badge ${data.isLive ? 'live' : 'offline'}">
                                 ${data.isLive ? 'Live' : 'Offline'}
@@ -1960,95 +2400,172 @@
         }
 
         // Update performance table
-        function updatePerformanceTable() {
-            const tbody = document.getElementById('performanceTableBody');
-            tbody.innerHTML = '';
+       function updatePerformanceTable() {
+    const tbody = document.getElementById('performanceTableBody');
+    tbody.innerHTML = '';
+    
+    const hasSelectedAgents = currentFilters.agents.length > 0;
 
-            // Calculate agent working hours
-            const agentHours = {};
-            activityData.forEach(activity => {
-                if (activity.activity_type !== 'Regular') return;
-                
-                if (!agentHours[activity.agent_name]) {
-                    agentHours[activity.agent_name] = 0;
-                }
-                
-                let hours;
-                if (activity.end_time) {
-                    const start = new Date(activity.start_time);
-                    const end = new Date(activity.end_time);
-                    hours = (end - start) / (1000 * 60 * 60);
-                } else {
-                    const start = new Date(activity.start_time);
-                    const now = new Date();
-                    hours = (now - start) / (1000 * 60 * 60);
-                }
-                
-                agentHours[activity.agent_name] += hours;
-            });
+    /* -------- Working hours per agent -------- */
+    const agentHours = {};
+    activityData.forEach(a => {
+        if (a.activity_type !== 'Regular') return;
+        
+        // Filter by selected agents if any
+        if (hasSelectedAgents && !currentFilters.agents.includes(a.agent_name)) return;
 
-            // Calculate agent totals
-            const agentTotals = {};
-            performanceData.forEach(agent => {
-                if (!agentTotals[agent.agent]) {
-                    agentTotals[agent.agent] = {
-                        type: agent.agent_type,
-                        chats: 0,
-                        bookings: 0,
-                        cancelled: 0,
-                        revenue: 0
-                    };
-                }
-                agentTotals[agent.agent].chats += agent.chats_handled || 0;
-                agentTotals[agent.agent].bookings += agent.total_bookings || 0;
-                agentTotals[agent.agent].cancelled += agent.cancelled_bookings || 0;
-                agentTotals[agent.agent].revenue += agent.total_revenue || 0;
-            });
+        if (!agentHours[a.agent_name]) agentHours[a.agent_name] = 0;
 
-            // Sort by revenue descending
-            const sortedAgents = Object.keys(agentTotals).sort((a, b) => 
-                agentTotals[b].revenue - agentTotals[a].revenue
-            );
+        const start = new Date(a.start_time);
+        const end = a.end_time ? new Date(a.end_time) : new Date();
+        agentHours[a.agent_name] += (end - start) / (1000 * 60 * 60);
+    });
 
-            sortedAgents.forEach(agentName => {
-                const agent = agentTotals[agentName];
-                const workingHours = agentHours[agentName] || 0;
-                
-                const conversionRate = agent.chats > 0 ? 
-                    ((agent.bookings / agent.chats) * 100) : 0;
-                const cancellationRate = agent.bookings > 0 ? 
-                    ((agent.cancelled / agent.bookings) * 100) : 0;
-                
-                // Calculate efficiency (revenue per hour)
-                const efficiency = workingHours > 0 ? 
-                    Math.round(agent.revenue / workingHours) : 0;
-                
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td class="agent-name">${agentName}</td>
-                    <td>
-                        <span class="agent-type-badge ${agent.type === 'primary' || agent.type === 'both' ? 'primary' : 'secondary'}">
-                            ${agent.type === 'both' ? 'Primary' : agent.type}
-                        </span>
-                    </td>
-                    <td class="metric-value ${workingHours < 6 ? 'metric-negative' : 'metric-neutral'}">
-                        ${workingHours.toFixed(1)}h
-                    </td>
-                    <td class="metric-value">${agent.chats.toLocaleString()}</td>
-                    <td class="metric-value">${agent.bookings.toLocaleString()}</td>
-                    <td class="metric-value metric-negative">${agent.cancelled.toLocaleString()}</td>
-                    <td class="metric-value ${conversionRate < 45 ? 'conversion-problem' : conversionRate >= 60 ? 'metric-positive' : 'metric-neutral'}">
-                        ${conversionRate.toFixed(1)}%
-                    </td>
-                    <td class="metric-value ${cancellationRate > 30 ? 'cancellation-problem' : cancellationRate > 20 ? 'metric-warning' : 'metric-positive'}">
-                        ${cancellationRate.toFixed(1)}%
-                    </td>
-                    <td class="metric-value metric-positive">₹${agent.revenue.toLocaleString()}</td>
-                    <td class="metric-value metric-primary">₹${efficiency}/hr</td>
-                `;
-                tbody.appendChild(row);
-            });
+    /* -------- Aggregate performance -------- */
+    const agentTotals = {};
+    performanceData.forEach(a => {
+        // Filter by selected agents if any
+        if (hasSelectedAgents && !currentFilters.agents.includes(a.agent)) return;
+        
+        if (!agentTotals[a.agent]) {
+            agentTotals[a.agent] = {
+                chats: 0,
+                bookings: 0,
+                cancelled: 0,
+                revenue: 0
+            };
         }
+
+        agentTotals[a.agent].chats += a.chats_handled || 0;
+        agentTotals[a.agent].bookings += a.total_bookings || 0;
+        agentTotals[a.agent].cancelled += a.cancelled_bookings || 0;
+        agentTotals[a.agent].revenue += a.total_revenue || 0;
+    });
+
+    /* -------- Sort agents by NET conversion % (DESC) -------- */
+const sortedAgents = Object.keys(agentTotals)
+    .map(agent => {
+        const d = agentTotals[agent];
+        const netBookings = d.bookings - d.cancelled;
+        const netConversion =
+            d.chats > 0 ? (netBookings / d.chats) * 100 : 0;
+
+        return { agent, netConversion };
+    })
+    .sort((a, b) => b.netConversion - a.netConversion);
+
+/* -------- Render rows (sorted) -------- */
+sortedAgents.forEach(({ agent }) => {
+    const d = agentTotals[agent];
+    const hours = agentHours[agent] || 0;
+
+    const netBookings = d.bookings - d.cancelled;
+
+    const overallConversion =
+        d.chats > 0 ? (d.bookings / d.chats) * 100 : 0;
+
+    const netConversion =
+        d.chats > 0 ? (netBookings / d.chats) * 100 : 0;
+
+    const cancellationRate =
+        d.bookings > 0 ? (d.cancelled / d.bookings) * 100 : 0;
+
+    const efficacy =
+        hours > 0 ? Math.round(d.revenue / hours) : 0;
+
+    const row = document.createElement('tr');
+    row.innerHTML = `
+        <td class="agent-name">${agent}</td>
+
+        <td class="metric-value">${d.chats}</td>
+
+        <td class="metric-value">${d.bookings}</td>
+
+        <td class="metric-value metric-negative">${d.cancelled}</td>
+
+        <td class="metric-value metric-primary">${netBookings}</td>
+
+        <td class="metric-value ${
+            overallConversion < 45 ? 'conversion-problem' : 'metric-positive'
+        }">
+            ${overallConversion.toFixed(1)}%
+        </td>
+
+        <td class="metric-value ${
+            netConversion < 45 ? 'conversion-problem' : 'metric-positive'
+        }">
+            ${netConversion.toFixed(1)}%
+        </td>
+
+        <td class="metric-value ${
+            cancellationRate > 30 ? 'cancellation-problem' :
+            cancellationRate > 20 ? 'metric-warning' :
+            'metric-positive'
+        }">
+            ${cancellationRate.toFixed(1)}%
+        </td>
+
+        <td class="metric-value metric-positive">
+            ₹${d.revenue.toLocaleString()}
+        </td>
+
+        <td class="metric-value metric-primary">
+            ₹${efficacy}/hr
+        </td>
+    `;
+    tbody.appendChild(row);
+});
+}
+
+
+
+
+        
+
+        function toggleShiftDetails(date, agentName, el) {
+    // Remove existing open dropdown (if any)
+    const existing = el.closest('tr').nextSibling;
+    if (existing && existing.classList?.contains('shift-row')) {
+        existing.remove();
+        return;
+    }
+
+    // Collect shift sessions
+    const shifts = activityData.filter(a =>
+        a.activity_type === 'Regular' &&
+        a.agent_name === agentName &&
+        a.start_time.startsWith(date)
+    );
+
+    if (!shifts.length) return;
+
+    let html = shifts.map((s, i) => {
+        const start = new Date(s.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const end = s.end_time
+            ? new Date(s.end_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            : 'Live';
+
+        return `
+            <div>
+                <span>Session ${i + 1}</span>
+                <span>ON: ${start}</span>
+                <span>OFF: ${end}</span>
+            </div>
+        `;
+    }).join('');
+
+    const row = document.createElement('tr');
+    row.className = 'shift-row';
+    row.innerHTML = `
+        <td colspan="6">
+            <div class="shift-details">
+                ${html}
+            </div>
+        </td>
+    `;
+
+    el.closest('tr').after(row);
+}
 
         // Show/hide loading
         function showLoading() {

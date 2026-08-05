@@ -1,0 +1,1517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Track Your Mechanic - Instant Mechanic</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f8fafc;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        /* Header - Compact */
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+            z-index: 100;
+            flex-shrink: 0;
+        }
+
+        .header-icon {
+            width: 32px;
+            height: 32px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+
+        .header-content h1 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 0.125rem;
+        }
+
+        .header-content p {
+            font-size: 0.75rem;
+            opacity: 0.9;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .live-dot {
+            width: 6px;
+            height: 6px;
+            background: #10b981;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.1); }
+        }
+
+        /* Map Container - 60% of screen */
+        .map-section {
+            height: 60vh;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* ETA Overlay - Smaller and positioned better */
+        .eta-overlay {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            right: 15px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 0.75rem 1rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .eta-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .eta-main {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .eta-time {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #10b981;
+        }
+
+        .eta-label {
+            font-size: 0.8rem;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .eta-distance {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        /* Bottom Info Panel - 40% of screen, scrollable */
+        .info-panel {
+            height: 40vh;
+            background: white;
+            border-radius: 20px 20px 0 0;
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+            z-index: 50;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Scroll indicator for info panel */
+        .info-panel::-webkit-scrollbar {
+            width: 3px;
+        }
+
+        .info-panel::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 10px;
+        }
+
+        .info-panel::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+
+        .info-panel::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* Pull indicator at top of info panel */
+        .info-panel::before {
+            content: '';
+            width: 40px;
+            height: 4px;
+            background: #e2e8f0;
+            border-radius: 2px;
+            margin: 0 auto 0.75rem auto;
+            flex-shrink: 0;
+        }
+
+        /* Booking Header - More compact */
+        .booking-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid #e2e8f0;
+            flex-shrink: 0;
+        }
+
+        .booking-id {
+            font-size: 0.85rem;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .booking-status {
+            background: #fef3c7;
+            color: #d97706;
+            padding: 0.3rem 0.8rem;
+            border-radius: 16px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        /* Service Details - More compact */
+        .service-details {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 0.75rem;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .car-image {
+            width: 70px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 2px solid #e2e8f0;
+        }
+
+        .service-info h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 0.4rem;
+        }
+
+        .service-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.8rem;
+            color: #64748b;
+        }
+
+        .meta-item i {
+            width: 14px;
+            color: #667eea;
+            font-size: 0.75rem;
+        }
+
+        .price-highlight {
+            color: #10b981;
+            font-weight: 600;
+        }
+
+        /* Stats Grid - More compact */
+        .stats-section {
+            margin-bottom: 1rem;
+            flex-shrink: 0;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.75rem;
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 0.75rem 0.5rem;
+            background: #f8fafc;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .stat-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 0.2rem;
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            color: #64748b;
+            text-transform: uppercase;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+
+        /* Mechanic Card - More compact */
+        .mechanic-section {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border-radius: 16px;
+            padding: 1rem;
+            border: 1px solid #bae6fd;
+            flex-shrink: 0;
+        }
+
+        .mechanic-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .mechanic-avatar {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .mechanic-info h4 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 0.2rem;
+        }
+
+        .mechanic-phone {
+            font-size: 0.8rem;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .mechanic-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin-top: 0.4rem;
+            padding: 0.2rem 0.6rem;
+            border-radius: 16px;
+        }
+
+        .status-moving {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-stopped {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .status-arrived {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .call-button {
+            width: 100%;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border: none;
+            padding: 0.8rem;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.6rem;
+            margin-top: 0.75rem;
+        }
+
+        .call-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+        }
+
+        .call-button:active {
+            transform: translateY(0);
+        }
+
+        /* Loading State */
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.95);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #e2e8f0;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-size: 1rem;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        /* Error States */
+        .error-message {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #dc2626;
+            padding: 1rem;
+            border-radius: 12px;
+            margin: 1rem;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        /* Refresh Button - positioned in map area */
+        .refresh-btn {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 1rem;
+            cursor: pointer;
+            box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
+            transition: all 0.3s ease;
+            z-index: 60;
+        }
+
+        .refresh-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .refresh-btn.spinning {
+            animation: spin 1s linear infinite;
+        }
+
+        /* Mobile Optimizations */
+        /* Arrival Notification */
+        .arrival-notification {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            z-index: 2000;
+            max-width: 350px;
+            width: 90%;
+            animation: slideInUp 0.5s ease-out;
+        }
+
+        .arrival-notification.fade-out {
+            animation: fadeOut 0.5s ease-in;
+            opacity: 0;
+        }
+
+        .arrival-content {
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .arrival-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem auto;
+            color: white;
+            font-size: 2.5rem;
+        }
+
+        .arrival-text h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+        }
+
+        .arrival-text p {
+            font-size: 1rem;
+            color: #64748b;
+            margin-bottom: 1.5rem;
+        }
+
+        .arrival-call-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+        }
+
+        .arrival-call-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+        }
+
+        @keyframes slideInUp {
+            from {
+                transform: translate(-50%, 100%);
+                opacity: 0;
+            }
+            to {
+                transform: translate(-50%, -50%);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+            }
+            to {
+                opacity: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 0.5rem 1rem;
+            }
+
+            .header-content h1 {
+                font-size: 1rem;
+            }
+
+            .header-content p {
+                font-size: 0.7rem;
+            }
+
+            .eta-overlay {
+                left: 10px;
+                right: 10px;
+                top: 10px;
+                padding: 0.6rem 0.8rem;
+            }
+
+            .eta-time {
+                font-size: 1.3rem;
+            }
+
+            .eta-label {
+                font-size: 0.75rem;
+            }
+
+            .eta-distance {
+                font-size: 0.9rem;
+            }
+
+            .info-panel {
+                padding: 0.75rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.6rem;
+            }
+
+            .stat-card {
+                padding: 0.6rem 0.4rem;
+            }
+
+            .stat-value {
+                font-size: 1.1rem;
+            }
+
+            .stat-label {
+                font-size: 0.65rem;
+            }
+
+            .service-details {
+                grid-template-columns: 1fr;
+                text-align: center;
+                gap: 0.6rem;
+            }
+
+            .car-image {
+                justify-self: center;
+                width: 80px;
+                height: 60px;
+            }
+
+            .service-info h3 {
+                font-size: 1rem;
+            }
+
+            .meta-item {
+                font-size: 0.75rem;
+                justify-content: center;
+            }
+
+            .mechanic-section {
+                padding: 0.8rem;
+            }
+
+            .mechanic-avatar {
+                width: 45px;
+                height: 45px;
+                font-size: 1.2rem;
+            }
+
+            .mechanic-info h4 {
+                font-size: 1rem;
+            }
+
+            .mechanic-phone {
+                font-size: 0.75rem;
+            }
+
+            .call-button {
+                padding: 0.7rem;
+                font-size: 0.85rem;
+            }
+
+            .refresh-btn {
+                width: 40px;
+                height: 40px;
+                bottom: 12px;
+                right: 12px;
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Extra small screens */
+        @media (max-width: 480px) {
+            .map-section {
+                height: 58vh;
+            }
+
+            .info-panel {
+                height: 42vh;
+            }
+
+            .eta-main {
+                gap: 0.4rem;
+            }
+
+            .eta-time {
+                font-size: 1.2rem;
+            }
+
+            .stats-grid {
+                gap: 0.5rem;
+            }
+
+            .stat-card {
+                padding: 0.5rem 0.3rem;
+            }
+
+            .stat-value {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="loading" id="loading">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Loading your mechanic's location...</div>
+    </div>
+
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-icon">
+                <i class="fas fa-wrench"></i>
+            </div>
+            <div class="header-content">
+                <h1>Your Mechanic is On the Way</h1>
+                <p>
+                    <span class="live-dot"></span>
+                    Live tracking active
+                </p>
+            </div>
+        </header>
+
+        <!-- Map Section -->
+        <div class="map-section">
+            <div id="map"></div>
+            
+            <!-- ETA Overlay -->
+            <div class="eta-overlay" id="etaOverlay">
+                <div class="eta-content">
+                    <div class="eta-main">
+                        <div class="eta-time" id="etaTime">--</div>
+                        <div class="eta-label">min away</div>
+                    </div>
+                    <div class="eta-distance" id="etaDistance">-- km</div>
+                </div>
+            </div>
+
+            <!-- Refresh Button -->
+            <button class="refresh-btn" id="refreshBtn" onclick="refreshData()">
+                <i class="fas fa-sync"></i>
+            </button>
+        </div>
+
+        <!-- Bottom Info Panel -->
+        <div class="info-panel">
+            <!-- Booking Header -->
+            <div class="booking-header">
+                <div class="booking-id" id="bookingId">Loading...</div>
+                <div class="booking-status" id="bookingStatus">--</div>
+            </div>
+
+            <!-- Service Details -->
+            <div class="service-details" id="serviceDetails">
+                <!-- Content will be populated by JavaScript -->
+            </div>
+
+            <!-- Stats -->
+            <div class="stats-section">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="statDistance">--</div>
+                        <div class="stat-label">Distance</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statSpeed">--</div>
+                        <div class="stat-label">Speed</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statEta">--</div>
+                        <div class="stat-label">ETA</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statStatus">--</div>
+                        <div class="stat-label">Status</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mechanic Details -->
+            <div class="mechanic-section" id="mechanicSection">
+                <!-- Content will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAhQ7pefYjHolK8tjYqgdSZ7XXZSUaglp4&callback=initMap&libraries=geometry"></script>
+
+    <script>
+        // Hide loading screen immediately when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                const loading = document.getElementById('loading');
+                if (loading) loading.style.display = 'none';
+            }, 2000);
+        });
+
+        // ===========================================
+        // CONFIGURATION
+        // ===========================================
+        const CONFIG = {
+            traccar: {
+                baseUrl: 'https://traccar.instantmechanic.online',
+                email: 'gdmirdha@gmail.com',
+                password: '12341234'
+            },
+            booking: {
+                baseUrl: 'https://ai.instantmechanic.online'
+            }
+        };
+
+        // ===========================================
+        // GLOBAL VARIABLES
+        // ===========================================
+        let map;
+        let mechanicMarker;
+        let customerMarker;
+        let geofenceCircle;
+        let directionsService;
+        let directionsRenderer;
+        let bookingData = {};
+        let mechanicData = {};
+        let isTracking = true;
+        let traccarSessionEstablished = false;
+        let routeData = null;
+        let hasArrivedNotified = false;
+        let lastUpdateTime = null;
+        let connectionStatus = 'connecting';
+        let updateInterval = null;
+        
+        // URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const bookingId = urlParams.get('booking') || '18332';
+        const deviceId = urlParams.get('device') || '1';
+
+        // ===========================================
+        // MAP INITIALIZATION
+        // ===========================================
+        function initMap() {
+            map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 13,
+                center: { lat: 28.4354417, lng: 77.0349183 },
+                styles: [
+                    {
+                        "featureType": "poi.business",
+                        "stylers": [{"visibility": "off"}]
+                    },
+                    {
+                        "featureType": "poi.park",
+                        "elementType": "labels.text",
+                        "stylers": [{"visibility": "off"}]
+                    },
+                    {
+                        "featureType": "road",
+                        "elementType": "geometry",
+                        "stylers": [{"color": "#ffffff"}]
+                    },
+                    {
+                        "featureType": "road.highway",
+                        "elementType": "geometry",
+                        "stylers": [{"color": "#dadada"}]
+                    },
+                    {
+                        "featureType": "water",
+                        "stylers": [{"color": "#46bcec"}]
+                    },
+                    {
+                        "featureType": "transit",
+                        "stylers": [{"visibility": "off"}]
+                    }
+                ],
+                disableDefaultUI: true,
+                zoomControl: true,
+                zoomControlOptions: {
+                    position: google.maps.ControlPosition.LEFT_BOTTOM
+                }
+            });
+
+            directionsService = new google.maps.DirectionsService();
+            directionsRenderer = new google.maps.DirectionsRenderer({
+                suppressMarkers: true,
+                preserveViewport: false,
+                polylineOptions: {
+                    strokeColor: '#667eea',
+                    strokeWeight: 5,
+                    strokeOpacity: 0.8
+                }
+            });
+            directionsRenderer.setMap(map);
+
+            // Hide loading immediately when map initializes
+            setTimeout(() => {
+                document.getElementById('loading').style.display = 'none';
+            }, 1000);
+
+            // Load data in background
+            loadBookingData();
+            loadMechanicLocation();
+            
+            // Start smart refresh system (4th Feature)
+            startSmartRefresh();
+            
+            // Also update on page focus/visibility
+            document.addEventListener('visibilitychange', () => {
+                if (!document.hidden && isTracking) {
+                    loadMechanicLocation();
+                }
+            });
+        }
+
+        // ===========================================
+        // AUTHENTICATION
+        // ===========================================
+        async function authenticateTraccar() {
+            try {
+                updateConnectionStatus('connecting');
+                
+                const response = await fetch(`${CONFIG.traccar.baseUrl}/api/session`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'Accept': 'application/json'
+                    },
+                    credentials: 'include',
+                    body: new URLSearchParams({
+                        'email': CONFIG.traccar.email,
+                        'password': CONFIG.traccar.password
+                    })
+                });
+
+                if (response.ok) {
+                    traccarSessionEstablished = true;
+                    updateConnectionStatus('connected');
+                    return true;
+                } else {
+                    updateConnectionStatus('error');
+                    showError('Authentication failed. Please check credentials.');
+                    return false;
+                }
+            } catch (error) {
+                updateConnectionStatus('error');
+                showError('Unable to connect to tracking server');
+                return false;
+            }
+        }
+
+        // ===========================================
+        // DATA LOADING
+        // ===========================================
+        async function loadBookingData() {
+            try {
+                const response = await fetch(`${CONFIG.booking.baseUrl}/bot/api/bookings/${bookingId}/`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': '*/*',
+                        'Origin': 'https://instantmechanic.online',
+                        'Referer': 'https://instantmechanic.online/'
+                    }
+                });
+                
+                if (response.ok) {
+                    bookingData = await response.json();
+                    updateBookingUI();
+                    setupCustomerLocation();
+                } else {
+                    throw new Error(`Failed to load booking data: ${response.status}`);
+                }
+            } catch (error) {
+                console.error('Error loading booking:', error);
+                // Set fallback booking data to prevent UI breaks
+                bookingData = {
+                    id: bookingId,
+                    booking_status: 'PENDING',
+                    car: 'Vehicle',
+                    problem: 'Service Request',
+                    price: 'Rs 788',
+                    customer_mobile: '9180057356',
+                    mechanic_name: 'Mechanic',
+                    agent_mobile: '9554889260',
+                    car_image: 'https://via.placeholder.com/80x60?text=Car',
+                    location: null
+                };
+                updateBookingUI();
+                showError('Failed to load booking information');
+            }
+        }
+
+        async function loadMechanicLocation() {
+            try {
+                if (!traccarSessionEstablished) {
+                    const authSuccess = await authenticateTraccar();
+                    if (!authSuccess) return;
+                }
+
+                const response = await fetch(`${CONFIG.traccar.baseUrl}/api/positions?deviceId=${deviceId}`, {
+                    method: 'GET',
+                    credentials: 'include',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const positions = await response.json();
+                    if (positions.length > 0) {
+                        const newMechanicData = positions[0];
+                        
+                        // Check if location actually changed
+                        const locationChanged = !mechanicData.latitude || 
+                            Math.abs(newMechanicData.latitude - mechanicData.latitude) > 0.00001 ||
+                            Math.abs(newMechanicData.longitude - mechanicData.longitude) > 0.00001;
+                        
+                        mechanicData = newMechanicData;
+                        updateMechanicMarker();
+                        updateStats();
+                        calculateRoute();
+                        
+                        // Update connection status and last successful fetch time
+                        updateConnectionStatus('connected');
+                        lastUpdateTime = new Date();
+                        
+                        // Log background location update
+                        if (!document.hidden) {
+                            console.log(`Location updated: ${mechanicData.latitude}, ${mechanicData.longitude} at ${lastUpdateTime.toLocaleTimeString()}`);
+                        }
+                        
+                        // Update ETA display immediately
+                        if (locationChanged && mechanicMarker && customerMarker) {
+                            const distance = google.maps.geometry.spherical.computeDistanceBetween(
+                                mechanicMarker.getPosition(),
+                                customerMarker.getPosition()
+                            );
+                            const etaMinutes = Math.round((distance / 1000) / 30 * 60); // Assuming 30km/h speed
+                            document.getElementById('etaTime').textContent = etaMinutes;
+                        }
+                    }
+                } else if (response.status === 401) {
+                    traccarSessionEstablished = false;
+                    updateConnectionStatus('connecting');
+                    const authSuccess = await authenticateTraccar();
+                    if (authSuccess) {
+                        return loadMechanicLocation();
+                    }
+                } else {
+                    updateConnectionStatus('error');
+                }
+            } catch (error) {
+                console.error('Error loading mechanic location:', error);
+                updateConnectionStatus('error');
+                
+                // Only show error to user if it's been more than 30 seconds since last update
+                if (lastUpdateTime && (new Date() - lastUpdateTime) > 30000) {
+                    showError('Connection lost. Retrying...');
+                }
+            }
+        }
+
+        // ===========================================
+        // UI UPDATES
+        // ===========================================
+        function updateBookingUI() {
+            // Update booking header
+            document.getElementById('bookingId').textContent = `Booking #${bookingData.id || bookingId}`;
+            document.getElementById('bookingStatus').textContent = bookingData.booking_status || 'PENDING';
+
+            // Update service details
+            const serviceDetails = document.getElementById('serviceDetails');
+            if (serviceDetails) {
+                serviceDetails.innerHTML = `
+                    <img src="${bookingData.car_image || 'https://via.placeholder.com/80x60?text=Car'}" alt="Car" class="car-image" onerror="this.src='https://via.placeholder.com/80x60?text=Car'">
+                    <div class="service-info">
+                        <h3>${bookingData.car || 'Vehicle'}</h3>
+                        <div class="service-meta">
+                            <div class="meta-item">
+                                <i class="fas fa-tools"></i>
+                                <span>${bookingData.problem || 'Service Request'}</span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-rupee-sign"></i>
+                                <span class="price-highlight">${bookingData.price || '--'}</span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-phone"></i>
+                                <span>${bookingData.customer_mobile || '--'}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Update mechanic section
+            const mechanicSection = document.getElementById('mechanicSection');
+            if (mechanicSection) {
+                const mechanicName = bookingData.mechanic_name || 'Mechanic';
+                const mechanicPhone = bookingData.agent_mobile || '--';
+                
+                mechanicSection.innerHTML = `
+                    <div class="mechanic-header">
+                        <div class="mechanic-avatar">
+                            ${mechanicName.charAt(0).toUpperCase()}
+                        </div>
+                        <div class="mechanic-info">
+                            <h4>${mechanicName}</h4>
+                            <div class="mechanic-phone">
+                                <i class="fas fa-phone"></i>
+                                <span>${mechanicPhone}</span>
+                            </div>
+                            <div class="mechanic-status status-moving" id="mechanicStatus">
+                                <i class="fas fa-circle"></i>
+                                <span>Connecting...</span>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="call-button" onclick="callMechanic('${mechanicPhone}')">
+                        <i class="fas fa-phone"></i>
+                        Call ${mechanicName}
+                    </button>
+                `;
+            }
+        }
+
+        function setupCustomerLocation() {
+            if (bookingData && bookingData.location) {
+                const urlMatch = bookingData.location.match(/q=(-?\d+\.?\d*),(-?\d+\.?\d*)/);
+                if (urlMatch) {
+                    const customerLat = parseFloat(urlMatch[1]);
+                    const customerLng = parseFloat(urlMatch[2]);
+                    
+                    // Validate coordinates
+                    if (!isNaN(customerLat) && !isNaN(customerLng)) {
+                        const customerLocation = { lat: customerLat, lng: customerLng };
+                        
+                        customerMarker = new google.maps.Marker({
+                            position: customerLocation,
+                            map: map,
+                            title: 'Your Location',
+                            icon: {
+                                path: "m12,0c-4.4,0-8,3.6-8,8 0,5.4 7.9,16 7.9,16 0.1,0.1 0.1,0.1 0.2,0 0,0 7.9-10.6 7.9-16 0-4.4-3.6-8-8-8z",
+                                fillColor: '#ef4444',
+                                fillOpacity: 1,
+                                strokeColor: '#ffffff',
+                                strokeWeight: 3,
+                                scale: 2,
+                                anchor: new google.maps.Point(12, 32)
+                            }
+                        });
+
+                        geofenceCircle = new google.maps.Circle({
+                            strokeColor: '#ef4444',
+                            strokeOpacity: 0.8,
+                            strokeWeight: 2,
+                            fillColor: '#ef4444',
+                            fillOpacity: 0.1,
+                            map: map,
+                            center: customerLocation,
+                            radius: 300
+                        });
+
+                        map.setCenter(customerLocation);
+                    }
+                }
+            } else {
+                // Set default location if no customer location provided
+                const defaultLocation = { lat: 28.4354417, lng: 77.0349183 };
+                map.setCenter(defaultLocation);
+            }
+        }
+
+        function updateMechanicMarker() {
+            const mechanicLocation = {
+                lat: mechanicData.latitude,
+                lng: mechanicData.longitude
+            };
+
+            if (!mechanicMarker) {
+                mechanicMarker = new google.maps.Marker({
+                    position: mechanicLocation,
+                    map: map,
+                    title: 'Mechanic Location',
+                    icon: {
+                        path: "M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.22.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z",
+                        fillColor: '#10b981',
+                        fillOpacity: 1,
+                        strokeColor: '#ffffff',
+                        strokeWeight: 2,
+                        scale: 1.5,
+                        anchor: new google.maps.Point(12, 12),
+                        rotation: 0
+                    },
+                    optimized: false
+                });
+            } else {
+                mechanicMarker.setPosition(mechanicLocation);
+                
+                // Update car rotation based on movement direction
+                if (mechanicData.course) {
+                    const icon = mechanicMarker.getIcon();
+                    icon.rotation = mechanicData.course;
+                    mechanicMarker.setIcon(icon);
+                }
+            }
+
+            // Update status and check geofence
+            updateMechanicStatus();
+            checkGeofenceEntry();
+        }
+
+        // Check if mechanic has entered customer geofence
+        function checkGeofenceEntry() {
+            if (mechanicMarker && customerMarker && !hasArrivedNotified) {
+                const distance = google.maps.geometry.spherical.computeDistanceBetween(
+                    mechanicMarker.getPosition(),
+                    customerMarker.getPosition()
+                );
+                
+                if (distance <= 300) {
+                    hasArrivedNotified = true;
+                    showArrivalNotification();
+                    updateHeaderForArrival();
+                    
+                    // Visual feedback - pulse the geofence circle
+                    if (geofenceCircle) {
+                        geofenceCircle.setOptions({
+                            fillColor: '#10b981',
+                            fillOpacity: 0.3,
+                            strokeColor: '#10b981',
+                            strokeWeight: 3
+                        });
+                    }
+                }
+            }
+        }
+
+        // Show arrival notification
+        function showArrivalNotification() {
+            // Create arrival notification overlay
+            const notification = document.createElement('div');
+            notification.className = 'arrival-notification';
+            notification.innerHTML = `
+                <div class="arrival-content">
+                    <div class="arrival-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="arrival-text">
+                        <h3>Mechanic Has Arrived!</h3>
+                        <p>${bookingData.mechanic_name || 'Your mechanic'} is now at your location</p>
+                    </div>
+                    <button class="arrival-call-btn" onclick="callMechanic('${bookingData.agent_mobile}')">
+                        <i class="fas fa-phone"></i> Call Now
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                notification.classList.add('fade-out');
+                setTimeout(() => {
+                    notification.remove();
+                }, 500);
+            }, 5000);
+            
+            // Play notification sound (if supported)
+            try {
+                const audio = new Audio();
+                audio.volume = 0.3;
+                audio.play();
+            } catch (error) {
+                console.log('Audio notification not supported');
+            }
+        }
+
+        // Update header when mechanic arrives
+        function updateHeaderForArrival() {
+            const headerContent = document.querySelector('.header-content h1');
+            if (headerContent) {
+                headerContent.textContent = 'Your Mechanic Has Arrived!';
+            }
+            
+            const liveText = document.querySelector('.header-content p');
+            if (liveText) {
+                liveText.innerHTML = '<span class="live-dot"></span>Mechanic at your location';
+            }
+        }
+
+        // Connection Status Management (4th Feature)
+        function updateConnectionStatus(status) {
+            connectionStatus = status;
+            const liveText = document.querySelector('.header-content p');
+            const liveDot = document.querySelector('.live-dot');
+            
+            if (!liveText || hasArrivedNotified) return;
+            
+            switch (status) {
+                case 'connected':
+                    liveText.innerHTML = '<span class="live-dot"></span>Live tracking active';
+                    if (liveDot) {
+                        liveDot.style.background = '#10b981';
+                        liveDot.style.animation = 'pulse 2s infinite';
+                    }
+                    break;
+                case 'connecting':
+                    liveText.innerHTML = '<span class="live-dot"></span>Connecting...';
+                    if (liveDot) {
+                        liveDot.style.background = '#f59e0b';
+                        liveDot.style.animation = 'pulse 1s infinite';
+                    }
+                    break;
+                case 'error':
+                    liveText.innerHTML = '<span class="live-dot"></span>Connection issues';
+                    if (liveDot) {
+                        liveDot.style.background = '#ef4444';
+                        liveDot.style.animation = 'pulse 0.5s infinite';
+                    }
+                    break;
+            }
+        }
+
+        // Smart refresh system with connection monitoring
+        function startSmartRefresh() {
+            if (updateInterval) clearInterval(updateInterval);
+            
+            updateInterval = setInterval(() => {
+                if (isTracking) {
+                    // Check if we haven't updated in more than 20 seconds
+                    if (lastUpdateTime && (new Date() - lastUpdateTime) > 20000) {
+                        updateConnectionStatus('connecting');
+                    }
+                    
+                    loadMechanicLocation();
+                }
+            }, 10000);
+        }
+
+        // Enhanced refresh with visual feedback
+        function refreshData() {
+            const btn = document.getElementById('refreshBtn');
+            btn.classList.add('spinning');
+            updateConnectionStatus('connecting');
+            
+            Promise.all([
+                loadBookingData(),
+                loadMechanicLocation()
+            ]).then(() => {
+                updateConnectionStatus('connected');
+            }).catch(() => {
+                updateConnectionStatus('error');
+            }).finally(() => {
+                setTimeout(() => {
+                    btn.classList.remove('spinning');
+                }, 1000);
+            });
+        }
+
+        function updateMechanicStatus() {
+            const statusElement = document.getElementById('mechanicStatus');
+            if (!statusElement) return;
+
+            const isMoving = mechanicData.attributes.motion;
+            const currentSpeed = Math.round(mechanicData.speed || 0);
+            
+            if (mechanicMarker && customerMarker) {
+                const distance = google.maps.geometry.spherical.computeDistanceBetween(
+                    mechanicMarker.getPosition(),
+                    customerMarker.getPosition()
+                );
+                
+                if (distance <= 300) {
+                    statusElement.className = 'mechanic-status status-arrived';
+                    statusElement.innerHTML = '<i class="fas fa-check-circle"></i><span>Arrived!</span>';
+                } else if (isMoving) {
+                    statusElement.className = 'mechanic-status status-moving';
+                    statusElement.innerHTML = '<i class="fas fa-route"></i><span>On the way</span>';
+                } else {
+                    statusElement.className = 'mechanic-status status-stopped';
+                    statusElement.innerHTML = '<i class="fas fa-pause-circle"></i><span>Stopped</span>';
+                }
+            }
+        }
+
+        function calculateRoute() {
+            if (mechanicMarker && customerMarker) {
+                const mechanicPos = mechanicMarker.getPosition();
+                const customerPos = customerMarker.getPosition();
+
+                directionsService.route({
+                    origin: mechanicPos,
+                    destination: customerPos,
+                    travelMode: google.maps.TravelMode.DRIVING,
+                    avoidTolls: true,
+                    drivingOptions: {
+                        departureTime: new Date(),
+                        trafficModel: google.maps.TrafficModel.BEST_GUESS
+                    }
+                }, (result, status) => {
+                    if (status === 'OK') {
+                        directionsRenderer.setDirections(result);
+                        routeData = result;
+
+                        const route = result.routes[0];
+                        const leg = route.legs[0];
+                        updateETA(leg);
+                        
+                        // Fit bounds with proper padding for 60% map area
+                        const bounds = new google.maps.LatLngBounds();
+                        bounds.extend(mechanicPos);
+                        bounds.extend(customerPos);
+                        map.fitBounds(bounds, { 
+                            padding: { top: 80, right: 30, bottom: 80, left: 30 }
+                        });
+                    } else {
+                        updateFallbackStats();
+                    }
+                });
+            }
+        }
+
+        function updateETA(leg) {
+            const etaMinutes = Math.round(leg.duration_in_traffic ? 
+                leg.duration_in_traffic.value / 60 : leg.duration.value / 60);
+            const distanceText = leg.distance.text;
+
+            document.getElementById('etaTime').textContent = etaMinutes;
+            document.getElementById('etaDistance').textContent = distanceText;
+        }
+
+        function updateStats() {
+            if (mechanicMarker && customerMarker) {
+                const distance = google.maps.geometry.spherical.computeDistanceBetween(
+                    mechanicMarker.getPosition(),
+                    customerMarker.getPosition()
+                );
+                
+                const distanceKm = (distance / 1000).toFixed(1);
+                const currentSpeed = Math.round(mechanicData.speed || 0);
+                const etaMinutes = Math.round((distanceKm / Math.max(currentSpeed, 20)) * 60);
+                
+                document.getElementById('statDistance').textContent = `${distanceKm} km`;
+                document.getElementById('statSpeed').textContent = `${currentSpeed} km/h`;
+                document.getElementById('statEta').textContent = `${etaMinutes} min`;
+
+                let status = 'En Route';
+                if (distance <= 300) {
+                    status = 'Arrived';
+                } else if (!mechanicData.attributes.motion) {
+                    status = 'Stopped';
+                }
+                document.getElementById('statStatus').textContent = status;
+            }
+        }
+
+        function updateFallbackStats() {
+            if (mechanicMarker && customerMarker) {
+                const distance = google.maps.geometry.spherical.computeDistanceBetween(
+                    mechanicMarker.getPosition(),
+                    customerMarker.getPosition()
+                );
+                
+                const distanceKm = (distance / 1000).toFixed(1);
+                const etaMinutes = Math.round((distanceKm / 30) * 60);
+                
+                document.getElementById('etaTime').textContent = etaMinutes;
+                document.getElementById('etaDistance').textContent = `${distanceKm} km`;
+            }
+        }
+
+        // ===========================================
+        // UTILITY FUNCTIONS
+        // ===========================================
+        function callMechanic(phoneNumber) {
+            window.location.href = `tel:${phoneNumber}`;
+        }
+
+        function showError(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            errorDiv.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${message}`;
+            document.querySelector('.info-panel').prepend(errorDiv);
+            
+            setTimeout(() => {
+                errorDiv.remove();
+            }, 5000);
+        }
+
+        // ===========================================
+        // EVENT HANDLERS
+        // ===========================================
+        document.addEventListener('visibilitychange', () => {
+            isTracking = !document.hidden;
+            if (isTracking) {
+                loadMechanicLocation();
+                startSmartRefresh();
+            } else {
+                if (updateInterval) clearInterval(updateInterval);
+            }
+        });
+
+        window.addEventListener('focus', () => {
+            isTracking = true;
+            loadMechanicLocation();
+            startSmartRefresh();
+        });
+
+        window.addEventListener('blur', () => {
+            isTracking = false;
+            if (updateInterval) clearInterval(updateInterval);
+        });
+
+        // Handle network connectivity
+        window.addEventListener('online', () => {
+            updateConnectionStatus('connecting');
+            loadMechanicLocation();
+        });
+
+        window.addEventListener('offline', () => {
+            updateConnectionStatus('error');
+        });
+    </script>
+</body>
+</html>
