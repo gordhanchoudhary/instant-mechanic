@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EnvisionVR Technology | AV, IT &amp; AR/VR/MR Immersive Solutions</title>
+<meta name="description" content="EnvisionVR Technology delivers AV/IT integration, AR/VR/MR immersive solutions, and smart computer accessories &amp; CCTV for modern businesses and institutions. Based in Balasore, Odisha.">
+<meta name="theme-color" content="#050b16">
+
+<!--
+  ============================================================================
+  CONTENT REVIEW CHECKLIST — please confirm/replace before this goes live:
+  1. Gallery images and solution photos are free-license stock photography
+     used to illustrate each capability — not photos of real EnvisionVR
+     projects. Swap in real project/installation photos once available.
+  2. Social links: WhatsApp number is real (from the current live site);
+     LinkedIn/Facebook/Instagram point to "#" — add real handles once
+     accounts are confirmed.
+  3. Map embed geocodes the address text ("169, Baliapal, Balasore, Odisha")
+     — replace with an exact pinned location/embed code once available.
+  4. Query form has no backend — it opens WhatsApp with the enquiry
+     pre-filled (per the requested flow). No data is stored server-side.
+  5. Logo file is the image supplied for this project (assets/img/logo.jpeg).
+  ============================================================================
+-->
+
+<link rel="icon" href="assets/img/logo.jpeg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<!-- ================= ICON SPRITE ================= -->
+<svg style="display:none">
+  <symbol id="i-vr" viewBox="0 0 24 24"><path d="M4 8h16a2 2 0 0 1 2 2v5a3 3 0 0 1-3 3h-1.5a2 2 0 0 1-1.8-1.1L14.8 14H9.2l-.9 2.9A2 2 0 0 1 6.5 18H5a3 3 0 0 1-3-3v-5a2 2 0 0 1 2-2z"/><circle cx="8.3" cy="12" r="1.4"/><circle cx="15.7" cy="12" r="1.4"/></symbol>
+  <symbol id="i-ar" viewBox="0 0 24 24"><path d="M2 8a5 5 0 0 1 10 0"/><path d="M12 8a5 5 0 0 1 10 0"/><path d="M2 8v1a3 3 0 0 0 6 0V8M16 8v1a3 3 0 0 0 6 0V8"/></symbol>
+  <symbol id="i-monitor" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="1.4"/><path d="M8 20h8M12 16v4"/></symbol>
+  <symbol id="i-camera" viewBox="0 0 24 24"><path d="M4 8h3l1.5-2h7L17 8h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13.5" r="3.4"/></symbol>
+  <symbol id="i-cloud" viewBox="0 0 24 24"><path d="M7 18a4.5 4.5 0 0 1-.6-8.96A5.5 5.5 0 0 1 17 8.06 4 4 0 0 1 16.5 16H7z"/></symbol>
+  <symbol id="i-megaphone" viewBox="0 0 24 24"><path d="M3 10v4a1 1 0 0 0 1 1h2l7 4V5L6 9H4a1 1 0 0 0-1 1z"/><path d="M17 9a4 4 0 0 1 0 6M20 6a8 8 0 0 1 0 12"/></symbol>
+  <symbol id="i-wrench" viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.1L3 18l3 3 6.6-6.3a4 4 0 0 0 5.1-5.4l-2.8 2.8-2-2z"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M4 12.5l5.5 5.5L20 6.5"/></symbol>
+  <symbol id="i-whatsapp" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 3a9 9 0 0 0-7.8 13.5L3 21l4.7-1.2A9 9 0 1 0 12 3z" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8.5 8.8c.2-.6.5-.6.8-.6h.6c.2 0 .4 0 .6.5s.7 1.7.8 1.8c.1.2.1.3 0 .5-.1.2-.2.3-.4.5-.2.2-.4.4-.2.7.2.4 1 1.5 2.1 2.4 1.4 1.2 2 1.3 2.3 1.1.3-.1.5-.3.7-.6.2-.2.4-.3.6-.2.2.1 1.5.7 1.7.8.2.1.4.2.4.3 0 .2 0 .9-.4 1.4-.4.5-1.4 1-2.4.8-1-.2-3-1.1-4.6-2.9-1.5-1.6-2.3-3.2-2.5-3.7-.2-.5-.5-1.3 0-2z"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24"><path d="M5 4h3.5l1.5 4.5L8 10.5a12 12 0 0 0 5.5 5.5l1.9-2 4.6 1.5V19a2 2 0 0 1-2 2C10.5 21 3 13.5 3 6a2 2 0 0 1 2-2z"/></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="1.5"/><path d="M3 6l9 7 9-7"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s7-6.4 7-12a7 7 0 1 0-14 0c0 5.6 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></symbol>
+  <symbol id="i-arrow-right" viewBox="0 0 24 24"><path d="M4 12h16M14 6l6 6-6 6"/></symbol>
+  <symbol id="i-chevron" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24"><path d="M5 5l14 14M19 5 5 19"/></symbol>
+  <symbol id="i-arrow-up" viewBox="0 0 24 24"><path d="M12 19V5M6 11l6-6 6 6"/></symbol>
+  <symbol id="i-linkedin" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7.5 10v7M7.5 7.2v.1M11 17v-4.2c0-1.5 1-2.4 2.2-2.4 1.2 0 2 .8 2 2.4V17M11 10v7"/></symbol>
+  <symbol id="i-facebook" viewBox="0 0 24 24"><path d="M14 21v-7h2.3l.4-3H14V9c0-.9.3-1.5 1.7-1.5H17V4.9c-.3 0-1.2-.1-2.3-.1-2.3 0-3.7 1.4-3.7 3.9V11H8.5v3H11v7z"/></symbol>
+  <symbol id="i-instagram" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.3" cy="6.7" r="1"/></symbol>
+  <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4.2"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="17.5" cy="9" r="2.4"/><path d="M15.5 14.3c2.4.3 4.5 2.4 4.5 5.7"/></symbol>
+  <symbol id="i-award" viewBox="0 0 24 24"><circle cx="12" cy="9" r="5"/><path d="M9 13.5 7.5 21l4.5-2.5 4.5 2.5-1.5-7.5"/></symbol>
+  <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></symbol>
+  <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.5 3.8 5.8 3.8 9s-1.3 6.5-3.8 9c-2.5-2.5-3.8-5.8-3.8-9S9.5 5.5 12 3z"/></symbol>
+  <symbol id="i-headset" viewBox="0 0 24 24"><path d="M4 13a8 8 0 0 1 16 0"/><rect x="3" y="13" width="4" height="6" rx="1.3"/><rect x="17" y="13" width="4" height="6" rx="1.3"/><path d="M20 19v1a3 3 0 0 1-3 3h-3"/></symbol>
+  <symbol id="i-layers" viewBox="0 0 24 24"><path d="M12 3 3 8l9 5 9-5-9-5z"/><path d="M3 12l9 5 9-5M3 16l9 5 9-5"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/><path d="M9 12l2 2 4-4"/></symbol>
+  <symbol id="i-compass" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/></symbol>
+  <symbol id="i-rocket" viewBox="0 0 24 24"><path d="M12 2c3 2 5 6 5 10-1.5 1-3.2 1.6-5 1.6S8.5 13 7 12c0-4 2-8 5-10z"/><path d="M9 15l-3 3 1 4 4-1M15 15l3 3-1 4-4-1"/><circle cx="12" cy="9" r="1.6"/></symbol>
+</svg>
+
+<!-- ================= HEADER ================= -->
+<header class="site-header" id="top">
+  <div class="container">
+    <a href="#top" class="brand">
+      <span class="brand-mark"><img src="assets/img/logo.jpeg" alt="EnvisionVR Technology logo"></span>
+      <span class="brand-name"><strong>EnvisionVR</strong><span>Digital Vision</span></span>
+    </a>
+
+    <nav class="main-nav">
+      <ul>
+        <li><a href="#top" class="nav-link">Home</a></li>
+        <li><a href="#about" class="nav-link">About</a></li>
+        <li><a href="#services" class="nav-link">Services</a></li>
+        <li><a href="#solutions" class="nav-link">Solutions</a></li>
+        <li><a href="#why" class="nav-link">Why Us</a></li>
+        <li><a href="#contact" class="nav-link">Contact</a></li>
+      </ul>
+      <div class="nav-cta">
+        <a href="https://wa.me/919237234886?text=Hi%20EnvisionVR%20Technology%2C%20I%27d%20like%20to%20know%20more%20about%20your%20services." target="_blank" rel="noopener" class="btn btn-whatsapp">
+          <svg class="icon" width="18" height="18"><use href="#i-whatsapp"/></svg> Chat With Us
+        </a>
+      </div>
+    </nav>
+
+    <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+      <svg class="icon" width="22" height="22"><use href="#i-menu"/></svg>
+    </button>
+  </div>
+</header>
+
+<!-- ================= HERO ================= -->
+<section class="hero">
+  <div class="hero-bg-image"></div>
+  <canvas id="hero-canvas"></canvas>
+  <div class="cursor-glow"></div>
+  <div class="hero-inner">
+    <div class="hero-tag"><span class="dot"></span> AV &middot; IT &middot; AR/VR/MR Immersive Technologies</div>
+    <h1>Engineering Immersive <em>Digital Experiences</em></h1>
+    <p class="lead">EnvisionVR Technology delivers integrated AV, IT, and AR/VR/MR solutions — helping businesses and institutions train, visualize, and collaborate in fully immersive digital environments.</p>
+    <div class="hero-actions">
+      <a href="#contact" class="btn btn-primary">Get a Free Consultation <svg class="icon" width="18" height="18"><use href="#i-arrow-right"/></svg></a>
+      <a href="https://wa.me/919237234886?text=Hi%20EnvisionVR%20Technology%2C%20I%27d%20like%20to%20know%20more%20about%20your%20services." target="_blank" rel="noopener" class="btn btn-secondary">
+        <svg class="icon" width="18" height="18"><use href="#i-whatsapp"/></svg> Chat on WhatsApp
+      </a>
+    </div>
+    <div class="trust-badges">
+      <div class="trust-badge"><span class="check"><svg class="icon" width="12" height="12"><use href="#i-check"/></svg></span> AV/IT Integration</div>
+      <div class="trust-badge"><span class="check"><svg class="icon" width="12" height="12"><use href="#i-check"/></svg></span> AR/VR/MR Solutions</div>
+      <div class="trust-badge"><span class="check"><svg class="icon" width="12" height="12"><use href="#i-check"/></svg></span> Smart CCTV &amp; Accessories</div>
+      <div class="trust-badge"><span class="check"><svg class="icon" width="12" height="12"><use href="#i-check"/></svg></span> Installation &amp; Support</div>
+    </div>
+  </div>
+  <div class="hero-scroll"><span>Scroll</span><span class="line"></span></div>
+</section>
+
+<!-- ================= MARQUEE ================= -->
+<div class="marquee-wrap">
+  <div class="marquee-label">Technology We Work With</div>
+  <div class="marquee-track">
+    <div class="marquee-item"><svg class="icon" width="20" height="20"><use href="#i-vr"/></svg> VR Headsets</div>
+    <div class="marquee-item"><svg class="icon" width="20" height="20"><use href="#i-ar"/></svg> AR Smart Glasses</div>
+    <div class="marquee-item"><svg class="icon" width="20" height="20"><use href="#i-monitor"/></svg> Interactive Displays</div>
+    <div class="marquee-item"><svg class="icon" width="20" height="20"><use href="#i-headset"/></svg> Video Conferencing</div>
+    <div class="marquee-item"><svg class="icon" width="20" height="20"><use href="#i-camera"/></svg> IP Surveillance</div>
+    <div class="marquee-item"><svg class="icon" width="20" height="20"><use href="#i-layers"/></svg> Digital Signage</div>
+    <div class="marquee-item"><svg class="icon" width="20" height="20"><use href="#i-cloud"/></svg> Cloud &amp; Hosting</div>
+    <div class="marquee-item"><svg class="icon" width="20" height="20"><use href="#i-bolt"/></svg> Immersive Content</div>
+    <!-- duplicated for seamless loop -->
+    <div class="marquee-item"><svg class="icon" width="20" height="20"><use href="#i-vr"/></svg> VR Headsets</div>
+    <div class="marquee-item"><svg class="icon" width="20" height="20"><use href="#i-ar"/></svg> AR Smart Glasses</div>
+    <div class="marquee-item"><svg class="icon" width="20" height="20"><use href="#i-monitor"/></svg> Interactive Displays</div>
+    <div class="marquee-item"><svg class="icon" width="20" height="20"><use href="#i-headset"/></svg> Video Conferencing</div>
+    <div class="marquee-item"><svg class="icon" width="20" height="20"><use href="#i-camera"/></svg> IP Surveillance</div>
+    <div class="marquee-item"><svg class="icon" width="20" height="20"><use href="#i-layers"/></svg> Digital Signage</div>
+    <div class="marquee-item"><svg class="icon" width="20" height="20"><use href="#i-cloud"/></svg> Cloud &amp; Hosting</div>
+    <div class="marquee-item"><svg class="icon" width="20" height="20"><use href="#i-bolt"/></svg> Immersive Content</div>
+  </div>
+</div>
+
+<!-- ================= ABOUT ================= -->
+<section class="section" id="about">
+  <div class="bg-orb" style="width:420px;height:420px;background:var(--green);top:10%;left:-10%;"></div>
+  <div class="container about-grid">
+    <div class="about-media reveal">
+      <img src="assets/img/vr-office.jpg" alt="Professional using a VR headset in a modern office environment" loading="lazy">
+      <div class="about-stat-card">
+        <strong>3-in-1</strong>
+        <span>Integrated AV, IT &amp; Immersive Technology under one roof</span>
+      </div>
+    </div>
+    <div class="about-copy reveal reveal-delay-1">
+      <div class="eyebrow">About EnvisionVR Technology</div>
+      <h2>Bringing <em>Tomorrow's Technology</em> To Businesses Today</h2>
+      <p>EnvisionVR Technology is a technology solutions company providing innovative AV, IT, and AR/VR/MR services tailored for modern businesses and institutions. We help organizations move beyond flat screens and static presentations into fully immersive, interactive digital experiences.</p>
+      <p>From boardrooms that need seamless audio-visual integration to training programs that demand realistic virtual simulations, our team designs, installs, and supports technology built around how your business actually works.</p>
+      <p>Based in Balasore, Odisha, we work with clients across sectors — corporate offices, educational institutions, retail spaces, and event organizers — bringing immersive technology within reach.</p>
+
+      <div class="about-values">
+        <div class="about-value">
+          <span class="ic"><svg class="icon" width="19" height="19"><use href="#i-vr"/></svg></span>
+          <div><strong>Immersive Innovation</strong><p>AR/VR/MR expertise across training, design &amp; collaboration</p></div>
+        </div>
+        <div class="about-value">
+          <span class="ic"><svg class="icon" width="19" height="19"><use href="#i-layers"/></svg></span>
+          <div><strong>Reliable Integration</strong><p>End-to-end AV &amp; IT systems built for daily use</p></div>
+        </div>
+        <div class="about-value">
+          <span class="ic"><svg class="icon" width="19" height="19"><use href="#i-shield"/></svg></span>
+          <div><strong>Security-First</strong><p>Smart CCTV &amp; surveillance to protect what matters</p></div>
+        </div>
+        <div class="about-value">
+          <span class="ic"><svg class="icon" width="19" height="19"><use href="#i-headset"/></svg></span>
+          <div><strong>Client-First Support</strong><p>Installation, maintenance &amp; support after go-live</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SERVICES ================= -->
+<section class="section section--panel" id="services">
+  <div class="container">
+    <div class="section-head center">
+      <div class="eyebrow" style="justify-content:center">What We Do</div>
+      <h2>Integrated Technology, <em>Immersive Results</em></h2>
+      <p>From AV integration to AR/VR/MR experiences and secure infrastructure — everything a modern business needs from one technology partner.</p>
+    </div>
+
+    <div class="services-grid">
+      <div class="tilt-wrap reveal">
+        <div class="service-card">
+          <div class="service-icon"><svg class="icon" width="26" height="26"><use href="#i-monitor"/></svg></div>
+          <h3>AV System Design &amp; Integration</h3>
+          <p>We design and integrate reliable audio-visual systems — from meeting rooms to auditoriums — that enhance communication, collaboration and user experience.</p>
+          <a href="#contact" class="link-arrow">Enquire Now <svg class="icon" width="15" height="15"><use href="#i-arrow-right"/></svg></a>
+        </div>
+      </div>
+      <div class="tilt-wrap reveal reveal-delay-1">
+        <div class="service-card">
+          <div class="service-icon"><svg class="icon" width="26" height="26"><use href="#i-vr"/></svg></div>
+          <h3>AR/VR/MR &amp; Immersive Technologies</h3>
+          <p>Custom AR, VR and MR experiences for training, visualization and engagement — turning complex ideas into experiences people actually understand.</p>
+          <a href="#contact" class="link-arrow">Enquire Now <svg class="icon" width="15" height="15"><use href="#i-arrow-right"/></svg></a>
+        </div>
+      </div>
+      <div class="tilt-wrap reveal reveal-delay-2">
+        <div class="service-card">
+          <div class="service-icon"><svg class="icon" width="26" height="26"><use href="#i-camera"/></svg></div>
+          <h3>Computer Accessories, Printers &amp; CCTV</h3>
+          <p>Smart tech, secure solutions. We supply and install computer accessories, printers and CCTV surveillance systems built for everyday reliability.</p>
+          <a href="#contact" class="link-arrow">Enquire Now <svg class="icon" width="15" height="15"><use href="#i-arrow-right"/></svg></a>
+        </div>
+      </div>
+      <div class="tilt-wrap reveal">
+        <div class="service-card">
+          <div class="service-icon"><svg class="icon" width="26" height="26"><use href="#i-wrench"/></svg></div>
+          <h3>Installation, Support &amp; Maintenance</h3>
+          <p>Expert installation, ongoing support and proactive maintenance that keeps every system performing at its best, long after the handover.</p>
+          <a href="#contact" class="link-arrow">Enquire Now <svg class="icon" width="15" height="15"><use href="#i-arrow-right"/></svg></a>
+        </div>
+      </div>
+      <div class="tilt-wrap reveal reveal-delay-1">
+        <div class="service-card">
+          <div class="service-icon"><svg class="icon" width="26" height="26"><use href="#i-cloud"/></svg></div>
+          <h3>Website Hosting &amp; Digital Presence</h3>
+          <p>Reliable hosting and digital infrastructure so your business stays online, secure and fast — built to grow with you.</p>
+          <a href="#contact" class="link-arrow">Enquire Now <svg class="icon" width="15" height="15"><use href="#i-arrow-right"/></svg></a>
+        </div>
+      </div>
+      <div class="tilt-wrap reveal reveal-delay-2">
+        <div class="service-card">
+          <div class="service-icon"><svg class="icon" width="26" height="26"><use href="#i-megaphone"/></svg></div>
+          <h3>Digital Marketing</h3>
+          <p>Focused digital marketing support to help your business reach the right audience online, backed by the same technical team behind your tech stack.</p>
+          <a href="#contact" class="link-arrow">Enquire Now <svg class="icon" width="15" height="15"><use href="#i-arrow-right"/></svg></a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SOLUTIONS / USE-CASES ================= -->
+<section class="section" id="solutions">
+  <div class="bg-orb" style="width:380px;height:380px;background:var(--cyan);top:20%;right:-8%;"></div>
+  <div class="container">
+    <div class="section-head center">
+      <div class="eyebrow" style="justify-content:center">Where It Works</div>
+      <h2>Immersive Technology, <em>Real-World Use</em></h2>
+      <p>AR/VR/MR isn't just a demo — it's a practical tool for training, design and engagement across industries.</p>
+    </div>
+    <div class="solutions-grid">
+      <div class="solution-card reveal">
+        <img src="assets/img/vr-office.jpg" alt="Employee using a VR headset for corporate training" loading="lazy">
+        <div class="solution-label">
+          <span>Corporate</span>
+          <strong>Training &amp; Simulation</strong>
+          <p>Reduce training risk and cost with realistic VR simulations for onboarding, safety drills and skill-building.</p>
+        </div>
+      </div>
+      <div class="solution-card reveal reveal-delay-1">
+        <img src="assets/img/ar-headset.jpg" alt="AR/MR headset used for design visualization" loading="lazy">
+        <div class="solution-label">
+          <span>Architecture &amp; Product</span>
+          <strong>Design Visualization</strong>
+          <p>Walk through architectural, product or interior designs in AR/MR before a single brick is laid.</p>
+        </div>
+      </div>
+      <div class="solution-card reveal reveal-delay-2">
+        <img src="assets/img/vr-headset-action.jpg" alt="Person experiencing an immersive VR activation" loading="lazy">
+        <div class="solution-label">
+          <span>Events &amp; Brands</span>
+          <strong>Experiential Marketing</strong>
+          <p>Immersive VR/AR activations that turn booths and events into experiences people remember.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= WHY CHOOSE ================= -->
+<section class="section section--alt" id="why">
+  <div class="container">
+    <div class="section-head center">
+      <div class="eyebrow" style="justify-content:center">Why EnvisionVR</div>
+      <h2>Why Businesses <em>Choose Us</em></h2>
+      <p>What sets our approach to immersive technology and integration apart.</p>
+    </div>
+    <div class="why-grid">
+      <div class="why-card reveal">
+        <div class="num">01</div>
+        <div class="why-icon"><svg class="icon" width="21" height="21"><use href="#i-vr"/></svg></div>
+        <h3>Immersive Technology Expertise</h3>
+        <p>Deep, focused experience in AR, VR and MR — not a side offering bolted onto generic IT services.</p>
+      </div>
+      <div class="why-card reveal reveal-delay-1">
+        <div class="num">02</div>
+        <div class="why-icon"><svg class="icon" width="21" height="21"><use href="#i-layers"/></svg></div>
+        <h3>End-to-End Project Support</h3>
+        <p>From consultation and design through installation, training and after-sales support.</p>
+      </div>
+      <div class="why-card reveal reveal-delay-2">
+        <div class="num">03</div>
+        <div class="why-icon"><svg class="icon" width="21" height="21"><use href="#i-shield"/></svg></div>
+        <h3>Security-Conscious Design</h3>
+        <p>CCTV and IT systems designed with data and physical security in mind from day one.</p>
+      </div>
+      <div class="why-card reveal">
+        <div class="num">04</div>
+        <div class="why-icon"><svg class="icon" width="21" height="21"><use href="#i-target"/></svg></div>
+        <h3>Transparent, Fair Pricing</h3>
+        <p>Clear quotes and honest recommendations — you only get what your project actually needs.</p>
+      </div>
+      <div class="why-card reveal reveal-delay-1">
+        <div class="num">05</div>
+        <div class="why-icon"><svg class="icon" width="21" height="21"><use href="#i-pin"/></svg></div>
+        <h3>Local Roots, Wider Reach</h3>
+        <p>Based in Balasore, Odisha, with the flexibility to support clients beyond the region.</p>
+      </div>
+      <div class="why-card reveal reveal-delay-2">
+        <div class="num">06</div>
+        <div class="why-icon"><svg class="icon" width="21" height="21"><use href="#i-headset"/></svg></div>
+        <h3>Dedicated After-Sales Care</h3>
+        <p>We stay involved after installation — support, maintenance and upgrades when you need them.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PROCESS ================= -->
+<section class="section" id="process">
+  <div class="container">
+    <div class="section-head center">
+      <div class="eyebrow" style="justify-content:center">How We Work</div>
+      <h2>From First Call To <em>Full Deployment</em></h2>
+      <p>A clear, five-stage process that keeps every project on track.</p>
+    </div>
+    <div class="process-track">
+      <div class="process-step reveal"><div class="process-dot">01</div><h3>Consultation</h3><p>Understanding your goals &amp; space</p></div>
+      <div class="process-step reveal reveal-delay-1"><div class="process-dot">02</div><h3>Solution Design</h3><p>Right tech for your requirement</p></div>
+      <div class="process-step reveal reveal-delay-2"><div class="process-dot">03</div><h3>Development &amp; Integration</h3><p>Building &amp; configuring the system</p></div>
+      <div class="process-step reveal reveal-delay-3"><div class="process-dot">04</div><h3>Installation &amp; Testing</h3><p>On-site setup &amp; quality checks</p></div>
+      <div class="process-step reveal"><div class="process-dot">05</div><h3>Training &amp; Support</h3><p>Handover, training &amp; ongoing care</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= STATS ================= -->
+<section class="section stats-bg">
+  <div class="container">
+    <div class="stats-grid">
+      <div class="stat-item reveal"><strong data-count="3">0</strong><span>Core Technology Pillars</span></div>
+      <div class="stat-item reveal reveal-delay-1"><strong data-count="6">0</strong><span>Solution Categories</span></div>
+      <div class="stat-item reveal reveal-delay-2"><strong data-count="6">0</strong><span>Days a Week Open</span></div>
+      <div class="stat-item reveal reveal-delay-3"><strong data-count="100" data-suffix="%">0</strong><span>Client-Focused Delivery</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= GALLERY ================= -->
+<section class="section section--alt">
+  <div class="container">
+    <div class="section-head center">
+      <div class="eyebrow" style="justify-content:center">A Glimpse Inside</div>
+      <h2>Immersive Technology <em>In Action</em></h2>
+      <p>Representative imagery across our core solution areas. <em style="color:var(--faint); font-style:normal;">(Illustrative — real project photography to be added.)</em></p>
+    </div>
+    <div class="gallery-grid">
+      <div class="gallery-item tall reveal"><img src="assets/img/vr-headset-action.jpg" alt="Immersive VR experience" loading="lazy"></div>
+      <div class="gallery-item reveal reveal-delay-1"><img src="assets/img/ar-headset.jpg" alt="AR/MR headset technology" loading="lazy"></div>
+      <div class="gallery-item reveal reveal-delay-2"><img src="assets/img/computer-setup.jpg" alt="Computer accessories and workstation setup" loading="lazy"></div>
+      <div class="gallery-item tall reveal reveal-delay-3"><img src="assets/img/cctv-camera.jpg" alt="Smart CCTV surveillance camera" loading="lazy"></div>
+      <div class="gallery-item reveal"><img src="assets/img/vr-office.jpg" alt="VR headset used in an office training setting" loading="lazy"></div>
+      <div class="gallery-item reveal reveal-delay-1"><img src="assets/img/hero-particles.jpg" alt="Abstract digital network representing connected technology" loading="lazy"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CTA BANNER ================= -->
+<section class="section--tight">
+  <div class="container">
+    <div class="cta-banner reveal">
+      <div>
+        <h2>Ready To Bring Immersive Technology To Your Business?</h2>
+        <p>Tell us what you're building — we'll help you design the right AV, IT or AR/VR/MR solution.</p>
+      </div>
+      <div class="cta-actions">
+        <a href="https://wa.me/919237234886?text=Hi%20EnvisionVR%20Technology%2C%20I%27d%20like%20to%20discuss%20a%20project." target="_blank" rel="noopener" class="btn btn-whatsapp"><svg class="icon" width="18" height="18"><use href="#i-whatsapp"/></svg> WhatsApp Us</a>
+        <a href="tel:+919237234886" class="btn btn-secondary"><svg class="icon" width="18" height="18"><use href="#i-phone"/></svg> Call Now</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CONTACT ================= -->
+<section class="section" id="contact">
+  <div class="container">
+    <div class="section-head center">
+      <div class="eyebrow" style="justify-content:center">Get In Touch</div>
+      <h2>Let's Talk About <em>Your Project</em></h2>
+      <p>Fill in your details and we'll pick up the conversation on WhatsApp.</p>
+    </div>
+
+    <div class="contact-grid">
+      <form class="contact-form glass-card reveal" autocomplete="off">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="fname">Full Name</label>
+            <input type="text" id="fname" name="fname" required placeholder="Your name">
+          </div>
+          <div class="form-group">
+            <label for="phone">Phone Number</label>
+            <input type="tel" id="phone" name="phone" required placeholder="+91 00000 00000">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="email">Email (optional)</label>
+          <input type="email" id="email" name="email" placeholder="you@company.com">
+        </div>
+        <div class="form-group">
+          <label for="service">Service of Interest</label>
+          <select id="service" name="service">
+            <option>AV System Design &amp; Integration</option>
+            <option>AR/VR/MR &amp; Immersive Technologies</option>
+            <option>Computer Accessories, Printers &amp; CCTV</option>
+            <option>Installation, Support &amp; Maintenance</option>
+            <option>Website Hosting &amp; Digital Marketing</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="message">Project Details (optional)</label>
+          <textarea id="message" name="message" placeholder="Tell us briefly about what you need..."></textarea>
+        </div>
+        <button type="submit" class="btn btn-whatsapp btn-block"><svg class="icon" width="18" height="18"><use href="#i-whatsapp"/></svg> Send via WhatsApp</button>
+        <p class="form-note">Submitting this form opens WhatsApp with your details pre-filled — nothing is stored on our server.</p>
+      </form>
+
+      <div class="reveal reveal-delay-1">
+        <div class="contact-info-list">
+          <div class="contact-info-item glass-card">
+            <span class="ic"><svg class="icon" width="20" height="20"><use href="#i-pin"/></svg></span>
+            <div><strong>Office Address</strong><p>169, Baliapal, Balasore, Odisha</p></div>
+          </div>
+          <div class="contact-info-item glass-card">
+            <span class="ic"><svg class="icon" width="20" height="20"><use href="#i-phone"/></svg></span>
+            <div><strong>Phone</strong><a href="tel:+919237234886">+91 92372 34886</a></div>
+          </div>
+          <div class="contact-info-item glass-card">
+            <span class="ic"><svg class="icon" width="20" height="20"><use href="#i-mail"/></svg></span>
+            <div><strong>Email</strong><a href="mailto:envisionvr7@gmail.com">envisionvr7@gmail.com</a></div>
+          </div>
+          <div class="contact-info-item glass-card">
+            <span class="ic"><svg class="icon" width="20" height="20"><use href="#i-clock"/></svg></span>
+            <div><strong>Working Hours</strong><p>Mon – Sat: 10:00 AM – 8:00 PM<br>Sunday: Closed</p></div>
+          </div>
+        </div>
+
+        <div class="map-frame">
+          <iframe src="https://www.google.com/maps?q=169,+Baliapal,+Balasore,+Odisha&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="EnvisionVR Technology location — Baliapal, Balasore, Odisha"></iframe>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FOOTER ================= -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="brand">
+          <span class="brand-mark"><img src="assets/img/logo.jpeg" alt="EnvisionVR Technology logo"></span>
+          <span class="brand-name"><strong style="color:#fff;">EnvisionVR</strong><span>Digital Vision</span></span>
+        </div>
+        <p>Integrated AV, IT and AR/VR/MR technology solutions for modern businesses and institutions — based in Balasore, Odisha.</p>
+        <div class="footer-social">
+          <a href="https://wa.me/919237234886" target="_blank" rel="noopener" aria-label="WhatsApp"><svg class="icon" width="16" height="16"><use href="#i-whatsapp"/></svg></a>
+          <a href="#" aria-label="LinkedIn"><svg class="icon" width="16" height="16"><use href="#i-linkedin"/></svg></a>
+          <a href="#" aria-label="Facebook"><svg class="icon" width="16" height="16"><use href="#i-facebook"/></svg></a>
+          <a href="#" aria-label="Instagram"><svg class="icon" width="16" height="16"><use href="#i-instagram"/></svg></a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4 class="footer-col-title">Company</h4>
+        <ul class="footer-links">
+          <li><a href="#about">About</a></li>
+          <li><a href="#why">Why Us</a></li>
+          <li><a href="#process">Our Process</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4 class="footer-col-title">Services</h4>
+        <ul class="footer-links">
+          <li><a href="#services">AV Integration</a></li>
+          <li><a href="#services">AR/VR/MR Solutions</a></li>
+          <li><a href="#services">CCTV &amp; Accessories</a></li>
+          <li><a href="#services">Installation &amp; Support</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4 class="footer-col-title">Contact</h4>
+        <ul class="footer-links">
+          <li><a href="mailto:envisionvr7@gmail.com">envisionvr7@gmail.com</a></li>
+          <li><a href="tel:+919237234886">+91 92372 34886</a></li>
+          <li><a href="#contact">Get a Free Consultation</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; <span data-year>2026</span> EnvisionVR Technology. All rights reserved.</span>
+      <span>Crafted for immersive-grade performance.</span>
+    </div>
+  </div>
+</footer>
+
+<a href="https://wa.me/919237234886?text=Hi%20EnvisionVR%20Technology%2C%20I%27d%20like%20to%20know%20more%20about%20your%20services." target="_blank" rel="noopener" class="whatsapp-float" aria-label="Chat on WhatsApp">
+  <svg class="icon" width="26" height="26"><use href="#i-whatsapp"/></svg>
+</a>
+
+<button class="back-to-top" aria-label="Back to top">
+  <svg class="icon" width="20" height="20"><use href="#i-arrow-up"/></svg>
+</button>
+
+<script src="assets/js/main.js"></script>
+</body>
+</html>
