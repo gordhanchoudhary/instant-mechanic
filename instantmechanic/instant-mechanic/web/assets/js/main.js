@@ -123,6 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
     form.addEventListener('submit', (e) => {
       e.preventDefault();
       const name = form.fname.value.trim();
+      const company = form.company.value.trim();
       const phone = form.phone.value.trim();
       const email = form.email.value.trim();
       const service = form.service.value;
@@ -134,6 +135,7 @@ document.addEventListener('DOMContentLoaded', () => {
         `Name: ${name}`,
         `Phone: ${phone}`,
       ];
+      if (company) lines.push(`Company: ${company}`);
       if (email) lines.push(`Email: ${email}`);
       if (message) lines.push(`Details: ${message}`);
 
