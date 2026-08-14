@@ -242,6 +242,29 @@
       font-style: italic;
       text-align: center;
     }
+
+    /* Request location button */
+    .request-location-btn {
+      display: inline-block;
+      width: auto;
+      background-color: #ff9800;
+      color: white;
+      border: none;
+      padding: 4px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+      margin: 0 0 0 8px;
+      vertical-align: middle;
+    }
+
+    .request-location-btn:hover { background-color: #e68900; }
+    .request-location-btn:disabled { background-color: #6c757d; cursor: not-allowed; }
+
+    .location-missing-text {
+      color: #d9534f;
+      font-style: italic;
+    }
   </style>
 </head>
 <body>
@@ -335,7 +358,13 @@
     let userChangedMechanic = false;
     let bookingData = null;
     let customerMobile = null;
+    let customerId = null;
+    let customerCar = null;
+    let customerProblem = null;
     let mixpanelReady = false;
+
+    // Correct location format: https://www.google.com/maps?q=lat,long
+    const VALID_LOCATION_REGEX = /^https:\/\/www\.google\.com\/maps\?q=-?\d+(\.\d+)?,-?\d+(\.\d+)?$/;
 
     // ── Mixpanel helpers ──
     function waitForMixpanel(callback, maxAttempts = 50, attempt = 1) {
@@ -484,6 +513,20 @@
       return 0;
     }
 
+    // Builds the Location row HTML — shows a "Request Location" button
+    // whenever location is missing or not in the https://www.google.com/maps?q=lat,long format
+    function buildLocationHtml(data) {
+      const isValid = data.location && VALID_LOCATION_REGEX.test(data.location);
+
+      if (isValid) {
+        return `<p><strong>Location:</strong> <a href="${data.location}" target="_blank">Map</a></p>`;
+      }
+
+      const label = data.location ? "Incorrect format" : "Missing";
+      return `<p><strong>Location:</strong> <span class="location-missing-text">${label}</span>
+        <button type="button" class="request-location-btn" onclick="requestLocation()">📍 Request Location</button></p>`;
+    }
+
     function fetchBooking() {
       if (!bookingId) return alert("Booking ID not provided in URL");
       fetch(`https://ai.instantmechanic.online/bot/api/bookings/${bookingId}/`)
@@ -493,6 +536,9 @@
           assignedMechanicId = data.mechanic;
           originalMechanicId = data.mechanic;
           customerMobile = data.customer_mobile || data.mobile || null;
+          customerId = data.customer || null;
+          customerCar = data.car || null;
+          customerProblem = data.problem || null;
 
           if (customerMobile) waitForMixpanel(() => identifyMixpanelUser(customerMobile));
 
@@ -505,7 +551,7 @@
             <p><strong>Car:</strong> ${data.car}</p>
             <p><strong>Problem:</strong> ${data.problem}</p>
             <p><strong>Price:</strong> ${data.price}</p>
-            <p><strong>Location:</strong> <a href="${data.location}" target="_blank">Map</a></p>
+            ${buildLocationHtml(data)}
             <p><strong>Is Cancelled:</strong> ${data.is_cancelled ? 'Yes' : 'No'}</p>
             <p><strong>Cancellation Reason:</strong> ${data.cancellation_reason || '-'}</p>
             <p><strong>Agent:</strong> ${data.agent_name || '-'}</p>
@@ -612,6 +658,52 @@
           fetchBooking();
         })
         .catch(error => alert("Error updating security amount: " + error.message));
+    }
+
+    // Builds the location-request message, personalized with the customer's car and problem when available.
+    function buildLocationRequestMessage() {
+      const carPart = customerCar ? ` for your ${customerCar}` : "";
+      const problemPart = customerProblem ? ` (${customerProblem})` : "";
+      return `Your booking${carPart}${problemPart} is confirmed and the mechanic is ready to move. Please share your exact current location so the mechanic can reach you very soon.`;
+    }
+
+    // Sends a WhatsApp message to the customer asking them to share their live location.
+    function requestLocation() {
+      if (!customerId) {
+        alert("Customer ID not available for this booking.");
+        return;
+      }
+
+      const btn = document.querySelector(".request-location-btn");
+      if (btn) { btn.disabled = true; btn.textContent = "Sending..."; }
+
+      fetch("https://ai.instantmechanic.online/bot/send-location-request", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          customer_id: customerId,
+          body_text: buildLocationRequestMessage()
+        })
+      })
+        .then(res => res.json())
+        .then(() => {
+          if (customerMobile) {
+            waitForMixpanel(() => {
+              identifyMixpanelUser(customerMobile);
+              trackMixpanelEvent("Location Request Sent", {
+                agent_name: localStorage.getItem("agent_name"), booking_id: bookingId,
+                customer_id: customerId, customer_mobile: customerMobile,
+                timestamp: new Date().toISOString()
+              });
+            });
+          }
+          alert("Location request sent to customer.");
+          if (btn) { btn.disabled = false; btn.textContent = "📍 Request Location"; }
+        })
+        .catch(error => {
+          alert("Error sending location request: " + error.message);
+          if (btn) { btn.disabled = false; btn.textContent = "📍 Request Location"; }
+        });
     }
 
     function fetchMechanics() {
