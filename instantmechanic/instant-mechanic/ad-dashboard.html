@@ -99,6 +99,19 @@ tr:hover td{background:#fafaf8}
 .funnel-bar-bg{flex:2;height:8px;background:#f0efeb;border-radius:4px;overflow:hidden}
 .funnel-bar-fill{height:100%;border-radius:4px}
 .date-label{font-size:12px;color:#555;background:#f0efeb;padding:3px 10px;border-radius:5px;display:inline-block}
+.cmp-table{width:100%;border-collapse:collapse;font-size:12px}
+.cmp-table th{padding:8px 12px;font-size:11px;font-weight:500;color:#888;border-bottom:0.5px solid #e1e0d9;text-align:left;white-space:nowrap}
+.cmp-table td{padding:9px 12px;border-bottom:0.5px solid #f0efeb;white-space:nowrap;vertical-align:middle}
+.cmp-table tr:last-child td{border-bottom:none}
+.cmp-table tr:hover td{background:#fafaf8}
+.cmp-slot-hdr td{background:#f7f6f3;font-weight:600;font-size:12px;color:#333;padding:10px 12px}
+.delta{font-size:11px;font-weight:500;display:inline-flex;align-items:center;gap:2px;padding:1px 6px;border-radius:4px}
+.delta-up{background:#eaf3de;color:#3b6d11}
+.delta-down{background:#fef2f2;color:#a32d2d}
+.delta-flat{background:#f1efe8;color:#777}
+.cmp-label{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:500}
+.cmp-this{background:#e6f1fb;color:#185fa5}
+.cmp-prev{background:#f1efe8;color:#555}
 
 @media(max-width:700px){.grid2{grid-template-columns:1fr}.kpi-row{grid-template-columns:repeat(2,1fr)}.dp-popup{min-width:260px}}
 </style>
@@ -181,6 +194,7 @@ tr:hover td{background:#fafaf8}
     <div class="tab active" onclick="showTab('overview',this)">Overview</div>
     <div class="tab" onclick="showTab('slots',this)">By slot</div>
     <div class="tab" onclick="showTab('table',this)">Raw table</div>
+    <div class="tab" onclick="showTab('compare',this)">Compare</div>
   </div>
 
   <div id="tab-overview">
@@ -227,6 +241,19 @@ tr:hover td{background:#fafaf8}
           <tbody id="rawBody"></tbody>
         </table>
       </div>
+    </div>
+    <div id="tab-compare" style="display:none">
+    <div class="section">
+      <div class="section-title" style="justify-content:space-between;flex-wrap:wrap;gap:10px">
+        <span><i class="ti ti-arrows-diff" aria-hidden="true"></i> Week-on-week comparison</span>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:12px;color:#888">Select a date:</span>
+          <input type="date" id="compareDate" style="height:32px;border:0.5px solid #d0cfc7;border-radius:6px;padding:0 10px;font-size:12px;color:#0b0b0b;background:#fff">
+          <button class="tbtn tbtn-primary" onclick="runCompare()" style="height:32px;font-size:12px">Compare</button>
+        </div>
+      </div>
+      <div id="compareInfo" style="font-size:12px;color:#888;margin-bottom:14px"></div>
+      <div id="compareBody"></div>
     </div>
   </div>
 </div>
@@ -662,11 +689,142 @@ function buildRawTable(rows){
   }).join('');
 }
 
+// ── Compare mode ──────────────────────────────────────────────────────────
+let CMP = { this: null, prev: null };
+
+async function runCompare(){
+  const val = document.getElementById('compareDate').value;
+  if(!val){ alert('Please select a date.'); return; }
+
+  const thisDate = parse(val);
+  const prevDate = new Date(thisDate); prevDate.setDate(prevDate.getDate() - 7);
+
+  const thisStr = fmt(thisDate);
+  const prevStr = fmt(prevDate);
+
+  const dayNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const dayName  = dayNames[thisDate.getDay()];
+  const prevDayName = dayNames[prevDate.getDay()];
+
+  document.getElementById('compareInfo').innerHTML =
+    `Comparing <span class="cmp-label cmp-this">${thisStr} (${dayName})</span> vs <span class="cmp-label cmp-prev">${prevStr} (${prevDayName} — previous week)</span>`;
+  document.getElementById('compareBody').innerHTML = '<div style="color:#aaa;font-size:13px;padding:20px 0">Loading...</div>';
+
+  try {
+    const [r1, r2] = await Promise.all([
+      fetch(BASE + '?dates=' + thisStr).then(r=>r.json()),
+      fetch(BASE + '?dates=' + prevStr).then(r=>r.json()),
+    ]);
+    CMP.this = r1.rows;
+    CMP.prev = r2.rows;
+    buildCompareTable(thisStr, prevStr);
+  } catch(e) {
+    document.getElementById('compareBody').innerHTML = '<div style="color:#d03b3b;font-size:13px">Failed to load comparison data.</div>';
+  }
+}
+
+function cmpDelta(curr, prev, lowerBetter=false, fmt='num'){
+  if(prev == null || prev === 0) return '';
+  const diff = curr - prev;
+  if(Math.abs(diff) < 0.001) return `<span class="delta delta-flat">≈</span>`;
+  const better  = lowerBetter ? diff < 0 : diff > 0;
+  const arrow   = diff > 0 ? '▲' : '▼';
+  const cls     = better ? 'delta-up' : 'delta-down';
+  let str;
+  if(fmt==='rupee') str = arrow+' ₹'+Math.abs(Math.round(diff)).toLocaleString();
+  else if(fmt==='pct') str = arrow+' '+Math.abs(diff).toFixed(1)+'%';
+  else str = arrow+' '+(Math.abs(diff)<10?Math.abs(diff).toFixed(1):Math.round(Math.abs(diff))).toLocaleString();
+  return `<span class="delta ${cls}">${str}</span>`;
+}
+
+function slotSummary(rows, slot){
+  const sr = slot === 'ALL' ? rows : rows.filter(r=>r.slot===slot);
+  if(!sr.length) return null;
+  const spend  = sr.reduce((s,r)=>s+r.cost,0);
+  const clicks = sr.reduce((s,r)=>s+(r.clicks||0),0);
+  const wa     = sr.reduce((s,r)=>s+r.whatsapp_convert,0);
+  const net    = sr.reduce((s,r)=>s+r.net_booking,0);
+  const cancelled = sr.reduce((s,r)=>s+r.cancelled_overall,0);
+  const ai     = sr.reduce((s,r)=>s+r.ai_booking,0);
+  const manual = sr.reduce((s,r)=>s+r.manual_booking,0);
+  const total  = net + cancelled;
+  const cr     = total ? cancelled/total*100 : 0;
+  const nc     = wa ? net/wa*100 : 0;
+  const cpl    = net ? spend/net : 0;
+  const ctw    = clicks ? wa/clicks*100 : 0;
+  return { spend, clicks, wa, net, cancelled, ai, manual, total, cr, nc, cpl, ctw };
+}
+
+function buildCompareTable(thisStr, prevStr){
+  const slots = ['ALL', ...Object.keys(SLOT_SHORT)];
+  let html = '';
+
+  slots.forEach(slot => {
+    const t = slotSummary(CMP.this, slot);
+    const p = slotSummary(CMP.prev, slot);
+    if(!t && !p) return;
+
+    const label = slot === 'ALL' ? '📊 All slots (day total)' : SLOT_SHORT[slot];
+    const col   = slot === 'ALL' ? '#333' : SLOT_COLOR[slot];
+
+    const tv = t || {};
+    const pv = p || {};
+
+    const rows = [
+      { metric:'Spend',         t: t?rupee(tv.spend):'–',            p: p?rupee(pv.spend):'–',            delta: t&&p?cmpDelta(tv.spend,pv.spend,true,'rupee'):'' },
+      { metric:'Clicks',        t: t?num(tv.clicks):'–',             p: p?num(pv.clicks):'–',             delta: t&&p?cmpDelta(tv.clicks,pv.clicks,false,'num'):'' },
+      { metric:'CTW%',          t: t?tv.ctw.toFixed(1)+'%':'–',      p: p?pv.ctw.toFixed(1)+'%':'–',      delta: t&&p?cmpDelta(tv.ctw,pv.ctw,false,'pct'):'' },
+      { metric:'WA converts',   t: t?num(tv.wa):'–',                 p: p?num(pv.wa):'–',                 delta: t&&p?cmpDelta(tv.wa,pv.wa,false,'num'):'' },
+      { metric:'Total bookings',t: t?num(tv.total):'–',              p: p?num(pv.total):'–',              delta: t&&p?cmpDelta(tv.total,pv.total,false,'num'):'' },
+      { metric:'Net bookings',  t: t?num(tv.net):'–',                p: p?num(pv.net):'–',                delta: t&&p?cmpDelta(tv.net,pv.net,false,'num'):'' },
+      { metric:'AI bookings',   t: t?`${tv.ai} (${tv.net?Math.round(tv.ai/tv.net*100):'0'}%)`:'–', p: p?`${pv.ai} (${pv.net?Math.round(pv.ai/pv.net*100):'0'}%)`:'–', delta: t&&p?cmpDelta(tv.ai,pv.ai,false,'num'):'' },
+      { metric:'Manual bookings',t:t?`${tv.manual} (${tv.net?Math.round(tv.manual/tv.net*100):'0'}%)`:'–',p:p?`${pv.manual} (${pv.net?Math.round(pv.manual/pv.net*100):'0'}%)`:'–',delta:t&&p?cmpDelta(tv.manual,pv.manual,false,'num'):'' },
+      { metric:'Cancelled',     t: t?num(tv.cancelled):'–',          p: p?num(pv.cancelled):'–',          delta: t&&p?cmpDelta(tv.cancelled,pv.cancelled,true,'num'):'' },
+      { metric:'Cancel rate',   t: t?tv.cr.toFixed(1)+'%':'–',       p: p?pv.cr.toFixed(1)+'%':'–',       delta: t&&p?cmpDelta(tv.cr,pv.cr,true,'pct'):'' },
+      { metric:'Net conv%',     t: t?tv.nc.toFixed(1)+'%':'–',       p: p?pv.nc.toFixed(1)+'%':'–',       delta: t&&p?cmpDelta(tv.nc,pv.nc,false,'pct'):'' },
+      { metric:'Cost/booking',  t: t?rupee(tv.cpl):'–',              p: p?rupee(pv.cpl):'–',              delta: t&&p?cmpDelta(tv.cpl,pv.cpl,true,'rupee'):'' },
+    ];
+
+    html += `
+      <div style="margin-bottom:24px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+          ${slot!=='ALL'?`<span style="width:10px;height:10px;border-radius:2px;background:${col}"></span>`:''}
+          <strong style="font-size:13px;color:${col}">${label}</strong>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="cmp-table">
+            <thead><tr>
+              <th style="min-width:130px">Metric</th>
+              <th><span class="cmp-label cmp-this">${thisStr.slice(5)}</span></th>
+              <th><span class="cmp-label cmp-prev">${prevStr.slice(5)} (prev week)</span></th>
+              <th>Change</th>
+            </tr></thead>
+            <tbody>
+              ${rows.map(r=>`<tr>
+                <td style="color:#555;font-weight:500">${r.metric}</td>
+                <td style="font-weight:500">${r.t}</td>
+                <td style="color:#888">${r.p}</td>
+                <td>${r.delta}</td>
+              </tr>`).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>`;
+  });
+
+  document.getElementById('compareBody').innerHTML = html;
+}
+
 function showTab(name,el){
   document.querySelectorAll('[id^="tab-"]').forEach(t=>t.style.display='none');
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.getElementById('tab-'+name).style.display='block';
   el.classList.add('active');
+  // pre-fill compare date with yesterday when switching to compare
+  if(name==='compare' && !document.getElementById('compareDate').value){
+    const y=new Date(TODAY); y.setDate(y.getDate()-1);
+    document.getElementById('compareDate').value = fmt(y);
+  }
 }
 
 document.getElementById('slotFilter').addEventListener('change',()=>{if(RAW)render();});
