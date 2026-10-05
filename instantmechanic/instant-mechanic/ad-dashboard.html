@@ -603,7 +603,7 @@ function buildKPIs(rows){
       <div class="kpi-label">${k.l}</div>
       <div class="kpi-val">${k.v}</div>
       <div class="kpi-sub">${k.s}</div>
-      ${k.avg ? `<div style="font-size:10px;color:#aaa;margin-top:6px;border-top:0.5px dashed #e8e7e0;padding-top:5px">${k.avg}</div>` : ''}
+      ${k.avg && k.avg.trim() ? `<div style="font-size:10px;color:#aaa;margin-top:6px;border-top:0.5px dashed #e8e7e0;padding-top:5px">${k.avg}</div>` : ''}
     </div>`).join('');
 }
 
@@ -668,11 +668,14 @@ function buildSlotChart(){
 
 function tile(l, v, sub, cls, avgHtml=''){
   const c=cls==='danger'?'#d03b3b':cls==='warn'?'#c88000':cls==='good'?'#1b8a56':'#0b0b0b';
+  const avgStr = avgHtml && avgHtml.trim()
+    ? `<div style="font-size:10px;color:#aaa;margin-top:5px;border-top:0.5px dashed #e8e7e0;padding-top:4px">${avgHtml}</div>`
+    : '';
   return `<div style="background:#fafaf8;border:0.5px solid #e8e7e0;border-radius:8px;padding:10px 12px">
     <div style="font-size:10px;color:#888;margin-bottom:4px">${l}</div>
     <div style="font-size:16px;font-weight:500;color:${c}">${v}</div>
     ${sub?`<div style="font-size:10px;color:#aaa;margin-top:2px">${sub}</div>`:''}
-    ${avgHtml?`<div class="tile-avg">${avgHtml}</div>`:''}
+    ${avgStr}
   </div>`;
 }
 
