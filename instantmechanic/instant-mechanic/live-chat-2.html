@@ -1310,9 +1310,81 @@
         };
       }
 
-      function trackPageLanding() {
+      // Device details for the landing event. Battery, device model and network info are only
+      // available in Chromium browsers (Android Chrome etc.); Safari/iPhone and Firefox report 'unsupported'.
+      // Each lookup is capped so a slow or missing API never delays the landing event by more than 1s.
+      function withTimeout(promise, ms) {
+        return Promise.race([promise, new Promise(resolve => setTimeout(() => resolve(null), ms))]);
+      }
+
+      async function getDeviceDetails() {
+        const details = {
+          battery_level: 'unsupported',
+          battery_charging: 'unsupported',
+          device_model: 'unsupported',
+          os_version: 'unsupported',
+          network_type: 'unsupported',
+          network_downlink_mbps: 'unsupported',
+          network_rtt_ms: 'unsupported',
+          data_saver: 'unsupported',
+          device_memory_gb: navigator.deviceMemory || 'unsupported',
+          cpu_cores: navigator.hardwareConcurrency || 'unsupported',
+          device_pixel_ratio: window.devicePixelRatio || 1,
+          touch_points: navigator.maxTouchPoints || 0,
+          language: navigator.language || 'unknown',
+          timezone: 'unknown'
+        };
+
+        try {
+          details.timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'unknown';
+        } catch (e) {}
+
+        const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+        if (connection) {
+          details.network_type = connection.effectiveType || 'unknown';
+          details.network_downlink_mbps = connection.downlink ?? 'unknown';
+          details.network_rtt_ms = connection.rtt ?? 'unknown';
+          details.data_saver = !!connection.saveData;
+        }
+
+        // Fallback model from the user agent (iPhone/iPad/desktop don't expose an exact model)
+        const ua = navigator.userAgent;
+        const uaDevice = ['iPhone', 'iPad', 'iPod', 'Android', 'Macintosh', 'Windows', 'Linux'].find(name => ua.includes(name));
+        if (uaDevice) details.device_model = uaDevice;
+        const iosVersion = ua.match(/OS (\d+[_\d]*) like Mac OS X/);
+        const androidVersion = ua.match(/Android (\d+(?:\.\d+)*)/);
+        if (iosVersion) details.os_version = iosVersion[1].replace(/_/g, '.');
+        else if (androidVersion) details.os_version = androidVersion[1];
+
+        const lookups = [];
+
+        if (navigator.getBattery) {
+          lookups.push(withTimeout(navigator.getBattery(), 1000).then(battery => {
+            if (!battery) return;
+            details.battery_level = Math.round(battery.level * 100);
+            details.battery_charging = battery.charging;
+          }).catch(() => {}));
+        }
+
+        if (navigator.userAgentData && navigator.userAgentData.getHighEntropyValues) {
+          lookups.push(withTimeout(navigator.userAgentData.getHighEntropyValues(['model', 'platformVersion']), 1000).then(values => {
+            if (!values) return;
+            if (values.model) details.device_model = values.model;   // e.g. "SM-S918B" (Galaxy S23 Ultra)
+            if (values.platformVersion) details.os_version = values.platformVersion;
+          }).catch(() => {}));
+        }
+
+        await Promise.all(lookups);
+        return details;
+      }
+
+      async function trackPageLanding() {
         const trafficSource = getTrafficSource();
-        
+        let deviceDetails = {};
+        try {
+          deviceDetails = await getDeviceDetails();
+        } catch (e) {}
+
         const eventData = {
           page_title: document.title,
           page_url: window.location.href,
@@ -1323,6 +1395,7 @@
           seo_optimized: true,
           google_rating: '4.8',
           total_reviews: 376,
+          ...deviceDetails,
           ...trafficSource
         };
         
