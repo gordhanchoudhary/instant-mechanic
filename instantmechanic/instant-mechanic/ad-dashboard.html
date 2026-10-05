@@ -99,6 +99,12 @@ tr:hover td{background:#fafaf8}
 .funnel-bar-bg{flex:2;height:8px;background:#f0efeb;border-radius:4px;overflow:hidden}
 .funnel-bar-fill{height:100%;border-radius:4px}
 .date-label{font-size:12px;color:#555;background:#f0efeb;padding:3px 10px;border-radius:5px;display:inline-block}
+.avg-badge{display:inline-flex;align-items:center;gap:3px;font-size:10px;margin-top:5px;color:#888}
+.avg-badge .avg-val{font-weight:500;color:#555}
+.avg-badge .avg-arrow{font-size:10px}
+.avg-arrow.up{color:#1b8a56}.avg-arrow.down{color:#d03b3b}
+.tile-avg{font-size:10px;color:#aaa;margin-top:4px;border-top:0.5px dashed #e8e7e0;padding-top:4px}
+.avg-loading{font-size:10px;color:#bbb;font-style:italic}
 @media(max-width:700px){.grid2{grid-template-columns:1fr}.kpi-row{grid-template-columns:repeat(2,1fr)}.dp-popup{min-width:260px}}
 </style>
 </head>
@@ -201,14 +207,25 @@ tr:hover td{background:#fafaf8}
 
   <div id="tab-slots" style="display:none">
     <div class="section">
-      <div class="section-title"><i class="ti ti-layout-grid" aria-hidden="true"></i> Slot breakdown</div>
+      <div class="section-title" style="justify-content:space-between">
+        <span><i class="ti ti-layout-grid" aria-hidden="true"></i> Slot breakdown</span>
+        <button class="tbtn" onclick="refreshAvg()" id="avgRefreshBtn" style="height:28px;font-size:11px;padding:0 10px">
+          <i class="ti ti-refresh" aria-hidden="true"></i> Refresh 30-day avg
+        </button>
+      </div>
+      <div id="avgStatus" style="font-size:11px;color:#aaa;margin-bottom:10px"></div>
       <div id="slotTable"></div>
     </div>
   </div>
 
   <div id="tab-table" style="display:none">
     <div class="section">
-      <div class="section-title"><i class="ti ti-table" aria-hidden="true"></i> All rows</div>
+      <div class="section-title" style="justify-content:space-between">
+        <span><i class="ti ti-table" aria-hidden="true"></i> All rows</span>
+        <button class="tbtn" onclick="exportCSV()" style="height:28px;font-size:11px;padding:0 10px">
+          <i class="ti ti-download" aria-hidden="true"></i> Export CSV
+        </button>
+      </div>
       <div style="overflow-x:auto">
         <table>
           <thead><tr>
@@ -226,6 +243,82 @@ tr:hover td{background:#fafaf8}
 <script>
 const BASE = 'https://ai.instantmechanic.online/bot/ad-dashboard/';
 let RAW = null, spendChart = null, slotChart = null;
+let AVG_DATA = null; // 30-day slot averages
+
+const AVG_LS_KEY  = 'rsa_avg_data';
+const AVG_LS_DATE = 'rsa_avg_date';
+
+async function loadAvgData(force=false){
+  // Return cached unless forced
+  const cached = localStorage.getItem(AVG_LS_KEY);
+  const cachedDate = localStorage.getItem(AVG_LS_DATE);
+  if(!force && cached && cachedDate){
+    try{ AVG_DATA = JSON.parse(cached); setAvgStatus(`30-day avg loaded (cached ${cachedDate})`); return; } catch(e){}
+  }
+  setAvgStatus('Fetching 30-day avg...');
+  document.getElementById('avgRefreshBtn').disabled = true;
+  try{
+    // Build last 30 days date list
+    const list=[];
+    for(let i=29;i>=0;i--){ const d=new Date(TODAY); d.setDate(d.getDate()-i); list.push(fmt(d)); }
+    const url = BASE+'?dates='+list.join(',');
+    const res = await fetch(url);
+    const data = await res.json();
+    AVG_DATA = computeSlotAvg(data.rows);
+    const today = fmt(TODAY);
+    try{ localStorage.setItem(AVG_LS_KEY, JSON.stringify(AVG_DATA)); localStorage.setItem(AVG_LS_DATE, today); } catch(e){}
+    setAvgStatus(`30-day avg updated (${today})`);
+    if(RAW){ const r=filteredRows(); buildKPIs(r); buildSlotTable(r); }
+  } catch(e){
+    setAvgStatus('Failed to load avg data');
+  }
+  document.getElementById('avgRefreshBtn').disabled = false;
+}
+
+function computeSlotAvg(rows){
+  // Per slot, compute avg of key metrics per day
+  const bySlot = {};
+  rows.forEach(r => {
+    if(!bySlot[r.slot]) bySlot[r.slot] = [];
+    bySlot[r.slot].push(r);
+  });
+  const avg = {};
+  Object.keys(bySlot).forEach(slot => {
+    const sr = bySlot[slot];
+    const n  = sr.length || 1;
+    avg[slot] = {
+      spend:       sr.reduce((s,r)=>s+r.cost,0)/n,
+      clicks:      sr.reduce((s,r)=>s+(r.clicks||0),0)/n,
+      wa:          sr.reduce((s,r)=>s+r.whatsapp_convert,0)/n,
+      net:         sr.reduce((s,r)=>s+r.net_booking,0)/n,
+      cancelled:   sr.reduce((s,r)=>s+r.cancelled_overall,0)/n,
+      total:       sr.reduce((s,r)=>s+r.net_booking+r.cancelled_overall,0)/n,
+      cancel_rate: sr.reduce((s,r)=>s+parsePct(r.cancel_pct),0)/n,
+      net_conv:    sr.reduce((s,r)=>s+parsePct(r.net_conversion_pct),0)/n,
+      cpl:         sr.filter(r=>r.net_booking>0).reduce((s,r)=>s+(r.cost/r.net_booking),0) / (sr.filter(r=>r.net_booking>0).length||1),
+      days:        n,
+    };
+  });
+  return avg;
+}
+
+function setAvgStatus(msg){ const el=document.getElementById('avgStatus'); if(el) el.textContent=msg; }
+
+function avgCompare(val, avgVal, lowerIsBetter=false, fmt='num'){
+  if(!avgVal) return '';
+  const diff = val - avgVal;
+  if(Math.abs(diff) < 0.01*avgVal) return `<span class="avg-badge"><span class="avg-val">≈ avg</span></span>`;
+  const better = lowerIsBetter ? diff < 0 : diff > 0;
+  const arrow  = diff > 0 ? '▲' : '▼';
+  const cls    = better ? 'up' : 'down';
+  let diffStr;
+  if(fmt==='rupee') diffStr = '₹'+Math.abs(Math.round(diff)).toLocaleString();
+  else if(fmt==='pct') diffStr = Math.abs(diff).toFixed(1)+'%';
+  else diffStr = (Math.abs(diff)<10 ? Math.abs(diff).toFixed(1) : Math.round(Math.abs(diff))).toLocaleString();
+  return `<span class="avg-badge"><span class="avg-arrow ${cls}">${arrow} ${diffStr}</span></span>`;
+}
+
+async function refreshAvg(){ await loadAvgData(true); }
 let pickerMode = 'range';
 let calYear, calMonth;
 let rangeStart = null, rangeEnd = null, singleDate = null;
@@ -471,18 +564,47 @@ function buildKPIs(rows){
   const cpl=net?spend/net:0;
   const cancelRate=(net+cancelled)?(cancelled/(net+cancelled)*100):0;
   const netConv=wa?net/wa*100:0;
-  const cpc = clicks ? spend/clicks : 0;
-  const cpc_wa = wa ? spend/wa : 0;
+  const cpc=clicks?spend/clicks:0;
+  const cpc_wa=wa?spend/wa:0;
+  const nDays = [...new Set(rows.map(r=>r.date))].length || 1;
+
+  // Roll up 30d avg across all slots
+  let a30 = null;
+  if(AVG_DATA){
+    const slots = Object.keys(AVG_DATA);
+    if(slots.length){
+      a30 = {
+        spend:       slots.reduce((s,k)=>s+AVG_DATA[k].spend,0),
+        clicks:      slots.reduce((s,k)=>s+AVG_DATA[k].clicks,0),
+        wa:          slots.reduce((s,k)=>s+AVG_DATA[k].wa,0),
+        net:         slots.reduce((s,k)=>s+AVG_DATA[k].net,0),
+        cancel_rate: slots.reduce((s,k)=>s+AVG_DATA[k].cancel_rate,0)/slots.length,
+        net_conv:    slots.reduce((s,k)=>s+AVG_DATA[k].net_conv,0)/slots.length,
+        cpl:         slots.reduce((s,k)=>s+AVG_DATA[k].cpl,0)/slots.length,
+      };
+    }
+  }
+
+  // per-day values for comparison
+  const pd = { spend:spend/nDays, clicks:clicks/nDays, wa:wa/nDays, net:net/nDays };
+
   const kpis=[
-    {l:'Total spend',v:rupee(spend),s:`₹${cpc.toFixed(0)}/click · ₹${Math.round(cpc_wa)}/customer`,c:''},
-    {l:'Total clicks',v:num(clicks),s:'from Google Ads',c:''},
-    {l:'WA converts',v:num(wa),s:`CTW ${clicks?(wa/clicks*100).toFixed(1)+'%':'–'}`,c:''},
-    {l:'Net bookings',v:num(net),s:`AI: ${ai} · Manual: ${manual}`,c:net<50?'warn':'good'},
-    {l:'Cancel rate',v:cancelRate.toFixed(1)+'%',s:`${cancelled} cancelled`,c:cancelRate>40?'danger':cancelRate>30?'warn':'good'},
-    {l:'Net conv%',v:netConv.toFixed(1)+'%',s:'bookings / WA leads',c:netConv<20?'warn':netConv>35?'good':''},
-    {l:'Cost/booking',v:rupee(cpl),s:'spend / net bookings',c:cpl>600?'danger':cpl>400?'warn':'good'},
+    {l:'Total spend',    v:rupee(spend),            s:`₹${cpc.toFixed(0)}/click · ₹${Math.round(cpc_wa)}/customer`, c:'',                                              avg: a30 ? `avg/day ₹${Math.round(a30.spend)} ${avgCompare(pd.spend, a30.spend, true, 'rupee')}` : ''},
+    {l:'Total clicks',   v:num(clicks),              s:'from Google Ads',                                              c:'',                                              avg: a30 ? `avg/day ${Math.round(a30.clicks)} ${avgCompare(pd.clicks, a30.clicks, false, 'num')}` : ''},
+    {l:'WA converts',    v:num(wa),                  s:`CTW ${clicks?(wa/clicks*100).toFixed(1)+'%':'–'}`,            c:'',                                              avg: a30 ? `avg/day ${Math.round(a30.wa)} ${avgCompare(pd.wa, a30.wa, false, 'num')}` : ''},
+    {l:'Net bookings',   v:num(net),                 s:`AI: ${ai} · Manual: ${manual}`,                               c:net<50?'warn':'good',                            avg: a30 ? `avg/day ${Math.round(a30.net)} ${avgCompare(pd.net, a30.net, false, 'num')}` : ''},
+    {l:'Cancel rate',    v:cancelRate.toFixed(1)+'%',s:`${cancelled} cancelled`,                                      c:cancelRate>40?'danger':cancelRate>30?'warn':'good', avg: a30 ? `30d avg ${a30.cancel_rate.toFixed(1)}% ${avgCompare(cancelRate, a30.cancel_rate, true, 'pct')}` : ''},
+    {l:'Net conv%',      v:netConv.toFixed(1)+'%',   s:'bookings / WA leads',                                         c:netConv<20?'warn':netConv>35?'good':'',          avg: a30 ? `30d avg ${a30.net_conv.toFixed(1)}% ${avgCompare(netConv, a30.net_conv, false, 'pct')}` : ''},
+    {l:'Cost/booking',   v:rupee(cpl),               s:'spend / net bookings',                                        c:cpl>600?'danger':cpl>400?'warn':'good',          avg: a30 ? `30d avg ₹${Math.round(a30.cpl)} ${avgCompare(cpl, a30.cpl, true, 'rupee')}` : ''},
   ];
-  document.getElementById('kpiRow').innerHTML=kpis.map(k=>`<div class="kpi ${k.c}"><div class="kpi-label">${k.l}</div><div class="kpi-val">${k.v}</div><div class="kpi-sub">${k.s}</div></div>`).join('');
+
+  document.getElementById('kpiRow').innerHTML=kpis.map(k=>`
+    <div class="kpi ${k.c}">
+      <div class="kpi-label">${k.l}</div>
+      <div class="kpi-val">${k.v}</div>
+      <div class="kpi-sub">${k.s}</div>
+      ${k.avg ? `<div style="font-size:10px;color:#aaa;margin-top:6px;border-top:0.5px dashed #e8e7e0;padding-top:5px">${k.avg}</div>` : ''}
+    </div>`).join('');
 }
 
 function buildSpendChart(rows){
@@ -544,9 +666,14 @@ function buildSlotChart(){
   });
 }
 
-function tile(l,v,sub,cls){
+function tile(l, v, sub, cls, avgHtml=''){
   const c=cls==='danger'?'#d03b3b':cls==='warn'?'#c88000':cls==='good'?'#1b8a56':'#0b0b0b';
-  return `<div style="background:#fafaf8;border:0.5px solid #e8e7e0;border-radius:8px;padding:10px 12px"><div style="font-size:10px;color:#888;margin-bottom:4px">${l}</div><div style="font-size:16px;font-weight:500;color:${c}">${v}</div>${sub?`<div style="font-size:10px;color:#aaa;margin-top:2px">${sub}</div>`:''}</div>`;
+  return `<div style="background:#fafaf8;border:0.5px solid #e8e7e0;border-radius:8px;padding:10px 12px">
+    <div style="font-size:10px;color:#888;margin-bottom:4px">${l}</div>
+    <div style="font-size:16px;font-weight:500;color:${c}">${v}</div>
+    ${sub?`<div style="font-size:10px;color:#aaa;margin-top:2px">${sub}</div>`:''}
+    ${avgHtml?`<div class="tile-avg">${avgHtml}</div>`:''}
+  </div>`;
 }
 
 function buildSlotTable(rows){
@@ -555,20 +682,80 @@ function buildSlotTable(rows){
   let html='';
   Object.keys(SLOT_SHORT).forEach(slot=>{
     const sr=bySlot[slot]; if(!sr||!sr.length) return;
-    const spend=sr.reduce((s,r)=>s+r.cost,0);
-    const clicks=sr.reduce((s,r)=>s+(r.clicks||0),0);
-    const wa=sr.reduce((s,r)=>s+r.whatsapp_convert,0);
-    const net=sr.reduce((s,r)=>s+r.net_booking,0);
-    const cancelled=sr.reduce((s,r)=>s+r.cancelled_overall,0);
-    const ai=sr.reduce((s,r)=>s+r.ai_booking,0);
-    const manual=sr.reduce((s,r)=>s+r.manual_booking,0);
-    const cr=(net+cancelled)?cancelled/(net+cancelled)*100:0;
-    const nc=wa?net/wa*100:0;
-    const cpl=net?spend/net:0;
-    const col=SLOT_COLOR[slot];
-    html+=`<div style="margin-bottom:16px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span style="width:10px;height:10px;border-radius:2px;background:${col}"></span><strong style="font-size:13px">${SLOT_SHORT[slot]}</strong><span style="font-size:11px;color:#888">${sr.length} day(s)</span></div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;padding-left:18px">${tile('Spend',rupee(spend),clicks?`₹${(spend/clicks).toFixed(0)}/click · ₹${wa?Math.round(spend/wa):'–'}/customer`:'')}${tile('Clicks',num(clicks))}${tile('WA converts',num(wa),clicks?'CTW '+(wa/clicks*100).toFixed(1)+'%':'')}${tile('Total bookings',num(net+cancelled),'net + cancelled')}${tile('Net bookings',num(net),`AI ${ai} · Manual ${manual}`)}${tile('Cancelled',num(cancelled),`${cr.toFixed(1)}% cancel rate`,cr>40?'danger':cr>30?'warn':'good')}${tile('Net conv%',nc.toFixed(1)+'%','',nc>35?'good':nc<20?'warn':'')}${tile('Cost/booking',rupee(cpl),'',cpl>600?'danger':cpl>400?'warn':'good')}</div></div>`;
+    const n      = sr.length;
+    const spend  = sr.reduce((s,r)=>s+r.cost,0);
+    const clicks = sr.reduce((s,r)=>s+(r.clicks||0),0);
+    const wa     = sr.reduce((s,r)=>s+r.whatsapp_convert,0);
+    const net    = sr.reduce((s,r)=>s+r.net_booking,0);
+    const cancelled = sr.reduce((s,r)=>s+r.cancelled_overall,0);
+    const ai     = sr.reduce((s,r)=>s+r.ai_booking,0);
+    const manual = sr.reduce((s,r)=>s+r.manual_booking,0);
+    const cr     = (net+cancelled)?cancelled/(net+cancelled)*100:0;
+    const nc     = wa?net/wa*100:0;
+    const cpl    = net?spend/net:0;
+    const col    = SLOT_COLOR[slot];
+
+    // Per-day averages for this period (to compare against 30d avg)
+    const avgSpend  = spend/n, avgClicks=clicks/n, avgWa=wa/n;
+    const avgNet    = net/n, avgCpl=cpl;
+
+    // 30-day avg for this slot
+    const a = AVG_DATA && AVG_DATA[slot];
+
+    const spendAvgLine  = a ? `avg/day ₹${Math.round(a.spend)} ${avgCompare(spend/n, a.spend, true, 'rupee')}` : '';
+    const clicksAvgLine = a ? `avg/day ${Math.round(a.clicks)} ${avgCompare(clicks/n, a.clicks, false, 'num')}` : '';
+    const waAvgLine     = a ? `avg/day ${Math.round(a.wa)} ${avgCompare(wa/n, a.wa, false, 'num')}` : '';
+    const totalAvgLine  = a ? `avg/day ${Math.round(a.total)} ${avgCompare((net+cancelled)/n, a.total, false, 'num')}` : '';
+    const netAvgLine    = a ? `avg/day ${Math.round(a.net)} ${avgCompare(net/n, a.net, false, 'num')}` : '';
+    const crAvgLine     = a ? `30d avg ${a.cancel_rate.toFixed(1)}% ${avgCompare(cr, a.cancel_rate, true, 'pct')}` : '';
+    const ncAvgLine     = a ? `30d avg ${a.net_conv.toFixed(1)}% ${avgCompare(nc, a.net_conv, false, 'pct')}` : '';
+    const cplAvgLine    = a ? `30d avg ₹${Math.round(a.cpl)} ${avgCompare(cpl, a.cpl, true, 'rupee')}` : '';
+
+    html+=`<div style="margin-bottom:20px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+        <span style="width:10px;height:10px;border-radius:2px;background:${col}"></span>
+        <strong style="font-size:13px">${SLOT_SHORT[slot]}</strong>
+        <span style="font-size:11px;color:#888">${n} day(s)</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;padding-left:18px">
+        ${tile('Spend', rupee(spend), clicks?`₹${(spend/clicks).toFixed(0)}/click · ₹${wa?Math.round(spend/wa):'–'}/customer`:'', '', spendAvgLine)}
+        ${tile('Clicks', num(clicks), '', '', clicksAvgLine)}
+        ${tile('WA converts', num(wa), clicks?'CTW '+(wa/clicks*100).toFixed(1)+'%':'', '', waAvgLine)}
+        ${tile('Total bookings', num(net+cancelled), 'net + cancelled', '', totalAvgLine)}
+        ${tile('Net bookings', num(net), `AI ${ai} · Manual ${manual}`, '', netAvgLine)}
+        ${tile('Cancelled', num(cancelled), `${cr.toFixed(1)}% cancel rate`, cr>40?'danger':cr>30?'warn':'good', crAvgLine)}
+        ${tile('Net conv%', nc.toFixed(1)+'%', '', nc>35?'good':nc<20?'warn':'', ncAvgLine)}
+        ${tile('Cost/booking', rupee(cpl), '', cpl>600?'danger':cpl>400?'warn':'good', cplAvgLine)}
+      </div>
+    </div>`;
   });
-  document.getElementById('slotTable').innerHTML=html;
+  document.getElementById('slotTable').innerHTML = html || '<p style="color:#aaa;font-size:13px">No data for selected filters.</p>';
+}
+
+function exportCSV(){
+  if(!RAW||!RAW.rows.length){ alert('No data to export.'); return; }
+  const rows = filteredRows();
+  const headers = ['Date','Slot','Clicks','CPC','Spend','WA Converts','CTW%','AI Bookings','AI%','Manual','Manual%','Total','Cancelled','Cancel%','Net','Net Conv%'];
+  const lines = [headers.join(',')];
+  rows.forEach(r=>{
+    const manualDen = r.whatsapp_convert - r.ai_booking;
+    const manualPct = manualDen>0?(r.manual_booking/manualDen*100).toFixed(1)+'%':'0%';
+    lines.push([
+      r.date, `"${SLOT_SHORT[r.slot]||r.slot}"`,
+      r.clicks||0, r.cost_per_click||0, r.cost.toFixed(2),
+      r.whatsapp_convert, r.ctw_pct||'0%',
+      r.ai_booking, r.ai_pct,
+      r.manual_booking, manualPct,
+      r.net_booking+r.cancelled_overall,
+      r.cancelled_overall, r.cancel_pct,
+      r.net_booking, r.net_conversion_pct
+    ].join(','));
+  });
+  const blob = new Blob([lines.join('\n')], {type:'text/csv'});
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = `rsa-ads-${fmt(new Date())}.csv`;
+  a.click(); URL.revokeObjectURL(url);
 }
 
 function cancelBadge(p){const v=parsePct(p);return v>40?`<span class="badge badge-red">${p}</span>`:v>30?`<span class="badge badge-amber">${p}</span>`:`<span class="badge badge-green">${p}</span>`;}
@@ -609,12 +796,13 @@ function showTab(name,el){
 
 document.getElementById('slotFilter').addEventListener('change',()=>{if(RAW)render();});
 
-// Init: default yesterday
+// Init: default yesterday + load avg in background
 (function(){
   const y=new Date(TODAY); y.setDate(y.getDate()-1);
   rangeStart=y; rangeEnd=y; singleDate=y;
   const list=[fmt(y)];
   updateLabel(list); fetchData(list);
+  loadAvgData(false); // load from cache or fetch
 })();
 </script>
 </body>
