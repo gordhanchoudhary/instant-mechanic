@@ -471,8 +471,10 @@ function buildKPIs(rows){
   const cpl=net?spend/net:0;
   const cancelRate=(net+cancelled)?(cancelled/(net+cancelled)*100):0;
   const netConv=wa?net/wa*100:0;
+  const cpc = clicks ? spend/clicks : 0;
+  const cpc_wa = wa ? spend/wa : 0;
   const kpis=[
-    {l:'Total spend',v:rupee(spend),s:'incl. 18% GST',c:''},
+    {l:'Total spend',v:rupee(spend),s:`₹${cpc.toFixed(0)}/click · ₹${Math.round(cpc_wa)}/customer`,c:''},
     {l:'Total clicks',v:num(clicks),s:'from Google Ads',c:''},
     {l:'WA converts',v:num(wa),s:`CTW ${clicks?(wa/clicks*100).toFixed(1)+'%':'–'}`,c:''},
     {l:'Net bookings',v:num(net),s:`AI: ${ai} · Manual: ${manual}`,c:net<50?'warn':'good'},
@@ -575,7 +577,26 @@ function convBadge(p){const v=parsePct(p);return v>35?`<span class="badge badge-
 function buildRawTable(rows){
   document.getElementById('rawBody').innerHTML=rows.map(r=>{
     const col=SLOT_COLOR[r.slot]||'#888';
-    return `<tr><td>${r.date.slice(5)}</td><td><span style="display:inline-flex;align-items:center;gap:5px"><span style="width:8px;height:8px;border-radius:2px;background:${col}"></span>${SLOT_SHORT[r.slot]||r.slot}</span></td><td>${num(r.clicks)}</td><td>${r.cost_per_click!=null?'₹'+r.cost_per_click:'–'}</td><td>${rupee(r.cost)}</td><td>${r.whatsapp_convert}</td><td>${r.ctw_pct||'–'}</td><td>${r.ai_booking} <span style="color:#888;font-size:10px">(${r.ai_pct})</span></td><td>${r.manual_booking} <span style="color:#888;font-size:10px">(${r.manual_pct})</span></td><td><strong>${r.total}</strong></td><td>${r.cancelled_overall}</td><td>${cancelBadge(r.cancel_pct)}</td><td><strong>${r.net_booking}</strong></td><td>${convBadge(r.net_conversion_pct)}</td></tr>`;
+    const totalAttempted = r.net_booking + r.cancelled_overall;
+    // manual% = manual / (wa_converts - ai_bookings)
+    const manualDen = r.whatsapp_convert - r.ai_booking;
+    const manualPct = manualDen > 0 ? (r.manual_booking / manualDen * 100).toFixed(1)+'%' : '0%';
+    return `<tr>
+      <td>${r.date.slice(5)}</td>
+      <td><span style="display:inline-flex;align-items:center;gap:5px"><span style="width:8px;height:8px;border-radius:2px;background:${col}"></span>${SLOT_SHORT[r.slot]||r.slot}</span></td>
+      <td>${num(r.clicks)}</td>
+      <td>${r.cost_per_click!=null?'₹'+r.cost_per_click:'–'}</td>
+      <td>${rupee(r.cost)}</td>
+      <td>${r.whatsapp_convert}</td>
+      <td>${r.ctw_pct||'–'}</td>
+      <td>${r.ai_booking} <span style="color:#888;font-size:10px">(${r.ai_pct})</span></td>
+      <td>${r.manual_booking} <span style="color:#888;font-size:10px">(${manualPct})</span></td>
+      <td><strong>${totalAttempted}</strong></td>
+      <td>${r.cancelled_overall}</td>
+      <td>${cancelBadge(r.cancel_pct)}</td>
+      <td><strong>${r.net_booking}</strong></td>
+      <td>${convBadge(r.net_conversion_pct)}</td>
+    </tr>`;
   }).join('');
 }
 
