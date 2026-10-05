@@ -599,7 +599,7 @@ function buildSlotTable(rows){
         ${tile('Total bookings', num(net+cancelled), 'net + cancelled')}
         ${tile('Net bookings', num(net), `AI ${ai} · Manual ${manual}`)}
         ${tile('Cancelled', num(cancelled), `${cr.toFixed(1)}% cancel rate`, cr>40?'danger':cr>30?'warn':'good')}
-        ${tile('Net conv%', nc.toFixed(1)+'%', `overall ${wa?(((net+cancelled)/wa)*100).toFixed(1)+'%':'–'} (total/WA)`, nc>35?'good':nc<20?'warn':'')}
+        ${tile('Net conv%', nc.toFixed(1)+'%', `overall ${wa?(((net+cancelled)/wa)*100).toFixed(1)+'%':'–'}`, nc>35?'good':nc<20?'warn':'')}
         ${tile('Cost/booking', rupee(cpl), '', cpl>600?'danger':cpl>400?'warn':'good')}
       </div>
     </div>`;
