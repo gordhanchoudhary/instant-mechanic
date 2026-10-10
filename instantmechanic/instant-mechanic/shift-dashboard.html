@@ -253,15 +253,9 @@ tr:hover td{background:var(--surface2)}
   </div>
 
   <div id="tab-overview">
-    <div class="grid2">
-      <div class="section">
-        <div class="section-title"><i class="ti ti-chart-bar" aria-hidden="true"></i> Daily spend vs net bookings</div>
-        <div class="chart-wrap"><canvas id="spendChart" role="img" aria-label="Daily spend and net bookings">Daily spend and net bookings per day.</canvas></div>
-      </div>
-      <div class="section">
-        <div class="section-title"><i class="ti ti-trending-up" aria-hidden="true"></i> Conversion funnel</div>
-        <div id="funnelBlock" style="padding-top:8px"></div>
-      </div>
+    <div class="section">
+      <div class="section-title"><i class="ti ti-trending-up" aria-hidden="true"></i> Conversion funnel</div>
+      <div id="funnelBlock" style="padding-top:8px"></div>
     </div>
     <div class="section">
       <div class="section-title"><i class="ti ti-clock" aria-hidden="true"></i> Net conversion % by slot (avg)</div>
@@ -300,7 +294,7 @@ tr:hover td{background:var(--surface2)}
         <table>
           <thead><tr>
             <th>Date</th><th>Slot</th>
-            <th>WA Converts</th><th>CTW%</th><th>AI Bookings</th><th>Manual</th>
+            <th>WA Converts</th><th>AI Bookings</th><th>Manual</th>
             <th>Total</th><th>Cancelled</th><th>Cancel%</th><th>Net</th><th>Net Conv%</th>
           </tr></thead>
           <tbody id="rawBody"></tbody>
@@ -327,7 +321,7 @@ tr:hover td{background:var(--surface2)}
 
 <script>
 const BASE = 'https://ai.instantmechanic.online/bot/ad-dashboard/';
-let RAW = null, spendChart = null, slotChart = null;
+let RAW = null, slotChart = null;
 let pickerMode = 'range';
 let calYear, calMonth;
 let rangeStart = null, rangeEnd = null, singleDate = null;
@@ -534,7 +528,7 @@ function filteredRows(){
 
 function render(){
   const rows=filteredRows();
-  buildAlerts(rows); buildKPIs(rows); buildSpendChart(rows);
+  buildAlerts(rows); buildKPIs(rows);
   buildFunnel(rows); buildSlotChart(); buildSlotTable(rows); buildRawTable(rows);
 }
 
@@ -550,14 +544,9 @@ function buildAlerts(rows){
   const cancelRate=totalB?totalC/totalB*100:0;
   if(cancelRate>40) warns.push({t:'danger',m:`Cancel rate is <strong>${cancelRate.toFixed(1)}%</strong> — very high. Check mechanic availability.`});
   else if(cancelRate>30) warns.push({t:'warn',m:`Cancel rate at <strong>${cancelRate.toFixed(1)}%</strong> — above 30%.`});
-  const lowCTW=rows.filter(r=>r.clicks&&r.clicks>50&&parsePct(r.ctw_pct)<10);
-  if(lowCTW.length) warns.push({t:'warn',m:`${lowCTW.length} slot(s) with CTW% below 10% despite high clicks.`});
   const netRows=rows.filter(r=>r.whatsapp_convert>10);
   const avgNC=netRows.length?netRows.reduce((s,r)=>s+parsePct(r.net_conversion_pct),0)/netRows.length:0;
   if(avgNC<20&&netRows.length) warns.push({t:'warn',m:`Avg net conversion <strong>${avgNC.toFixed(1)}%</strong> — below 20%.`});
-  const eve=rows.filter(r=>r.slot==='Evening 6pm to 12am');
-  const eveCTW=eve.length?eve.reduce((s,r)=>s+parsePct(r.ctw_pct),0)/eve.length:0;
-  if(eveCTW<10&&eve.length) warns.push({t:'warn',m:`Evening slot avg CTW <strong>${eveCTW.toFixed(1)}%</strong> — consider reducing budget.`});
   if(!warns.length){ box.innerHTML=''; return; }
   warns.forEach(w=>{ box.innerHTML+=`<div class="alert alert-${w.t}"><i class="ti ti-alert-triangle"></i><span>${w.m}</span></div>`; });
 }
@@ -575,11 +564,16 @@ function buildKPIs(rows){
   const netConv=wa?net/wa*100:0;
   const cpc=clicks?spend/clicks:0;
   const cpc_wa=wa?spend/wa:0;
+  const totalBookings=net+cancelled;
+  const cancelledAI=rows.reduce((s,r)=>s+(r.cancelled_ai||0),0);
+  const cancelledManual=rows.reduce((s,r)=>s+(r.cancelled_manual||0),0);
+  const cancelSub = cancelledAI||cancelledManual ? `AI: ${cancelledAI} · Manual: ${cancelledManual}` : `${cancelled} cancelled`;
   const kpis=[
-    {l:'WA converts',   v:num(wa),                   s:`CTW ${clicks?(wa/clicks*100).toFixed(1)+'%':'–'}`,            c:''},
-    {l:'Net bookings',  v:num(net),                  s:`AI: ${ai} · Manual: ${manual}`,                               c:net<50?'warn':'good'},
-    {l:'Cancel rate',   v:cancelRate.toFixed(1)+'%', s:`${cancelled} cancelled`,                                      c:cancelRate>40?'danger':cancelRate>30?'warn':'good'},
-    {l:'Net conv%',     v:netConv.toFixed(1)+'%',    s:'bookings / WA leads',                                         c:netConv<20?'warn':netConv>35?'good':''},
+    {l:'WA converts',     v:num(wa),                   s:`${wa} leads from ads`,                                      c:''},
+    {l:'Total bookings',  v:num(totalBookings),         s:`net + cancelled`,                                           c:''},
+    {l:'Net bookings',    v:num(net),                   s:`AI: ${ai} · Manual: ${manual}`,                             c:net<50?'warn':'good'},
+    {l:'Cancel rate',     v:cancelRate.toFixed(1)+'%',  s:cancelSub,                                                  c:cancelRate>40?'danger':cancelRate>30?'warn':'good'},
+    {l:'Net conv%',       v:netConv.toFixed(1)+'%',     s:'bookings / WA leads',                                      c:netConv<20?'warn':netConv>35?'good':''},
   ];
 
   document.getElementById('kpiRow').innerHTML=kpis.map(k=>`
@@ -590,27 +584,6 @@ function buildKPIs(rows){
     </div>`).join('');
 }
 
-function buildSpendChart(rows){
-  const byDate={};
-  (RAW.dates||[]).forEach(d=>{byDate[d]={spend:0,net:0};});
-  rows.forEach(r=>{ if(byDate[r.date]){byDate[r.date].spend+=r.cost;byDate[r.date].net+=r.net_booking;} });
-  const dates=Object.keys(byDate);
-  if(spendChart) spendChart.destroy();
-  const ctx=document.getElementById('spendChart').getContext('2d');
-  spendChart=new Chart(ctx,{
-    type:'bar',
-    data:{labels:dates.map(d=>d.slice(5)),datasets:[
-      {label:'Spend',data:dates.map(d=>Math.round(byDate[d].spend)),backgroundColor:'#b5d4f4',borderRadius:3,yAxisID:'y'},
-      {label:'Net bookings',data:dates.map(d=>byDate[d].net),type:'line',borderColor:'#1baf7a',backgroundColor:'transparent',pointBackgroundColor:'#1baf7a',pointRadius:4,borderWidth:2,yAxisID:'y2'}
-    ]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
-      scales:{
-        y:{grid:{color:'#f0efeb'},ticks:{color:'#888',callback:v=>'₹'+v.toLocaleString(),font:{size:11}},border:{display:false}},
-        y2:{position:'right',grid:{display:false},ticks:{color:'#1baf7a',font:{size:11}},border:{display:false}},
-        x:{grid:{display:false},ticks:{color:'#888',font:{size:11}},border:{display:false}}
-      }}
-  });
-}
 
 function buildFunnel(rows){
   const clicks=rows.reduce((s,r)=>s+(r.clicks||0),0);
@@ -664,18 +637,23 @@ function buildSlotTable(rows){
   let html='';
   Object.keys(SLOT_SHORT).forEach(slot=>{
     const sr=bySlot[slot]; if(!sr||!sr.length) return;
-    const n      = sr.length;
-    const spend  = sr.reduce((s,r)=>s+r.cost,0);
-    const clicks = sr.reduce((s,r)=>s+(r.clicks||0),0);
-    const wa     = sr.reduce((s,r)=>s+r.whatsapp_convert,0);
-    const net    = sr.reduce((s,r)=>s+r.net_booking,0);
-    const cancelled = sr.reduce((s,r)=>s+r.cancelled_overall,0);
-    const ai     = sr.reduce((s,r)=>s+r.ai_booking,0);
-    const manual = sr.reduce((s,r)=>s+r.manual_booking,0);
-    const cr     = (net+cancelled)?cancelled/(net+cancelled)*100:0;
-    const nc     = wa?net/wa*100:0;
-    const cpl    = net?spend/net:0;
-    const col    = SLOT_COLOR[slot];
+    const n           = sr.length;
+    const spend       = sr.reduce((s,r)=>s+r.cost,0);
+    const clicks      = sr.reduce((s,r)=>s+(r.clicks||0),0);
+    const wa          = sr.reduce((s,r)=>s+r.whatsapp_convert,0);
+    const net         = sr.reduce((s,r)=>s+r.net_booking,0);
+    const cancelled   = sr.reduce((s,r)=>s+r.cancelled_overall,0);
+    const ai          = sr.reduce((s,r)=>s+r.ai_booking,0);
+    const manual      = sr.reduce((s,r)=>s+r.manual_booking,0);
+    const cancelledAI = sr.reduce((s,r)=>s+(r.cancelled_ai||0),0);
+    const cancelledM  = sr.reduce((s,r)=>s+(r.cancelled_manual||0),0);
+    const cr          = (net+cancelled)?cancelled/(net+cancelled)*100:0;
+    const nc          = wa?net/wa*100:0;
+    const cpl         = net?spend/net:0;
+    const col         = SLOT_COLOR[slot];
+    const cancelSub   = cancelledAI||cancelledM
+                          ? `AI: ${cancelledAI} · Manual: ${cancelledM}`
+                          : `${cr.toFixed(1)}% cancel rate`;
 
     html+=`<div style="margin-bottom:20px">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
@@ -684,10 +662,10 @@ function buildSlotTable(rows){
         <span style="font-size:11px;color:#888">${n} day(s)</span>
       </div>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;padding-left:18px">
-        ${tile('WA converts', num(wa), clicks?'CTW '+(wa/clicks*100).toFixed(1)+'%':'')}
+        ${tile('WA converts', num(wa), '')}
         ${tile('Total bookings', num(net+cancelled), 'net + cancelled')}
         ${tile('Net bookings', num(net), `AI ${ai} · Manual ${manual}`)}
-        ${tile('Cancelled', num(cancelled), `${cr.toFixed(1)}% cancel rate`, cr>40?'danger':cr>30?'warn':'good')}
+        ${tile('Cancelled', num(cancelled), cancelSub, cr>40?'danger':cr>30?'warn':'good')}
         ${tile('Net conv%', nc.toFixed(1)+'%', `overall ${wa?(((net+cancelled)/wa)*100).toFixed(1)+'%':'–'}`, nc>35?'good':nc<20?'warn':'')}
       </div>
     </div>`;
@@ -698,14 +676,14 @@ function buildSlotTable(rows){
 function exportCSV(){
   if(!RAW||!RAW.rows.length){ alert('No data to export.'); return; }
   const rows = tableFilteredRows(filteredRows());
-  const headers = ['Date','Slot','WA Converts','CTW%','AI Bookings','AI%','Manual','Manual%','Total','Cancelled','Cancel%','Net','Net Conv%'];
+  const headers = ['Date','Slot','WA Converts','AI Bookings','AI%','Manual','Manual%','Total','Cancelled','Cancel%','Net','Net Conv%'];
   const lines = [headers.join(',')];
   rows.forEach(r=>{
     const manualDen = r.whatsapp_convert - r.ai_booking;
     const manualPct = manualDen>0?(r.manual_booking/manualDen*100).toFixed(1)+'%':'0%';
     lines.push([
       r.date, `"${SLOT_SHORT[r.slot]||r.slot}"`,
-      r.whatsapp_convert, r.ctw_pct||'0%',
+      r.whatsapp_convert,
       r.ai_booking, r.ai_pct,
       r.manual_booking, manualPct,
       r.net_booking+r.cancelled_overall,
@@ -740,7 +718,6 @@ function buildRawTable(rows){
       <td>${r.date.slice(5)}</td>
       <td><span style="display:inline-flex;align-items:center;gap:5px"><span style="width:8px;height:8px;border-radius:2px;background:${col}"></span>${SLOT_SHORT[r.slot]||r.slot}</span></td>
       <td>${r.whatsapp_convert}</td>
-      <td>${r.ctw_pct||'–'}</td>
       <td>${r.ai_booking} <span style="color:#888;font-size:10px">(${r.ai_pct})</span></td>
       <td>${r.manual_booking} <span style="color:#888;font-size:10px">(${manualPct})</span></td>
       <td><strong>${totalAttempted}</strong></td>
@@ -834,7 +811,6 @@ function buildCompareTable(thisStr, prevStr){
     const pv = p || {};
 
     const rows = [
-      { metric:'CTW%',          t: t?tv.ctw.toFixed(1)+'%':'–',      p: p?pv.ctw.toFixed(1)+'%':'–',      delta: t&&p?cmpDelta(tv.ctw,pv.ctw,false,'pct'):'' },
       { metric:'WA converts',   t: t?num(tv.wa):'–',                 p: p?num(pv.wa):'–',                 delta: t&&p?cmpDelta(tv.wa,pv.wa,false,'num'):'' },
       { metric:'Total bookings',t: t?num(tv.total):'–',              p: p?num(pv.total):'–',              delta: t&&p?cmpDelta(tv.total,pv.total,false,'num'):'' },
       { metric:'Net bookings',  t: t?num(tv.net):'–',                p: p?num(pv.net):'–',                delta: t&&p?cmpDelta(tv.net,pv.net,false,'num'):'' },
