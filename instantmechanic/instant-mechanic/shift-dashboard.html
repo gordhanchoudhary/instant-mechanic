@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RSA Ads Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+:root{
+  --bg:#f4f4f1;--surface:#ffffff;--surface2:#fafaf8;--border:#e8e7e1;--border-light:#f0efe9;
+  --text:#111;--text2:#555;--text3:#999;
+  --blue:#2563eb;--blue-bg:#eff6ff;
+  --green:#16a34a;--green-bg:#f0fdf4;
+  --amber:#d97706;--amber-bg:#fffbeb;
+  --red:#dc2626;--red-bg:#fef2f2;
+  --radius:12px;--radius-sm:8px;--radius-xs:5px;
+  --shadow:0 1px 3px rgba(0,0,0,.06),0 4px 12px rgba(0,0,0,.05);
+  --shadow-lg:0 4px 24px rgba(0,0,0,.10);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',sans-serif;background:var(--bg);color:var(--text);font-size:14px;-webkit-font-smoothing:antialiased}
+
+/* ── top bar ── */
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;gap:16px;height:56px;position:sticky;top:0;z-index:100;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.topbar-logo{display:flex;align-items:center;gap:8px;font-weight:600;font-size:15px;color:var(--text)}
+.topbar-logo span{width:28px;height:28px;background:#111;border-radius:7px;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:13px}
+.topbar-sub{font-size:12px;color:var(--text3);margin-left:4px;font-weight:400}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.page{max-width:1280px;margin:0 auto;padding:24px 24px}
+
+/* ── toolbar ── */
+.toolbar{display:flex;gap:8px;align-items:center;margin-bottom:20px;flex-wrap:wrap}
+.tbtn{height:36px;border:1px solid var(--border);border-radius:var(--radius-xs);padding:0 14px;background:var(--surface);color:var(--text);font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;transition:all .15s;font-weight:450}
+.tbtn:hover{background:var(--surface2);border-color:#ccc}
+.tbtn.active{background:var(--text);color:#fff;border-color:var(--text)}
+.tbtn-primary{background:var(--text);color:#fff;border-color:var(--text);font-weight:500}
+.tbtn-primary:hover{background:#333;border-color:#333}
+.date-showing{font-size:12px;color:var(--text3);margin-left:4px}
+
+/* ── date picker ── */
+.dp-wrap{position:relative}
+.dp-popup{position:absolute;top:44px;left:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);z-index:999;box-shadow:var(--shadow-lg);min-width:310px;overflow:hidden}
+.dp-popup.hidden{display:none}
+.dp-modes{display:flex;border-bottom:1px solid var(--border)}
+.dp-mode{flex:1;padding:9px;text-align:center;font-size:12px;cursor:pointer;color:var(--text3);transition:.15s}
+.dp-mode:hover{color:var(--text)}
+.dp-mode.active{color:var(--text);font-weight:600;border-bottom:2px solid var(--text)}
+.dp-body{padding:16px}
+.dp-quick{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:14px}
+.dp-quick button{padding:4px 10px;border:1px solid var(--border);border-radius:20px;font-size:11px;cursor:pointer;background:var(--surface);color:var(--text2);transition:.15s;font-weight:450}
+.dp-quick button:hover{background:var(--text);color:#fff;border-color:var(--text)}
+.dp-inputs{display:flex;gap:8px;align-items:center;margin-bottom:14px}
+.dp-inputs input{flex:1;height:34px;border:1px solid var(--border);border-radius:var(--radius-xs);padding:0 10px;font-size:12px;color:var(--text);background:var(--surface)}
+.dp-inputs span{font-size:11px;color:var(--text3)}
+.cal{width:100%}
+.cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.cal-nav{background:none;border:1px solid var(--border);cursor:pointer;font-size:15px;color:var(--text2);padding:4px 10px;border-radius:var(--radius-xs);transition:.15s}
+.cal-nav:hover{background:var(--surface2)}
+.cal-month{font-size:13px;font-weight:600}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.cal-dow{text-align:center;font-size:10px;color:var(--text3);padding:4px 0;font-weight:500}
+.cal-day{text-align:center;padding:6px 2px;font-size:12px;cursor:pointer;border-radius:var(--radius-xs);color:var(--text);transition:.12s}
+.cal-day:hover{background:var(--surface2)}
+.cal-day.today{font-weight:700;color:var(--blue)}
+.cal-day.selected{background:var(--text);color:#fff}
+.cal-day.in-range{background:var(--blue-bg);color:var(--blue)}
+.cal-day.range-start,.cal-day.range-end{background:var(--text);color:#fff;font-weight:600}
+.cal-day.disabled{color:var(--border);cursor:default;pointer-events:none}
+.cal-day.other-month{color:#ddd}
+.dp-footer{display:flex;justify-content:flex-end;gap:8px;padding:12px 16px;border-top:1px solid var(--border);background:var(--surface2)}
+.dp-apply{padding:7px 18px;background:var(--text);color:#fff;border:none;border-radius:var(--radius-xs);font-size:12px;cursor:pointer;font-weight:500;transition:.15s}
+.dp-apply:hover{background:#333}
+.dp-clear{padding:7px 14px;background:var(--surface);color:var(--text2);border:1px solid var(--border);border-radius:var(--radius-xs);font-size:12px;cursor:pointer;transition:.15s}
+.dp-clear:hover{background:var(--surface2)}
+
+/* ── select ── */
+select{height:36px;border:1px solid var(--border);border-radius:var(--radius-xs);padding:0 12px;background:var(--surface);color:var(--text);font-size:13px;cursor:pointer;font-weight:450}
+
+/* ── alerts ── */
+.alerts{margin-bottom:18px}
+.alert{display:flex;align-items:flex-start;gap:10px;padding:11px 15px;border-radius:var(--radius-sm);margin-bottom:8px;font-size:13px;border-left:3px solid}
+.alert-warn{background:var(--amber-bg);border-color:#f59e0b;color:#92400e}
+.alert-danger{background:var(--red-bg);border-color:#f87171;color:#991b1b}
+.alert i{font-size:15px;margin-top:1px;flex-shrink:0}
+
+/* ── kpi ── */
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:12px;margin-bottom:22px}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;box-shadow:var(--shadow);transition:box-shadow .2s}
+.kpi:hover{box-shadow:var(--shadow-lg)}
+.kpi-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;font-weight:600}
+.kpi-val{font-size:24px;font-weight:600;line-height:1;letter-spacing:-.5px}
+.kpi-sub{font-size:11px;color:var(--text3);margin-top:5px}
+.kpi.danger{border-left:3px solid var(--red)}.kpi.danger .kpi-val{color:var(--red)}
+.kpi.warn{border-left:3px solid var(--amber)}.kpi.warn .kpi-val{color:var(--amber)}
+.kpi.good{border-left:3px solid var(--green)}.kpi.good .kpi-val{color:var(--green)}
+
+/* ── sections ── */
+.section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:16px;box-shadow:var(--shadow)}
+.section-title{font-size:13px;font-weight:600;color:var(--text2);margin-bottom:16px;display:flex;align-items:center;gap:7px}
+.section-title i{color:var(--text3)}
+
+/* ── tables ── */
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{text-align:left;padding:8px 12px;color:var(--text3);font-weight:600;border-bottom:1px solid var(--border);white-space:nowrap;font-size:11px;text-transform:uppercase;letter-spacing:.4px;background:var(--surface2)}
+th:first-child{border-radius:var(--radius-xs) 0 0 0}
+th:last-child{border-radius:0 var(--radius-xs) 0 0}
+td{padding:9px 12px;border-bottom:1px solid var(--border-light);white-space:nowrap;color:var(--text)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--surface2)}
+
+/* ── badges ── */
+.badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600}
+.badge-red{background:var(--red-bg);color:#b91c1c}
+.badge-green{background:var(--green-bg);color:#15803d}
+.badge-amber{background:var(--amber-bg);color:#b45309}
+.badge-gray{background:var(--surface2);color:var(--text2)}
+
+/* ── tabs ── */
+.tabs{display:flex;gap:0;margin-bottom:18px;border-bottom:1px solid var(--border);padding-bottom:0}
+.tab{padding:9px 18px;font-size:13px;cursor:pointer;color:var(--text3);border-bottom:2px solid transparent;margin-bottom:-1px;transition:.15s;font-weight:450}
+.tab:hover{color:var(--text)}
+.tab.active{color:var(--text);border-bottom-color:var(--text);font-weight:600}
+
+/* ── charts ── */
+.chart-wrap{position:relative;width:100%;height:220px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+
+/* ── funnel ── */
+.funnel-row{display:flex;align-items:center;gap:10px;margin-bottom:12px;font-size:13px}
+.funnel-num{font-size:20px;font-weight:600;min-width:65px;letter-spacing:-.5px}
+.funnel-label{color:var(--text2);flex:1;font-size:12px}
+.funnel-bar-bg{flex:2;height:7px;background:var(--border-light);border-radius:4px;overflow:hidden}
+.funnel-bar-fill{height:100%;border-radius:4px;transition:width .4s ease}
+
+/* ── date label ── */
+.date-label{font-size:12px;color:var(--text2);background:var(--surface2);border:1px solid var(--border);padding:3px 10px;border-radius:20px;display:inline-block;font-weight:500}
+
+/* ── compare ── */
+.cmp-table{width:100%;border-collapse:collapse;font-size:12px}
+.cmp-table th{padding:9px 14px;font-size:10px;font-weight:600;color:var(--text3);border-bottom:1px solid var(--border);text-align:left;white-space:nowrap;background:var(--surface2);text-transform:uppercase;letter-spacing:.4px}
+.cmp-table td{padding:10px 14px;border-bottom:1px solid var(--border-light);white-space:nowrap;vertical-align:middle}
+.cmp-table tr:last-child td{border-bottom:none}
+.cmp-table tr:hover td{background:var(--surface2)}
+.delta{font-size:11px;font-weight:600;display:inline-flex;align-items:center;gap:2px;padding:2px 8px;border-radius:20px}
+.delta-up{background:var(--green-bg);color:#15803d}
+.delta-down{background:var(--red-bg);color:#b91c1c}
+.delta-flat{background:var(--surface2);color:var(--text3)}
+.cmp-label{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
+.cmp-this{background:var(--blue-bg);color:var(--blue)}
+.cmp-prev{background:var(--surface2);color:var(--text2);border:1px solid var(--border)}
+
+/* ── slot tiles ── */
+.slot-tile{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;transition:box-shadow .15s}
+.slot-tile:hover{box-shadow:var(--shadow)}
+
+@media(max-width:768px){
+  .grid2{grid-template-columns:1fr}
+  .kpi-row{grid-template-columns:repeat(2,1fr)}
+  .dp-popup{min-width:280px}
+  .topbar{padding:0 16px}
+  .page{padding:16px}
+}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-logo">
+    <span>📊</span>
+    RSA Ads
+    <span class="topbar-sub">Performance Dashboard</span>
+  </div>
+  <div class="topbar-right">
+    <span id="subLabel" class="date-showing"></span>
+  </div>
+</div>
+
+<div class="page">
+  <div class="toolbar">
+    <!-- Date picker trigger -->
+    <div class="dp-wrap" id="dpWrap">
+      <button class="tbtn" id="dpTrigger" onclick="togglePicker()">
+        <i class="ti ti-calendar" aria-hidden="true"></i>
+        <span id="dpLabel">Last 7 days</span>
+        <i class="ti ti-chevron-down" aria-hidden="true" style="font-size:12px;color:#aaa"></i>
+      </button>
+
+      <div class="dp-popup hidden" id="dpPopup">
+        <div class="dp-modes">
+          <div class="dp-mode active" id="modeRange" onclick="setMode('range')">Date range</div>
+          <div class="dp-mode" id="modeSingle" onclick="setMode('single')">Single date</div>
+        </div>
+        <div class="dp-body">
+          <!-- Quick presets -->
+          <div class="dp-quick">
+            <button onclick="applyPreset('today')">Today</button>
+            <button onclick="applyPreset('yesterday')">Yesterday</button>
+            <button onclick="applyPreset('last7')">Last 7 days</button>
+            <button onclick="applyPreset('last14')">Last 14 days</button>
+            <button onclick="applyPreset('last30')">Last 30 days</button>
+            <button onclick="applyPreset('thismonth')">This month</button>
+          </div>
+          <!-- Manual inputs -->
+          <div class="dp-inputs" id="rangeInputs">
+            <input type="date" id="inputFrom" onchange="onInputChange()">
+            <span>→</span>
+            <input type="date" id="inputTo" onchange="onInputChange()">
+          </div>
+          <div class="dp-inputs" id="singleInput" style="display:none">
+            <input type="date" id="inputSingle" onchange="onSingleChange()" style="width:100%">
+          </div>
+          <!-- Calendar -->
+          <div class="cal" id="calWrap">
+            <div class="cal-header">
+              <button class="cal-nav" onclick="prevMonth()">&#8249;</button>
+              <span class="cal-month" id="calMonthLabel"></span>
+              <button class="cal-nav" onclick="nextMonth()">&#8250;</button>
+            </div>
+            <div class="cal-grid" id="calDow"></div>
+            <div class="cal-grid" id="calDays"></div>
+          </div>
+        </div>
+        <div class="dp-footer">
+          <button class="dp-clear" onclick="clearPicker()">Clear</button>
+          <button class="dp-apply" onclick="applyPicker()">Apply</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slot filter -->
+    <select id="slotFilter">
+      <option value="all">All slots</option>
+      <option value="Night Shift 12am to 3am">12am–3am</option>
+      <option value="Night Shift 3am to 6am">3am–6am</option>
+      <option value="Morning 6am to 11am">6am–11am</option>
+      <option value="Afternoon 11am to 6pm">11am–6pm</option>
+      <option value="Evening 6pm to 12am">6pm–12am</option>
+    </select>
+
+    <button class="tbtn tbtn-primary" onclick="fetchData()">
+      <i class="ti ti-refresh" aria-hidden="true"></i> Refresh
+    </button>
+  </div>
+
+  <div class="alerts" id="alertBox"></div>
+  <div class="kpi-row" id="kpiRow"></div>
+
+  <div class="tabs">
+    <div class="tab active" onclick="showTab('overview',this)">Overview</div>
+    <div class="tab" onclick="showTab('slots',this)">By slot</div>
+    <div class="tab" onclick="showTab('table',this)">Raw table</div>
+    <div class="tab" onclick="showTab('compare',this)">Compare</div>
+  </div>
+
+  <div id="tab-overview">
+    <div class="grid2">
+      <div class="section">
+        <div class="section-title"><i class="ti ti-chart-bar" aria-hidden="true"></i> Daily spend vs net bookings</div>
+        <div class="chart-wrap"><canvas id="spendChart" role="img" aria-label="Daily spend and net bookings">Daily spend and net bookings per day.</canvas></div>
+      </div>
+      <div class="section">
+        <div class="section-title"><i class="ti ti-trending-up" aria-hidden="true"></i> Conversion funnel</div>
+        <div id="funnelBlock" style="padding-top:8px"></div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-title"><i class="ti ti-clock" aria-hidden="true"></i> Net conversion % by slot (avg)</div>
+      <div class="chart-wrap" style="height:180px"><canvas id="slotChart" role="img" aria-label="Net conversion by slot">Net conversion percentage by time slot.</canvas></div>
+    </div>
+  </div>
+
+  <div id="tab-slots" style="display:none">
+    <div class="section">
+      <div class="section-title">
+        <i class="ti ti-layout-grid" aria-hidden="true"></i> Slot breakdown
+      </div>
+      <div id="slotTable"></div>
+    </div>
+  </div>
+
+  <div id="tab-table" style="display:none">
+    <div class="section">
+      <div class="section-title" style="justify-content:space-between;flex-wrap:wrap;gap:8px">
+        <span><i class="ti ti-table" aria-hidden="true"></i> All rows</span>
+        <div style="display:flex;align-items:center;gap:8px">
+          <select id="tableSlotFilter" onchange="buildRawTable(filteredRows())" style="height:30px;font-size:12px;padding:0 10px">
+            <option value="all">All slots</option>
+            <option value="Night Shift 12am to 3am">12am–3am</option>
+            <option value="Night Shift 3am to 6am">3am–6am</option>
+            <option value="Morning 6am to 11am">6am–11am</option>
+            <option value="Afternoon 11am to 6pm">11am–6pm</option>
+            <option value="Evening 6pm to 12am">6pm–12am</option>
+          </select>
+          <button class="tbtn" onclick="exportCSV()" style="height:30px;font-size:12px;padding:0 10px">
+            <i class="ti ti-download" aria-hidden="true"></i> Export CSV
+          </button>
+        </div>
+      </div>
+      <div style="overflow-x:auto">
+        <table>
+          <thead><tr>
+            <th>Date</th><th>Slot</th><th>Clicks</th><th>CPC</th><th>Spend</th>
+            <th>WA Converts</th><th>CTW%</th><th>AI Bookings</th><th>Manual</th>
+            <th>Total</th><th>Cancelled</th><th>Cancel%</th><th>Net</th><th>Net Conv%</th>
+          </tr></thead>
+          <tbody id="rawBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-compare" style="display:none">
+    <div class="section">
+      <div class="section-title" style="justify-content:space-between;flex-wrap:wrap;gap:10px">
+        <span><i class="ti ti-arrows-diff" aria-hidden="true"></i> Week-on-week comparison</span>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:12px;color:#888">Select a date:</span>
+          <input type="date" id="compareDate" style="height:36px;border:1px solid var(--border);border-radius:var(--radius-xs);padding:0 12px;font-size:12px;color:var(--text);background:var(--surface);font-family:inherit">
+          <button class="tbtn tbtn-primary" onclick="runCompare()" style="height:32px;font-size:12px">Compare</button>
+        </div>
+      </div>
+      <div id="compareInfo" style="font-size:12px;color:#888;margin-bottom:14px"></div>
+      <div id="compareBody"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const BASE = 'https://ai.instantmechanic.online/bot/ad-dashboard/';
+let RAW = null, spendChart = null, slotChart = null;
+let pickerMode = 'range';
+let calYear, calMonth;
+let rangeStart = null, rangeEnd = null, singleDate = null;
+let selecting = false;
+
+const TODAY = new Date(); TODAY.setHours(0,0,0,0);
+
+const SLOT_COLOR = {
+  'Night Shift 12am to 3am':'#6250d6','Night Shift 3am to 6am':'#9085e9',
+  'Morning 6am to 11am':'#2a78d6','Afternoon 11am to 6pm':'#1baf7a','Evening 6pm to 12am':'#eb6834'
+};
+const SLOT_SHORT = {
+  'Night Shift 12am to 3am':'12am–3am','Night Shift 3am to 6am':'3am–6am',
+  'Morning 6am to 11am':'6am–11am','Afternoon 11am to 6pm':'11am–6pm','Evening 6pm to 12am':'6pm–12am'
+};
+
+function fmt(d){ const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0'); return `${y}-${m}-${day}`; }
+function parse(s){ const [y,m,d]=s.split('-').map(Number); return new Date(y,m-1,d); }
+function fmtDisplay(s){ return s.slice(5).replace('-','/'); }
+
+function datesInRange(from, to){
+  const list=[], cur=new Date(from);
+  while(cur<=to){ list.push(fmt(cur)); cur.setDate(cur.getDate()+1); }
+  return list;
+}
+
+/* ── Picker open/close ── */
+function togglePicker(){
+  const p=document.getElementById('dpPopup');
+  if(p.classList.contains('hidden')){ openPicker(); } else { closePicker(); }
+}
+function openPicker(){
+  initCal(TODAY.getFullYear(), TODAY.getMonth());
+  document.getElementById('dpPopup').classList.remove('hidden');
+  document.addEventListener('mousedown', outsideClick);
+}
+function closePicker(){
+  document.getElementById('dpPopup').classList.add('hidden');
+  document.removeEventListener('mousedown', outsideClick);
+}
+function outsideClick(e){
+  if(!document.getElementById('dpWrap').contains(e.target)) closePicker();
+}
+
+/* ── Mode ── */
+function setMode(m){
+  pickerMode = m;
+  document.getElementById('modeRange').classList.toggle('active', m==='range');
+  document.getElementById('modeSingle').classList.toggle('active', m==='single');
+  document.getElementById('rangeInputs').style.display = m==='range'?'flex':'none';
+  document.getElementById('singleInput').style.display = m==='single'?'flex':'none';
+  renderCal();
+}
+
+/* ── Quick presets ── */
+function applyPreset(p){
+  const t = new Date(TODAY);
+  if(p==='today'){ rangeStart=singleDate=new Date(t); rangeEnd=new Date(t); }
+  else if(p==='yesterday'){ const y=new Date(t); y.setDate(y.getDate()-1); rangeStart=singleDate=y; rangeEnd=new Date(y); }
+  else if(p==='last7'){ const f=new Date(t); f.setDate(f.getDate()-6); rangeStart=f; rangeEnd=new Date(t); }
+  else if(p==='last14'){ const f=new Date(t); f.setDate(f.getDate()-13); rangeStart=f; rangeEnd=new Date(t); }
+  else if(p==='last30'){ const f=new Date(t); f.setDate(f.getDate()-29); rangeStart=f; rangeEnd=new Date(t); }
+  else if(p==='thismonth'){ rangeStart=new Date(t.getFullYear(),t.getMonth(),1); rangeEnd=new Date(t); }
+  syncInputs(); renderCal(); applyPicker();
+}
+
+function syncInputs(){
+  if(pickerMode==='range'){
+    if(rangeStart) document.getElementById('inputFrom').value = fmt(rangeStart);
+    if(rangeEnd)   document.getElementById('inputTo').value   = fmt(rangeEnd);
+  } else {
+    if(singleDate) document.getElementById('inputSingle').value = fmt(singleDate);
+  }
+}
+
+function onInputChange(){
+  const f=document.getElementById('inputFrom').value;
+  const t=document.getElementById('inputTo').value;
+  if(f) rangeStart=parse(f);
+  if(t) rangeEnd=parse(t);
+  renderCal();
+}
+function onSingleChange(){
+  const v=document.getElementById('inputSingle').value;
+  if(v){ singleDate=parse(v); rangeStart=rangeEnd=singleDate; }
+  renderCal();
+}
+
+function applyPicker(){
+  let dates=[];
+  if(pickerMode==='single' && singleDate){ dates=[fmt(singleDate)]; }
+  else if(rangeStart && rangeEnd){ dates=datesInRange(rangeStart,rangeEnd); }
+  if(!dates.length){ closePicker(); return; }
+  updateLabel(dates); closePicker(); fetchData(dates);
+}
+
+function clearPicker(){
+  rangeStart=rangeEnd=singleDate=null;
+  document.getElementById('inputFrom').value='';
+  document.getElementById('inputTo').value='';
+  document.getElementById('inputSingle').value='';
+  renderCal();
+}
+
+function updateLabel(dates){
+  const lbl=document.getElementById('dpLabel');
+  if(dates.length===1){ lbl.textContent=dates[0].slice(5).replace('-','/'); }
+  else{ lbl.textContent=dates[0].slice(5).replace('-','/')+' → '+dates[dates.length-1].slice(5).replace('-','/'); }
+  document.getElementById('subLabel').textContent = lbl.textContent;
+}
+
+/* ── Calendar ── */
+function initCal(y,m){ calYear=y; calMonth=m; renderCal(); }
+
+function renderCal(){
+  const label=document.getElementById('calMonthLabel');
+  const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  label.textContent=months[calMonth]+' '+calYear;
+
+  const dowEl=document.getElementById('calDow');
+  dowEl.innerHTML=['Su','Mo','Tu','We','Th','Fr','Sa'].map(d=>`<div class="cal-dow">${d}</div>`).join('');
+
+  const first=new Date(calYear,calMonth,1).getDay();
+  const days=new Date(calYear,calMonth+1,0).getDate();
+  const prevDays=new Date(calYear,calMonth,0).getDate();
+
+  let cells='';
+  for(let i=0;i<first;i++){
+    const d=prevDays-first+1+i;
+    cells+=`<div class="cal-day other-month">${d}</div>`;
+  }
+  for(let d=1;d<=days;d++){
+    const dt=new Date(calYear,calMonth,d);
+    const ds=fmt(dt);
+    let cls='cal-day';
+    if(dt>TODAY) cls+=' disabled';
+    if(dt.toDateString()===TODAY.toDateString()) cls+=' today';
+    if(pickerMode==='single'){
+      if(singleDate && dt.toDateString()===singleDate.toDateString()) cls+=' selected';
+    } else {
+      if(rangeStart && rangeEnd){
+        if(dt>=rangeStart && dt<=rangeEnd) cls+=' in-range';
+        if(dt.toDateString()===rangeStart.toDateString()) cls+=' range-start';
+        if(dt.toDateString()===rangeEnd.toDateString()) cls+=' range-end';
+      } else if(rangeStart && dt.toDateString()===rangeStart.toDateString()) cls+=' selected';
+    }
+    cells+=`<div class="${cls}" onclick="dayClick('${ds}')">${d}</div>`;
+  }
+  const rem=(7-(first+days)%7)%7;
+  for(let i=1;i<=rem;i++) cells+=`<div class="cal-day other-month">${i}</div>`;
+  document.getElementById('calDays').innerHTML=cells;
+}
+
+function dayClick(ds){
+  const dt=parse(ds);
+  if(dt>TODAY) return;
+  if(pickerMode==='single'){
+    singleDate=dt; rangeStart=rangeEnd=dt;
+    document.getElementById('inputSingle').value=ds;
+  } else {
+    if(!rangeStart||selecting===false){
+      rangeStart=dt; rangeEnd=null; selecting=true;
+      document.getElementById('inputFrom').value=ds;
+      document.getElementById('inputTo').value='';
+    } else {
+      if(dt<rangeStart){ rangeEnd=rangeStart; rangeStart=dt; }
+      else { rangeEnd=dt; }
+      selecting=false;
+      document.getElementById('inputFrom').value=fmt(rangeStart);
+      document.getElementById('inputTo').value=fmt(rangeEnd);
+    }
+  }
+  renderCal();
+}
+
+function prevMonth(){ calMonth--; if(calMonth<0){calMonth=11;calYear--;} renderCal(); }
+function nextMonth(){ calMonth++; if(calMonth>11){calMonth=0;calYear++;} renderCal(); }
+
+/* ── API ── */
+async function fetchData(dates){
+  if(!dates){
+    // default: last 7 days
+    const list=[];
+    for(let i=6;i>=0;i--){ const d=new Date(TODAY); d.setDate(d.getDate()-i); list.push(fmt(d)); }
+    dates=list;
+    updateLabel(dates);
+  }
+  const url=BASE+'?dates='+dates.join(',');
+  document.getElementById('alertBox').innerHTML='<div class="alert alert-warn"><i class="ti ti-loader"></i> Loading...</div>';
+  try{
+    const res=await fetch(url);
+    RAW=await res.json();
+    render();
+  } catch(e){
+    document.getElementById('alertBox').innerHTML=`<div class="alert alert-danger"><i class="ti ti-alert-circle"></i> Failed to load. Check API or dates.</div>`;
+  }
+}
+
+function filteredRows(){
+  if(!RAW) return [];
+  const slot=document.getElementById('slotFilter').value;
+  return slot==='all' ? RAW.rows : RAW.rows.filter(r=>r.slot===slot);
+}
+
+function render(){
+  const rows=filteredRows();
+  buildAlerts(rows); buildKPIs(rows); buildSpendChart(rows);
+  buildFunnel(rows); buildSlotChart(); buildSlotTable(rows); buildRawTable(rows);
+}
+
+function num(n){ return n==null?'–':n.toLocaleString(); }
+function rupee(n){ return '₹'+Math.round(n).toLocaleString(); }
+function parsePct(s){ return parseFloat(s)||0; }
+
+function buildAlerts(rows){
+  const box=document.getElementById('alertBox'); box.innerHTML='';
+  const warns=[];
+  const totalB=rows.reduce((s,r)=>s+r.total+r.cancelled_overall,0);
+  const totalC=rows.reduce((s,r)=>s+r.cancelled_overall,0);
+  const cancelRate=totalB?totalC/totalB*100:0;
+  if(cancelRate>40) warns.push({t:'danger',m:`Cancel rate is <strong>${cancelRate.toFixed(1)}%</strong> — very high. Check mechanic availability.`});
+  else if(cancelRate>30) warns.push({t:'warn',m:`Cancel rate at <strong>${cancelRate.toFixed(1)}%</strong> — above 30%.`});
+  const lowCTW=rows.filter(r=>r.clicks&&r.clicks>50&&parsePct(r.ctw_pct)<10);
+  if(lowCTW.length) warns.push({t:'warn',m:`${lowCTW.length} slot(s) with CTW% below 10% despite high clicks.`});
+  const netRows=rows.filter(r=>r.whatsapp_convert>10);
+  const avgNC=netRows.length?netRows.reduce((s,r)=>s+parsePct(r.net_conversion_pct),0)/netRows.length:0;
+  if(avgNC<20&&netRows.length) warns.push({t:'warn',m:`Avg net conversion <strong>${avgNC.toFixed(1)}%</strong> — below 20%.`});
+  const eve=rows.filter(r=>r.slot==='Evening 6pm to 12am');
+  const eveCTW=eve.length?eve.reduce((s,r)=>s+parsePct(r.ctw_pct),0)/eve.length:0;
+  if(eveCTW<10&&eve.length) warns.push({t:'warn',m:`Evening slot avg CTW <strong>${eveCTW.toFixed(1)}%</strong> — consider reducing budget.`});
+  if(!warns.length){ box.innerHTML=''; return; }
+  warns.forEach(w=>{ box.innerHTML+=`<div class="alert alert-${w.t}"><i class="ti ti-alert-triangle"></i><span>${w.m}</span></div>`; });
+}
+
+function buildKPIs(rows){
+  const spend=rows.reduce((s,r)=>s+r.cost,0);
+  const clicks=rows.reduce((s,r)=>s+(r.clicks||0),0);
+  const wa=rows.reduce((s,r)=>s+r.whatsapp_convert,0);
+  const net=rows.reduce((s,r)=>s+r.net_booking,0);
+  const cancelled=rows.reduce((s,r)=>s+r.cancelled_overall,0);
+  const ai=rows.reduce((s,r)=>s+r.ai_booking,0);
+  const manual=rows.reduce((s,r)=>s+r.manual_booking,0);
+  const cpl=net?spend/net:0;
+  const cancelRate=(net+cancelled)?(cancelled/(net+cancelled)*100):0;
+  const netConv=wa?net/wa*100:0;
+  const cpc=clicks?spend/clicks:0;
+  const cpc_wa=wa?spend/wa:0;
+  const kpis=[
+    {l:'WA converts',   v:num(wa),                   s:`CTW ${clicks?(wa/clicks*100).toFixed(1)+'%':'–'}`,            c:''},
+    {l:'Net bookings',  v:num(net),                  s:`AI: ${ai} · Manual: ${manual}`,                               c:net<50?'warn':'good'},
+    {l:'Cancel rate',   v:cancelRate.toFixed(1)+'%', s:`${cancelled} cancelled`,                                      c:cancelRate>40?'danger':cancelRate>30?'warn':'good'},
+    {l:'Net conv%',     v:netConv.toFixed(1)+'%',    s:'bookings / WA leads',                                         c:netConv<20?'warn':netConv>35?'good':''},
+  ];
+
+  document.getElementById('kpiRow').innerHTML=kpis.map(k=>`
+    <div class="kpi ${k.c}">
+      <div class="kpi-label">${k.l}</div>
+      <div class="kpi-val">${k.v}</div>
+      <div class="kpi-sub">${k.s}</div>
+    </div>`).join('');
+}
+
+function buildSpendChart(rows){
+  const byDate={};
+  (RAW.dates||[]).forEach(d=>{byDate[d]={spend:0,net:0};});
+  rows.forEach(r=>{ if(byDate[r.date]){byDate[r.date].spend+=r.cost;byDate[r.date].net+=r.net_booking;} });
+  const dates=Object.keys(byDate);
+  if(spendChart) spendChart.destroy();
+  const ctx=document.getElementById('spendChart').getContext('2d');
+  spendChart=new Chart(ctx,{
+    type:'bar',
+    data:{labels:dates.map(d=>d.slice(5)),datasets:[
+      {label:'Spend',data:dates.map(d=>Math.round(byDate[d].spend)),backgroundColor:'#b5d4f4',borderRadius:3,yAxisID:'y'},
+      {label:'Net bookings',data:dates.map(d=>byDate[d].net),type:'line',borderColor:'#1baf7a',backgroundColor:'transparent',pointBackgroundColor:'#1baf7a',pointRadius:4,borderWidth:2,yAxisID:'y2'}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{
+        y:{grid:{color:'#f0efeb'},ticks:{color:'#888',callback:v=>'₹'+v.toLocaleString(),font:{size:11}},border:{display:false}},
+        y2:{position:'right',grid:{display:false},ticks:{color:'#1baf7a',font:{size:11}},border:{display:false}},
+        x:{grid:{display:false},ticks:{color:'#888',font:{size:11}},border:{display:false}}
+      }}
+  });
+}
+
+function buildFunnel(rows){
+  const clicks=rows.reduce((s,r)=>s+(r.clicks||0),0);
+  const wa=rows.reduce((s,r)=>s+r.whatsapp_convert,0);
+  const attempted=rows.reduce((s,r)=>s+r.total+r.cancelled_overall,0);
+  const net=rows.reduce((s,r)=>s+r.net_booking,0);
+  const max=clicks||1;
+  const steps=[
+    {l:'Clicks',v:clicks,c:'#2a78d6'},
+    {l:'WA converts',v:wa,c:'#6250d6'},
+    {l:'Bookings attempted',v:attempted,c:'#eb6834'},
+    {l:'Net bookings',v:net,c:'#1baf7a'},
+  ];
+  document.getElementById('funnelBlock').innerHTML=steps.map(s=>`
+    <div class="funnel-row">
+      <div class="funnel-num" style="color:${s.c}">${num(s.v)}</div>
+      <div class="funnel-label">${s.l}</div>
+      <div class="funnel-bar-bg"><div class="funnel-bar-fill" style="width:${Math.min(100,s.v/max*100)}%;background:${s.c}"></div></div>
+      <div style="font-size:11px;color:#888;min-width:38px;text-align:right">${clicks?(s.v/clicks*100).toFixed(0)+'%':'–'}</div>
+    </div>`).join('');
+}
+
+function buildSlotChart(){
+  const sd={};
+  Object.keys(SLOT_SHORT).forEach(k=>{sd[k]=[];});
+  RAW.rows.forEach(r=>{if(sd[r.slot])sd[r.slot].push(parsePct(r.net_conversion_pct));});
+  const slots=Object.keys(SLOT_SHORT);
+  const avgs=slots.map(s=>sd[s].length?sd[s].reduce((a,b)=>a+b,0)/sd[s].length:0);
+  if(slotChart) slotChart.destroy();
+  const ctx=document.getElementById('slotChart').getContext('2d');
+  slotChart=new Chart(ctx,{
+    type:'bar',
+    data:{labels:slots.map(s=>SLOT_SHORT[s]),datasets:[{data:avgs.map(v=>parseFloat(v.toFixed(1))),backgroundColor:slots.map(s=>SLOT_COLOR[s]),borderRadius:4}]},
+    options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`${c.raw.toFixed(1)}%`}}},
+      scales:{x:{grid:{color:'#f0efeb'},ticks:{color:'#888',callback:v=>v+'%',font:{size:11}},border:{display:false}},y:{grid:{display:false},ticks:{color:'#555',font:{size:11}},border:{display:false}}}}
+  });
+}
+
+function tile(l, v, sub, cls){
+  const c=cls==='danger'?'var(--red)':cls==='warn'?'var(--amber)':cls==='good'?'var(--green)':'var(--text)';
+  return `<div class="slot-tile">
+    <div style="font-size:10px;color:var(--text3);margin-bottom:5px;font-weight:600;text-transform:uppercase;letter-spacing:.5px">${l}</div>
+    <div style="font-size:18px;font-weight:600;color:${c};letter-spacing:-.3px">${v}</div>
+    ${sub?`<div style="font-size:10px;color:var(--text3);margin-top:3px">${sub}</div>`:''}
+  </div>`;
+}
+
+function buildSlotTable(rows){
+  const bySlot={};
+  rows.forEach(r=>{if(!bySlot[r.slot])bySlot[r.slot]=[];bySlot[r.slot].push(r);});
+  let html='';
+  Object.keys(SLOT_SHORT).forEach(slot=>{
+    const sr=bySlot[slot]; if(!sr||!sr.length) return;
+    const n      = sr.length;
+    const spend  = sr.reduce((s,r)=>s+r.cost,0);
+    const clicks = sr.reduce((s,r)=>s+(r.clicks||0),0);
+    const wa     = sr.reduce((s,r)=>s+r.whatsapp_convert,0);
+    const net    = sr.reduce((s,r)=>s+r.net_booking,0);
+    const cancelled = sr.reduce((s,r)=>s+r.cancelled_overall,0);
+    const ai     = sr.reduce((s,r)=>s+r.ai_booking,0);
+    const manual = sr.reduce((s,r)=>s+r.manual_booking,0);
+    const cr     = (net+cancelled)?cancelled/(net+cancelled)*100:0;
+    const nc     = wa?net/wa*100:0;
+    const cpl    = net?spend/net:0;
+    const col    = SLOT_COLOR[slot];
+
+    html+=`<div style="margin-bottom:20px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+        <span style="width:10px;height:10px;border-radius:2px;background:${col}"></span>
+        <strong style="font-size:13px">${SLOT_SHORT[slot]}</strong>
+        <span style="font-size:11px;color:#888">${n} day(s)</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;padding-left:18px">
+        ${tile('Spend', rupee(spend), clicks?`₹${(spend/clicks).toFixed(0)}/click · ₹${wa?Math.round(spend/wa):'–'}/customer`:'')}
+        ${tile('Clicks', num(clicks))}
+        ${tile('WA converts', num(wa), clicks?'CTW '+(wa/clicks*100).toFixed(1)+'%':'')}
+        ${tile('Total bookings', num(net+cancelled), 'net + cancelled')}
+        ${tile('Net bookings', num(net), `AI ${ai} · Manual ${manual}`)}
+        ${tile('Cancelled', num(cancelled), `${cr.toFixed(1)}% cancel rate`, cr>40?'danger':cr>30?'warn':'good')}
+        ${tile('Net conv%', nc.toFixed(1)+'%', `overall ${wa?(((net+cancelled)/wa)*100).toFixed(1)+'%':'–'}`, nc>35?'good':nc<20?'warn':'')}
+        ${tile('Cost/booking', rupee(cpl), '', cpl>600?'danger':cpl>400?'warn':'good')}
+      </div>
+    </div>`;
+  });
+  document.getElementById('slotTable').innerHTML = html || '<p style="color:#aaa;font-size:13px">No data for selected filters.</p>';
+}
+
+function exportCSV(){
+  if(!RAW||!RAW.rows.length){ alert('No data to export.'); return; }
+  const rows = tableFilteredRows(filteredRows());
+  const headers = ['Date','Slot','Clicks','CPC','Spend','WA Converts','CTW%','AI Bookings','AI%','Manual','Manual%','Total','Cancelled','Cancel%','Net','Net Conv%'];
+  const lines = [headers.join(',')];
+  rows.forEach(r=>{
+    const manualDen = r.whatsapp_convert - r.ai_booking;
+    const manualPct = manualDen>0?(r.manual_booking/manualDen*100).toFixed(1)+'%':'0%';
+    lines.push([
+      r.date, `"${SLOT_SHORT[r.slot]||r.slot}"`,
+      r.clicks||0, r.cost_per_click||0, r.cost.toFixed(2),
+      r.whatsapp_convert, r.ctw_pct||'0%',
+      r.ai_booking, r.ai_pct,
+      r.manual_booking, manualPct,
+      r.net_booking+r.cancelled_overall,
+      r.cancelled_overall, r.cancel_pct,
+      r.net_booking, r.net_conversion_pct
+    ].join(','));
+  });
+  const blob = new Blob([lines.join('\n')], {type:'text/csv'});
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = `rsa-ads-${fmt(new Date())}.csv`;
+  a.click(); URL.revokeObjectURL(url);
+}
+
+function cancelBadge(p){const v=parsePct(p);return v>40?`<span class="badge badge-red">${p}</span>`:v>30?`<span class="badge badge-amber">${p}</span>`:`<span class="badge badge-green">${p}</span>`;}
+function convBadge(p){const v=parsePct(p);return v>35?`<span class="badge badge-green">${p}</span>`:v<20?`<span class="badge badge-amber">${p}</span>`:`<span class="badge badge-gray">${p}</span>`;}
+
+function tableFilteredRows(rows){
+  const f = document.getElementById('tableSlotFilter')?.value || 'all';
+  return f === 'all' ? rows : rows.filter(r => r.slot === f);
+}
+
+function buildRawTable(rows){
+  rows = tableFilteredRows(rows);
+  document.getElementById('rawBody').innerHTML=rows.map(r=>{
+    const col=SLOT_COLOR[r.slot]||'#888';
+    const totalAttempted = r.net_booking + r.cancelled_overall;
+    // manual% = manual / (wa_converts - ai_bookings)
+    const manualDen = r.whatsapp_convert - r.ai_booking;
+    const manualPct = manualDen > 0 ? (r.manual_booking / manualDen * 100).toFixed(1)+'%' : '0%';
+    return `<tr>
+      <td>${r.date.slice(5)}</td>
+      <td><span style="display:inline-flex;align-items:center;gap:5px"><span style="width:8px;height:8px;border-radius:2px;background:${col}"></span>${SLOT_SHORT[r.slot]||r.slot}</span></td>
+      <td>${num(r.clicks)}</td>
+      <td>${r.cost_per_click!=null?'₹'+r.cost_per_click:'–'}</td>
+      <td>${rupee(r.cost)}</td>
+      <td>${r.whatsapp_convert}</td>
+      <td>${r.ctw_pct||'–'}</td>
+      <td>${r.ai_booking} <span style="color:#888;font-size:10px">(${r.ai_pct})</span></td>
+      <td>${r.manual_booking} <span style="color:#888;font-size:10px">(${manualPct})</span></td>
+      <td><strong>${totalAttempted}</strong></td>
+      <td>${r.cancelled_overall}</td>
+      <td>${cancelBadge(r.cancel_pct)}</td>
+      <td><strong>${r.net_booking}</strong></td>
+      <td>${convBadge(r.net_conversion_pct)}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ── Compare mode ──────────────────────────────────────────────────────────
+let CMP = { this: null, prev: null };
+
+async function runCompare(){
+  const val = document.getElementById('compareDate').value;
+  if(!val){ alert('Please select a date.'); return; }
+
+  const thisDate = parse(val);
+  const prevDate = new Date(thisDate); prevDate.setDate(prevDate.getDate() - 7);
+
+  const thisStr = fmt(thisDate);
+  const prevStr = fmt(prevDate);
+
+  const dayNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const dayName  = dayNames[thisDate.getDay()];
+  const prevDayName = dayNames[prevDate.getDay()];
+
+  document.getElementById('compareInfo').innerHTML =
+    `Comparing <span class="cmp-label cmp-this">${thisStr} (${dayName})</span> vs <span class="cmp-label cmp-prev">${prevStr} (${prevDayName} — previous week)</span>`;
+  document.getElementById('compareBody').innerHTML = '<div style="color:#aaa;font-size:13px;padding:20px 0">Loading...</div>';
+
+  try {
+    const [r1, r2] = await Promise.all([
+      fetch(BASE + '?dates=' + thisStr).then(r=>r.json()),
+      fetch(BASE + '?dates=' + prevStr).then(r=>r.json()),
+    ]);
+    CMP.this = r1.rows;
+    CMP.prev = r2.rows;
+    buildCompareTable(thisStr, prevStr);
+  } catch(e) {
+    document.getElementById('compareBody').innerHTML = '<div style="color:#d03b3b;font-size:13px">Failed to load comparison data.</div>';
+  }
+}
+
+function cmpDelta(curr, prev, lowerBetter=false, fmt='num'){
+  if(prev == null || prev === 0) return '';
+  const diff = curr - prev;
+  if(Math.abs(diff) < 0.001) return `<span class="delta delta-flat">≈</span>`;
+  const better  = lowerBetter ? diff < 0 : diff > 0;
+  const arrow   = diff > 0 ? '▲' : '▼';
+  const cls     = better ? 'delta-up' : 'delta-down';
+  let str;
+  if(fmt==='rupee') str = arrow+' ₹'+Math.abs(Math.round(diff)).toLocaleString();
+  else if(fmt==='pct') str = arrow+' '+Math.abs(diff).toFixed(1)+'%';
+  else str = arrow+' '+(Math.abs(diff)<10?Math.abs(diff).toFixed(1):Math.round(Math.abs(diff))).toLocaleString();
+  return `<span class="delta ${cls}">${str}</span>`;
+}
+
+function slotSummary(rows, slot){
+  const sr = slot === 'ALL' ? rows : rows.filter(r=>r.slot===slot);
+  if(!sr.length) return null;
+  const spend  = sr.reduce((s,r)=>s+r.cost,0);
+  const clicks = sr.reduce((s,r)=>s+(r.clicks||0),0);
+  const wa     = sr.reduce((s,r)=>s+r.whatsapp_convert,0);
+  const net    = sr.reduce((s,r)=>s+r.net_booking,0);
+  const cancelled = sr.reduce((s,r)=>s+r.cancelled_overall,0);
+  const ai     = sr.reduce((s,r)=>s+r.ai_booking,0);
+  const manual = sr.reduce((s,r)=>s+r.manual_booking,0);
+  const total  = net + cancelled;
+  const cr     = total ? cancelled/total*100 : 0;
+  const nc     = wa ? net/wa*100 : 0;
+  const cpl    = net ? spend/net : 0;
+  const ctw    = clicks ? wa/clicks*100 : 0;
+  return { spend, clicks, wa, net, cancelled, ai, manual, total, cr, nc, cpl, ctw };
+}
+
+function buildCompareTable(thisStr, prevStr){
+  const slots = ['ALL', ...Object.keys(SLOT_SHORT)];
+  let html = '';
+
+  slots.forEach(slot => {
+    const t = slotSummary(CMP.this, slot);
+    const p = slotSummary(CMP.prev, slot);
+    if(!t && !p) return;
+
+    const label = slot === 'ALL' ? '📊 All slots (day total)' : SLOT_SHORT[slot];
+    const col   = slot === 'ALL' ? '#333' : SLOT_COLOR[slot];
+
+    const tv = t || {};
+    const pv = p || {};
+
+    const rows = [
+      { metric:'Spend',         t: t?rupee(tv.spend):'–',            p: p?rupee(pv.spend):'–',            delta: t&&p?cmpDelta(tv.spend,pv.spend,true,'rupee'):'' },
+      { metric:'Clicks',        t: t?num(tv.clicks):'–',             p: p?num(pv.clicks):'–',             delta: t&&p?cmpDelta(tv.clicks,pv.clicks,false,'num'):'' },
+      { metric:'CTW%',          t: t?tv.ctw.toFixed(1)+'%':'–',      p: p?pv.ctw.toFixed(1)+'%':'–',      delta: t&&p?cmpDelta(tv.ctw,pv.ctw,false,'pct'):'' },
+      { metric:'WA converts',   t: t?num(tv.wa):'–',                 p: p?num(pv.wa):'–',                 delta: t&&p?cmpDelta(tv.wa,pv.wa,false,'num'):'' },
+      { metric:'Total bookings',t: t?num(tv.total):'–',              p: p?num(pv.total):'–',              delta: t&&p?cmpDelta(tv.total,pv.total,false,'num'):'' },
+      { metric:'Net bookings',  t: t?num(tv.net):'–',                p: p?num(pv.net):'–',                delta: t&&p?cmpDelta(tv.net,pv.net,false,'num'):'' },
+      { metric:'AI bookings',   t: t?`${tv.ai} (${tv.net?Math.round(tv.ai/tv.net*100):'0'}%)`:'–', p: p?`${pv.ai} (${pv.net?Math.round(pv.ai/pv.net*100):'0'}%)`:'–', delta: t&&p?cmpDelta(tv.ai,pv.ai,false,'num'):'' },
+      { metric:'Manual bookings',t:t?`${tv.manual} (${tv.net?Math.round(tv.manual/tv.net*100):'0'}%)`:'–',p:p?`${pv.manual} (${pv.net?Math.round(pv.manual/pv.net*100):'0'}%)`:'–',delta:t&&p?cmpDelta(tv.manual,pv.manual,false,'num'):'' },
+      { metric:'Cancelled',     t: t?num(tv.cancelled):'–',          p: p?num(pv.cancelled):'–',          delta: t&&p?cmpDelta(tv.cancelled,pv.cancelled,true,'num'):'' },
+      { metric:'Cancel rate',   t: t?tv.cr.toFixed(1)+'%':'–',       p: p?pv.cr.toFixed(1)+'%':'–',       delta: t&&p?cmpDelta(tv.cr,pv.cr,true,'pct'):'' },
+      { metric:'Net conv%',     t: t?tv.nc.toFixed(1)+'%':'–',       p: p?pv.nc.toFixed(1)+'%':'–',       delta: t&&p?cmpDelta(tv.nc,pv.nc,false,'pct'):'' },
+      { metric:'Cost/booking',  t: t?rupee(tv.cpl):'–',              p: p?rupee(pv.cpl):'–',              delta: t&&p?cmpDelta(tv.cpl,pv.cpl,true,'rupee'):'' },
+    ];
+
+    html += `
+      <div style="margin-bottom:24px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+          ${slot!=='ALL'?`<span style="width:10px;height:10px;border-radius:2px;background:${col}"></span>`:''}
+          <strong style="font-size:13px;color:${col}">${label}</strong>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="cmp-table">
+            <thead><tr>
+              <th style="min-width:130px">Metric</th>
+              <th><span class="cmp-label cmp-this">${thisStr.slice(5)}</span></th>
+              <th><span class="cmp-label cmp-prev">${prevStr.slice(5)} (prev week)</span></th>
+              <th>Change</th>
+            </tr></thead>
+            <tbody>
+              ${rows.map(r=>`<tr>
+                <td style="color:#555;font-weight:500">${r.metric}</td>
+                <td style="font-weight:500">${r.t}</td>
+                <td style="color:#888">${r.p}</td>
+                <td>${r.delta}</td>
+              </tr>`).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>`;
+  });
+
+  document.getElementById('compareBody').innerHTML = html;
+}
+
+function showTab(name,el){
+  document.querySelectorAll('[id^="tab-"]').forEach(t=>t.style.display='none');
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+name).style.display='block';
+  el.classList.add('active');
+  // pre-fill compare date with yesterday when switching to compare
+  if(name==='compare' && !document.getElementById('compareDate').value){
+    const y=new Date(TODAY); y.setDate(y.getDate()-1);
+    document.getElementById('compareDate').value = fmt(y);
+  }
+}
+
+document.getElementById('slotFilter').addEventListener('change',()=>{if(RAW)render();});
+
+// Init: default yesterday + load avg in background
+(function(){
+  const y=new Date(TODAY); y.setDate(y.getDate()-1);
+  rangeStart=y; rangeEnd=y; singleDate=y;
+  const list=[fmt(y)];
+  updateLabel(list); fetchData(list);
+})();
+</script>
+</body>
+</html>
