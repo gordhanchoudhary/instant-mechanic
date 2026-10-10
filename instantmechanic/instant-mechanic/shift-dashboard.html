@@ -299,7 +299,7 @@ tr:hover td{background:var(--surface2)}
       <div style="overflow-x:auto">
         <table>
           <thead><tr>
-            <th>Date</th><th>Slot</th><th>Clicks</th><th>CPC</th><th>Spend</th>
+            <th>Date</th><th>Slot</th>
             <th>WA Converts</th><th>CTW%</th><th>AI Bookings</th><th>Manual</th>
             <th>Total</th><th>Cancelled</th><th>Cancel%</th><th>Net</th><th>Net Conv%</th>
           </tr></thead>
@@ -684,14 +684,11 @@ function buildSlotTable(rows){
         <span style="font-size:11px;color:#888">${n} day(s)</span>
       </div>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;padding-left:18px">
-        ${tile('Spend', rupee(spend), clicks?`₹${(spend/clicks).toFixed(0)}/click · ₹${wa?Math.round(spend/wa):'–'}/customer`:'')}
-        ${tile('Clicks', num(clicks))}
         ${tile('WA converts', num(wa), clicks?'CTW '+(wa/clicks*100).toFixed(1)+'%':'')}
         ${tile('Total bookings', num(net+cancelled), 'net + cancelled')}
         ${tile('Net bookings', num(net), `AI ${ai} · Manual ${manual}`)}
         ${tile('Cancelled', num(cancelled), `${cr.toFixed(1)}% cancel rate`, cr>40?'danger':cr>30?'warn':'good')}
         ${tile('Net conv%', nc.toFixed(1)+'%', `overall ${wa?(((net+cancelled)/wa)*100).toFixed(1)+'%':'–'}`, nc>35?'good':nc<20?'warn':'')}
-        ${tile('Cost/booking', rupee(cpl), '', cpl>600?'danger':cpl>400?'warn':'good')}
       </div>
     </div>`;
   });
@@ -701,14 +698,13 @@ function buildSlotTable(rows){
 function exportCSV(){
   if(!RAW||!RAW.rows.length){ alert('No data to export.'); return; }
   const rows = tableFilteredRows(filteredRows());
-  const headers = ['Date','Slot','Clicks','CPC','Spend','WA Converts','CTW%','AI Bookings','AI%','Manual','Manual%','Total','Cancelled','Cancel%','Net','Net Conv%'];
+  const headers = ['Date','Slot','WA Converts','CTW%','AI Bookings','AI%','Manual','Manual%','Total','Cancelled','Cancel%','Net','Net Conv%'];
   const lines = [headers.join(',')];
   rows.forEach(r=>{
     const manualDen = r.whatsapp_convert - r.ai_booking;
     const manualPct = manualDen>0?(r.manual_booking/manualDen*100).toFixed(1)+'%':'0%';
     lines.push([
       r.date, `"${SLOT_SHORT[r.slot]||r.slot}"`,
-      r.clicks||0, r.cost_per_click||0, r.cost.toFixed(2),
       r.whatsapp_convert, r.ctw_pct||'0%',
       r.ai_booking, r.ai_pct,
       r.manual_booking, manualPct,
@@ -743,9 +739,6 @@ function buildRawTable(rows){
     return `<tr>
       <td>${r.date.slice(5)}</td>
       <td><span style="display:inline-flex;align-items:center;gap:5px"><span style="width:8px;height:8px;border-radius:2px;background:${col}"></span>${SLOT_SHORT[r.slot]||r.slot}</span></td>
-      <td>${num(r.clicks)}</td>
-      <td>${r.cost_per_click!=null?'₹'+r.cost_per_click:'–'}</td>
-      <td>${rupee(r.cost)}</td>
       <td>${r.whatsapp_convert}</td>
       <td>${r.ctw_pct||'–'}</td>
       <td>${r.ai_booking} <span style="color:#888;font-size:10px">(${r.ai_pct})</span></td>
@@ -841,8 +834,6 @@ function buildCompareTable(thisStr, prevStr){
     const pv = p || {};
 
     const rows = [
-      { metric:'Spend',         t: t?rupee(tv.spend):'–',            p: p?rupee(pv.spend):'–',            delta: t&&p?cmpDelta(tv.spend,pv.spend,true,'rupee'):'' },
-      { metric:'Clicks',        t: t?num(tv.clicks):'–',             p: p?num(pv.clicks):'–',             delta: t&&p?cmpDelta(tv.clicks,pv.clicks,false,'num'):'' },
       { metric:'CTW%',          t: t?tv.ctw.toFixed(1)+'%':'–',      p: p?pv.ctw.toFixed(1)+'%':'–',      delta: t&&p?cmpDelta(tv.ctw,pv.ctw,false,'pct'):'' },
       { metric:'WA converts',   t: t?num(tv.wa):'–',                 p: p?num(pv.wa):'–',                 delta: t&&p?cmpDelta(tv.wa,pv.wa,false,'num'):'' },
       { metric:'Total bookings',t: t?num(tv.total):'–',              p: p?num(pv.total):'–',              delta: t&&p?cmpDelta(tv.total,pv.total,false,'num'):'' },
@@ -852,7 +843,6 @@ function buildCompareTable(thisStr, prevStr){
       { metric:'Cancelled',     t: t?num(tv.cancelled):'–',          p: p?num(pv.cancelled):'–',          delta: t&&p?cmpDelta(tv.cancelled,pv.cancelled,true,'num'):'' },
       { metric:'Cancel rate',   t: t?tv.cr.toFixed(1)+'%':'–',       p: p?pv.cr.toFixed(1)+'%':'–',       delta: t&&p?cmpDelta(tv.cr,pv.cr,true,'pct'):'' },
       { metric:'Net conv%',     t: t?tv.nc.toFixed(1)+'%':'–',       p: p?pv.nc.toFixed(1)+'%':'–',       delta: t&&p?cmpDelta(tv.nc,pv.nc,false,'pct'):'' },
-      { metric:'Cost/booking',  t: t?rupee(tv.cpl):'–',              p: p?rupee(pv.cpl):'–',              delta: t&&p?cmpDelta(tv.cpl,pv.cpl,true,'rupee'):'' },
     ];
 
     html += `
